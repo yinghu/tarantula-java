@@ -4,9 +4,7 @@ import java.util.List;
 
 public interface DataStore {
 
-    //String bucket();
-
-    //String node();
+    int scope();
 
     String name();
 

@@ -26,7 +26,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
         BinaryKey binaryKey = new BinaryKey(key.array());
         ClusterProvider.Node[] nlist = nextNodeList(maxReplicationNumber());
         int replicated = this.serviceContext.clusterProvider().recoverService().onReplicate(localNode.nodeName(),metadata.source(),metadata.label(),binaryKey.key,value.array(),nlist);
-        logger.warn("Distributing ["+metadata.source()+"]["+replicated+"]["+nlist.length+"]");
+        logger.warn("Distributing DB ["+metadata.source()+"] Replicated ["+replicated+"] Node Size ["+nlist.length+"]");
         if(replicated>0) return;
         logger.warn("Replication number [" + replicated + "] of " + serviceContext.clusterProvider().maxReplicationNumber() + "]");
         KeyIndex keyIndex = new KeyIndexTrack(metadata.label()==null?metadata.source():metadata.source()+"_"+metadata.label(),binaryKey);
@@ -37,13 +37,13 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
         }
     }
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer){
-        logger.warn("Recovering ["+metadata.source()+":"+metadata.label());
+        logger.warn("Recovering DB : "+metadata.source()+" LABEL : "+metadata.label());
         BinaryKey binaryKey = new BinaryKey(key.array());
         KeyIndex keyIndex = serviceContext.keyIndexService().lookup(metadata.label()==null?metadata.source(): metadata.source()+"_"+metadata.label(),binaryKey);
         if(keyIndex==null) return false;
         ClusterProvider.Node[] nlist = nodeList(keyIndex);
         if(metadata.label()==null){
-            logger.warn("Recovering ["+metadata.source()+"]["+nlist.length+"]");
+            logger.warn("Recovering DB : "+metadata.source()+" Node Size :"+nlist.length);
             byte[] data = serviceContext.clusterProvider().recoverService().onRecover(metadata.source(),binaryKey.key,nodeList(keyIndex));
             if(data==null) return false;
             for(byte b : data){
@@ -51,7 +51,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
             }
             return true;
         }else{
-            logger.warn("Recovering edge ["+metadata.source()+":"+metadata.label()+"]["+nlist.length+"]");
+            logger.warn("Recovering EDGE : "+metadata.source()+" : "+metadata.label()+" : "+nlist.length);
             Batchable batch = serviceContext.clusterProvider().recoverService().onRecover(metadata.source(),metadata.label(),binaryKey.key,nodeList(keyIndex));
             if(batch==null) return false;
             DataStore dataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,metadata.source());

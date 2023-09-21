@@ -13,10 +13,10 @@ public class KeyIndexSyncOperation extends Operation {
     private int length;
     private byte[][] keys;
     private byte[][] values;
-    private int source;
+    private String source;
     public KeyIndexSyncOperation() {
     }
-    public KeyIndexSyncOperation(int length, byte[][] keys, byte[][] values, int source) {
+    public KeyIndexSyncOperation(int length, byte[][] keys, byte[][] values, String source) {
         this.length = length;
         this.source = source;
         this.keys = new byte[this.length][];
@@ -29,10 +29,6 @@ public class KeyIndexSyncOperation extends Operation {
     @Override
     public void run() throws Exception {
         KeyIndexClusterService cds = this.getService();
-        ///ReplicationData[] data = new ReplicationData[length];
-        //for(int i=0;i<length;i++){
-            //data[i]=new ReplicationData(source,keys[i],values[i]);
-        //}
         cds.sync(keys,values,source);
     }
 
@@ -44,7 +40,7 @@ public class KeyIndexSyncOperation extends Operation {
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-        out.writeInt(source);
+        out.writeUTF(source);
         out.writeInt(length);
         for(int i=0;i<length;i++){
             out.writeByteArray(keys[i]);
@@ -55,7 +51,7 @@ public class KeyIndexSyncOperation extends Operation {
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        source = in.readInt();
+        source = in.readUTF();
         this.length = in.readInt();
         keys = new byte[length][];
         values = new byte[length][];

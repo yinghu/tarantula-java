@@ -6,11 +6,7 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Metadata;
 
-import com.icodesoftware.util.BinaryKey;
-import com.tarantula.platform.service.KeyIndexTrack;
 import com.tarantula.platform.service.cluster.keyindex.DistributionKeyIndexService;
-
-import java.nio.ByteBuffer;
 
 
 public class IndexScopeReplicationProxy extends ScopedReplicationProxy {

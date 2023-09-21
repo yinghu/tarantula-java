@@ -35,12 +35,11 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
         }
     }
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer){
-        logger.warn("Recovering ["+metadata.source()+":"+metadata.label());
         BinaryKey binaryKey = new BinaryKey(key.array());
         KeyIndex keyIndex = serviceContext.keyIndexService().lookup(metadata.label()==null?metadata.source():metadata.source()+"_"+metadata.label(),binaryKey);
         if(keyIndex==null) return false;
         ClusterProvider.Node[] nlist = nodeList(keyIndex);
-        logger.warn("Recovering ["+metadata.source()+"]["+nlist.length+"]");
+        logger.warn("Recovering DB : "+metadata.source()+" Node Size : "+nlist.length);
         byte[] data = serviceContext.clusterProvider().accessIndexService().onRecover(metadata.source(),binaryKey.key,nodeList(keyIndex));
         if(data==null) return false;
         for(byte b : data){

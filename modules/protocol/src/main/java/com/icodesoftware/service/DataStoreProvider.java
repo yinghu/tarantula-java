@@ -30,6 +30,9 @@ public interface DataStoreProvider extends ServiceProvider {
     DataStore createLocalDataStore(String name);
 
     List<String> list();
+
+    List<String> list(int scope);
+
     DataStore lookup(String name);
 
     interface OnStart{

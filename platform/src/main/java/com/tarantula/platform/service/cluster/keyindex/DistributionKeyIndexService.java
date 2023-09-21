@@ -11,7 +11,7 @@ public interface DistributionKeyIndexService extends ServiceProvider {
     byte[] recover(String source,byte[] key);
 
     boolean startSync(String syncKey);
-    void onSync(int size,byte[][] keys,byte[][] values,String memberId,int partition);
+    void onSync(int size,byte[][] keys,byte[][] values,String memberId,String source);
     boolean endSync(String memberId,String syncKey);
 
     void load(String source,byte[] key,DataStoreSummary.View view);

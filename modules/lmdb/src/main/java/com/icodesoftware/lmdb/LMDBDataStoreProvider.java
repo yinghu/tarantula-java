@@ -107,7 +107,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     }
 
     public LocalEdgeDataStore createEdgeDB(int scope,String source,String label){
-        final String edgeName = source+"_"+label;
+        final String edgeName = source+"#"+label;
         if(scope== Distributable.DATA_SCOPE){
             return edgMap.computeIfAbsent(edgeName,k-> new LocalEdgeDataStore(new LocalMetadata(scope,source,label),data.openDbi(edgeName, DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT)));
         }
@@ -152,6 +152,14 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         return dlist;
     }
 
+    public List<String> list(int scope){
+        ArrayList<String> dlist = new ArrayList<>();
+        storeMap.forEach((k,v)->{
+            if(v.scope()==scope) dlist.add(k);
+        });
+        return dlist;
+    }
+
     @Override
     public DataStore lookup(String name) {
         return storeMap.get(name);
@@ -175,16 +183,33 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
             pendingQueue.offer(new BufferCache(KEY_SIZE,VALUE_SIZE,pendingQueue));
         }
         data.getDbiNames().forEach(n->{
-            logger.warn("Data DB : "+new String(n));
+            String dname = new String(n);
+            if(!dname.contains("#")){
+                logger.warn("Data DB : "+dname);
+                createDataStore(dname);
+            }
         });
         integration.getDbiNames().forEach(n->{
-            logger.warn("Integration DB : "+new String(n));
+            String dname = new String(n);
+            if(!dname.contains("#")){
+                logger.warn("Integration DB : "+dname);
+                createAccessIndexDataStore(dname);
+            }
         });
         index.getDbiNames().forEach(n->{
-            logger.warn("Index DB : "+new String(n));
+            String dname = new String(n);
+            if(!dname.contains("#")){
+                logger.warn("Index DB : "+dname);
+                createKeyIndexDataStore(dname);
+            }
+
         });
         local.getDbiNames().forEach(n->{
-            logger.warn("Local DB : "+new String(n));
+            String dname = new String(n);
+            if(!dname.contains("#")){
+                logger.warn("Local DB : "+dname);
+                createLocalDataStore(dname);
+            }
         });
         logger.warn("LMDB Provider started with store size ["+storeSize+"]["+pendingQueue.size()+"]");
     }

@@ -19,6 +19,12 @@ public class EmptyDataStore implements DataStore {
     public long count() {
         return 0;
     }
+
+    @Override
+    public int scope() {
+        return 0;
+    }
+
     public List<String> edgeList(){
         ArrayList<String> elist = new ArrayList<>();
         return elist;

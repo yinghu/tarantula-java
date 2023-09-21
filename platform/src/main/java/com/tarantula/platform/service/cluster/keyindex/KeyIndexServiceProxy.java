@@ -67,10 +67,10 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
         return (boolean)ret.result;
     }
 
-    public void onSync(int size,byte[][] keys,byte[][] values,String memberId,int partition){
+    public void onSync(int size,byte[][] keys,byte[][] values,String memberId,String source){
         NodeEngine nodeEngine = getNodeEngine();
         Member m = nodeEngine.getClusterService().getMember(memberId);
-        KeyIndexSyncOperation operation = new KeyIndexSyncOperation(size,keys,values,partition);
+        KeyIndexSyncOperation operation = new KeyIndexSyncOperation(size,keys,values,source);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionKeyIndexService.NAME,operation,m.getAddress());
         ClusterUtil.CallResult ret = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()-> {
             Future<Void> future = builder.invoke();

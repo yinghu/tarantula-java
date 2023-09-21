@@ -43,6 +43,10 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         loadEdges();
     }
 
+    @Override
+    public int scope() {
+        return scope;
+    }
 
     @Override
     public String name() {
@@ -473,7 +477,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             edgeIndex.forEach((k,v)->{
                 LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(scope,name,k);
                 key.rewind();
-                System.out.println("DEL EDGE :"+k+":"+localEdgeDataStore.dbi.delete(txn,kv.val(),key));
+                localEdgeDataStore.dbi.delete(txn,kv.val(),key);
                 kv.val().rewind();
             });
         }

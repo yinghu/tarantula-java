@@ -4,10 +4,7 @@ import com.hazelcast.core.DistributedObject;
 import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Event;
-import com.icodesoftware.Recoverable;
-import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.KeyIndex;
@@ -149,24 +146,24 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
     public boolean startSync(String memberId,String syncKey){
         DistributionKeyIndexService distributionKeyIndexService = this.tarantulaContext.clusterProvider().serviceProvider(DistributionKeyIndexService.NAME);
         new Thread(()->{
-            for(int i=0;i<tarantulaContext.accessIndexRoutingNumber;i++){
-                //DataStoreOnPartition dso = onPartition(i);
-                int[] batch={0,i};
+            this.tarantulaContext.deploymentDataStoreProvider.list(Distributable.INDEX_SCOPE).forEach(db->{
+                DataStore dataStore = this.tarantulaContext.deploymentDataStoreProvider.lookup(db);
+                logger.warn("DB :"+db+" Count : "+dataStore.count());
+                int[] batch ={0};
                 byte[][] keys = new byte[tarantulaContext.recoverBatchSize][];
                 byte[][] values = new byte[tarantulaContext.recoverBatchSize][];
-                //dso.dataStore.backup().forEach((k,v)->{
-                    //if(batch[0] == tarantulaContext.recoverBatchSize){
-                        //distributionKeyIndexService.onSync(batch[0],keys,values,memberId,batch[1]);
-                      //  batch[0] = 0;
-                    //}
-                    //keys[batch[0]]=k;
-                    //values[batch[0]]=v;
-                    //batch[0]++;
-                    //total[0]++;
-                    //return true;
-                //});
-                if(batch[0]>0) distributionKeyIndexService.onSync(batch[0],keys,values,memberId,batch[1]);
-            }
+                dataStore.backup().forEach((k,v)->{
+                    if(batch[0]==tarantulaContext.recoverBatchSize){
+                        distributionKeyIndexService.onSync(batch[0],keys,values,memberId,db);
+                        batch[0]=0;
+                    }
+                    keys[batch[0]]=k.array();
+                    values[batch[0]]=v.array();
+                    batch[0]++;
+                    return true;
+                });
+                if(batch[0]>0) distributionKeyIndexService.onSync(batch[0],keys,values,memberId,db);
+            });
             distributionKeyIndexService.endSync(memberId,syncKey);
         }).start();
         return true;
@@ -176,11 +173,20 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
         return true;
     }
 
-    public void sync(byte[][] keys,byte[][] values,int partition){
+    public void sync(byte[][] keys,byte[][] values,String source){
+        logger.warn("DB :"+source+" Batch : "+keys.length);
+        DataStore dso = this.tarantulaContext.deploymentDataStoreProvider.createKeyIndexDataStore(source);
         for(int i=0;i<keys.length;i++){
-            //DataStore dso = onPartition(partition);
-            //int ix = i;
-            //dso.lock(keys[i],()->dso.dataStore.backup().set(keys[ix],values[ix]));
+            final int ix = i;
+            dso.backup().set((k,v)->{
+                for(byte b : keys[ix]){
+                    k.writeByte(b);
+                }
+                for(byte b : values[ix]){
+                    v.writeByte(b);
+                }
+                return true;
+            });
         }
     }
 
