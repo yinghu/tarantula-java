@@ -1,6 +1,10 @@
 package com.icodesoftware.util;
 import com.icodesoftware.Recoverable;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Base64;
+
 public class NaturalKey implements Recoverable.Key {
 
     private String key;
@@ -10,7 +14,8 @@ public class NaturalKey implements Recoverable.Key {
     }
 
     public String asString(){
-        return this.key;
+        byte[] data = ByteBuffer.allocate(key.length()+4).order(ByteOrder.nativeOrder()).putInt(key.length()).put(key.getBytes()).flip().array();
+        return Base64.getEncoder().encodeToString(data);
     }
 
     public boolean read(Recoverable.DataBuffer buffer){

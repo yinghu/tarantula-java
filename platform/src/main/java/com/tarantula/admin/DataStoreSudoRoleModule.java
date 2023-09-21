@@ -79,13 +79,10 @@ public class DataStoreSudoRoleModule implements Module {
             JsonArray data = new JsonArray();
             if(sum!=null){
                 sum.load(query[1].getBytes(),(n,h,t)->{
-                    //RevisionObject revisionObject = RevisionObject.fromBinary(v);
                     JsonObject debug = new JsonObject();
-                    debug.addProperty("address",n.address());
-                    //debug.addProperty("local",revisionObject.local);
-                    //debug.addProperty("revision",Long.toString(revisionObject.revision));
-                    //debug.addProperty("node",new String(revisionObject.node));
-                    //debug.add("content",JsonUtil.parse(revisionObject.data));
+                    debug.addProperty("local",h.local());
+                    debug.addProperty("revision",Long.toString(h.revision()));
+                    debug.add("content",t.toJson());
                     data.add(debug);
                     return true;
                 });

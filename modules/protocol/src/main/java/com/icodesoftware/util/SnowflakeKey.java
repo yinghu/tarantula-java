@@ -1,6 +1,10 @@
 package com.icodesoftware.util;
 import com.icodesoftware.Recoverable;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Base64;
+
 public class SnowflakeKey implements Recoverable.Key {
 
     private long snowflakeId;
@@ -10,7 +14,8 @@ public class SnowflakeKey implements Recoverable.Key {
     }
 
     public String asString(){
-        return Long.toString(snowflakeId);
+        byte[] data = ByteBuffer.allocate(8).order(ByteOrder.nativeOrder()).putLong(snowflakeId).flip().array();
+        return Base64.getEncoder().encodeToString(data);
     }
 
     public boolean read(Recoverable.DataBuffer buffer){

@@ -582,7 +582,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         try{
             if (dbi.get(txn,key) == null) return false;
             Recoverable.DataBuffer data = BufferProxy.buffer(txn.val());
-            return buffer.on(BufferProxy.buffer(txn.key()),data);
+            return buffer.on(BufferProxy.buffer(key.rewind()),data);
         }finally {
             txn.close();
         }

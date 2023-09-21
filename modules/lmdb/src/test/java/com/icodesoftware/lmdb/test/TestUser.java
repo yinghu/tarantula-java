@@ -3,8 +3,6 @@ package com.icodesoftware.lmdb.test;
 
 import com.icodesoftware.Access;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.util.NaturalKey;
-import com.icodesoftware.util.OidKey;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.SnowflakeKey;
 

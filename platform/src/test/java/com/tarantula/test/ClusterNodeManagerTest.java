@@ -77,6 +77,7 @@ public class ClusterNodeManagerTest {
         Assert.assertEquals(keyIndex.slaveNodes()[0],"N03");
         Assert.assertEquals(keyIndex.slaveNodes()[1],"N01");
 
+
         keyIndex.placeSlaveNode("N07");
         Assert.assertEquals(keyIndex.slaveNodes().length,3);
         Assert.assertEquals(keyIndex.slaveNodes()[0],"N07");

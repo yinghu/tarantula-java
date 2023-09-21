@@ -2,6 +2,7 @@ package com.icodesoftware.util;
 import com.icodesoftware.Recoverable;
 
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Objects;
 
 public class BinaryKey implements Recoverable.Key {
@@ -16,7 +17,7 @@ public class BinaryKey implements Recoverable.Key {
     }
 
     public String asString(){
-        return "binary key";
+        return Base64.getEncoder().encodeToString(key);
     }
 
     public boolean read(Recoverable.DataBuffer buffer){
