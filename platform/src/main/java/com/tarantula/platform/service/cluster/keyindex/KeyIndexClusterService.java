@@ -38,8 +38,8 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
     }
 
     public byte[] get(String source,byte[] key) {
-        logger.warn("SRC : "+source);
         DataStore dso = dataStore(source);
+        logger.warn("SRC : "+source+" DB: "+dso.name());
         byte[][] data={null};
         if(!dso.backup().get(new BinaryKey(key),(k,v)->{
             data[0]=v.array();
