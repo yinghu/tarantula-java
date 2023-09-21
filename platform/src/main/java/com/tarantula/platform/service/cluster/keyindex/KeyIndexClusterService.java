@@ -38,7 +38,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
     }
 
     public byte[] get(String source,byte[] key) {
-        DataStore dso = dataStore(source);
+        DataStore dso = this.tarantulaContext.deploymentDataStoreProvider.createKeyIndexDataStore(source);
         logger.warn("SRC : "+source+" DB: "+dso.name());
         byte[][] data={null};
         if(!dso.backup().get(new BinaryKey(key),(k,v)->{
