@@ -225,7 +225,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(dataMapStoreListener!=null){
             dataMapStoreListener.setup(serviceContext);
         }
-        logger.warn("LMDB provider map store listener setup");
+        logger.warn("Setup LMDB provider map store listeners");
     }
 
     @Override
@@ -239,7 +239,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(dataMapStoreListener!=null){
             dataMapStoreListener.waitForData();
         }
-        logger.warn("LMDB provider map store listener waitingForData");
+        logger.warn("Waiting data for LMDB provider map store listeners");
     }
 
     @Override

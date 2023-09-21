@@ -560,6 +560,13 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
     public void _setup() throws Exception{
         //Waiting for all distribution service ready
+        DistributionKeyIndexService distributionKeyIndexService = clusterProvider().serviceProvider(DistributionKeyIndexService.NAME);
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        distributionKeyIndexService.startSync(DistributionKeyIndexService.NAME);
+        _syncLatch.put(DistributionKeyIndexService.NAME,countDownLatch);
+        countDownLatch.await();
+        _syncLatch.remove(DistributionKeyIndexService.NAME);
+        log.warn("Key index data sync has finished");
         AccessIndex bid = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/"+node.bucketName,AccessIndex.SYSTEM_INDEX);
         node.bucketId = bid.distributionId();
         AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,AccessIndex.SYSTEM_INDEX);
@@ -577,7 +584,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         //
 
         initMetricsProvider();
-        this.deploymentDataStoreProvider.waitForData();
  	    this.serviceProviders.forEach((k,v)->{ //synchronize data and setup
             v.setup(this);
             v.waitForData();//block for global data sync
@@ -601,13 +607,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
     public void _syncNodeData() throws Exception{
  	    this.accessIndexService().onDisable();
-        DistributionKeyIndexService distributionKeyIndexService = clusterProvider().serviceProvider(DistributionKeyIndexService.NAME);
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-        distributionKeyIndexService.startSync(DistributionKeyIndexService.NAME);
-        _syncLatch.put(DistributionKeyIndexService.NAME,countDownLatch);
-        countDownLatch.await();
-        _syncLatch.remove(DistributionKeyIndexService.NAME);
- 	    log.warn("Key index data sync has finished");
         for(String s : this.integrationCluster.recoverService().onListModules()){
             log.warn("Loading module files from master node ["+s+"]");
             byte[] ret = this.integrationCluster.recoverService().onLoadModuleJarFile(s);
