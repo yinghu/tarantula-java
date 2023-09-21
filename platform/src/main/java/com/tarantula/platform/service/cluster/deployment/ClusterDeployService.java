@@ -77,6 +77,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
             if(lm.getUuid().equals(m.getUuid())){
                 break;
             }
+            this.tarantulaContext.integrationCluster().onNodeAdded(m);
             pt++;
         }
         log.warn("Bucket receiver updating on member added->["+pt+"/"+sz+"]"+lm.getUuid());

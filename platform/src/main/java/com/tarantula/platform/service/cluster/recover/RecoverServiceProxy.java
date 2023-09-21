@@ -90,7 +90,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     }
     public Batchable onRecover(String source,String label,byte[] key,ClusterProvider.Node[] nodes){
         NodeEngine nodeEngine = getNodeEngine();
-        byte[] ret = null;
+        Batchable ret = null;
         RecoverEdgeOperation operation = new RecoverEdgeOperation(source,label,key);
         for(ClusterProvider.Node node : nodes){
             Member m = nodeEngine.getClusterService().getMember(node.memberId());
@@ -101,11 +101,11 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
             });
             if(callResult.successful&&callResult.result!=null){
-                ret = (byte[]) callResult.result;
+                ret = (Batchable) callResult.result;
                 break;
             }
         }
-        return null;//ret;
+        return ret;
     }
     public void onDelete(String source,byte[] key){
         NodeEngine nodeEngine = getNodeEngine();

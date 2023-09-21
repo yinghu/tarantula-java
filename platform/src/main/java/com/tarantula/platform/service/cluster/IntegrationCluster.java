@@ -386,9 +386,24 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         this.vMap.remove(BufferUtil.toArray(ByteBuffer.allocate(8).putLong(Long.parseLong(node[1])).flip()));//remove nodeId = > node
         this.vMap.remove(memberId.getBytes()); //remove member =>  nodeId
     }
-    //public void onNodeAdded(String memberId){
-
-    //}
+    public void onNodeAdded(Member member){
+        try{_serviceReady.await();}catch (Exception ex){}
+        String setting = member.getStringAttribute("node");
+        if(setting==null){
+            log.warn("NODE NOT READY : "+member.getUuid());
+            return;
+        }
+        String[] node = setting.split("#");
+        String nodeName = node[0];
+        long nodeId = Long.parseLong(node[1]);
+        String memberId = member.getUuid();
+        Node existingNode = fromCluster(nodeId);
+        if(existingNode!=null){
+            nList.forEach(nodeListener -> nodeListener.nodeAdded(existingNode));
+            this.summary.register(existingNode);
+            log.warn("NODE ADDED : "+nodeName+" : "+memberId+" : "+nodeId);
+        }
+    }
 
     private Node fromCluster(long nodeId){
         Node n = new ClusterNode();
