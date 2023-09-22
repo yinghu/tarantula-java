@@ -1,38 +1,99 @@
 package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.DataStore;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableRegistry;
-import com.icodesoftware.service.ClusterProvider;
+
 import com.icodesoftware.service.DataStoreSummary;
 import com.icodesoftware.service.KeyIndex;
-import com.icodesoftware.service.KeyIndexService;
 import com.icodesoftware.util.BinaryKey;
 import com.tarantula.platform.TarantulaContext;
-import com.tarantula.platform.service.cluster.recover.DistributionDataViewer;
 
 import java.util.Base64;
+import java.util.List;
 
 public class DataStoreViewer implements DataStoreSummary {
 
     private DataStore dataStore;
     private TarantulaContext tarantulaContext;
+
+    private long count;
+    private int depth;
+    private int pageSize;
+
+    private long leafPages;
+    private long branchPages;
+    private long overflowPages;
+
+    private List<String> edgeList;
+
     public DataStoreViewer(TarantulaContext tarantulaContext,DataStore dataStore){
         this.tarantulaContext = tarantulaContext;
         this.dataStore = dataStore;
+        this.dataStore.backup().view(this);
     }
     @Override
     public String name() {
         return dataStore.name();
     }
 
-
-
-    @Override
-    public long totalRecords() {
-        return dataStore.count();
+    public int scope(){
+        return dataStore.scope();
     }
 
+    public long count(){
+        return count;
+    }
+    public int depth(){
+        return depth;
+    }
+    public int pageSize(){
+        return pageSize;
+    }
+
+    public long leafPages(){
+        return leafPages;
+    }
+
+    public long overflowPages(){
+        return overflowPages;
+    }
+
+    public long branchPages(){
+        return branchPages;
+    }
+
+    public List<String> edgeList(){
+        return edgeList;
+    }
+
+    public void count(long count){
+        this.count = count;
+    }
+    public void depth(int depth){
+        this.depth = depth;
+    }
+
+    public void pageSize(int pageSize){
+        this.pageSize = pageSize;
+    }
+
+    public void leafPages(long leafPages){
+        this.leafPages = leafPages;
+    }
+
+    public void overflowPages(long overflowPages){
+        this.overflowPages = overflowPages;
+    }
+
+    public void branchPages(long branchPages){
+        this.branchPages = branchPages;
+    }
+
+    public void edgeList(List<String> edgeList){
+        this.edgeList = edgeList;
+    }
 
     public void list(DataStoreSummary.View view){
         dataStore.backup().forEach((k,v)-> {
@@ -47,10 +108,10 @@ public class DataStoreViewer implements DataStoreSummary {
 
     public void load(byte[] key, DataStoreSummary.View view){
         BinaryKey akey = new BinaryKey(Base64.getDecoder().decode(key));
-        if(!dataStore.name().startsWith(KeyIndexService.STORE_NAME)){
+        if(dataStore.scope() != Distributable.INDEX_SCOPE){
             KeyIndex keyIndex = tarantulaContext.keyIndexService.lookup(dataStore.name(),akey);
         }
-        System.out.println("DB : "+dataStore.name());
+        System.out.println("DB : "+dataStore.name()+" : "+dataStore.scope());
         this.dataStore.backup().get(akey,(k,v)->{
             Recoverable.DataHeader h = v.readHeader();
             RecoverableRegistry registry = tarantulaContext.recoverableRegistry(h.factoryId());

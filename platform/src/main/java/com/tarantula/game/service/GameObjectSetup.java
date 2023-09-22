@@ -4,7 +4,6 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
 
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.VersionedConfigurableObject;
 import com.tarantula.platform.item.VersionedConfigurableObjectQuery;
@@ -66,6 +65,7 @@ public class GameObjectSetup implements ApplicationPreSetup {
     public  <T extends Configurable> boolean delete(Descriptor application,T t){
         DataStore dataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,serviceDataStore(application));
         if(!dataStore.delete(t)) return false;
+        /**
         dataStore.deleteEdge(t.ownerKey(),t.key(),t.configurationName());
         dataStore.deleteEdge(t.ownerKey(),t.key(),t.configurationTypeId());
         dataStore.deleteEdge(t.ownerKey(),t.key(),t.configurationCategory());
@@ -74,11 +74,11 @@ public class GameObjectSetup implements ApplicationPreSetup {
             dataStore.deleteEdge(t.ownerKey(),t.key(),t.configurationType().substring(0,superIndex));
         }
         else{
-            dataStore.deleteEdge(t.ownerKey(),t.key(),t.configurationType());
+           dataStore.deleteEdge(t.ownerKey(),t.key(),t.configurationType());
         }
         if((superIndex = t.configurationCategory().indexOf("."))> 0){
             dataStore.deleteEdge(t.ownerKey(),t.key(),t.configurationCategory().substring(0,superIndex));
-        }
+        }**/
         deleteVersion(dataStore,(ConfigurableObject)t);
         if(listener!=null) listener.onDeleted(application,t);
         return true;
@@ -182,6 +182,6 @@ public class GameObjectSetup implements ApplicationPreSetup {
             dataStore.delete(v);
             return true;
         });
-        dataStore.deleteEdge(configurableObject.key(),VersionedConfigurableObject.LABEL);
+        //dataStore.deleteEdge(configurableObject.key(),VersionedConfigurableObject.LABEL);
     }
 }

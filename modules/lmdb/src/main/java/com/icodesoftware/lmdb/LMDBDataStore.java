@@ -1,6 +1,7 @@
 package com.icodesoftware.lmdb;
 
 import com.icodesoftware.*;
+import com.icodesoftware.service.DataStoreSummary;
 import com.icodesoftware.service.Metadata;
 import org.lmdbjava.*;
 
@@ -53,21 +54,28 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         return name;
     }
 
-    @Override
-    public long count() {
-        Txn<ByteBuffer> txn = env.txnRead();
-        try{
-            Stat st = dbi.stat(txn);
-            return st.entries;
-        }finally {
-            txn.close();
-        }
-    }
 
-    public List<String> edgeList(){
+    private List<String> edgeList(){
         ArrayList<String> elist = new ArrayList<>();
         edgeIndex.forEach((k,v)->elist.add(k));
         return elist;
+    }
+
+    @Override
+    public void view(DataStoreSummary dataStoreSummary){
+        Txn<ByteBuffer> txn = env.txnRead();
+        try{
+            Stat st = dbi.stat(txn);
+            dataStoreSummary.count(st.entries);
+            dataStoreSummary.depth(st.depth);
+            dataStoreSummary.leafPages(st.leafPages);
+            dataStoreSummary.overflowPages(st.overflowPages);
+            dataStoreSummary.branchPages(st.branchPages);
+            dataStoreSummary.pageSize(st.pageSize);
+            dataStoreSummary.edgeList(edgeList());
+        }finally {
+            txn.close();
+        }
     }
 
     @Override

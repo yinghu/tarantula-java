@@ -3,64 +3,69 @@ package com.tarantula.test;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.icodesoftware.DataStore;
 
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.game.service.GameObjectSetup;
+import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.item.*;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.InputStream;
+import java.util.List;
 
 
 public class ConfigurableObjectTestSet extends DataStoreHook{
 
 
     @Test(groups = { "ConfigurableObject" })
-    public void configurableObjectTest() {
-        DataStore dataStore = dataStoreProvider.createDataStore("test_tarantula_config");
+    public void configurableObjectOptsTest() {
+        GameObjectSetup gameObjectSetup = new GameObjectSetup();
+        gameObjectSetup.setup(serviceContext);
+        DeploymentDescriptor app = new DeploymentDescriptor();
+        app.typeId("test-game-data");
+        app.distributionId(serviceContext.distributionId());
         InputStream in = (Thread.currentThread().getContextClassLoader().getResourceAsStream("sample-admin-role-commodity-settings.json"));
-        long ref1 = serviceContext.distributionId();
-        //long ref2 = serviceContext.distributionId();
-        //System.out.println(ref1);
-        //System.out.println(ref2);
         JsonArray items = JsonUtil.parse(in).get("list").getAsJsonArray();
         Assert.assertNotNull(items);
+        //save
         items.forEach(item->{
             JsonObject jo = item.getAsJsonObject();
-            jo.get("reference").getAsJsonArray().add(ref1);
-            //jo.get("reference").getAsJsonArray().add(ref2);
-            ConfigurableObject configurableObject = new ConfigurableObject();
+            Commodity configurableObject = new Commodity();
             Assert.assertTrue(configurableObject.configureAndValidate(jo));
-            Assert.assertTrue(dataStore.create(configurableObject));
-
-            ConfigurableObject c = new ConfigurableObject();
-            c.distributionId(configurableObject.distributionId());
-            Assert.assertTrue(dataStore.load(c));
-            c.reference().forEach(d->{
-                Assert.assertEquals(d.getAsLong(),ref1);
-                //System.out.println(d.getAsLong());
-            });
-            //System.out.println(">>>>>>>>>>>>>>>>>");
-            //ConfigurableCategory category = new ConfigurableCategory(jo);
-            //category.ownerKey(ConfigurableCategoryQuery.AssetKey);
-            //category.label("category");
-            //category.onEdge(true);
-            //Assert.assertNotNull(category.name());
-            //Assert.assertTrue(dataStore.createIfAbsent(category,false));
-            //Assert.assertTrue(dataStore.createEdge(category,"category"));
-            //Assert.assertTrue(dataStore.createEdge(category,"link"));
-            //Assert.assertTrue(dataStore.createEdge(category,"data"));
-            //ConfigurableCategory load = new ConfigurableCategory();
-            //load.name(category.name());
-            //Assert.assertTrue(dataStore.load(load));
-            //Assert.assertEquals(load.name(),category.name());
+            Assert.assertTrue(gameObjectSetup.save(app,configurableObject));
         });
-        //Assert.assertEquals(dataStore.list(new ConfigurableCategoryQuery(ConfigurableCategoryQuery.AssetKey,"category")).size(),2);
-        //Assert.assertEquals(dataStore.list(new ConfigurableCategoryQuery(ConfigurableCategoryQuery.AssetKey,"link")).size(),2);
-        //Assert.assertEquals(dataStore.list(new ConfigurableCategoryQuery(ConfigurableCategoryQuery.AssetKey,"data")).size(),2);
+        //after save
+        //type
+        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"commodity")).size(),30);
+        //typeId
+        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"Gem")).size(),6);
+        //name
+        List<ConfigurableObject> g500 = gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"G500"));
+        Assert.assertEquals(g500.size(),1);
+        //category
+        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"HardCurrency")).size(),6);
+        //version from g500
+        Assert.assertEquals(gameObjectSetup.list(app,new VersionedConfigurableObjectQuery(g500.get(0).distributionId())).size(),1);
+
+        //update
+        g500.get(0).configurationVersion("v2.0");
+        //after update
+        Assert.assertTrue(gameObjectSetup.save(app,g500.get(0)));
+        Assert.assertEquals(gameObjectSetup.list(app,new VersionedConfigurableObjectQuery(g500.get(0).distributionId())).size(),2);
+
+        //delete
+        Assert.assertTrue(gameObjectSetup.delete(app,g500.get(0)));
+        //after delete
+        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableCategoryQuery(app.key(),"G500")).size(),0);
+        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"commodity")).size(),29);
+        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"Gem")).size(),5);
+        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"HardCurrency")).size(),5);
+        Assert.assertEquals(gameObjectSetup.list(app,new VersionedConfigurableObjectQuery(g500.get(0).distributionId())).size(),0);
     }
+
+
 
 
 

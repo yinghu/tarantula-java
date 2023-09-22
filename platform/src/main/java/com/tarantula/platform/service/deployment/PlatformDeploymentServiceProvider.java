@@ -822,8 +822,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     }
 
-    public List<String> listDataStore(){
-        return this.tarantulaContext.dataStoreProvider().list();
+    public List<String> listDataStore(int scope) {
+        return this.tarantulaContext.dataStoreProvider().list(scope);
     }
 
     public DataStoreSummary validDataStore(String dataStore){

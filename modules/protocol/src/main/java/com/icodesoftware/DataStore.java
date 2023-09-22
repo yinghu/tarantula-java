@@ -1,5 +1,7 @@
 package com.icodesoftware;
 
+import com.icodesoftware.service.DataStoreSummary;
+
 import java.util.List;
 
 public interface DataStore {
@@ -8,8 +10,8 @@ public interface DataStore {
 
     String name();
 
-    long count();
-    List<String> edgeList();
+    //long count();
+    //List<String> edgeList();
 
     <T extends Recoverable> boolean create(T t);
 
@@ -41,6 +43,8 @@ public interface DataStore {
         boolean unset(BufferStream bufferStream);
 
         void forEach(BufferStream buffer);
+
+        void view(DataStoreSummary dataStoreSummary);
     }
 
 

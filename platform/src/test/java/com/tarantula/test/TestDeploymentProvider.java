@@ -229,7 +229,7 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
     }
 
     @Override
-    public List<String> listDataStore() {
+    public List<String> listDataStore(int scope) {
         return null;
     }
 

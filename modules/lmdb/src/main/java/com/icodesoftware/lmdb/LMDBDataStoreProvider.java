@@ -152,6 +152,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         return dlist;
     }
 
+    @Override
     public List<String> list(int scope){
         ArrayList<String> dlist = new ArrayList<>();
         storeMap.forEach((k,v)->{
@@ -298,7 +299,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
             return keyIndexMapStoreListener.onDeleting(metadata,key,value);
         }
-        return false;
+        return true;
     }
 
     public void assign(Recoverable.DataBuffer dataBuffer){

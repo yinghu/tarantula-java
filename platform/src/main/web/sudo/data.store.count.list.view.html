@@ -9,7 +9,18 @@
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div> 
-   
+    <div class="w3-panel tx-margin-bottom-8">
+        <div class="w3-container">
+            <label class="tx-text-12 tx-margin-right-4">Local</label>
+            <input id='tx-data-store-local-scope' class="w3-check tx-text-12" type="checkbox" checked>
+            <label class="tx-text-12 tx-margin-right-4">Data</label>
+            <input id='tx-data-store-data-scope' class="w3-check tx-text-12" type="checkbox" checked>
+            <label class="tx-text-12 tx-margin-right-4">Access</label>
+            <input id='tx-data-store-access-scope' class="w3-check tx-text-12" type="checkbox" checked>
+            <label class="tx-text-12 tx-margin-right-4">Index</label>
+            <input id='tx-data-store-index-scope' class="w3-check tx-text-12" type="checkbox" checked>
+        </div>
+    </div>
     <div class="w3-panel  tx-margin-bottom-8">
         <div class="w3-container">
             <label class="tx-text-14 tx-margin-right-4">Data Store Selection :</label>
@@ -77,6 +88,18 @@
     let keyPanel = document.querySelector('#tx-data-store-key-list');
     let keySelected = '';
     
+    document.querySelector('#tx-data-store-local-scope').onchange = ()=>{
+        _tx_load_store_list();
+    };
+    document.querySelector('#tx-data-store-data-scope').onchange = ()=>{
+        _tx_load_store_list();
+    };
+    document.querySelector('#tx-data-store-access-scope').onchange = ()=>{
+        _tx_load_store_list();
+    };
+    document.querySelector('#tx-data-store-index-scope').onchange = ()=>{
+        _tx_load_store_list();
+    };
     dataStoreBar.innerHTML = '';
     dataStoreBar.onchange = ()=>{
         dataStoreSelected = dataStoreBar.value;
@@ -87,14 +110,14 @@
         keySelected = keyPanel.value;
     };
     
-    TARA_API.onGet('role/sudo/datastore','onListDataStore','',(resp)=>{
-        editor.set(resp);                      
-        resp.list.forEach((n,i) => {
-            if(i==0) dataStoreSelected = n;
-            dataStoreBar.innerHTML += TARA_HTML.option(n,n,i==0);
-        });
-        _tx_load_store_keys();
-    });
+    //TARA_API.onGet('role/sudo/datastore','onListDataStore','',(resp)=>{
+      //  editor.set(resp);                      
+       // resp.list.forEach((n,i) => {
+         //   if(i==0) dataStoreSelected = n;
+           // dataStoreBar.innerHTML += TARA_HTML.option(n,n,i==0);
+        //});
+        //_tx_load_store_keys();
+    //});
     
     document.querySelector('#tx-data-store-key-reload').onclick =()=>{
         _tx_load_store_keys();
@@ -118,6 +141,7 @@
     document.querySelector('#tx-data-store-json-mode-preview').onclick=()=>{
         editor.setMode('preview');
     };
+    _tx_load_store_list();
     function _tx_load_store_keys(){
         keyPanel.innerHTML = '';
         let kindx = document.querySelector('#tx-data-store-key-index').value;
@@ -129,5 +153,21 @@
                 keyPanel.innerHTML += TARA_HTML.option(kv.key,kv.key,i==0);
             });                          
         }); 
+    }
+    function _tx_load_store_list(){
+        let local = document.querySelector('#tx-data-store-local-scope').checked;
+        let data = document.querySelector('#tx-data-store-data-scope').checked;
+        let access = document.querySelector('#tx-data-store-access-scope').checked;
+        let index = document.querySelector('#tx-data-store-index-scope').checked;
+        let query = local+'#'+data+'#'+access+'#'+index;
+        TARA_API.onGet('role/sudo/datastore','onListDataStore',query,(resp)=>{
+        editor.set(resp); 
+        dataStoreBar.innerHTML='';                     
+        resp.list.forEach((n,i) => {
+            if(i==0) dataStoreSelected = n;
+            dataStoreBar.innerHTML += TARA_HTML.option(n,n,i==0);
+        });
+        _tx_load_store_keys();
+    });    
     }
 </script>

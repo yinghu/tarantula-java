@@ -8,6 +8,7 @@ import com.icodesoftware.service.*;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -38,7 +39,12 @@ public class DataStoreSudoRoleModule implements Module {
             }
         }
         else if(session.action().equals("onListDataStore")){
-            List<String> dlist = this.deploymentServiceProvider.listDataStore();
+            String[] query = session.name().split("#");
+            List<String> dlist = new ArrayList<>();
+            if(Boolean.parseBoolean(query[0])) dlist.addAll(this.deploymentServiceProvider.listDataStore(Distributable.LOCAL_SCOPE));
+            if(Boolean.parseBoolean(query[1])) dlist.addAll(this.deploymentServiceProvider.listDataStore(Distributable.DATA_SCOPE));
+            if(Boolean.parseBoolean(query[2])) dlist.addAll(this.deploymentServiceProvider.listDataStore(Distributable.INTEGRATION_SCOPE));
+            if(Boolean.parseBoolean(query[3])) dlist.addAll(this.deploymentServiceProvider.listDataStore(Distributable.INDEX_SCOPE));
             session.write(toJsonList(dlist).toString().getBytes());
         }
         else if(session.action().equals("onLoadDataStoreKeys")){
@@ -47,8 +53,16 @@ public class DataStoreSudoRoleModule implements Module {
             DataStoreSummary sum = this.deploymentServiceProvider.validDataStore(query[0]);
             JsonObject summary = new JsonObject();
             summary.addProperty("name",sum.name());
-            //summary.addProperty("partitionNumber",sum.partitionNumber());
-            summary.addProperty("totalRecords",sum.totalRecords());
+            summary.addProperty("scope",sum.scope());
+            summary.addProperty("depth",Integer.toString(sum.depth()));
+            summary.addProperty("pageSize",Integer.toString(sum.pageSize()));
+            summary.addProperty("branchPages",Long.toString(sum.branchPages()));
+            summary.addProperty("overflowPages",Long.toString(sum.overflowPages()));
+            summary.addProperty("leafPages",Long.toString(sum.leafPages()));
+            summary.addProperty("totalRecords",Long.toString(sum.count()));
+            JsonArray edges = new JsonArray();
+            sum.edgeList().forEach(e->edges.add(e));
+            summary.add("edges",edges);
             JsonArray keys = new JsonArray();
             int[] kn = {Integer.parseInt(query[1])};
             int[] batch = {Integer.parseInt(query[2])};

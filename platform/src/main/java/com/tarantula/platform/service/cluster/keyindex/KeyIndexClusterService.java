@@ -148,7 +148,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
         new Thread(()->{
             this.tarantulaContext.deploymentDataStoreProvider.list(Distributable.INDEX_SCOPE).forEach(db->{
                 DataStore dataStore = this.tarantulaContext.deploymentDataStoreProvider.lookup(db);
-                logger.warn("DB :"+db+" Count : "+dataStore.count());
+                //logger.warn("DB :"+db+" Count : "+dataStore.count());
                 int[] batch ={0};
                 byte[][] keys = new byte[tarantulaContext.recoverBatchSize][];
                 byte[][] values = new byte[tarantulaContext.recoverBatchSize][];

@@ -83,11 +83,10 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
     //Access index set operation API
     void registerAccessIndexListener(AccessIndexService.Listener listener);
-    //AccessIndexService.AccessIndexStore accessIndexStore();
-    //KeyIndexService.KeyIndexStore keyIndexStore();
+
     //data store backup operation API
     void issueDataStoreBackup();
-    List<String> listDataStore();
+    List<String> listDataStore(int scope);
     List<String> listServiceView();
     List<String> listMetricsView();
     DataStoreSummary validDataStore(String dataStore);

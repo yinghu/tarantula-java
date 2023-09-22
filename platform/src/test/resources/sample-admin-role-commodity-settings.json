@@ -15,10 +15,10 @@
       "reference": []
     },
     {
-      "configurationType": "commodity",
+      "configurationType": "commodity.application",
       "configurationTypeId": "Gem",
       "configurationName": "G500",
-      "configurationCategory": "HardCurrency",
+      "configurationCategory": "HardCurrency.Foo",
       "configurationVersion": "v1.0",
       "header": {
         "Name": "G500",
