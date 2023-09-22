@@ -285,14 +285,21 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     public <T extends Recoverable> boolean delete(T t){
         BufferCache cache = lmdbDataStoreProvider.fromCache();
         Recoverable.DataBuffer key = cache.key;
+        if(!t.writeKey(key)){
+            cache.reset();
+            return false;
+        }
+        key.flip();
+        if(!lmdbDataStoreProvider.onDeleting(metadata,key, cache.value)){
+            cache.reset();
+            return false;
+        }
         final Txn<ByteBuffer> txn = env.txnWrite();
         try{
-            if(!t.writeKey(key)) return false;
-            if(!dbi.delete(txn, key.flip())) return false;
+            if(!dbi.delete(txn, key.rewind())) return false;
             removeEdges(txn,key.rewind());
             txn.commit();
             key.rewind();
-            lmdbDataStoreProvider.onDeleting(metadata,key,cache.value);
             return true;
         }finally {
             txn.close();
@@ -533,7 +540,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             if(!edgeKey.write(value)) return false;
             setEdge(txn,label);
             LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(scope,name,label);
-            if(!localEdgeDataStore.dbi.put(txn,key.flip(),value.flip(), PutFlags.MDB_NODUPDATA)) throw new RuntimeException("lmdb failure to insert key/value");
+            if(!localEdgeDataStore.dbi.put(txn,key.flip(),value.flip(), PutFlags.MDB_NODUPDATA)) return false;//no duplicate entry
             idx.dbi.put(txn,value.rewind(),key.rewind(),PutFlags.MDB_NODUPDATA);
             key.rewind();
             value.rewind();

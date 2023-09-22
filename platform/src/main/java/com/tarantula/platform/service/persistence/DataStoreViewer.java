@@ -49,7 +49,6 @@ public class DataStoreViewer implements DataStoreSummary {
         BinaryKey akey = new BinaryKey(Base64.getDecoder().decode(key));
         if(!dataStore.name().startsWith(KeyIndexService.STORE_NAME)){
             KeyIndex keyIndex = tarantulaContext.keyIndexService.lookup(dataStore.name(),akey);
-            System.out.println(keyIndex.masterNode());
         }
         System.out.println("DB : "+dataStore.name());
         this.dataStore.backup().get(akey,(k,v)->{
@@ -61,16 +60,5 @@ public class DataStoreViewer implements DataStoreSummary {
             view.on(null,h,recoverable);
             return true;
         });
-        //System.out.println(new String(key));
-        //view.on(tarantulaContext.node(),key,dataStore.backup().get(key));
-        //KeyIndex keyIndex = tarantulaContext.keyIndexService.lookup(dataStore.name(),new BinaryKey(key));
-        //if(keyIndex==null) return;
-        //ClusterProvider.Node[] nodes = tarantulaContext.keyIndexService.nodeList(keyIndex);
-        //DistributionDataViewer distributionDataViewer = (DistributionDataViewer) tarantulaContext.clusterProvider().recoverService();
-        //for(ClusterProvider.Node node : nodes){
-            //if(node==null) continue;
-            //byte[] ret = distributionDataViewer.load(dataStore.name(),key,node);
-            //if(ret!=null) view.on(node,key,ret);
-        //}
     }
 }

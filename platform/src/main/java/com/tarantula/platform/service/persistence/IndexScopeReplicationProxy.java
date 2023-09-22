@@ -33,11 +33,6 @@ public class IndexScopeReplicationProxy extends ScopedReplicationProxy {
         }
         return true;
     }
-    @Override
-    public void onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
-        //this.serviceContext.clusterProvider().recoverService().onDelete(metadata.source(),key);
-    }
-
 
 
     @Override

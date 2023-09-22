@@ -30,8 +30,8 @@ public class TestMapStoreListener implements MapStoreListener {
 
 
     @Override
-    public void onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
-
+    public boolean onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
+        return false;
     }
     public void assignKey(Recoverable.DataBuffer dataBuffer){
         dataBuffer.writeLong(snowflakeIdGenerator.snowflakeId());

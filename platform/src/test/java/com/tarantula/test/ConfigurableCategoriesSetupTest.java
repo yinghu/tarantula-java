@@ -48,9 +48,9 @@ public class ConfigurableCategoriesSetupTest extends DataStoreHook{
             Assert.assertTrue(gameObjectSetup.edge(app,type,"type"));
             Assert.assertTrue(categories.addCategory(category));
             Assert.assertTrue(types.addType(type));
-            //ConfigurableCategory load = new ConfigurableCategory();
-            //load.oid(category.oid());
-            //Assert.assertTrue(gameObjectSetup.load(app,category));
+            ConfigurableCategory load = new ConfigurableCategory();
+            load.name(category.name());
+            Assert.assertTrue(gameObjectSetup.load(app,category));
             //System.out.println(load.configurableType().toJson().toString());
         });
         gameObjectSetup.list(app,new ConfigurableCategoryQuery(ConfigurableCategoryQuery.AssetKey,"category")).forEach(c->{

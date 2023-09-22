@@ -95,7 +95,7 @@ public class TestMapStoreListener implements MapStoreListener {
 
 
     @Override
-    public void onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
+    public boolean onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
         DataStore dataStore = provider.createKeyIndexDataStore(KeyIndexService.STORE_NAME +  metadata.source());
         if(metadata.label()==null){
             boolean del = dataStore.backup().unset((k,v)->{
@@ -105,7 +105,7 @@ public class TestMapStoreListener implements MapStoreListener {
                 return true;
             });
             System.out.println("DEL :"+metadata.source()+":"+dataStore.name()+":"+del);
-            return;
+            return true;
         }
         boolean del = dataStore.backup().unsetEdge(metadata.label(),(k,v)->{
             for(byte b : key.array()){
@@ -118,7 +118,7 @@ public class TestMapStoreListener implements MapStoreListener {
             return true;
         },value==null);
         System.out.println("UNSET EDGE :"+metadata.label()+":"+del);
-
+        return true;
     }
 
     @Override

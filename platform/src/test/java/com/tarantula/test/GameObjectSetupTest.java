@@ -19,7 +19,7 @@ import org.testng.annotations.Test;
 
 public class GameObjectSetupTest extends DataStoreHook{
 
-    //@Test(groups = { "GameObjectSetup" })
+    @Test(groups = { "GameObjectSetup" })
     public void serviceDataStoreTest() {
         GameObjectSetup gameObjectSetup = new GameObjectSetup();
         gameObjectSetup.setup(serviceContext);
@@ -35,8 +35,9 @@ public class GameObjectSetupTest extends DataStoreHook{
         app.typeId("holee-game-service");
         DataStore dataStore3 = gameObjectSetup.dataStore(app);
         Assert.assertEquals(dataStore3.name(),"holee_game_service");
+
     }
-    //@Test(groups = { "GameObjectSetup" })
+    @Test(groups = { "GameObjectSetup" })
     public void configDataStoreTest() {
         GameObjectSetup gameObjectSetup = new GameObjectSetup();
         gameObjectSetup.setup(serviceContext);
@@ -69,7 +70,6 @@ public class GameObjectSetupTest extends DataStoreHook{
         JsonArray items = (JsonArray) template.property("itemList");
         Assert.assertNotNull(items);
         items.forEach(item->{
-            //System.out.println(item.getAsJsonObject());
             JsonObject jo = item.getAsJsonObject();
             ConfigurableCategory category = new ConfigurableCategory(jo);
             category.onEdge(true);
@@ -77,6 +77,7 @@ public class GameObjectSetupTest extends DataStoreHook{
             category.ownerKey(ConfigurableCategoryQuery.AssetKey);
             Assert.assertNotNull(category.name());
             Assert.assertTrue(gameObjectSetup.save(app,category));
+            category.parse();
             category.ownerKey(ConfigurableCategoryQuery.ComponentKey);
             Assert.assertTrue(gameObjectSetup.edge(app,category,"category"));
             ConfigurableType type = category.configurableType();
@@ -86,10 +87,18 @@ public class GameObjectSetupTest extends DataStoreHook{
             gameObjectSetup.save(app,type);
             type.ownerKey(ConfigurableTypeQuery.CommodityKey);
             Assert.assertTrue(gameObjectSetup.edge(app,type,"type"));
+            Assert.assertFalse(gameObjectSetup.edge(app,type,"type"));
             ConfigurableCategory load = new ConfigurableCategory();
-            //load.oid(category.oid());
-            //Assert.assertTrue(gameObjectSetup.load(app,category));
-            //System.out.println(load.configurableType().toJson().toString());
+            load.name(category.name());
+            Assert.assertTrue(gameObjectSetup.load(app,load));
+            load.parse();
+            Assert.assertEquals(load.name(),category.name());
+            Assert.assertEquals(load.scope,category.scope);
+            Assert.assertEquals(load.rechargeable,category.rechargeable);
+            Assert.assertEquals(load.version,category.version);
+            Assert.assertEquals(load.description,category.description);
+            Assert.assertEquals(load.application,category.application);
+            Assert.assertEquals(load.header,category.header);
         });
         Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableCategoryQuery(ConfigurableCategoryQuery.AssetKey,"category")).size(),2);
         Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableCategoryQuery(ConfigurableCategoryQuery.ComponentKey,"category")).size(),2);
@@ -112,7 +121,7 @@ public class GameObjectSetupTest extends DataStoreHook{
             ConfigurableObject co = new ConfigurableObject();
             Assert.assertTrue(co.configureAndValidate(jo));
             Assert.assertTrue(gameObjectSetup.save(app,co));
-            //Assert.assertEquals(gameObjectSetup.list(app,new VersionedConfigurableObjectQuery(co.oid())).size(),1);
+            Assert.assertEquals(gameObjectSetup.list(app,new VersionedConfigurableObjectQuery(co.distributionId())).size(),1);
         });
         gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"commodity")).forEach(c->{
             c.setup();

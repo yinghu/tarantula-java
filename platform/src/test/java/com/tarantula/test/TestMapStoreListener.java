@@ -55,7 +55,7 @@ public class TestMapStoreListener implements MapStoreListener {
         return false;
     }
     @Override
-    public void onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
-
+    public boolean onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
+        return true;
     }
 }

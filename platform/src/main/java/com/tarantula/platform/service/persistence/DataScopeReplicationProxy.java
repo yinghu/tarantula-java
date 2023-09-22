@@ -74,24 +74,20 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
                 });
 
             });
-
             return true;
         }
     }
     @Override
-    public void onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
+    public boolean onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
         logger.warn("DB Delete : "+metadata.source()+" : "+metadata.label());
         RecoverService recoverService = this.serviceContext.clusterProvider().recoverService();
         if(metadata.label()==null) {
-            recoverService.onDelete(metadata.source(),key.array());
-            return;
+            return recoverService.onDelete(metadata.source(),key.array());
         }
         if(value==null){
-            recoverService.onDeleteEdge(metadata.source(),metadata.label(),key.array());
-            return;
+            return recoverService.onDeleteEdge(metadata.source(),metadata.label(),key.array());
         }
-        recoverService.onDeleteEdge(metadata.source(),metadata.label(),key.array(),value.array());
-
+        return recoverService.onDeleteEdge(metadata.source(),metadata.label(),key.array(),value.array());
     }
 
 }

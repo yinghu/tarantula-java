@@ -107,10 +107,11 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         }
         return ret;
     }
-    public void onDelete(String source,byte[] key){
+    public boolean onDelete(String source,byte[] key){
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         DeleteOperation operation = new DeleteOperation(source,key);
+        boolean expected = true;
         for(Member m : mlist){
             if(m.localMember()) continue;
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
@@ -119,14 +120,18 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
             });
             if(!callResult.successful){
+                expected = false;
+                break;
                 //metricsListener.onUpdated();
             }
         }
+        return expected;
     }
-    public void onDeleteEdge(String source,String label,byte[] key){
+    public boolean onDeleteEdge(String source,String label,byte[] key){
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         DeleteEdgeFromLabelOperation operation = new DeleteEdgeFromLabelOperation(source,label,key);
+        boolean expected = true;
         for(Member m : mlist){
             if(m.localMember()) continue;
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
@@ -135,14 +140,18 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
             });
             if(!callResult.successful){
+                expected = false;
+                break;
                 //metricsListener.onUpdated();
             }
         }
+        return expected;
     }
-    public void onDeleteEdge(String source,String label,byte[] key,byte[] edge){
+    public boolean onDeleteEdge(String source,String label,byte[] key,byte[] edge){
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         DeleteEdgeOperation operation = new DeleteEdgeOperation(source,label,key,edge);
+        boolean expected = true;
         for(Member m : mlist){
             if(m.localMember()) continue;
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
@@ -151,9 +160,12 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
             });
             if(!callResult.successful){
+                expected = false;
+                break;
                 //metricsListener.onUpdated();
             }
         }
+        return expected;
     }
     @Override
     public int onReplicate(String nodeName,String source,String label, byte[] key, byte[] value, ClusterProvider.Node[] nodes){

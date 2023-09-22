@@ -12,6 +12,6 @@ public interface MapStoreListener extends ServiceProvider {
     //recover cluster operation
     boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value);
 
-    void onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value);
+    boolean onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value);
 
 }
