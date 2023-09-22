@@ -39,7 +39,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     protected boolean dedicated;
     protected GameArena arena;
 
-    protected ConcurrentHashMap<String,Entry> joinIndex;
+    protected ConcurrentHashMap<Long,Entry> joinIndex;
     protected Entry[] entries;
 
     private GameModule gameModule;
@@ -105,7 +105,10 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         joinIndex.forEach((k,e)->list.add(e));
         return list;
     }
+
     public GameRoomHeader(int capacity){
+        this.onEdge = true;
+        this.label = LABEL;
         this.capacity = capacity;
         this.round = 1;
         this.joinIndex = new ConcurrentHashMap<>(capacity);
@@ -118,7 +121,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         int[] created ={0};
         dataStore.list(new GameEntryQuery(this.distributionId()),(ge)->{
             entries[ge.seat()]=ge;
-            if(ge.occupied()) joinIndex.put(ge.systemId(),ge);
+            if(ge.occupied()) joinIndex.put(ge.stubId(),ge);
             created[0]++;
             return true;
         });
@@ -223,7 +226,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         }
     }
 
-    public GameRoom join(String systemId,Listener listener){
+    public GameRoom join(long systemId,Listener listener){
         Entry entry = joinIndex.putIfAbsent(systemId,placeHolder);
         if(entry != null) return view();
         synchronized (entries){
@@ -231,7 +234,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
                 if(!entries[i].occupied()){
                     entry = entries[i];
                     entry.occupied(true);
-                    entry.systemId(systemId);
+                    entry.stubId(systemId);
                     totalJoined++;
                     break;
                 }
@@ -244,7 +247,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         return view();
     }
 
-    public void leave(String systemId,Listener listener){
+    public void leave(long systemId,Listener listener){
         Entry entry = joinIndex.remove(systemId);
         if(entry == null) return;
         synchronized (entries){

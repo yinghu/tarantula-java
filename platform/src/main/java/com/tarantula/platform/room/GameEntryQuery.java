@@ -3,7 +3,6 @@ package com.tarantula.platform.room;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.SnowflakeKey;
-import com.tarantula.game.GamePortableRegistry;
 
 public class GameEntryQuery implements RecoverableFactory<GameEntry> {
 
@@ -18,10 +17,6 @@ public class GameEntryQuery implements RecoverableFactory<GameEntry> {
         return new GameEntry();
     }
 
-
-    public  int registryId(){
-        return GamePortableRegistry.GAME_ENTRY_CID;
-    }
 
     public String label(){
         return GameEntry.LABEL;

@@ -35,7 +35,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PlatformRoomServiceProvider implements ConfigurationServiceProvider, GameServerListener, ReloadListener,RoomListener {
 
     private static final String CONFIG = "game-room-settings";
-    private static final String DS_SUFFIX = "_room";
 
     public static final String NAME = "room";
 
@@ -193,7 +192,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         gameServiceProvider.presenceServiceProvider().onLeave(stub);
         if(dedicated) return; //close from channel close
         GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
-        localLeave(stub.systemId(),index,stub.roomId,(room,entry)->{});
+        localLeave(stub.distributionId(),index,stub.roomId,(room,entry)->{});
     }
 
     @Override
@@ -470,22 +469,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
     private GameRoom newGameRoom(String type,int roomCapacity){
-        GameRoom gameRoom = null;
-        switch (type){
-            case GameZone.PLAY_MODE_PVE:
-                gameRoom = new PVEGameRoom();
-                break;
-            case GameZone.PLAY_MODE_PVP:
-                gameRoom = new PVPGameRoom(roomCapacity);
-                break;
-            case GameZone.PLAY_MODE_TVE:
-                gameRoom = new TVEGameRoom(roomCapacity);
-                break;
-            case GameZone.PLAY_MODE_TVT:
-                gameRoom = new TVTGameRoom(roomCapacity);
-                break;
-        }
-        return gameRoom;
+        return GameRoom.newGameRoom(type,roomCapacity);
     }
 
     private GameZoneIndex gameZoneIndex(String configurationName){
@@ -541,7 +525,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         room.setup(udpEndpoint.createChannels(index.gameZone.capacity()));
     }
 
-    private void localLeave(String systemId, GameZoneIndex index, String roomId, GameRoom.Listener listener){
+    private void localLeave(long systemId, GameZoneIndex index, String roomId, GameRoom.Listener listener){
         GameRoom gameRoom = loadGameRoom(index,roomId);
         if(gameRoom==null) {
             logger.warn("Room Missed->"+index.gameZone.distributionKey()+">>"+roomId);
@@ -551,7 +535,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
     private GameRoom joinGameRoom(GameZoneIndex index,GameRoom gameRoom,Rating rating){
-        GameRoom joined = gameRoom.join(rating.systemId(),(room,entry)->{
+        GameRoom joined = gameRoom.join(rating.distributionId(),(room,entry)->{
             if(room.available()){
                 index.runningRooms.addFirst(room);
             }

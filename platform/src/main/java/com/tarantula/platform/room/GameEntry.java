@@ -12,7 +12,7 @@ import java.util.Map;
 public class GameEntry extends RecoverableObject implements GameRoom.Entry{
 
 
-    private String systemId;
+    private long stubId;
     private int seat;
     private boolean occupied;
     private int team;
@@ -24,8 +24,8 @@ public class GameEntry extends RecoverableObject implements GameRoom.Entry{
     public int seat(){
         return seat;
     }
-    public String systemId(){
-        return systemId;
+    public long stubId(){
+        return stubId;
     }
     public int team(){
         return team;
@@ -37,8 +37,8 @@ public class GameEntry extends RecoverableObject implements GameRoom.Entry{
     public void seat(int seat){
         this.seat = seat;
     }
-    public void systemId(String systemId){
-        this.systemId = systemId;
+    public void stubId(long stubId){
+        this.stubId = stubId;
     }
     public void team(int team){
         this.team = team;
@@ -47,29 +47,14 @@ public class GameEntry extends RecoverableObject implements GameRoom.Entry{
         this.occupied = occupied;
     }
 
-    @Override
-    public Map<String,Object> toMap(){
-        properties.put("1",seat);
-        properties.put("2",team);
-        properties.put("3",systemId);
-        properties.put("4",occupied);
-        return properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        this.seat  =  ((Number)properties.getOrDefault("1",0)).intValue();
-        this.team = ((Number)properties.getOrDefault("2",0)).intValue();
-        this.systemId = (String)properties.getOrDefault("3",null);
-        this.occupied = (boolean)properties.getOrDefault("4",false);
-    }
+
 
     @Override
     public boolean read(DataBuffer buffer){
         this.seat = buffer.readInt();
         this.team = buffer.readInt();
         this.occupied = buffer.readBoolean();
-        //this.totalJoined = buffer.readInt();
-        //this.totalLeft = buffer.readInt();
+        this.stubId = buffer.readLong();
         return true;
     }
     @Override
@@ -77,7 +62,7 @@ public class GameEntry extends RecoverableObject implements GameRoom.Entry{
         buffer.writeInt(seat);
         buffer.writeInt(team);
         buffer.writeBoolean(occupied);
-        //buffer.writeInt(totalLeft);
+        buffer.writeLong(stubId);
         return true;
     }
 
@@ -94,7 +79,7 @@ public class GameEntry extends RecoverableObject implements GameRoom.Entry{
     public void writePortable(PortableWriter portableWriter) throws IOException {
         portableWriter.writeInt("1",seat);
         portableWriter.writeInt("2",team);
-        portableWriter.writeUTF("3",systemId);
+        portableWriter.writeLong("3",stubId);
         portableWriter.writeBoolean("4",occupied);
     }
 
@@ -102,14 +87,14 @@ public class GameEntry extends RecoverableObject implements GameRoom.Entry{
     public void readPortable(PortableReader portableReader) throws IOException {
         seat = portableReader.readInt("1");
         team = portableReader.readInt("2");
-        systemId = portableReader.readUTF("3");
+        stubId = portableReader.readLong("3");
         occupied = portableReader.readBoolean("4");
     }
 
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("EntryId",distributionKey());
-        jsonObject.addProperty("SystemId",systemId);
+        jsonObject.addProperty("StubId",stubId);
         jsonObject.addProperty("Seat",seat);
         jsonObject.addProperty("Team",team);
         jsonObject.addProperty("Occupied",occupied);

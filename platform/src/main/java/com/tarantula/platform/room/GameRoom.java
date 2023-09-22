@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface GameRoom extends Room,Resettable,Closable,Configurable,Portable, UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener, ChannelListener {
 
-    String LABEL = "ZGR";
+    String LABEL = "gameRoom";
 
     int channelId();
     int sessionId();
@@ -23,9 +23,9 @@ public interface GameRoom extends Room,Resettable,Closable,Configurable,Portable
     void setup(Channel channel);
 
     //Distributed Methods
-    GameRoom join(String systemId,Listener listener);
+    GameRoom join(long stubId,Listener listener);
     GameRoom view();
-    void leave(String systemId,Listener listener);
+    void leave(long stubId,Listener listener);
     void load();
 
 
@@ -40,20 +40,39 @@ public interface GameRoom extends Room,Resettable,Closable,Configurable,Portable
 
     interface Entry extends Resettable,Configurable, Portable {
 
-        String LABEL = "GGE";
+        String LABEL = "roomEntry";
 
         int seat();
-        String systemId();
+        long stubId();
         int team();
         boolean occupied();
 
         void seat(int seat);
-        void systemId(String systemId);
+        void stubId(long stubId);
         void team(int team);
         void occupied(boolean occupied);
     }
 
     interface Listener{
         void onUpdated(GameRoom room,Entry entry);
+    }
+
+    static GameRoom newGameRoom(String type,int roomCapacity){
+        GameRoom gameRoom = null;
+        switch (type){
+            case GameZone.PLAY_MODE_PVE:
+                gameRoom = new PVEGameRoom();
+                break;
+            case GameZone.PLAY_MODE_PVP:
+                gameRoom = new PVPGameRoom(roomCapacity);
+                break;
+            case GameZone.PLAY_MODE_TVE:
+                gameRoom = new TVEGameRoom(roomCapacity);
+                break;
+            case GameZone.PLAY_MODE_TVT:
+                gameRoom = new TVTGameRoom(roomCapacity);
+                break;
+        }
+        return gameRoom;
     }
 }
