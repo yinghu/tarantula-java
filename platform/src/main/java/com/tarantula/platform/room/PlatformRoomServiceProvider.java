@@ -19,7 +19,6 @@ import com.tarantula.game.*;
 import com.tarantula.game.service.PlatformGameContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.OnAccessTrack;
 import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.platform.util.SystemUtil;
@@ -224,13 +223,11 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         else{
             index.pendingRooms = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone);
             index.runningRooms = new LinkedBlockingDeque<>(maxRoomPoolSizePerZone);
-            index.roomIndex = new IndexSet(gameZone.configurationTypeId());
-            index.roomIndex.distributionId(serviceContext.node().nodeId());
-            this.dataStore.createIfAbsent(index.roomIndex,true);
+            GameRoomQuery query = new GameRoomQuery(serviceContext.node().nodeId(),gameZone.playMode(),gameZone.capacity());
             int[] rooms = {0};
-            index.roomIndex.keySet().forEach(k->{
-                GameRoom room = loadGameRoom(index,k);
-                if(room!=null) rooms[0]++;
+            this.dataStore.list(query).forEach(r->{
+                loadGameRoom(index,r);
+                rooms[0]++;
             });
             if(rooms[0] < minRoomPoolSizePerZone){
                 int remaining = minRoomPoolSizePerZone - rooms[0];
@@ -240,7 +237,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                     if(gameRoom!=null) rooms[0]++;
                 }
             }
-            this.dataStore.update(index.roomIndex);
             int roomPoolRemaining = index.maxRoomPoolSize.addAndGet((-1)*rooms[0]);
             logger.warn(gameZone+" Remaining Room Pool Size ["+roomPoolRemaining+"] Capacity ["+gameZone.capacity()+"]");
             if(started) {
@@ -482,18 +478,27 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         return gameZone[0];
     }
 
+    private GameRoom loadGameRoom(GameZoneIndex zoneIndex,GameRoom gameRoom){
+        gameRoom.dataStore(this.dataStore);
+        gameRoom.load();
+        GameModule gameModule = gameModule(zoneIndex.gameZone.gameModule(),gameRoom);
+        gameRoom.setup(zoneIndex.gameZone,gameModule,dedicated);
+        resetGameRoom(zoneIndex,gameRoom,true);
+        gameRoomIndex.put(gameRoom.roomId(),gameRoom);
+        return gameRoom;
+    }
+
     private GameRoom loadGameRoom(GameZoneIndex zoneIndex,String roomId){
-        GameZone gameZone = zoneIndex.gameZone;
         return gameRoomIndex.computeIfAbsent(roomId,(k)->{
-            GameRoom _gameRoom = this.newGameRoom(gameZone.playMode(),gameZone.capacity());
-            _gameRoom.distributionKey(roomId);
-            if(!this.dataStore.load(_gameRoom)) return null;
-            _gameRoom.dataStore(this.dataStore);
-            _gameRoom.load();
-            GameModule gameModule = gameModule(zoneIndex.gameZone.gameModule(),_gameRoom);
-            _gameRoom.setup(zoneIndex.gameZone,gameModule,dedicated);
-            resetGameRoom(zoneIndex,_gameRoom,true);
-            return _gameRoom;
+            GameRoom gameRoom = this.newGameRoom(zoneIndex.gameZone.gameModule(),zoneIndex.gameZone.capacity());
+            gameRoom.distributionId(Long.parseLong(roomId));
+            if(!this.dataStore.load(gameRoom)) return null;
+            gameRoom.dataStore(this.dataStore);
+            gameRoom.load();
+            GameModule gameModule = gameModule(zoneIndex.gameZone.gameModule(),gameRoom);
+            gameRoom.setup(zoneIndex.gameZone,gameModule,dedicated);
+            resetGameRoom(zoneIndex,gameRoom,true);
+            return gameRoom;
         });
     }
 
@@ -504,15 +509,12 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }
         GameZone gameZone = zoneIndex.gameZone;
         GameRoom gameRoom = this.newGameRoom(gameZone.playMode(),gameZone.capacity());
+        gameRoom.ownerKey(gameZone.key());
         if(!this.dataStore.create(gameRoom)) return null;
         gameRoom.dataStore(this.dataStore);
         gameRoom.load();
         GameModule gameModule = gameModule(zoneIndex.gameZone.gameModule(),gameRoom);
         gameRoom.setup(zoneIndex.gameZone,gameModule,dedicated);
-        synchronized (zoneIndex.roomIndex){
-            zoneIndex.roomIndex.addKey(gameRoom.roomId());
-            this.dataStore.update(zoneIndex.roomIndex);
-        }
         gameRoomIndex.put(gameRoom.roomId(),gameRoom);
         resetGameRoom(zoneIndex,gameRoom,queued);
         return gameRoom;
@@ -525,7 +527,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         room.setup(udpEndpoint.createChannels(index.gameZone.capacity()));
     }
 
-    private void localLeave(long systemId, GameZoneIndex index, String roomId, GameRoom.Listener listener){
+    private void localLeave(long systemId, GameZoneIndex index,String roomId, GameRoom.Listener listener){
         GameRoom gameRoom = loadGameRoom(index,roomId);
         if(gameRoom==null) {
             logger.warn("Room Missed->"+index.gameZone.distributionKey()+">>"+roomId);

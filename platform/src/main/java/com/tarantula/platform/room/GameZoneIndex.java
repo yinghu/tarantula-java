@@ -22,7 +22,7 @@ public class GameZoneIndex {
     public GameModule gameModule;
 
     //none dedicated settings
-    public IndexSet roomIndex;
+    //public IndexSet roomIndex;
     public ArrayBlockingQueue<GameRoom> pendingRooms;
     public LinkedBlockingDeque<GameRoom> runningRooms;
     public LinkedBlockingDeque<GameRoom>[] rankingRooms;
