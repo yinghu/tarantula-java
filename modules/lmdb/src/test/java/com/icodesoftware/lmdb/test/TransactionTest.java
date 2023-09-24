@@ -1,5 +1,6 @@
 package com.icodesoftware.lmdb.test;
 
+import com.beust.ah.A;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
@@ -41,6 +42,112 @@ public class TransactionTest {
     public void tearDown() throws Exception{
 
         //lmdbDataStoreProvider.shutdown();
+    }
+    @Test(groups = { "LMDB" })
+    public void transactionLoadTest() {
+        Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.INTEGRATION_SCOPE);
+        long id = localDistributionIdGenerator.id();
+        Assert.assertTrue(id>0);
+        TestAccessIndex testUser = new TestAccessIndex("user");
+        testUser.distributionId(id);
+        testUser.onEdge(true);
+        testUser.label(TestUser.LABEL);
+        testUser.ownerKey(new SnowflakeKey(100));
+        DataStore t1 = lmdbDataStoreProvider.createAccessIndexDataStore("test_user_f");
+        Assert.assertTrue(t1.createIfAbsent(testUser,false));
+        transaction.execute(ctx->{
+            DataStore user = ctx.onDataStore("test_user_f");
+            Assert.assertTrue(user.scope()==Distributable.INTEGRATION_SCOPE);
+            TestAccessIndex load = new TestAccessIndex("user");
+            Assert.assertFalse(user.createIfAbsent(load,true));
+            TestAccessIndex load1 = new TestAccessIndex("user");
+            Assert.assertTrue(user.load(load1));
+            Assert.assertEquals(load.distributionId(),id);
+            Assert.assertEquals(load1.distributionId(),id);
+            return true;
+        });
+        transaction.close();
+        /**
+        Transaction update = lmdbDataStoreProvider.transaction(Distributable.INTEGRATION_SCOPE);
+        update.execute(ctx->{
+            DataStore user = ctx.onDataStore("test_user_f");
+            Assert.assertTrue(user.scope()==Distributable.INTEGRATION_SCOPE);
+            TestAccessIndex load = new TestAccessIndex("user");
+            Assert.assertFalse(user.createIfAbsent(load,true));
+            Assert.assertTrue(load.distributionId()==id);
+            load.distributionId(100);
+            Assert.assertTrue(user.update(load));
+            return true;
+        });
+        update.close();
+        **/
+        //DataStore t1 = lmdbDataStoreProvider.createAccessIndexDataStore("test_user_f");
+        //TestAccessIndex load = new TestAccessIndex("user");
+        //Assert.assertTrue(t1.load(load));
+        //Assert.assertEquals(load.distributionId(),100);
+        //Assert.assertEquals(load.revision(),Long.MIN_VALUE+1);
+    }
+
+    @Test(groups = { "LMDB" })
+    public void transactionUpdateTest() {
+        Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.INTEGRATION_SCOPE);
+        long id = localDistributionIdGenerator.id();
+        Assert.assertTrue(id>0);
+        TestAccessIndex testUser = new TestAccessIndex("user");
+        testUser.distributionId(id);
+        testUser.onEdge(true);
+        testUser.label(TestUser.LABEL);
+        testUser.ownerKey(new SnowflakeKey(100));
+        transaction.execute(ctx->{
+            DataStore user = ctx.onDataStore("test_user_d");
+            Assert.assertTrue(user.scope()==Distributable.INTEGRATION_SCOPE);
+            Assert.assertTrue(user.createIfAbsent(testUser,false));
+            return true;
+        });
+        transaction.close();
+        Transaction update = lmdbDataStoreProvider.transaction(Distributable.INTEGRATION_SCOPE);
+        update.execute(ctx->{
+            DataStore user = ctx.onDataStore("test_user_d");
+            Assert.assertTrue(user.scope()==Distributable.INTEGRATION_SCOPE);
+            TestAccessIndex load = new TestAccessIndex("user");
+            Assert.assertFalse(user.createIfAbsent(load,true));
+            Assert.assertTrue(load.distributionId()==id);
+            load.distributionId(100);
+            Assert.assertTrue(user.update(load));
+            return true;
+        });
+        update.close();
+
+        DataStore t1 = lmdbDataStoreProvider.createAccessIndexDataStore("test_user_d");
+        TestAccessIndex load = new TestAccessIndex("user");
+        Assert.assertTrue(t1.load(load));
+        Assert.assertEquals(load.distributionId(),100);
+        Assert.assertEquals(load.revision(),Long.MIN_VALUE+1);
+    }
+    @Test(groups = { "LMDB" })
+    public void transactionCreateEdgeTest() {
+        Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.INTEGRATION_SCOPE);
+        long id = localDistributionIdGenerator.id();
+        Assert.assertTrue(id>0);
+        TestAccessIndex testUser = new TestAccessIndex("user");
+        testUser.distributionId(id);
+        testUser.onEdge(true);
+        testUser.label(TestUser.LABEL);
+        testUser.ownerKey(new SnowflakeKey(100));
+        transaction.execute(ctx->{
+            DataStore user = ctx.onDataStore("test_user_c");
+            Assert.assertTrue(user.scope()==Distributable.INTEGRATION_SCOPE);
+            Assert.assertTrue(user.createIfAbsent(testUser,false));
+            Assert.assertTrue(user.createEdge(testUser,"friend"));
+            Assert.assertTrue(user.createEdge(testUser,"slots"));
+            return true;
+        });
+        transaction.close();
+        DataStore t1 = lmdbDataStoreProvider.createAccessIndexDataStore("test_user_c");
+        Assert.assertTrue(t1.load(testUser));
+        Assert.assertEquals(t1.list(new TestAccessQuery(100)).size(),1);
+        Assert.assertEquals(t1.list(new TestAccessQuery(100,"friend")).size(),1);
+        Assert.assertEquals(t1.list(new TestAccessQuery(100,"slots")).size(),1);
     }
     @Test(groups = { "LMDB" })
     public void transactionCreateIfAbsentTest() {

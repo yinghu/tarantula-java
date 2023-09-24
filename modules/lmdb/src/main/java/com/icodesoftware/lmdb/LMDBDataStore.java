@@ -115,7 +115,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             cache.reset();
             return false;
         }
-        final Txn<ByteBuffer> txn = env.txnWrite(); //can read also
+        final Txn<ByteBuffer> txn = env.txn(ptxn); //can read also
         boolean updated = false;
         try{
             if (dbi.get(txn, key.flip()) != null){
@@ -146,7 +146,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             cache.reset();
             return false;
         }
-        final Txn<ByteBuffer> xtxn = env.txnWrite();
+        final Txn<ByteBuffer> xtxn = env.txn(ptxn);
         try{
             value.flip();
             Recoverable.DataHeader header = value.readHeader();
@@ -241,7 +241,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             cache.reset();
             return false;
         }
-        final Txn<ByteBuffer> txn = env.txnWrite(); //read only
+        final Txn<ByteBuffer> txn = env.txn(ptxn); //read only
         try{
             if (!dbi.put(txn, key.rewind(),value.flip())) throw new RuntimeException("lmdb failure to insert key/value");
             txn.commit();
@@ -259,14 +259,14 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     public <T extends Recoverable> boolean createEdge(T t,String label){
         if(label==null) return false;
-        lmdbDataStoreProvider.createEdgeDB(scope,name,label);
-        Txn<ByteBuffer> txn = env.txnWrite();
+        //lmdbDataStoreProvider.createEdgeDB(scope,name,label);
+        //Txn<ByteBuffer> txn = env.txnWrite();
         try{
-            if(!onEdge(t.ownerKey(),label,t.key(),txn)) return false;
-            txn.commit();
+            if(!onEdge(t.ownerKey(),label,t.key(),ptxn)) return false;
+            //txn.commit();
             return true;
         }finally {
-            txn.close();
+            //txn.close();
         }
     }
 
