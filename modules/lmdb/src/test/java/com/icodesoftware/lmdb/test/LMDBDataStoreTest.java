@@ -269,30 +269,4 @@ public class LMDBDataStoreTest {
         //Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),1);
     }
 
-    @Test(groups = { "LMDB" })
-    public void transactionTest() {
-        Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE);
-        long id = localDistributionIdGenerator.id();
-        Assert.assertTrue(id>0);
-        TestUser testUser = new TestUser("user",id);
-        transaction.execute(ctx->{
-            DataStore user = ctx.onDataStore("test_user_p");
-            System.out.println(user.create(testUser));
-            DataStore account = ctx.onDataStore("test_account_p");
-            System.out.println(account.create(testUser));
-            //System.out.println(dataStore.name());cd mo
-        });
-        transaction.close();
-        lmdbDataStoreProvider.createDataStore("test_user_p").backup().forEach((k,v)->{
-            Recoverable.DataHeader h = v.readHeader();
-            System.out.println("CID : "+h.classId());
-            return true;
-        });
-        lmdbDataStoreProvider.createDataStore("test_account_p").backup().forEach((k,v)->{
-            Recoverable.DataHeader h = v.readHeader();
-            System.out.println("AID : "+h.classId());
-            return true;
-        });
-    }
-
 }

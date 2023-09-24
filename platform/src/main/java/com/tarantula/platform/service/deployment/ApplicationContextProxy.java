@@ -110,4 +110,9 @@ public class ApplicationContextProxy implements ApplicationContext {
     public ClusterProvider.Node node(){
         return this.tarantulaApplicationContext.node();
     }
+
+    @Override
+    public Transaction transaction() {
+        return this.tarantulaApplicationContext.transaction();
+    }
 }

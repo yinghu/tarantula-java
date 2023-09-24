@@ -176,4 +176,8 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     public ClusterProvider.Node node(){
         return tarantulaContext.node();
     }
+
+    public Transaction transaction(){
+        return this.tarantulaContext.deploymentDataStoreProvider.transaction(Distributable.DATA_SCOPE);
+    }
 }

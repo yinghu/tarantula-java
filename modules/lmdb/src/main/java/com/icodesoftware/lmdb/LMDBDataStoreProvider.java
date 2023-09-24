@@ -48,7 +48,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private final static int VALUE_SIZE = 1800;
 
     private final static int PENDING_BUFFER_SIZE = 16;
-    private final static ConcurrentHashMap<String,LMDBDataStore> storeMap = new ConcurrentHashMap<>();
+    private final static ConcurrentHashMap<String,DataStore> storeMap = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<String,LocalEdgeDataStore> edgMap = new ConcurrentHashMap<>();
 
     final static ArrayBlockingQueue<BufferCache> pendingQueue = new ArrayBlockingQueue<>(PENDING_BUFFER_SIZE);;
@@ -152,23 +152,22 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         throw new RuntimeException("Scope ["+scope+"] not supported");
     }
 
-    public LMDBDataStore createDataStore(int scope,String name,Txn<ByteBuffer> txn){
-        if(txn!=null) System.out.println("db : "+scope+" : "+name +" : "+ txn.getId());
+    public DataStore createDataStore(int scope,String name,Txn<ByteBuffer> txn){
         if(scope==Distributable.DATA_SCOPE){
             Dbi<ByteBuffer> dbi = txn==null? data.openDbi(name,DbiFlags.MDB_CREATE) : data.openDbi(txn,name.getBytes(),null,DbiFlags.MDB_CREATE);
-            return new LMDBDataStore(scope,name,dbi,data,this,txn);
+            return txn==null? new CachedLMDBDataStore(scope,name,dbi,data,this) : new LMDBDataStore(scope,name,dbi,data,this,txn);
         }
         if(scope==Distributable.INTEGRATION_SCOPE){
             Dbi<ByteBuffer> dbi = txn==null? integration.openDbi(name,DbiFlags.MDB_CREATE) : integration.openDbi(txn,name.getBytes(),null,DbiFlags.MDB_CREATE);
-            return new LMDBDataStore(scope,name,dbi,integration,this,txn);
+            return txn==null? new CachedLMDBDataStore(scope,name,dbi,integration,this) : new LMDBDataStore(scope,name,dbi,integration,this,txn);
         }
         if(scope==Distributable.INDEX_SCOPE){
             Dbi<ByteBuffer> dbi = txn==null? index.openDbi(name,DbiFlags.MDB_CREATE) : index.openDbi(txn,name.getBytes(),null,DbiFlags.MDB_CREATE);
-            return new LMDBDataStore(scope,name,dbi,index,this,txn);
+            return txn==null? new CachedLMDBDataStore(scope,name,dbi,index,this) : new LMDBDataStore(scope,name,dbi,index,this,txn);
         }
         if(scope==Distributable.LOCAL_SCOPE){
             Dbi<ByteBuffer> dbi = txn==null? local.openDbi(name,DbiFlags.MDB_CREATE) : local.openDbi(txn,name.getBytes(),null,DbiFlags.MDB_CREATE);
-            return new LMDBDataStore(scope,name,dbi,local,this,txn);
+            return txn==null? new CachedLMDBDataStore(scope,name,dbi,local,this) : new LMDBDataStore(scope,name,dbi,local,this,txn);
         }
         throw new RuntimeException("Scope ["+scope+"] not supported");
     }

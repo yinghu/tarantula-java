@@ -4,14 +4,11 @@ import com.icodesoftware.service.DataStoreSummary;
 
 import java.util.List;
 
-public interface DataStore {
+public interface DataStore extends Closable{
 
     int scope();
 
     String name();
-
-    //long count();
-    //List<String> edgeList();
 
     <T extends Recoverable> boolean create(T t);
 

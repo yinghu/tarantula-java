@@ -39,4 +39,6 @@ public interface ApplicationContext extends Context{
 
 
     ClusterProvider.Node node();
+
+    Transaction transaction();
 }

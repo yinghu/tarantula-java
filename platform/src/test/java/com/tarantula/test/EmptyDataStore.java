@@ -85,4 +85,9 @@ public class EmptyDataStore implements DataStore {
     public Backup backup() {
         return null;
     }
+
+    @Override
+    public void close() {
+
+    }
 }
