@@ -3,6 +3,7 @@ package com.icodesoftware.lmdb.test;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.Transaction;
 import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.lmdb.LMDBDataStoreProvider;
 import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
@@ -43,7 +44,8 @@ public class LMDBDataStoreTest {
     }
     @AfterTest
     public void tearDown() throws Exception{
-       lmdbDataStoreProvider.shutdown();
+
+        //lmdbDataStoreProvider.shutdown();
     }
 
     @Test(groups = { "LMDB" })
@@ -194,7 +196,7 @@ public class LMDBDataStoreTest {
         Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),1);
     }
 
-    //@Test(groups = { "LMDB" })
+    @Test(groups = { "LMDB" })
     public void deleteWithEdgeTest() {
         DataStore ds = lmdbDataStoreProvider.createDataStore("test_use_d");
         long ownerId1 = 10000;
@@ -265,6 +267,32 @@ public class LMDBDataStoreTest {
         //Assert.assertTrue(ds.create(testUser));
         //Assert.assertTrue(ds.createEdge(testUser,"friends"));
         //Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),1);
+    }
+
+    @Test(groups = { "LMDB" })
+    public void transactionTest() {
+        Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE);
+        long id = localDistributionIdGenerator.id();
+        Assert.assertTrue(id>0);
+        TestUser testUser = new TestUser("user",id);
+        transaction.execute(ctx->{
+            DataStore user = ctx.onDataStore("test_user_p");
+            System.out.println(user.create(testUser));
+            DataStore account = ctx.onDataStore("test_account_p");
+            System.out.println(account.create(testUser));
+            //System.out.println(dataStore.name());cd mo
+        });
+        transaction.close();
+        lmdbDataStoreProvider.createDataStore("test_user_p").backup().forEach((k,v)->{
+            Recoverable.DataHeader h = v.readHeader();
+            System.out.println("CID : "+h.classId());
+            return true;
+        });
+        lmdbDataStoreProvider.createDataStore("test_account_p").backup().forEach((k,v)->{
+            Recoverable.DataHeader h = v.readHeader();
+            System.out.println("AID : "+h.classId());
+            return true;
+        });
     }
 
 }

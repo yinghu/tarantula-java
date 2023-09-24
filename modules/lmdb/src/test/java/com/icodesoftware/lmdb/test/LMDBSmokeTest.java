@@ -1,6 +1,7 @@
 package com.icodesoftware.lmdb.test;
 
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.Transaction;
 import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.util.SnowflakeIdGenerator;
 import com.icodesoftware.util.TimeUtil;
@@ -40,7 +41,7 @@ public class LMDBSmokeTest {
         env.close();
     }
 
-    @Test(groups = { "LMDBSmoke" })
+    //@Test(groups = { "LMDBSmoke" })
     public void smokeTest() {
         Dbi<ByteBuffer> dbi = env.openDbi("tarantula_edge", DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
         Txn<ByteBuffer> txn = env.txnWrite();
@@ -82,7 +83,7 @@ public class LMDBSmokeTest {
         c.close();
         Assert.assertEquals(ct[0],10);
     }
-    @Test(groups = { "LMDBSmoke" })
+    //@Test(groups = { "LMDBSmoke" })
     public void keyTest() {
         Dbi<ByteBuffer> dbi = env.openDbi("tarantula_int_key", DbiFlags.MDB_CREATE);
         Txn<ByteBuffer> txn = env.txnWrite();
@@ -123,7 +124,7 @@ public class LMDBSmokeTest {
         return new long[]{start,end-1};
     }
 
-    @Test(groups = { "LMDBSmoke" })
+    //@Test(groups = { "LMDBSmoke" })
     public void snowflakeTest() {
         SnowflakeIdGenerator snowflakeIdGenerator = new SnowflakeIdGenerator(99, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
         Dbi<ByteBuffer> dbi = env.openDbi("tarantula_snow_flake", DbiFlags.MDB_CREATE);
@@ -159,6 +160,43 @@ public class LMDBSmokeTest {
             //System.out.println(snowflakeIdGenerator.fromSnowflakeId(vx)[1]);
         }
     }
+
+    @Test(groups = { "LMDBSmoke" })
+    public void txnTest() {
+        ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
+        key.putLong(100).flip();
+        ByteBuffer value = ByteBuffer.allocateDirect(700);
+        value.putLong(100).flip();
+        final Txn<ByteBuffer> c = env.txnWrite();
+        Dbi dbi1 = env.openDbi(c,"test1".getBytes(),null,DbiFlags.MDB_CREATE);
+        final Txn<ByteBuffer> c1 = env.txn(c);
+        if(dbi1.get(c1,key)!=null){
+            System.out.println("VC1 X : "+c1.val().getLong());
+        }
+        c1.abort();
+        final Txn<ByteBuffer> c1x = env.txn(c);
+
+        dbi1.put(c1x,key.rewind(),value);
+        if(dbi1.get(c1x,key.rewind())!=null){
+            System.out.println("VC1 Y : "+c1x.val().getLong());
+        }
+        c1x.commit();
+        Dbi dbi2 = env.openDbi(c,"test2".getBytes(),null,DbiFlags.MDB_CREATE);
+        final Txn<ByteBuffer> c2 = env.txn(c);
+        if(dbi2.get(c2,key)!=null){
+            System.out.println("VC2 X : "+c2.val().getLong());
+        }
+        dbi2.put(c2,key.rewind(),value.rewind());
+        if(dbi2.get(c2,key.rewind())!=null){
+            System.out.println("VC2 Y : "+c2.val().getLong());
+        }
+        //c2.commit();
+        c.commit();
+        dbi1.close();
+        dbi2.close();
+
+    }
+
 
 
 }

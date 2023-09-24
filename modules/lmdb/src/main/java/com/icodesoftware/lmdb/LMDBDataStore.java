@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
-    private final Env<ByteBuffer> env;
+    public final Env<ByteBuffer> env;
     private final Dbi<ByteBuffer> dbi;
     private final LocalEdgeDataStore idx;
 
@@ -31,7 +31,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     //NOTES : key+value < 2032 bytes ( 511 bytes for key ; value <= 1521 bytes (2032 - 511 - 8)
 
     private final LMDBDataStoreProvider lmdbDataStoreProvider;
-    public LMDBDataStore(int scope,String name, Dbi<ByteBuffer> dbi,Env<ByteBuffer> env,LMDBDataStoreProvider lmdbDataStoreProvider){
+    public LMDBDataStore(int scope,String name, Dbi<ByteBuffer> dbi,Env<ByteBuffer> env,LMDBDataStoreProvider lmdbDataStoreProvider,Txn<ByteBuffer> ptxn){
         this.edgeIndex = new ConcurrentHashMap<>();
         this.metadata = new LocalMetadata(scope,name);
         this.scope = scope;
@@ -39,9 +39,9 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         this.dbi = dbi;
         this.env = env;
         this.lmdbDataStoreProvider = lmdbDataStoreProvider;
-        idx = this.lmdbDataStoreProvider.createEdgeDB(scope,name,IDX_EDGE);
+        idx = this.lmdbDataStoreProvider.localEdgeDataStore(scope,name,IDX_EDGE,ptxn);
         IDX_KEY.getLong();
-        loadEdges();
+        loadEdges(ptxn);
     }
 
     @Override
@@ -463,8 +463,8 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     }
     //help methods
 
-    private void loadEdges(){
-        final Txn<ByteBuffer> txn = env.txnRead();
+    private void loadEdges(Txn<ByteBuffer> ptxn){
+        final Txn<ByteBuffer> txn = ptxn==null?env.txnRead():env.txn(ptxn);
         try {
             IDX_KEY.rewind();
             CursorIterable<ByteBuffer> cursor = idx.dbi.iterate(txn, KeyRange.closed(IDX_KEY,IDX_KEY));
@@ -473,6 +473,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
                 String edge = new String(BufferProxy.buffer(kv.val()).array());
                 edgeIndex.put(edge,edge);
             }
+            cursor.close();
         }finally {
             txn.close();
         }
@@ -602,4 +603,56 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             txn.close();
         }
     }
+
+    public <T extends Recoverable> boolean createEx(Txn ptxn ,T t) {
+        //create edge db before txn creation
+        //if(t.onEdge() && t.label()!=null) lmdbDataStoreProvider.localEdgeDataStore(scope,name,t.label(),txn.getParent());
+        BufferCache cache = lmdbDataStoreProvider.fromCache();
+        Recoverable.DataBuffer key = cache.key;
+        Recoverable.DataBuffer value = cache.value;
+        System.out.println("sp :"+scope+":"+ name+":"+ new String(dbi.getName())+" : "+ptxn.getId());
+        final Txn<ByteBuffer> txn = env.txn(ptxn);//can read also
+        try{
+            lmdbDataStoreProvider.assign(key);
+            key.flip();
+            if(!t.readKey(key)) return false;
+            value.writeHeader(new LocalHeader(true,Long.MIN_VALUE,t.getFactoryId(),t.getClassId()));
+            if(!t.write(value)) return false;
+            if(!dbi.put(txn,key.rewind(),value.flip())) throw new RuntimeException("lmdb failure to insert key/value");
+            txn.commit();
+            if(t.onEdge()) onEdgeEx(t.ownerKey(),t.label(),t.key(),ptxn);
+            key.rewind();
+            value.rewind();
+            t.revision(Long.MIN_VALUE);
+            //lmdbDataStoreProvider.onDistributing(metadata,key,value);
+            return true;
+        }finally {
+            //txn.close();
+            cache.reset();
+        }
+    }
+    private boolean onEdgeEx(Recoverable.Key ownerKey, String label, Recoverable.Key edgeKey, Txn<ByteBuffer> ptxn){
+        if(ownerKey ==null || label==null) return false;
+        BufferCache cache = lmdbDataStoreProvider.fromCache();
+        Recoverable.DataBuffer key = cache.key;
+        Recoverable.DataBuffer value = cache.value;
+        try{
+            if(!ownerKey.write(key)) return false;
+            if(!edgeKey.write(value)) return false;
+            //setEdge(txn,label);
+            LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.localEdgeDataStore(scope,name,label,ptxn);
+            Txn<ByteBuffer> txn = env.txn(ptxn);
+            if(!localEdgeDataStore.dbi.put(txn,key.flip(),value.flip(), PutFlags.MDB_NODUPDATA)) return false;//no duplicate entry
+            idx.dbi.put(txn,value.rewind(),key.rewind(),PutFlags.MDB_NODUPDATA);
+            txn.commit();
+            key.rewind();
+            value.rewind();
+            //lmdbDataStoreProvider.onDistributing(localEdgeDataStore.metadata,key,value);
+            return true;
+        }finally {
+            cache.reset();
+        }
+    }
+
+
 }

@@ -1,10 +1,7 @@
 package com.icodesoftware.lmdb;
 
 import com.google.gson.JsonElement;
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Distributable;
-import com.icodesoftware.Recoverable;
-import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DataStoreProvider;
 import com.icodesoftware.service.MapStoreListener;
@@ -14,6 +11,7 @@ import com.icodesoftware.service.ServiceContext;
 import org.lmdbjava.Dbi;
 import org.lmdbjava.DbiFlags;
 import org.lmdbjava.Env;
+import org.lmdbjava.Txn;
 
 import java.nio.ByteBuffer;
 import java.nio.file.FileSystems;
@@ -27,7 +25,7 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener {
+public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener{
 
     private TarantulaLogger logger = JDKLogger.getLogger(LMDBDataStoreProvider.class);
 
@@ -37,7 +35,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private String indexPath = "target/lmdb/index";
 
     private String localPath = "target/lmdb/local";
-    private Env<ByteBuffer> data;
+    public Env<ByteBuffer> data;
     private Env<ByteBuffer> integration;
     private Env<ByteBuffer> index;
     private Env<ByteBuffer> local;
@@ -100,48 +98,24 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     @Override
     public DataStore createAccessIndexDataStore(String name) {
-        return storeMap.computeIfAbsent(name,k->{
-            Dbi<ByteBuffer> dbi = integration.openDbi(name, DbiFlags.MDB_CREATE);
-            return new LMDBDataStore(Distributable.INTEGRATION_SCOPE,name,dbi,integration,this);
-        });
+        return storeMap.computeIfAbsent(name,k->createDataStore(Distributable.INTEGRATION_SCOPE,name,null));
     }
 
     public LocalEdgeDataStore createEdgeDB(int scope,String source,String label){
         final String edgeName = source+"#"+label;
-        if(scope== Distributable.DATA_SCOPE){
-            return edgMap.computeIfAbsent(edgeName,k-> new LocalEdgeDataStore(new LocalMetadata(scope,source,label),data.openDbi(edgeName, DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT)));
-        }
-        if(scope==Distributable.INTEGRATION_SCOPE){
-            return edgMap.computeIfAbsent(edgeName,k-> new LocalEdgeDataStore(new LocalMetadata(scope,source,label),integration.openDbi(edgeName, DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT)));
-        }
-        if(scope==Distributable.INDEX_SCOPE){
-            return edgMap.computeIfAbsent(edgeName,k-> new LocalEdgeDataStore(new LocalMetadata(scope,source,label),index.openDbi(edgeName, DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT)));
-        }
-        if(scope==Distributable.LOCAL_SCOPE){
-            return edgMap.computeIfAbsent(edgeName,k-> new LocalEdgeDataStore(new LocalMetadata(scope,source,label),local.openDbi(edgeName, DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT)));
-        }
-        throw new RuntimeException("Scope ["+scope+"] not supported");
+        return edgMap.computeIfAbsent(edgeName,k->localEdgeDataStore(scope,source,label,null));
     }
 
     @Override
     public DataStore createKeyIndexDataStore(String name) {
-        return storeMap.computeIfAbsent(name,k->{
-            Dbi<ByteBuffer> dbi = index.openDbi(name, DbiFlags.MDB_CREATE);
-            return new LMDBDataStore(Distributable.INDEX_SCOPE,name,dbi,index,this);
-        });
+        return storeMap.computeIfAbsent(name,k-> createDataStore(Distributable.INDEX_SCOPE,name,null));
     }
     @Override
     public DataStore createDataStore(String name){
-        return storeMap.computeIfAbsent(name,k->{
-            Dbi<ByteBuffer> dbi = data.openDbi(name, DbiFlags.MDB_CREATE);
-            return new LMDBDataStore(Distributable.DATA_SCOPE,name,dbi,data,this);
-        });
+        return storeMap.computeIfAbsent(name,k->createDataStore(Distributable.DATA_SCOPE, name, null));
     }
     public DataStore createLocalDataStore(String name){
-        return storeMap.computeIfAbsent(name,k->{
-            Dbi<ByteBuffer> dbi = local.openDbi(name, DbiFlags.MDB_CREATE);
-            return new LMDBDataStore(Distributable.LOCAL_SCOPE,name,dbi,local,this);
-        });
+        return storeMap.computeIfAbsent(name,k->createDataStore(Distributable.LOCAL_SCOPE,name,null));
     }
     @Override
     public List<String> list() {
@@ -166,7 +140,61 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         return storeMap.get(name);
     }
 
+    public Transaction transaction(int scope){
+        return new LocalTransaction(scope,this);
+    }
 
+    public Txn<ByteBuffer> txn(int scope){
+        if(scope==Distributable.DATA_SCOPE) return data.txnWrite();
+        if(scope==Distributable.INTEGRATION_SCOPE) return integration.txnWrite();
+        if(scope==Distributable.INDEX_SCOPE) return index.txnWrite();
+        if(scope==Distributable.LOCAL_SCOPE) return local.txnWrite();
+        throw new RuntimeException("Scope ["+scope+"] not supported");
+    }
+
+    public LMDBDataStore createDataStore(int scope,String name,Txn<ByteBuffer> txn){
+        if(txn!=null) System.out.println("db : "+scope+" : "+name +" : "+ txn.getId());
+        if(scope==Distributable.DATA_SCOPE){
+            Dbi<ByteBuffer> dbi = txn==null? data.openDbi(name,DbiFlags.MDB_CREATE) : data.openDbi(txn,name.getBytes(),null,DbiFlags.MDB_CREATE);
+            return new LMDBDataStore(scope,name,dbi,data,this,txn);
+        }
+        if(scope==Distributable.INTEGRATION_SCOPE){
+            Dbi<ByteBuffer> dbi = txn==null? integration.openDbi(name,DbiFlags.MDB_CREATE) : integration.openDbi(txn,name.getBytes(),null,DbiFlags.MDB_CREATE);
+            return new LMDBDataStore(scope,name,dbi,integration,this,txn);
+        }
+        if(scope==Distributable.INDEX_SCOPE){
+            Dbi<ByteBuffer> dbi = txn==null? index.openDbi(name,DbiFlags.MDB_CREATE) : index.openDbi(txn,name.getBytes(),null,DbiFlags.MDB_CREATE);
+            return new LMDBDataStore(scope,name,dbi,index,this,txn);
+        }
+        if(scope==Distributable.LOCAL_SCOPE){
+            Dbi<ByteBuffer> dbi = txn==null? local.openDbi(name,DbiFlags.MDB_CREATE) : local.openDbi(txn,name.getBytes(),null,DbiFlags.MDB_CREATE);
+            return new LMDBDataStore(scope,name,dbi,local,this,txn);
+        }
+        throw new RuntimeException("Scope ["+scope+"] not supported");
+    }
+    public LocalEdgeDataStore localEdgeDataStore(int scope,String source,String label,Txn<ByteBuffer> txn){
+        if(scope==Distributable.DATA_SCOPE){
+            String edgeName = source+"#"+label;
+            Dbi<ByteBuffer> dbi = txn==null? data.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : data.openDbi(txn,edgeName.getBytes(),null,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
+            return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
+        }
+        if(scope==Distributable.INTEGRATION_SCOPE){
+            String edgeName = source+"#"+label;
+            Dbi<ByteBuffer> dbi = txn==null? integration.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : integration.openDbi(txn,edgeName.getBytes(),null,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
+            return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
+        }
+        if(scope==Distributable.INDEX_SCOPE){
+            String edgeName = source+"#"+label;
+            Dbi<ByteBuffer> dbi = txn==null? index.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : index.openDbi(txn,edgeName.getBytes(),null,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
+            return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
+        }
+        if(scope==Distributable.LOCAL_SCOPE){
+            String edgeName = source+"#"+label;
+            Dbi<ByteBuffer> dbi = txn==null? local.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : local.openDbi(txn,edgeName.getBytes(),null,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
+            return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
+        }
+        throw new RuntimeException("Scope ["+scope+"] not supported");
+    }
 
     @Override
     public String name() {
@@ -317,5 +345,4 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(cache!=null) return cache;
         return new BufferCache(KEY_SIZE,VALUE_SIZE,pendingQueue);
     }
-
 }
