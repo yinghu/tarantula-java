@@ -4,7 +4,6 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Transaction;
 import org.lmdbjava.Txn;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 
 public class LocalTransaction implements Transaction, Transaction.DataStoreContext {
 
@@ -12,7 +11,7 @@ public class LocalTransaction implements Transaction, Transaction.DataStoreConte
     private final int scope;
 
     private Txn<ByteBuffer> txn;
-    private ArrayList<DataStore> joined = new ArrayList<>();
+
     public LocalTransaction(int scope,LMDBDataStoreProvider dataStoreProvider){
         this.scope = scope;
         this.dataStoreProvider = dataStoreProvider;
@@ -37,14 +36,11 @@ public class LocalTransaction implements Transaction, Transaction.DataStoreConte
 
     @Override
     public void close() {
-        joined.forEach(db->db.close());
-        joined.clear();
+        //clear transaction resources
     }
 
     @Override
     public DataStore onDataStore(String name) {
-        DataStore dataStore = dataStoreProvider.createDataStore(scope,name,txn);
-        joined.add(dataStore);
-        return dataStore;
+       return dataStoreProvider.createDataStore(scope,name,txn);
     }
 }
