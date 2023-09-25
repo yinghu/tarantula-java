@@ -39,4 +39,6 @@ public interface ServiceContext extends Context{
 
     PostOffice postOffice();
 
+    Transaction transaction(int scope);
+
 }

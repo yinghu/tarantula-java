@@ -1049,4 +1049,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public long distributionId() {
         return distributionIdGenerator.id();
     }
+
+    public Transaction transaction(int scope){
+         return dataStoreProvider().transaction(scope);
+    }
 }

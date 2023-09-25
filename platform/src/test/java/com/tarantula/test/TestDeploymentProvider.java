@@ -46,6 +46,10 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
 
     }
 
+    public Transaction transaction(int scope){
+        return null;
+    }
+
     @Override
     public byte[] serverKey(String typeId) {
         return new byte[0];

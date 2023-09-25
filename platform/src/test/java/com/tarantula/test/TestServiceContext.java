@@ -172,4 +172,7 @@ public class TestServiceContext implements ServiceContext {
     public KeyIndexService keyIndexService(){
         return null;
     }
+    public Transaction transaction(int scope){
+        return null;
+    }
 }

@@ -94,7 +94,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
     DistributionCallback distributionCallback();
 
-
+    Transaction transaction(int scope);
     //local callbacks on distributed operations
     interface DistributionCallback{
 
