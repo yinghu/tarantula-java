@@ -1,7 +1,6 @@
 package com.icodesoftware.util;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
@@ -190,7 +189,7 @@ public class RecoverableObject implements Recoverable {
     }
     @Override
     public String toString(){
-        return (JsonUtil.toJsonString(this.toMap()));
+        return toJson().toString();
     }
 
     @Override

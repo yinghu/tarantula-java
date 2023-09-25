@@ -33,6 +33,9 @@ public class DataStoreViewer implements DataStoreSummary {
         this.dataStore = dataStore;
         this.dataStore.backup().view(this);
     }
+
+    public DataStoreViewer(){
+    }
     @Override
     public String name() {
         return dataStore.name();

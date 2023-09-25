@@ -253,7 +253,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         AccessKey akey = new AccessKey();
         akey.distributionKey(sp[0]);
         if(!this.deployDataStore.load(akey) || akey.disabled()) return null;
-        GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(akey.distributionId());
+        GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(akey.index()));
         if(gameCluster==null) return null;
         String validLobby = gameCluster.gameLobbyName;
         String wmark = SystemUtil.validAccessKey(messageDigest(),accessKey,validLobby,akey.timestamp());
@@ -267,7 +267,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         AccessKey accessKey = new AccessKey();
         accessKey.typeId(gc.gameLobbyName);
         accessKey.timestamp(stmp);
-        accessKey.distributionId(gameClusterId);
+        accessKey.index(gc.distributionKey());
         if(!this.deployDataStore.create(accessKey)) return null;
         byte[] wmark = encrypt(ByteBuffer.allocate(8).putLong(stmp).array());
         return SystemUtil.accessKey(messageDigest(),accessKey.typeId(),accessKey.distributionKey(),stmp,SystemUtil.toHexString(wmark));

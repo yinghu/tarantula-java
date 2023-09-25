@@ -3,7 +3,6 @@ package com.tarantula.platform.presence;
 import com.icodesoftware.service.LoginProvider;
 import com.icodesoftware.util.RecoverableObject;
 
-import java.util.Map;
 
 public class ThirdPartyLogin extends RecoverableObject implements LoginProvider {
 
@@ -27,17 +26,19 @@ public class ThirdPartyLogin extends RecoverableObject implements LoginProvider 
     }
 
     @Override
-    public Map<String,Object> toMap(){
-        this.properties.put("1",owner);
-        this.properties.put("2",index);
-        this.properties.put("3",name);
-        return this.properties;
+    public boolean write(DataBuffer buffer) {
+        buffer.writeUTF8(owner);
+        buffer.writeUTF8(index);
+        buffer.writeUTF8(name);
+        return true;
     }
+
     @Override
-    public void fromMap(Map<String,Object> properties){
-        this.owner = (String)properties.get("1");
-        this.index = (String)properties.get("2");
-        this.name = (String)properties.get("3");
+    public boolean read(DataBuffer buffer) {
+        owner = buffer.readUTF8();
+        index = buffer.readUTF8();
+        name = buffer.readUTF8();
+        return true;
     }
 
     public String provider(){
