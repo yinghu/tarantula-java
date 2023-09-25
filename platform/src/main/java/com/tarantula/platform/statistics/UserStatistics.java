@@ -87,6 +87,7 @@ public class UserStatistics extends RecoverableObject implements Statistics {
 
     public void load(){
         dataStore.list(new StatisticsEntryQuery(this.distributionId),e->{
+            e.dataStore(dataStore);
             mappings.put(e.name(),e);
             return true;
         });

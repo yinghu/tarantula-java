@@ -103,9 +103,9 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
             }
         }
         total += delta;
-        if(listener!=null){
-            listener.entryUpdated(this);
-        }
+        //if(listener!=null){
+            //listener.entryUpdated(this);
+        //}
         return this;
     }
     @Override

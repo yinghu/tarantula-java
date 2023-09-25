@@ -153,8 +153,11 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         return stub[0];
     }
     public Statistics statistics(Session session){
+        CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);
         UserStatistics deltaStatistics = new UserStatistics();
-        this.platformGameServiceProvider.savedGameServiceProvider().createIfAbsent(session,deltaStatistics);
+        deltaStatistics.distributionId(currentSaveIndex.saveId);
+        deltaStatistics.dataStore(applicationPreSetup.dataStore(gameCluster,NAME+"_statistics"));
+        deltaStatistics.load();
         deltaStatistics.registerListener((entry -> {
             LeaderBoard leaderBoard = platformLeaderBoardProvider.leaderBoard(entry.name());
             leaderBoard.onAllBoard(entry);

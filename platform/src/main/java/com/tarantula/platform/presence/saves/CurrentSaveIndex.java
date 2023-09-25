@@ -6,7 +6,6 @@ import com.tarantula.platform.presence.PresencePortableRegistry;
 
 public class CurrentSaveIndex extends RecoverableObject {
 
-    //session  <> save Id mapping for current save selection or default save
 
     public static final String LABEL = "currentSaveIndex";
 
