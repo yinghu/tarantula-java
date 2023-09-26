@@ -6,7 +6,7 @@ import com.tarantula.platform.GameCluster;
 
 import java.util.List;
 
-public interface ApplicationPreSetup {
+public interface ApplicationPreSetup extends Transaction.DataStoreContext {
 
     String SET_UP_NAME = "applicationPreSetup";
 
@@ -39,6 +39,7 @@ public interface ApplicationPreSetup {
     void setup(ServiceContext serviceContext);
 
     void registerListener(Listener listener);
+
     interface Listener{
         default <T extends Configurable> void onUpdated(Descriptor application,T t){};
         default <T extends Configurable> void onCreated(Descriptor application,T t){};
@@ -48,4 +49,5 @@ public interface ApplicationPreSetup {
 
         default <T extends Configurable> void onDeleted(GameCluster application,T t){};
     }
+
 }

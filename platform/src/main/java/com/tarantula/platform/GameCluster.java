@@ -9,6 +9,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.ServiceContext;
+import com.tarantula.game.service.GameObjectSetup;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.item.*;
 import com.tarantula.platform.service.ApplicationPreSetup;
@@ -265,6 +266,15 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         applicationPreSetup.setup(serviceContext);
         applicationPreSetup.registerListener(this);
         return applicationPreSetup;
+    }
+
+    public Transaction transaction(){
+        Transaction transaction = serviceContext.transaction(Distributable.DATA_SCOPE);
+        ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup(applicationSetup);
+        preSetup.setup(serviceContext);
+        preSetup.registerListener(this);
+        transaction.setup(preSetup);
+        return transaction;
     }
 
     @Override

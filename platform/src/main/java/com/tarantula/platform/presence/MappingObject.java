@@ -1,6 +1,7 @@
-package com.tarantula.game;
+package com.tarantula.platform.presence;
 
 import com.icodesoftware.util.RecoverableObject;
+
 
 
 public class MappingObject extends RecoverableObject {
@@ -8,23 +9,14 @@ public class MappingObject extends RecoverableObject {
     private byte[] value;
     @Override
     public int getFactoryId() {
-        return GamePortableRegistry.OID;
+        return PresencePortableRegistry.OID;
     }
     @Override
     public int getClassId() {
-        return GamePortableRegistry.MAPPING_OBJECT_CID;
+        return PresencePortableRegistry.MAPPING_OBJECT_CID;
     }
 
 
-
-    @Override
-    public void label(String label){
-        if(label.startsWith("mo_")){
-            this.label = label;
-            return;
-        }
-        this.label = "mo_"+label;
-    }
 
     public MappingObject(){
         this.onEdge = true;
@@ -41,6 +33,7 @@ public class MappingObject extends RecoverableObject {
 
     @Override
     public boolean read(DataBuffer buffer) {
+        name = buffer.readUTF8();
         int size = buffer.readInt();
         if(size==0) return true;
         value = new byte[size];
@@ -52,6 +45,7 @@ public class MappingObject extends RecoverableObject {
 
     @Override
     public boolean write(DataBuffer buffer) {
+        buffer.writeUTF8(name);
         if(value==null || value.length==0){
             buffer.writeInt(0);
             return true;

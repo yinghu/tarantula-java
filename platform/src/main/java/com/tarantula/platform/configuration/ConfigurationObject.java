@@ -1,19 +1,20 @@
 package com.tarantula.platform.configuration;
 
-import com.icodesoftware.util.JsonUtil;
-import com.icodesoftware.util.RecoverableObject;
-import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.item.ItemPortableRegistry;
+import com.tarantula.platform.presence.MappingObject;
 
 
-public class ConfigurationObject extends RecoverableObject {
+public class ConfigurationObject extends MappingObject {
 
-    private final static String _KEY = "_key";
+    public static final String LABEL = "configuration_object";
 
     public ConfigurationObject(){
+        super();
+        this.label = LABEL;
     }
     public ConfigurationObject(String label){
-        this.label = label;
+        this();
+        this.name = label;
     }
     @Override
     public int getFactoryId() {
@@ -22,19 +23,6 @@ public class ConfigurationObject extends RecoverableObject {
     @Override
     public int getClassId() {
         return ItemPortableRegistry.CONFIGURATION_OBJECT_CID;
-    }
-
-    @Override
-    public Key key(){
-        return new AssociateKey(this.distributionId,this.label);
-    }
-
-    public void value(byte[] json){
-        properties.put(_KEY, JsonUtil.parseAsJsonElement(json));
-    }
-
-    public byte[] value(){
-        return properties.getOrDefault(_KEY,"{}").toString().getBytes();
     }
 
 

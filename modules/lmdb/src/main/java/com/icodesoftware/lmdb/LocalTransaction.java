@@ -11,16 +11,17 @@ public class LocalTransaction implements Transaction, Transaction.DataStoreConte
     private final int scope;
 
     private Txn<ByteBuffer> txn;
-
+    private DataStoreContext dataStoreContext;
     public LocalTransaction(int scope,LMDBDataStoreProvider dataStoreProvider){
         this.scope = scope;
         this.dataStoreProvider = dataStoreProvider;
+        this.dataStoreContext = this;
     }
     @Override
     public void execute(TransactionContext transactionContext) {
         txn = dataStoreProvider.txn(scope);
         try{
-            if(!transactionContext.update(this)){
+            if(!transactionContext.update(this.dataStoreContext)){
                 txn.abort();
                 return;
             }
@@ -42,5 +43,14 @@ public class LocalTransaction implements Transaction, Transaction.DataStoreConte
     @Override
     public DataStore onDataStore(String name) {
        return dataStoreProvider.createDataStore(scope,name,txn);
+    }
+
+    public void setup(DataStoreContext dataStoreContext){
+        this.dataStoreContext = dataStoreContext;
+        this.dataStoreContext.parent(this);
+    }
+
+    public void parent(DataStoreContext parentContext){
+
     }
 }

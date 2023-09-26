@@ -4,9 +4,13 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.service.Content;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.ServiceContext;
-import com.tarantula.platform.IndexSet;
+import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
+import com.tarantula.platform.item.ItemPortableRegistry;
+import com.tarantula.platform.presence.MappingObject;
+import com.tarantula.platform.presence.PresencePortableRegistry;
+import com.tarantula.platform.util.RecoverableQuery;
 
 public class CredentialConfiguration extends Application {
 
@@ -29,8 +33,9 @@ public class CredentialConfiguration extends Application {
     protected ConfigurationObject saveConfigurationObject(String label,DeploymentServiceProvider deploymentServiceProvider, DataStore dataStore){
         String fileName = header.get(label).getAsString();
         Content conf = deploymentServiceProvider.resource(fileName);
+        RecoverableQuery<MappingObject> query = new RecoverableQuery<>(new SnowflakeKey(this.distributionId),ConfigurationObject.LABEL, ItemPortableRegistry.CONFIGURABLE_OBJECT_CID,ItemPortableRegistry.INS);
+
         ConfigurationObject configurationObject = new ConfigurationObject(label);
-        configurationObject.distributionKey(this.distributionKey());
         if(conf.existed()){
             if(dataStore.load(configurationObject)){
                 configurationObject.value(conf.data());
@@ -45,12 +50,7 @@ public class CredentialConfiguration extends Application {
         else{
             dataStore.load(configurationObject);
         }
-        IndexSet index = new IndexSet("keys");
-        index.distributionKey(this.distributionKey());
-        dataStore.createIfAbsent(index,true);
-        if(index.addKey(configurationObject.key().asString())){
-            dataStore.update(index);
-        }
+
         return configurationObject;
     }
 }

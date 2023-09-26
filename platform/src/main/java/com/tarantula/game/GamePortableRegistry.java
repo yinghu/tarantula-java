@@ -3,6 +3,7 @@ package com.tarantula.game;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.AbstractRecoverableListener;
 import com.tarantula.platform.event.PortableEventRegistry;
+import com.tarantula.platform.presence.MappingObject;
 import com.tarantula.platform.room.*;
 
 public class GamePortableRegistry<T extends Recoverable>  extends AbstractRecoverableListener {
@@ -10,7 +11,7 @@ public class GamePortableRegistry<T extends Recoverable>  extends AbstractRecove
     public static final int OID = 10;
 
     public static final int STUB_CID = 3;
-    public static final int MAPPING_OBJECT_CID = 4;
+
     public static final int GAME_UPDATE_OBJECT_CID = 5;
 
     public static final int RATING_CID = PortableEventRegistry.RATING_CID;//110
@@ -35,9 +36,6 @@ public class GamePortableRegistry<T extends Recoverable>  extends AbstractRecove
     public   T create(int i) {
         Recoverable pt = null;
         switch (i){
-            case MAPPING_OBJECT_CID:
-                pt = new MappingObject();
-                break;
             case GAME_UPDATE_OBJECT_CID:
                 pt = new GameUpdateObject();
                 break;

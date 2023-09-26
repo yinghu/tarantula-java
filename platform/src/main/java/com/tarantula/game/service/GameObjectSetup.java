@@ -184,4 +184,20 @@ public class GameObjectSetup implements ApplicationPreSetup {
         });
         //dataStore.deleteEdge(configurableObject.key(),VersionedConfigurableObject.LABEL);
     }
+
+
+    @Override
+    public DataStore onDataStore(String name) {
+        System.out.println(name);
+        return parentContext.onDataStore(name);
+    }
+
+
+    @Override
+    public void parent(Transaction.DataStoreContext parentContext) {
+        System.out.println("SETUP : "+parentContext.getClass().getName());
+        this.parentContext = parentContext;
+    }
+
+    private Transaction.DataStoreContext parentContext;
 }

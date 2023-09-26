@@ -7,12 +7,14 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.DataStore;
 
+import com.icodesoftware.Transaction;
 import com.tarantula.game.service.GameObjectSetup;
 
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.*;
 
+import com.tarantula.platform.service.ApplicationPreSetup;
 import org.testng.Assert;
 
 import org.testng.annotations.Test;
@@ -152,5 +154,27 @@ public class GameObjectSetupTest extends DataStoreHook{
         Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"commodity")).size(),0);
         Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"Gem")).size(),0);
     }
+
+    @Test(groups = { "GameObjectSetup" })
+    public void configTransactionTest() {
+        GameObjectSetup gameObjectSetup = new GameObjectSetup();
+        gameObjectSetup.setup(serviceContext);
+        DeploymentDescriptor app = new DeploymentDescriptor();
+        app.typeId("sample-game-data");
+
+        Configuration configuration = serviceContext.configuration("sample-admin-role-commodity-settings");
+        Assert.assertNotNull(configuration);
+        JsonArray list = ((JsonElement)configuration.property("list")).getAsJsonArray();
+        list.forEach(e->{
+            JsonObject jo = e.getAsJsonObject();
+            ConfigurableObject co = new ConfigurableObject();
+            Assert.assertTrue(co.configureAndValidate(jo));
+            Assert.assertTrue(gameObjectSetup.save(app,co));
+            Assert.assertTrue(gameObjectSetup.delete(app,co));
+        });
+        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"commodity")).size(),0);
+        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"Gem")).size(),0);
+    }
+
 
 }

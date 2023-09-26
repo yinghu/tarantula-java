@@ -173,6 +173,6 @@ public class TestServiceContext implements ServiceContext {
         return null;
     }
     public Transaction transaction(int scope){
-        return null;
+        return dataStoreProvider.transaction(scope);
     }
 }

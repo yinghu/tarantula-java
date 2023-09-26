@@ -63,6 +63,7 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
 
     public static final int PLAYER_SESSION_INDEX_CID = 22;
 
+    public static final int MAPPING_OBJECT_CID = 23;
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
     public static PresencePortableRegistry INS;
@@ -139,6 +140,9 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
                 break;
             case PLAYER_SESSION_INDEX_CID:
                 pt = new PlayerSessionIndex();
+                break;
+            case MAPPING_OBJECT_CID:
+                pt = new MappingObject();
                 break;
             default:
         }
