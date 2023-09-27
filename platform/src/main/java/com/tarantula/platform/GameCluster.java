@@ -25,7 +25,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class GameCluster extends OnApplicationHeader implements Portable , Configurable, ApplicationPreSetup.Listener,Configurable.Listener<OnLobby> {
+public class GameCluster extends OnApplicationHeader implements Portable , Configurable, ApplicationPreSetup.Listener,Configurable.Listener<OnLobby>,Transaction.Listener {
 
     private TarantulaLogger logger = JDKLogger.getLogger(GameCluster.class);
 
@@ -242,7 +242,6 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
                 Files.createDirectories(_web_game);
             }
         }catch (Exception ex){
-            //log.error("error on game cluster->"+configuration.property(GameCluster.NAME),ex);
             throw new RuntimeException(ex);
         }
     }
@@ -273,7 +272,8 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         ApplicationPreSetup preSetup = SystemUtil.applicationPreSetup(applicationSetup);
         preSetup.setup(serviceContext);
         preSetup.registerListener(this);
-        transaction.setup(preSetup);
+        preSetup.registerGameCluster(this);
+        transaction.register(preSetup,this);
         return transaction;
     }
 
@@ -579,6 +579,16 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         if(name.equals(Configurable.APPLICATION_CONFIG_TYPE))
             return this.serviceContext.deploymentServiceProvider().configuration(this,GameCluster.GAME_APPLICATION_CATEGORY_TEMPLATE);
         return null;
+    }
+
+    @Override
+    public void afterCommit() {
+        System.out.println("Transaction committed");
+    }
+
+    @Override
+    public void afterAbort(Exception exception) {
+        System.out.println("Transaction aborted");
     }
 
 }

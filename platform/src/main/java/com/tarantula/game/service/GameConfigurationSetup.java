@@ -2,7 +2,6 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.ServiceContext;
-
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.VersionedConfigurableObject;
@@ -12,7 +11,7 @@ import com.tarantula.platform.service.ApplicationPreSetup;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameObjectSetup implements ApplicationPreSetup {
+public class GameConfigurationSetup implements ApplicationPreSetup {
 
 
     protected String DS_CONFIG = "configuration";
@@ -102,7 +101,7 @@ public class GameObjectSetup implements ApplicationPreSetup {
 
 
     public <T extends Configurable> boolean save(GameCluster gameCluster, T t){
-        DataStore dataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,DS_CONFIG));
+        DataStore dataStore = parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));//serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,DS_CONFIG));
         if(dataStore.update(t)) {
             if(listener!=null) listener.onUpdated(gameCluster,t);
             return true;

@@ -38,6 +38,7 @@ public interface ApplicationPreSetup extends Transaction.DataStoreContext {
 
     void setup(ServiceContext serviceContext);
 
+    void registerGameCluster(GameCluster gameCluster);
     void registerListener(Listener listener);
 
     interface Listener{
