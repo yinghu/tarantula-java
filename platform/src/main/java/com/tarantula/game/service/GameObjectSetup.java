@@ -189,4 +189,9 @@ public class GameObjectSetup implements ApplicationPreSetup {
 
     private Transaction.DataStoreContext parentContext;
     private boolean onTransaction;
+
+    @Override
+    public void close() {
+
+    }
 }

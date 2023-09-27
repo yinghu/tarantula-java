@@ -8,7 +8,7 @@ public interface Transaction extends Closable{
     interface TransactionContext{
         boolean update(DataStoreContext dataStoreContext);
     }
-    interface DataStoreContext{
+    interface DataStoreContext extends Closable{
         void parent(DataStoreContext parentContext);
         DataStore onDataStore(String name);
     }

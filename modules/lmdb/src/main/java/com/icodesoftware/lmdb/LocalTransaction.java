@@ -44,6 +44,8 @@ public class LocalTransaction implements Transaction, Transaction.DataStoreConte
     @Override
     public void close() {
         //clear transaction resources
+        if(dataStoreContext==this) return;
+        dataStoreContext.close();
     }
 
     @Override

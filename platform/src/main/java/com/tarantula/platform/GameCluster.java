@@ -337,16 +337,17 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     }
     @Override
     public <T extends Configurable> void onCreated(Descriptor application,T t) {
-        reset(t,true);
+        //reset(t,true);
         listeners.forEach(l->l.onCreated(application,t));
     }
     @Override
     public <T extends Configurable> void onDeleted(Descriptor application,T t) {
-        reset(t,false);
+        //reset(t,false);
         listeners.forEach(l->l.onDeleted(application,t));
     }
     @Override
     public <T extends Configurable> void onUpdated(GameCluster application,T t){
+        /**
         if(t instanceof TypeIndex){
             TypeIndex typeIndex = (TypeIndex) t;
             if(typeIndex.typed == TypeIndex.Typed.Category){
@@ -371,7 +372,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
                 //logger.warn(typeIndex.history().toString());
                 //logger.warn(typeIndex.payload().toString());
             }
-        }
+        }**/
         listeners.forEach(l->l.onUpdated(application,t));
     }
     @Override
@@ -589,6 +590,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     @Override
     public void afterAbort(Exception exception) {
         System.out.println("Transaction aborted");
+        if(exception!=null) exception.printStackTrace();
     }
 
 }
