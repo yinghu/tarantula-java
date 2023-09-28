@@ -2,6 +2,7 @@ package com.tarantula.platform.inventory;
 
 
 import com.icodesoftware.DataStore;
+import com.icodesoftware.util.SnowflakeKey;
 
 public class CommodityRedeemer extends ApplicationRedeemer {
 
@@ -12,9 +13,9 @@ public class CommodityRedeemer extends ApplicationRedeemer {
     public void redeem() {
         int cindex = this.configurationCategory.indexOf(".");
         Inventory inventory = this.inventoryServiceProvider.newInventory(cindex<0?this.configurationCategory:this.configurationCategory.substring(0,cindex),this.configurationTypeId);
-        inventory.distributionKey(systemId);
+        inventory.ownerKey(new SnowflakeKey(Long.parseLong(systemId)));
         DataStore inventoryDataStore = this.inventoryServiceProvider.inventoryDataStore();
-        inventoryDataStore.createIfAbsent(inventory,true);
+        inventoryDataStore.create(inventory);
         inventory.dataStore(inventoryDataStore);
         inventory.redeem(this,this.inventoryServiceProvider);
     }

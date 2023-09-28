@@ -6,37 +6,43 @@ import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ItemPortableRegistry;
 
-import java.util.Map;
 
 public class InventoryItem extends ConfigurableObject {
 
+    public final static String LABEL = "inventory_item";
 
     private JsonObject commodity;
     public InventoryItem(){
-
+        this.onEdge = true;
+        this.label = LABEL;
     }
     public InventoryItem(ApplicationRedeemer commodity){
+        this();
         this.configurationName = commodity.configurationName();
         this.configurationTypeId = commodity.configurationTypeId();
         this.reference.add(commodity.distributionKey());
         this.commodity = commodity.toJson();
     }
 
+
     @Override
-    public Map<String,Object> toMap(){
-        this.properties.put(TYPE_ID_KEY, this.configurationTypeId);
-        this.properties.put(NAME_KEY, this.configurationName);
-        this.properties.put(REFERENCE_KEY,reference.toString());
-        this.properties.put(COMMODITY_PAYLOAD,commodity.toString());
-        return this.properties;
+    public boolean write(DataBuffer buffer) {
+        buffer.writeUTF8(configurationTypeId);
+        buffer.writeUTF8(configurationName);
+        buffer.writeUTF8(reference!=null?reference.toString():"[]");
+        buffer.writeUTF8(commodity!=null?commodity.toString():"{}");
+        return true;
     }
+
     @Override
-    public void fromMap(Map<String,Object> properties){
-        this.configurationTypeId = (String) properties.get(TYPE_ID_KEY);
-        this.configurationName = (String) properties.get(NAME_KEY);
-        this.reference = JsonUtil.parseAsJsonArray((String) properties.getOrDefault(REFERENCE_KEY, "[]"));
-        this.commodity = JsonUtil.parse((String)properties.getOrDefault(COMMODITY_PAYLOAD, "{}"));
+    public boolean read(DataBuffer buffer) {
+        this.configurationTypeId = buffer.readUTF8();
+        this.configurationName = buffer.readUTF8();
+        this.reference = JsonUtil.parseAsJsonArray(buffer.readUTF8());
+        this.commodity = JsonUtil.parse(buffer.readUTF8());
+        return true;
     }
+
     public int getFactoryId() {
         return ItemPortableRegistry.OID;
     }

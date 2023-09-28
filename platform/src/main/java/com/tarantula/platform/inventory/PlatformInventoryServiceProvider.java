@@ -127,6 +127,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
     public Inventory newInventory(String category,String typeId){
         ConfigurableCategories categories = this.gameCluster.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE);
         ConfigurableCategory conf = categories.configurableSetting(category);
+        conf.parse();
         return new Inventory(conf.name(),typeId,conf.rechargeable);
     }
 

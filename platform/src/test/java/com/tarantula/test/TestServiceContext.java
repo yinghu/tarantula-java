@@ -5,6 +5,7 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.platform.ApplicationConfiguration;
+import com.tarantula.platform.item.ItemPortableRegistry;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.tarantula.platform.service.persistence.ClusterNode;
@@ -34,6 +35,7 @@ public class TestServiceContext implements ServiceContext {
         PresencePortableRegistry registry = new PresencePortableRegistry<>();
         GamePortableRegistry gamePortableRegistry = new GamePortableRegistry();
         StatisticsPortableRegistry statisticsPortableRegistry = new StatisticsPortableRegistry();
+        ItemPortableRegistry itemPortableRegistry = new ItemPortableRegistry();
     }
     @Override
     public DataStore dataStore(int scope, String s) {
