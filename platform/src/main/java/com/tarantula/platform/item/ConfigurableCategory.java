@@ -7,6 +7,8 @@ import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.NaturalKey;
 import com.icodesoftware.util.RecoverableObject;
 
+import java.util.HashMap;
+
 public class ConfigurableCategory extends RecoverableObject implements Configuration {
 
     public String header;
@@ -18,6 +20,7 @@ public class ConfigurableCategory extends RecoverableObject implements Configura
 
     public boolean rechargeable;
 
+    public HashMap<String,JsonObject> properties = new HashMap<>();
     public ConfigurableCategory(){
         this.onEdge = true;
     }
@@ -45,7 +48,12 @@ public class ConfigurableCategory extends RecoverableObject implements Configura
         JsonObject resp = new JsonObject();
         resp.addProperty("name",name);
         resp.add("header", JsonUtil.parse(header));
-        resp.add("application", JsonUtil.parse(application));
+        JsonObject props = JsonUtil.parse(application);
+        props.get("properties").getAsJsonArray().forEach(e->{
+            JsonObject jo = e.getAsJsonObject();
+            properties.put(jo.get("name").getAsString(),jo);
+        });
+        resp.add("application", props);
         return resp;
     }
 

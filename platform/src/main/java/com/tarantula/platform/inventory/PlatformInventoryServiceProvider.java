@@ -125,7 +125,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
     }
 
     public Inventory newInventory(String category,String typeId){
-        ConfigurableCategories categories = this.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE,gameCluster,applicationPreSetup);
+        ConfigurableCategories categories = this.gameCluster.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE);
         ConfigurableCategory conf = categories.configurableSetting(category);
         return new Inventory(conf.name(),typeId,conf.rechargeable);
     }
@@ -138,32 +138,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
         category.list((ci)-> filter.onFilter(ci));
         return category;
     }
-    private ConfigurableTemplate categoryTemplateSetting(GameCluster gameCluster,String name){
-        if(name.equals(Configurable.ASSET_CONFIG_TYPE))
-            return this.serviceContext.deploymentServiceProvider().configuration(gameCluster,GameCluster.GAME_ASSET_CATEGORY_TEMPLATE);
-        if(name.equals(Configurable.COMPONENT_CONFIG_TYPE))
-            return this.serviceContext.deploymentServiceProvider().configuration(gameCluster,GameCluster.GAME_COMPONENT_CATEGORY_TEMPLATE);
-        if(name.equals(Configurable.COMMODITY_CONFIG_TYPE))
-            return this.serviceContext.deploymentServiceProvider().configuration(gameCluster,GameCluster.GAME_COMMODITY_CATEGORY_TEMPLATE);
-        if(name.equals(Configurable.ITEM_CONFIG_TYPE))
-            return this.serviceContext.deploymentServiceProvider().configuration(gameCluster,GameCluster.GAME_ITEM_CATEGORY_TEMPLATE);
-        if(name.equals(Configurable.APPLICATION_CONFIG_TYPE))
-            return this.serviceContext.deploymentServiceProvider().configuration(gameCluster,GameCluster.GAME_APPLICATION_CATEGORY_TEMPLATE);
-        return null;
-    }
-    private ConfigurableCategories configurableCategories(String type,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){
-        ConfigurableCategories categories = new ConfigurableCategories();
-        categories.name(type);
-        if(!applicationPreSetup.load(gameCluster,categories)){
-            ConfigurableTemplate configuration = this.categoryTemplateSetting(gameCluster,type);
-            JsonArray cclasses = (JsonArray)configuration.property("itemList");
-            cclasses.forEach((c)->{
-                categories.addCategory(new ConfigurableCategory(c.getAsJsonObject()));
-            });
-            applicationPreSetup.save(gameCluster,categories);
-        }
-        return categories;
-    }
+
 
     @Override
     public void onInventory(Inventory inventory,InventoryItem item) {

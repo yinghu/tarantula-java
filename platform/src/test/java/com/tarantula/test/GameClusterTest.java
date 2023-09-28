@@ -143,7 +143,7 @@ public class GameClusterTest extends DataStoreHook{
         });
         t2.close();
         Assert.assertEquals(ex.list(app,new VersionedConfigurableObjectQuery(g.distributionId())).size(),2);
-
+        System.out.println(g.application());
         Transaction t3 = load.transaction();
         t3.execute(ctx->{
             ApplicationPreSetup preSetup = (ApplicationPreSetup)ctx;

@@ -48,7 +48,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
 
     protected Configurable.Listener listener;
     protected ArrayList<ConfigurableObject> _reference;
-    protected JsonObject _configurableSetting = new JsonObject();
+    protected ConfigurableCategories _configurableSetting;
 
     public ConfigurableObject(){}
     public ConfigurableObject(ConfigurableObject configurableObject){
@@ -121,37 +121,6 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     public void released(){
         this.disabled = true;
         this.dataStore.update(this);
-    }
-
-    @Override
-    public Map<String, Object> toMap() {
-        this.properties.put(TYPE_KEY, this.configurationType);
-        this.properties.put(TYPE_ID_KEY, this.configurationTypeId);
-        this.properties.put(NAME_KEY, this.configurationName);
-        this.properties.put(CATEGORY_KEY, this.configurationCategory);
-        this.properties.put(VERSION_KEY, this.configurationVersion);
-        this.properties.put(DISABLED_KEY,this.disabled);
-        this.properties.put(HEADER_KEY,header.toString());
-        this.properties.put(APPLICATION_KEY,application.toString());
-        this.properties.put(REFERENCE_KEY,reference.toString());
-        this.properties.put(SETTINGS_KEY,_configurableSetting.toString());
-        this.properties.put(SCOPE_KEY,configurationScope);
-        return this.properties;
-    }
-
-    @Override
-    public void fromMap(Map<String, Object> properties) {
-        this.configurationType = (String) properties.get(TYPE_KEY);
-        this.configurationTypeId = (String) properties.get(TYPE_ID_KEY);
-        this.configurationName = (String) properties.get(NAME_KEY);
-        this.configurationCategory = (String) properties.get(CATEGORY_KEY);
-        this.configurationVersion = (String) properties.get(VERSION_KEY);
-        this.disabled = (boolean)properties.getOrDefault(DISABLED_KEY,false);
-        this.header = JsonUtil.parse((String) properties.getOrDefault(HEADER_KEY, "{}"));
-        this.application = JsonUtil.parse((String) properties.getOrDefault(APPLICATION_KEY, "{}"));
-        this.reference = JsonUtil.parseAsJsonArray((String) properties.getOrDefault(REFERENCE_KEY, "[]"));
-        this._configurableSetting = JsonUtil.parse((String) properties.getOrDefault(SETTINGS_KEY, "{}"));
-        this.configurationScope = (String) properties.get(SCOPE_KEY);
     }
 
     public boolean read(DataBuffer buffer){
@@ -279,14 +248,11 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         return category;
     }
 
-    public void configurableSetting(ConfigurableCategory configurableSetting){
-        configurableSetting.parse();
-        configurationScope = configurableSetting.scope;
-        //configurableSetting.properties.forEach(e->{
-            //String fn = e.getAsJsonObject().get("name").getAsString();
-            //if(_configurableSetting.has(fn)) _configurableSetting.remove(fn);
-            //_configurableSetting.add(fn,e);
-        //});
+    public void configurableSetting(ConfigurableCategories configurableSetting){
+        ConfigurableCategory category = configurableSetting.configurableSetting(configurationCategory);
+        category.parse();
+        configurationScope = category.scope;
+        _configurableSetting = configurableSetting;
     }
 
     public JsonObject header(){
@@ -300,12 +266,17 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     }
 
     protected JsonObject toJson(JsonObject json){
+        ConfigurableCategory category = _configurableSetting.configurableSetting(configurationCategory);
+        category.toJson();
         HashMap<String,ConfigurableObject> _ref = new HashMap<>();
         if(_reference==null) return json;
-        _reference.forEach(cob-> _ref.put(cob.distributionKey(),cob));
+        _reference.forEach(cob-> {
+            cob._configurableSetting = _configurableSetting;
+            _ref.put(cob.distributionKey(),cob);
+        });
         application.entrySet().forEach(e->{
             String k = e.getKey();
-            JsonObject _type = _configurableSetting.get(k).getAsJsonObject();
+            JsonObject _type = category.properties.get(k);
             String f = k.substring(0,1);
             String fk = k.replaceFirst(f,"_"+f.toLowerCase());
             String cat = _type.get("type").getAsString();

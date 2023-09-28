@@ -7,6 +7,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
+import com.tarantula.platform.item.ConfigurableCategories;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.item.ItemDistributionCallback;
@@ -118,12 +119,13 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     }
 
     private void registerShop(Shop shop){
+        shop.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
         Shop s = shop.setup();
         shopIndex.put(shop.configurationName(),s);
-        //shopIndex.put(shop.distributionId(),s);
+        shopIndex.put(shop.distributionKey(),s);
         shop.list().forEach(item->{
-            //item.setup();
-            //shoppingItems.put(item.distributionId(),new ShoppingItem(item));
+            item.setup();
+            shoppingItems.put(item.distributionKey(),new ShoppingItem(item));
         });
     }
 

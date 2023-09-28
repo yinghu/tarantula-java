@@ -200,17 +200,21 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             session.write(createApplication(new Application(),JsonUtil.parse(payload),gameCluster,applicationPreSetup).getBytes());
         }
         else if(session.action().equals("onStock")){
+            this.context.log(session.name(),OnLog.WARN);
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
             ApplicationPreSetup preSetup = gameCluster.applicationPreSetup();
             Descriptor app = gameCluster.serviceWithCategory("item");
-            //ConfigurableCategories categories = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,preSetup);
+            ConfigurableCategories categories = this.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,preSetup);
             String category = query[1].split("/")[1];
-            //ConfigurableCategory configurableSetting = categories.configurableSetting(category);
-            //if(configurableSetting != null && configurableSetting.scope.startsWith("application.")){
-                //String serviceCategory = configurableSetting.scope.substring(12);
-                //app = gameCluster.serviceWithCategory(serviceCategory);
-            //}
+            ConfigurableCategory configurableSetting = categories.configurableSetting(category);
+            if(configurableSetting != null){
+                configurableSetting.parse();
+                if(configurableSetting.scope.startsWith("application.")){
+                    String serviceCategory = configurableSetting.scope.substring(12);
+                    app = gameCluster.serviceWithCategory(serviceCategory);
+                }
+            }
             List<ConfigurableObject> items = preSetup.list(app,new ConfigurableObjectQuery(app.key(),category));
             session.write(new ItemAdminContext(true,query[1],items).toJson().toString().getBytes());
         }
@@ -294,7 +298,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             return JsonUtil.toSimpleResponse(false," no config setting ["+app.configurationCategory()+"]");
         }
         Descriptor desc = gameCluster.serviceWithCategory("item");
-        app.configurableSetting(conf);
+        app.configurableSetting(configurableCategories);
         if(!applicationPreSetup.save(desc,app)){
             return JsonUtil.toSimpleResponse(true,"failed to save");
         }
@@ -310,7 +314,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             return JsonUtil.toSimpleResponse(false," no config setting ["+app.configurationCategory()+"]");
         }
         Descriptor desc = gameCluster.serviceWithCategory("item");
-        app.configurableSetting(conf);
+        app.configurableSetting(configurableCategories);
         if(!applicationPreSetup.save(desc,app)) {
             return JsonUtil.toSimpleResponse(true,"failed to save");
         }
@@ -326,7 +330,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             return JsonUtil.toSimpleResponse(false," no config setting ["+app.configurationCategory()+"]");
         }
         Descriptor desc = gameCluster.serviceWithCategory("item");
-        app.configurableSetting(conf);
+        app.configurableSetting(configurableCategories);
         if(!applicationPreSetup.save(desc,app)) {
             return JsonUtil.toSimpleResponse(true,"failed to save");
         }
@@ -345,7 +349,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             return JsonUtil.toSimpleResponse(false," no config setting ["+app.configurationCategory()+"]");
         }
         Descriptor desc = gameCluster.serviceWithCategory("item");
-        app.configurableSetting(conf);
+        app.configurableSetting(configurableCategories);
         if(!applicationPreSetup.save(desc,app)) {
             return JsonUtil.toSimpleResponse(true,"failed to save");
         }
@@ -362,7 +366,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         }
         Descriptor desc = gameCluster.serviceWithCategory(app.configurationTypeId());
         app.disabled(true);
-        app.configurableSetting(conf);
+        app.configurableSetting(configurableCategories);
         if(!applicationPreSetup.save(desc,app)){
             return JsonUtil.toSimpleResponse(true,"failed to save");
         }

@@ -28,7 +28,7 @@ public class VersionedConfigurableObject extends ConfigurableObject{
         this.reference = configurableObject.reference;
         //this.listener = configurableObject.listener;
         //this._reference = configurableObject._reference;
-        this._configurableSetting = configurableObject._configurableSetting;
+        //this._configurableSetting = configurableObject._configurableSetting;
         this.distributionId(configurableObject.distributionId());
     }
     public int getFactoryId() {

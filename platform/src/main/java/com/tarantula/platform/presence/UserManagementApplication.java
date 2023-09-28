@@ -3,6 +3,7 @@ package com.tarantula.platform.presence;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
+import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.metrics.AccessMetrics;
@@ -282,7 +283,8 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         payload.property(OnAccess.ACTIVATED,activated);
         Account account = new UserAccount();
         account.distributionId(accountId);
-        return userService.createUser(account,new User());
+        payload.ownerKey(new SnowflakeKey(accountId));
+        return userService.createUser(account,toAccess(payload));
     }
     private Access createLogin(OnAccess payload,long systemId,String roleName,boolean validated,String validator,boolean primary){
         payload.property(OnAccess.SYSTEM_ID,systemId);
@@ -292,6 +294,24 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         payload.property(OnAccess.PRIMARY_USER,primary);
         payload.property(OnAccess.ACTIVATED,activated);
         return userService.createUser(payload);
+    }
+
+    private Access toAccess(OnAccess onAccess){
+        Access acc = new User((String) onAccess.property(OnAccess.LOGIN),(Boolean)onAccess.property(OnAccess.VALIDATED),(String) onAccess.property(OnAccess.VALIDATOR));
+        acc.emailAddress((String)onAccess.property(OnAccess.EMAIL_ADDRESS));
+        acc.distributionId(Long.parseLong((String)onAccess.property(OnAccess.SYSTEM_ID)));
+        String pwd = (String)onAccess.property(OnAccess.PASSWORD);
+        //String hash = tokenValidatorProvider.tokenValidator().hashPassword(pwd);
+        acc.password(pwd);
+        acc.activated((Boolean)onAccess.property(OnAccess.ACTIVATED));
+        acc.primary((Boolean)onAccess.property(OnAccess.PRIMARY_USER));
+        if(!acc.primary()){
+            //if(onAccess.ownerKey()==null) throw new IllegalArgumentException("No owner for sub user");
+            acc.ownerKey(onAccess.ownerKey());
+            acc.onEdge(true);
+        }
+        acc.role((String)onAccess.property(OnAccess.ACCESS_CONTROL));
+        return acc;
     }
 
     @Override
