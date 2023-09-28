@@ -139,7 +139,7 @@ public class AdminRoleModule implements Module{
                 desc.typeId(typeId);//replaced with named type id
                 desc.moduleId(typeId);
                 desc.tag(desc.tag().replaceFirst("game",name.toLowerCase()));
-                boolean suc = this.deploymentServiceProvider.createApplication(desc,null,null,true);
+                boolean suc = this.deploymentServiceProvider.createApplication(desc,null,true);
                 session.write(JsonUtil.toSimpleResponse(suc,suc?"service ["+desc.name()+"] Added":"service ["+desc.name()+"] Not Added").getBytes());
             }else{
                 session.write(JsonUtil.toSimpleResponse(false,"game service not existed").getBytes());

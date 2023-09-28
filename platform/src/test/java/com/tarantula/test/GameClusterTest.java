@@ -36,7 +36,7 @@ public class GameClusterTest extends DataStoreHook{
         gameCluster.developer = "gdds";
         gameCluster.tournamentEnabled = true;
         gameCluster.dedicated = false;
-        gameCluster.applicationSetup = "com.tarantula.game.service.GameConfigurationSetup";
+        //gameCluster.applicationSetup = "com.tarantula.game.service.GameConfigurationSetup";
         gameCluster.maxArenaCount = 10;
         gameCluster.maxZoneCount = 10;
         gameCluster.maxLobbyCount = 10;
@@ -100,14 +100,14 @@ public class GameClusterTest extends DataStoreHook{
             return true;
         });
         transaction.close();
-        load.applicationSetup = "com.tarantula.game.service.GameObjectSetup";
+        //load.applicationSetup = "com.tarantula.game.service.GameObjectSetup";
         ApplicationPreSetup ex = load.applicationPreSetup();
         Assert.assertEquals(ex.list(load,new ConfigurableCategoryQuery(ConfigurableCategoryQuery.AssetKey,"category")).size(),2);
 
         DeploymentDescriptor app = new DeploymentDescriptor();
         app.typeId("beam-data");
         app.distributionId(serviceContext.distributionId());
-        load.applicationSetup = "com.tarantula.game.service.GameConfigurationSetup";
+        //load.applicationSetup = "com.tarantula.game.service.GameConfigurationSetup";
         InputStream in = (Thread.currentThread().getContextClassLoader().getResourceAsStream("sample-admin-role-commodity-settings.json"));
         JsonArray commodities = JsonUtil.parse(in).get("list").getAsJsonArray();
         Assert.assertNotNull(commodities);

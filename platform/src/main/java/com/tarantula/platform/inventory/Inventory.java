@@ -8,19 +8,19 @@ import com.icodesoftware.Countable;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.item.ItemPortableRegistry;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+
 
 public class Inventory extends RecoverableObject implements Configurable, Balance, Countable {
 
     public final static String LABEL = "inventory";
-    private HashMap<String,InventoryItem> itemList = new HashMap<>();
+    private ArrayList<InventoryItem> itemList = new ArrayList<>();
     private boolean rechargeable;
     private double balance;
     private int count;
 
-    private String typeId;
-    private String type;
+    public String typeId;
+    public String type;
 
 
     public Inventory(){
@@ -50,23 +50,10 @@ public class Inventory extends RecoverableObject implements Configurable, Balanc
         dataStore.update(this);
         inventoryListener.onInventory(this,inventoryItem);
     }
-    public String load(String inventoryId){
-        InventoryItem inventoryItem = itemList.get(inventoryId);
-        if(inventoryItem==null){
-            return null;
-        }
-        return inventoryItem.itemId();
-    }
 
     public void list(){
-        //keySet.forEach((k)->{
-            InventoryItem inventoryItem = new InventoryItem();
-            //inventoryItem.distributionKey(k);
-            if(dataStore.load(inventoryItem)){
-                inventoryItem.dataStore(dataStore);
-                //itemList.put(k,inventoryItem);
-            }
-        //});
+         InventoryItemQuery query = new InventoryItemQuery(this.distributionId);
+         itemList.addAll(dataStore.list(query));
     }
     @Override
     public int getFactoryId() {
@@ -109,7 +96,7 @@ public class Inventory extends RecoverableObject implements Configurable, Balanc
         jsonObject.addProperty("Rechargeable",rechargeable);
         jsonObject.addProperty("Count",count);
         JsonArray items = new JsonArray();
-        itemList.forEach((k,item)->items.add(item.toJson()));
+        itemList.forEach((item)->items.add(item.toJson()));
         jsonObject.add("_itemList",items);
         return jsonObject;
     }

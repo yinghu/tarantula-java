@@ -326,14 +326,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             b.moduleArtifact(descriptor.moduleArtifact());
             b.moduleVersion(descriptor.moduleVersion());
             b.applicationClassName(this.tarantulaContext.singleModuleApplication);
-            this.createApplication(b,null,null,false);
+            this.createApplication(b,null,false);
         });
         response.successful(true);
         response.message("module created");
         return response;
     }
 
-    public boolean createApplication(Descriptor descriptor, String postSetup,String configName,boolean launching){
+    public boolean createApplication(Descriptor descriptor,String configName,boolean launching){
         DataStore ds = this.tarantulaContext.masterDataStore();
         LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.node().deploymentId(),descriptor.typeId());
         if(!ds.load(query)){
@@ -678,8 +678,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 if(mds.load(lobbyTypeIdIndex)){//stop existed
                     throw new RuntimeException("["+name+"] duplicated");
                 }
-                String cname = (String) gameClusterConfig.property(ApplicationPreSetup.SET_UP_NAME);
-                gameCluster.applicationSetup = (cname);
+                //String cname = (String) gameClusterConfig.property(ApplicationPreSetup.SET_UP_NAME);
+                //gameCluster.applicationSetup = (cname);
                 Descriptor descriptor = configuration.descriptor;
                 descriptor.ownerKey(new SnowflakeKey(publishingId));
                 descriptor.label(LobbyDescriptor.LABEL);

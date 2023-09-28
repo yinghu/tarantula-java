@@ -106,6 +106,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
         items.forEach((a)-> {
             logger.warn(a.configurationCategory()+""+a.distributionId());
             if(!a.disabled()){
+                a.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
                 a.setup();
                 lobbyItems.put(gameTypeId+"/"+a.configurationName(),a);
             }

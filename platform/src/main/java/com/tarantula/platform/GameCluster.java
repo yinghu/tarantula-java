@@ -56,7 +56,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     protected CopyOnWriteArrayList<ApplicationPreSetup.Listener> listeners = new CopyOnWriteArrayList<>();
 
     public String mode;
-    public String applicationSetup;
+    //public String applicationSetup;
 
     public String gameLobbyName;
 
@@ -120,7 +120,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         jo.addProperty("gameClusterId",Long.toString(distributionId));
         jo.addProperty("name",name);
         jo.addProperty("mode",mode);
-        jo.addProperty("setup",applicationSetup);
+        //jo.addProperty("setup",applicationSetup);
         jo.addProperty("gameLobby",gameLobbyName);
         jo.addProperty("gameService",gameServiceName);
         jo.addProperty("gameData",gameDataName);
@@ -139,7 +139,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     public boolean write(DataBuffer buffer){
         buffer.writeUTF8(name);
         buffer.writeUTF8(mode);
-        buffer.writeUTF8(applicationSetup);
+        //buffer.writeUTF8(applicationSetup);
         buffer.writeUTF8(gameLobbyName);
         buffer.writeUTF8(gameServiceName);
         buffer.writeUTF8(gameDataName);
@@ -160,7 +160,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     public boolean read(DataBuffer buffer) {
         name = buffer.readUTF8();
         mode = buffer.readUTF8();
-        applicationSetup = buffer.readUTF8();
+        //applicationSetup = buffer.readUTF8();
         gameLobbyName = buffer.readUTF8();
         gameServiceName = buffer.readUTF8();
         gameDataName = buffer.readUTF8();
@@ -262,7 +262,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
 
     public ApplicationPreSetup applicationPreSetup(){
         if(applicationPreSetup!=null) return applicationPreSetup;
-        applicationPreSetup = SystemUtil.applicationPreSetup(applicationSetup);
+        applicationPreSetup = new GameObjectSetup();
         applicationPreSetup.setup(serviceContext);
         applicationPreSetup.registerListener(this);
         return applicationPreSetup;
@@ -270,7 +270,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
 
     public Transaction transaction(){
         Transaction transaction = serviceContext.transaction(Distributable.DATA_SCOPE);
-        ApplicationPreSetup preSetup = new GameConfigurationSetup();//SystemUtil.applicationPreSetup(applicationSetup);
+        ApplicationPreSetup preSetup = new GameConfigurationSetup();
         preSetup.setup(serviceContext);
         preSetup.registerListener(this);
         preSetup.registerGameCluster(this);

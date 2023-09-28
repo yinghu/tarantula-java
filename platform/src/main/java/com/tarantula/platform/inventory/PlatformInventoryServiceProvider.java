@@ -1,6 +1,5 @@
 package com.tarantula.platform.inventory;
 
-import com.google.gson.JsonArray;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
@@ -61,26 +60,32 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
         return category((ci)->ci.configurationType().equals(Configurable.COMMODITY_CONFIG_TYPE));
     }
     public List<Inventory> inventoryList(String systemId){
+        InventoryQuery query = new InventoryQuery(Long.parseLong(systemId));
         List<Inventory> inventoryList = new ArrayList<>();
-        category((ci)->{
-            if(ci.configurationType().equals(Configurable.COMMODITY_CONFIG_TYPE)){
-                Inventory inventory = inventory(systemId,ci.configurationCategory(),ci.configurationTypeId());
-                if(inventory!=null) inventoryList.add(inventory);
-                return true;
-            }
-            return false;
+        inventoryDataStore.list(query).forEach(t->{
+            t.dataStore(inventoryDataStore);
+            t.list();
+            inventoryList.add(t);
         });
         return inventoryList;
     }
 
     public Inventory inventory(String systemId,String category,String typeId){
         int cindex = category.indexOf(".");
-        Inventory inventory = new Inventory(cindex<0?category:category.substring(0,cindex),typeId);
-        inventory.distributionKey(systemId);
-        if(!inventoryDataStore.load(inventory)) return null;
-        inventory.dataStore(inventoryDataStore);
-        inventory.list();
-        return inventory;
+        String type = cindex<0?category:category.substring(0,cindex);
+        InventoryQuery query = new InventoryQuery(Long.parseLong(systemId));
+        Inventory[] inventories={null};
+        inventoryDataStore.list(query,t->{
+            if(t.type.equals(type)&&t.typeId.equals(typeId)){
+                inventories[0]=t;
+                return false;
+            }
+            return true;
+        });
+        if(inventories[0]==null) return new Inventory(type,typeId);
+        inventories[0].dataStore(inventoryDataStore);
+        inventories[0].list();
+        return inventories[0];
     }
     public boolean redeem(String systemId, Application item){
         ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,this);

@@ -60,7 +60,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     //end
 
     //game cluster operation APIs
-    boolean createApplication(Descriptor descriptor,String postSetup,String configName,boolean launching);
+    boolean createApplication(Descriptor descriptor,String configName,boolean launching);
 
     boolean updateApplication(Descriptor descriptor,OnAccess properties);
     boolean enableApplication(long applicationId);

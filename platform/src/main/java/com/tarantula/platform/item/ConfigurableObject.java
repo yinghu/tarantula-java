@@ -266,6 +266,7 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
     }
 
     protected JsonObject toJson(JsonObject json){
+        if(_configurableSetting==null) return json;
         ConfigurableCategory category = _configurableSetting.configurableSetting(configurationCategory);
         category.toJson();
         HashMap<String,ConfigurableObject> _ref = new HashMap<>();

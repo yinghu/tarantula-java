@@ -156,7 +156,7 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
     }
 
     @Override
-    public boolean createApplication(Descriptor descriptor, String postSetup, String configName, boolean launching) {
+    public boolean createApplication(Descriptor descriptor, String configName, boolean launching) {
         return false;
     }
 

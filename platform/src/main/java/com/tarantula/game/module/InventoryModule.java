@@ -26,6 +26,7 @@ public class InventoryModule extends ModuleHeader {
                 session.write(JsonUtil.toSimpleResponse(false,"no inventory").getBytes());
             }
         }
+        /**
         else if(session.action().equals("onCommodity")){
             String[] query = session.name().split("#");
             Inventory inventory = gameServiceProvider.inventoryServiceProvider().inventory(session.systemId(),query[0],query[1]);
@@ -37,7 +38,7 @@ public class InventoryModule extends ModuleHeader {
             else{
                 session.write(JsonUtil.toSimpleResponse(false,session.name()).getBytes());
             }
-        }
+        }**/
         else{
             throw new UnsupportedOperationException(session.action()+" not support");
         }
