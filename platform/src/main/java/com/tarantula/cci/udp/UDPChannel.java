@@ -78,7 +78,7 @@ public class UDPChannel extends GameChannel {
     }
 
     public void kickoff(){
-        this.timeoutListener.timeout(this.owner, this.routingNumber);
+        this.timeoutListener.timeout(this.owner, this.stub.stub());
         this.channelListener.onLeft(this);
     }
     public void joined(){

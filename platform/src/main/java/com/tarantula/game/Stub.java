@@ -7,7 +7,7 @@ import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.room.GameRoom;
 
 import java.time.LocalDateTime;
-import java.util.Map;
+
 
 //per stub/game by playerId + lobby tag
 public class Stub extends PlayerGameObject {
@@ -54,25 +54,7 @@ public class Stub extends PlayerGameObject {
         jo.addProperty("DistributionId",distributionId);
         return jo;
     }
-    @Override
-    public Map<String,Object> toMap(){
-        properties.put("joined",joined);
-        properties.put("zoneId",zoneId);
-        properties.put("roomId",roomId);
-        properties.put("tournamentId",tournamentId);
-        properties.put("trackId",trackId); //tournament instance id
-        properties.put("timestamp",timestamp);
-        return properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        joined = (boolean)properties.getOrDefault("joined",false);
-        zoneId = ((String)properties.getOrDefault("zoneId",null));
-        roomId = ((String)properties.getOrDefault("roomId",null));
-        tournamentId = ((String)properties.getOrDefault("tournamentId",null));
-        trackId = ((String)properties.getOrDefault("trackId",null));
-        timestamp = ((Number)properties.getOrDefault("timestamp",0)).longValue();
-    }
+
 
     public boolean read(DataBuffer buffer){
         this.joined = buffer.readBoolean();
@@ -81,7 +63,7 @@ public class Stub extends PlayerGameObject {
         this.tournamentId = buffer.readUTF8();
         this.trackId = buffer.readUTF8();
         this.timestamp = buffer.readLong();
-        this.stub = buffer.readLong();
+        this.systemId = Long.toString(buffer.readLong());
         return true;
     }
     public boolean write(DataBuffer buffer) {
@@ -91,7 +73,7 @@ public class Stub extends PlayerGameObject {
         buffer.writeUTF8(tournamentId);
         buffer.writeUTF8(trackId);
         buffer.writeLong(timestamp);
-        buffer.writeLong(stub);
+        buffer.writeLong(Long.parseLong(systemId));
         return true;
     }
 

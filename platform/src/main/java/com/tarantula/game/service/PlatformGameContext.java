@@ -60,11 +60,11 @@ public class PlatformGameContext implements GameContext, GameServiceProvider {
         return platformGameServiceProvider.gameServiceProxy(serviceId);
     }
 
-    public void updateStatistics(Room room,String systemId,int stub,String name,double delta){
+    public void updateStatistics(Room room,String systemId,long stub,String name,double delta){
         Statistics statistics = this.platformGameServiceProvider.presenceServiceProvider().statistics(new SimpleStub(systemId,stub));
         statistics.entry(name).update(delta).update();
     }
-    public void updateExperience(Room room,String systemId,int stub,double delta){
+    public void updateExperience(Room room,String systemId,long stub,double delta){
         Rating rating = this.platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(systemId,stub));
         logger.warn("SystemId->"+systemId+">>>STUB>"+stub);
         logger.warn("Rating->"+rating.rank+">>"+rating.level+">>>"+rating.xp+">>"+delta+">>>"+room.arena().xp());

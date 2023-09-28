@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GameLobbyProxy extends RecoverableObject implements GameLobby,Configurable.Listener<LobbyItem>{
 
 
-    private ConcurrentHashMap<String,Stub> stubIndex;
+    //private ConcurrentHashMap<String,Stub> stubIndex;
     private ConcurrentHashMap<Integer,GameZone> zoneIndex;
     private PlatformGameServiceProvider gameServiceProvider;
     private ApplicationContext context;
@@ -21,51 +21,35 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     private boolean started;
 
     public GameLobbyProxy(){
-        this.stubIndex = new ConcurrentHashMap<>();
+        //this.stubIndex = new ConcurrentHashMap<>();
         this.zoneIndex = new ConcurrentHashMap<>();
     }
 
     @Override
     public Stub join(Session session, Rating rating) {
         if(!started) return new Stub("lobby not started");
-        //Stub stub = gameServiceProvider.presenceServiceProvider().stub(session,application);
-        //StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
-        //Stub stub = stubIndex.get(stubKey.asString());
-        //if(stub.joined) {
-            //stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));
-            //return stub;
-        //}
+        Stub stub = gameServiceProvider.presenceServiceProvider().stub(session,application);
+        if(stub.joined) {
+            stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));
+            return stub;
+        }
         GameZone _zone = gameZone(rating);
         return _zone.join(session,rating);
-        //stubIndex.put(stub.key().asString(),stub);
-        //this.context.log("Room->"+stub.roomId,OnLog.WARN);
-        //return stub;
     }
 
     @Override
     public boolean leave(Session session) {
         if(!started) return false;
-        //StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
-        Stub stub = gameServiceProvider.presenceServiceProvider().stub(session,application);//stubIndex.remove(stubKey.asString());
+        Stub stub = gameServiceProvider.presenceServiceProvider().stub(session,application);
         if(!stub.joined) return false;
         GameZone gameZone = this.gameServiceProvider.roomServiceProvider().gameZoneFromZoneId(session.name());
         gameZone.leave(stub);
-        //stub.pushChannel.close();
         return true;
-
-        //recover from disk
-        //stub = new Stub();
-        //stub.distributionKey(session.systemId());
-        //stub.stub(session.stub());
-        //stub.label(application.tag());
-        //GameZone gameZone = this.gameServiceProvider.roomServiceProvider().gameZoneFromZoneId(session.name());
-        //if(!gameZone.dataStore().load(stub) || !stub.joined) return false;
-        //return gameZone.leave(stub);
     }
 
     public void validate(Session session){
-        StubKey stubKey = new StubKey(session.systemId(),application.tag(),session.stub());
-        session.write(JsonUtil.toSimpleResponse(stubIndex.get(stubKey.asString())!=null,"").getBytes());
+        Stub stub =  this.gameServiceProvider.presenceServiceProvider().stub(session,application);
+        session.write(JsonUtil.toSimpleResponse(stub.joined,"").getBytes());
     }
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
@@ -75,12 +59,12 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     }
 
     @Override
-    public boolean timeout(String systemId,int stub) {
-        StubKey stubKey = new StubKey(systemId,application.tag(),stub);
-        Stub removed = stubIndex.remove(stubKey.asString());
-        if(removed==null) return false;
-        removed.zone.leave(removed);
-        gameServiceProvider.onUpdated(GameClusterMetrics.GAME_TIMEOUT_COUNT,1);
+    public boolean timeout(String systemId,long stub) {
+        Stub removed = this.gameServiceProvider.presenceServiceProvider().stub(new SimpleStub(systemId,stub),application);
+        if(!removed.joined) return false;
+        GameZone gameZone = this.gameServiceProvider.roomServiceProvider().gameZoneFromZoneId(removed.zoneId);
+        gameZone.leave(removed);
+        //gameServiceProvider.onUpdated(GameClusterMetrics.GAME_TIMEOUT_COUNT,1);
         return  true;
     }
 

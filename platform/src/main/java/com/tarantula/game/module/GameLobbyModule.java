@@ -32,7 +32,13 @@ GameLobbyModule extends ModuleHeader{
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
-        if(session.action().equals("onLeave")){
+        if(session.action().equals("onStartBattle")){
+            session.write(payload);
+        }
+        else if(session.action().equals("onEndBattle")){
+            session.write(payload);
+        }
+        else if(session.action().equals("onLeave")){
             boolean left = gameLobby.leave(session);
             session.write(JsonUtil.toSimpleResponse(left,"left room").getBytes());
         }
