@@ -2,6 +2,7 @@ package com.tarantula.platform.service;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
+import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 public class AccessKeyQuery implements RecoverableFactory<AccessKey> {
@@ -26,6 +27,6 @@ public class AccessKeyQuery implements RecoverableFactory<AccessKey> {
     }
     @Override
     public Recoverable.Key key() {
-        return key;
+        return new SnowflakeKey(owner);
     }
 }

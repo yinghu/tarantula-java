@@ -9,7 +9,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.game.GamePortableRegistry;
+
 import com.tarantula.game.service.PlatformGameServiceProvider;
 
 import com.tarantula.platform.item.PlatformItemServiceProvider;
@@ -61,7 +61,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
             this.dataStore.createIfAbsent(save, false);
         }
         save.dataStore(dataStore);
-        if(saveIndex.addKey(save.key().asString())) saveIndex.update();
+        //if(saveIndex.addKey(save.key().asString())) saveIndex.update();
         platformGameServiceProvider.presenceServiceProvider().updateSavedGame(currentSaveIndex);
     }
 
@@ -72,7 +72,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         save.dataStore(dataStore);
         if(!this.dataStore.createIfAbsent(save,true)) return;
         PlayerSaveIndex saveIndex = playerSaveIndex(saveId);
-        if(saveIndex.addKey(save.key().asString())) saveIndex.update();
+        //if(saveIndex.addKey(save.key().asString())) saveIndex.update();
         platformGameServiceProvider.presenceServiceProvider().updateSavedGame(currentSaveIndex);
     }
 
@@ -88,10 +88,10 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         CurrentSaveIndex currentSaveIndex = currentSaveIndex(session);
         //reset or delete saved data associated with the save
         PlayerSaveIndex saveIndex = playerSaveIndex(currentSaveIndex.index()==null?session.systemId():currentSaveIndex.index());
-        saveIndex.keySet().forEach(k->{
+        //saveIndex.keySet().forEach(k->{
             //this.dataStore.delete(k);
-        });
-        saveIndex.clear();
+        //});
+        //saveIndex.clear();
         return currentSaveIndex;
     }
 

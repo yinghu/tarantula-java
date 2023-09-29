@@ -8,7 +8,7 @@ import com.tarantula.platform.inventory.Inventory;
 import com.tarantula.platform.inventory.InventoryItem;
 import com.tarantula.platform.store.Shop;
 import com.tarantula.platform.store.ShoppingItem;
-import com.tarantula.platform.store.Transaction;
+import com.tarantula.platform.store.TransactionLog;
 
 
 public class ItemPortableRegistry<T extends Recoverable> extends AbstractRecoverableListener {
@@ -99,7 +99,7 @@ public class ItemPortableRegistry<T extends Recoverable> extends AbstractRecover
                 pt = new ShoppingItem();
                 break;
             case TRANSACTION_CID:
-                pt = new Transaction();
+                pt = new TransactionLog();
                 break;
             case CONFIGURABLE_TEMPLATE:
                 pt = new ConfigurableTemplate();

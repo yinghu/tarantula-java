@@ -1,9 +1,7 @@
 package com.tarantula.game.module;
 
 import com.icodesoftware.*;
-import com.icodesoftware.Module;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.presence.PersonalDataIndex;
 import com.tarantula.platform.presence.PersonalDataObject;
@@ -27,9 +25,9 @@ public class PersonalDataStoreModule extends ModuleHeader implements Configurabl
                 boolean suc;
                 if(key==null) {
                     suc = dataStore.create(po);
-                    if(suc && savedIndex.addKey(session.name()+"#"+po.distributionKey())){
-                        savedIndex.update();
-                    }
+                    //if(suc && savedIndex.addKey(session.name()+"#"+po.distributionKey())){
+                        //savedIndex.update();
+                    //}
                 }
                 else{
                     dataStore.load(po);

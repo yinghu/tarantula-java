@@ -12,7 +12,6 @@ import com.icodesoftware.service.*;
 
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.IndexSet;
 import com.tarantula.platform.item.*;
 
 import java.util.HashMap;
@@ -145,42 +144,21 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
     }
 
     public <T extends Configurable> void onCreated(Descriptor application,T t){
-        logger.warn("Created->"+t.configurationType());
-        int index = t.configurationType().indexOf(".");
-        String scope = index>0?t.configurationType().substring(0,index):t.configurationType();
-        ConfigurableCategories categories = gameCluster.configurableCategories(scope);
-        ConfigurableCategory configurableSetting = categories.configurableSetting(t.configurationCategory());
-        logger.warn(configurableSetting.toJson().toString());
-        logger.warn(application.distributionId()+">>CCC"+t.distributionKey()+">>"+t.configurationVersion()+">>>"+t.configurationCategory()+">>"+t.configurationType());
+
     }
     public <T extends Configurable> void onUpdated(Descriptor application,T t){
-        //logger.warn(application.distributionKey()+">>UUU"+t.distributionKey()+">>"+t.configurationVersion());
+
     }
     public <T extends Configurable> void onDeleted(Descriptor application,T t){
-        logger.warn(application.distributionKey()+">>GDDD"+t.key().asString()+">>"+t.configurationVersion());
-        IndexSet indexSet = new IndexSet("keys");
-        indexSet.distributionKey(t.distributionKey());
-        if(!dataStore.load(indexSet)) return;
-        indexSet.keySet().forEach((k->{
-            //this.dataStore.delete(t);
-        }));
-        this.dataStore.delete(t);
     }
     public <T extends Configurable> void onCreated(GameCluster application,T t){
-        //logger.warn(application.distributionKey()+">>GCCC"+t.key().asString()+">>"+t.configurationVersion());
+
     }
     public <T extends Configurable> void onUpdated(GameCluster application,T t){
-        logger.warn(application.distributionKey()+">>GUUU"+t.key().asString()+">>"+t.configurationVersion());
+
     }
     public <T extends Configurable> void onDeleted(GameCluster application,T t){
-        logger.warn(application.distributionKey()+">>GDDD"+t.key().asString()+">>"+t.configurationVersion());
-        IndexSet indexSet = new IndexSet("keys");
-        indexSet.distributionKey(t.distributionKey());
-        if(!dataStore.load(indexSet)) return;
-        indexSet.keySet().forEach((k->{
-            //this.dataStore.delete(k.getBytes());
-        }));
-        //this.dataStore.delete(indexSet.key().asString().getBytes());
+
     }
 
     public <T extends CredentialConfiguration> T credentialConfiguration(String vendor){

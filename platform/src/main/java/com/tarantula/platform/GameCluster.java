@@ -343,56 +343,18 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     }
     @Override
     public <T extends Configurable> void onDeleted(Descriptor application,T t) {
-        //reset(t,false);
         listeners.forEach(l->l.onDeleted(application,t));
     }
     @Override
     public <T extends Configurable> void onUpdated(GameCluster application,T t){
-        /**
-        if(t instanceof TypeIndex){
-            TypeIndex typeIndex = (TypeIndex) t;
-            if(typeIndex.typed == TypeIndex.Typed.Category){
-                HashMap<String,JsonObject> previous = new HashMap<>();
-                typeIndex.history().get("application").getAsJsonObject().get("properties").getAsJsonArray().forEach(e->{
-                    JsonObject prop = e.getAsJsonObject();
-                    String type = prop.get("type").getAsString();
-                    if(type.equals("enum")){
-                        previous.put(prop.get("reference").getAsString(),prop);
-                    }
-                    else if(type.equals("category")){
-                        previous.put(prop.get("reference").getAsString().split(":")[1],prop);
-                    }
-                    else if(type.equals("list") || type.equals("list")){
-                        String[] ref = prop.get("reference").getAsString().split(":");
-                        if(ref[0].equals("category")){
-                            previous.put(ref[1],prop);
-                        }
-                    }
-                });
-                reset(typeIndex,previous);
-                //logger.warn(typeIndex.history().toString());
-                //logger.warn(typeIndex.payload().toString());
-            }
-        }**/
         listeners.forEach(l->l.onUpdated(application,t));
     }
     @Override
     public <T extends Configurable> void onCreated(GameCluster application,T t){
-        //if(t instanceof TypeIndex){
-            //TypeIndex typeIndex = (TypeIndex)t;
-            //if(typeIndex.typed == TypeIndex.Typed.Category){
-                //reset(typeIndex,new HashMap<>());
-            //}
-        //}
         listeners.forEach(l->l.onCreated(application,t));
     }
 
     public <T extends Configurable> void onDeleted(GameCluster application,T t){
-        TypeIndex typeIndex = (TypeIndex) t;
-        if(typeIndex.typed == TypeIndex.Typed.Category){
-            delete(typeIndex);
-            //logger.warn(((TypeIndex) t).payload().toString());
-        }
         listeners.forEach(l->l.onDeleted(application,t));
     }
     @Override
@@ -415,110 +377,6 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         this.listeners.add(listener);
     }
 
-    private <T extends Configurable> void reset(T t,boolean updated){
-        int index = t.configurationType().indexOf(".");
-        String scope = index>0?t.configurationType().substring(0,index):t.configurationType();
-        ConfigurableCategories categories = this.configurableCategories(scope);
-        ConfigurableCategory configurableSetting = categories.configurableSetting(t.configurationCategory());
-        if(configurableSetting==null){
-            logger.warn("Category setting not existed ["+t.configurationCategory()+"]");
-            return;
-        }
-        //resetReferenceIndex(t.configurationCategory(),t.key().asString(),!updated);
-        //configurableSetting.properties.forEach(prop->{
-          //  JsonObject ctype = prop.getAsJsonObject();
-           // String type = ctype.get("type").getAsString();
-            //if(type.equals("enum")){
-              //  resetReferenceIndex(ctype.get("reference").getAsString(),t.key().asString(),!updated);
-            //}
-        //});
-    }
-
-    private void reset(TypeIndex typeIndex,HashMap<String,JsonObject> previous){
-        JsonObject header = typeIndex.payload().getAsJsonObject("header");
-        JsonObject app = typeIndex.payload().getAsJsonObject("application");
-        String category = header.get("type").getAsString();
-        app.get("properties").getAsJsonArray().forEach(e->{
-            JsonObject jo = e.getAsJsonObject();
-            String type = jo.get("type").getAsString();
-            if(type.equals("enum")){
-                String ref = jo.get("reference").getAsString();
-                if(previous.remove(ref)==null){
-                    resetReferenceIndex(ref,category,false);
-                }
-            }
-            else if(type.equals("category")){
-                String ref = jo.get("reference").getAsString().split(":")[1];
-                if(previous.remove(ref)==null){
-                    int index = ref.indexOf(".");
-                    if(index>0){
-                        resetReferenceIndex(ref.substring(0,index),category,false);
-                    }
-                    resetReferenceIndex(ref,category,false);
-                }
-            }
-            else if(type.equals("list") || type.equals("set")){
-                String[] ref = jo.get("reference").getAsString().split(":");
-                if(ref[0].equals("category")){
-                    if(previous.remove(ref[1])==null){
-                        int index = ref[1].indexOf(".");
-                        if(index>0){
-                            resetReferenceIndex(ref[1].substring(0,index),category,false);
-                        }
-                        resetReferenceIndex(ref[1],category,false);
-                    }
-                }
-            }
-        });
-        previous.forEach((k,v)->{
-            logger.warn("Remove index ["+category+"] from ["+k+"]");
-            int index = k.indexOf(".");
-            if(index>0){
-                resetReferenceIndex(k.substring(0,index),category,true);
-            }
-            resetReferenceIndex(k,category,true);
-        });
-    }
-
-    private void delete(TypeIndex typeIndex){
-        JsonObject header = typeIndex.payload().getAsJsonObject("header");
-        JsonObject app = typeIndex.payload().getAsJsonObject("application");
-        String category = header.get("type").getAsString();
-        app.get("properties").getAsJsonArray().forEach(e->{
-            JsonObject jo = e.getAsJsonObject();
-            String type = jo.get("type").getAsString();
-            if(type.equals("enum")){
-                String ref = jo.get("reference").getAsString();
-                resetReferenceIndex(ref,category,true);
-            }
-            else if(type.equals("category")){
-                String ref = jo.get("reference").getAsString().split(":")[1];
-                int index = ref.indexOf(".");
-                if(index>0){
-                    resetReferenceIndex(ref.substring(0,index),category,true);
-                }
-                resetReferenceIndex(ref,category,true);
-            }
-            else if(type.equals("list") || type.equals("set")){
-                String[] ref = jo.get("reference").getAsString().split(":");
-                if(ref[0].equals("category")){
-                    int index = ref[1].indexOf(".");
-                    if(index>0){
-                        resetReferenceIndex(ref[1].substring(0,index),category,true);
-                    }
-                    resetReferenceIndex(ref[1],category,true);
-                }
-            }
-        });
-    }
-
-    private void resetReferenceIndex(String reference,String key,boolean deleted){
-        ReferenceIndex referenceIndex = new ReferenceIndex(reference);
-        applicationPreSetup.load(this,referenceIndex);
-        boolean suc = deleted? referenceIndex.removeKey(key):referenceIndex.addKey(key);
-        if(!suc) return;
-        applicationPreSetup.save(this,referenceIndex);
-    }
 
     public ConfigurableCategories configurableCategories(String type){
         ApplicationPreSetup preSetup = applicationPreSetup();

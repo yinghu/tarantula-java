@@ -2,10 +2,10 @@ package com.tarantula.platform.presence.saves;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.tarantula.platform.IndexSet;
+import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
-public class PlayerSaveIndex extends IndexSet {
+public class PlayerSaveIndex extends RecoverableObject {
 
     //Save id or system ID if no save selected = > Data ID
 
@@ -32,7 +32,7 @@ public class PlayerSaveIndex extends IndexSet {
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         JsonArray keys = new JsonArray();
-        keySet().forEach(k->keys.add(k));
+        //keySet().forEach(k->keys.add(k));
         jsonObject.add("_keys",keys);
         return jsonObject;
     }

@@ -17,7 +17,7 @@ public class AccessKeyTest extends DataStoreHook{
 
     @Test(groups = { "DataStore" })
     public void smokeTest() {
-        DataStore dataStore = dataStoreProvider.createDataStore("access_key");
+        DataStore dataStore = dataStoreProvider.createDataStore("access_key_test");
         SnowflakeKey ownerId = new SnowflakeKey(serviceContext.distributionId());
         AccessKey accessKey = new AccessKey();
         accessKey.typeId("test");
@@ -37,7 +37,7 @@ public class AccessKeyTest extends DataStoreHook{
         Assert.assertFalse(dataStore.createIfAbsent(loadIf,true));
         Assert.assertTrue(loadIf.typeId().equals(load.typeId()));
 
-        AccessKeyQuery query = new AccessKeyQuery(ownerId);
+        AccessKeyQuery query = new AccessKeyQuery(ownerId.snowflakeId());
         List<AccessKey> keys = dataStore.list(query);
         Assert.assertTrue(keys.size()==1);
         Assert.assertTrue(accessKey.typeId().equals(keys.get(0).typeId()));

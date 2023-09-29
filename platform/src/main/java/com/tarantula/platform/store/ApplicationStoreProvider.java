@@ -49,7 +49,7 @@ public class ApplicationStoreProvider extends AuthObject {
             return false;
         }
         String tid = UUID.randomUUID().toString();
-        Transaction transaction = new Transaction(systemId,"soft purchase",bundleId);
+        TransactionLog transaction = new TransactionLog(systemId,"soft purchase",bundleId);
         transaction.index(tid);
         serviceEventLogger.log(transaction);
         return true;

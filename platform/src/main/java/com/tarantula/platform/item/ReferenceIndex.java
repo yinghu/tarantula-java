@@ -3,11 +3,11 @@ package com.tarantula.platform.item;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.NaturalKey;
-import com.tarantula.platform.IndexSet;
+import com.icodesoftware.util.RecoverableObject;
 
 import java.util.Map;
 
-public class ReferenceIndex extends IndexSet implements Configurable {
+public class ReferenceIndex extends RecoverableObject implements Configurable {
 
     public ReferenceIndex(){
         this.label = "references";
@@ -41,6 +41,6 @@ public class ReferenceIndex extends IndexSet implements Configurable {
         return new NaturalKey(name+ Recoverable.PATH_SEPARATOR+label);
     }
     public void index(String key){
-        keySet.add(key);
+
     }
 }

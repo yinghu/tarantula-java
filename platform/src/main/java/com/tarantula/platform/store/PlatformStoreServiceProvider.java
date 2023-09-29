@@ -7,7 +7,6 @@ import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
-import com.tarantula.platform.item.ConfigurableCategories;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.item.ItemDistributionCallback;

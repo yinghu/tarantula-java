@@ -2,11 +2,10 @@ package com.tarantula.platform.presence;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.tarantula.platform.IndexSet;
+import com.icodesoftware.util.RecoverableObject;
 
-import java.util.Set;
 
-public class PersonalDataIndex extends IndexSet {
+public class PersonalDataIndex extends RecoverableObject {
 
 
     public PersonalDataIndex(){
@@ -27,15 +26,15 @@ public class PersonalDataIndex extends IndexSet {
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         JsonArray keys = new JsonArray();
-        keySet().forEach(k->keys.add(k));
+        //keySet().forEach(k->keys.add(k));
         jsonObject.add("_keys",keys);
         return jsonObject;
     }
     public String dataKey(String key){
-        Set<String> keys = this.keySet();
-        for (String k : keys){
-            if(k.startsWith(key)) return k;
-        }
+        //Set<String> keys = this.keySet();
+        //for (String k : keys){
+            //if(k.startsWith(key)) return k;
+        //}
         return null;
     }
 

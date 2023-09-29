@@ -53,7 +53,7 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
             this.dataStore.createIfAbsent(pendingRewardIndex,true);
             PendingReward pending = new PendingReward(item);
             this.dataStore.create(pending);
-            pendingRewardIndex.addKey(pending.distributionKey());
+            //pendingRewardIndex.addKey(pending.distributionKey());
             this.dataStore.update(pendingRewardIndex);
             return;
         }
@@ -70,7 +70,7 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         PendingRewardIndex pendingRewardIndex = new PendingRewardIndex();
         pendingRewardIndex.distributionKey(session.systemId());
         this.dataStore.createIfAbsent(pendingRewardIndex,true);
-        pendingRewardIndex.removeKey(rewardKey);
+        //pendingRewardIndex.removeKey(rewardKey);
         dataStore.update(pendingRewardIndex);
         return true;
     }
@@ -79,11 +79,11 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         PendingRewardIndex pendingRewardIndex = new PendingRewardIndex();
         pendingRewardIndex.distributionKey(systemId);
         this.dataStore.createIfAbsent(pendingRewardIndex,true);
-        pendingRewardIndex.keySet().forEach(k->{
-            PendingReward pending = new PendingReward();
-            pending.distributionKey(k);
-            if(dataStore.load(pending)) rewards.add(pending);
-        });
+        //pendingRewardIndex.keySet().forEach(k->{
+            //PendingReward pending = new PendingReward();
+            //pending.distributionKey(k);
+            //if(dataStore.load(pending)) rewards.add(pending);
+        //});
         return rewards;
     }
 }

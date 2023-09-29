@@ -1,12 +1,12 @@
 package com.tarantula.platform.presence.saves;
 
-import com.tarantula.platform.IndexSet;
+import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.util.*;
 
 //system id => saved game id index set
-public class SavedGameIndex extends IndexSet {
+public class SavedGameIndex extends RecoverableObject {
 
     private Set<SavedGame> savedGames  = new HashSet<>();
 
@@ -21,13 +21,13 @@ public class SavedGameIndex extends IndexSet {
     @Override
     public void fromMap(Map<String,Object> properties){
         super.fromMap(properties);
-        keySet.forEach((k)->{
-            SavedGame savedGame = new SavedGame();
-            savedGame.distributionKey(k);
-            savedGame.dataStore(this.dataStore);
-            savedGames.add(savedGame);
-        });
-        properties.clear();
+        //keySet.forEach((k)->{
+            //SavedGame savedGame = new SavedGame();
+            //savedGame.distributionKey(k);
+            //savedGame.dataStore(this.dataStore);
+            //savedGames.add(savedGame);
+        //});
+        //properties.clear();
     }
 
     @Override
@@ -41,7 +41,7 @@ public class SavedGameIndex extends IndexSet {
     }
     public boolean addSavedGame(SavedGame savedGame){
         if(!savedGames.add(savedGame)) return false;
-        addKey(savedGame.distributionKey());
+        //addKey(savedGame.distributionKey());
         dataStore.update(this);
         return true;
     }

@@ -3,8 +3,6 @@ package com.tarantula.platform.room;
 import com.icodesoftware.protocol.GameModule;
 import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.game.GameZone;
-import com.tarantula.platform.IndexSet;
-
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;

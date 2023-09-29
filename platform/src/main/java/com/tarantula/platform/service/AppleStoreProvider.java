@@ -17,7 +17,7 @@ import com.tarantula.platform.configuration.AppleCredentialConfiguration;
 import com.tarantula.platform.configuration.AppleStoreKey;
 import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
-import com.tarantula.platform.store.Transaction;
+import com.tarantula.platform.store.TransactionLog;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -106,7 +106,7 @@ public class AppleStoreProvider extends AuthObject{
         if(!validated){
             params.put(OnAccess.STORE_MESSAGE,"transaction cannot be validated");
         }
-        Transaction transaction = new Transaction(systemId,(String)params.get(OnAccess.STORE_BUNDLE_ID),resp);
+        TransactionLog transaction = new TransactionLog(systemId,(String)params.get(OnAccess.STORE_BUNDLE_ID),resp);
         transaction.distributionKey(pendingTransactionId);
         serviceEventLogger.log(transaction);
         //this.metricsListener.onUpdated(VendorMetrics.APPLE_STORE_COUNT,1);

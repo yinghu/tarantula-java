@@ -2,7 +2,6 @@ package com.tarantula.platform.store;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
-import com.tarantula.platform.item.ItemPortableRegistry;
 
 public class ShoppingItemObjectQuery implements RecoverableFactory<Shop> {
 

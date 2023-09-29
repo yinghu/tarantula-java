@@ -9,7 +9,6 @@ import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ItemPortableRegistry;
 import com.tarantula.platform.presence.MappingObject;
-import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.util.RecoverableQuery;
 
 public class CredentialConfiguration extends Application {

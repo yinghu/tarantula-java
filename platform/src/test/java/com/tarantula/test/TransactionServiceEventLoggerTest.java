@@ -1,14 +1,10 @@
 package com.tarantula.test;
 
 import com.icodesoftware.DataStore;
-import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.DataStoreProvider;
 import com.tarantula.platform.service.cluster.ClusterFailureEvent;
-import com.tarantula.platform.store.Transaction;
+import com.tarantula.platform.store.TransactionLog;
 import com.tarantula.platform.store.TransactionEventLogger;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class TransactionServiceEventLoggerTest extends DataStoreHook{
 
@@ -17,7 +13,7 @@ public class TransactionServiceEventLoggerTest extends DataStoreHook{
     public void loggerTest() {
         DataStore dataStore = dataStoreProvider.createDataStore("test_event_log");
         TransactionEventLogger transactionEventLogger = new TransactionEventLogger(dataStore);
-        Transaction transaction = new Transaction("","","");
+        TransactionLog transaction = new TransactionLog("","","");
         transaction.index("transaction0011");
         Exception exception = null;
         try{

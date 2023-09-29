@@ -1,10 +1,10 @@
 package com.tarantula.platform.presence.saves;
 
 import com.google.gson.JsonObject;
-import com.tarantula.platform.IndexSet;
+import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
-public class DeviceSaveIndex extends IndexSet {
+public class DeviceSaveIndex extends RecoverableObject {
 
 
     public DeviceSaveIndex(){

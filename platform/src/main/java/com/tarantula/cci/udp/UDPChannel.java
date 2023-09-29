@@ -27,8 +27,6 @@ public class UDPChannel extends GameChannel {
 
     public void register(Session session,ChannelListener channelListener,UDPEndpointServiceProvider.RequestListener requestListener,UDPEndpointServiceProvider.ActionListener actionListener, Session.TimeoutListener timeoutListener){
         this.stub = session;
-        this.owner = session.systemId();
-        //this.routingNumber = session.stub();
         this.channelListener = channelListener;
         this.requestListener = requestListener;
         this.actionListener = actionListener;
@@ -78,8 +76,7 @@ public class UDPChannel extends GameChannel {
     }
 
     public void kickoff(){
-        System.out.println("KOFF : "+sessionId+" : "+channelId);
-        this.timeoutListener.timeout(this.owner, this.stub.distributionId());
+        this.timeoutListener.timeout(this.stub.systemId(), this.stub.distributionId());
         this.channelListener.onLeft(this);
     }
     public void joined(){

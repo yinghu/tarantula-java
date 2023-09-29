@@ -43,11 +43,11 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             TypeIndex typeIndex = new TypeIndex(jo.get("name").getAsString(),TypeIndex.Typed.Enum,query[1],jo);
             boolean updateAllowed = query[2].equals("save");
             boolean deleted = query[2].equals("delete");
-            if(applicationPreSetup.load(gameCluster,typeIndex)){
-                ReferenceIndex instanceIndex = new ReferenceIndex(typeIndex.name());
-                applicationPreSetup.load(gameCluster,instanceIndex);
-                updateAllowed = deleted ?(typeIndex.payload().get("type").getAsString().equals("enum") && instanceIndex.keySet().isEmpty()) : typeIndex.payload().get("type").getAsString().equals("enum");
-            }
+            //if(applicationPreSetup.load(gameCluster,typeIndex)){
+                //ReferenceIndex instanceIndex = new ReferenceIndex(typeIndex.name());
+                //applicationPreSetup.load(gameCluster,instanceIndex);
+                //updateAllowed = deleted ?(typeIndex.payload().get("type").getAsString().equals("enum") && instanceIndex.keySet().isEmpty()) : typeIndex.payload().get("type").getAsString().equals("enum");
+            //}
             if(updateAllowed){
                 typeIndex.upgrade(jo);
                 if(deleted){

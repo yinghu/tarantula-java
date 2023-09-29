@@ -183,22 +183,22 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.tarantulaContext.node().deploymentId(),descriptor.typeId());
         if(!dataStore.load(lobbyTypeIdIndex)){
             if(descriptor.index()!=null){
-                IndexSet indexSet = new IndexSet();
-                indexSet.distributionKey(descriptor.index());
-                indexSet.label(ExposedGameService.INDEX_LABEL);
-                if(dataStore.load(indexSet)){
-                    indexSet.keySet().forEach((k)->{
-                        DeploymentDescriptor app = new DeploymentDescriptor();
-                        app.distributionKey(k);
-                        if(dataStore.load(app)){
-                            app.codebase(descriptor.codebase());
-                            app.moduleArtifact(descriptor.moduleArtifact());
-                            app.moduleVersion(descriptor.moduleVersion());
-                            dataStore.update(app);
-                            suc[0]=true;
-                        }
-                    });
-                }
+                //IndexSet indexSet = new IndexSet();
+                //indexSet.distributionKey(descriptor.index());
+                //indexSet.label(ExposedGameService.INDEX_LABEL);
+                //if(dataStore.load(indexSet)){
+                    //indexSet.keySet().forEach((k)->{
+                        //DeploymentDescriptor app = new DeploymentDescriptor();
+                        //app.distributionKey(k);
+                        //if(dataStore.load(app)){
+                            //app.codebase(descriptor.codebase());
+                            //app.moduleArtifact(descriptor.moduleArtifact());
+                            //app.moduleVersion(descriptor.moduleVersion());
+                            //dataStore.update(app);
+                            //suc[0]=true;
+                        //}
+                    //});
+                //}
             }
             return suc[0];
         }
@@ -345,14 +345,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(!ds.create(descriptor)) return false;
         if(!descriptor.typeId().equals(descriptor.moduleId())){
             //create index for moduleId
-            IndexSet indexSet = new IndexSet();
-            indexSet.distributionKey(descriptor.index());
-            indexSet.label(ExposedGameService.INDEX_LABEL);
-            indexSet.addKey(descriptor.distributionKey());
-            if(!ds.createIfAbsent(indexSet,true)){
-                indexSet.addKey(descriptor.distributionKey());
-                ds.update(indexSet);
-            }
+            //IndexSet indexSet = new IndexSet();
+            //indexSet.distributionKey(descriptor.index());
+            //indexSet.label(ExposedGameService.INDEX_LABEL);
+            //indexSet.addKey(descriptor.distributionKey());
+            //if(!ds.createIfAbsent(indexSet,true)){
+                //indexSet.addKey(descriptor.distributionKey());
+                //ds.update(indexSet);
+            //}
             //log.warn("create index->"+descriptor.moduleId()+"<><><>"+descriptor.index());
         }
         this.integrationCluster.deployService().onLaunchApplication(descriptor.typeId(),descriptor.distributionId());

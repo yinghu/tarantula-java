@@ -267,7 +267,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         AccessKey accessKey = new AccessKey();
         accessKey.typeId(gc.gameLobbyName);
         accessKey.timestamp(stmp);
-        accessKey.index(gc.distributionKey());
+        accessKey.index(Long.toString(gameClusterId));
+        accessKey.ownerKey(new SnowflakeKey(gc.distributionId()));
         if(!this.deployDataStore.create(accessKey)) return null;
         byte[] wmark = encrypt(ByteBuffer.allocate(8).putLong(stmp).array());
         return SystemUtil.accessKey(messageDigest(),accessKey.typeId(),accessKey.distributionKey(),stmp,SystemUtil.toHexString(wmark));

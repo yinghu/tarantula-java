@@ -5,10 +5,10 @@ import com.tarantula.platform.service.ServiceEventLog;
 
 
 
-public class Transaction extends ServiceEventLog {
+public class TransactionLog extends ServiceEventLog {
 
-    public Transaction(){}
-    public Transaction(String source,String message,String payload){
+    public TransactionLog(){}
+    public TransactionLog(String source, String message, String payload){
         super("transaction",Level.INFO,source,message,payload);
     }
 
