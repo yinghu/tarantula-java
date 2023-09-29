@@ -134,10 +134,10 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     public Stub stub(Session session,Descriptor lobby){
         DataStore ds = applicationPreSetup.dataStore(gameCluster,NAME+"_"+lobby.tag().replaceAll(Recoverable.PATH_SEPARATOR,"_"));
         Stub stub = new Stub();
-        stub.distributionId(session.distributionId());
+        stub.distributionId(session.stub());
         stub.systemId(session.systemId());
         ds.createIfAbsent(stub,true);
-        stub.dataStore(dataStore);
+        stub.dataStore(ds);
         return stub;
     }
     public Statistics statistics(Session session){
@@ -246,7 +246,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     }
 
     public void onLeave(Session session){
-        platformGameServiceProvider.savedGameServiceProvider().checkSavedGame(session.systemId());
+        platformGameServiceProvider.savedGameServiceProvider().checkSavedGame(session.distributionKey());
     }
 
     public void onLobby(Descriptor onLobby){

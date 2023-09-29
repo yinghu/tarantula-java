@@ -8,8 +8,6 @@ import com.tarantula.platform.room.GameRoom;
 
 import java.time.LocalDateTime;
 
-
-//per stub/game by playerId + lobby tag
 public class Stub extends PlayerGameObject {
 
     public final static String LABEL = "stub";
@@ -22,8 +20,9 @@ public class Stub extends PlayerGameObject {
     public Tournament.Instance tournament;
     public GameZone zone;
 
-    public Channel pushChannel;
 
+    public Channel pushChannel;
+    public int sessionId;
     public Stub(){
         timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         this.onEdge = true;
@@ -60,6 +59,7 @@ public class Stub extends PlayerGameObject {
         this.joined = buffer.readBoolean();
         this.zoneId = buffer.readUTF8();
         this.roomId = buffer.readUTF8();
+        this.sessionId = buffer.readInt();
         this.tournamentId = buffer.readUTF8();
         this.trackId = buffer.readUTF8();
         this.timestamp = buffer.readLong();
@@ -70,6 +70,7 @@ public class Stub extends PlayerGameObject {
         buffer.writeBoolean(joined);
         buffer.writeUTF8(zoneId);
         buffer.writeUTF8(roomId);
+        buffer.writeInt(sessionId);
         buffer.writeUTF8(tournamentId);
         buffer.writeUTF8(trackId);
         buffer.writeLong(timestamp);
@@ -86,11 +87,6 @@ public class Stub extends PlayerGameObject {
         return GamePortableRegistry.STUB_CID;
     }
 
-
-    @Override
-    public String toString(){
-        return key().toString();
-    }
 
     @Override
     public void write(Session.Header messageHeader,byte[] payload){

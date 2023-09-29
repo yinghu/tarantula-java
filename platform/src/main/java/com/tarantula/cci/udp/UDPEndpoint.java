@@ -211,7 +211,6 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
 
     @Override
     public void onJoined(int channelId, int sessionId){
-        //logger.warn("Session joined->"+sessionId+">>"+channelId);
         UDPChannel joined = channels.get(sessionId);
         joined.joined();
     }

@@ -24,7 +24,6 @@ GameLobbyModule extends ModuleHeader{
             return;
         }
         Rating rating = gameServiceProvider.presenceServiceProvider().rating(session);
-        this.context.log("RATING ["+rating.distributionId()+"]["+rating.rank+"]",OnLog.WARN);
         Stub stub = gameLobby.join(session,rating);
         gameServiceProvider.presenceServiceProvider().onPlay(session.systemId());
         session.write(stub.toJson().toString().getBytes());

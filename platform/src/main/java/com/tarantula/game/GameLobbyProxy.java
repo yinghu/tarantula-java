@@ -5,14 +5,12 @@ import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.game.service.*;
 import com.tarantula.platform.lobby.LobbyItem;
-import com.tarantula.platform.service.metrics.GameClusterMetrics;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GameLobbyProxy extends RecoverableObject implements GameLobby,Configurable.Listener<LobbyItem>{
 
 
-    //private ConcurrentHashMap<String,Stub> stubIndex;
     private ConcurrentHashMap<Integer,GameZone> zoneIndex;
     private PlatformGameServiceProvider gameServiceProvider;
     private ApplicationContext context;
@@ -21,7 +19,6 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     private boolean started;
 
     public GameLobbyProxy(){
-        //this.stubIndex = new ConcurrentHashMap<>();
         this.zoneIndex = new ConcurrentHashMap<>();
     }
 
@@ -42,7 +39,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         if(!started) return false;
         Stub stub = gameServiceProvider.presenceServiceProvider().stub(session,application);
         if(!stub.joined) return false;
-        GameZone gameZone = this.gameServiceProvider.roomServiceProvider().gameZoneFromZoneId(session.name());
+        GameZone gameZone = this.gameServiceProvider.roomServiceProvider().gameZoneFromZoneId(stub.zoneId);
         gameZone.leave(stub);
         return true;
     }

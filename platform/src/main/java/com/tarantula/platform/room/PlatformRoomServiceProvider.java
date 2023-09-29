@@ -173,7 +173,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             GameRoom room = gameRoomIndex.get(stub.roomId);
             Channel channel = room.registerChannel(stub,timeoutListener);
             udpEndpoint.registerChannel((UDPChannel)channel);
-            //logger.warn("Using assigned channel ["+channel.channelId()+"/"+channel.sessionId()+"]");
+            logger.warn("Using assigned channel ["+channel.channelId()+"/"+channel.sessionId()+"]");
             return channel;
         }
     }
@@ -191,6 +191,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         gameServiceProvider.presenceServiceProvider().onLeave(stub);
         if(dedicated) return; //close from channel close
         GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
+        Channel channel = udpEndpoint.channel(stub.sessionId);
+        if(channel!=null) channel.close();
         localLeave(stub.distributionId(),index,stub.roomId,(room,entry)->{});
     }
 
@@ -490,7 +492,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     private GameRoom loadGameRoom(GameZoneIndex zoneIndex,String roomId){
         return gameRoomIndex.computeIfAbsent(roomId,(k)->{
-            GameRoom gameRoom = this.newGameRoom(zoneIndex.gameZone.gameModule(),zoneIndex.gameZone.capacity());
+            GameRoom gameRoom = this.newGameRoom(zoneIndex.gameZone.playMode(),zoneIndex.gameZone.capacity());
             gameRoom.distributionId(Long.parseLong(roomId));
             if(!this.dataStore.load(gameRoom)) return null;
             gameRoom.dataStore(this.dataStore);

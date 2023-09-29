@@ -78,7 +78,8 @@ public class UDPChannel extends GameChannel {
     }
 
     public void kickoff(){
-        this.timeoutListener.timeout(this.owner, this.stub.stub());
+        System.out.println("KOFF : "+sessionId+" : "+channelId);
+        this.timeoutListener.timeout(this.owner, this.stub.distributionId());
         this.channelListener.onLeft(this);
     }
     public void joined(){

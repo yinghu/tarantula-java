@@ -149,23 +149,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
 
     @Override
-    public Map<String,Object> toMap(){
-        this.properties.put("1",capacity);
-        this.properties.put("2",round);
-        this.properties.put("3",totalJoined);
-        this.properties.put("4",totalLeft);
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        this.capacity = ((Number)properties.getOrDefault("1",1)).intValue();
-        this.round = ((Number)properties.getOrDefault("2",0)).intValue();
-        this.totalJoined = ((Number)properties.getOrDefault("3",0)).intValue();
-        this.totalLeft = ((Number)properties.getOrDefault("4",0)).intValue();
-
-    }
-
-    @Override
     public boolean read(DataBuffer buffer){
         this.capacity = buffer.readInt();
         this.round = buffer.readInt();
