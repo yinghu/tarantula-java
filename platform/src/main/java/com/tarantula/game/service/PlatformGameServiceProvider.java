@@ -10,6 +10,7 @@ import com.icodesoftware.protocol.GameServiceProvider;
 import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.service.*;
 import com.perfectday.games.earth8.Earth8GameServiceProvider;
+import com.perfectday.games.earth8.Earth8PortableRegistry;
 import com.tarantula.game.module.ErrorModule;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.achievement.PlatformAchievementServiceProvider;
@@ -128,6 +129,7 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
             return true;
         });
         gameServiceProvider.setup(new PlatformGameContext(serviceContext,this,JDKLogger.getLogger(Earth8GameServiceProvider.class)));
+        serviceContext.recoverableRegistry(new Earth8PortableRegistry<>());
         logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionId()+"]");
     }
     @Override

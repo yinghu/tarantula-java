@@ -542,7 +542,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public <T extends Recoverable> RecoverableRegistry<T> recoverableRegistry(int registryId){
  	    return fMap.get(registryId);
     }
-
+    public void recoverableRegistry(RecoverableListener recoverableRegistry){
+        if(fMap.contains(recoverableRegistry.registryId())) throw new RuntimeException("registry already exist ["+recoverableRegistry.registryId()+"]");
+        fMap.put(recoverableRegistry.registryId(),recoverableRegistry);
+    }
 
     public EndpointService endpointService(){
  	    return this.endpointService;

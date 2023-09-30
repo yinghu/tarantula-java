@@ -23,6 +23,8 @@ public interface ServiceContext extends Context{
     long distributionId();
     ServiceEventLogger serviceEventLogger();
     <T extends Recoverable> RecoverableRegistry<T> recoverableRegistry(int registryId);
+    void recoverableRegistry(RecoverableListener recoverableListener);
+
     TokenValidatorProvider.AuthVendor authVendor(String name);
     Configuration configuration(String config);
     List<Descriptor> availableServices();

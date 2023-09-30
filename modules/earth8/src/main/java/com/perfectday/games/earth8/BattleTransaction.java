@@ -70,4 +70,14 @@ public class BattleTransaction extends RecoverableObject {
         }
         return battleTransaction;
     }
+
+    @Override
+    public int getClassId() {
+        return Earth8PortableRegistry.BATTLE_TRANSACTION_CID;
+    }
+
+    @Override
+    public int getFactoryId() {
+        return Earth8PortableRegistry.OID;
+    }
 }
