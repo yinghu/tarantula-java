@@ -28,21 +28,36 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         BattleTransaction battleTransaction = BattleTransaction.fromJson(payload);
         if(!battleTransaction.validate()){
             session.write(JsonUtil.toSimpleResponse(false,"invalid battle settings").getBytes());
+            return;
         }
-        else{
-            Transaction transaction = gameContext.applicationSchema().transaction();
-            boolean created = transaction.execute(ctx->{
-                ApplicationPreSetup applicationPreSetup = (ApplicationPreSetup)ctx;
-                DataStore dataStore = applicationPreSetup.onDataStore("battle");
-                return dataStore.create(battleTransaction);
-            });
-            session.write(created?battleTransaction.toJson().toString().getBytes():JsonUtil.toSimpleResponse(false,"failed to create battle transaction").getBytes());
-        }
+        Transaction transaction = gameContext.applicationSchema().transaction();
+        boolean created = transaction.execute(ctx->{
+            ApplicationPreSetup applicationPreSetup = (ApplicationPreSetup)ctx;
+            DataStore dataStore = applicationPreSetup.onDataStore("battle");
+            return dataStore.create(battleTransaction);
+        });
+        session.write(created?battleTransaction.toJson().toString().getBytes():JsonUtil.toSimpleResponse(false,"failed to create battle transaction").getBytes());
     }
     public void updateGame(Session session,byte[] payload) throws Exception{
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("command","updateGame");
-        session.write(jsonObject.toString().getBytes());
+        JsonObject jsonObject = JsonUtil.parse(payload);
+        long battleId = jsonObject.get("BattleId").getAsLong();
+        if(battleId<=0) {
+            session.write(JsonUtil.toSimpleResponse(false,"invalid battleId").getBytes());
+            return;
+        }
+        BattleTransaction battleTransaction = new BattleTransaction();
+        battleTransaction.distributionId(battleId);
+        Transaction transaction = gameContext.applicationSchema().transaction();
+        boolean updated = transaction.execute(ctx->{
+            ApplicationPreSetup applicationPreSetup = (ApplicationPreSetup)ctx;
+            DataStore dataStore = applicationPreSetup.onDataStore("battle");
+            if(!dataStore.load(battleTransaction)) return false;
+            //battleTransaction.win = win;
+            //battleTransaction.disabled(true);
+            //return dataStore.update(battleTransaction);
+            return true;
+        });
+        session.write(JsonUtil.toSimpleResponse(updated,"battle updated").getBytes());
     }
     public void endGame(Session session,byte[] payload) throws Exception{
         JsonObject jsonObject = JsonUtil.parse(payload);
@@ -50,6 +65,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         boolean win = jsonObject.get("Win").getAsBoolean();
         if(battleId<=0){
             session.write(JsonUtil.toSimpleResponse(false,"invalid battleId").getBytes());
+            return;
         }
         BattleTransaction battleTransaction = new BattleTransaction();
         battleTransaction.distributionId(battleId);
