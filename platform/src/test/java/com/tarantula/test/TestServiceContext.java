@@ -69,7 +69,7 @@ public class TestServiceContext implements ServiceContext {
 
     @Override
     public void recoverableRegistry(RecoverableListener recoverableListener) {
-        
+
     }
 
     @Override
