@@ -68,6 +68,7 @@ public class DataStoreSudoRoleModule implements Module {
             int[] batch = {Integer.parseInt(query[2])};
             summary.addProperty("keyStartIndex",kn[0]);
             summary.addProperty("keyEndIndex",kn[0]+batch[0]);
+            Gson gson = new Gson();
             sum.list((n,h,t)->{
                 kn[0]--;
                 if(kn[0]<0) {
@@ -77,7 +78,7 @@ public class DataStoreSudoRoleModule implements Module {
                     debug.addProperty("local",h.local());
                     debug.addProperty("revision",Long.toString(h.revision()));
                     debug.addProperty("node",n.nodeName());
-                    debug.add("content",t.toJson());
+                    debug.add("content",gson.toJsonTree(t));
                     keys.add(debug);
                     batch[0]--;
                 }
@@ -92,11 +93,12 @@ public class DataStoreSudoRoleModule implements Module {
             JsonObject summary = new JsonObject();
             JsonArray data = new JsonArray();
             if(sum!=null){
+                Gson gson = new Gson();
                 sum.load(query[1].getBytes(),(n,h,t)->{
                     JsonObject debug = new JsonObject();
                     debug.addProperty("local",h.local());
                     debug.addProperty("revision",Long.toString(h.revision()));
-                    debug.add("content",t.toJson());
+                    debug.add("content",gson.toJsonTree(t));
                     data.add(debug);
                     return true;
                 });

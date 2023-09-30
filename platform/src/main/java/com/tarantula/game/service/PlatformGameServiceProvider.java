@@ -337,14 +337,10 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
         return transactionEventLogger;
     }
 
-    public void startGame(Session session, byte[] payload) throws Exception{
-        gameServiceProvider.startGame(session,payload);
+
+    public GameServiceProvider gameServiceProvider(){
+        return gameServiceProvider;
     }
-    public void updateGame(Session session,byte[] payload) throws Exception{
-        gameServiceProvider.updateGame(session,payload);
-    }
-    public void endGame(Session session,byte[] payload) throws Exception{
-        gameServiceProvider.endGame(session,payload);
-    }
+
 
 }

@@ -14,7 +14,6 @@ public class BattleTransaction extends RecoverableObject {
 
     public boolean win;
 
-    public boolean finished;
     @Override
     public boolean write(DataBuffer buffer) {
         buffer.writeLong(chapterId);
@@ -24,7 +23,7 @@ public class BattleTransaction extends RecoverableObject {
             buffer.writeLong(unit);
         }
         buffer.writeBoolean(win);
-        buffer.writeBoolean(finished);
+        buffer.writeBoolean(disabled);
         return true;
     }
 
@@ -38,7 +37,7 @@ public class BattleTransaction extends RecoverableObject {
             party[i]=buffer.readLong();
         }
         win = buffer.readBoolean();
-        finished = buffer.readBoolean();
+        disabled = buffer.readBoolean();
         return true;
     }
 

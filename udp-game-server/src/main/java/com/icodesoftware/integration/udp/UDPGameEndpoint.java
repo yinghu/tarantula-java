@@ -5,6 +5,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.game.PendingReleaseRoom;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.*;
+import com.icodesoftware.service.ApplicationSchema;
 import com.icodesoftware.service.Serviceable;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.HttpCaller;
@@ -359,7 +360,11 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             logger.warn("failed to create channel");
         }
     }
-    public Transaction transaction(){
+    public GameServiceProvider gameServiceProvider(){
+        return null;
+    }
+    @Override
+    public ApplicationSchema applicationSchema() {
         return null;
     }
 

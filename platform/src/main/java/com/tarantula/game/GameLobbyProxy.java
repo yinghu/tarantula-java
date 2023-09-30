@@ -26,7 +26,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     public Stub join(Session session, Rating rating) {
         if(!started) return new Stub("lobby not started");
         Stub stub = gameServiceProvider.presenceServiceProvider().stub(session,application);
-        if(stub.joined) {
+        if(stub.joined()) {
             stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));
             return stub;
         }
@@ -38,7 +38,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     public boolean leave(Session session) {
         if(!started) return false;
         Stub stub = gameServiceProvider.presenceServiceProvider().stub(session,application);
-        if(!stub.joined) return false;
+        if(!stub.joined()) return false;
         GameZone gameZone = this.gameServiceProvider.roomServiceProvider().gameZoneFromZoneId(stub.zoneId);
         gameZone.leave(stub);
         return true;
@@ -46,7 +46,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
 
     public void validate(Session session){
         Stub stub =  this.gameServiceProvider.presenceServiceProvider().stub(session,application);
-        session.write(JsonUtil.toSimpleResponse(stub.joined,"").getBytes());
+        session.write(JsonUtil.toSimpleResponse(stub.joined(),"").getBytes());
     }
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
@@ -58,7 +58,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     @Override
     public boolean timeout(String systemId,long stub) {
         Stub removed = this.gameServiceProvider.presenceServiceProvider().stub(new SimpleStub(systemId,stub),application);
-        if(!removed.joined) return false;
+        if(!removed.joined()) return false;
         GameZone gameZone = this.gameServiceProvider.roomServiceProvider().gameZoneFromZoneId(removed.zoneId);
         gameZone.leave(removed);
         //gameServiceProvider.onUpdated(GameClusterMetrics.GAME_TIMEOUT_COUNT,1);

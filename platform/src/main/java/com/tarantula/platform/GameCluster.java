@@ -277,6 +277,9 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
         return transaction;
     }
 
+    public Descriptor application(String category){
+        return serviceWithCategory(category);
+    }
     @Override
     public String typeId(){
         return serviceType().replace("-service","");

@@ -20,8 +20,8 @@ public class PVPRoomProxy extends RoomProxyHeader{
         stub.label(application.tag());
         this.dataStore.createIfAbsent(stub,true);
         GameRoom room = gameServiceProvider.roomServiceProvider().join(rating,gameZone);
-        stub.joined = room!=null;
-        if(!stub.joined) return stub;
+        stub.joined(room!=null);
+        if(!stub.joined()) return stub;
         stub.roomId = room.roomId();
         stub.zoneId = gameZone.distributionKey();
         stub.room = room;
@@ -40,7 +40,7 @@ public class PVPRoomProxy extends RoomProxyHeader{
         return stub;
     }
     public boolean leave(Stub stub){
-        stub.joined = false;
+        stub.joined(false);
         this.dataStore.update(stub);
         this.gameServiceProvider.roomServiceProvider().leave(stub);
         return true;

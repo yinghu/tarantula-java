@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class MetricsProperty extends RecoverableObject implements Metrics.Spot {
 
-    public String name;
+    //public String name;
     public double value;
 
 

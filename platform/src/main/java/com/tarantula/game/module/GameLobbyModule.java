@@ -27,22 +27,24 @@ GameLobbyModule extends ModuleHeader{
         Stub stub = gameLobby.join(session,rating);
         gameServiceProvider.presenceServiceProvider().onPlay(session.systemId());
         session.write(stub.toJson().toString().getBytes());
+        if(stub.joined()) gameServiceProvider.gameServiceProvider().onJoined(session);
     }
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onStartGame")){
-            gameServiceProvider.startGame(session,payload);
+            gameServiceProvider.gameServiceProvider().startGame(session,payload);
         }
         else if(session.action().equals("onUpdateGame")){
-            gameServiceProvider.updateGame(session,payload);
+            gameServiceProvider.gameServiceProvider().updateGame(session,payload);
         }
         else if(session.action().equals("onEndGame")){
-            gameServiceProvider.endGame(session,payload);
+            gameServiceProvider.gameServiceProvider().endGame(session,payload);
         }
         else if(session.action().equals("onLeave")){
             boolean left = gameLobby.leave(session);
             session.write(JsonUtil.toSimpleResponse(left,"left room").getBytes());
+            if(left)gameServiceProvider.gameServiceProvider().onLeft(session);
         }
         else if(session.action().equals("onValidate")){
             this.context.log("check game session",OnLog.WARN);
@@ -54,10 +56,9 @@ GameLobbyModule extends ModuleHeader{
             }
             Rating rating = gameServiceProvider.presenceServiceProvider().rating(session);
             rating.level = this.context.descriptor().accessRank()*100-99;
-            this.context.log("RATING ["+rating.distributionId()+"]["+rating.rank+"]",OnLog.WARN);
             Stub stub = gameLobby.join(session,rating);
             session.write(stub.toJson().toString().getBytes());
-            //this.gameServiceProvider.onUpdated(GameClusterMetrics.GAME_JOIN_COUNT,1);
+            this.gameServiceProvider.gameServiceProvider().onJoined(session);
         }
         else if(session.action().equals("onTestScore")){
             if(this.context.validator().role(session.distributionId()).accessControl()< AccessControl.admin.accessControl()){

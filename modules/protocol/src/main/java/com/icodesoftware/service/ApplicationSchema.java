@@ -1,6 +1,7 @@
 package com.icodesoftware.service;
 
 import com.icodesoftware.Configurable;
+import com.icodesoftware.Descriptor;
 import com.icodesoftware.Transaction;
 
 public interface ApplicationSchema extends Configurable,Configurable.Listener<OnLobby>, Transaction.Listener {
@@ -39,4 +40,5 @@ public interface ApplicationSchema extends Configurable,Configurable.Listener<On
 
      long accountId();
 
+     Descriptor application(String category);
 }

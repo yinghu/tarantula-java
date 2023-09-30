@@ -80,13 +80,13 @@ public class GameModuleHeader implements GameModule {
     }
 
     public void update(GameServiceProvider gameServiceProvider,byte[] payload){
-        UpdateBatch updateBatch = UpdateBatch.fromBytes(payload);
-        for(PlayerUpdate playerUpdate :updateBatch.playerUpdates){
-            for(GameExperience gameExperience : playerUpdate.gameExperiences){
-                gameServiceProvider.updateStatistics(room,playerUpdate.systemId,playerUpdate.stub,gameExperience.name,gameExperience.statisticsDelta);
-                gameServiceProvider.updateExperience(room,playerUpdate.systemId,playerUpdate.stub,gameExperience.experienceDelta);
-            }
-        }
+        //UpdateBatch updateBatch = UpdateBatch.fromBytes(payload);
+        //for(PlayerUpdate playerUpdate :updateBatch.playerUpdates){
+            //for(GameExperience gameExperience : playerUpdate.gameExperiences){
+                //gameServiceProvider.updateStatistics(room,playerUpdate.systemId,playerUpdate.stub,gameExperience.name,gameExperience.statisticsDelta);
+                //gameServiceProvider.updateExperience(room,playerUpdate.systemId,playerUpdate.stub,gameExperience.experienceDelta);
+            //}
+        //}
     }
 
     public void countdown(long durationCountdown){

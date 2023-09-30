@@ -6,38 +6,38 @@ import com.tarantula.platform.OnApplicationHeader;
 
 abstract public class Data extends OnApplicationHeader implements Portable{
 
-    protected String sessionId;
+    protected transient String sessionId;
     protected boolean joined;
 
-    protected String source;
-    protected String destination;
+    protected transient String source;
+    protected transient String destination;
 
-    protected String contentType ="application/json";
+    protected transient String contentType ="application/json";
 
-    protected byte[] payload;
+    protected transient byte[] payload;
 
     protected int retries;
 
 
-    protected Portable portable;
+    protected transient Portable portable;
 
-    protected String tag;
+    protected transient String tag;
 
-    protected String clientId;
+    protected transient String clientId;
 
-    protected String action;
+    protected transient String action;
 
-    protected String trackId;
+    protected transient String trackId;
 
-    protected String token;
+    protected transient String token;
 
     protected boolean closed;
 
-    protected SessionForward forward;
+    protected transient SessionForward forward;
 
-    protected EventService eventService;
+    protected transient EventService eventService;
 
-    protected int routingNumber;
+    protected transient int routingNumber;
     public int routingNumber(){
         return this.routingNumber;
     }

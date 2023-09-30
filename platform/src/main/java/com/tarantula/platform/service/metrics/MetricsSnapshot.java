@@ -74,7 +74,7 @@ public class MetricsSnapshot extends RecoverableObject  {
 
 
     public void initialize(MetricsProperty property,LocalDateTime timeUpdated){
-        metrics[property.routingNumber()].name = property.name;
+        metrics[property.routingNumber()].name(property.name());
         this.timestamp = TimeUtil.toUTCMilliseconds(timeUpdated);
     }
     public MetricsSnapshot update(double currentData){

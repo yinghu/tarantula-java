@@ -1,16 +1,13 @@
 package com.tarantula.game.service;
 
 import com.icodesoftware.*;
-import com.icodesoftware.protocol.GameContext;
-import com.icodesoftware.protocol.GameServiceProvider;
-import com.icodesoftware.protocol.GameServiceProxy;
+import com.icodesoftware.protocol.*;
+import com.icodesoftware.service.ApplicationSchema;
 import com.icodesoftware.service.ServiceContext;
-import com.tarantula.game.Rating;
-import com.tarantula.game.SimpleStub;
 
 import java.util.concurrent.ScheduledFuture;
 
-public class PlatformGameContext implements GameContext, GameServiceProvider {
+public class PlatformGameContext implements GameContext {
 
     private final ServiceContext serviceContext;
     private final TarantulaLogger logger;
@@ -62,30 +59,13 @@ public class PlatformGameContext implements GameContext, GameServiceProvider {
         return platformGameServiceProvider.gameServiceProxy(serviceId);
     }
 
-    public void updateStatistics(Room room,String systemId,long stub,String name,double delta){
-        Statistics statistics = this.platformGameServiceProvider.presenceServiceProvider().statistics(new SimpleStub(systemId,stub));
-        statistics.entry(name).update(delta).update();
+    public GameServiceProvider gameServiceProvider(){
+        return platformGameServiceProvider.gameServiceProvider();
     }
-    public void updateExperience(Room room,String systemId,long stub,double delta){
-        Rating rating = this.platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(systemId,stub));
-        logger.warn("SystemId->"+systemId+">>>STUB>"+stub);
-        logger.warn("Rating->"+rating.rank+">>"+rating.level+">>>"+rating.xp+">>"+delta+">>>"+room.arena().xp());
-        rating.update(delta,room.arena().xp()).update();
-    }
-
     @Override
-    public Transaction transaction() {
-        return platformGameServiceProvider.gameCluster().transaction();
+    public ApplicationSchema applicationSchema(){
+        return platformGameServiceProvider.gameCluster();
     }
 
-    public void startGame(Session session, byte[] payload){}
-    public void updateGame(Session session,byte[] payload){}
-    public void endGame(Session session,byte[] payload){
 
-    }
-
-    @Override
-    public void setup(GameContext gameContext) {
-
-    }
 }

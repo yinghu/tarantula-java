@@ -613,7 +613,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public void onUpdated(Room room, byte[] payload) {
         //logger.warn("room updated->"+room.channelId()+">>"+new String(payload));
         GameRoom gameRoom = (GameRoom)room;
-        gameRoom.onUpdated(gameUpdateContext,payload);
+        gameRoom.onUpdated(gameUpdateContext.gameServiceProvider(),payload);
     }
 
     @Override
@@ -631,6 +631,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         if(index==null){
             logger.warn("Game lobby not available ["+gameUpdateObject.key().asString()+"]");
         }
-        index.gameModule.update(this.gameServiceProvider.gameContext(index.gameModule.getClass()),gameUpdateObject.value());
+        index.gameModule.update(this.gameServiceProvider.gameContext(index.gameModule.getClass()).gameServiceProvider(),gameUpdateObject.value());
     }
 }

@@ -16,8 +16,8 @@ public class PVERoomProxy extends RoomProxyHeader {
     public Stub join(Session session,Rating rating) {
         Stub stub = gameServiceProvider.presenceServiceProvider().stub(session,application);
         GameRoom room = this.gameServiceProvider.roomServiceProvider().join(rating,gameZone);
-        stub.joined = room!=null;
-        if(!stub.joined) return stub;
+        stub.joined(room!=null);
+        if(!stub.joined()) return stub;
         stub.room = room;
         stub.roomId = stub.room.roomId();
         stub.zone = gameZone;
@@ -39,7 +39,7 @@ public class PVERoomProxy extends RoomProxyHeader {
         return stub;
     }
     public boolean leave(Stub stub){
-        stub.joined = false;
+        stub.joined(false);
         stub.update();
         this.gameServiceProvider.roomServiceProvider().leave(stub);
         if(application.tournamentEnabled()&&stub.tournament!=null){
