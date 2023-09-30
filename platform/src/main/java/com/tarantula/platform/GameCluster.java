@@ -7,14 +7,14 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.ApplicationSchema;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.GameConfigurationSetup;
 import com.tarantula.game.service.GameObjectSetup;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.item.*;
-import com.tarantula.platform.service.ApplicationPreSetup;
-import com.tarantula.platform.util.SystemUtil;
+import com.icodesoftware.service.ApplicationPreSetup;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,10 +23,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.HashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class GameCluster extends OnApplicationHeader implements Portable , Configurable, ApplicationPreSetup.Listener,Configurable.Listener<OnLobby>,Transaction.Listener {
+public class GameCluster extends OnApplicationHeader implements ApplicationSchema,Portable, ApplicationPreSetup.Listener
+{
 
     private TarantulaLogger logger = JDKLogger.getLogger(GameCluster.class);
 
@@ -56,7 +56,6 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
     protected CopyOnWriteArrayList<ApplicationPreSetup.Listener> listeners = new CopyOnWriteArrayList<>();
 
     public String mode;
-    //public String applicationSetup;
 
     public String gameLobbyName;
 
@@ -273,7 +272,7 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         ApplicationPreSetup preSetup = new GameConfigurationSetup();
         preSetup.setup(serviceContext);
         preSetup.registerListener(this);
-        preSetup.registerGameCluster(this);
+        preSetup.registerApplicationSchema(this);
         transaction.register(preSetup,this);
         return transaction;
     }
@@ -346,15 +345,15 @@ public class GameCluster extends OnApplicationHeader implements Portable , Confi
         listeners.forEach(l->l.onDeleted(application,t));
     }
     @Override
-    public <T extends Configurable> void onUpdated(GameCluster application,T t){
+    public <T extends Configurable> void onUpdated(ApplicationSchema application,T t){
         listeners.forEach(l->l.onUpdated(application,t));
     }
     @Override
-    public <T extends Configurable> void onCreated(GameCluster application,T t){
+    public <T extends Configurable> void onCreated(ApplicationSchema application,T t){
         listeners.forEach(l->l.onCreated(application,t));
     }
 
-    public <T extends Configurable> void onDeleted(GameCluster application,T t){
+    public <T extends Configurable> void onDeleted(ApplicationSchema application,T t){
         listeners.forEach(l->l.onDeleted(application,t));
     }
     @Override

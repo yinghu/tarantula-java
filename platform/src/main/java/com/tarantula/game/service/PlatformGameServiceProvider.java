@@ -6,8 +6,10 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.protocol.GameServiceProvider;
 import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.service.*;
+import com.perfectday.games.earth8.Earth8GameServiceProvider;
 import com.tarantula.game.module.ErrorModule;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.achievement.PlatformAchievementServiceProvider;
@@ -54,8 +56,11 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
 
     private Descriptor serviceProxy;
 
+    private GameServiceProvider gameServiceProvider;
+
     public PlatformGameServiceProvider(GameCluster gameCluster){
         NAME = gameCluster.serviceType();
+        this.gameServiceProvider = new Earth8GameServiceProvider();
         this.gameCluster = gameCluster;
         metricsListener = (k,v)->{};
         this.gameServiceProviders = new ConcurrentHashMap<>();
@@ -122,6 +127,7 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
             listener.onEvent(e);
             return true;
         });
+        gameServiceProvider.setup(new PlatformGameContext(serviceContext,this,JDKLogger.getLogger(Earth8GameServiceProvider.class)));
         logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionId()+"]");
     }
     @Override
@@ -327,6 +333,16 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
         DataStore dataStore = this.serviceContext.dataStore(Distributable.DATA_SCOPE,gameCluster.typeId()+"_transaction_"+storeName);
         TransactionEventLogger transactionEventLogger = new TransactionEventLogger(dataStore);
         return transactionEventLogger;
+    }
+
+    public void startGame(Session session, byte[] payload) throws Exception{
+        gameServiceProvider.startGame(session,payload);
+    }
+    public void updateGame(Session session,byte[] payload) throws Exception{
+        gameServiceProvider.updateGame(session,payload);
+    }
+    public void endGame(Session session,byte[] payload) throws Exception{
+        gameServiceProvider.endGame(session,payload);
     }
 
 }

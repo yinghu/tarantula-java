@@ -17,11 +17,13 @@ public class PlatformGameContext implements GameContext, GameServiceProvider {
 
     private final PlatformGameServiceProvider platformGameServiceProvider;
 
+
     public PlatformGameContext(ServiceContext serviceContext,PlatformGameServiceProvider platformGameServiceProvider,TarantulaLogger logger){
         this.serviceContext = serviceContext;
         this.platformGameServiceProvider = platformGameServiceProvider;
         this.logger = logger;
     }
+
     public ScheduledFuture<?> schedule(SchedulingTask task){
         return this.serviceContext.schedule(task);
     }
@@ -69,5 +71,21 @@ public class PlatformGameContext implements GameContext, GameServiceProvider {
         logger.warn("SystemId->"+systemId+">>>STUB>"+stub);
         logger.warn("Rating->"+rating.rank+">>"+rating.level+">>>"+rating.xp+">>"+delta+">>>"+room.arena().xp());
         rating.update(delta,room.arena().xp()).update();
+    }
+
+    @Override
+    public Transaction transaction() {
+        return platformGameServiceProvider.gameCluster().transaction();
+    }
+
+    public void startGame(Session session, byte[] payload){}
+    public void updateGame(Session session,byte[] payload){}
+    public void endGame(Session session,byte[] payload){
+
+    }
+
+    @Override
+    public void setup(GameContext gameContext) {
+
     }
 }

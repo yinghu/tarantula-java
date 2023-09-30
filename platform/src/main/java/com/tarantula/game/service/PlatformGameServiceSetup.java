@@ -4,10 +4,10 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.TarantulaLogger;
 
+import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.service.ApplicationPreSetup;
 
 
 public class PlatformGameServiceSetup implements ServiceProvider {

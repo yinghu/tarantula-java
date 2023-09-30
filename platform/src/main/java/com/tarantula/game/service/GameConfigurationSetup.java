@@ -1,12 +1,12 @@
 package com.tarantula.game.service;
 
 import com.icodesoftware.*;
+import com.icodesoftware.service.ApplicationSchema;
 import com.icodesoftware.service.ServiceContext;
-import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.VersionedConfigurableObject;
 import com.tarantula.platform.item.VersionedConfigurableObjectQuery;
-import com.tarantula.platform.service.ApplicationPreSetup;
+import com.icodesoftware.service.ApplicationPreSetup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ public class GameConfigurationSetup implements ApplicationPreSetup {
 
     protected ServiceContext serviceContext;
     protected Listener listener;
-    protected GameCluster gameCluster;
+    protected ApplicationSchema gameCluster;
     public <T extends Configurable> boolean save(Descriptor application,T t){
         DataStore dataStore = parentContext.onDataStore(serviceDataStore(application));//serviceContext.dataStore(Distributable.DATA_SCOPE,serviceDataStore(application));
         t.dataStore(dataStore);
@@ -100,7 +100,7 @@ public class GameConfigurationSetup implements ApplicationPreSetup {
     }
 
 
-    public <T extends Configurable> boolean save(GameCluster gameCluster, T t){
+    public <T extends Configurable> boolean save(ApplicationSchema gameCluster, T t){
         DataStore dataStore = parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));//serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,DS_CONFIG));
         if(dataStore.update(t)) {
             if(listener!=null) listener.onUpdated(gameCluster,t);
@@ -112,31 +112,31 @@ public class GameConfigurationSetup implements ApplicationPreSetup {
     }
 
     @Override
-    public <T extends Configurable> boolean edge(GameCluster gameCluster, T t, String label) {
+    public <T extends Configurable> boolean edge(ApplicationSchema gameCluster, T t, String label) {
         DataStore dataStore = parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));//serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,DS_CONFIG));
         return dataStore.createEdge(t,label);
     }
 
-    public <T extends Configurable> boolean load(GameCluster gameCluster, T t){
+    public <T extends Configurable> boolean load(ApplicationSchema gameCluster, T t){
         DataStore dataStore = parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));//serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,DS_CONFIG));
         t.dataStore(dataStore);
         return dataStore.load(t);
     }
-    public <T extends Configurable> boolean delete(GameCluster gameCluster, T t){
+    public <T extends Configurable> boolean delete(ApplicationSchema gameCluster, T t){
         DataStore dataStore = parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));//serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,DS_CONFIG));
         boolean suc = dataStore.delete(t);
         if(suc && this.listener!=null) listener.onDeleted(gameCluster,t);
         return suc;
     }
-    public <T extends Configurable> List<T> list(GameCluster gameCluster, RecoverableFactory<T> recoverableFactory){
+    public <T extends Configurable> List<T> list(ApplicationSchema gameCluster, RecoverableFactory<T> recoverableFactory){
         DataStore dataStore = parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));//serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,DS_CONFIG));
         return dataStore.list(recoverableFactory);
     }
-    public DataStore dataStore(GameCluster gameCluster){
+    public DataStore dataStore(ApplicationSchema gameCluster){
         return parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));//serviceContext.dataStore(Distributable.DATA_SCOPE,serviceDataStoreName);
     }
 
-    public DataStore dataStore(GameCluster gameCluster,String service){
+    public DataStore dataStore(ApplicationSchema gameCluster,String service){
         return parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));//serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,service));
     }
 
@@ -144,7 +144,7 @@ public class GameConfigurationSetup implements ApplicationPreSetup {
         return parentContext.onDataStore(serviceDataStore(application));//serviceContext.dataStore(Distributable.DATA_SCOPE,serviceDataStore(descriptor));
     }
 
-    private String configureDataStore(GameCluster application,String suffix){
+    private String configureDataStore(ApplicationSchema application,String suffix){
         String serviceTypeId = application.serviceType();
         return serviceTypeId.replaceAll("-","_")+"_"+suffix;
     }
@@ -154,7 +154,7 @@ public class GameConfigurationSetup implements ApplicationPreSetup {
         this.serviceContext = serviceContext;
     }
 
-    public void registerGameCluster(GameCluster gameCluster){
+    public void registerApplicationSchema(ApplicationSchema gameCluster){
         this.gameCluster = gameCluster;
     }
     public void registerListener(Listener listener){

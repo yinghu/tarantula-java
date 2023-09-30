@@ -12,6 +12,14 @@
     <div class="w3-display-container w3-white tx-content-8"></div>
     <div class="w3-panel w3-border-bottom w3-border-red">
         <div class='w3-bar w3-white'>
+            <span id='tx-lobby-live-json-tree-clear' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Clear</span>
+            <span id='tx-lobby-live-end-game' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>End Game</span>
+            <span id='tx-lobby-live-update-game' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Update Game</span>
+            <span id='tx-lobby-live-start-game' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Start Game</span>
+        </div>            
+    </div>
+    <div class="w3-panel w3-border-bottom w3-border-red">
+        <div class='w3-bar w3-white'>
             <span id='tx-lobby-live-service-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
             <span id='tx-lobby-live-service-json-mode-code' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Code</span>
             <span id='tx-lobby-live-service-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span>    
@@ -42,7 +50,30 @@
     document.querySelector('#tx-lobby-live-leave').onclick=()=>{
         TARA_API.onGet(TARA_API.query().serviceTag,'onLeave',zoneId,(resp)=>{
             editor.set(resp);
+            tx_close_current_page();  
         });
+    };
+    document.querySelector('#tx-lobby-live-start-game').onclick=()=>{
+        TARA_API.onSet(TARA_API.query().serviceTag,'onStartGame',zoneId,editor.get(),(resp)=>{
+            editor.set(resp);
+        });
+    };
+    document.querySelector('#tx-lobby-live-update-game').onclick=()=>{
+        TARA_API.onSet(TARA_API.query().serviceTag,'onUpdateGame',zoneId,editor.get(),(resp)=>{
+            editor.set(resp);
+        });
+    };
+    document.querySelector('#tx-lobby-live-end-game').onclick=()=>{
+        TARA_API.onSet(TARA_API.query().serviceTag,'onEndGame',zoneId,editor.get(),(resp)=>{
+            editor.set(resp);
+        });
+    };
+    document.querySelector('#tx-lobby-live-json-tree-clear').onclick=()=>{
+        let game ={};
+        game.ChapterId = 1;
+        game.StageId = 2;
+        game.Party = [3,4,5];
+        editor.set(game);
     };
     document.querySelector('#tx-lobby-live-close').onclick=()=>{
         editor.destroy();

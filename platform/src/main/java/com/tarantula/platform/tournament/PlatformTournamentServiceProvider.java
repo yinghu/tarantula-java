@@ -11,7 +11,6 @@ import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.DistributionItemService;
-import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.item.ItemDistributionCallback;
 
 import java.time.LocalDateTime;

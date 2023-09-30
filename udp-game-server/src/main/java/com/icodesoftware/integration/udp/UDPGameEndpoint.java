@@ -359,6 +359,9 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             logger.warn("failed to create channel");
         }
     }
+    public Transaction transaction(){
+        return null;
+    }
 
     private void onCountdown(){
         pendingReleaseRooms.forEach((k,v)->v.room.onCountdown(gameModuleCountdownInterval));

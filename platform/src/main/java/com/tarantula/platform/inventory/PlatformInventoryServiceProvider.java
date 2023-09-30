@@ -2,12 +2,12 @@ package com.tarantula.platform.inventory;
 
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.*;
-import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.tournament.TournamentPrize;
 

@@ -57,6 +57,11 @@
 		  <artifactId>gec-lmdb</artifactId>
 		  <version>1.0</version>
 	  </dependency>
+	  <dependency>
+		  <groupId>com.perfectday.games</groupId>
+		  <artifactId>gec-earth8</artifactId>
+		  <version>1.0</version>
+	  </dependency>
   </dependencies>
   <build>
   	<plugins>

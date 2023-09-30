@@ -2,13 +2,13 @@ package com.tarantula.platform.store;
 
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.DistributionItemService;
-import com.tarantula.platform.service.ApplicationPreSetup;
 import com.tarantula.platform.item.ItemDistributionCallback;
 
 import java.util.ArrayList;

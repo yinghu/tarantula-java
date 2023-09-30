@@ -323,6 +323,9 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
         channel.onAction(messageHeader,messageBuffer,callback);
     }
 
+    public Transaction transaction(){
+        return null;
+    }
 
     private UDPEndpointServiceProvider createInstance(String className){
         try{

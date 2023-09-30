@@ -1,12 +1,12 @@
 package com.tarantula.platform.item;
 
 import com.icodesoftware.*;
+import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.service.ApplicationPreSetup;
 
 
 public class PlatformItemServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback,ApplicationPreSetup.Listener {

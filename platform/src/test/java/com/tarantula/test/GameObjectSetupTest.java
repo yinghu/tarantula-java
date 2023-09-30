@@ -7,14 +7,12 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.DataStore;
 
-import com.icodesoftware.Transaction;
 import com.tarantula.game.service.GameObjectSetup;
 
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.*;
 
-import com.tarantula.platform.service.ApplicationPreSetup;
 import org.testng.Assert;
 
 import org.testng.annotations.Test;

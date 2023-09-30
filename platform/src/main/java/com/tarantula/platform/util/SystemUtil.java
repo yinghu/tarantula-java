@@ -3,14 +3,13 @@ package com.tarantula.platform.util;
 import com.icodesoftware.OnSession;
 import com.icodesoftware.protocol.GameModule;
 import com.icodesoftware.protocol.ValidationUtil;
+import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.OnSessionTrack;
-import com.tarantula.platform.service.ApplicationPreSetup;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.ByteBuffer;
-import java.security.Key;
 import java.security.MessageDigest;
 import java.time.*;
 import java.util.Arrays;

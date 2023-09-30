@@ -31,11 +31,14 @@ GameLobbyModule extends ModuleHeader{
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
-        if(session.action().equals("onStartBattle")){
-            session.write(payload);
+        if(session.action().equals("onStartGame")){
+            gameServiceProvider.startGame(session,payload);
         }
-        else if(session.action().equals("onEndBattle")){
-            session.write(payload);
+        else if(session.action().equals("onUpdateGame")){
+            gameServiceProvider.updateGame(session,payload);
+        }
+        else if(session.action().equals("onEndGame")){
+            gameServiceProvider.endGame(session,payload);
         }
         else if(session.action().equals("onLeave")){
             boolean left = gameLobby.leave(session);
