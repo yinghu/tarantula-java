@@ -158,11 +158,13 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
                 if(category.scope.equals(ctype)){
                     if(updated){//do update
                         category.reset(jo);
-                        applicationPreSetup.save(gameCluster,category);
-                        session.write(JsonUtil.toSimpleResponse(false,"["+ category.name()+"] updated in scope["+ctype+"]").getBytes());
+                        boolean suc = applicationPreSetup.save(gameCluster,category);
+                        session.write(JsonUtil.toSimpleResponse(suc,"["+ category.name()+"] updated in scope["+ctype+"]").getBytes());
                     }
                     else{//do delete
-                        session.write(JsonUtil.toSimpleResponse(false,"["+ category.name()+"] deleted in scope["+ctype+"]").getBytes());
+                        boolean suc = applicationPreSetup.delete(gameCluster,category);
+                        if(suc) applicationPreSetup.delete(gameCluster,category.configurableType());
+                        session.write(JsonUtil.toSimpleResponse(suc,"["+ category.name()+"] deleted in scope["+ctype+"]").getBytes());
                     }
                 }
                 else{

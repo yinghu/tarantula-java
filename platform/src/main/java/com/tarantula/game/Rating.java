@@ -7,7 +7,6 @@ import com.icodesoftware.DataStore;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class Rating extends PlayerGameObject implements DataStore.Updatable {
 
@@ -35,23 +34,6 @@ public class Rating extends PlayerGameObject implements DataStore.Updatable {
         int _tryRank = 1+((level-1)/RANK_UP_LEVEL_BASE);
         if(_tryRank > rank) rank = _tryRank;
         return this;
-    }
-    @Override
-    public Map<String,Object> toMap(){
-        this.properties.put("1",rank);
-        this.properties.put("2",level);
-        this.properties.put("3",levelUpXp);
-        this.properties.put("4",xp);
-        this.properties.put("5",granted);
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        this.rank = ((Number)properties.get("1")).intValue();
-        this.level =((Number)properties.get("2")).intValue();
-        this.levelUpXp = ((Number)properties.get("3")).doubleValue();
-        this.xp = ((Number)properties.get("4")).doubleValue();
-        this.granted = ((boolean)properties.getOrDefault("5",false));
     }
 
     public boolean read(DataBuffer buffer){

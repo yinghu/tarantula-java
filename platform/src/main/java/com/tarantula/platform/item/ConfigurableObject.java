@@ -14,24 +14,6 @@ import java.util.HashMap;
 
 public class ConfigurableObject extends RecoverableObject implements Configuration {
 
-    protected static String TYPE_KEY = "1";
-    protected static String TYPE_ID_KEY = "2";
-    protected static String NAME_KEY = "3";
-    protected static String CATEGORY_KEY = "4";
-    protected static String VERSION_KEY = "5";
-    protected static String DISABLED_KEY = "6";
-
-    protected static String HEADER_KEY = "7";
-    protected static String APPLICATION_KEY = "8";
-
-    protected static String REFERENCE_KEY = "9";
-
-    protected static String SETTINGS_KEY = "10";
-
-    protected static String SCOPE_KEY = "11";
-
-    protected static String COMMODITY_PAYLOAD = "12";
-
 
     protected String configurationType;
     protected String configurationTypeId;
