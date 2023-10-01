@@ -16,12 +16,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     }
 
     //callbacks from HTTP
-
     @Override
     public void onJoined(Session session) {
         gameContext.log("JOIN : "+session.distributionKey()+" :"+session.stub(),OnLog.WARN);
-        gameContext.log("APP : "+gameContext.applicationSchema().application("inventory").tag(),OnLog.WARN);
-        gameContext.log("APP : "+gameContext.applicationSchema().application("item").tag(),OnLog.WARN);
     }
 
     public void startGame(Session session, byte[] payload) throws Exception{
@@ -52,9 +49,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             ApplicationPreSetup applicationPreSetup = (ApplicationPreSetup)ctx;
             DataStore dataStore = applicationPreSetup.onDataStore("battle");
             if(!dataStore.load(battleTransaction)) return false;
-            //battleTransaction.win = win;
-            //battleTransaction.disabled(true);
-            //return dataStore.update(battleTransaction);
+            //TO DO UPDATE ON CURRENT BATTLE
             return true;
         });
         session.write(JsonUtil.toSimpleResponse(updated,"battle updated").getBytes());
@@ -78,6 +73,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             battleTransaction.disabled(true);
             return dataStore.update(battleTransaction);
         });
+        if(updated){
+            //TO DO AFTER CURRENT BATTLE FINISHED
+        }
         session.write(JsonUtil.toSimpleResponse(updated,"battle finished").getBytes());
     }
 
@@ -89,11 +87,12 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     //Callbacks from UDP channel
     @Override
     public byte[] onRequest(Session session, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+        //UDP REQUEST RESPONSE CAN BE REPACKING FOR LARGE PAYLOAD
         return null;
     }
 
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
-
+        //UDP MESSAGE WITH RELAY CALL WITH SINGLE UDP MESSAGE
     }
 }

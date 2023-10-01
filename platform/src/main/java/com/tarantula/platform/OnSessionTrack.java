@@ -82,10 +82,10 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
     public JsonObject toJson() {
         JsonObject jp = new JsonObject();
         jp.addProperty("Successful",true);
-        jp.addProperty("SystemId",systemId);
+        jp.addProperty("SystemId",distributionId);
         jp.addProperty("Stub",stub);
         jp.addProperty("Token",token);
-        jp.addProperty("Ticket",ticket);
+        //jp.addProperty("Ticket",ticket);
         jp.addProperty("Login",login);
         return jp;
     }

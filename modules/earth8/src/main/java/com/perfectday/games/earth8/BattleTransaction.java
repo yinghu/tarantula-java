@@ -14,6 +14,7 @@ public class BattleTransaction extends RecoverableObject {
 
     public boolean win;
 
+    //Data store write contract
     @Override
     public boolean write(DataBuffer buffer) {
         buffer.writeLong(chapterId);
@@ -27,6 +28,7 @@ public class BattleTransaction extends RecoverableObject {
         return true;
     }
 
+    //Data store read contract
     @Override
     public boolean read(DataBuffer buffer) {
         chapterId = buffer.readLong();
@@ -41,6 +43,7 @@ public class BattleTransaction extends RecoverableObject {
         return true;
     }
 
+    //LIMIT RESPONSE SIZE FROM DEFAULT JSON-CONVERT
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
@@ -49,6 +52,7 @@ public class BattleTransaction extends RecoverableObject {
         return jsonObject;
     }
 
+    //data validate contract
     @Override
     public boolean validate() {
         for(long unit : party){
