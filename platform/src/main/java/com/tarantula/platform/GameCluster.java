@@ -237,7 +237,7 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
                 URL srcApplications = Thread.currentThread().getContextClassLoader().getResource("config-template/applications");
                 copyTemplateFile(srcApplications,_config_applications);
             }
-            Path _web_game = Paths.get(deployDir+"/web/"+this.property(GameCluster.NAME));
+            Path _web_game = Paths.get(deployDir+"/web/"+this.name);
             if(!Files.exists(_web_game)){
                 Files.createDirectories(_web_game);
             }

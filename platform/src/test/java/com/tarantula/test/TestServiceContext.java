@@ -26,12 +26,13 @@ public class TestServiceContext implements ServiceContext {
         this.distributionIdGenerator = distributionIdGenerator;
         this.node = new ClusterNode("BSD","T01",31);
         this.node.clusterNameSuffix = "test";
-        this.node.deployDirectory = "deploy";
+        //this.node.deployDirectory = "deploy";
         this.node.servicePushAddress = "127.0.0.1";
         this.node.runAsMirror = false;
         this.node.backupEnabled = false;
         this.node.dailyBackupEnabled = false;
         this.node.dataStoreDirectory = "target/tld";
+        this.node.deployDirectory = "target/deploy";
         PresencePortableRegistry registry = new PresencePortableRegistry<>();
         GamePortableRegistry gamePortableRegistry = new GamePortableRegistry();
         StatisticsPortableRegistry statisticsPortableRegistry = new StatisticsPortableRegistry();

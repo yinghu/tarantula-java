@@ -11,7 +11,6 @@ import com.icodesoftware.util.RecoverableObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 public class ConfigurableObject extends RecoverableObject implements Configuration {
 

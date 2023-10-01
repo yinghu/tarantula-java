@@ -8,7 +8,6 @@ import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ItemPortableRegistry;
-import com.tarantula.platform.presence.MappingObject;
 import com.tarantula.platform.util.RecoverableQuery;
 
 public class CredentialConfiguration extends Application {
@@ -32,24 +31,30 @@ public class CredentialConfiguration extends Application {
     protected ConfigurationObject saveConfigurationObject(String label,DeploymentServiceProvider deploymentServiceProvider, DataStore dataStore){
         String fileName = header.get(label).getAsString();
         Content conf = deploymentServiceProvider.resource(fileName);
-        RecoverableQuery<MappingObject> query = new RecoverableQuery<>(new SnowflakeKey(this.distributionId),ConfigurationObject.LABEL, ItemPortableRegistry.CONFIGURABLE_OBJECT_CID,ItemPortableRegistry.INS);
-
-        ConfigurationObject configurationObject = new ConfigurationObject(label);
-        if(conf.existed()){
-            if(dataStore.load(configurationObject)){
-                configurationObject.value(conf.data());
-                dataStore.update(configurationObject);
+        RecoverableQuery<ConfigurationObject> query = new RecoverableQuery<>(new SnowflakeKey(this.distributionId),ConfigurationObject.LABEL, ItemPortableRegistry.CONFIGURATION_OBJECT_CID,ItemPortableRegistry.INS);
+        ConfigurationObject[] pending = {null};
+        dataStore.list(query,(t)->{
+            if(t.name().equals(label)){
+                pending[0]=t;
+                return false;
             }
-            else{
-                configurationObject.value(conf.data());
-                dataStore.createIfAbsent(configurationObject,false);
-            }
+            return true;
+        });
+        if(!conf.existed()&&pending[0]==null) throw new IllegalArgumentException("config content not existed ["+label+"]");
+        if(conf.existed()&&pending[0]==null){
+            pending[0] = new ConfigurationObject(label);
+            pending[0].value(conf.data());
+            pending[0].ownerKey(this.key());
+            dataStore.create(pending[0]);
             deploymentServiceProvider.deleteResource(fileName);
+            return pending[0];
         }
-        else{
-            dataStore.load(configurationObject);
+        if(conf.existed()&&pending[0]!=null) {
+            pending[0].value(conf.data());
+            dataStore.update(pending[0]);
+            deploymentServiceProvider.deleteResource(fileName);
+            return pending[0];
         }
-
-        return configurationObject;
+        return pending[0];
     }
 }

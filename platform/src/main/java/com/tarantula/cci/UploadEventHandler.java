@@ -87,17 +87,18 @@ public class UploadEventHandler extends AbstractRequestHandler {
             if(gameCluster==null){
                 throw new RuntimeException("no game cluster setup");
             }
-            String gameClusterName = (String) gameCluster.property(GameCluster.NAME);
+            String gameClusterName = gameCluster.name();
             String path = exchange.path();
             String fn = gameClusterName + path.substring(path.lastIndexOf("/"));
             TokenValidatorProvider.AuthVendor authVendor = tokenValidator.authVendor(query[1]);
             if(authVendor != null){
-                authVendor.upload(gameClusterName.toLowerCase()+"#"+fn, uploadContent.content);
+                boolean suc = authVendor.upload(gameClusterName.toLowerCase()+"#"+fn, uploadContent.content);
+                return super.onEvent(new ResponsiveEvent("", event.sessionId(), JsonUtil.toSimpleResponse(suc, fn).getBytes(), 0, "text/html", true));
+            }else {
+                fn = gameClusterName + "/" + SystemUtil.oid() + path.substring(path.lastIndexOf(".") - 1);
+                boolean suc = deployService.onUpload("web/" + fn, uploadContent.content);
+                return super.onEvent(new ResponsiveEvent("", event.sessionId(), JsonUtil.toSimpleResponse(suc, fn).getBytes(), 0, "text/html", true));
             }
-            fn = gameClusterName +"/"+SystemUtil.oid()+path.substring(path.lastIndexOf(".")-1);
-            boolean suc = deployService.onUpload("web/"+fn,uploadContent.content);
-            return super.onEvent(new ResponsiveEvent("", event.sessionId(), JsonUtil.toSimpleResponse(suc,fn).getBytes(),0,"text/html",true));
-
         }catch (Exception ex){
             log.error("failed to upload context ["+typeId+"]",ex);
             return super.onEvent(new ResponsiveEvent("", event.sessionId(), JsonUtil.toSimpleResponse(false,ex.getMessage()).getBytes(),0,"text/html",true));

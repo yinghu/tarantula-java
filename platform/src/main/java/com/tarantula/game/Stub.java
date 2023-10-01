@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class Stub extends PlayerGameObject {
 
     public final static String LABEL = "stub";
-    //public boolean joined;
+
     public boolean offline;
     public String zoneId;
     public String roomId;
