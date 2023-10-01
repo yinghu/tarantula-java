@@ -7,7 +7,6 @@ import com.icodesoftware.Descriptor;
 import com.icodesoftware.util.RecoverableObject;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class Category extends RecoverableObject implements Configurable {
@@ -17,26 +16,6 @@ public class Category extends RecoverableObject implements Configurable {
     public Category(Descriptor app){
         this.label = "category";
         this.app = app;
-    }
-
-    @Override
-    public int getFactoryId() {
-        return ItemPortableRegistry.OID;
-    }
-
-    @Override
-    public Map<String,Object> toMap(){
-        super.toMap();
-        return properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        super.fromMap(properties);
-    }
-
-    @Override
-    public int getClassId() {
-        return ItemPortableRegistry.CATEGORY_CID;
     }
 
     public void list(){

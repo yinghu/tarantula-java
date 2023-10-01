@@ -40,7 +40,7 @@ public class ConfigurableType extends RecoverableObject implements Configuration
     }
     @Override
     public int getClassId() {
-        return ItemPortableRegistry.CONFIGURABLE_TYPES_CID;
+        return ItemPortableRegistry.CONFIGURABLE_TYPE_CID;
     }
     public boolean readKey(Recoverable.DataBuffer buffer){
         name = buffer.readUTF8().split("/")[1];
@@ -54,5 +54,9 @@ public class ConfigurableType extends RecoverableObject implements Configuration
     @Override
     public Key key() {
         return new NaturalKey("type/"+this.name);
+    }
+
+    public void reset(JsonObject update){
+        application = update.toString();
     }
 }

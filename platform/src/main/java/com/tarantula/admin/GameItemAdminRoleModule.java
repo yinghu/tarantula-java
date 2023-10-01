@@ -40,35 +40,32 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
             ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
             JsonObject jo = JsonUtil.parse(payload).get("type").getAsJsonObject();
-            TypeIndex typeIndex = new TypeIndex(jo.get("name").getAsString(),TypeIndex.Typed.Enum,query[1],jo);
-            boolean updateAllowed = query[2].equals("save");
-            boolean deleted = query[2].equals("delete");
-            //if(applicationPreSetup.load(gameCluster,typeIndex)){
-                //ReferenceIndex instanceIndex = new ReferenceIndex(typeIndex.name());
-                //applicationPreSetup.load(gameCluster,instanceIndex);
-                //updateAllowed = deleted ?(typeIndex.payload().get("type").getAsString().equals("enum") && instanceIndex.keySet().isEmpty()) : typeIndex.payload().get("type").getAsString().equals("enum");
-            //}
-            if(updateAllowed){
-                typeIndex.upgrade(jo);
-                if(deleted){
-                    applicationPreSetup.delete(gameCluster,typeIndex);
-                }else{
-                    applicationPreSetup.save(gameCluster,typeIndex);
-                }
-                List<String> updates = availableUpdates(deleted?Configurable.ASSET_CONFIG_TYPE:query[1]);
+            ConfigurableType type = new ConfigurableType(jo);
+            ConfigurableTypes types = configurableTypes(Configurable.APPLICATION_CONFIG_TYPE,gameCluster,applicationPreSetup);
+            if(types.addType(type)){
+                //add new one
+                applicationPreSetup.save(gameCluster,type);
+                List<String> updates = availableUpdates(query[1]);
                 updates.forEach((update)-> {
                     ConfigurableTypes configurableTypes = this.configurableTypes(update, gameCluster, applicationPreSetup);
-                    if(deleted){
-                        configurableTypes.removeType(jo);
-                    }else{
-                        configurableTypes.addType(jo);
-                    }
-                    applicationPreSetup.save(gameCluster, configurableTypes);
-                    if(update.equals(query[1])) session.write(configurableTypes.toJson().toString().getBytes());
+                    configurableTypes.addType(type);
+                    type.ownerKey(ConfigurableTypeQuery.query(update,"type").key());
+                    applicationPreSetup.edge(gameCluster,type,"type");
                 });
+                session.write(JsonUtil.toSimpleResponse(true, "new enum ["+type.name()+"] created").getBytes());
             }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,query[2]+" not allowed").getBytes());
+            else {//update or delete
+                if(query[2].equals("delete")){
+                    ConfigurableType delete = types.type(type.name());
+                    applicationPreSetup.delete(gameCluster,delete);
+                    session.write(JsonUtil.toSimpleResponse(true, "enum ["+type.name()+"] deleted").getBytes());
+                }
+                else {//update if not delete option
+                    ConfigurableType update = types.type(type.name());
+                    update.reset(jo);
+                    applicationPreSetup.save(gameCluster,update);
+                    session.write(JsonUtil.toSimpleResponse(true, "enum ["+type.name()+"] updated").getBytes());
+                }
             }
         }
         else if(session.action().equals("onUpdateTypesSettings")){
@@ -92,7 +89,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
                     List<String> updates = availableUpdates(query[1]);
                     updates.forEach((update)-> {
                         ConfigurableTypes configurableTypes = this.configurableTypes(update, gameCluster, applicationPreSetup);
-                        configurableTypes.addType(jo);
+                        //configurableTypes.addType(jo);
                         applicationPreSetup.save(gameCluster, configurableTypes);
                     });
                 }

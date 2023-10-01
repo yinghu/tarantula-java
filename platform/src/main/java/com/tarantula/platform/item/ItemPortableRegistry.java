@@ -27,7 +27,6 @@ public class ItemPortableRegistry<T extends Recoverable> extends AbstractRecover
 
     public static final int INVENTORY_ITEM_CID = 8;
 
-    public static final int CATEGORY_CID = 9;
     public static final int CATEGORY_ITEM_CID = 10;
 
     public static final int REFERENCE_INDEX_CID = 11;
@@ -38,9 +37,7 @@ public class ItemPortableRegistry<T extends Recoverable> extends AbstractRecover
 
     public static final int CONFIGURABLE_TEMPLATE = 15;
 
-    public static final int CONFIGURABLE_TYPES_CID = 16;
 
-    public static final int CONFIGURABLE_CATEGORIES_CID = 17;
 
     public static final int SHOP_CID = 18;
 
@@ -86,9 +83,7 @@ public class ItemPortableRegistry<T extends Recoverable> extends AbstractRecover
             case INVENTORY_ITEM_CID:
                 pt = new InventoryItem();
                 break;
-            //case CATEGORY_CID:
-                //pt = new Category();
-                //break;
+
             case CATEGORY_ITEM_CID:
                 pt = new CategoryItem();
                 break;
@@ -104,12 +99,7 @@ public class ItemPortableRegistry<T extends Recoverable> extends AbstractRecover
             case CONFIGURABLE_TEMPLATE:
                 pt = new ConfigurableTemplate();
                 break;
-            case CONFIGURABLE_TYPES_CID:
-                pt = new ConfigurableTypes();
-                break;
-            case CONFIGURABLE_CATEGORIES_CID:
-                pt = new ConfigurableCategories();
-                break;
+
             case SHOP_CID:
                 pt = new Shop();
                 break;
