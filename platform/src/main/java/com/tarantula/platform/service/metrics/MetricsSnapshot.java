@@ -52,7 +52,7 @@ public class MetricsSnapshot extends RecoverableObject  {
         buffer.writeUTF8(name);
         buffer.writeLong(timestamp);
         for(int i=0; i<TRACKING_NUMBER;i++){
-            buffer.writeDouble((double)metrics[i].value());
+            buffer.writeDouble(metrics[i].value());
             buffer.writeLong(metrics[i].timestamp());
         }
         return true;

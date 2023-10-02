@@ -11,6 +11,7 @@ import com.tarantula.platform.service.metrics.GameClusterMetrics;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
 public class
+
 GameLobbyModule extends ModuleHeader{
 
     private GameLobbyProxy gameLobby;

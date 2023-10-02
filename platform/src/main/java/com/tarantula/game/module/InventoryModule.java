@@ -3,9 +3,8 @@ package com.tarantula.game.module;
 import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
 
-import com.tarantula.platform.inventory.Inventory;
+import com.tarantula.platform.inventory.UserInventory;
 import com.tarantula.platform.item.Category;
-import com.tarantula.platform.item.Commodity;
 
 
 public class InventoryModule extends ModuleHeader {
@@ -19,7 +18,7 @@ public class InventoryModule extends ModuleHeader {
         }
         else if(session.action().equals("onInventory")){
             String[] query = session.name().split("#");
-            Inventory inventory = gameServiceProvider.inventoryServiceProvider().inventory(session.systemId(),query[0],query[1]);
+            UserInventory inventory = gameServiceProvider.inventoryServiceProvider().inventory(session.distributionId(),query[0],query[1]);
             if(inventory!=null){
                 session.write(inventory.toJson().toString().getBytes());
             }else{

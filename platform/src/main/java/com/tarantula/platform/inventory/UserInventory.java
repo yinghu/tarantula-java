@@ -5,13 +5,14 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Balance;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Countable;
+import com.icodesoftware.Inventory;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.item.ItemPortableRegistry;
 
 import java.util.ArrayList;
 
 
-public class Inventory extends RecoverableObject implements Configurable, Balance, Countable {
+public class UserInventory extends RecoverableObject implements Inventory {
 
     public final static String LABEL = "inventory";
     private ArrayList<InventoryItem> itemList = new ArrayList<>();
@@ -23,16 +24,16 @@ public class Inventory extends RecoverableObject implements Configurable, Balanc
     public String type;
 
 
-    public Inventory(){
+    public UserInventory(){
         this.onEdge = true;
         this.label = LABEL;
     }
 
-    public Inventory(String category,String typeId){
+    public UserInventory(String category, String typeId){
         this(category,typeId,false);
     }
 
-    public Inventory(String category,String typeId,boolean rechargeable){
+    public UserInventory(String category, String typeId, boolean rechargeable){
         this();
         this.type = category;
         this.typeId = typeId;
@@ -123,5 +124,10 @@ public class Inventory extends RecoverableObject implements Configurable, Balanc
     public int count(int delta){
         count += delta;
         return count;
+    }
+
+    @Override
+    public boolean rechargeable() {
+        return rechargeable;
     }
 }

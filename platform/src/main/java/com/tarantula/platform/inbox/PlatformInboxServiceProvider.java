@@ -28,7 +28,7 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
     }
 
 
-    public Inbox inbox(String systemId){
+    public Inbox inbox(long systemId){
         Inbox inbox = new Inbox();
         inbox.inventoryList = this.inventoryServiceProvider.inventoryList(systemId);
         inbox.rewardList = this.rewardList(systemId);
@@ -74,10 +74,10 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         dataStore.update(pendingRewardIndex);
         return true;
     }
-    private List<PendingReward> rewardList(String systemId){
+    private List<PendingReward> rewardList(long systemId){
         ArrayList<PendingReward> rewards = new ArrayList();
         PendingRewardIndex pendingRewardIndex = new PendingRewardIndex();
-        pendingRewardIndex.distributionKey(systemId);
+        pendingRewardIndex.distributionId(systemId);
         this.dataStore.createIfAbsent(pendingRewardIndex,true);
         //pendingRewardIndex.keySet().forEach(k->{
             //PendingReward pending = new PendingReward();

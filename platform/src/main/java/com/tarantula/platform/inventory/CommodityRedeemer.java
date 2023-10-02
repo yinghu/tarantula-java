@@ -15,7 +15,7 @@ public class CommodityRedeemer extends ApplicationRedeemer {
         String type = cindex<0?this.configurationCategory:this.configurationCategory.substring(0,cindex);
         InventoryQuery query = new InventoryQuery(Long.parseLong(systemId));
         DataStore inventoryDataStore = this.inventoryServiceProvider.inventoryDataStore();
-        Inventory[] inventories = {null};
+        UserInventory[] inventories = {null};
         inventoryDataStore.list(query,t->{
             if(t.type.equals(type)&&t.typeId.equals(this.configurationTypeId)){
                 inventories[0]=t;
@@ -28,7 +28,7 @@ public class CommodityRedeemer extends ApplicationRedeemer {
             inventories[0].redeem(this,this.inventoryServiceProvider);
             return;
         }
-        Inventory inventory = this.inventoryServiceProvider.newInventory(type,this.configurationTypeId);
+        UserInventory inventory = this.inventoryServiceProvider.newInventory(type,this.configurationTypeId);
         inventory.ownerKey(new SnowflakeKey(Long.parseLong(systemId)));
         inventoryDataStore.create(inventory);
         inventory.dataStore(inventoryDataStore);

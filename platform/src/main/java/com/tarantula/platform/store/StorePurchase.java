@@ -3,14 +3,14 @@ package com.tarantula.platform.store;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.tarantula.platform.ResponseHeader;
-import com.tarantula.platform.inventory.Inventory;
+import com.tarantula.platform.inventory.UserInventory;
 import java.util.List;
 import java.util.Map;
 
 public class StorePurchase extends ResponseHeader {
 
     public String transactionId;
-    public List<Inventory> inventoryList;
+    public List<UserInventory> inventoryList;
 
 
     @Override

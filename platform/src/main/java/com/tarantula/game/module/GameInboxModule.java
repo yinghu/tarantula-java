@@ -10,7 +10,7 @@ public class GameInboxModule extends ModuleHeader{
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onInbox")){
-            Inbox inbox = this.gameServiceProvider.inboxServiceProvider().inbox(session.systemId());
+            Inbox inbox = this.gameServiceProvider.inboxServiceProvider().inbox(session.distributionId());
             session.write(inbox.toJson().toString().getBytes());
         }
         else if(session.action().equals("onRedeem")){

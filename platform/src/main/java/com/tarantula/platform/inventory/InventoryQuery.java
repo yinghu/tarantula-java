@@ -4,7 +4,7 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.SnowflakeKey;
 
-public class InventoryQuery implements RecoverableFactory<Inventory> {
+public class InventoryQuery implements RecoverableFactory<UserInventory> {
 
     private long systemId;
 
@@ -13,13 +13,13 @@ public class InventoryQuery implements RecoverableFactory<Inventory> {
         this.systemId = systemId;
     }
 
-    public Inventory create() {
-        return new Inventory();
+    public UserInventory create() {
+        return new UserInventory();
     }
 
 
     public String label(){
-        return Inventory.LABEL;
+        return UserInventory.LABEL;
     }
 
     @Override

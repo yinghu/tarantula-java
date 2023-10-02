@@ -59,9 +59,9 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
     public Category category(){
         return category((ci)->ci.configurationType().equals(Configurable.COMMODITY_CONFIG_TYPE));
     }
-    public List<Inventory> inventoryList(String systemId){
-        InventoryQuery query = new InventoryQuery(Long.parseLong(systemId));
-        List<Inventory> inventoryList = new ArrayList<>();
+    public List<UserInventory> inventoryList(long systemId){
+        InventoryQuery query = new InventoryQuery(systemId);
+        List<UserInventory> inventoryList = new ArrayList<>();
         inventoryDataStore.list(query).forEach(t->{
             t.dataStore(inventoryDataStore);
             t.list();
@@ -70,11 +70,11 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
         return inventoryList;
     }
 
-    public Inventory inventory(String systemId,String category,String typeId){
+    public UserInventory inventory(long systemId, String category, String typeId){
         int cindex = category.indexOf(".");
         String type = cindex<0?category:category.substring(0,cindex);
-        InventoryQuery query = new InventoryQuery(Long.parseLong(systemId));
-        Inventory[] inventories={null};
+        InventoryQuery query = new InventoryQuery(systemId);
+        UserInventory[] inventories={null};
         inventoryDataStore.list(query,t->{
             if(t.type.equals(type)&&t.typeId.equals(typeId)){
                 inventories[0]=t;
@@ -82,7 +82,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
             }
             return true;
         });
-        if(inventories[0]==null) return new Inventory(type,typeId);
+        if(inventories[0]==null) return new UserInventory(type,typeId);
         inventories[0].dataStore(inventoryDataStore);
         inventories[0].list();
         return inventories[0];
@@ -129,11 +129,11 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
         return true;
     }
 
-    public Inventory newInventory(String category,String typeId){
+    public UserInventory newInventory(String category, String typeId){
         ConfigurableCategories categories = this.gameCluster.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE);
         ConfigurableCategory conf = categories.configurableSetting(category);
         conf.parse();
-        return new Inventory(conf.name(),typeId,conf.rechargeable);
+        return new UserInventory(conf.name(),typeId,conf.rechargeable);
     }
 
     private Category category(Category.Filter filter){
@@ -147,7 +147,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
 
 
     @Override
-    public void onInventory(Inventory inventory,InventoryItem item) {
+    public void onInventory(UserInventory inventory, InventoryItem item) {
         //callback on adding inventory
     }
 }

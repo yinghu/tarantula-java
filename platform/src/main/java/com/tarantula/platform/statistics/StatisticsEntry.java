@@ -1,15 +1,11 @@
 package com.tarantula.platform.statistics;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.Recoverable;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 
-import com.tarantula.platform.ResourceKey;
-
 import java.time.LocalDateTime;
-import java.time.temporal.IsoFields;
 import java.util.Map;
 
 public class StatisticsEntry extends RecoverableObject implements Statistics.Entry {

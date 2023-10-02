@@ -1,5 +1,5 @@
 package com.tarantula.platform.inventory;
 
 public interface InventoryListener {
-     void onInventory(Inventory inventory,InventoryItem inventoryItem);
+     void onInventory(UserInventory inventory, InventoryItem inventoryItem);
 }

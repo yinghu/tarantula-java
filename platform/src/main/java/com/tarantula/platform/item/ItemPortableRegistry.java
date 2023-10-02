@@ -4,7 +4,7 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.AbstractRecoverableListener;
 import com.tarantula.platform.configuration.ConfigurationObject;
 import com.tarantula.platform.configuration.VendorConfiguration;
-import com.tarantula.platform.inventory.Inventory;
+import com.tarantula.platform.inventory.UserInventory;
 import com.tarantula.platform.inventory.InventoryItem;
 import com.tarantula.platform.store.Shop;
 import com.tarantula.platform.store.ShoppingItem;
@@ -77,7 +77,7 @@ public class ItemPortableRegistry<T extends Recoverable> extends AbstractRecover
                 pt = new Application();
                 break;
             case INVENTORY_CID:
-                pt = new Inventory();
+                pt = new UserInventory();
                 break;
             case INVENTORY_ITEM_CID:
                 pt = new InventoryItem();

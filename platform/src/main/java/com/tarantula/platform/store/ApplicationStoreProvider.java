@@ -5,7 +5,7 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.tarantula.game.service.PlatformGameServiceProvider;
-import com.tarantula.platform.inventory.Inventory;
+import com.tarantula.platform.inventory.UserInventory;
 import com.tarantula.platform.service.AuthObject;
 
 import java.util.Map;
@@ -42,16 +42,16 @@ public class ApplicationStoreProvider extends AuthObject {
             logger.warn("IAP shopping item cannot be here");
             return false;
         }
-        String systemId = (String) params.get(OnAccess.SYSTEM_ID);
-        Inventory inventory = this.platformGameServiceProvider.inventoryServiceProvider().inventory(systemId,shoppingItem.purchaseType().name(),shoppingItem.virtualCurrency().name());
+        long systemId = (long) params.get(OnAccess.SYSTEM_ID);
+        UserInventory inventory = this.platformGameServiceProvider.inventoryServiceProvider().inventory(systemId,shoppingItem.purchaseType().name(),shoppingItem.virtualCurrency().name());
         if(inventory==null || !inventory.transact(shoppingItem.price()*(-1))){
             logger.warn("Not enough balance to buy");
             return false;
         }
-        String tid = UUID.randomUUID().toString();
-        TransactionLog transaction = new TransactionLog(systemId,"soft purchase",bundleId);
-        transaction.index(tid);
-        serviceEventLogger.log(transaction);
+        //String tid = UUID.randomUUID().toString();
+        //TransactionLog transaction = new TransactionLog(systemId,"soft purchase",bundleId);
+        //transaction.index(tid);
+        //serviceEventLogger.log(transaction);
         return true;
     }
 
