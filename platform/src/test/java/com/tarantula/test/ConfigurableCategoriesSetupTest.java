@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import com.icodesoftware.DataStore;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameObjectSetup;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.*;
@@ -51,6 +52,11 @@ public class ConfigurableCategoriesSetupTest extends DataStoreHook{
             ConfigurableCategory load = new ConfigurableCategory();
             load.name(category.name());
             Assert.assertTrue(gameObjectSetup.load(app,category));
+            //JsonArray prop = JsonUtil.parse(category.application).getAsJsonArray("properties");
+            //prop.forEach(p->{
+                //JsonObject jx = p.getAsJsonObject();
+                //System.out.println(jx.get("reference").getAsString()+" : "+category.name());
+            //});
             //System.out.println(load.configurableType().toJson().toString());
         });
         gameObjectSetup.list(app,new ConfigurableCategoryQuery(ConfigurableCategoryQuery.AssetKey,"category")).forEach(c->{

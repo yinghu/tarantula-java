@@ -29,8 +29,6 @@ public class ItemPortableRegistry<T extends Recoverable> extends AbstractRecover
 
     public static final int CATEGORY_ITEM_CID = 10;
 
-    public static final int REFERENCE_INDEX_CID = 11;
-
     public static final int SHOPPING_ITEM_CID = 13;
 
     public static final int TRANSACTION_CID = 14;
@@ -38,7 +36,8 @@ public class ItemPortableRegistry<T extends Recoverable> extends AbstractRecover
     public static final int CONFIGURABLE_TEMPLATE = 15;
 
 
-
+    public static final int INSTANCE_REFERENCE = 16;
+    public static final int CATEGORY_REFERENCE = 17;
     public static final int SHOP_CID = 18;
 
     public static final int CONFIGURATION_OBJECT_CID = 19;
@@ -87,9 +86,7 @@ public class ItemPortableRegistry<T extends Recoverable> extends AbstractRecover
             case CATEGORY_ITEM_CID:
                 pt = new CategoryItem();
                 break;
-            case REFERENCE_INDEX_CID:
-                pt = new ReferenceIndex();
-                break;
+
             case SHOPPING_ITEM_CID:
                 pt = new ShoppingItem();
                 break;
@@ -99,7 +96,12 @@ public class ItemPortableRegistry<T extends Recoverable> extends AbstractRecover
             case CONFIGURABLE_TEMPLATE:
                 pt = new ConfigurableTemplate();
                 break;
-
+            case INSTANCE_REFERENCE:
+                pt = new InstanceReference();
+                break;
+            case CATEGORY_REFERENCE:
+                pt = new CategoryReference();
+                break;
             case SHOP_CID:
                 pt = new Shop();
                 break;

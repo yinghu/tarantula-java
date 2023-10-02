@@ -68,34 +68,6 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
                 }
             }
         }
-        else if(session.action().equals("onUpdateTypesSettings")){
-            String[] query = session.name().split("#");
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
-            ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
-            JsonArray jtypes = JsonUtil.parse(payload).get("types").getAsJsonArray();
-            int send = jtypes.size();
-            for(JsonElement je : jtypes){
-                JsonObject jo = je.getAsJsonObject();
-                TypeIndex typeIndex = new TypeIndex(jo.get("name").getAsString(),TypeIndex.Typed.Category,query[1],jo);
-                boolean updateAllowed = true;
-                if(applicationPreSetup.load(gameCluster,typeIndex)){
-                    String tpy = typeIndex.payload().get("type").getAsString();
-                    updateAllowed = tpy.equals("string") || tpy.equals("number");
-                }
-                String ppt = jo.get("type").getAsString();
-                if(updateAllowed && (ppt.equals("string")||ppt.equals("number"))){
-                    send--;
-                    applicationPreSetup.save(gameCluster,typeIndex);
-                    List<String> updates = availableUpdates(query[1]);
-                    updates.forEach((update)-> {
-                        ConfigurableTypes configurableTypes = this.configurableTypes(update, gameCluster, applicationPreSetup);
-                        //configurableTypes.addType(jo);
-                        applicationPreSetup.save(gameCluster, configurableTypes);
-                    });
-                }
-            }
-            session.write(JsonUtil.toSimpleResponse(send==0,send!=0?"one or more updates not allowed":"updated").getBytes());
-        }
         else if(session.action().equals("onCreateCategorySettings")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
