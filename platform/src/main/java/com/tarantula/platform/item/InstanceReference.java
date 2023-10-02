@@ -5,6 +5,7 @@ import com.icodesoftware.util.RecoverableObject;
 
 public class InstanceReference extends RecoverableObject {
 
+    public final static String LABEL = "instance";
     public InstanceReference(){
 
     }
@@ -25,5 +26,10 @@ public class InstanceReference extends RecoverableObject {
     @Override
     public Key ownerKey() {
         return new NaturalKey(name);
+    }
+
+    @Override
+    public String label() {
+        return LABEL;
     }
 }

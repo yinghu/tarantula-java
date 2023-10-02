@@ -5,7 +5,7 @@ import com.icodesoftware.util.RecoverableObject;
 
 public class CategoryReference extends RecoverableObject {
 
-
+    public final static String LABEL = "category";
     public CategoryReference(){
 
     }
@@ -35,4 +35,8 @@ public class CategoryReference extends RecoverableObject {
         return new NaturalKey(name);
     }
 
+    @Override
+    public String label() {
+        return LABEL;
+    }
 }
