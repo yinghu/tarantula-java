@@ -9,8 +9,8 @@ public interface Transaction extends Closable{
         boolean update(DataStoreContext dataStoreContext);
     }
     interface DataStoreContext extends Closable{
-        void parent(DataStoreContext parentContext);
-        DataStore onDataStore(String name);
+        default void parent(DataStoreContext parentContext){}
+        default DataStore onDataStore(String name){ return null;}
     }
     interface Listener{
         void afterCommit();

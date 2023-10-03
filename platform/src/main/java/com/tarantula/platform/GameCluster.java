@@ -25,8 +25,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class GameCluster extends OnApplicationHeader implements ApplicationSchema,Portable, ApplicationPreSetup.Listener
-{
+public class GameCluster extends OnApplicationHeader implements ApplicationSchema,Portable, ApplicationPreSetup.Listener {
 
     private TarantulaLogger logger = JDKLogger.getLogger(GameCluster.class);
 
@@ -264,6 +263,7 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
         applicationPreSetup = new GameObjectSetup();
         applicationPreSetup.setup(serviceContext);
         applicationPreSetup.registerListener(this);
+        applicationPreSetup.registerApplicationSchema(this);
         return applicationPreSetup;
     }
 

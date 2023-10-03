@@ -4,7 +4,9 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.ApplicationSchema;
 import com.icodesoftware.service.ServiceContext;
 
-import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.inventory.InventoryQuery;
+import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
+import com.tarantula.platform.inventory.UserInventory;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.VersionedConfigurableObject;
 import com.tarantula.platform.item.VersionedConfigurableObjectQuery;
@@ -176,23 +178,25 @@ public class GameObjectSetup implements ApplicationPreSetup {
         //dataStore.deleteEdge(configurableObject.key(),VersionedConfigurableObject.LABEL);
     }
 
-
-    @Override
-    public DataStore onDataStore(String name) {
-        return parentContext.onDataStore(configureDataStore(gameCluster,name));
+    public List<Inventory> inventoryList(long systemId){
+        DataStore ids = serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,PlatformInventoryServiceProvider.NAME));
+        InventoryQuery query = new InventoryQuery(systemId);
+        List<Inventory> inventoryList = new ArrayList<>();
+        ids.list(query).forEach(t->{
+            t.dataStore(ids);
+            t.list();
+            inventoryList.add(t);
+        });
+        return inventoryList;
+    }
+    public Inventory inventory(long inventoryId){
+        DataStore ids = serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,PlatformInventoryServiceProvider.NAME));
+        UserInventory inventory = new UserInventory();
+        inventory.distributionId(inventoryId);
+        if(!ids.load(inventory)) return null;
+        inventory.dataStore(ids);
+        inventory.list();
+        return inventory;
     }
 
-    @Override
-    public void parent(Transaction.DataStoreContext parentContext) {
-        this.parentContext = parentContext;
-        this.onTransaction = true;
-    }
-
-    private Transaction.DataStoreContext parentContext;
-    private boolean onTransaction;
-
-    @Override
-    public void close() {
-
-    }
 }

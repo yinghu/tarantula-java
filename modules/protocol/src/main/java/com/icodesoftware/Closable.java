@@ -2,5 +2,5 @@ package com.icodesoftware;
 
 
 public interface Closable {
-    void close();
+    default void close(){}
 }

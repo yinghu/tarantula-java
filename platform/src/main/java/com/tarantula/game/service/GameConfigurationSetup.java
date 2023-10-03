@@ -3,6 +3,9 @@ package com.tarantula.game.service;
 import com.icodesoftware.*;
 import com.icodesoftware.service.ApplicationSchema;
 import com.icodesoftware.service.ServiceContext;
+import com.tarantula.platform.inventory.InventoryQuery;
+import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
+import com.tarantula.platform.inventory.UserInventory;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.VersionedConfigurableObject;
 import com.tarantula.platform.item.VersionedConfigurableObjectQuery;
@@ -172,6 +175,26 @@ public class GameConfigurationSetup implements ApplicationPreSetup {
         //dataStore.deleteEdge(configurableObject.key(),VersionedConfigurableObject.LABEL);
     }
 
+    public List<Inventory> inventoryList(long systemId){
+        DataStore ids = onDataStore(PlatformInventoryServiceProvider.NAME);
+        InventoryQuery query = new InventoryQuery(systemId);
+        List<Inventory> inventoryList = new ArrayList<>();
+        ids.list(query).forEach(t->{
+            t.dataStore(ids);
+            t.list();
+            inventoryList.add(t);
+        });
+        return inventoryList;
+    }
+    public Inventory inventory(long inventoryId){
+        DataStore ids = onDataStore(PlatformInventoryServiceProvider.NAME);
+        UserInventory inventory = new UserInventory();
+        inventory.distributionId(inventoryId);
+        if(!ids.load(inventory)) return null;
+        inventory.dataStore(ids);
+        inventory.list();
+        return inventory;
+    }
 
     @Override
     public DataStore onDataStore(String name) {

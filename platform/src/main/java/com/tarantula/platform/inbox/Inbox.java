@@ -2,14 +2,14 @@ package com.tarantula.platform.inbox;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.icodesoftware.Inventory;
 import com.icodesoftware.util.RecoverableObject;
-import com.tarantula.platform.inventory.UserInventory;
 
 import java.util.List;
 
 public class Inbox extends RecoverableObject {
 
-    public List<UserInventory> inventoryList;
+    public List<Inventory> inventoryList;
     public List<PendingReward> rewardList;
 
 

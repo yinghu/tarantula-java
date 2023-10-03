@@ -10,6 +10,7 @@ import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.item.ItemPortableRegistry;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class UserInventory extends RecoverableObject implements Inventory {
@@ -129,5 +130,11 @@ public class UserInventory extends RecoverableObject implements Inventory {
     @Override
     public boolean rechargeable() {
         return rechargeable;
+    }
+
+    public List<Configurable> itemList(){
+        List<Configurable> ilist = new ArrayList<>();
+        itemList.forEach(item->ilist.add(item));
+        return ilist;
     }
 }

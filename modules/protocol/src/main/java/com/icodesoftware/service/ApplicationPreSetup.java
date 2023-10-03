@@ -35,6 +35,9 @@ public interface ApplicationPreSetup extends Transaction.DataStoreContext{
     void registerApplicationSchema(ApplicationSchema gameCluster);
     void registerListener(Listener listener);
 
+    List<Inventory> inventoryList(long systemId);
+    Inventory inventory(long inventoryId);
+
     interface Listener{
         default <T extends Configurable> void onUpdated(Descriptor application,T t){};
         default <T extends Configurable> void onCreated(Descriptor application,T t){};

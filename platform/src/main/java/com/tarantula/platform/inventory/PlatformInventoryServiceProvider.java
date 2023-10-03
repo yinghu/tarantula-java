@@ -59,9 +59,9 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
     public Category category(){
         return category((ci)->ci.configurationType().equals(Configurable.COMMODITY_CONFIG_TYPE));
     }
-    public List<UserInventory> inventoryList(long systemId){
+    public List<Inventory> inventoryList(long systemId){
         InventoryQuery query = new InventoryQuery(systemId);
-        List<UserInventory> inventoryList = new ArrayList<>();
+        List<Inventory> inventoryList = new ArrayList<>();
         inventoryDataStore.list(query).forEach(t->{
             t.dataStore(inventoryDataStore);
             t.list();
