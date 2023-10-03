@@ -321,10 +321,6 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
         channel.onAction(messageHeader,messageBuffer,callback);
     }
 
-    public GameServiceProvider gameServiceProvider(){
-        return null;
-    }
-
     private UDPEndpointServiceProvider createInstance(String className){
         try{
             return (UDPEndpointServiceProvider) Class.forName(className).getConstructor().newInstance();
