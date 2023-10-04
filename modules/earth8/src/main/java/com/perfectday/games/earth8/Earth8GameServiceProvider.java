@@ -28,16 +28,17 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             return;
         }
         //single read to validate party items
-        gameContext.applicationSchema().applicationPreSetup().inventoryList(session.distributionId()).forEach(t->{
-            t.itemList().forEach(configurable -> {
-                //use configurable.distributionId() to check party existing
+        ApplicationPreSetup applicationPreSetup = gameContext.applicationSchema().applicationPreSetup();
+        applicationPreSetup.inventoryList(session.distributionId()).forEach(t->{
+            t.onStock().forEach(configurable -> {
+                this.gameContext.log(configurable.distributionId()+" : "+configurable.stockId(),OnLog.WARN);
             });
         });
         //if party check fail return false;
         Transaction transaction = gameContext.applicationSchema().transaction();
         boolean created = transaction.execute(ctx->{
-            ApplicationPreSetup applicationPreSetup = (ApplicationPreSetup)ctx;
-            DataStore dataStore = applicationPreSetup.onDataStore("battle");
+            ApplicationPreSetup setup = (ApplicationPreSetup)ctx;
+            DataStore dataStore = setup.onDataStore("battle");
             return dataStore.create(battleTransaction);
         });
         session.write(created?battleTransaction.toJson().toString().getBytes():JsonUtil.toSimpleResponse(false,"failed to create battle transaction").getBytes());
@@ -59,10 +60,6 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             //TO DO UPDATE ON CURRENT BATTLE
             //return true;
         //});
-
-
-
-
 
 
         //session.write(jsonObject.toString().getBytes());

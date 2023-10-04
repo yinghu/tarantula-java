@@ -6,5 +6,10 @@ public interface Inventory extends Configurable,Balance,Countable{
 
     boolean rechargeable();
 
-    List<Configurable> itemList();
+    List<Stock> onStock();
+
+    interface Stock extends Configurable{
+        long stockId();
+
+    }
 }

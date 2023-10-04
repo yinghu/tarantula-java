@@ -132,8 +132,8 @@ public class UserInventory extends RecoverableObject implements Inventory {
         return rechargeable;
     }
 
-    public List<Configurable> itemList(){
-        List<Configurable> ilist = new ArrayList<>();
+    public List<Stock> onStock(){
+        List<Stock> ilist = new ArrayList<>();
         itemList.forEach(item->ilist.add(item));
         return ilist;
     }

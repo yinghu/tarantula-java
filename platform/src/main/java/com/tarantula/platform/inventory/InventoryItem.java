@@ -2,12 +2,13 @@ package com.tarantula.platform.inventory;
 
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.Inventory;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ItemPortableRegistry;
 
 
-public class InventoryItem extends ConfigurableObject {
+public class InventoryItem extends ConfigurableObject implements Inventory.Stock {
 
     public final static String LABEL = "inventory_item";
 
@@ -69,6 +70,9 @@ public class InventoryItem extends ConfigurableObject {
         return configurableObject.setup();
     }
 
+    public long stockId(){
+        return reference.get(0).getAsLong();
+    }
     public String itemId(){
         return reference.get(0).getAsString();
     }
