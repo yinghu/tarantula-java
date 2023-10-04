@@ -1,6 +1,7 @@
 package com.perfectday.games.earth8;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.service.ApplicationPreSetup;
 
 public class UnitXpUp extends BattleUpdate{
 
@@ -41,5 +42,9 @@ public class UnitXpUp extends BattleUpdate{
         unitXpUp.parse(jsonObject);
         unitXpUp.xpGain = jsonObject.get("XpGain").getAsInt();
         return unitXpUp;
+    }
+
+    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup){
+        return true;
     }
 }

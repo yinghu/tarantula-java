@@ -1,6 +1,7 @@
 package com.perfectday.games.earth8;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 
@@ -74,6 +75,13 @@ public class BattleUpdate extends RecoverableObject {
         cmap.entrySet().forEach(entry->{
             currencies.put(entry.getKey(),entry.getValue().getAsInt());
         });
+    }
+    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup){
+        return true;
+    }
+
+    public boolean update(ApplicationPreSetup applicationPreSetup){
+        return runUpdate(applicationPreSetup);
     }
 
 

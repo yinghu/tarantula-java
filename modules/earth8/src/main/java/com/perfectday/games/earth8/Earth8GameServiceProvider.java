@@ -57,7 +57,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             DataStore dataStore = applicationPreSetup.onDataStore("battle");
             if(!dataStore.create(update)) return false;
             //TO MORE TRANSACTION STUFF
-            return true;
+            return update.update(applicationPreSetup);
         });
         session.write(JsonUtil.toSimpleResponse(updated,updated?"battle updated":"failed to update").getBytes());
     }
