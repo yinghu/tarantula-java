@@ -1,7 +1,6 @@
 package com.perfectday.games.earth8;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.util.JsonUtil;
 
 public class UnitXpUp extends BattleUpdate{
 

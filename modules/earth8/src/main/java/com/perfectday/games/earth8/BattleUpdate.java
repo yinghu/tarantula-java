@@ -69,6 +69,7 @@ public class BattleUpdate extends RecoverableObject {
         updateId = UpdateId.values()[json.get("UpdateId").getAsInt()];
         unitId = json.get("UnitId").getAsLong();
         equipmentId = json.get("EquipmentId").getAsLong();
+        if(!json.has("Currencies")) return;
         JsonObject cmap = json.get("Currencies").getAsJsonObject();
         cmap.entrySet().forEach(entry->{
             currencies.put(entry.getKey(),entry.getValue().getAsInt());
