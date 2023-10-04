@@ -50,27 +50,16 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         session.write(created?battleTransaction.toJson().toString().getBytes():JsonUtil.toSimpleResponse(false,"failed to create battle transaction").getBytes());
     }
     public void updateGame(Session session,byte[] payload) throws Exception{
-        JsonObject jsonObject = JsonUtil.parse(payload);
-        //long battleId = jsonObject.get("BattleId").getAsLong();
-        //if(battleId<=0) {
-            //session.write(JsonUtil.toSimpleResponse(false,"invalid battleId").getBytes());
-            //return;
-        //}
-        //BattleTransaction battleTransaction = new BattleTransaction();
-        //battleTransaction.distributionId(battleId);
-        //Transaction transaction = gameContext.applicationSchema().transaction();
-        //boolean updated = transaction.execute(ctx->{
-            //ApplicationPreSetup applicationPreSetup = (ApplicationPreSetup)ctx;
-            //DataStore dataStore = applicationPreSetup.onDataStore("battle");
-            //if(!dataStore.load(battleTransaction) || battleTransaction.disabled()) return false;
-            //TO DO UPDATE ON CURRENT BATTLE
-            //return true;
-        //});
-
-
-        //session.write(jsonObject.toString().getBytes());
-        this.gameContext.log(jsonObject.toString(),OnLog.WARN);
-        session.write(JsonUtil.toSimpleResponse(true,"battle updated").getBytes());
+        BattleUpdate update = BattleUpdate.fromJson(payload);
+        Transaction transaction = gameContext.applicationSchema().transaction();
+        boolean updated = transaction.execute(ctx->{
+            ApplicationPreSetup applicationPreSetup = (ApplicationPreSetup)ctx;
+            DataStore dataStore = applicationPreSetup.onDataStore("battle");
+            if(!dataStore.create(update)) return false;
+            //TO MORE TRANSACTION STUFF
+            return true;
+        });
+        session.write(JsonUtil.toSimpleResponse(updated,updated?"battle updated":"failed to update").getBytes());
     }
     public void endGame(Session session,byte[] payload) throws Exception{
         JsonObject jsonObject = JsonUtil.parse(payload);

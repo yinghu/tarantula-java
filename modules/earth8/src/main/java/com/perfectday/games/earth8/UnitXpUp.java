@@ -8,7 +8,7 @@ public class UnitXpUp extends BattleUpdate{
     public int xpGain;
     @Override
     public boolean write(DataBuffer buffer) {
-        buffer.writeLong(unitId);
+        if(!super.write(buffer)) return false;
         buffer.writeInt(xpGain);
         return true;
     }
@@ -16,7 +16,7 @@ public class UnitXpUp extends BattleUpdate{
     //Data store read contract
     @Override
     public boolean read(DataBuffer buffer) {
-        unitId = buffer.readLong();
+        super.read(buffer);
         xpGain = buffer.readInt();
         return true;
     }
@@ -37,10 +37,9 @@ public class UnitXpUp extends BattleUpdate{
         return Earth8PortableRegistry.OID;
     }
 
-    public static UnitXpUp fromJson(byte[] payload){
-        JsonObject jsonObject = JsonUtil.parse(payload);
+    public static UnitXpUp fromJson(JsonObject jsonObject){
         UnitXpUp unitXpUp = new UnitXpUp();
-        unitXpUp.unitId = jsonObject.get("UnitId").getAsLong();
+        unitXpUp.parse(jsonObject);
         unitXpUp.xpGain = jsonObject.get("XpGain").getAsInt();
         return unitXpUp;
     }

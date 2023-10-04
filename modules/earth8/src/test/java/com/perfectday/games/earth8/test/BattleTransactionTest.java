@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 public class BattleTransactionTest {
 
     @Test(groups = { "BattleTransaction" })
-    public void payloadTest() {
+    public void parsePayloadTest() {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("ChapterId",100);
         jsonObject.addProperty("StageId",200);
