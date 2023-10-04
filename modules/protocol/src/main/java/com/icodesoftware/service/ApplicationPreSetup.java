@@ -36,8 +36,10 @@ public interface ApplicationPreSetup extends Transaction.DataStoreContext{
     void registerListener(Listener listener);
 
     List<Inventory> inventoryList(long systemId);
-    Inventory inventory(long inventoryId);
 
+    Inventory inventory(long systemId,String typeId);
+    Inventory inventory(long inventoryId);
+    Configurable load(Descriptor application,long configurableId);
     interface Listener{
         default <T extends Configurable> void onUpdated(Descriptor application,T t){};
         default <T extends Configurable> void onCreated(Descriptor application,T t){};

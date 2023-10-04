@@ -7,10 +7,14 @@ import com.icodesoftware.util.SnowflakeKey;
 public class InventoryQuery implements RecoverableFactory<UserInventory> {
 
     private long systemId;
-
+    private String label;
 
     public InventoryQuery(long systemId){
         this.systemId = systemId;
+    }
+    public InventoryQuery(long systemId,String label){
+        this.systemId = systemId;
+        this.label = label;
     }
 
     public UserInventory create() {
@@ -19,7 +23,7 @@ public class InventoryQuery implements RecoverableFactory<UserInventory> {
 
 
     public String label(){
-        return UserInventory.LABEL;
+        return label==null?UserInventory.LABEL:label;
     }
 
     @Override

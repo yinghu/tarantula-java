@@ -83,7 +83,11 @@ public class GameObjectSetup implements ApplicationPreSetup {
         });
         return list;
     }
-
+    public Configurable load(Descriptor application,long configurableId){
+        Configurable ret = new ConfigurableObject();
+        ret.distributionId(configurableId);
+        return load(application,ret)?ret:null;
+    }
 
     protected String serviceDataStore(Descriptor application){
         if(application.typeId().endsWith("-data")){
@@ -188,6 +192,17 @@ public class GameObjectSetup implements ApplicationPreSetup {
             inventoryList.add(t);
         });
         return inventoryList;
+    }
+    public Inventory inventory(long systemId,String typeId){
+        DataStore ids = serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,PlatformInventoryServiceProvider.NAME));
+        InventoryQuery query = new InventoryQuery(systemId,typeId);
+        List<Inventory> inventoryList = new ArrayList<>();
+        ids.list(query).forEach(t->{
+            t.dataStore(ids);
+            t.list();
+            inventoryList.add(t);
+        });
+        return inventoryList.isEmpty()?null:inventoryList.get(0);
     }
     public Inventory inventory(long inventoryId){
         DataStore ids = serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,PlatformInventoryServiceProvider.NAME));

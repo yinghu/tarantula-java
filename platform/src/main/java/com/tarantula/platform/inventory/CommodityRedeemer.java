@@ -31,6 +31,8 @@ public class CommodityRedeemer extends ApplicationRedeemer {
         UserInventory inventory = this.inventoryServiceProvider.newInventory(type,this.configurationTypeId);
         inventory.ownerKey(new SnowflakeKey(Long.parseLong(systemId)));
         inventoryDataStore.create(inventory);
+        inventoryDataStore.createEdge(inventory,this.configurationTypeId);
+        inventoryDataStore.createEdge(inventory,type);
         inventory.dataStore(inventoryDataStore);
         inventory.redeem(this,this.inventoryServiceProvider);
     }

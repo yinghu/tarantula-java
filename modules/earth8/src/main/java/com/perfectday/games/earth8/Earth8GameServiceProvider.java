@@ -29,9 +29,15 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         }
         //single read to validate party items
         ApplicationPreSetup applicationPreSetup = gameContext.applicationSchema().applicationPreSetup();
+        Inventory gem = applicationPreSetup.inventory(session.distributionId(),"Gem");
+        if(gem!=null) this.gameContext.log(gem.balance()+" : "+gem.rechargeable()+" : "+gem.count(0),OnLog.WARN);
         applicationPreSetup.inventoryList(session.distributionId()).forEach(t->{
             t.onStock().forEach(configurable -> {
                 this.gameContext.log(configurable.distributionId()+" : "+configurable.stockId(),OnLog.WARN);
+                Configurable stock = applicationPreSetup.load(gameContext.applicationSchema().application("item"),configurable.stockId());
+                this.gameContext.log(stock.header().toString(),OnLog.WARN);
+                this.gameContext.log(stock.application().toString(),OnLog.WARN);
+                this.gameContext.log(stock.reference().toString(),OnLog.WARN);
             });
         });
         //if party check fail return false;
