@@ -99,8 +99,8 @@ public class GameObjectSetup implements ApplicationPreSetup {
     }
 
 
-    protected String query(String type,String category){
-        return new StringBuffer().append(type).append(Recoverable.PATH_SEPARATOR).append(category).toString();
+    private String index(String type,String index){
+        return new StringBuffer().append(type).append("_").append(index).toString();
     }
 
 

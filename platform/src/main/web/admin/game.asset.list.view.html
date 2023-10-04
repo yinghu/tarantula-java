@@ -368,16 +368,18 @@
             });
             serviceBarTitle.innerHTML = tx_first_upcase(TARA_API.query().serviceCategory)+".Instances";
          }else{
-            TARA_API.onGet('role/admin/item',"onStock",TARA_API.query().gameClusterId+'#'+itemQuery,(resp)=>{
+            TARA_API.onGet('role/admin/item',"onStock",TARA_API.query().gameClusterId+'#'+itemQuery+'#'+TARA_API.query().category,(resp)=>{
                 if(resp.successful){
                     serviceBar.innerHTML = '';
                     resp.itemList.forEach((a,i)=>{
+                        //console.log(a);
+                        //console.log(TARA_API.query().serviceCategory+' : '+TARA_API.query().category);
                         let aix = a.configurationType.indexOf('.');
                         if(aix > 0 && TARA_API.query().serviceCategory != null 
                             && a.configurationType.substring(aix+1) == TARA_API.query().serviceCategory){
                             serviceBar.innerHTML += toHtmlBarStockItem(a,i);
                         }
-                        else if(aix < 0 && TARA_API.query().serviceCategory == null){
+                        else if(aix < 0 && TARA_API.query().serviceCategory == null && a.configurationType == TARA_API.query().category){
                             serviceBar.innerHTML += toHtmlBarStockItem(a,i);
                         }
                     });

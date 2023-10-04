@@ -45,6 +45,9 @@ public class MatchMakingModule extends ModuleHeader implements Configurable.List
             }
             this.gameServiceProvider.onUpdated(GameClusterMetrics.GAME_JOIN_COUNT,1);
         }
+        else if(session.action().equals("onUpdateGame")){
+            gameServiceProvider.gameServiceProvider().updateGame(session,payload);
+        }
         else if(session.action().equals("onLeave")){
             String[] query = session.name().split("#");
             session.name(query[1]);

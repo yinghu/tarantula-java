@@ -9,6 +9,7 @@ public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecov
     public static final int OID = 100;
 
     public static final int BATTLE_TRANSACTION_CID = 1;
+    public static final int BATTLE_UPDATE_CID = 2;
 
     public static Earth8PortableRegistry INS;
 
@@ -21,6 +22,9 @@ public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecov
         switch (i){
             case BATTLE_TRANSACTION_CID:
                 pt = new BattleTransaction();
+                break;
+            case BATTLE_UPDATE_CID:
+                pt = new BattleUpdate();
                 break;
             default:
         }

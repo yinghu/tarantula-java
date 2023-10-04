@@ -23,7 +23,7 @@ public class GameConfigurationSetup implements ApplicationPreSetup {
     protected Listener listener;
     protected ApplicationSchema gameCluster;
     public <T extends Configurable> boolean save(Descriptor application,T t){
-        DataStore dataStore = parentContext.onDataStore(serviceDataStore(application));//serviceContext.dataStore(Distributable.DATA_SCOPE,serviceDataStore(application));
+        DataStore dataStore = parentContext.onDataStore(serviceDataStore(application));
         t.dataStore(dataStore);
         if(!t.configureAndValidate()){
             return false;
@@ -60,20 +60,20 @@ public class GameConfigurationSetup implements ApplicationPreSetup {
     }
 
     public <T extends Configurable> boolean load(Descriptor application, T t){
-        DataStore dataStore = parentContext.onDataStore(serviceDataStore(application));//serviceContext.dataStore(Distributable.DATA_SCOPE,serviceDataStore(application));
+        DataStore dataStore = parentContext.onDataStore(serviceDataStore(application));
         t.dataStore(dataStore);
         return dataStore.load(t);
     }
 
     public  <T extends Configurable> boolean delete(Descriptor application,T t){
-        DataStore dataStore = parentContext.onDataStore(serviceDataStore(application));//serviceContext.dataStore(Distributable.DATA_SCOPE,serviceDataStore(application));
+        DataStore dataStore = parentContext.onDataStore(serviceDataStore(application));
         if(!dataStore.delete(t)) return false;
         deleteVersion(dataStore,(ConfigurableObject)t);
         if(listener!=null) listener.onDeleted(application,t);
         return true;
     }
     public <T extends Configurable> List<T> list(Descriptor application, RecoverableFactory<T> recoverableFactory){
-        DataStore dataStore = parentContext.onDataStore(serviceDataStore(application));//serviceContext.dataStore(Distributable.DATA_SCOPE,serviceDataStore(application));
+        DataStore dataStore = parentContext.onDataStore(serviceDataStore(application));
         ArrayList<T> list = new ArrayList<>();
         dataStore.list(recoverableFactory,(c)->{
             c.dataStore(dataStore);
@@ -104,7 +104,7 @@ public class GameConfigurationSetup implements ApplicationPreSetup {
 
 
     public <T extends Configurable> boolean save(ApplicationSchema gameCluster, T t){
-        DataStore dataStore = parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));//serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,DS_CONFIG));
+        DataStore dataStore = parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));
         if(dataStore.update(t)) {
             if(listener!=null) listener.onUpdated(gameCluster,t);
             return true;
@@ -116,35 +116,35 @@ public class GameConfigurationSetup implements ApplicationPreSetup {
 
     @Override
     public <T extends Configurable> boolean edge(ApplicationSchema gameCluster, T t, String label) {
-        DataStore dataStore = parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));//serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,DS_CONFIG));
+        DataStore dataStore = parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));
         return dataStore.createEdge(t,label);
     }
 
     public <T extends Configurable> boolean load(ApplicationSchema gameCluster, T t){
-        DataStore dataStore = parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));//serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,DS_CONFIG));
+        DataStore dataStore = parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));
         t.dataStore(dataStore);
         return dataStore.load(t);
     }
     public <T extends Configurable> boolean delete(ApplicationSchema gameCluster, T t){
-        DataStore dataStore = parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));//serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,DS_CONFIG));
+        DataStore dataStore = parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));
         boolean suc = dataStore.delete(t);
         if(suc && this.listener!=null) listener.onDeleted(gameCluster,t);
         return suc;
     }
     public <T extends Configurable> List<T> list(ApplicationSchema gameCluster, RecoverableFactory<T> recoverableFactory){
-        DataStore dataStore = parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));//serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,DS_CONFIG));
+        DataStore dataStore = parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));
         return dataStore.list(recoverableFactory);
     }
     public DataStore dataStore(ApplicationSchema gameCluster){
-        return parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));//serviceContext.dataStore(Distributable.DATA_SCOPE,serviceDataStoreName);
+        return parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));
     }
 
     public DataStore dataStore(ApplicationSchema gameCluster,String service){
-        return parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));//serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,service));
+        return parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));
     }
 
     public DataStore dataStore(Descriptor application){
-        return parentContext.onDataStore(serviceDataStore(application));//serviceContext.dataStore(Distributable.DATA_SCOPE,serviceDataStore(descriptor));
+        return parentContext.onDataStore(serviceDataStore(application));
     }
 
     private String configureDataStore(ApplicationSchema application,String suffix){

@@ -451,7 +451,7 @@
         let pv = payload.category[propertyName].reference.split(':');           
         list.innerHTML='<option value="" disabled selected>Choose your option</option>';
         TARA_API.onGet('role/admin/item',"onStock",TARA_API.query().gameClusterId+'#category/'+pv[1],(resp)=>{
-            //console.log(resp);
+            console.log(resp);
             resp.itemList.forEach(item=>{
                 list.innerHTML += '<option value=\''+item.itemId+'\'>'+item.configurationName+'</option>';
                 payload[item.itemId]=item;
