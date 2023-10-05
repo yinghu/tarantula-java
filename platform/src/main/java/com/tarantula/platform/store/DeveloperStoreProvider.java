@@ -1,4 +1,4 @@
-package com.tarantula.platform.service;
+package com.tarantula.platform.store;
 
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.TarantulaLogger;
@@ -6,18 +6,17 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.store.TransactionLog;
+import com.tarantula.platform.service.AuthObject;
 
 import java.util.Map;
 import java.util.UUID;
 
-public class DeveloperStoreProvider extends AuthObject{
+public class DeveloperStoreProvider extends AuthObject {
 
     private static final TarantulaLogger logger = JDKLogger.getLogger(DeveloperStoreProvider.class);
 
     public DeveloperStoreProvider(PlatformGameServiceProvider gameServiceProvider, MetricsListener metricsListener){
         super(gameServiceProvider.gameCluster().typeId(),"");
-        //this.platformGameServiceProvider = platformGameServiceProvider;
         this.applicationMetricsListener = metricsListener;
     }
 

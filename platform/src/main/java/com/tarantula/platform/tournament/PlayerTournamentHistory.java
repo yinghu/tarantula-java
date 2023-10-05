@@ -2,17 +2,15 @@ package com.tarantula.platform.tournament;
 
 import com.icodesoftware.Tournament;
 
-import com.tarantula.platform.FIFOIndexSet;
+import com.icodesoftware.util.RecoverableObject;
 
 
-public class PlayerTournamentHistory extends FIFOIndexSet {
+public class PlayerTournamentHistory extends RecoverableObject {
 
     public PlayerTournamentHistory(){
         this.label = Tournament.HISTORY_LABEL;
     }
-    public PlayerTournamentHistory(int maxHistoryRecords){
-        super(Tournament.HISTORY_LABEL,maxHistoryRecords);
-    }
+
 
     @Override
     public int getFactoryId() {

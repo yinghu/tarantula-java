@@ -34,8 +34,6 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
 
     public static final int INDEX_SET_CID = 26;
 
-    public static final int FIFO_INDEX_SET_CID = 27;
-
     public static final int ON_VIEW_OID = 28;
 
     public static final int PROPERTY_INDEX_SET_CID = 29;
@@ -127,9 +125,6 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
                 break;
             case PRESENCE_KEY_CID:
                 _ins = new PresenceKey();
-                break;
-            case FIFO_INDEX_SET_CID:
-                _ins = new FIFOIndexSet();
                 break;
             case SERVICE_EVENT_LOG_CID:
                 _ins = new ServiceEventLog();

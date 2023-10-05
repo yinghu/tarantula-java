@@ -45,6 +45,7 @@ public class ApplicationStoreProvider extends AuthObject {
         long systemId = (long) params.get(OnAccess.SYSTEM_ID);
         UserInventory inventory = this.platformGameServiceProvider.inventoryServiceProvider().inventory(systemId,shoppingItem.purchaseType().name(),shoppingItem.virtualCurrency().name());
         if(inventory==null || !inventory.transact(shoppingItem.price()*(-1))){
+
             logger.warn("Not enough balance to buy");
             return false;
         }

@@ -5,7 +5,6 @@ import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,12 +19,6 @@ public class ThirdPartyServiceProvider implements AuthVendorRegistry {
         this.name = name;
         this.aMap = new ConcurrentHashMap<>();
         this.metricsListener = (n,v)->{};
-    }
-    public ThirdPartyServiceProvider(String name, List<TokenValidatorProvider.AuthVendor> preload){
-        this.name = name;
-        this.aMap = new ConcurrentHashMap<>();
-        this.metricsListener = (n,v)->{};
-        preload.forEach((v)-> aMap.put(v.name(),v));
     }
 
     public String typeId(){
@@ -42,12 +35,6 @@ public class ThirdPartyServiceProvider implements AuthVendorRegistry {
         throw new RuntimeException("Operation not support");
     }
 
-    //@Override
-    //public String clientId(String typeId) {
-        //TokenValidatorProvider.AuthVendor vendor = aMap.get(typeId);
-        //if(vendor == null) throw new RuntimeException("No auth vendor associated with ["+typeId+"]");
-        //return vendor.clientId();
-    //}
 
 
     @Override
