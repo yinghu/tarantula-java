@@ -10,6 +10,18 @@ public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecov
 
     public static final int BATTLE_TRANSACTION_CID = 1;
     public static final int UNIT_XP_UP_CID = 2;
+    public static final int UNIT_RANK_UP_CID = 3;
+    public static final int UNIT_SKILL_UP_CID = 4;
+
+    public static final int EQUIPMENT_XP_UP_CID = 5;
+    public static final int EQUIPMENT_RANK_UP_CID = 6;
+
+    public static final int EQUIPMENT_SALVAGE_CID = 7;
+
+    public static final int EQUIPMENT_EQUIP_CID = 8;
+
+    public static final int EQUIPMENT_UN_EQUIP_CID = 9;
+
 
     public static Earth8PortableRegistry INS;
 
@@ -25,6 +37,27 @@ public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecov
                 break;
             case UNIT_XP_UP_CID:
                 pt = new UnitXpUp();
+                break;
+            case UNIT_RANK_UP_CID:
+                pt = new UnitRankUp();
+                break;
+            case UNIT_SKILL_UP_CID:
+                pt = new UnitSkillUp();
+                break;
+            case EQUIPMENT_XP_UP_CID:
+                pt = new EquipmentXpUp();
+                break;
+            case EQUIPMENT_RANK_UP_CID:
+                pt = new EquipmentRankUp();
+                break;
+            case EQUIPMENT_SALVAGE_CID:
+                pt = new EquipmentSalvage();
+                break;
+            case EQUIPMENT_EQUIP_CID:
+                pt = new EquipmentEquip();
+                break;
+            case EQUIPMENT_UN_EQUIP_CID:
+                pt = new EquipmentUnEquip();
                 break;
             default:
         }

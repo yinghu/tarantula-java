@@ -5,7 +5,6 @@ import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 
-import javax.print.DocFlavor;
 import java.util.HashMap;
 
 public class BattleUpdate extends RecoverableObject {
@@ -62,6 +61,29 @@ public class BattleUpdate extends RecoverableObject {
             case UnitXpUP:
                 update = UnitXpUp.fromJson(jsonObject);
                 break;
+            case UnitRankUp:
+                update = UnitRankUp.fromJson(jsonObject);
+                break;
+            case UnitSkillUp:
+                update = UnitSkillUp.fromJson(jsonObject);
+                break;
+            case EquipmentXpUp:
+                update = EquipmentXpUp.fromJson(jsonObject);
+                break;
+            case EquipmentRankUp:
+                update = EquipmentRankUp.fromJson(jsonObject);
+                break;
+            case EquipmentSalvage:
+                update = EquipmentSalvage.fromJson(jsonObject);
+                break;
+            case EquipmentEquip:
+                update = EquipmentEquip.fromJson(jsonObject);
+                break;
+            case EquipmentUnEquip:
+                update = EquipmentUnEquip.fromJson(jsonObject);
+                break;
+            default:
+                throw new UnsupportedOperationException("operation not supported");
         }
         return update;
     }

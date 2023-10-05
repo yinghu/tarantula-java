@@ -1,9 +1,8 @@
 package com.perfectday.games.earth8;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.service.ApplicationPreSetup;
 
-public class UnitXpUp extends BattleUpdate{
+public class EquipmentXpUp extends BattleUpdate{
 
     public int xpGain;
     @Override
@@ -21,9 +20,10 @@ public class UnitXpUp extends BattleUpdate{
         return true;
     }
 
+
     @Override
     public int getClassId() {
-        return Earth8PortableRegistry.UNIT_XP_UP_CID;
+        return Earth8PortableRegistry.EQUIPMENT_XP_UP_CID;
     }
 
     @Override
@@ -31,15 +31,11 @@ public class UnitXpUp extends BattleUpdate{
         return Earth8PortableRegistry.OID;
     }
 
-    public static UnitXpUp fromJson(JsonObject jsonObject){
-        UnitXpUp unitXpUp = new UnitXpUp();
-        unitXpUp.parse(jsonObject);
-        unitXpUp.xpGain = jsonObject.get("XpGain").getAsInt();
-        return unitXpUp;
+    public static EquipmentXpUp fromJson(JsonObject jsonObject){
+        EquipmentXpUp unitRankUp = new EquipmentXpUp();
+        unitRankUp.parse(jsonObject);
+        unitRankUp.xpGain = jsonObject.get("XpGain").getAsInt();
+        return unitRankUp;
     }
 
-    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup){
-        System.out.println("UnitXpUp");
-        return true;
-    }
 }

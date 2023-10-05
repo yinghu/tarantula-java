@@ -70,9 +70,14 @@
     };
     document.querySelector('#tx-lobby-live-json-tree-clear').onclick=()=>{
         let game ={};
-        game.ChapterId = 1;
-        game.StageId = 2;
-        game.Party = [3,4,5];
+        game.UpdateId=0;
+        game.UnitId = 1;
+        game.EquipmentId = 2;
+        game.SkillId = 5;
+        game.Rank = 2;
+        game.Level = 3;
+        game.Currencies = {Gem:100,XpPortionA:5,XpPortionB:6}
+        game.XpGain=100;
         editor.set(game);
     };
     document.querySelector('#tx-lobby-live-close').onclick=()=>{
