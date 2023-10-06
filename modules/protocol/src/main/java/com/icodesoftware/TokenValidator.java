@@ -7,7 +7,6 @@ public interface TokenValidator {
 
     //validate and parse the token, call before dispatching event
     OnSession validateToken(String token);
-    //OnSession token(String systemId,int stub);
 
     //hash password to avoid direct password persistence
     String hashPassword(String password);
@@ -18,9 +17,7 @@ public interface TokenValidator {
     //validate ticket, call before application callback
     boolean validateTicket(Session session);
 
-
     void offSession(long id,long stub);
-
 
     boolean validateToken(Map<String,Object> params);
 

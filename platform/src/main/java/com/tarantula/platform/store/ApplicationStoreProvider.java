@@ -9,7 +9,6 @@ import com.tarantula.platform.inventory.UserInventory;
 import com.tarantula.platform.service.AuthObject;
 
 import java.util.Map;
-import java.util.UUID;
 
 public class ApplicationStoreProvider extends AuthObject {
 
@@ -43,9 +42,9 @@ public class ApplicationStoreProvider extends AuthObject {
             return false;
         }
         long systemId = (long) params.get(OnAccess.SYSTEM_ID);
+
         UserInventory inventory = this.platformGameServiceProvider.inventoryServiceProvider().inventory(systemId,shoppingItem.purchaseType().name(),shoppingItem.virtualCurrency().name());
         if(inventory==null || !inventory.transact(shoppingItem.price()*(-1))){
-
             logger.warn("Not enough balance to buy");
             return false;
         }

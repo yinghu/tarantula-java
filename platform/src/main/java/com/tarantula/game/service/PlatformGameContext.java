@@ -5,6 +5,7 @@ import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ApplicationSchema;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.service.TokenValidatorProvider;
 
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
@@ -15,10 +16,11 @@ public class PlatformGameContext implements GameContext {
     private final TarantulaLogger logger;
 
     private final PlatformGameServiceProvider platformGameServiceProvider;
-
+    private final TokenValidatorProvider tokenValidatorProvider;
 
     public PlatformGameContext(ServiceContext serviceContext,PlatformGameServiceProvider platformGameServiceProvider,TarantulaLogger logger){
         this.serviceContext = serviceContext;
+        this.tokenValidatorProvider = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
         this.platformGameServiceProvider = platformGameServiceProvider;
         this.logger = logger;
     }
@@ -67,6 +69,10 @@ public class PlatformGameContext implements GameContext {
     @Override
     public ApplicationSchema applicationSchema(){
         return platformGameServiceProvider.gameCluster();
+    }
+
+    public TokenValidatorProvider.AuthVendor authorVendor(String name){
+        return tokenValidatorProvider.authVendor(name);
     }
 
 

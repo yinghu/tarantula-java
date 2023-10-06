@@ -9,7 +9,6 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.service.AuthObject;
 
 import java.util.Map;
-import java.util.UUID;
 
 public class DeveloperStoreProvider extends AuthObject {
 
@@ -33,11 +32,10 @@ public class DeveloperStoreProvider extends AuthObject {
             logger.warn("Illegal access from ["+params.get(OnAccess.STORE_RECEIPT)+"]");
             return false;
         }
-        String tid = UUID.randomUUID().toString();
-        params.put(OnAccess.STORE_TRANSACTION_ID,tid);
+        params.put(OnAccess.STORE_TRANSACTION_ID,serviceContext.distributionId());
         params.put(OnAccess.STORE_QUANTITY,1);
         TransactionLog transaction = new TransactionLog((String)params.get(OnAccess.SYSTEM_ID),(String)params.get(OnAccess.STORE_BUNDLE_ID),"token access");
-        transaction.index(tid);
+
         serviceEventLogger.log(transaction);
         return true;
     }

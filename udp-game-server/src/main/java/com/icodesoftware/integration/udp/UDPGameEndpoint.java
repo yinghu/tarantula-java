@@ -21,7 +21,7 @@ import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.PingListener, UDPEndpointServiceProvider.ActionListener,GameContext,RoomListener{
+public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.PingListener, UDPEndpointServiceProvider.ActionListener,RoomListener{
 
     private TarantulaLogger logger = JDKLogger.getLogger(UDPGameEndpoint.class);
 
@@ -274,7 +274,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
 
     private GameModule createGameModule(ActiveRoom room) throws Exception{
         GameModule gameModule = (GameModule)Class.forName(moduleName).getConstructor().newInstance();
-        gameModule.setup(room,this);
+        //gameModule.setup(room,this);
         gameModule.registerRoomListener(this);
         logger.warn("Game module ["+moduleName+"] created");
         return gameModule;
@@ -363,7 +363,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     public GameServiceProvider gameServiceProvider(){
         return null;
     }
-    @Override
+    //@Override
     public ApplicationSchema applicationSchema() {
         return null;
     }
