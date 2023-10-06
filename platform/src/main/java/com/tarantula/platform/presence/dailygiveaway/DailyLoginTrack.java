@@ -3,12 +3,11 @@ package com.tarantula.platform.presence.dailygiveaway;
 import com.google.gson.JsonObject;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.time.LocalDateTime;
 import java.time.Year;
-import java.util.Map;
+
 
 public class DailyLoginTrack extends RecoverableObject {
 
@@ -22,19 +21,21 @@ public class DailyLoginTrack extends RecoverableObject {
     }
 
     @Override
-    public Map<String,Object> toMap(){
-        this.properties.put("1",lastLoginDay);
-        this.properties.put("2",tier);
-        this.properties.put("3",timestamp);
-        this.properties.put("4",rewardPending);
-        return this.properties;
+    public boolean read(DataBuffer buffer) {
+        lastLoginDay = buffer.readInt();
+        tier = buffer.readInt();
+        timestamp = buffer.readLong();
+        rewardPending = buffer.readBoolean();
+        return true;
     }
+
     @Override
-    public void fromMap(Map<String,Object> properties){
-        this.lastLoginDay = ((Number) properties.get("1")).intValue();
-        this.tier = ((Number) properties.get("2")).intValue();
-        this.timestamp = ((Number) properties.get("3")).longValue();
-        this.rewardPending = (boolean) properties.getOrDefault("4",false);
+    public boolean write(DataBuffer buffer) {
+        buffer.writeInt(lastLoginDay);
+        buffer.writeInt(tier);
+        buffer.writeLong(timestamp);
+        buffer.writeBoolean(rewardPending);
+        return true;
     }
 
     @Override
@@ -46,10 +47,7 @@ public class DailyLoginTrack extends RecoverableObject {
     public int getFactoryId() {
         return PresencePortableRegistry.OID;
     }
-    @Override
-    public Key key(){
-        return new AssociateKey(this.distributionId,this.label);
-    }
+
 
     public boolean checkDailyLogin(int pendingHours,int maxDays,int maxTier){
         if(lastLoginDay==0 && tier==0){

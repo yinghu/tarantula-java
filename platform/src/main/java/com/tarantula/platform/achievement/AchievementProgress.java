@@ -1,12 +1,9 @@
 package com.tarantula.platform.achievement;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.RecoverableObject;
-import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
-import java.util.Map;
 
 public class AchievementProgress extends RecoverableObject {
 
@@ -29,23 +26,28 @@ public class AchievementProgress extends RecoverableObject {
         return PresencePortableRegistry.ACHIEVEMENT_PROGRESS_CID;
     }
 
+
+
     @Override
-    public Map<String,Object> toMap(){
-        properties.put("1",tier);
-        properties.put("2",target);
-        properties.put("3",objective);
-        properties.put("4",progress);
-        properties.put("5",disabled);
-        return properties;
+    public boolean write(DataBuffer buffer) {
+        buffer.writeInt(tier);
+        buffer.writeInt(target);
+        buffer.writeDouble(objective);
+        buffer.writeDouble(progress);
+        buffer.writeBoolean(disabled);
+        return true;
     }
+
     @Override
-    public void fromMap(Map<String,Object> properties){
-        this.tier = ((Number)properties.get("1")).intValue();
-        this.target = ((Number)properties.get("2")).intValue();
-        this.objective = ((Number)properties.get("3")).doubleValue();
-        this.progress = ((Number)properties.get("4")).doubleValue();
-        this.disabled = (boolean)properties.get("5");
+    public boolean read(DataBuffer buffer) {
+        tier = buffer.readInt();
+        target = buffer.readInt();
+        objective = buffer.readDouble();
+        progress = buffer.readDouble();
+        disabled = buffer.readBoolean();
+        return true;
     }
+
     public int tier(){
         return tier;
     }
@@ -79,10 +81,7 @@ public class AchievementProgress extends RecoverableObject {
     public String name(){
         return "tier_"+tier+"_target_"+target;
     }
-    @Override
-    public Recoverable.Key key(){
-        return new AssociateKey(this.distributionId,this.label);
-    }
+
     public void reset(int tier,int target,double objective){
         this.tier = tier;
         this.target = target;

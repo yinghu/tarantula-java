@@ -2,12 +2,12 @@ package com.tarantula.platform.achievement;
 
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.inbox.PlatformInboxServiceProvider;
-import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
+import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 
 
 import java.util.ArrayList;
@@ -17,7 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PlatformAchievementServiceProvider extends PlatformItemServiceProvider {
 
     public static final String NAME = "achievement";
-
 
     private ConcurrentHashMap<String,Achievement> achievements;
 
@@ -34,8 +33,32 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
     }
 
     public AchievementProgress onProgress(Session session,double delta){
+        CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);
         AchievementProgress achievementProgress = new AchievementProgress();
-        platformGameServiceProvider.savedGameServiceProvider().createIfAbsent(session,achievementProgress);
+        achievementProgress.distributionId(currentSaveIndex.saveId);
+        Transaction transaction = gameCluster.transaction();
+        transaction.execute(ctx->{
+            ApplicationPreSetup preSetup = (ApplicationPreSetup)ctx;
+            DataStore ds = preSetup.onDataStore(NAME);
+            ds.createIfAbsent(achievementProgress,true);
+            achievementProgress.dataStore(ds);
+            if(achievementProgress.disabled()) tryNextAchievement(achievementProgress);
+            if(achievementProgress.disabled()) return true;
+            if(achievementProgress.onProgress(delta)){
+                Achievement achievement = achievements.get(achievementProgress.name());
+                if(achievement==null) {
+                    achievementProgress.disabled(true);
+                    achievementProgress.update();
+                    return true;
+                }
+                //platformGameServiceProvider.inboxServiceProvider().claim(session.systemId(),achievement);
+                if(!tryNextAchievement(achievementProgress)){
+                    achievementProgress.disabled(true);
+                    achievementProgress.update();
+                }
+            }
+            return true;
+        });
         if(achievementProgress.disabled()) tryNextAchievement(achievementProgress);
         if(achievementProgress.disabled()) return null;
         if(achievementProgress.onProgress(delta)){

@@ -7,6 +7,9 @@ import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.util.JsonUtil;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 public class Earth8GameServiceProvider implements GameServiceProvider {
 
     private GameContext gameContext;
@@ -60,6 +63,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             return update.update(applicationPreSetup);
         });
         session.write(JsonUtil.toSimpleResponse(updated,updated?"battle updated":"failed to update").getBytes());
+        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        gameContext.authorVendor(OnAccess.AMAZON).upload("earth8#"+"earth8/"+date+"/"+update.distributionKey()+".json",payload);
     }
     public void endGame(Session session,byte[] payload) throws Exception{
         JsonObject jsonObject = JsonUtil.parse(payload);
