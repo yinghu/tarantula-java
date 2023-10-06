@@ -84,7 +84,9 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
         List<DailyGiveaway> items = applicationPreSetup.list(descriptor,new DailygGiveawayObjectQuery(descriptor.key(),"DailyGiveaway"));
         items.forEach((a)-> {
+            logger.warn("<><><>"+a.name()+"<><>"+a.day());
             if(!a.disabled()) {
+                a.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
                 a.setup();
                 dailyGiveaways.put(a.name(),a);
             }

@@ -48,6 +48,7 @@
                 <module-name>com.tarantula.game.module.GameItemModule</module-name>
                 <access-mode>13</access-mode>
             </application>
+            <!--
             <application>
                 <type-id>game-service</type-id>
                 <name>ServiceProxy</name>
@@ -56,7 +57,7 @@
                 <tag>game/proxy</tag>
                 <module-name>com.tarantula.game.module.GameServiceProxyModule</module-name>
             </application>
-
+            -->
             <application><!-- tournament module-->
                 <type-id>game-service</type-id>
                 <name>Tournament</name>

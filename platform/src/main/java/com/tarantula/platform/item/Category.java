@@ -14,7 +14,7 @@ public class Category extends RecoverableObject implements Configurable {
     private Set<CategoryItem> itemList = new HashSet<>();
     private Descriptor app;
     public Category(Descriptor app){
-        this.label = "category";
+        this.label = "inventory_category";
         this.app = app;
     }
 

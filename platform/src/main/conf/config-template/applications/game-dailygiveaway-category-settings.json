@@ -8,7 +8,7 @@
   [
     {
       "header": {
-        "scope": "application.giveaway",
+        "scope": "application.resource",
         "type": "DailyGiveaway",
         "description": "giveaway category",
         "version": "1.0",

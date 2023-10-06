@@ -305,7 +305,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         if(!applicationPreSetup.save(desc,app)) {
             return JsonUtil.toSimpleResponse(true,"failed to save");
         }
-        Category category = app.category(gameCluster.serviceWithCategory("inventory"));
+        Category category = app.category(gameCluster.serviceWithCategory("item"));
         category.list();
         category.addItem(new CategoryItem(Configurable.COMMODITY_CONFIG_TYPE,conf.name(),app.configurationTypeId()));
         return new CommoditySerializer().serialize(app,Application.class,null).toString();

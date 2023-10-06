@@ -15,10 +15,8 @@ import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PlatformResourceServiceProvider extends PlatformItemServiceProvider{
 
@@ -88,8 +86,9 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
 
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        List<GameResource> items = applicationPreSetup.list(descriptor,new GameResourceQuery(descriptor.key(), descriptor.category()));
+        List<GameResource> items = applicationPreSetup.list(descriptor,new GameResourceQuery(descriptor.key(),"Resource"));
         items.forEach((a)-> {
+            a.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
             a.setup();
             if(!a.disabled()) {
                 setup(a);
@@ -97,6 +96,8 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
             }
         });
         this.application = descriptor;
+        this.platformGameServiceProvider.achievementServiceProvider().registerConfigurableListener(descriptor,listener);
+        this.platformGameServiceProvider.dailyGiveawayServiceProvider().registerConfigurableListener(descriptor,listener);
         return null;
     }
 

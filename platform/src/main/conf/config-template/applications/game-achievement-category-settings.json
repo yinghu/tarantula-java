@@ -8,7 +8,7 @@
   [
     {
       "header": {
-        "scope": "application.achievement",
+        "scope": "application.resource",
         "type": "Achievement",
         "description": "achievement category",
         "version": "1.0",

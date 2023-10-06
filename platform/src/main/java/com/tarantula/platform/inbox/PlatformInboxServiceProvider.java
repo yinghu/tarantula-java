@@ -32,6 +32,8 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         Inbox inbox = new Inbox();
         inbox.inventoryList = this.inventoryServiceProvider.inventoryList(systemId);
         inbox.rewardList = this.rewardList(systemId);
+        inbox.achievementList = this.platformGameServiceProvider.achievementServiceProvider().list();
+        inbox.dailyGiveawayList = this.platformGameServiceProvider.dailyGiveawayServiceProvider().list();
         return inbox;
     }
 
