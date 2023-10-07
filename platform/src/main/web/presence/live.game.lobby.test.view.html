@@ -71,9 +71,12 @@
     document.querySelector('#tx-lobby-live-json-tree-clear').onclick=()=>{
         let game ={};
         game.UpdateId=0;
+        game.ChapterId=10;
+        game.StageId = 20;
         game.UnitId = 1;
         game.EquipmentId = 2;
         game.SkillId = 5;
+        game.Party =[100,200,300];
         game.Rank = 2;
         game.Level = 3;
         game.Currencies = {Gem:100,XpPortionA:5,XpPortionB:6}

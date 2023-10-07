@@ -1,6 +1,7 @@
 package com.tarantula.platform.resource;
 
 import com.tarantula.platform.item.Application;
+import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.Item;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
@@ -11,6 +12,10 @@ public class GameResource extends Application {
 
     public GameResource(){
 
+    }
+
+    public GameResource(ConfigurableObject configurableObject){
+        super(configurableObject);
     }
 
     public int getFactoryId() {

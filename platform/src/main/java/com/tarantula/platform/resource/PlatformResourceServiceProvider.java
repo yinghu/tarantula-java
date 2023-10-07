@@ -11,6 +11,7 @@ import com.icodesoftware.service.RNG;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JvmRNG;
 import com.tarantula.game.service.PlatformGameServiceProvider;
+import com.tarantula.platform.configuration.ConfigurationObject;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.*;
 
@@ -61,18 +62,30 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
     }
 
     public boolean onItemRegistered(String category,String itemId){
-        GameResource gameResource = new GameResource();
-        gameResource.distributionKey(itemId);
+        ConfigurableObject configurationObject = new ConfigurableObject();
+        configurationObject.distributionKey(itemId);
         Descriptor app = gameCluster.serviceWithCategory(category);
-        if(!applicationPreSetup.load(app,gameResource)){
+        if(!applicationPreSetup.load(app,configurationObject)){
             return false;
         }
+        if(configurationObject.configurationCategory().equals("Achievement")){
+            this.platformGameServiceProvider.achievementServiceProvider().onItemRegistered(category,itemId);
+            return true;
+        }
+        if(configurationObject.configurationCategory().equals("DailyGiveaway")){
+            this.platformGameServiceProvider.dailyGiveawayServiceProvider().onItemRegistered(category,itemId);
+            return true;
+        }
+        GameResource gameResource = new GameResource(configurationObject);
+        gameResource.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
         gameResource.setup();
         setup(gameResource);
         gameResourceIndex.put(gameResource.name(),gameResource);
         return true;
     }
     public boolean onItemReleased(String category,String itemId){
+        this.platformGameServiceProvider.dailyGiveawayServiceProvider().onItemReleased(category,itemId);
+        this.platformGameServiceProvider.achievementServiceProvider().onItemReleased(category,itemId);
         String[] released = {null};
         gameResourceIndex.forEach((k,v)->{
             if(v.distributionKey().equals(itemId)) released[0] = k;

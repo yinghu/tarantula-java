@@ -73,9 +73,9 @@
         TARA_API.onGet(TARA_API.query().serviceTag,'onList',"Mills",(resp)=>{
             achievementList.innerHTML = '';
             if(resp.Successful){
-                resp._itemList.forEach(item => {
-                   achievementList.innerHTML += TARA_HTML.command(item.ItemId,'Tier : '+item.Tier+' Target : '+item.Target,' Objective : '+item.Objective,'achievement-grant','----');
-                });    
+                //resp._itemList.forEach(item => {
+                   //achievementList.innerHTML += TARA_HTML.command(item.ItemId,'Tier : '+item.Tier+' Target : '+item.Target,' Objective : '+item.Objective,'achievement-grant','----');
+                //});    
                 //document.querySelectorAll('.tx-live-achievement-grant').forEach(a=>{
                       //a.onclick = ()=>{
                         //tx_achievement_grant(a.getAttribute('tx-item-id'));

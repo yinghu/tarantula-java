@@ -26,8 +26,6 @@ public class AchievementProgress extends RecoverableObject {
         return PresencePortableRegistry.ACHIEVEMENT_PROGRESS_CID;
     }
 
-
-
     @Override
     public boolean write(DataBuffer buffer) {
         buffer.writeInt(tier);

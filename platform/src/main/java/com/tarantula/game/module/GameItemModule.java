@@ -1,13 +1,15 @@
 package com.tarantula.game.module;
 
 import com.icodesoftware.*;
+import com.icodesoftware.util.JsonUtil;
 
 
 public class GameItemModule extends ModuleHeader{
 
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
-        throw new UnsupportedOperationException(session.action()+" not support");
+        session.write(JsonUtil.toSimpleResponse(true,"item call").getBytes());
+        return false;
     }
 
     @Override

@@ -46,7 +46,6 @@
                 <category>item</category>
                 <tag>game/item</tag>
                 <module-name>com.tarantula.game.module.GameItemModule</module-name>
-                <access-mode>13</access-mode>
             </application>
             <!--
             <application>
