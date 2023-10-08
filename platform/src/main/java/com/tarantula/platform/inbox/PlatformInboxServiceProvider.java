@@ -18,6 +18,10 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
 
     public static final String NAME = "inbox";
 
+    @Override
+    public void registerSummary(Summary summary) {
+        super.registerSummary(summary);
+    }
 
     private final PlatformInventoryServiceProvider inventoryServiceProvider;
 
@@ -30,6 +34,7 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
 
     public Inbox inbox(long systemId){
         Inbox inbox = new Inbox();
+        inbox.shop = this.platformGameServiceProvider.storeServiceProvider().shop("Tami");
         inbox.inventoryList = this.inventoryServiceProvider.inventoryList(systemId);
         inbox.rewardList = this.rewardList(systemId);
         inbox.achievementList = this.platformGameServiceProvider.achievementServiceProvider().list();

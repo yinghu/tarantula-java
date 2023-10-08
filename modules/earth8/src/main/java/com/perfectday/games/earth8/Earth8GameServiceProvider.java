@@ -32,6 +32,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         }
         //single read to validate party items
         ApplicationPreSetup applicationPreSetup = gameContext.applicationSchema().applicationPreSetup();
+        //applicationPreSetup.list()
         Inventory gem = applicationPreSetup.inventory(session.distributionId(),"Gem");
         if(gem!=null) this.gameContext.log(gem.balance()+" : "+gem.rechargeable()+" : "+gem.count(0),OnLog.WARN);
         applicationPreSetup.inventoryList(session.distributionId()).forEach(t->{
@@ -90,7 +91,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         }
         session.write(JsonUtil.toSimpleResponse(updated,"battle finished").getBytes());
     }
-
+    public <T extends OnAccess> void onGameEvent(T event){
+        gameContext.log("EVENT : "+event.toJson().toString(),OnLog.WARN);
+    }
     @Override
     public void onLeft(Session session) {
         gameContext.log(" LEAVE : "+session.distributionKey()+" : "+session.stub(),OnLog.WARN);
@@ -100,11 +103,12 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     @Override
     public byte[] onRequest(Session session, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         //UDP REQUEST RESPONSE CAN BE REPACKING FOR LARGE PAYLOAD
-        return null;
+        return null;//callback on caller only if byte not null
     }
 
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
         //UDP MESSAGE WITH RELAY CALL WITH SINGLE UDP MESSAGE
+        //read buffer -> write header/buffer->flip->read header->callback on channel members
     }
 }

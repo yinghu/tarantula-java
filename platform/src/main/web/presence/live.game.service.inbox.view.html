@@ -56,7 +56,7 @@
     };
     
     function tx_live_inbox_setup(){
-        TARA_API.onGet(TARA_API.query().serviceTag,'onInbox',"",(resp)=>{
+        TARA_API.onGet(TARA_API.query().serviceTag,'onInbox',"Tami",(resp)=>{
             editor.set(resp);
             if(resp.Successful){
                 inboxList.innerHTML = '';
