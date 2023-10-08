@@ -15,21 +15,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class PlatformInventoryServiceProvider implements ServiceProvider,InventoryListener {
+public class PlatformInventoryServiceProvider extends PlatformItemServiceProvider implements InventoryListener {
 
     public static final String NAME = "inventory";
 
     private TarantulaLogger logger;
 
-    private final String gameServiceName;
-    private GameCluster gameCluster;
-    private ServiceContext serviceContext;
-    private ApplicationPreSetup applicationPreSetup;
+    //private final String gameServiceName;
+   // private GameCluster gameCluster;
+    //private ServiceContext serviceContext;
+    //private ApplicationPreSetup applicationPreSetup;
     private DataStore inventoryDataStore;
 
     public PlatformInventoryServiceProvider(PlatformGameServiceProvider gameServiceProvider){
-        this.gameCluster = gameServiceProvider.gameCluster();
-        this.gameServiceName = gameCluster.serviceType();
+        super(gameServiceProvider,NAME);
+        //this.gameServiceName = gameCluster.serviceType();
     }
 
     @Override
@@ -48,8 +48,9 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
     }
     @Override
     public void setup(ServiceContext serviceContext) {
-        this.serviceContext = serviceContext;
-        this.applicationPreSetup = gameCluster.applicationPreSetup();
+        super.setup(serviceContext);
+        //this.serviceContext = serviceContext;
+        //this.applicationPreSetup = gameCluster.applicationPreSetup();
         this.inventoryDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME);
         this.logger = JDKLogger.getLogger(PlatformInventoryServiceProvider.class);
     }
@@ -148,6 +149,7 @@ public class PlatformInventoryServiceProvider implements ServiceProvider,Invento
 
     @Override
     public void onInventory(UserInventory inventory, InventoryItem item) {
-        //callback on adding inventory
+        logger.warn("inventory added=>"+inventory.typeId);
+        this.platformGameServiceProvider.gameServiceProvider().onInventory(inventory,item);
     }
 }

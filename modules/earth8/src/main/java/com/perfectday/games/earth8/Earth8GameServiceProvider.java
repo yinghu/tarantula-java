@@ -33,7 +33,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         //single read to validate party items
         ApplicationPreSetup applicationPreSetup = gameContext.applicationSchema().applicationPreSetup();
         //applicationPreSetup.list()
-        Inventory gem = applicationPreSetup.inventory(session.distributionId(),"Gem");
+        Inventory gem = applicationPreSetup.inventory(session.distributionId(),"Unit");
         if(gem!=null) this.gameContext.log(gem.balance()+" : "+gem.rechargeable()+" : "+gem.count(0),OnLog.WARN);
         applicationPreSetup.inventoryList(session.distributionId()).forEach(t->{
             t.onStock().forEach(configurable -> {
@@ -42,6 +42,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                 this.gameContext.log(stock.header().toString(),OnLog.WARN);
                 this.gameContext.log(stock.application().toString(),OnLog.WARN);
                 this.gameContext.log(stock.reference().toString(),OnLog.WARN);
+                stock.setup();
+                this.gameContext.log(stock.toJson().toString(),OnLog.WARN);
             });
         });
         //if party check fail return false;
@@ -93,6 +95,10 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     }
     public <T extends OnAccess> void onGameEvent(T event){
         gameContext.log("EVENT : "+event.toJson().toString(),OnLog.WARN);
+    }
+
+    public void onInventory(Inventory inventory, Inventory.Stock stock){
+        this.gameContext.log("INVENTORY->"+inventory.distributionId()+"<><>"+stock.stockId(),OnLog.WARN);
     }
     @Override
     public void onLeft(Session session) {

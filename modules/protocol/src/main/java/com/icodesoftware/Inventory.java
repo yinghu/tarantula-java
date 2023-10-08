@@ -10,6 +10,5 @@ public interface Inventory extends Configurable,Balance,Countable{
 
     interface Stock extends Configurable{
         long stockId();
-
     }
 }
