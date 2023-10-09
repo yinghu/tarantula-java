@@ -98,7 +98,17 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     }
 
     public void onInventory(Inventory inventory, Inventory.Stock stock){
-        this.gameContext.log("INVENTORY->"+inventory.distributionId()+"<><>"+stock.stockId(),OnLog.WARN);
+        if(inventory.rechargeable()) return;
+        this.gameContext.log(stock.header().toString(),OnLog.WARN);
+        this.gameContext.log(stock.application().toString(),OnLog.WARN);
+        this.gameContext.log(stock.reference().toString(),OnLog.WARN);
+        ApplicationPreSetup applicationPreSetup = gameContext.applicationSchema().applicationPreSetup();
+        Configurable configurable = applicationPreSetup.load(gameContext.applicationSchema().application("item"),stock.stockId());
+        if(configurable==null) return;
+        this.gameContext.log(configurable.header().toString(),OnLog.WARN);
+        this.gameContext.log(configurable.application().toString(),OnLog.WARN);
+        this.gameContext.log(configurable.reference().toString(),OnLog.WARN);
+        this.gameContext.log(configurable.toJson().toString(),OnLog.WARN);
     }
     @Override
     public void onLeft(Session session) {

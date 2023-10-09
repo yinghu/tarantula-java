@@ -62,19 +62,16 @@ public class InventoryItem extends ConfigurableObject implements Inventory.Stock
         return jsonObject;
     }
 
-    public ConfigurableObject load(){
-        ConfigurableObject configurableObject = new ConfigurableObject();
-        configurableObject.distributionKey(reference.get(0).getAsString());
-        if(!dataStore.load(configurableObject)) return null;
-        configurableObject.dataStore(dataStore);
-        return configurableObject.setup();
-    }
+    //public ConfigurableObject load(){
+        //ConfigurableObject configurableObject = new ConfigurableObject();
+        //configurableObject.distributionKey(reference.get(0).getAsString());
+        //if(!dataStore.load(configurableObject)) return null;
+        //configurableObject.dataStore(dataStore);
+        //return configurableObject.setup();
+    //}
 
     public long stockId(){
         return reference.get(0).getAsLong();
-    }
-    public String itemId(){
-        return reference.get(0).getAsString();
     }
 
 }

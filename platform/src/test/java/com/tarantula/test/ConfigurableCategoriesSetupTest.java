@@ -17,12 +17,13 @@ public class ConfigurableCategoriesSetupTest extends DataStoreHook{
 
     @Test(groups = { "ConfigurableCategories" })
     public void configSettingTest() {
-        GameObjectSetup gameObjectSetup = new GameObjectSetup();
-        gameObjectSetup.setup(serviceContext);
+
         GameCluster app = new GameCluster();
         app.gameServiceName = "woop-game-service";
         app.gameLobbyName = "woop-game-lobby";
         app.gameDataName = "woop-game-data";
+        GameObjectSetup gameObjectSetup = new GameObjectSetup(app);
+        gameObjectSetup.setup(serviceContext);
         ConfigurableTemplate configuration = serviceContext.deploymentServiceProvider().configuration(app,"sample-game-asset-category-settings");
         JsonArray items = (JsonArray) configuration.property("itemList");
         Assert.assertNotNull(items);

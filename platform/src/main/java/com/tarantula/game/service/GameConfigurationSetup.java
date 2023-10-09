@@ -3,6 +3,7 @@ package com.tarantula.game.service;
 import com.icodesoftware.*;
 import com.icodesoftware.service.ApplicationSchema;
 import com.icodesoftware.service.ServiceContext;
+import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.inventory.InventoryQuery;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.inventory.UserInventory;
@@ -21,7 +22,12 @@ public class GameConfigurationSetup implements ApplicationPreSetup {
 
     protected ServiceContext serviceContext;
     protected Listener listener;
-    protected ApplicationSchema gameCluster;
+    protected GameCluster gameCluster;
+
+    public GameConfigurationSetup(GameCluster gameCluster){
+        this.gameCluster = gameCluster;
+        this.listener = gameCluster;
+    }
     public <T extends Configurable> boolean save(Descriptor application,T t){
         DataStore dataStore = parentContext.onDataStore(serviceDataStore(application));
         t.dataStore(dataStore);
@@ -83,9 +89,12 @@ public class GameConfigurationSetup implements ApplicationPreSetup {
         return list;
     }
     public Configurable load(Descriptor application,long configurableId){
-        Configurable ret = new ConfigurableObject();
+        ConfigurableObject ret = new ConfigurableObject();
         ret.distributionId(configurableId);
-        return load(application,ret)?ret:null;
+        if(!load(application,ret)) return null;
+        ret.configurableSetting(((GameCluster)gameCluster).configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
+        return ret.setup();
+        //return ret;
     }
 
     protected String serviceDataStore(Descriptor application){
@@ -161,9 +170,6 @@ public class GameConfigurationSetup implements ApplicationPreSetup {
         this.serviceContext = serviceContext;
     }
 
-    public void registerApplicationSchema(ApplicationSchema gameCluster){
-        this.gameCluster = gameCluster;
-    }
     public void registerListener(Listener listener){
         this.listener = listener;
     }

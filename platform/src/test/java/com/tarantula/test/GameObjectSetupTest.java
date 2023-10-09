@@ -21,7 +21,11 @@ public class GameObjectSetupTest extends DataStoreHook{
 
     @Test(groups = { "GameObjectSetup" })
     public void serviceDataStoreTest() {
-        GameObjectSetup gameObjectSetup = new GameObjectSetup();
+        GameCluster gc = new GameCluster();
+        gc.gameServiceName = "woop-game-service";
+        gc.gameLobbyName = "woop-game-lobby";
+        gc.gameDataName = "woop-game-data";
+        GameObjectSetup gameObjectSetup = new GameObjectSetup(gc);
         gameObjectSetup.setup(serviceContext);
         DeploymentDescriptor app = new DeploymentDescriptor();
         app.typeId("holee-game-data");
@@ -39,12 +43,13 @@ public class GameObjectSetupTest extends DataStoreHook{
     }
     @Test(groups = { "GameObjectSetup" })
     public void configDataStoreTest() {
-        GameObjectSetup gameObjectSetup = new GameObjectSetup();
-        gameObjectSetup.setup(serviceContext);
         GameCluster app = new GameCluster();
         app.gameServiceName = "holee-game-service";
         app.gameLobbyName = "holee-game-lobby";
         app.gameDataName = "holee-game-data";
+        GameObjectSetup gameObjectSetup = new GameObjectSetup(app);
+        gameObjectSetup.setup(serviceContext);
+
         DataStore dataStore1 = gameObjectSetup.dataStore(app);
         Assert.assertEquals(dataStore1.name(),"holee_game_service");
 
@@ -60,7 +65,11 @@ public class GameObjectSetupTest extends DataStoreHook{
     }
     @Test(groups = { "GameObjectSetup" })
     public void configSettingTest() {
-        GameObjectSetup gameObjectSetup = new GameObjectSetup();
+        GameCluster gc = new GameCluster();
+        gc.gameServiceName = "woop-game-service";
+        gc.gameLobbyName = "woop-game-lobby";
+        gc.gameDataName = "woop-game-data";
+        GameObjectSetup gameObjectSetup = new GameObjectSetup(gc);
         gameObjectSetup.setup(serviceContext);
         GameCluster app = new GameCluster();
         app.gameServiceName = "holee-service";
@@ -108,7 +117,11 @@ public class GameObjectSetupTest extends DataStoreHook{
 
     @Test(groups = { "GameObjectSetup" })
     public void configCreateObjectTest() {
-        GameObjectSetup gameObjectSetup = new GameObjectSetup();
+        GameCluster gc = new GameCluster();
+        gc.gameServiceName = "woop-game-service";
+        gc.gameLobbyName = "woop-game-lobby";
+        gc.gameDataName = "woop-game-data";
+        GameObjectSetup gameObjectSetup = new GameObjectSetup(gc);
         gameObjectSetup.setup(serviceContext);
         DeploymentDescriptor app = new DeploymentDescriptor();
         app.typeId("holee-game-data");
@@ -134,7 +147,11 @@ public class GameObjectSetupTest extends DataStoreHook{
     }
     @Test(groups = { "GameObjectSetup" })
     public void configDeleteObjectTest() {
-        GameObjectSetup gameObjectSetup = new GameObjectSetup();
+        GameCluster gc = new GameCluster();
+        gc.gameServiceName = "woop-game-service";
+        gc.gameLobbyName = "woop-game-lobby";
+        gc.gameDataName = "woop-game-data";
+        GameObjectSetup gameObjectSetup = new GameObjectSetup(gc);
         gameObjectSetup.setup(serviceContext);
         DeploymentDescriptor app = new DeploymentDescriptor();
         app.typeId("sample-game-data");
@@ -155,7 +172,11 @@ public class GameObjectSetupTest extends DataStoreHook{
 
     @Test(groups = { "GameObjectSetup" })
     public void configTransactionTest() {
-        GameObjectSetup gameObjectSetup = new GameObjectSetup();
+        GameCluster gc = new GameCluster();
+        gc.gameServiceName = "woop-game-service";
+        gc.gameLobbyName = "woop-game-lobby";
+        gc.gameDataName = "woop-game-data";
+        GameObjectSetup gameObjectSetup = new GameObjectSetup(gc);
         gameObjectSetup.setup(serviceContext);
         DeploymentDescriptor app = new DeploymentDescriptor();
         app.typeId("sample-game-data");

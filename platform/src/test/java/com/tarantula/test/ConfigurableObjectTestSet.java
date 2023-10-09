@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameObjectSetup;
 import com.tarantula.platform.DeploymentDescriptor;
+import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.*;
 
 import org.testng.Assert;
@@ -21,7 +22,11 @@ public class ConfigurableObjectTestSet extends DataStoreHook{
 
     @Test(groups = { "ConfigurableObject" })
     public void configurableObjectOptsTest() {
-        GameObjectSetup gameObjectSetup = new GameObjectSetup();
+        GameCluster gc = new GameCluster();
+        gc.gameServiceName = "woop-game-service";
+        gc.gameLobbyName = "woop-game-lobby";
+        gc.gameDataName = "woop-game-data";
+        GameObjectSetup gameObjectSetup = new GameObjectSetup(gc);
         gameObjectSetup.setup(serviceContext);
         DeploymentDescriptor app = new DeploymentDescriptor();
         app.typeId("test-game-data");

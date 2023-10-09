@@ -260,19 +260,15 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
 
     public ApplicationPreSetup applicationPreSetup(){
         if(applicationPreSetup!=null) return applicationPreSetup;
-        applicationPreSetup = new GameObjectSetup();
+        applicationPreSetup = new GameObjectSetup(this);
         applicationPreSetup.setup(serviceContext);
-        applicationPreSetup.registerListener(this);
-        applicationPreSetup.registerApplicationSchema(this);
         return applicationPreSetup;
     }
 
     public Transaction transaction(){
         Transaction transaction = serviceContext.transaction(Distributable.DATA_SCOPE);
-        ApplicationPreSetup preSetup = new GameConfigurationSetup();
+        ApplicationPreSetup preSetup = new GameConfigurationSetup(this);
         preSetup.setup(serviceContext);
-        preSetup.registerListener(this);
-        preSetup.registerApplicationSchema(this);
         transaction.register(preSetup,this);
         return transaction;
     }
