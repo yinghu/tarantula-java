@@ -129,12 +129,6 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
         return true;
     }
 
-    public UserInventory newInventory(String category, String typeId){
-        ConfigurableCategories categories = this.gameCluster.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE);
-        ConfigurableCategory conf = categories.configurableSetting(category);
-        conf.parse();
-        return new UserInventory(conf.name(),typeId,conf.rechargeable);
-    }
 
     private Category category(Category.Filter filter){
         Descriptor app = gameCluster.serviceWithCategory("inventory");

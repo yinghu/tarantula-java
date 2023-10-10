@@ -6,7 +6,8 @@ public interface Inventory extends Configurable,Balance,Countable{
 
     String DataStore = "inventory";
     boolean rechargeable();
-
+    String typeId();
+    String type();
     List<Stock> onStock();
 
     interface Stock extends Configurable{

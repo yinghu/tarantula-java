@@ -13,7 +13,7 @@ import java.util.List;
 public class UserInventory extends RecoverableObject implements Inventory {
 
     public final static String LABEL = "inventory";
-    private ArrayList<InventoryItem> itemList = new ArrayList<>();
+    private ArrayList<Stock> itemList = new ArrayList<>();
     private boolean rechargeable;
     private double balance;
     private int count;
@@ -150,9 +150,17 @@ public class UserInventory extends RecoverableObject implements Inventory {
     }
 
     public List<Stock> onStock(){
-        List<Stock> ilist = new ArrayList<>();
-        itemList.forEach(item->ilist.add(item));
-        return ilist;
+        return itemList;
+    }
+
+    @Override
+    public String type() {
+        return type;
+    }
+
+    @Override
+    public String typeId() {
+        return typeId;
     }
 
     public void resetListener(Listener listener){
