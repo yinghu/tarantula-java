@@ -13,6 +13,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.GameConfigurationSetup;
 import com.tarantula.game.service.GameObjectSetup;
 import com.tarantula.platform.event.PortableEventRegistry;
+import com.tarantula.platform.inventory.UserInventory;
 import com.tarantula.platform.item.*;
 import com.icodesoftware.service.ApplicationPreSetup;
 
@@ -25,7 +26,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class GameCluster extends OnApplicationHeader implements ApplicationSchema,Portable, ApplicationPreSetup.Listener {
+public class GameCluster extends OnApplicationHeader implements ApplicationSchema,Portable, ApplicationPreSetup.Listener, Inventory.Listener {
 
     private TarantulaLogger logger = JDKLogger.getLogger(GameCluster.class);
 
@@ -51,6 +52,8 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
     protected ServiceContext serviceContext;
 
     protected ApplicationPreSetup applicationPreSetup;
+
+    protected CopyOnWriteArrayList<Inventory.Listener> onInventory = new CopyOnWriteArrayList<>();
 
     protected CopyOnWriteArrayList<ApplicationPreSetup.Listener> listeners = new CopyOnWriteArrayList<>();
 
@@ -374,7 +377,9 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
     public void addListener(ApplicationPreSetup.Listener listener){
         this.listeners.add(listener);
     }
-
+    public void addListener(Inventory.Listener listener){
+        this.onInventory.add(listener);
+    }
 
     public ConfigurableCategories configurableCategories(String type){
         ApplicationPreSetup preSetup = applicationPreSetup();
@@ -450,4 +455,16 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
         if(exception!=null) exception.printStackTrace();
     }
 
+    public Inventory createInventory(String category,String typeId){
+        ConfigurableCategories categories = this.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE);
+        ConfigurableCategory conf = categories.configurableSetting(category);
+        conf.parse();
+        Inventory inventory = new UserInventory(conf.name(),typeId,conf.rechargeable,this);
+        return inventory;
+    }
+
+    @Override
+    public void onInventory(Inventory inventory, Inventory.Stock inventoryItem) {
+        onInventory.forEach(listener -> listener.onInventory(inventory,inventoryItem));
+    }
 }

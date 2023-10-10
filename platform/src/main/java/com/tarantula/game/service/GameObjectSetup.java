@@ -183,6 +183,9 @@ public class GameObjectSetup implements ApplicationPreSetup {
         //dataStore.deleteEdge(configurableObject.key(),VersionedConfigurableObject.LABEL);
     }
 
+    public Inventory createInventory(String category,String typeId){
+        return gameCluster.createInventory(category,typeId);
+    }
     public List<Inventory> inventoryList(long systemId){
         DataStore ids = serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,PlatformInventoryServiceProvider.NAME));
         InventoryQuery query = new InventoryQuery(systemId);
@@ -190,6 +193,7 @@ public class GameObjectSetup implements ApplicationPreSetup {
         ids.list(query).forEach(t->{
             t.dataStore(ids);
             t.list();
+            t.resetListener(gameCluster);
             inventoryList.add(t);
         });
         return inventoryList;
@@ -201,6 +205,7 @@ public class GameObjectSetup implements ApplicationPreSetup {
         ids.list(query).forEach(t->{
             t.dataStore(ids);
             t.list();
+            t.resetListener(gameCluster);
             inventoryList.add(t);
         });
         return inventoryList.isEmpty()?null:inventoryList.get(0);
@@ -212,6 +217,7 @@ public class GameObjectSetup implements ApplicationPreSetup {
         if(!ids.load(inventory)) return null;
         inventory.dataStore(ids);
         inventory.list();
+        inventory.resetListener(gameCluster);
         return inventory;
     }
 

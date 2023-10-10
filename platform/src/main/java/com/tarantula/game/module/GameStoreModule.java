@@ -57,16 +57,16 @@ public class GameStoreModule extends ModuleHeader implements Configurable.Listen
                 throw new RuntimeException("no permission");
             }
             String[] query = session.name().split("#");
-            ShoppingItem shoppingItem = this.storeServiceProvider.shoppingItem(query[1]);
-            if(shoppingItem==null) throw new RuntimeException("shopping item not existed");
+            //ShoppingItem shoppingItem = this.storeServiceProvider.shoppingItem(query[1]);
+            //if(shoppingItem==null) throw new RuntimeException("shopping item not existed");
             Map<String,Object> params = new HashMap<>();
             params.put(OnAccess.SYSTEM_ID,session.systemId());
             params.put(OnAccess.TYPE_ID,serviceTypeId);
             params.put(OnAccess.PROVIDER,OnAccess.DEVELOPER_STORE);
             params.put(OnAccess.STORE_RECEIPT,query[0]);
-            params.put(OnAccess.STORE_BUNDLE_ID,shoppingItem.distributionKey());
+            params.put(OnAccess.STORE_BUNDLE_ID,query[1]);
             if(this.context.validator().validateToken(params)){
-                this.storeServiceProvider.grant(session.systemId(),shoppingItem.distributionKey());
+                //this.storeServiceProvider.grant(session.systemId(),shoppingItem.distributionKey());
                 StorePurchase storePurchase = new StorePurchase();
                 storePurchase.transactionId = session.name();
                 storePurchase.inventoryList = inventoryServiceProvider.inventoryList(session.distributionId());

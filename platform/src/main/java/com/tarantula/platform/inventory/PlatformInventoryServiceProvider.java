@@ -4,9 +4,8 @@ import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceProvider;
-import com.tarantula.platform.GameCluster;
+
 import com.tarantula.platform.item.*;
 import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.tournament.TournamentPrize;
@@ -15,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class PlatformInventoryServiceProvider extends PlatformItemServiceProvider implements InventoryListener {
+public class PlatformInventoryServiceProvider extends PlatformItemServiceProvider implements Inventory.Listener {
 
     public static final String NAME = "inventory";
 
@@ -148,8 +147,8 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
 
 
     @Override
-    public void onInventory(UserInventory inventory, InventoryItem item) {
-        logger.warn("inventory added=>"+inventory.typeId);
+    public void onInventory(Inventory inventory, Inventory.Stock item) {
+        logger.warn("inventory added=>"+inventory.configurationTypeId());
         this.platformGameServiceProvider.gameServiceProvider().onInventory(inventory,item);
     }
 }

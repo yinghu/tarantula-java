@@ -184,37 +184,42 @@ public class GameConfigurationSetup implements ApplicationPreSetup {
         });
         //dataStore.deleteEdge(configurableObject.key(),VersionedConfigurableObject.LABEL);
     }
-
+    public Inventory createInventory(String category,String typeId){
+        return gameCluster.createInventory(category,typeId);
+    }
     public List<Inventory> inventoryList(long systemId){
-        DataStore ids = onDataStore(PlatformInventoryServiceProvider.NAME);
+        DataStore ids = onDataStore(Inventory.DataStore);
         InventoryQuery query = new InventoryQuery(systemId);
         List<Inventory> inventoryList = new ArrayList<>();
         ids.list(query).forEach(t->{
             t.dataStore(ids);
             t.list();
+            t.resetListener(gameCluster);
             inventoryList.add(t);
         });
         return inventoryList;
     }
 
     public Inventory inventory(long systemId,String typeId){
-        DataStore ids = onDataStore(PlatformInventoryServiceProvider.NAME);
+        DataStore ids = onDataStore(Inventory.DataStore);
         InventoryQuery query = new InventoryQuery(systemId,typeId);
-        List<Inventory> inventoryList = new ArrayList<>();
+        List<UserInventory> inventoryList = new ArrayList<>();
         ids.list(query).forEach(t->{
             t.dataStore(ids);
             t.list();
+            t.resetListener(gameCluster);
             inventoryList.add(t);
         });
         return inventoryList.isEmpty()?null:inventoryList.get(0);
     }
     public Inventory inventory(long inventoryId){
-        DataStore ids = onDataStore(PlatformInventoryServiceProvider.NAME);
+        DataStore ids = onDataStore(Inventory.DataStore);
         UserInventory inventory = new UserInventory();
         inventory.distributionId(inventoryId);
         if(!ids.load(inventory)) return null;
         inventory.dataStore(ids);
         inventory.list();
+        inventory.resetListener(gameCluster);
         return inventory;
     }
 

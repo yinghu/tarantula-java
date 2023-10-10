@@ -32,11 +32,14 @@ public interface ApplicationPreSetup extends Transaction.DataStoreContext{
 
     void setup(ServiceContext serviceContext);
 
+    //
+    //
+    Inventory createInventory(String category,String typeId);
     List<Inventory> inventoryList(long systemId);
-
     Inventory inventory(long systemId,String typeId);
     Inventory inventory(long inventoryId);
     Configurable load(Descriptor application,long configurableId);
+
 
     interface Listener{
         default <T extends Configurable> void onUpdated(Descriptor application,T t){};

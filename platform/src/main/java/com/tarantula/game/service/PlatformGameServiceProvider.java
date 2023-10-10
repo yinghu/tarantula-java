@@ -130,6 +130,7 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
         });
         gameServiceProvider.setup(new PlatformGameContext(serviceContext,this,JDKLogger.getLogger(Earth8GameServiceProvider.class)));
         serviceContext.recoverableRegistry(new Earth8PortableRegistry<>());
+        gameCluster.addListener(gameServiceProvider);
         logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionId()+"]");
     }
     @Override

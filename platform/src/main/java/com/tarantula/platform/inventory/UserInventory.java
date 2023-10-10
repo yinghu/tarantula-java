@@ -2,9 +2,6 @@ package com.tarantula.platform.inventory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.icodesoftware.Balance;
-import com.icodesoftware.Configurable;
-import com.icodesoftware.Countable;
 import com.icodesoftware.Inventory;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.item.ItemPortableRegistry;
@@ -24,6 +21,7 @@ public class UserInventory extends RecoverableObject implements Inventory {
     public String typeId;
     public String type;
 
+    private Listener listener;
 
     public UserInventory(){
         this.onEdge = true;
@@ -40,8 +38,15 @@ public class UserInventory extends RecoverableObject implements Inventory {
         this.typeId = typeId;
         this.rechargeable = rechargeable;
     }
+    public UserInventory(String category, String typeId, boolean rechargeable,Listener listener){
+        this();
+        this.type = category;
+        this.typeId = typeId;
+        this.rechargeable = rechargeable;
+        this.listener = listener;
+    }
 
-    public void redeem(ApplicationRedeemer commodity,InventoryListener inventoryListener){
+    public void redeem(ApplicationRedeemer commodity,Inventory.Listener inventoryListener){
         InventoryItem inventoryItem = new InventoryItem(commodity);
         inventoryItem.ownerKey(this.key());
         dataStore.create(inventoryItem);
@@ -51,6 +56,18 @@ public class UserInventory extends RecoverableObject implements Inventory {
         count++;
         dataStore.update(this);
         inventoryListener.onInventory(this,inventoryItem);
+    }
+
+    public void redeem(ApplicationRedeemer commodity){
+        InventoryItem inventoryItem = new InventoryItem(commodity);
+        inventoryItem.ownerKey(this.key());
+        dataStore.create(inventoryItem);
+        if(this.rechargeable){
+            balance += commodity.amount();
+        }
+        count++;
+        dataStore.update(this);
+        listener.onInventory(this,inventoryItem);
     }
 
     public void list(){
@@ -136,5 +153,9 @@ public class UserInventory extends RecoverableObject implements Inventory {
         List<Stock> ilist = new ArrayList<>();
         itemList.forEach(item->ilist.add(item));
         return ilist;
+    }
+
+    public void resetListener(Listener listener){
+        this.listener = listener;
     }
 }

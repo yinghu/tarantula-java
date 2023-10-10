@@ -4,7 +4,7 @@ import com.icodesoftware.Inventory;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.Session;
 
-public interface GameServiceProvider extends UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener{
+public interface GameServiceProvider extends UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener,Inventory.Listener{
     void setup(GameContext gameContext);
 
     void onJoined(Session session);
@@ -13,6 +13,5 @@ public interface GameServiceProvider extends UDPEndpointServiceProvider.RequestL
     void endGame(Session session,byte[] payload) throws Exception;
     <T extends OnAccess> void onGameEvent(T event);
 
-    void onInventory(Inventory inventory, Inventory.Stock stock);
     void onLeft(Session session);
 }
