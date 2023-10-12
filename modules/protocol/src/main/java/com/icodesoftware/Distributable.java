@@ -8,6 +8,7 @@ public interface Distributable {
 
     int INTEGRATION_SCOPE = 2; //ACCESS REPLICATION SCOPE
     int INDEX_SCOPE = 3; //KEY INDEX REPLICATION SCOPE
+    int LOG_SCOPE = 4; //TRANSACTION LOG SCOPE
 
     String bucket();
     void bucket(String bucket);

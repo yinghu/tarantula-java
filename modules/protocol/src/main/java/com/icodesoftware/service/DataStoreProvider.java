@@ -30,6 +30,8 @@ public interface DataStoreProvider extends ServiceProvider {
     //create partitioned data scope data store
     DataStore createLocalDataStore(String name);
 
+    DataStore createLogDataStore(String name);
+
     List<String> list();
 
     List<String> list(int scope);

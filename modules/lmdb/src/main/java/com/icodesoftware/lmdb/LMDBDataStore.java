@@ -99,7 +99,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             key.rewind();
             value.rewind();
             t.revision(Long.MIN_VALUE);
-            lmdbDataStoreProvider.onDistributing(metadata,key,value);
+            lmdbDataStoreProvider.onDistributing(metadata,key,value,ptxn.getId());
             return true;
         }finally {
             txn.close();
@@ -131,7 +131,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
                     t.revision(header.revision());
                     key.rewind();
                     update.rewind();
-                    lmdbDataStoreProvider.onDistributing(metadata,key,update);
+                    lmdbDataStoreProvider.onDistributing(metadata,key,update,ptxn.getId());
                     updated = true;
                 }
             }
@@ -160,7 +160,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             xtxn.commit();
             key.rewind();
             value.rewind();
-            lmdbDataStoreProvider.onDistributing(metadata,key,value);
+            lmdbDataStoreProvider.onDistributing(metadata,key,value,ptxn.getId());
         }
         finally {
             xtxn.close();
@@ -210,7 +210,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             t.revision(Long.MIN_VALUE);
             key.rewind();
             value.rewind();
-            lmdbDataStoreProvider.onDistributing(metadata,key,value);
+            lmdbDataStoreProvider.onDistributing(metadata,key,value,ptxn.getId());
             return true;
         }
         finally {
@@ -276,7 +276,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             return false;
         }
         key.flip();
-        if(!lmdbDataStoreProvider.onDeleting(metadata,key, cache.value)){
+        if(!lmdbDataStoreProvider.onDeleting(metadata,key, cache.value,ptxn.getId())){
             cache.reset();
             return false;
         }
@@ -553,7 +553,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             txn.commit();
             key.rewind();
             value.rewind();
-            lmdbDataStoreProvider.onDistributing(localEdgeDataStore.metadata,key,value);
+            lmdbDataStoreProvider.onDistributing(localEdgeDataStore.metadata,key,value,ptxn.getId());
             return true;
         }finally {
             cache.reset();
@@ -573,7 +573,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             txn.commit();
             key.rewind();
             value.rewind();
-            lmdbDataStoreProvider.onDeleting(localEdgeDataStore.metadata,key,value);
+            lmdbDataStoreProvider.onDeleting(localEdgeDataStore.metadata,key,value,ptxn.getId());
             return true;
         }finally {
             txn.close();
@@ -591,7 +591,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             if(!localEdgeDataStore.dbi.delete(txn,key.flip())) return false;
             txn.commit();
             key.rewind();
-            this.lmdbDataStoreProvider.onDeleting(localEdgeDataStore.metadata,key,null);
+            this.lmdbDataStoreProvider.onDeleting(localEdgeDataStore.metadata,key,null,ptxn.getId());
             return true;
         } finally {
             cache.reset();

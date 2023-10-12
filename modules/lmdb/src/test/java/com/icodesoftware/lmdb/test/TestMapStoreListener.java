@@ -64,9 +64,11 @@ public class TestMapStoreListener implements MapStoreListener {
         );
         return suc[0]>0;
     }
+    public void onLogging(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
 
+    }
     @Override
-    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
+    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
         DataStore dataStore = provider.createKeyIndexDataStore(KeyIndexService.STORE_NAME + metadata.source());
         if(metadata.label()==null){
             dataStore.backup().set((k,v)->{
@@ -95,7 +97,7 @@ public class TestMapStoreListener implements MapStoreListener {
 
 
     @Override
-    public boolean onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
+    public boolean onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
         DataStore dataStore = provider.createKeyIndexDataStore(KeyIndexService.STORE_NAME +  metadata.source());
         if(metadata.label()==null){
             boolean del = dataStore.backup().unset((k,v)->{

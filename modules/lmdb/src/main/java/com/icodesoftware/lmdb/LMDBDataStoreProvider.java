@@ -33,13 +33,15 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private String dataPath ="target/lmdb/data";
     private String integrationPath="target/lmdb/integration";
     private String indexPath = "target/lmdb/index";
-
     private String localPath = "target/lmdb/local";
+
+    private String logPath = "target/lmdb/log";
+
     public Env<ByteBuffer> data;
     private Env<ByteBuffer> integration;
     private Env<ByteBuffer> index;
     private Env<ByteBuffer> local;
-
+    private Env<ByteBuffer> log;
     private long storeSize = 1_048_576L; // 1MB = 1,048,576 (1024*1024)
     private int maxDatabaseNumber = 1024;
     private int maxReaders = 100;
@@ -68,10 +70,12 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         String _integrationPath = ((JsonElement)properties.get("integrationPath")).getAsString();
         String _indexPath = ((JsonElement)properties.get("indexPath")).getAsString();
         String _localPath = ((JsonElement)properties.get("localPath")).getAsString();
+        String _logPath = ((JsonElement)properties.get("logPath")).getAsString();
         this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_dataPath;
         this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+_integrationPath;
         this.indexPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_indexPath;
         this.localPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_localPath;
+        this.logPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_logPath;
     }
 
     @Override
@@ -117,6 +121,9 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     public DataStore createLocalDataStore(String name){
         return storeMap.computeIfAbsent(name,k->createDataStore(Distributable.LOCAL_SCOPE,name,null));
     }
+    public DataStore createLogDataStore(String name){
+        return storeMap.computeIfAbsent(name,k->createDataStore(Distributable.LOG_SCOPE,name,null));
+    }
     @Override
     public List<String> list() {
         ArrayList<String> dlist = new ArrayList<>();
@@ -149,6 +156,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(scope==Distributable.INTEGRATION_SCOPE) return integration.txnWrite();
         if(scope==Distributable.INDEX_SCOPE) return index.txnWrite();
         if(scope==Distributable.LOCAL_SCOPE) return local.txnWrite();
+        if(scope==Distributable.LOG_SCOPE) return log.txnWrite();
         throw new RuntimeException("Scope ["+scope+"] not supported");
     }
 
@@ -168,6 +176,10 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(scope==Distributable.LOCAL_SCOPE){
             Dbi<ByteBuffer> dbi = txn==null? local.openDbi(name,DbiFlags.MDB_CREATE) : local.openDbi(txn,name.getBytes(),null,DbiFlags.MDB_CREATE);
             return txn==null? new CachedLMDBDataStore(scope,name,dbi,local,this) : new LMDBDataStore(scope,name,dbi,local,this,txn);
+        }
+        if(scope==Distributable.LOG_SCOPE){
+            Dbi<ByteBuffer> dbi = txn==null? log.openDbi(name,DbiFlags.MDB_CREATE) : log.openDbi(txn,name.getBytes(),null,DbiFlags.MDB_CREATE);
+            return txn==null? new CachedLMDBDataStore(scope,name,dbi,log,this) : new LMDBDataStore(scope,name,dbi,log,this,txn);
         }
         throw new RuntimeException("Scope ["+scope+"] not supported");
     }
@@ -192,6 +204,11 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
             Dbi<ByteBuffer> dbi = txn==null? local.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : local.openDbi(txn,edgeName.getBytes(),null,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
             return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
         }
+        if(scope==Distributable.LOG_SCOPE){
+            String edgeName = source+"#"+label;
+            Dbi<ByteBuffer> dbi = txn==null? log.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : log.openDbi(txn,edgeName.getBytes(),null,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
+            return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
+        }
         throw new RuntimeException("Scope ["+scope+"] not supported");
     }
 
@@ -207,6 +224,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         integration = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.integrationPath).toFile());
         index = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.indexPath).toFile());
         local = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(localPath).toFile());
+        log = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(logPath).toFile());
         for(int i=0;i<PENDING_BUFFER_SIZE;i++){
             pendingQueue.offer(new BufferCache(KEY_SIZE,VALUE_SIZE,pendingQueue));
         }
@@ -237,6 +255,13 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
             if(!dname.contains("#")){
                 logger.warn("Local DB : "+dname);
                 createLocalDataStore(dname);
+            }
+        });
+        log.getDbiNames().forEach(n->{
+            String dname = new String(n);
+            if(!dname.contains("#")){
+                logger.warn("Log DB : "+dname);
+                createLogDataStore(dname);
             }
         });
         logger.warn("LMDB Provider started with store size ["+storeSize+"]["+pendingQueue.size()+"]");
@@ -284,18 +309,17 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         pendingQueue.clear();
     }
 
-
-    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
+    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
         if(metadata.scope()==Distributable.INTEGRATION_SCOPE && integrationMapStoreListener!=null){
-            integrationMapStoreListener.onDistributing(metadata,key,value);
+            integrationMapStoreListener.onDistributing(metadata,key,value,transactionId);
             return;
         }
         if(metadata.scope()==Distributable.DATA_SCOPE && dataMapStoreListener!=null){
-            dataMapStoreListener.onDistributing(metadata,key,value);
+            dataMapStoreListener.onDistributing(metadata,key,value,transactionId);
             return;
         }
         if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
-            keyIndexMapStoreListener.onDistributing(metadata,key,value);
+            keyIndexMapStoreListener.onDistributing(metadata,key,value,transactionId);
         }
     }
 
@@ -315,16 +339,16 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
 
     @Override
-    public boolean onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
+    public boolean onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
         if(metadata.scope()==Distributable.INTEGRATION_SCOPE && integrationMapStoreListener!=null){
-            return integrationMapStoreListener.onDeleting(metadata,key,value);
+            return integrationMapStoreListener.onDeleting(metadata,key,value,transactionId);
         }
         if(metadata.scope()==Distributable.DATA_SCOPE && dataMapStoreListener!=null){
-             return dataMapStoreListener.onDeleting(metadata,key,value);
+             return dataMapStoreListener.onDeleting(metadata,key,value,transactionId);
 
         }
         if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
-            return keyIndexMapStoreListener.onDeleting(metadata,key,value);
+            return keyIndexMapStoreListener.onDeleting(metadata,key,value,transactionId);
         }
         return true;
     }

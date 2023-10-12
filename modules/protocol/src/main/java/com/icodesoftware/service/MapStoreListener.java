@@ -8,10 +8,11 @@ public interface MapStoreListener extends ServiceProvider {
     //<T extends Recoverable> void onBackingUp(Metadata metadata,String key,T t);
 
     //dispatch cluster operation
-    void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value);
+    void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId);
     //recover cluster operation
     boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value);
 
-    boolean onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value);
+    boolean onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId);
+
 
 }

@@ -42,7 +42,7 @@ public class TestMapStoreListener implements MapStoreListener {
                 }
                 return true;
             });
-            System.out.println("HD : "+header.factoryId()+" : "+header.classId()+" : "+header.revision()+" : "+suc+" : "+metadata.source());
+            //System.out.println("HD : "+header.factoryId()+" : "+header.classId()+" : "+header.revision()+" : "+suc+" : "+metadata.source());
             return;
         }
         boolean suc = dataStore.backup().setEdge(metadata.label(),(k,v)->{
@@ -54,7 +54,7 @@ public class TestMapStoreListener implements MapStoreListener {
             }
             return true;
         });
-        System.out.println("EG : "+metadata.label()+" : "+suc+" : "+metadata.source());
+        //System.out.println("EG : "+metadata.label()+" : "+suc+" : "+metadata.source());
     }
 
 
@@ -63,6 +63,7 @@ public class TestMapStoreListener implements MapStoreListener {
     }
     @Override
     public boolean onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
-        return true;
+         System.out.println("DEL : "+metadata.source()+" : "+metadata.label());
+         return true;
     }
 }
