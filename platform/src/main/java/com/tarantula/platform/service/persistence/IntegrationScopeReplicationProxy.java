@@ -17,7 +17,7 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
     }
 
 
-    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
+    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
         if(asyncDistributing){
             return;
         }

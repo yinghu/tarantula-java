@@ -143,7 +143,7 @@ public class GameClusterTest extends DataStoreHook{
         });
         t2.close();
         Assert.assertEquals(ex.list(app,new VersionedConfigurableObjectQuery(g.distributionId())).size(),2);
-        System.out.println(g.application());
+        //System.out.println(g.application());
         Transaction t3 = load.transaction();
         t3.execute(ctx->{
             ApplicationPreSetup preSetup = (ApplicationPreSetup)ctx;
@@ -156,6 +156,9 @@ public class GameClusterTest extends DataStoreHook{
         Assert.assertEquals(ex.list(app,new ConfigurableObjectQuery(app.key(),"Gem")).size(),5);
         Assert.assertEquals(ex.list(app,new ConfigurableObjectQuery(app.key(),"HardCurrency")).size(),5);
         Assert.assertEquals(ex.list(app,new VersionedConfigurableObjectQuery(g.distributionId())).size(),0);
+
+        DataStore log = dataStoreProvider.createLogDataStore("log_beam_service");
+        Assert.assertEquals(log.list(new ConfigurableObjectQuery(app.key(),"commodity")).size(),30);
     }
 
 }

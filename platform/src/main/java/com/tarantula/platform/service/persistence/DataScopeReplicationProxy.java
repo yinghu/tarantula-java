@@ -16,7 +16,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
         super(Distributable.DATA_SCOPE);
     }
 
-    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
+    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
         if(asyncDistributing){
             return;
         }
@@ -78,7 +78,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
         }
     }
     @Override
-    public boolean onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
+    public boolean onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
         logger.warn("DB Delete : "+metadata.source()+" : "+metadata.label());
         RecoverService recoverService = this.serviceContext.clusterProvider().recoverService();
         if(metadata.label()==null) {

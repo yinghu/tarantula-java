@@ -28,13 +28,6 @@ public class ReplicateOnDataScopeOperation extends Operation {
         this.key = key;
         this.value = value;
     }
-    public ReplicateOnDataScopeOperation(String nodeName,String source, byte[] key, byte[] value) {
-        this.nodeName = nodeName;
-        this.source = source;
-        this.key = key;
-        this.value = value;
-    }
-
 
     @Override
     public void run() throws Exception {
