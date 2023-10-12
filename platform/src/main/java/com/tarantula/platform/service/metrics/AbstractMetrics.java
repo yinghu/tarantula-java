@@ -4,7 +4,6 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.TimeUtil;
-import com.mysql.cj.CacheAdapter;
 import com.tarantula.platform.statistics.StatisticsUtil;
 import com.tarantula.platform.statistics.StatsDelta;
 

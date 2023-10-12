@@ -55,6 +55,7 @@ public class TestMapStoreListener implements MapStoreListener {
             return true;
         });
         //System.out.println("EG : "+metadata.label()+" : "+suc+" : "+metadata.source());
+
     }
 
 

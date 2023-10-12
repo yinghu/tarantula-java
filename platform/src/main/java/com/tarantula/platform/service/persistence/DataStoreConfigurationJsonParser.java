@@ -73,52 +73,6 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
                 properties.put(v.getKey(),v.getValue());
             });
         });
-
-        Map<String,Object> _intrgration = new HashMap<>();
-        JsonObject _iconfig = config.get("integration-backup-router").getAsJsonObject();
-        _intrgration.put("enabled",node.runAsMirror()? false : node.backupEnabled());
-        JsonArray ilist = _iconfig.get("backup-provider-list").getAsJsonArray();
-        Configuration exconfig = this.serviceContext.configuration("tarantula-backup-router");
-        for(JsonElement je : ilist) {
-            JsonObject p = je.getAsJsonObject();
-            if(p.get("enabled").getAsBoolean()){
-                String _n = p.get("name").getAsString();
-                if(exconfig==null) break;
-                Object ref = exconfig.property(_n);
-                if(ref==null){
-                    _intrgration.put("enabled",false);
-                }
-                else{
-                    JsonArray pts = ((JsonElement)ref).getAsJsonArray();
-                    p.add("properties",pts);
-                }
-                _intrgration.put("backup-provider",p);
-                break;
-            }
-        }
-        Map<String,Object> _data = new HashMap<>();
-        JsonObject _dconfig = config.get("data-backup-router").getAsJsonObject();
-        _data.put("enabled",node.runAsMirror()? false : node.backupEnabled());
-        JsonArray dlist = _dconfig.get("backup-provider-list").getAsJsonArray();
-        for(JsonElement je : dlist) {
-            JsonObject p = je.getAsJsonObject();
-            if(p.get("enabled").getAsBoolean()){
-                String _n = p.get("name").getAsString();
-                if(exconfig==null) break;
-                Object ref = exconfig.property(_n);
-                if(ref==null){
-                    _data.put("enabled",false);
-                }
-                else{
-                    JsonArray pts = ((JsonElement)ref).getAsJsonArray();
-                    p.add("properties",pts);
-                }
-                _data.put("backup-provider",p);
-                break;
-            }
-        }
-        properties.put("integrationRouter",_intrgration);
-        properties.put("dataRouter",_data);
         properties.put("serviceContext",this.serviceContext);
         dataStoreProvider.configure(properties);
         onStart.on(dataStoreProvider);
