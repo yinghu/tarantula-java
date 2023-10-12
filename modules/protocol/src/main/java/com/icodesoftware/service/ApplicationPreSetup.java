@@ -9,16 +9,18 @@ public interface ApplicationPreSetup extends Transaction.DataStoreContext{
     <T extends Configurable> boolean save(Descriptor application, T t);
 
     <T extends Configurable> boolean edge(Descriptor application, T t,String label);
+    <T extends Configurable> boolean deleteEdge(Descriptor application, T t,String label);
     <T extends Configurable> boolean load(Descriptor application,T t);
     <T extends Configurable> boolean delete(Descriptor application,T t);
     <T extends Configurable> List<T> list(Descriptor application, RecoverableFactory<T> recoverableFactory);
 
     <T extends Configurable> boolean save(ApplicationSchema gameCluster, T t);
 
-    <T extends Configurable> boolean edge(ApplicationSchema gameCluster, T t,String label);
-
+    <T extends Configurable> boolean edge(ApplicationSchema gameCluster, T t, String label);
+    <T extends Configurable> boolean deleteEdge(ApplicationSchema gameCluster, T t, String label);
     <T extends Configurable> boolean load(ApplicationSchema gameCluster, T t);
     <T extends Configurable> boolean delete(ApplicationSchema gameCluster, T t);
+
     <T extends Configurable> List<T> list(ApplicationSchema gameCluster, RecoverableFactory<T> recoverableFactory);
 
     //{game}_service data store

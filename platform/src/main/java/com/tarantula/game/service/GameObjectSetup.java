@@ -66,6 +66,11 @@ public class GameObjectSetup implements ApplicationPreSetup {
         return false;
     }
 
+    @Override
+    public <T extends Configurable> boolean deleteEdge(Descriptor application, T t, String label) {
+        return false;
+    }
+
     public <T extends Configurable> boolean load(Descriptor application, T t){
         DataStore dataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,serviceDataStore(application));
         t.dataStore(dataStore);
@@ -93,7 +98,7 @@ public class GameObjectSetup implements ApplicationPreSetup {
         ConfigurableObject ret = new ConfigurableObject();
         ret.distributionId(configurableId);
         if(!load(application,ret)) return null;
-        ret.configurableSetting(((GameCluster)gameCluster).configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
+        ret.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
         return ret.setup();
         //return ret;
     }
@@ -128,7 +133,11 @@ public class GameObjectSetup implements ApplicationPreSetup {
         DataStore dataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,DS_CONFIG));
         return dataStore.createEdge(t,label);
     }
-
+    @Override
+    public <T extends Configurable> boolean deleteEdge(ApplicationSchema gameCluster, T t, String label) {
+        DataStore dataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,DS_CONFIG));
+        return dataStore.deleteEdge(t.ownerKey(),t.key(),label);
+    }
     public <T extends Configurable> boolean load(ApplicationSchema gameCluster, T t){
         DataStore dataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,DS_CONFIG));
         t.dataStore(dataStore);

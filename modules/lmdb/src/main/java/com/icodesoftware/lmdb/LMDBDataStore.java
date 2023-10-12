@@ -490,8 +490,9 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             Txn<ByteBuffer> rtxn = env.txn(ptxn);
             key.rewind();
             pendingRemoves.forEach(r->{
-                localEdgeDataStore.dbi.delete(rtxn,r.key.rewind(),key);
-                rtxn.commit();
+                if(localEdgeDataStore.dbi.delete(rtxn,r.key.rewind(),key)){
+                    rtxn.commit();
+                }
                 rtxn.close();
             });
         });

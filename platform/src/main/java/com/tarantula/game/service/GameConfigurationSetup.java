@@ -62,7 +62,14 @@ public class GameConfigurationSetup implements ApplicationPreSetup {
 
     @Override
     public <T extends Configurable> boolean edge(Descriptor application, T t, String label) {
-        return false;
+        DataStore dataStore = parentContext.onDataStore(serviceDataStore(application));
+        return dataStore.createEdge(t,label);
+    }
+
+    @Override
+    public <T extends Configurable> boolean deleteEdge(Descriptor application, T t, String label) {
+        DataStore dataStore = parentContext.onDataStore(serviceDataStore(application));
+        return dataStore.deleteEdge(t.ownerKey(),t.key(),label);
     }
 
     public <T extends Configurable> boolean load(Descriptor application, T t){
@@ -132,7 +139,11 @@ public class GameConfigurationSetup implements ApplicationPreSetup {
         DataStore dataStore = parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));
         return dataStore.createEdge(t,label);
     }
-
+    @Override
+    public <T extends Configurable> boolean deleteEdge(ApplicationSchema gameCluster, T t, String label) {
+        DataStore dataStore = parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));
+        return dataStore.deleteEdge(t.ownerKey(),t.key(),label);
+    }
     public <T extends Configurable> boolean load(ApplicationSchema gameCluster, T t){
         DataStore dataStore = parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));
         t.dataStore(dataStore);

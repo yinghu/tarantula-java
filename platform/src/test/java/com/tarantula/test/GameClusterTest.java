@@ -139,18 +139,36 @@ public class GameClusterTest extends DataStoreHook{
         Transaction t2 = load.transaction();
         t2.execute(ctx->{
             ApplicationPreSetup preSetup = (ApplicationPreSetup)ctx;
-            return preSetup.save(app,g);
+            if(!preSetup.save(app,g)) return false;
+            g.ownerKey(app.key());
+            g.onEdge(true);
+            return preSetup.edge(app,g,"test");
         });
         t2.close();
         Assert.assertEquals(ex.list(app,new VersionedConfigurableObjectQuery(g.distributionId())).size(),2);
+        Assert.assertEquals(ex.list(app,new ConfigurableObjectQuery(app.key(),"test")).size(),1);
         //System.out.println(g.application());
         Transaction t3 = load.transaction();
         t3.execute(ctx->{
             ApplicationPreSetup preSetup = (ApplicationPreSetup)ctx;
-            return preSetup.delete(app,g);
+            g.ownerKey(app.key());
+            return preSetup.deleteEdge(app,g,"test");
+            //return preSetup.delete(app,g);
         });
         t3.close();
+
         //after delete
+        Assert.assertEquals(ex.list(app,new ConfigurableObjectQuery(app.key(),"test")).size(),0);
+
+        Transaction t4 = load.transaction();
+        t4.execute(ctx->{
+            ApplicationPreSetup preSetup = (ApplicationPreSetup)ctx;
+            g.ownerKey(app.key());
+            //return preSetup.deleteEdge(app,g,"test");
+            return preSetup.delete(app,g);
+        });
+        t4.close();
+
         Assert.assertEquals(ex.list(app,new ConfigurableCategoryQuery(app.key(),"G500")).size(),0);
         Assert.assertEquals(ex.list(app,new ConfigurableObjectQuery(app.key(),"commodity")).size(),29);
         Assert.assertEquals(ex.list(app,new ConfigurableObjectQuery(app.key(),"Gem")).size(),5);
@@ -158,7 +176,8 @@ public class GameClusterTest extends DataStoreHook{
         Assert.assertEquals(ex.list(app,new VersionedConfigurableObjectQuery(g.distributionId())).size(),0);
 
         DataStore log = dataStoreProvider.createLogDataStore("log_beam_service");
-        Assert.assertEquals(log.list(new ConfigurableObjectQuery(app.key(),"commodity")).size(),30);
+        Assert.assertEquals(log.list(new ConfigurableObjectQuery(app.key(),"commodity")).size(),29);
+
     }
 
 }
