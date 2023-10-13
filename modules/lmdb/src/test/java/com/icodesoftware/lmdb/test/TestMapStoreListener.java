@@ -94,7 +94,15 @@ public class TestMapStoreListener implements MapStoreListener {
 
     }
 
+    @Override
+    public void onCommit(long transactionId) {
 
+    }
+
+    @Override
+    public void onAbort(long transactionId) {
+
+    }
 
     @Override
     public boolean onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {

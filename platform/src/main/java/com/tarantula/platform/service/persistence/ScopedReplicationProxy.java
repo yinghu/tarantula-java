@@ -36,7 +36,15 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer){
         return false;
     }
+    @Override
+    public void onCommit(long transactionId) {
 
+    }
+
+    @Override
+    public void onAbort(long transactionId) {
+
+    }
     @Override
     public boolean onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
         return false;

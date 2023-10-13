@@ -29,20 +29,21 @@ public class TestMapStoreListener implements MapStoreListener {
 
     }
 
+    @Override
+    public void onCommit(long transactionId) {
 
+    }
+
+    @Override
+    public void onAbort(long transactionId) {
+
+    }
 
     @Override
     public boolean onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
         return false;
     }
-    public void assignKey(Recoverable.DataBuffer dataBuffer){
-        dataBuffer.writeLong(snowflakeIdGenerator.snowflakeId());
-        //dataBuffer.writeUTF8(UUID.randomUUID().toString());
-    }
 
-    public long distributionId(){
-        return snowflakeIdGenerator.snowflakeId();
-    }
     @Override
     public String name() {
         return null;

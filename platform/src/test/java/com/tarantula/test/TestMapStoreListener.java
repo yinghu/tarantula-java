@@ -70,7 +70,15 @@ public class TestMapStoreListener implements MapStoreListener {
         System.out.println("EG : "+metadata.label()+" : "+suc+" : "+metadata.source());
 
     }
+    @Override
+    public void onCommit(long transactionId) {
+        System.out.println("Commit : "+transactionId);
+    }
 
+    @Override
+    public void onAbort(long transactionId) {
+
+    }
 
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer bufferStream){
         return false;

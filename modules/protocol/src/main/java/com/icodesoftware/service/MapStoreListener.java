@@ -14,5 +14,7 @@ public interface MapStoreListener extends ServiceProvider {
 
     boolean onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId);
 
+    void onCommit(long transactionId);
+    void onAbort(long transactionId);
 
 }

@@ -11,6 +11,8 @@ import com.tarantula.platform.service.AccessKey;
 import com.tarantula.platform.service.KeyIndexTrack;
 import com.tarantula.platform.service.PresenceKey;
 import com.tarantula.platform.service.ServiceEventLog;
+import com.tarantula.platform.service.persistence.EdgeOperation;
+import com.tarantula.platform.service.persistence.NodeOperation;
 
 
 public class PortableRegistry<T extends Recoverable> extends AbstractRecoverableListener {
@@ -19,7 +21,9 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
 
     public static final int PROPERTY_CID = 3;
 
-   public static final int PARTITION_STATE_OID = 6;
+    public static final int NODE_DATA_CID = 4;
+    public static final int EDGE_DATA_CID = 5;
+    public static final int PARTITION_STATE_OID = 6;
     public static final int APPLICATION_CONFIGURATION_CID = 11; //DEPLOY OBJECT
     public static final int ON_LOBBY_CID = 12;
 
@@ -71,6 +75,12 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
 		switch(cid){
             case PROPERTY_CID:
                 _ins = new DistributedProperty();
+                break;
+            case NODE_DATA_CID:
+                _ins = new NodeOperation();
+                break;
+            case EDGE_DATA_CID:
+                _ins = new EdgeOperation();
                 break;
             case ACCESS_INDEX_CID:
                 _ins = new AccessIndexTrack();

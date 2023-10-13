@@ -353,6 +353,16 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         return true;
     }
 
+    @Override
+    public void onCommit(long transactionId) {
+        this.dataMapStoreListener.onCommit(transactionId);
+    }
+
+    @Override
+    public void onAbort(long transactionId) {
+        this.dataMapStoreListener.onAbort(transactionId);
+    }
+
     public void assign(Recoverable.DataBuffer dataBuffer){
         this.distributionIdGenerator.assign(dataBuffer);
     }

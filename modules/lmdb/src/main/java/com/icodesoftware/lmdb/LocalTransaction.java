@@ -25,15 +25,18 @@ public class LocalTransaction implements Transaction, Transaction.DataStoreConte
         try{
             if(!transactionContext.update(this.dataStoreContext)){
                 txn.abort();
+                this.dataStoreProvider.onAbort(txn.getId());
                 listener.afterAbort(null);
                 return false;
             }
             txn.commit();
+            this.dataStoreProvider.onCommit(txn.getId());
             listener.afterCommit();
             return true;
         }catch (Exception ex){
-            listener.afterAbort(ex);
             txn.abort();
+            this.dataStoreProvider.onAbort(txn.getId());
+            listener.afterAbort(ex);
             return false;
         }
         finally {
