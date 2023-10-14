@@ -30,12 +30,12 @@ public class TestMapStoreListener implements MapStoreListener {
     }
 
     @Override
-    public void onCommit(long transactionId) {
+    public void onCommit(int scope,long transactionId) {
 
     }
 
     @Override
-    public void onAbort(long transactionId) {
+    public void onAbort(int scope,long transactionId) {
 
     }
 

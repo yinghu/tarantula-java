@@ -22,20 +22,21 @@ public class LocalTransaction implements Transaction, Transaction.DataStoreConte
     @Override
     public boolean execute(TransactionContext transactionContext) {
         txn = dataStoreProvider.txn(scope);
+        long tid = txn.getId();
         try{
             if(!transactionContext.update(this.dataStoreContext)){
                 txn.abort();
-                this.dataStoreProvider.onAbort(txn.getId());
+                this.dataStoreProvider.onAbort(scope,tid);
                 listener.afterAbort(null);
                 return false;
             }
             txn.commit();
-            this.dataStoreProvider.onCommit(txn.getId());
+            this.dataStoreProvider.onCommit(scope,tid);
             listener.afterCommit();
             return true;
         }catch (Exception ex){
             txn.abort();
-            this.dataStoreProvider.onAbort(txn.getId());
+            this.dataStoreProvider.onAbort(scope,tid);
             listener.afterAbort(ex);
             return false;
         }

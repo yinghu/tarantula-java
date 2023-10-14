@@ -354,13 +354,33 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     }
 
     @Override
-    public void onCommit(long transactionId) {
-        this.dataMapStoreListener.onCommit(transactionId);
+    public void onCommit(int scope,long transactionId) {
+        if(scope==Distributable.DATA_SCOPE && this.dataMapStoreListener!=null){
+            this.dataMapStoreListener.onCommit(scope,transactionId);
+            return;
+        }
+        if(scope==Distributable.INTEGRATION_SCOPE && this.integrationMapStoreListener!=null){
+            this.integrationMapStoreListener.onCommit(scope,transactionId);
+            return;
+        }
+        if(scope==Distributable.INDEX_SCOPE && this.keyIndexMapStoreListener!=null){
+            this.keyIndexMapStoreListener.onCommit(scope,transactionId);
+        }
     }
 
     @Override
-    public void onAbort(long transactionId) {
-        this.dataMapStoreListener.onAbort(transactionId);
+    public void onAbort(int scope,long transactionId) {
+        if(scope==Distributable.DATA_SCOPE && this.dataMapStoreListener!=null){
+            this.dataMapStoreListener.onAbort(scope,transactionId);
+            return;
+        }
+        if(scope==Distributable.INTEGRATION_SCOPE && this.integrationMapStoreListener!=null){
+            this.integrationMapStoreListener.onAbort(scope,transactionId);
+            return;
+        }
+        if(scope==Distributable.INDEX_SCOPE && this.keyIndexMapStoreListener!=null){
+            this.keyIndexMapStoreListener.onAbort(scope,transactionId);
+        }
     }
 
     public void assign(Recoverable.DataBuffer dataBuffer){
