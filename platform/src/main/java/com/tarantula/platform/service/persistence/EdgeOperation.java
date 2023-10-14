@@ -24,6 +24,6 @@ public class EdgeOperation extends RecoverableObject {
 
     @Override
     public int getClassId() {
-        return PortableRegistry.EDGE_DATA_CID;
+        return PortableRegistry.EDGE_OPERATION_CID;
     }
 }

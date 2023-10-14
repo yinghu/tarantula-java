@@ -41,6 +41,7 @@ public class TestMapStoreListener implements MapStoreListener {
                 }
                 return true;
             });
+            /**
             boolean CUS = dataStore.backup().setEdge("transaction",(k,v)->{
                 k.writeLong(transactionId);
                 key.rewind();
@@ -53,8 +54,8 @@ public class TestMapStoreListener implements MapStoreListener {
             dataStore.backup().forEachEdgeKey(new SnowflakeKey(transactionId),"transaction",(k,v)->{
                 ct[0]++;
                 return true;
-            });
-            System.out.println("HD : "+header.factoryId()+" : "+header.classId()+" : "+header.revision()+" : "+suc+" : "+metadata.source()+" : "+CUS+" : "+ct[0]);
+            });**/
+            //System.out.println("HD : "+header.factoryId()+" : "+header.classId()+" : "+header.revision()+" : "+suc+" : "+metadata.source()+" : "+CUS+" : "+ct[0]);
 
             return;
         }

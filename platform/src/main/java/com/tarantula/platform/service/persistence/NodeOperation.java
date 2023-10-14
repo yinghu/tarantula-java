@@ -22,7 +22,7 @@ public class NodeOperation extends RecoverableObject {
 
     @Override
     public int getClassId() {
-        return PortableRegistry.NODE_DATA_CID;
+        return PortableRegistry.NODE_OPERATION_CID;
     }
 
 }
