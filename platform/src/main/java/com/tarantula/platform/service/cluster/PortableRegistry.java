@@ -11,8 +11,7 @@ import com.tarantula.platform.service.AccessKey;
 import com.tarantula.platform.service.KeyIndexTrack;
 import com.tarantula.platform.service.PresenceKey;
 import com.tarantula.platform.service.ServiceEventLog;
-import com.tarantula.platform.service.persistence.EdgeOperation;
-import com.tarantula.platform.service.persistence.NodeOperation;
+import com.tarantula.platform.service.persistence.TransactionLog;
 
 
 public class PortableRegistry<T extends Recoverable> extends AbstractRecoverableListener {
@@ -21,9 +20,10 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
 
     public static final int PROPERTY_CID = 3;
 
-    public static final int NODE_OPERATION_CID = 4;
-    public static final int EDGE_OPERATION_CID = 5;
     public static final int PARTITION_STATE_OID = 6;
+
+    public static final int TRANSACTION_LOG_CID = 7;
+
     public static final int APPLICATION_CONFIGURATION_CID = 11; //DEPLOY OBJECT
     public static final int ON_LOBBY_CID = 12;
 
@@ -76,20 +76,14 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
             case PROPERTY_CID:
                 _ins = new DistributedProperty();
                 break;
-            case NODE_OPERATION_CID:
-                _ins = new NodeOperation();
+            case PARTITION_STATE_OID:
+                _ins = new PartitionState();
                 break;
-            case EDGE_OPERATION_CID:
-                _ins = new EdgeOperation();
-                break;
-            case ACCESS_INDEX_CID:
-                _ins = new AccessIndexTrack();
+            case TRANSACTION_LOG_CID:
+                _ins = new TransactionLog();
                 break;
             case APPLICATION_CONFIGURATION_CID:
                 _ins = new ApplicationConfiguration();
-                break;
-            case PARTITION_STATE_OID:
-                _ins = new PartitionState();
                 break;
             case ON_LOBBY_CID:
                 _ins = new OnLobbyTrack();
@@ -100,22 +94,27 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
             case MODULE_INDEX_CID:
                 _ins = new ModuleIndex();
                 break;
-            case ON_VIEW_OID:
-                _ins = new OnViewTrack();
-                break;
 
             case ACCESS_KEY:
                 _ins = new AccessKey();
                 break;
-
+            case PRESENCE_KEY_CID:
+                _ins = new PresenceKey();
+                break;
             case ON_SESSION_CID:
                 _ins = new OnSessionTrack();
                 break;
             case INDEX_SET_CID:
                 _ins = new IndexSet();
                 break;
+            case ON_VIEW_OID:
+                _ins = new OnViewTrack();
+                break;
             case PROPERTY_INDEX_SET_CID:
                 _ins = new PropertyIndexSet();
+                break;
+            case SERVICE_EVENT_LOG_CID:
+                _ins = new ServiceEventLog();
                 break;
             case SINGLETON_FORWARD_CID:
                 _ins = new SessionForward();
@@ -130,14 +129,11 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
             case GAME_CLUSTER_CID:
                 _ins = new GameCluster();
                 break;
+            case ACCESS_INDEX_CID:
+                _ins = new AccessIndexTrack();
+                break;
             case CLIENT_CONNECTION_CID:
                 _ins = new ClientConnection();
-                break;
-            case PRESENCE_KEY_CID:
-                _ins = new PresenceKey();
-                break;
-            case SERVICE_EVENT_LOG_CID:
-                _ins = new ServiceEventLog();
                 break;
             case GAME_ENTRY_CID:
                 _ins = new GameEntry();

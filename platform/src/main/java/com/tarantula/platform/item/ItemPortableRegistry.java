@@ -8,8 +8,6 @@ import com.tarantula.platform.inventory.UserInventory;
 import com.tarantula.platform.inventory.InventoryItem;
 import com.tarantula.platform.store.Shop;
 import com.tarantula.platform.store.ShoppingItem;
-import com.tarantula.platform.store.TransactionLog;
-
 
 public class ItemPortableRegistry<T extends Recoverable> extends AbstractRecoverableListener {
 
@@ -30,8 +28,6 @@ public class ItemPortableRegistry<T extends Recoverable> extends AbstractRecover
     public static final int CATEGORY_ITEM_CID = 10;
 
     public static final int SHOPPING_ITEM_CID = 13;
-
-    public static final int TRANSACTION_CID = 14;
 
     public static final int CONFIGURABLE_TEMPLATE = 15;
 
@@ -89,9 +85,6 @@ public class ItemPortableRegistry<T extends Recoverable> extends AbstractRecover
 
             case SHOPPING_ITEM_CID:
                 pt = new ShoppingItem();
-                break;
-            case TRANSACTION_CID:
-                pt = new TransactionLog();
                 break;
             case CONFIGURABLE_TEMPLATE:
                 pt = new ConfigurableTemplate();

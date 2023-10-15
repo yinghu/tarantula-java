@@ -14,8 +14,8 @@ public class TransactionEventLogger implements ServiceEventLogger {
     }
     @Override
     public void log(ServiceEvent event) {
-        if(!(event instanceof TransactionLog)) throw new RuntimeException(event.getClass().getName()+" not supported");
-        if(!dataStore.createIfAbsent(event,false)) throw new RuntimeException("transaction already existed");
+        //if(!(event instanceof TransactionLog)) throw new RuntimeException(event.getClass().getName()+" not supported");
+        //if(!dataStore.createIfAbsent(event,false)) throw new RuntimeException("transaction already existed");
     }
 
     @Override

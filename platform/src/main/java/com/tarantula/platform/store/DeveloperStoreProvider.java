@@ -54,8 +54,8 @@ public class DeveloperStoreProvider extends AuthObject {
         if(!suc) return false;
         params.put(OnAccess.STORE_TRANSACTION_ID,serviceContext.distributionId());
         params.put(OnAccess.STORE_QUANTITY,1);
-        TransactionLog transaction = new TransactionLog((String)params.get(OnAccess.SYSTEM_ID),(String)params.get(OnAccess.STORE_BUNDLE_ID),"token access");
-        serviceEventLogger.log(transaction);
+        //TransactionLog transaction = new TransactionLog((String)params.get(OnAccess.SYSTEM_ID),(String)params.get(OnAccess.STORE_BUNDLE_ID),"token access");
+        //serviceEventLogger.log(transaction);
         return true;
     }
 
