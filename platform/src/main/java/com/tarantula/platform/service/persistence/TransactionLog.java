@@ -9,6 +9,8 @@ public class TransactionLog extends RecoverableObject {
     public static final String LABEL = "transaction";
     public boolean deleting;
 
+    public long updatingRevision;
+
     public int scope;
 
     public String source;
@@ -21,7 +23,7 @@ public class TransactionLog extends RecoverableObject {
         this.label = LABEL;
         this.onEdge = true;
     }
-    public TransactionLog(boolean deleting,int scope,String source,String edgeLabel,byte[] key,byte[] edgeKey){
+    public TransactionLog(boolean deleting,int scope,String source,String edgeLabel,byte[] key,byte[] edgeKey,long updatingRevision){
         this();
         this.deleting = deleting;
         this.scope = scope;
@@ -29,10 +31,12 @@ public class TransactionLog extends RecoverableObject {
         this.edgeLabel = edgeLabel;
         this.key = key;
         this.edgeKey = edgeKey;
+        this.updatingRevision = updatingRevision;
     }
     @Override
     public boolean write(DataBuffer buffer) {
         buffer.writeBoolean(deleting);
+        buffer.writeLong(updatingRevision);
         buffer.writeInt(scope);
         buffer.writeUTF8(source);
         buffer.writeUTF8(edgeLabel);
@@ -55,6 +59,7 @@ public class TransactionLog extends RecoverableObject {
     @Override
     public boolean read(DataBuffer buffer) {
         deleting = buffer.readBoolean();
+        updatingRevision = buffer.readLong();
         scope = buffer.readInt();
         source = buffer.readUTF8();
         edgeLabel = buffer.readUTF8();
@@ -82,8 +87,8 @@ public class TransactionLog extends RecoverableObject {
         return PortableRegistry.TRANSACTION_LOG_CID;
     }
 
-    public static TransactionLog log(long transactionId,boolean deleting,int scope,String source,String edgeLabel,byte[] key,byte[] edgeKey){
-        TransactionLog transactionLog = new TransactionLog(deleting,scope,source,edgeLabel,key,edgeKey);
+    public static TransactionLog log(long transactionId,boolean deleting,int scope,String source,String edgeLabel,byte[] key,byte[] edgeKey,long updatingRevision){
+        TransactionLog transactionLog = new TransactionLog(deleting,scope,source,edgeLabel,key,edgeKey,updatingRevision);
         transactionLog.ownerKey(new SnowflakeKey(transactionId));
         return transactionLog;
     }
