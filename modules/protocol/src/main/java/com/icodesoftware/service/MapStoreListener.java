@@ -5,7 +5,7 @@ import com.icodesoftware.Recoverable;
 public interface MapStoreListener extends ServiceProvider {
 
     //dispatch cluster operation
-    void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId);
+    void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId);
     //recover cluster operation
     boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value);
 

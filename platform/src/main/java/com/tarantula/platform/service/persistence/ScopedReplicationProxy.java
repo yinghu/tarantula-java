@@ -49,7 +49,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
     public boolean onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
         return false;
     }
-    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){}
+    public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){}
     @Override
     public String name() {
         return null;

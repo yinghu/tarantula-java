@@ -1,17 +1,21 @@
 package com.tarantula.test;
 
 import com.icodesoftware.DataStore;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.*;
 
 import com.icodesoftware.util.BinaryKey;
 import com.tarantula.platform.service.persistence.TransactionLog;
+import com.tarantula.platform.service.persistence.TransactionLogManager;
 import com.tarantula.platform.service.persistence.TransactionLogQuery;
 import com.tarantula.platform.service.persistence.TransactionResult;
 
 public class TestMapStoreListener implements MapStoreListener {
 
-    DataStoreProvider dataStoreProvider;
+    //DataStoreProvider dataStoreProvider;
+    ServiceContext serviceContext;
+    private TransactionLogManager transactionLogManager;
      @Override
     public String name() {
         return null;
@@ -19,7 +23,8 @@ public class TestMapStoreListener implements MapStoreListener {
 
     @Override
     public void start() throws Exception {
-
+        transactionLogManager = new TransactionLogManager();
+        transactionLogManager.setup(serviceContext);
     }
 
     @Override
@@ -27,10 +32,12 @@ public class TestMapStoreListener implements MapStoreListener {
 
     }
 
-
-    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
-        DataStore dataStore = dataStoreProvider.createLogDataStore("log_"+metadata.source());
-        DataStore ts = dataStoreProvider.createLogDataStore("log_trx");
+    public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
+        transactionLogManager.onDistributing(metadata,key,value,transactionId);
+    }
+    public void _onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
+        DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,"log_"+metadata.source());
+        DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,"log_trx");
         if(metadata.label()==null){
             Recoverable.DataHeader header = value.readHeader();
             value.rewind();
@@ -48,22 +55,6 @@ public class TestMapStoreListener implements MapStoreListener {
             if(!suc) return;
             TransactionLog log = TransactionLog.log(transactionId,false, metadata.scope(), metadata.source(),metadata.label(),ak,null,header.revision());
             ts.create(log);
-            /**
-            boolean CUS = dataStore.backup().setEdge("transaction",(k,v)->{
-                k.writeLong(transactionId);
-                key.rewind();
-                for(byte b : key.array()){
-                    v.writeByte(b);
-                }
-                return true;
-            });
-            int[] ct={0};
-            dataStore.backup().forEachEdgeKey(new SnowflakeKey(transactionId),"transaction",(k,v)->{
-                ct[0]++;
-                return true;
-            });**/
-            //System.out.println("HD : "+header.factoryId()+" : "+header.classId()+" : "+header.revision()+" : "+suc+" : "+metadata.source()+" : "+CUS+" : "+ct[0]);
-
             return;
         }
         byte[] ak = key.array();
@@ -85,29 +76,33 @@ public class TestMapStoreListener implements MapStoreListener {
     }
     @Override
     public void onCommit(int scope,long transactionId) {
-        DataStore ts = dataStoreProvider.createLogDataStore("log_trx");
-        TransactionLogQuery query = new TransactionLogQuery(transactionId);
-        ts.list(query).forEach(t->{
-            System.out.println("Committed : "+transactionId+" : "+t.distributionId()+" : "+t.source+" : "+t.edgeLabel+" : "+t.scope+" : "+t.deleting+" : "+t.updatingRevision);
-        });
-        ts.createIfAbsent(TransactionResult.result(transactionId,true),false);
+         transactionLogManager.onCommit(scope,transactionId);
+         //DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,"log_trx");
+        //TransactionLogQuery query = new TransactionLogQuery(transactionId);
+        //ts.list(query).forEach(t->{
+            //System.out.println("Committed : "+transactionId+" : "+t.distributionId()+" : "+t.source+" : "+t.edgeLabel+" : "+t.scope+" : "+t.deleting+" : "+t.updatingRevision);
+        //});
+        //ts.createIfAbsent(TransactionResult.result(transactionId,true),false);
     }
 
     @Override
     public void onAbort(int scope,long transactionId) {
-        System.out.println("Aborted : "+transactionId+" : "+scope);
-        DataStore ts = dataStoreProvider.createLogDataStore("log_trx");
-        ts.createIfAbsent(TransactionResult.result(transactionId,false),false);
+        transactionLogManager.onAbort(scope,transactionId);
+         //System.out.println("Aborted : "+transactionId+" : "+scope);
+        //DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,"log_trx");
+        //ts.createIfAbsent(TransactionResult.result(transactionId,false),false);
     }
 
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer bufferStream){
         return false;
     }
-    @Override
     public boolean onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
+         return transactionLogManager.onDeleting(metadata,key,value,transactionId);
+    }
+    public boolean _onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
          System.out.println("DEL : "+metadata.source()+" : "+metadata.label());
-         DataStore dataStore = dataStoreProvider.createLogDataStore("log_"+metadata.source());
-         DataStore ts = dataStoreProvider.createLogDataStore("log_trx");
+         DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,"log_"+metadata.source());
+         DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,"log_trx");
          if(metadata.label()==null){
              byte[] ak = key.array();
              if(!dataStore.backup().unset((k,v)->{

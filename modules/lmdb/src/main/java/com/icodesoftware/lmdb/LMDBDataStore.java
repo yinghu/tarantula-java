@@ -99,7 +99,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             key.rewind();
             value.rewind();
             t.revision(Long.MIN_VALUE);
-            lmdbDataStoreProvider.onDistributing(metadata,key,value,ptxn.getId());
+            lmdbDataStoreProvider.onUpdating(metadata,key,value,ptxn.getId());
             return true;
         }finally {
             txn.close();
@@ -131,7 +131,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
                     t.revision(header.revision());
                     key.rewind();
                     update.rewind();
-                    lmdbDataStoreProvider.onDistributing(metadata,key,update,ptxn.getId());
+                    lmdbDataStoreProvider.onUpdating(metadata,key,update,ptxn.getId());
                     updated = true;
                 }
             }
@@ -160,7 +160,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             xtxn.commit();
             key.rewind();
             value.rewind();
-            lmdbDataStoreProvider.onDistributing(metadata,key,value,ptxn.getId());
+            lmdbDataStoreProvider.onUpdating(metadata,key,value,ptxn.getId());
         }
         finally {
             xtxn.close();
@@ -210,7 +210,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             t.revision(Long.MIN_VALUE);
             key.rewind();
             value.rewind();
-            lmdbDataStoreProvider.onDistributing(metadata,key,value,ptxn.getId());
+            lmdbDataStoreProvider.onUpdating(metadata,key,value,ptxn.getId());
             return true;
         }
         finally {
@@ -554,7 +554,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             txn.commit();
             key.rewind();
             value.rewind();
-            lmdbDataStoreProvider.onDistributing(localEdgeDataStore.metadata,key,value,ptxn.getId());
+            lmdbDataStoreProvider.onUpdating(localEdgeDataStore.metadata,key,value,ptxn.getId());
             return true;
         }finally {
             cache.reset();

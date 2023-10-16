@@ -16,7 +16,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
         super(Distributable.DATA_SCOPE);
     }
 
-    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
+    public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
         if(asyncDistributing){
             return;
         }

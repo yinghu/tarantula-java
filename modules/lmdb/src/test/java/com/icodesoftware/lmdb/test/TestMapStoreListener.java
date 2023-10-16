@@ -68,7 +68,7 @@ public class TestMapStoreListener implements MapStoreListener {
 
     }
     @Override
-    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
+    public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
         DataStore dataStore = provider.createKeyIndexDataStore(KeyIndexService.STORE_NAME + metadata.source());
         if(metadata.label()==null){
             dataStore.backup().set((k,v)->{

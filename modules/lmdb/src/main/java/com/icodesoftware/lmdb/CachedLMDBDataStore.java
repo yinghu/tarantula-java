@@ -102,7 +102,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             key.rewind();
             value.rewind();
             t.revision(Long.MIN_VALUE);
-            lmdbDataStoreProvider.onDistributing(metadata,key,value,txn.getId());
+            lmdbDataStoreProvider.onUpdating(metadata,key,value,txn.getId());
             return true;
         }finally {
             txn.close();
@@ -134,7 +134,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
                     t.revision(header.revision());
                     key.rewind();
                     update.rewind();
-                    lmdbDataStoreProvider.onDistributing(metadata,key,update,txn.getId());
+                    lmdbDataStoreProvider.onUpdating(metadata,key,update,txn.getId());
                     updated = true;
                 }
             }
@@ -163,7 +163,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             xtxn.commit();
             key.rewind();
             value.rewind();
-            lmdbDataStoreProvider.onDistributing(metadata,key,value,xtxn.getId());
+            lmdbDataStoreProvider.onUpdating(metadata,key,value,xtxn.getId());
         }
         finally {
             xtxn.close();
@@ -213,7 +213,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             t.revision(Long.MIN_VALUE);
             key.rewind();
             value.rewind();
-            lmdbDataStoreProvider.onDistributing(metadata,key,value,txn.getId());
+            lmdbDataStoreProvider.onUpdating(metadata,key,value,txn.getId());
             return true;
         }
         finally {
@@ -557,7 +557,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             idx.dbi.put(txn,value.rewind(),key.rewind(),PutFlags.MDB_NODUPDATA);
             key.rewind();
             value.rewind();
-            lmdbDataStoreProvider.onDistributing(localEdgeDataStore.metadata,key,value,txn.getId());
+            lmdbDataStoreProvider.onUpdating(localEdgeDataStore.metadata,key,value,txn.getId());
             return true;
         }finally {
             cache.reset();

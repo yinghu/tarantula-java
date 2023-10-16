@@ -19,13 +19,10 @@ public class TestMapStoreListener implements MapStoreListener {
         snowflakeIdGenerator = new SnowflakeIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
     }
 
-    public void onLogging(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
-
-    }
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer){
         return false;
     }
-    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
+    public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
 
     }
 

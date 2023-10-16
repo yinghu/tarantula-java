@@ -50,6 +50,9 @@ public class TestServiceContext implements ServiceContext {
         if(scope== Distributable.INDEX_SCOPE){
             return dataStoreProvider.createKeyIndexDataStore(s);
         }
+        if(scope== Distributable.LOG_SCOPE){
+            return dataStoreProvider.createLogDataStore(s);
+        }
         return new EmptyDataStore();
     }
 

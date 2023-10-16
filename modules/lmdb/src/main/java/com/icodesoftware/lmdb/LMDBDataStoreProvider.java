@@ -309,17 +309,17 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         pendingQueue.clear();
     }
 
-    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
+    public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
         if(metadata.scope()==Distributable.INTEGRATION_SCOPE && integrationMapStoreListener!=null){
-            integrationMapStoreListener.onDistributing(metadata,key,value,transactionId);
+            integrationMapStoreListener.onUpdating(metadata,key,value,transactionId);
             return;
         }
         if(metadata.scope()==Distributable.DATA_SCOPE && dataMapStoreListener!=null){
-            dataMapStoreListener.onDistributing(metadata,key,value,transactionId);
+            dataMapStoreListener.onUpdating(metadata,key,value,transactionId);
             return;
         }
         if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
-            keyIndexMapStoreListener.onDistributing(metadata,key,value,transactionId);
+            keyIndexMapStoreListener.onUpdating(metadata,key,value,transactionId);
         }
     }
 
