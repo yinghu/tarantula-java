@@ -22,6 +22,10 @@ public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecov
 
     public static final int EQUIPMENT_UN_EQUIP_CID = 9;
 
+    public static final int UNIT_CID = 10;
+    public static final int EQUIPMENT_CID = 11;
+
+
 
     public static Earth8PortableRegistry INS;
 
@@ -58,6 +62,12 @@ public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecov
                 break;
             case EQUIPMENT_UN_EQUIP_CID:
                 pt = new EquipmentUnEquip();
+                break;
+            case UNIT_CID:
+                pt = new Unit();
+                break;
+            case EQUIPMENT_CID:
+                pt = new Equipment();
                 break;
             default:
         }

@@ -63,6 +63,34 @@
     {
       "header": {
         "scope": "commodity",
+        "type": "SoftCurrency.HeroCoin",
+        "description": "virtual currency",
+        "version": "1.0",
+        "rechargeable": true,
+        "constrained": true
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Name",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Amount",
+            "type": "number",
+            "reference": "Double",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "commodity",
         "type": "GameItem",
         "description": "common game item",
         "version": "1.0",

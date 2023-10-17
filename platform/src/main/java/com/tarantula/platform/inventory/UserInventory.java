@@ -15,6 +15,7 @@ public class UserInventory extends RecoverableObject implements Inventory {
     public final static String LABEL = "inventory";
     private ArrayList<Stock> itemList = new ArrayList<>();
     private boolean rechargeable;
+    private boolean constrained;
     private double balance;
     private int count;
 
@@ -38,11 +39,12 @@ public class UserInventory extends RecoverableObject implements Inventory {
         this.typeId = typeId;
         this.rechargeable = rechargeable;
     }
-    public UserInventory(String category, String typeId, boolean rechargeable,Listener listener){
+    public UserInventory(String category, String typeId, boolean rechargeable,boolean constrained,Listener listener){
         this();
         this.type = category;
         this.typeId = typeId;
         this.rechargeable = rechargeable;
+        this.constrained = constrained;
         this.listener = listener;
     }
 
@@ -87,6 +89,7 @@ public class UserInventory extends RecoverableObject implements Inventory {
         balance = buffer.readDouble();
         count = buffer.readInt();
         rechargeable = buffer.readBoolean();
+        constrained = buffer.readBoolean();
         return true;
     }
 
@@ -97,6 +100,7 @@ public class UserInventory extends RecoverableObject implements Inventory {
         buffer.writeDouble(balance);
         buffer.writeInt(count);
         buffer.writeBoolean(rechargeable);
+        buffer.writeBoolean(constrained);
         return true;
     }
 
@@ -147,6 +151,10 @@ public class UserInventory extends RecoverableObject implements Inventory {
     @Override
     public boolean rechargeable() {
         return rechargeable;
+    }
+
+    public boolean constrained(){
+        return this.constrained;
     }
 
     public List<Stock> onStock(){

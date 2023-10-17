@@ -37,7 +37,9 @@
                 <input id='tx-create-category-version' class="w3-input w3-round w3-border tx-text-12" type="text"> 
                 <div id="tx-create-category-rechargeable-display" style="display: none;">  
                     <label class="tx-text-12 tx-margin-left-4">Rechargeable</label>
-                    <input id='tx-create-category-rechargeable' class="w3-check tx-text-12 tx-margin-left-8" type="checkbox">      
+                    <input id='tx-create-category-rechargeable' class="w3-check tx-text-12 tx-margin-left-8" type="checkbox"> 
+                    <label class="tx-text-12 tx-margin-left-4">Constrained</label>
+                    <input id='tx-create-category-constrained' class="w3-check tx-text-12 tx-margin-left-8" type="checkbox">     
                 </div>
             </fieldset>    
         </div>
@@ -188,6 +190,7 @@
         document.querySelector('#tx-create-category-name').value = cat.header.description;
         document.querySelector('#tx-create-category-version').value = cat.header.version;
         document.querySelector('#tx-create-category-rechargeable').checked = cat.header.rechargeable;
+        document.querySelector('#tx-create-category-constrained').checked = cat.header.constrained;
         cat.application.properties.forEach(pp=>{
             let pname = pp.name;
             let ptype = pp.type;
@@ -295,6 +298,7 @@
         let cname = document.querySelector('#tx-create-category-name').value;
         let cversion = document.querySelector('#tx-create-category-version').value;
         let crechargeable = document.querySelector('#tx-create-category-rechargeable').checked;
+        let cconstrained = document.querySelector('#tx-create-category-constrained').checked;
         if(ctype==null||ctype==''){
             document.querySelector("#tx-create-category-warning-message").innerHTML = "Category type cannot be null";
             document.querySelector('#tx-create-category-warning-message-board').style.display = 'block';   
@@ -314,6 +318,7 @@
         categoryTemplate.header.description = cname;
         categoryTemplate.header.version = cversion;
         categoryTemplate.header.rechargeable = crechargeable; 
+        categoryTemplate.header.constrained = cconstrained;
         categoryTemplate.application.properties = [];
         pendingProps.forEach((v,k,m)=>{
             categoryTemplate.application.properties.push(v);

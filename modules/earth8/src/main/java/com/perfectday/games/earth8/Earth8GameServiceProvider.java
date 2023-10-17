@@ -98,7 +98,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     }
 
     public void onInventory(Inventory inventory, Inventory.Stock stock){
-        this.gameContext.log(inventory.type()+" : "+inventory.typeId(),OnLog.WARN);
+        this.gameContext.log(inventory.type()+" : "+inventory.typeId()+" : "+inventory.constrained(),OnLog.WARN);
         if(inventory.rechargeable()) return;
         this.gameContext.log(stock.header().toString(),OnLog.WARN);
         this.gameContext.log(stock.application().toString(),OnLog.WARN);

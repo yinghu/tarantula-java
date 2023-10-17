@@ -26,7 +26,7 @@ public class TransactionLogManager{
 
     public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value, long transactionId) {
         DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,STORE_PREFIX+metadata.source());
-        DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,"log_trx");
+        DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
         if(metadata.label()==null){
             Recoverable.DataHeader header = value.readHeader();
             value.rewind();
@@ -71,8 +71,8 @@ public class TransactionLogManager{
 
     public boolean onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value, long transactionId) {
         System.out.println("DEL : "+metadata.source()+" : "+metadata.label());
-        DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,"log_"+metadata.source());
-        DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,"log_trx");
+        DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,STORE_PREFIX+metadata.source());
+        DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
         if(metadata.label()==null){
             byte[] ak = key.array();
             if(!dataStore.backup().unset((k,v)->{
@@ -100,7 +100,7 @@ public class TransactionLogManager{
 
 
     public void onCommit(int scope, long transactionId) {
-        DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,"log_trx");
+        DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
         TransactionLogQuery query = new TransactionLogQuery(transactionId);
         ts.list(query).forEach(t->{
             System.out.println("Committed : "+transactionId+" : "+t.distributionId()+" : "+t.source+" : "+t.edgeLabel+" : "+t.scope+" : "+t.deleting+" : "+t.updatingRevision);
@@ -111,7 +111,7 @@ public class TransactionLogManager{
 
     public void onAbort(int scope, long transactionId) {
         System.out.println("Aborted : "+transactionId+" : "+scope);
-        DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,"log_trx");
+        DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
         ts.createIfAbsent(TransactionResult.result(transactionId,false),false);
     }
 

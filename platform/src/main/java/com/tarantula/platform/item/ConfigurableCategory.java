@@ -19,6 +19,7 @@ public class ConfigurableCategory extends RecoverableObject implements Configura
     public String description;
 
     public boolean rechargeable;
+    public boolean constrained;
 
     public HashMap<String,JsonObject> properties = new HashMap<>();
     public ConfigurableCategory(){
@@ -63,6 +64,7 @@ public class ConfigurableCategory extends RecoverableObject implements Configura
         version = h.get("version").getAsString();
         description = h.get("description").getAsString();
         rechargeable = h.get("rechargeable").getAsBoolean();
+        constrained = h.has("constrained")? h.get("constrained").getAsBoolean() : false;
     }
 
     public ConfigurableType configurableType(){

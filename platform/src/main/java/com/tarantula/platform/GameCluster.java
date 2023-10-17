@@ -459,7 +459,7 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
         ConfigurableCategories categories = this.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE);
         ConfigurableCategory conf = categories.configurableSetting(category);
         conf.parse();
-        Inventory inventory = new UserInventory(conf.name(),typeId,conf.rechargeable,this);
+        Inventory inventory = new UserInventory(conf.name(),typeId,conf.rechargeable,conf.constrained,this);
         return inventory;
     }
 
