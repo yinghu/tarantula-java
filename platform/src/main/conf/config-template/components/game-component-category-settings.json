@@ -9,7 +9,7 @@
     {
       "header": {
         "scope": "component",
-        "type": "NamedValue",
+        "type": "SubStat",
         "description": "game statistics entry",
         "version": "1.0",
         "rechargeable": true
@@ -24,29 +24,9 @@
             "downloadable": false
           },
           {
-            "name": "Value",
+            "name": "Stat",
             "type": "number",
-            "reference": "Float",
-            "nullable": false,
-            "downloadable": false
-          }
-        ]
-      }
-    },
-    {
-      "header": {
-        "scope": "component",
-        "type": "GameStatistics",
-        "description": "game statistics",
-        "version": "1.0",
-        "rechargeable": true
-      },
-      "application": {
-        "properties": [
-          {
-            "name": "Entries",
-            "type": "set",
-            "reference": "category:NamedValue",
+            "reference": "Integer",
             "nullable": false,
             "downloadable": false
           }

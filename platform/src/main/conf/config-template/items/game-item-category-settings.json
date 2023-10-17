@@ -51,9 +51,9 @@
       "application": {
         "properties": [
           {
-            "name": "Item",
+            "name": "Gold",
             "type": "category",
-            "reference": "category:HardCurrency",
+            "reference": "category:SoftCurrency",
             "nullable": false,
             "downloadable": false
           }
@@ -63,17 +63,57 @@
     {
       "header": {
         "scope": "item",
-        "type": "Sku.Gem",
-        "description": "gem pack",
+        "type": "Sku.Energy",
+        "description": "energy pack",
         "version": "1.0",
         "rechargeable": false
       },
       "application": {
         "properties": [
           {
-            "name": "Item",
+            "name": "Energy",
             "type": "category",
-            "reference": "category:HardCurrency",
+            "reference": "category:SoftCurrency",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "item",
+        "type": "Sku.Potion",
+        "description": "potion pack",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Potion",
+            "type": "category",
+            "reference": "category:SoftCurrency",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "item",
+        "type": "Sku.Material",
+        "description": "material pack",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Material",
+            "type": "category",
+            "reference": "category:SoftCurrency",
             "nullable": false,
             "downloadable": false
           }
@@ -91,7 +131,7 @@
       "application": {
         "properties": [
           {
-            "name": "Item",
+            "name": "Coin",
             "type": "category",
             "reference": "category:SoftCurrency",
             "nullable": false,
@@ -101,71 +141,44 @@
       }
     },
     {
+        "header": {
+          "scope": "item",
+          "type": "Sku.Unit",
+          "description": "unit sku",
+          "version": "v1.0",
+          "rechargeable": false
+        },
+        "application": {
+          "properties": [
+            {
+              "name": "Unit",
+              "type": "category",
+              "reference": "category:GameItem",
+              "nullable": false,
+              "downloadable": false
+            }
+          ]
+        }
+      },
+    {
       "header": {
         "scope": "item",
-        "type": "Sku.Chip",
-        "description": "chip pack",
-        "version": "1.0",
+        "type": "Sku.Equipment",
+        "description": "equipment sku",
+        "version": "v1.0",
         "rechargeable": false
       },
       "application": {
         "properties": [
           {
-            "name": "Item",
+            "name": "Equipment",
             "type": "category",
-            "reference": "category:SoftCurrency",
+            "reference": "category:GameItem",
             "nullable": false,
             "downloadable": false
           }
         ]
       }
-    },
-    {
-        "header": {
-          "scope": "item",
-          "type": "Sku.Mill",
-          "description": "mill type",
-          "version": "v1.0",
-          "rechargeable": false
-        },
-        "application": {
-          "properties": [
-            {
-              "name": "Item",
-              "type": "category",
-              "reference": "category:GameItem",
-              "nullable": false,
-              "downloadable": false
-            }
-          ]
-        }
-    },
-    {
-        "header": {
-          "scope": "item",
-          "type": "Sku.Robot",
-          "description": "robot sku",
-          "version": "v1.0",
-          "rechargeable": false
-        },
-        "application": {
-          "properties": [
-            {
-              "name": "Robot",
-              "type": "category",
-              "reference": "category:GameItem",
-              "nullable": false,
-              "downloadable": false
-            },
-            {
-              "name": "Equipments",
-              "type": "set",
-              "reference": "category:GameItem",
-              "nullable": false,
-              "downloadable": false
-            }
-          ]
-        }
-      }
+    }
   ]
 }

@@ -71,14 +71,7 @@
       "application": {
         "properties": [
           {
-            "name": "Name",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "TypeId",
+            "name": "ConfigId",
             "type": "string",
             "reference": "String",
             "nullable": false,
@@ -86,6 +79,20 @@
           },
           {
             "name": "Level",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Xp",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Rank",
             "type": "number",
             "reference": "Integer",
             "nullable": false,
@@ -105,14 +112,7 @@
       "application": {
         "properties": [
           {
-            "name": "Name",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "TypeId",
+            "name": "ConfigId",
             "type": "string",
             "reference": "String",
             "nullable": false,
@@ -126,14 +126,104 @@
             "downloadable": false
           },
           {
-            "name": "EquipmentType",
-            "type": "enum",
-            "reference": "EquipmentType",
+            "name": "Xp",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Rank",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Rarity",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "PrimaryStatType",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "PrimaryStat",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "SubStats",
+            "type": "list",
+            "reference": "category:SubStat",
             "nullable": false,
             "downloadable": false
           }
         ]
       }
-    }
+    },
+    {
+        "header": {
+          "scope": "commodity",
+          "type": "GameItem.Unit",
+          "description": "unit",
+          "version": "1.0",
+          "rechargeable": false
+        },
+        "application": {
+          "properties": [
+            {
+              "name": "MaxEquipmentNumber",
+              "type": "number",
+              "reference": "Integer",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "CurrencyConstraint",
+              "type": "list",
+              "reference": "string:String",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "Level",
+              "type": "number",
+              "reference": "Integer",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "ConfigId",
+              "type": "string",
+              "reference": "String",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "Xp",
+              "type": "number",
+              "reference": "Integer",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "Rank",
+              "type": "number",
+              "reference": "Integer",
+              "nullable": false,
+              "downloadable": false
+            }
+          ]
+        }
+      }
   ]
 }
