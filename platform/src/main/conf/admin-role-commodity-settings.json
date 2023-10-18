@@ -889,6 +889,66 @@
       "configurationName": "Beryl",
       "configurationCategory": "GameItem.Unit",
       "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "weapon_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "WeaponEquip",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "gloves_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "GlovesEquip",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "boots_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "BootsEquip",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
     }
   ]
 }
