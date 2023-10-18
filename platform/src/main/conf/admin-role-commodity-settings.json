@@ -3,427 +3,892 @@
   "list":
   [
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Gem",
-      "configurationName": "G80",
-      "configurationCategory": "HardCurrency",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "G80",
-        "Amount": "80"
+        "Name": "Gold100",
+        "Amount": "100"
       },
       "application": {},
-      "reference": []
-    },
-    {
+      "reference": [],
       "configurationType": "commodity",
-      "configurationTypeId": "Gem",
-      "configurationName": "G500",
-      "configurationCategory": "HardCurrency",
-      "configurationVersion": "v1.0",
-      "header": {
-        "Name": "G500",
-        "Amount": "500"
-      },
-      "application": {},
-      "reference": []
-    },
-    {
-      "configurationType": "commodity",
-      "configurationTypeId": "Gem",
-      "configurationName": "G1200",
-      "configurationCategory": "HardCurrency",
-      "configurationVersion": "v1.0",
-      "header": {
-        "Name": "G1200",
-        "Amount": "1200"
-      },
-      "application": {},
-      "reference": []
-    },
-    {
-      "configurationType": "commodity",
-      "configurationTypeId": "Gem",
-      "configurationName": "G2500",
-      "configurationCategory": "HardCurrency",
-      "configurationVersion": "v1.0",
-      "header": {
-        "Name": "G2500",
-        "Amount": "2500"
-      },
-      "application": {},
-      "reference": []
-    },
-    {
-      "configurationType": "commodity",
-      "configurationTypeId": "Gem",
-      "configurationName": "G6500",
-      "configurationCategory": "HardCurrency",
-      "configurationVersion": "v1.0",
-      "header": {
-        "Name": "G6500",
-        "Amount": "6500"
-      },
-      "application": {},
-      "reference": []
-    },
-    {
-      "configurationType": "commodity",
-      "configurationTypeId": "Gem",
-      "configurationName": "G14000",
-      "configurationCategory": "HardCurrency",
-      "configurationVersion": "v1.0",
-      "header": {
-        "Name": "G14000",
-        "Amount": "14000"
-      },
-      "application": {},
-      "reference": []
-    },
-    {
-      "configurationType": "commodity",
-      "configurationTypeId": "Coin",
-      "configurationName": "C900",
+      "configurationTypeId": "Gold",
+      "configurationName": "Gold100",
       "configurationCategory": "SoftCurrency",
-      "configurationVersion": "v1.0",
-      "header": {
-        "Name": "C900",
-        "Amount": "900"
-      },
-      "application": {},
-      "reference": []
+      "configurationVersion": "v1.0"
     },
     {
+      "header": {
+        "Name": "CampaignEnergy100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
       "configurationType": "commodity",
-      "configurationTypeId": "Coin",
-      "configurationName": "C4320",
+      "configurationTypeId": "CampaignEnergy",
+      "configurationName": "CampaignEnergy100",
       "configurationCategory": "SoftCurrency",
-      "configurationVersion": "v1.0",
-      "header": {
-        "Name": "C4320",
-        "Amount": "4320"
-      },
-      "application": {},
-      "reference": []
+      "configurationVersion": "v1.0"
     },
     {
+      "header": {
+        "Name": "SunHeroPotion100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
       "configurationType": "commodity",
-      "configurationTypeId": "Coin",
-      "configurationName": "C12450",
+      "configurationTypeId": "SunHeroPotion",
+      "configurationName": "SunHeroPotion100",
       "configurationCategory": "SoftCurrency",
-      "configurationVersion": "v1.0",
-      "header": {
-        "Name": "C12450",
-        "Amount": "12450"
-      },
-      "application": {},
-      "reference": []
+      "configurationVersion": "v1.0"
     },
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Mill",
-      "configurationName": "mill_resource_gearbox",
-      "configurationCategory": "GameItem",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "mill_resource_gearbox",
-        "TypeId": "Mill",
-        "Level": "1"
+        "Name": "MoonHeroPotion100",
+        "Amount": "100"
       },
       "application": {},
-      "reference": []
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "MoonHeroPotion",
+      "configurationName": "MoonHeroPotion100",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
     },
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Mill",
-      "configurationName": "mill_resource_battery",
-      "configurationCategory": "GameItem",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "mill_resource_battery",
-        "TypeId": "Mill",
-        "Level": "1"
+        "Name": "EarthHeroPotion100",
+        "Amount": "100"
       },
       "application": {},
-      "reference": []
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "EarthHeroPotion",
+      "configurationName": "EarthHeroPotion100",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
     },
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Mill",
-      "configurationName": "mill_resource_shield",
-      "configurationCategory": "GameItem",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "mill_resource_shield",
-        "TypeId": "Mill",
-        "Level": "1"
+        "Name": "HelmetEquipmentPotion100",
+        "Amount": "100"
       },
       "application": {},
-      "reference": []
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "HelmetEquipmentPotion",
+      "configurationName": "HelmetEquipmentPotion100",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
     },
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Mill",
-      "configurationName": "mill_resource_plating",
-      "configurationCategory": "GameItem",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "mill_resource_plating",
-        "TypeId": "Mill",
-        "Level": "1"
+        "Name": "ChestEquipmentPotion100",
+        "Amount": "100"
       },
       "application": {},
-      "reference": []
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "ChestEquipmentPotion",
+      "configurationName": "ChestEquipmentPotion100",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
     },
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Mill",
-      "configurationName": "mill_resource_propeller",
-      "configurationCategory": "GameItem",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "mill_resource_propeller",
-        "TypeId": "Mill",
-        "Level": "1"
+        "Name": "GlovesEquipmentPotion100",
+        "Amount": "100"
       },
       "application": {},
-      "reference": []
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "GlovesEquipmentPotion",
+      "configurationName": "GlovesEquipmentPotion100",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
     },
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Mill",
-      "configurationName": "mill_resource_frame",
-      "configurationCategory": "GameItem",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "mill_resource_frame",
-        "TypeId": "Mill",
-        "Level": "1"
+        "Name": "BootsEquipmentPotion100",
+        "Amount": "100"
       },
       "application": {},
-      "reference": []
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "BootsEquipmentPotion",
+      "configurationName": "BootsEquipmentPotion100",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
     },
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Robot",
-      "configurationName": "robot_pug",
-      "configurationCategory": "GameItem",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "robot_pug",
-        "TypeId": "PugPlayer_LoadoutConfig",
-        "Level": "1"
+        "Name": "WeaponEquipmentPotion100",
+        "Amount": "100"
       },
       "application": {},
-      "reference": []
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "WeaponEquipmentPotion",
+      "configurationName": "WeaponEquipmentPotion100",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
     },
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Robot",
-      "configurationName": "robot_crate",
-      "configurationCategory": "GameItem",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "robot_crate",
-        "TypeId": "CratePlayer_LoadoutConfig",
-        "Level": "1"
+        "Name": "ForcefieldEquipmentPotion100",
+        "Amount": "100"
       },
       "application": {},
-      "reference": []
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "ForcefieldEquipmentPotion",
+      "configurationName": "ForcefieldEquipmentPotion100",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
     },
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Robot",
-      "configurationName": "robot_strider",
-      "configurationCategory": "GameItem",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "robot_strider",
-        "TypeId": "StriderPlayer_LoadoutConfig",
-        "Level": "1"
+        "Name": "CommonEquipmentRankUpMaterial100",
+        "Amount": "100"
       },
       "application": {},
-      "reference": []
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "CommonEquipmentRankUpMaterial",
+      "configurationName": "CommonEquipmentRankUpMaterial100",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
     },
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Equipment",
-      "configurationName": "equipment_targeting_system_x",
-      "configurationCategory": "GameItem.Equipment",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "equipment_targeting_system_x",
-        "TypeId": "Equipment",
+        "Name": "RareEquipmentRankUpMaterial100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "RareEquipmentRankUpMaterial",
+      "configurationName": "RareEquipmentRankUpMaterial100",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "EpicEquipmentRankUpMaterial100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "EpicEquipmentRankUpMaterial",
+      "configurationName": "EpicEquipmentRankUpMaterial100",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "LegendaryEquipmentRankUpMaterial100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "LegendaryEquipmentRankUpMaterial",
+      "configurationName": "LegendaryEquipmentRankUpMaterial100",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "MaxineCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "MaxineHeroCoin",
+      "configurationName": "MaxineCoin100",
+      "configurationCategory": "SoftCurrency.HeroCoin",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "GusCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "GusHeroCoin",
+      "configurationName": "GusCoin100",
+      "configurationCategory": "SoftCurrency.HeroCoin",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "GwenCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "GwenHeroCoin",
+      "configurationName": "GwenCoin100",
+      "configurationCategory": "SoftCurrency.HeroCoin",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "RedcrosseKnightCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "RedcrosseKnightHeroCoin",
+      "configurationName": "RedcrosseKnightCoin100",
+      "configurationCategory": "SoftCurrency.HeroCoin",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "TerrenceCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "TerrenceHeroCoin",
+      "configurationName": "TerrenceCoin100",
+      "configurationCategory": "SoftCurrency.HeroCoin",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "FaerieCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "FaerieHeroCoin",
+      "configurationName": "FaerieCoin100",
+      "configurationCategory": "SoftCurrency.HeroCoin",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "SoniaCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "SoniaHeroCoin",
+      "configurationName": "SoniaCoin100",
+      "configurationCategory": "SoftCurrency.HeroCoin",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "FelixCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "FelixHeroCoin",
+      "configurationName": "FelixCoin100",
+      "configurationCategory": "SoftCurrency.HeroCoin",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "MarkIVCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "MarkIVHeroCoin",
+      "configurationName": "MarkIVCoin100",
+      "configurationCategory": "SoftCurrency.HeroCoin",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "ArmoredShogunCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "ArmoredShogunHeroCoin",
+      "configurationName": "ArmoredShogunCoin100",
+      "configurationCategory": "SoftCurrency.HeroCoin",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "R3NCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "R3NHeroCoin",
+      "configurationName": "R3NCoin100",
+      "configurationCategory": "SoftCurrency.HeroCoin",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "AlexanderCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "AlexanderHeroCoin",
+      "configurationName": "AlexanderCoin100",
+      "configurationCategory": "SoftCurrency.HeroCoin",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "KamikiKiKaiCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "KamikiKiKaiHeroCoin",
+      "configurationName": "KamikiKiKaiCoin100",
+      "configurationCategory": "SoftCurrency.HeroCoin",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "TabsCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "TabsHeroCoin",
+      "configurationName": "TabsCoin100",
+      "configurationCategory": "SoftCurrency.HeroCoin",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "Una'sLionCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Una'sLionHeroCoin",
+      "configurationName": "Una'sLionCoin100",
+      "configurationCategory": "SoftCurrency.HeroCoin",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "TatterCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "TatterHeroCoin",
+      "configurationName": "TatterCoin100",
+      "configurationCategory": "SoftCurrency.HeroCoin",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "HetraOfNectaneboCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "HetraOfNectaneboHeroCoin",
+      "configurationName": "HetraOfNectaneboCoin100",
+      "configurationCategory": "SoftCurrency.HeroCoin",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "DrYuneCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "DrYuneHeroCoin",
+      "configurationName": "DrYuneCoin100",
+      "configurationCategory": "SoftCurrency.HeroCoin",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "ClonkCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "ClonkHeroCoin",
+      "configurationName": "ClonkCoin100",
+      "configurationCategory": "SoftCurrency.HeroCoin",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "ValenciaCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "ValenciaHeroCoin",
+      "configurationName": "ValenciaCoin100",
+      "configurationCategory": "SoftCurrency.HeroCoin",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "BerylCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "BerylHeroCoin",
+      "configurationName": "BerylCoin100",
+      "configurationCategory": "SoftCurrency.HeroCoin",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "MaxEquipmentNumber": "6",
         "Level": "1",
-        "EquipmentType":"0"
+        "ConfigId": "maxine_unit_config",
+        "Xp": "100",
+        "Rank": "1"
       },
-      "application": {},
-      "reference": []
+      "application": {
+        "CurrencyConstraint": [
+          "MaxineHeroCoin"
+        ]
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Hero",
+      "configurationName": "Maxine",
+      "configurationCategory": "GameItem.Unit",
+      "configurationVersion": "v1.0"
     },
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Equipment",
-      "configurationName": "equipment_targeting_system_y",
-      "configurationCategory": "GameItem.Equipment",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "equipment_targeting_system_y",
-        "TypeId": "Equipment",
+        "MaxEquipmentNumber": "6",
         "Level": "1",
-        "EquipmentType":"0"
+        "ConfigId": "gus_unit_config",
+        "Xp": "100",
+        "Rank": "1"
       },
-      "application": {},
-      "reference": []
+      "application": {
+        "CurrencyConstraint": [
+          "GusHeroCoin"
+        ]
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Hero",
+      "configurationName": "Gus",
+      "configurationCategory": "GameItem.Unit",
+      "configurationVersion": "v1.0"
     },
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Equipment",
-      "configurationName": "equipment_targeting_system_z",
-      "configurationCategory": "GameItem.Equipment",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "equipment_targeting_system_z",
-        "TypeId": "Equipment",
+        "MaxEquipmentNumber": "6",
         "Level": "1",
-        "EquipmentType":"0"
+        "ConfigId": "gwen_unit_config",
+        "Xp": "100",
+        "Rank": "1"
       },
-      "application": {},
-      "reference": []
+      "application": {
+        "CurrencyConstraint": [
+          "GwenHeroCoin"
+        ]
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Hero",
+      "configurationName": "Gwen",
+      "configurationCategory": "GameItem.Unit",
+      "configurationVersion": "v1.0"
     },
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Equipment",
-      "configurationName": "equipment_motherboard_x",
-      "configurationCategory": "GameItem.Equipment",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "equipment_motherboard_x",
-        "TypeId": "Equipment",
+        "MaxEquipmentNumber": "6",
         "Level": "1",
-        "EquipmentType":"0"
+        "ConfigId": "redcrosse_knight_unit_config",
+        "Xp": "100",
+        "Rank": "1"
       },
-      "application": {},
-      "reference": []
+      "application": {
+        "CurrencyConstraint": [
+          "RedcrosseKnightHeroCoin"
+        ]
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Hero",
+      "configurationName": "RedcrosseKnight",
+      "configurationCategory": "GameItem.Unit",
+      "configurationVersion": "v1.0"
     },
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Equipment",
-      "configurationName": "equipment_motherboard_y",
-      "configurationCategory": "GameItem.Equipment",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "equipment_motherboard_y",
-        "TypeId": "Equipment",
+        "MaxEquipmentNumber": "6",
         "Level": "1",
-        "EquipmentType":"0"
+        "ConfigId": "terrence_unit_config",
+        "Xp": "100",
+        "Rank": "1"
       },
-      "application": {},
-      "reference": []
+      "application": {
+        "CurrencyConstraint": [
+          "TerrenceHeroCoin"
+        ]
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Hero",
+      "configurationName": "Terrence",
+      "configurationCategory": "GameItem.Unit",
+      "configurationVersion": "v1.0"
     },
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Equipment",
-      "configurationName": "equipment_drone_x",
-      "configurationCategory": "GameItem.Equipment",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "equipment_drone_x",
-        "TypeId": "Equipment",
+        "MaxEquipmentNumber": "6",
         "Level": "1",
-        "EquipmentType":"0"
+        "ConfigId": "faerie_unit_config",
+        "Xp": "100",
+        "Rank": "1"
       },
-      "application": {},
-      "reference": []
+      "application": {
+        "CurrencyConstraint": [
+          "FaerieHeroCoin"
+        ]
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Hero",
+      "configurationName": "Faerie",
+      "configurationCategory": "GameItem.Unit",
+      "configurationVersion": "v1.0"
     },
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Equipment",
-      "configurationName": "equipment_drone_y",
-      "configurationCategory": "GameItem.Equipment",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "equipment_drone_y",
-        "TypeId": "Equipment",
+        "MaxEquipmentNumber": "6",
         "Level": "1",
-        "EquipmentType":"0"
+        "ConfigId": "sonia_unit_config",
+        "Xp": "100",
+        "Rank": "1"
       },
-      "application": {},
-      "reference": []
+      "application": {
+        "CurrencyConstraint": [
+          "SoniaHeroCoin"
+        ]
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Hero",
+      "configurationName": "Sonia",
+      "configurationCategory": "GameItem.Unit",
+      "configurationVersion": "v1.0"
     },
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Equipment",
-      "configurationName": "equipment_drone_z",
-      "configurationCategory": "GameItem.Equipment",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "equipment_drone_z",
-        "TypeId": "Equipment",
+        "MaxEquipmentNumber": "6",
         "Level": "1",
-        "EquipmentType":"0"
+        "ConfigId": "felix_unit_config",
+        "Xp": "100",
+        "Rank": "1"
       },
-      "application": {},
-      "reference": []
+      "application": {
+        "CurrencyConstraint": [
+          "FelixHeroCoin"
+        ]
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Hero",
+      "configurationName": "Felix",
+      "configurationCategory": "GameItem.Unit",
+      "configurationVersion": "v1.0"
     },
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Equipment",
-      "configurationName": "equipment_exoskeleton_x",
-      "configurationCategory": "GameItem.Equipment",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "equipment_exoskeleton_x",
-        "TypeId": "Equipment",
+        "MaxEquipmentNumber": "6",
         "Level": "1",
-        "EquipmentType":"0"
+        "ConfigId": "markiv_unit_config",
+        "Xp": "100",
+        "Rank": "1"
       },
-      "application": {},
-      "reference": []
+      "application": {
+        "CurrencyConstraint": [
+          "MarkIVHeroCoin"
+        ]
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Hero",
+      "configurationName": "MarkIV",
+      "configurationCategory": "GameItem.Unit",
+      "configurationVersion": "v1.0"
     },
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Equipment",
-      "configurationName": "equipment_exoskeleton_y",
-      "configurationCategory": "GameItem.Equipment",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "equipment_exoskeleton_y",
-        "TypeId": "Equipment",
+        "MaxEquipmentNumber": "6",
         "Level": "1",
-        "EquipmentType":"0"
+        "ConfigId": "armored_shogun_unit_config",
+        "Xp": "100",
+        "Rank": "1"
       },
-      "application": {},
-      "reference": []
+      "application": {
+        "CurrencyConstraint": [
+          "ArmoredShogunHeroCoin"
+        ]
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Hero",
+      "configurationName": "ArmoredShogun",
+      "configurationCategory": "GameItem.Unit",
+      "configurationVersion": "v1.0"
     },
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Equipment",
-      "configurationName": "equipment_exoskeleton_z",
-      "configurationCategory": "GameItem.Equipment",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "equipment_exoskeleton_z",
-        "TypeId": "Equipment",
+        "MaxEquipmentNumber": "6",
         "Level": "1",
-        "EquipmentType":"0"
+        "ConfigId": "r3n_unit_config",
+        "Xp": "100",
+        "Rank": "1"
       },
-      "application": {},
-      "reference": []
+      "application": {
+        "CurrencyConstraint": [
+          "R3NHeroCoin"
+        ]
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Hero",
+      "configurationName": "R3N",
+      "configurationCategory": "GameItem.Unit",
+      "configurationVersion": "v1.0"
     },
     {
-      "configurationType": "commodity",
-      "configurationTypeId": "Equipment",
-      "configurationName": "equipment_armor_x",
-      "configurationCategory": "GameItem.Equipment",
-      "configurationVersion": "v1.0",
       "header": {
-        "Name": "equipment_armor_x",
-        "TypeId": "Equipment",
+        "MaxEquipmentNumber": "6",
         "Level": "1",
-        "EquipmentType":"0"
+        "ConfigId": "alexander_unit_config",
+        "Xp": "100",
+        "Rank": "1"
       },
-      "application": {},
-      "reference": []
+      "application": {
+        "CurrencyConstraint": [
+          "AlexanderHeroCoin"
+        ]
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Hero",
+      "configurationName": "Alexander",
+      "configurationCategory": "GameItem.Unit",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "MaxEquipmentNumber": "6",
+        "Level": "1",
+        "ConfigId": "kamiki_kikai_unit_config",
+        "Xp": "100",
+        "Rank": "1"
+      },
+      "application": {
+        "CurrencyConstraint": [
+          "KamikiKikaiHeroCoin"
+        ]
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Hero",
+      "configurationName": "KamikiKikai",
+      "configurationCategory": "GameItem.Unit",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "MaxEquipmentNumber": "6",
+        "Level": "1",
+        "ConfigId": "tabs_unit_config",
+        "Xp": "100",
+        "Rank": "1"
+      },
+      "application": {
+        "CurrencyConstraint": [
+          "TabsHeroCoin"
+        ]
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Hero",
+      "configurationName": "Tabs",
+      "configurationCategory": "GameItem.Unit",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "MaxEquipmentNumber": "6",
+        "Level": "1",
+        "ConfigId": "una's_lion_unit_config",
+        "Xp": "100",
+        "Rank": "1"
+      },
+      "application": {
+        "CurrencyConstraint": [
+          "Una'sLionHeroCoin"
+        ]
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Hero",
+      "configurationName": "Una'sLion",
+      "configurationCategory": "GameItem.Unit",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "MaxEquipmentNumber": "6",
+        "Level": "1",
+        "ConfigId": "tatter_unit_config",
+        "Xp": "100",
+        "Rank": "1"
+      },
+      "application": {
+        "CurrencyConstraint": [
+          "TatterHeroCoin"
+        ]
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Hero",
+      "configurationName": "Tatter",
+      "configurationCategory": "GameItem.Unit",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "MaxEquipmentNumber": "6",
+        "Level": "1",
+        "ConfigId": "hetra_of_nectanebo_unit_config",
+        "Xp": "100",
+        "Rank": "1"
+      },
+      "application": {
+        "CurrencyConstraint": [
+          "HetraOfNectaneboHeroCoin"
+        ]
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Hero",
+      "configurationName": "HetraOfNectanebo",
+      "configurationCategory": "GameItem.Unit",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "MaxEquipmentNumber": "6",
+        "Level": "1",
+        "ConfigId": "dr_yune_unit_config",
+        "Xp": "100",
+        "Rank": "1"
+      },
+      "application": {
+        "CurrencyConstraint": [
+          "DrYuneHeroCoin"
+        ]
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Hero",
+      "configurationName": "DrYune",
+      "configurationCategory": "GameItem.Unit",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "MaxEquipmentNumber": "6",
+        "Level": "1",
+        "ConfigId": "clonk_unit_config",
+        "Xp": "100",
+        "Rank": "1"
+      },
+      "application": {
+        "CurrencyConstraint": [
+          "ClonkHeroCoin"
+        ]
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Hero",
+      "configurationName": "Clonk",
+      "configurationCategory": "GameItem.Unit",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "MaxEquipmentNumber": "6",
+        "Level": "1",
+        "ConfigId": "valencia_unit_config",
+        "Xp": "100",
+        "Rank": "1"
+      },
+      "application": {
+        "CurrencyConstraint": [
+          "ValenciaHeroCoin"
+        ]
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Hero",
+      "configurationName": "Valencia",
+      "configurationCategory": "GameItem.Unit",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "MaxEquipmentNumber": "6",
+        "Level": "1",
+        "ConfigId": "beryl_unit_config",
+        "Xp": "100",
+        "Rank": "1"
+      },
+      "application": {
+        "CurrencyConstraint": [
+          "BerylHeroCoin"
+        ]
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Hero",
+      "configurationName": "Beryl",
+      "configurationCategory": "GameItem.Unit",
+      "configurationVersion": "v1.0"
     }
   ]
 }

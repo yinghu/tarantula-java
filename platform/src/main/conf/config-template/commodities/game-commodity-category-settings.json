@@ -191,7 +191,7 @@
           {
             "name": "SubStats",
             "type": "list",
-            "reference": "category:SubStat",
+            "reference": "category:StatEntry",
             "nullable": false,
             "downloadable": false
           }

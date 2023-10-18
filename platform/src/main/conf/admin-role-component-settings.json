@@ -5,7 +5,7 @@
       "configurationType": "component",
       "configurationTypeId": "Value",
       "configurationName": "Health",
-      "configurationCategory": "NamedValue",
+      "configurationCategory": "StatEntry",
       "configurationVersion": "v1.0",
       "header": {
         "Name": "Health",
@@ -18,7 +18,7 @@
       "configurationType": "component",
       "configurationTypeId": "Value",
       "configurationName": "MeleeDamage",
-      "configurationCategory": "NamedValue",
+      "configurationCategory": "StatEntry",
       "configurationVersion": "v1.0",
       "header": {
         "Name": "MeleeDamage",
@@ -31,7 +31,7 @@
       "configurationType": "component",
       "configurationTypeId": "Value",
       "configurationName": "RangedDamage",
-      "configurationCategory": "NamedValue",
+      "configurationCategory": "StatEntry",
       "configurationVersion": "v1.0",
       "header": {
         "Name": "RangedDamage",
@@ -44,7 +44,7 @@
       "configurationType": "component",
       "configurationTypeId": "Value",
       "configurationName": "CriticalDamagePercent",
-      "configurationCategory": "NamedValue",
+      "configurationCategory": "StatEntry",
       "configurationVersion": "v1.0",
       "header": {
         "Name": "CriticalDamagePercent",
@@ -57,7 +57,7 @@
       "configurationType": "component",
       "configurationTypeId": "Value",
       "configurationName": "Recovery",
-      "configurationCategory": "NamedValue",
+      "configurationCategory": "StatEntry",
       "configurationVersion": "v1.0",
       "header": {
         "Name": "Recovery",
@@ -70,7 +70,7 @@
       "configurationType": "component",
       "configurationTypeId": "Value",
       "configurationName": "Speed",
-      "configurationCategory": "NamedValue",
+      "configurationCategory": "StatEntry",
       "configurationVersion": "v1.0",
       "header": {
         "Name": "Speed",

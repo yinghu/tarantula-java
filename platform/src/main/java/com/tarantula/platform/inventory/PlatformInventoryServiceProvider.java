@@ -18,17 +18,11 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
 
     public static final String NAME = "inventory";
 
-    private TarantulaLogger logger;
 
-    //private final String gameServiceName;
-   // private GameCluster gameCluster;
-    //private ServiceContext serviceContext;
-    //private ApplicationPreSetup applicationPreSetup;
     private DataStore inventoryDataStore;
 
     public PlatformInventoryServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
-        //this.gameServiceName = gameCluster.serviceType();
     }
 
     @Override
@@ -48,14 +42,10 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
     @Override
     public void setup(ServiceContext serviceContext) {
         super.setup(serviceContext);
-        //this.serviceContext = serviceContext;
-        //this.applicationPreSetup = gameCluster.applicationPreSetup();
         this.inventoryDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME);
         this.logger = JDKLogger.getLogger(PlatformInventoryServiceProvider.class);
     }
-    public DataStore inventoryDataStore(){
-        return this.inventoryDataStore;
-    }
+
     public Category category(){
         return category((ci)->ci.configurationType().equals(Configurable.COMMODITY_CONFIG_TYPE));
     }

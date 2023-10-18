@@ -9,7 +9,7 @@
     {
       "header": {
         "scope": "component",
-        "type": "SubStat",
+        "type": "StatEntry",
         "description": "game statistics entry",
         "version": "1.0",
         "rechargeable": true
@@ -24,7 +24,7 @@
             "downloadable": false
           },
           {
-            "name": "Stat",
+            "name": "Value",
             "type": "number",
             "reference": "Integer",
             "nullable": false,

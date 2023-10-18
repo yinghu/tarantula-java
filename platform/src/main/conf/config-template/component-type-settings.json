@@ -5,8 +5,7 @@
   "description": "types of component category",
   "itemList":
   [
-    {"type": "category","name": "GameStatistics"},
-    {"type": "category","name": "NamedValue"},
+    {"type": "category","name": "StatEntry"},
     {"type": "category","name": "Room"}
   ]
 }

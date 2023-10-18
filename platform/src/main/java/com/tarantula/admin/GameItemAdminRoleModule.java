@@ -457,7 +457,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
                 this.context.log("unexpected error",ex,OnLog.ERROR);
             }
         }
-        /**
+
         Configuration assetConfiguration = this.context.configuration("asset");
         if(assetConfiguration!=null){
             try{
@@ -495,7 +495,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             }catch (Exception ex){
                 this.context.log("unexpected error",ex,OnLog.ERROR);
             }
-        }**/
+        }
     }
 
     @Override
