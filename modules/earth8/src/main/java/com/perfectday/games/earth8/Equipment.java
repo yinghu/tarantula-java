@@ -1,5 +1,7 @@
 package com.perfectday.games.earth8;
 
+import com.icodesoftware.Configurable;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Equipment extends GameItem{
@@ -29,5 +31,10 @@ public class Equipment extends GameItem{
     @Override
     public int getClassId() {
         return Earth8PortableRegistry.EQUIPMENT_CID;
+    }
+
+    public static Equipment fromConfig(long itemId,Configurable configurable){
+        Equipment equipment = new Equipment();
+        return equipment;
     }
 }

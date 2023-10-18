@@ -98,18 +98,36 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     }
 
     public void onInventory(Inventory inventory, Inventory.Stock stock){
-        this.gameContext.log(inventory.type()+" : "+inventory.typeId()+" : "+inventory.constrained(),OnLog.WARN);
         if(inventory.rechargeable()) return;
-        this.gameContext.log(stock.header().toString(),OnLog.WARN);
-        this.gameContext.log(stock.application().toString(),OnLog.WARN);
-        this.gameContext.log(stock.reference().toString(),OnLog.WARN);
-        ApplicationPreSetup applicationPreSetup = gameContext.applicationSchema().applicationPreSetup();
-        Configurable configurable = applicationPreSetup.load(gameContext.applicationSchema().application("item"),stock.stockId());
-        if(configurable==null) return;
-        this.gameContext.log(configurable.header().toString(),OnLog.WARN);
-        this.gameContext.log(configurable.application().toString(),OnLog.WARN);
-        this.gameContext.log(configurable.reference().toString(),OnLog.WARN);
-        this.gameContext.log(configurable.toJson().toString(),OnLog.WARN);
+        if(inventory.type().equals("GameItem.Equipment")){
+            ApplicationPreSetup applicationPreSetup = gameContext.applicationSchema().applicationPreSetup();
+            Configurable configurable = applicationPreSetup.load(gameContext.applicationSchema().application("item"),stock.stockId());
+            if(configurable==null) throw new RuntimeException("No configurable associated with inventory ["+inventory.type()+"]");
+            DataStore dataStore = applicationPreSetup.onDataStore("battle");
+            Equipment equipment = Equipment.fromConfig(stock.distributionId(),configurable);
+            dataStore.createIfAbsent(equipment,false);
+            return;
+        }
+        if(inventory.type().equals("GameItem.Unit")){
+            ApplicationPreSetup applicationPreSetup = gameContext.applicationSchema().applicationPreSetup();
+            Configurable configurable = applicationPreSetup.load(gameContext.applicationSchema().application("item"),stock.stockId());
+            if(configurable==null) throw new RuntimeException("No configurable associated with inventory ["+inventory.type()+"]");
+            DataStore dataStore = applicationPreSetup.onDataStore("battle");
+            Unit equipment = Unit.fromConfig(stock.distributionId(),configurable);
+            dataStore.createIfAbsent(equipment,false);
+            return;
+        }
+        this.gameContext.log("Inventory type ["+inventory.type()+"] not supported",OnLog.WARN);
+        //this.gameContext.log(stock.header().toString(),OnLog.WARN);
+        //this.gameContext.log(stock.application().toString(),OnLog.WARN);
+        //this.gameContext.log(stock.reference().toString(),OnLog.WARN);
+        //ApplicationPreSetup applicationPreSetup = gameContext.applicationSchema().applicationPreSetup();
+        //Configurable configurable = applicationPreSetup.load(gameContext.applicationSchema().application("item"),stock.stockId());
+        //if(configurable==null) return;
+        //this.gameContext.log(configurable.header().toString(),OnLog.WARN);
+        //this.gameContext.log(configurable.application().toString(),OnLog.WARN);
+        //this.gameContext.log(configurable.reference().toString(),OnLog.WARN);
+        //this.gameContext.log(configurable.toJson().toString(),OnLog.WARN);
     }
     @Override
     public void onLeft(Session session) {

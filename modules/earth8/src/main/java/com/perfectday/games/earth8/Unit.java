@@ -1,5 +1,7 @@
 package com.perfectday.games.earth8;
 
+import com.icodesoftware.Configurable;
+
 import java.util.List;
 
 public class Unit extends GameItem{
@@ -23,6 +25,11 @@ public class Unit extends GameItem{
     @Override
     public int getClassId() {
         return Earth8PortableRegistry.UNIT_CID;
+    }
+
+    public static Unit fromConfig(long itemId,Configurable configurable){
+        Unit unit = new Unit();
+        return unit;
     }
 
 }
