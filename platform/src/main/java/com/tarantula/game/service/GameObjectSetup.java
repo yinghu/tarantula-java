@@ -165,6 +165,10 @@ public class GameObjectSetup implements ApplicationPreSetup {
     public DataStore dataStore(Descriptor descriptor){
         return serviceContext.dataStore(Distributable.DATA_SCOPE,serviceDataStore(descriptor));
     }
+    @Override
+    public DataStore onDataStore(String name) {
+        return serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,name));
+    }
 
     private String configureDataStore(ApplicationSchema application,String suffix){
         String serviceTypeId = application.serviceType();

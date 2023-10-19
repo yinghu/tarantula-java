@@ -1,5 +1,6 @@
 package com.perfectday.games.earth8;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 
 import java.util.List;
@@ -29,6 +30,12 @@ public class Unit extends GameItem{
 
     public static Unit fromConfig(long itemId,Configurable configurable){
         Unit unit = new Unit();
+        unit.distributionId(itemId);
+        JsonObject header = configurable.header();
+        unit.configId = header.get("ConfigId").getAsString();
+        unit.level = header.get("Level").getAsInt();
+        unit.xp =  header.get("Xp").getAsInt();
+        unit.rank =  header.get("Rank").getAsInt();
         return unit;
     }
 
