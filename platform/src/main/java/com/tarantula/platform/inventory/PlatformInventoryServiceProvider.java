@@ -131,8 +131,8 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
 
 
     @Override
-    public void onInventory(Inventory inventory, Inventory.Stock item) {
+    public void onInventory(ApplicationPreSetup applicationPreSetup,Inventory inventory, Inventory.Stock item) {
         logger.warn("inventory added=>"+inventory.configurationTypeId());
-        this.platformGameServiceProvider.gameServiceProvider().onInventory(inventory,item);
+        this.platformGameServiceProvider.gameServiceProvider().onInventory(applicationPreSetup,inventory,item);
     }
 }

@@ -464,7 +464,7 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
     }
 
     @Override
-    public void onInventory(Inventory inventory, Inventory.Stock inventoryItem) {
-        onInventory.forEach(listener -> listener.onInventory(inventory,inventoryItem));
+    public void onInventory(ApplicationPreSetup applicationPreSetup,Inventory inventory, Inventory.Stock inventoryItem) {
+        onInventory.forEach(listener -> listener.onInventory(applicationPreSetup,inventory,inventoryItem));
     }
 }

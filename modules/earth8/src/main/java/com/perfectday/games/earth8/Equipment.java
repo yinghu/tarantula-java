@@ -6,6 +6,10 @@ import com.icodesoftware.Configurable;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Equipment extends GameItem{
+
+    public enum Type{ Weapon,Shield,Helmet,Chest,Gloves,Boots}
+
+    public Type type;
     public int rarity;
     public String primaryStatType;
     public int primaryStat;
@@ -13,6 +17,7 @@ public class Equipment extends GameItem{
     @Override
     public boolean write(DataBuffer buffer) {
         if(!super.write(buffer)) return false;
+        buffer.writeInt(type.ordinal());
         buffer.writeInt(rarity);
         buffer.writeUTF8(primaryStatType);
         buffer.writeInt(primaryStat);
@@ -23,6 +28,7 @@ public class Equipment extends GameItem{
     @Override
     public boolean read(DataBuffer buffer) {
         super.read(buffer);
+        type = Type.values()[buffer.readInt()];
         rarity = buffer.readInt();
         primaryStatType = buffer.readUTF8();
         primaryStat = buffer.readInt();
@@ -38,6 +44,7 @@ public class Equipment extends GameItem{
         Equipment equipment = new Equipment();
         equipment.distributionId(itemId);
         JsonObject header = configurable.header();
+        equipment.type = Type.values()[header.get("Type").getAsInt()];
         equipment.configId = header.get("ConfigId").getAsString();
         equipment.level = header.get("Level").getAsInt();
         equipment.xp =  header.get("Xp").getAsInt();

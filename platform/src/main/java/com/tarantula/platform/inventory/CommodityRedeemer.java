@@ -18,6 +18,7 @@ public class CommodityRedeemer extends ApplicationRedeemer {
         UserInventory inventory = (UserInventory)applicationPreSetup.inventory(Long.parseLong(systemId),this.configurationTypeId);
         DataStore inventoryDataStore = this.applicationPreSetup.onDataStore(Inventory.DataStore);
         if(inventory!=null){
+            inventory.applicationPreSetup(applicationPreSetup);
             inventory.redeem(this);
             return;
         }
@@ -27,6 +28,7 @@ public class CommodityRedeemer extends ApplicationRedeemer {
         inventoryDataStore.createEdge(inventory,this.configurationTypeId);
         inventoryDataStore.createEdge(inventory,this.configurationCategory);
         inventory.dataStore(inventoryDataStore);
+        inventory.applicationPreSetup(applicationPreSetup);
         inventory.redeem(this);
     }
 }

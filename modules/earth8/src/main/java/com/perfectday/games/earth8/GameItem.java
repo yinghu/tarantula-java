@@ -26,4 +26,9 @@ public class GameItem extends RecoverableObject {
         buffer.writeInt(rank);
         return true;
     }
+
+    @Override
+    public int getFactoryId() {
+        return Earth8PortableRegistry.OID;
+    }
 }

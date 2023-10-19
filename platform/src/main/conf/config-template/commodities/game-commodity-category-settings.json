@@ -140,6 +140,13 @@
       "application": {
         "properties": [
           {
+            "name": "Type",
+            "type": "enum",
+            "reference": "EquipmentType",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
             "name": "ConfigId",
             "type": "string",
             "reference": "String",

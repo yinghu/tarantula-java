@@ -1,5 +1,7 @@
 package com.icodesoftware;
 
+import com.icodesoftware.service.ApplicationPreSetup;
+
 import java.util.List;
 
 public interface Inventory extends Configurable,Balance,Countable{
@@ -17,6 +19,6 @@ public interface Inventory extends Configurable,Balance,Countable{
     }
 
     interface Listener{
-        void onInventory(Inventory inventory, Stock inventoryItem);
+        void onInventory(ApplicationPreSetup applicationPreSetup,Inventory inventory, Stock inventoryItem);
     }
 }

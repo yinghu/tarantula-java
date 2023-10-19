@@ -892,13 +892,14 @@
     },
     {
       "header": {
-        "ConfigId": "weapon_equipment_config",
+        "ConfigId": "vitality_weapon_equipment_config",
         "Level": "1",
         "Xp": "100",
         "Rank": "1",
         "Rarity": "1",
         "PrimaryStatType": "Melee",
-        "PrimaryStat": "1"
+        "PrimaryStat": "1",
+        "Type": "0"
       },
       "application": {
         "SubStats": []
@@ -906,19 +907,20 @@
       "reference": [],
       "configurationType": "commodity",
       "configurationTypeId": "Equip",
-      "configurationName": "WeaponEquip",
+      "configurationName": "VitalityWeapon",
       "configurationCategory": "GameItem.Equipment",
       "configurationVersion": "v1.0"
     },
     {
       "header": {
-        "ConfigId": "gloves_equipment_config",
+        "ConfigId": "vitality_shield_equipment_config",
         "Level": "1",
         "Xp": "100",
         "Rank": "1",
         "Rarity": "1",
         "PrimaryStatType": "Melee",
-        "PrimaryStat": "1"
+        "PrimaryStat": "1",
+        "Type": "1"
       },
       "application": {
         "SubStats": []
@@ -926,19 +928,20 @@
       "reference": [],
       "configurationType": "commodity",
       "configurationTypeId": "Equip",
-      "configurationName": "GlovesEquip",
+      "configurationName": "VitalityShield",
       "configurationCategory": "GameItem.Equipment",
       "configurationVersion": "v1.0"
     },
     {
       "header": {
-        "ConfigId": "boots_equipment_config",
+        "ConfigId": "vitality_helmet_equipment_config",
         "Level": "1",
         "Xp": "100",
         "Rank": "1",
         "Rarity": "1",
         "PrimaryStatType": "Melee",
-        "PrimaryStat": "1"
+        "PrimaryStat": "1",
+        "Type": "2"
       },
       "application": {
         "SubStats": []
@@ -946,7 +949,700 @@
       "reference": [],
       "configurationType": "commodity",
       "configurationTypeId": "Equip",
-      "configurationName": "BootsEquip",
+      "configurationName": "VitalityHelmet",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "vitality_chest_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "3"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "VitalityChest",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "vitality_gloves_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "4"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "VitalityGloves",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "vitality_boots_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "5"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "VitalityBoots",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "fury_weapon_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "0"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "FuryWeapon",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "fury_shield_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "1"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "FuryShield",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "fury_helmet_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "2"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "FuryHelmet",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "fury_chest_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "3"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "FuryChest",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "fury_gloves_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "4"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "FuryGloves",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "fury_boots_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "5"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "FuryBoots",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "guardian_weapon_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "0"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "GuardianWeapon",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "guardian_shield_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "1"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "GuardianShield",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "guardian_helmet_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "2"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "GuardianHelmet",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "guardian_chest_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "3"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "GuardianChest",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "guardian_gloves_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "4"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "GuardianGloves",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "guardian_boots_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "5"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "GuardianBoots",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "elite_vitality_weapon_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "0"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "EliteVitalityWeapon",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "elite_vitality_shield_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "1"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "EliteVitalityShield",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "elite_vitality_helmet_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "2"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "EliteVitalityHelmet",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "elite_vitality_chest_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "3"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "EliteVitalityChest",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "elite_vitality_gloves_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "4"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "EliteVitalityGloves",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "elite_vitality_boots_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "5"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "EliteVitalityBoots",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "elite_fury_weapon_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "0"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "EliteFuryWeapon",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "elite_fury_shield_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "1"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "EliteFuryShield",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "elite_fury_helmet_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "2"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "EliteFuryHelmet",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "elite_fury_chest_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "3"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "EliteFuryChest",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "elite_fury_gloves_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "4"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "EliteFuryGloves",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "elite_fury_boots_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "5"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "EliteFuryBoots",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "elite_guardian_weapon_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "0"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "EliteGuardianWeapon",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "elite_guardian_shield_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "1"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "EliteGuardianShield",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "elite_guardian_helmet_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "2"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "EliteGuardianHelmet",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "elite_guardian_chest_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "3"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "EliteGuardianChest",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "elite_guardian_gloves_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "4"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "EliteGuardianGloves",
+      "configurationCategory": "GameItem.Equipment",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "ConfigId": "elite_guardian_boots_equipment_config",
+        "Level": "1",
+        "Xp": "100",
+        "Rank": "1",
+        "Rarity": "1",
+        "PrimaryStatType": "Melee",
+        "PrimaryStat": "1",
+        "Type": "5"
+      },
+      "application": {
+        "SubStats": []
+      },
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "Equip",
+      "configurationName": "EliteGuardianBoots",
       "configurationCategory": "GameItem.Equipment",
       "configurationVersion": "v1.0"
     }

@@ -3,6 +3,7 @@ package com.tarantula.platform.inventory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Inventory;
+import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.item.ItemPortableRegistry;
 
@@ -23,7 +24,7 @@ public class UserInventory extends RecoverableObject implements Inventory {
     public String type;
 
     private Listener listener;
-
+    private ApplicationPreSetup applicationPreSetup;
     public UserInventory(){
         this.onEdge = true;
         this.label = LABEL;
@@ -57,7 +58,7 @@ public class UserInventory extends RecoverableObject implements Inventory {
         }
         count++;
         dataStore.update(this);
-        inventoryListener.onInventory(this,inventoryItem);
+        inventoryListener.onInventory(this.applicationPreSetup,this,inventoryItem);
     }
 
     public void redeem(ApplicationRedeemer commodity){
@@ -69,7 +70,7 @@ public class UserInventory extends RecoverableObject implements Inventory {
         }
         count++;
         dataStore.update(this);
-        listener.onInventory(this,inventoryItem);
+        listener.onInventory(this.applicationPreSetup,this,inventoryItem);
     }
 
     public void list(){
@@ -174,5 +175,8 @@ public class UserInventory extends RecoverableObject implements Inventory {
 
     public void resetListener(Listener listener){
         this.listener = listener;
+    }
+    public void applicationPreSetup(ApplicationPreSetup applicationPreSetup){
+        this.applicationPreSetup = applicationPreSetup;
     }
 }

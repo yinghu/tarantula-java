@@ -21,6 +21,6 @@
     {"type": "enum","name": "ItemType","value": [{"name":"HardCurrency","value":0},{"name":"SoftCurrency","value":1},{"name":"Bundle","value":2}]},
     {"type": "enum","name": "PurchaseType","value": [{"name":"HardCurrency","value":0},{"name":"SoftCurrency","value":1},{"name":"IAP","value":2}]},
     {"type": "enum","name": "VirtualCurrency","value": [{"name":"Gold","value":0},{"name":"Gem","value":1},{"name":"Coin","value":2},{"name":"Chip","value":3},{"name":"None","value":4}]},
-    {"type": "enum","name": "EquipmentType","value": [{"name":"TargetingSystem","value":0},{"name":"Motherboard","value":1},{"name":"Drone","value":2}]}
+    {"type": "enum","name": "EquipmentType","value": [{"name":"Weapon","value":0},{"name":"Shield","value":1},{"name":"Helmet","value":2},{"name":"Chest","value":3},{"name":"Gloves","value":4},{"name":"Boots","value":5}]}
   ]
 }
