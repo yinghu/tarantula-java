@@ -24,6 +24,11 @@ public class Unit extends GameItem{
     }
 
     @Override
+    public JsonObject toJson() {
+        return super.toJson();
+    }
+
+    @Override
     public int getClassId() {
         return Earth8PortableRegistry.UNIT_CID;
     }

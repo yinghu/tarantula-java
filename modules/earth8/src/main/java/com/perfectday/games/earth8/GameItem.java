@@ -1,5 +1,6 @@
 package com.perfectday.games.earth8;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.util.RecoverableObject;
 
 public class GameItem extends RecoverableObject {
@@ -30,5 +31,16 @@ public class GameItem extends RecoverableObject {
     @Override
     public int getFactoryId() {
         return Earth8PortableRegistry.OID;
+    }
+
+    @Override
+    public JsonObject toJson(){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("ItemId",distributionKey());
+        jsonObject.addProperty("ConfigId",configId);
+        jsonObject.addProperty("Level",level);
+        jsonObject.addProperty("Xp",xp);
+        jsonObject.addProperty("rank",rank);
+        return jsonObject;
     }
 }

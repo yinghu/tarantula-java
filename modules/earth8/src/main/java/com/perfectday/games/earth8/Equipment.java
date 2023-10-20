@@ -40,7 +40,17 @@ public class Equipment extends GameItem{
         return Earth8PortableRegistry.EQUIPMENT_CID;
     }
 
-    public static Equipment fromConfig(long itemId,Configurable configurable){
+    @Override
+    public JsonObject toJson() {
+        JsonObject jsonObject = super.toJson();
+        jsonObject.addProperty("Type",type.ordinal());
+        jsonObject.addProperty("Rarity",rarity);
+        jsonObject.addProperty("PrimaryStatType",primaryStatType);
+        jsonObject.addProperty("PrimaryStat",primaryStat);
+        return jsonObject;
+    }
+
+    public static Equipment fromConfig(long itemId, Configurable configurable){
         Equipment equipment = new Equipment();
         equipment.distributionId(itemId);
         JsonObject header = configurable.header();

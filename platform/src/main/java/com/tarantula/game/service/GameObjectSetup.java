@@ -200,7 +200,7 @@ public class GameObjectSetup implements ApplicationPreSetup {
         return gameCluster.createInventory(category,typeId);
     }
     public List<Inventory> inventoryList(long systemId){
-        DataStore ids = serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,PlatformInventoryServiceProvider.NAME));
+        DataStore ids = serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,Inventory.DataStore));
         InventoryQuery query = new InventoryQuery(systemId);
         List<Inventory> inventoryList = new ArrayList<>();
         ids.list(query).forEach(t->{
@@ -212,7 +212,7 @@ public class GameObjectSetup implements ApplicationPreSetup {
         return inventoryList;
     }
     public Inventory inventory(long systemId,String typeId){
-        DataStore ids = serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,PlatformInventoryServiceProvider.NAME));
+        DataStore ids = serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,Inventory.DataStore));
         InventoryQuery query = new InventoryQuery(systemId,typeId);
         List<Inventory> inventoryList = new ArrayList<>();
         ids.list(query).forEach(t->{
@@ -224,7 +224,7 @@ public class GameObjectSetup implements ApplicationPreSetup {
         return inventoryList.isEmpty()?null:inventoryList.get(0);
     }
     public Inventory inventory(long inventoryId){
-        DataStore ids = serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,PlatformInventoryServiceProvider.NAME));
+        DataStore ids = serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,Inventory.DataStore));
         UserInventory inventory = new UserInventory();
         inventory.distributionId(inventoryId);
         if(!ids.load(inventory)) return null;
