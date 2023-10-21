@@ -10,8 +10,8 @@ import com.icodesoftware.Tournament;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.platform.IndexSet;
 import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.platform.event.PortableEventRegistry;
 
@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class TournamentManager extends RecoverableObject implements Tournament, Portable {
 
-    private int schedule;
+    private Schedule schedule;
     private String type;
     private String description;
     private double enterCost;
@@ -40,7 +40,6 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     private int durationMinutes;
 
 
-    private IndexSet activeTournamentIndexSet;
     private ArrayBlockingQueue<TournamentInstance> pendingQueue;
     private ConcurrentHashMap<String, TournamentInstance> instanceIndex;
     private PlatformTournamentServiceProvider tournamentServiceProvider;
@@ -58,17 +57,17 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.type = schedule.type();
         this.name = schedule.name();
         this.description = schedule.description();
-        if(schedule.schedule()==Tournament.DAILY_SCHEDULE){
+        if(schedule.schedule()== Schedule.DAILY_SCHEDULE){
             this.startTime = LocalDateTime.now();
             this.endTime = this.startTime.plusHours(24);
             this.closeTime = this.endTime.minusMinutes(schedule.durationMinutesPerInstance());
         }
-        else if(schedule.schedule()==Tournament.WEEKLY_SCHEDULE){
+        else if(schedule.schedule()== Schedule.WEEKLY_SCHEDULE){
             this.startTime = LocalDateTime.now();
             this.endTime = this.startTime.plusDays(7);
             this.closeTime = this.endTime.minusMinutes(schedule.durationMinutesPerInstance());
         }
-        else if(schedule.schedule()==Tournament.MONTHLY_SCHEDULE){
+        else if(schedule.schedule()== Schedule.MONTHLY_SCHEDULE){
             this.startTime = LocalDateTime.now();
             this.endTime = this.startTime.plusDays(30);
             this.closeTime = this.endTime.minusMinutes(schedule.durationMinutesPerInstance());
@@ -87,7 +86,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     public TournamentManager(){
         roundRobin = new AtomicInteger(0);
     }
-    public int schedule(){
+    public Schedule schedule(){
         return this.schedule;
     }
 
@@ -112,33 +111,38 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return startTime;
     }
 
-    public Map<String,Object> toMap(){
-        properties.put("1",schedule);
-        properties.put("2",status.name());
-        properties.put("3",type);
-        properties.put("4",name);
-        properties.put("5", TimeUtil.toUTCMilliseconds(startTime));
-        properties.put("6", TimeUtil.toUTCMilliseconds(closeTime));
-        properties.put("7", TimeUtil.toUTCMilliseconds(endTime));
-        properties.put("8",maxEntriesPerInstance);
-        properties.put("9",durationMinutes);
-        properties.put("10",enterCost);
-        properties.put("11",index);
-        return properties;
+
+    @Override
+    public boolean write(DataBuffer buffer) {
+        buffer.writeInt(schedule.ordinal());
+        buffer.writeInt(status.ordinal());
+        buffer.writeUTF8(type);
+        buffer.writeUTF8(name);
+        buffer.writeLong(TimeUtil.toUTCMilliseconds(startTime));
+        buffer.writeLong(TimeUtil.toUTCMilliseconds(closeTime));
+        buffer.writeLong(TimeUtil.toUTCMilliseconds(endTime));
+        buffer.writeInt(maxEntriesPerInstance);
+        buffer.writeInt(durationMinutes);
+        buffer.writeDouble(enterCost);
+        buffer.writeUTF8(index);
+        return true;
     }
-    public void fromMap(Map<String,Object> properties){
-        this.schedule = ((Number)properties.get("1")).intValue();
-        this.status = Status.valueOf((String)properties.get("2"));
-        this.type = (String)properties.get("3");
-        this.name = (String)properties.get("4");
-        this.startTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("5")).longValue());
-        this.closeTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("6")).longValue());
-        this.endTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("7")).longValue());
-        this.maxEntriesPerInstance = ((Number)properties.get("8")).intValue();
-        this.durationMinutes = ((Number)properties.get("9")).intValue();
-        this.enterCost = ((Number)properties.get("10")).intValue();
-        this.index = (String)properties.get("11");
+
+    @Override
+    public boolean read(DataBuffer buffer) {
+        schedule = Schedule.values()[buffer.readInt()];
+        status = Status.values()[buffer.readInt()];
+        type = buffer.readUTF8();
+        name = buffer.readUTF8();
+        startTime = TimeUtil.fromUTCMilliseconds(buffer.readLong());
+        closeTime = TimeUtil.fromUTCMilliseconds(buffer.readLong());
+        endTime = TimeUtil.fromUTCMilliseconds(buffer.readLong());
+        maxEntriesPerInstance = buffer.readInt();
+        enterCost = buffer.readDouble();
+        index = buffer.readUTF8();
+        return true;
     }
+
     @Override
     public LocalDateTime closeTime() {
         return closeTime;
@@ -219,25 +223,13 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         ArrayList<  String> synced = new ArrayList<>();
         int[] pendingPoolSize = new int[]{0};
         pendingQueue = new ArrayBlockingQueue<>(this.tournamentServiceProvider.pendingInstancePoolSizePerSchedule);
-        activeTournamentIndexSet = new IndexSet(this.tournamentServiceProvider.serviceContext.node().nodeName());
-        activeTournamentIndexSet.distributionKey(this.distributionKey());
-        this.dataStore.createIfAbsent(activeTournamentIndexSet,true);
-        activeTournamentIndexSet.dataStore(this.dataStore);
-        activeTournamentIndexSet.keySet().forEach(k->{
-            TournamentInstance instance = new TournamentInstance();
-            instance.distributionKey(k);
-            if(this.dataStore.load(instance)) {
-                if(instance.status() == (Status.PENDING)){
-                    pendingQueue.offer(instance);
-                    pendingPoolSize[0]++;
-                }
-                else {//to master node for sync
-                    if(instance.status() != (Status.STARTING)) synced.add(k);
-                    this.activeTournamentIndexSet.removeKey(k);
-                }
+        TournamentInstanceQuery query = new TournamentInstanceQuery(this.distributionId,this.tournamentServiceProvider.serviceContext.node().nodeName());
+        dataStore.list(query).forEach(instance->{
+            if(instance.status() == (Status.PENDING)){
+                pendingQueue.offer(instance);
+                pendingPoolSize[0]++;
             }
         });
-        this.activeTournamentIndexSet.update();
         int pendingSize = this.tournamentServiceProvider.pendingInstancePoolSizePerSchedule-pendingPoolSize[0];
         if(pendingSize>0){
             for(int i=0;i<pendingSize;i++){
@@ -332,9 +324,6 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         TournamentInstance pendingEnded = this.instanceIndex.remove(ended.distributionKey());
         if(pendingEnded == null || pendingEnded.status() == (Status.ENDED)) return;
         if(pendingEnded.status() != (Status.CLOSED)) closeTournamentInstance(ended);
-        if(activeTournamentIndexSet.removeKey(ended.distributionKey())){
-            activeTournamentIndexSet.update();
-        }
         rank(pendingEnded);
         pendingEnded.ended();
         this.dataStore.update(pendingEnded);
@@ -375,13 +364,9 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         for(TournamentEntry entry : ended.end()){
             entry.rank(rank);
             entry.update();
-            PlayerTournamentHistory indexSet = new PlayerTournamentHistory();
-            indexSet.distributionKey(entry.systemId());
-            this.dataStore.createIfAbsent(indexSet,true);
             TournamentHistory history = new TournamentHistory(ended.distributionKey(),rank,entry.score(),LocalDateTime.now());
+            history.ownerKey(new SnowflakeKey(ended.distributionId()));
             dataStore.create(history);
-            //.indexSet.addKey(history.distributionKey());
-            dataStore.update(indexSet);
             TournamentPrize prize = prizes.get(rank);
             if(prize!=null) {
                 this.tournamentServiceProvider.inventoryServiceProvider.redeem(entry.systemId(),prize);
@@ -392,10 +377,10 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
     private TournamentInstance createInstance(){
         TournamentInstance instance = new TournamentInstance(maxEntriesPerInstance);
+        instance.label(this.tournamentServiceProvider.serviceContext.node().nodeName());
+        instance.ownerKey(this.key());
         this.dataStore.create(instance);
         this.tournamentServiceProvider.logger.warn(instance.toString());
-        activeTournamentIndexSet.addKey(instance.distributionKey());
-        activeTournamentIndexSet.update();
         return instance;
     }
 

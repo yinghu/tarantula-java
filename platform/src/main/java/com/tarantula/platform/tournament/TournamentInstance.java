@@ -15,7 +15,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -45,6 +44,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     }
     public TournamentInstance(){
         totalFinished = new AtomicInteger();
+        this.onEdge = true;
     }
 
     @Override
@@ -86,24 +86,31 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         return end;
     }
 
-    public Map<String,Object> toMap(){
-        properties.put("1",maxEntries);
-        properties.put("2", start!=null?TimeUtil.toUTCMilliseconds(start):0);
-        properties.put("3", close!=null?TimeUtil.toUTCMilliseconds(close):0);
-        properties.put("4", end!=null?TimeUtil.toUTCMilliseconds(end):0);
-        properties.put("5",status.name());
-        properties.put("6",routingNumber);
-        return properties;
+    @Override
+    public boolean write(DataBuffer buffer) {
+        buffer.writeInt(maxEntries);
+        buffer.writeLong(start!=null?TimeUtil.toUTCMilliseconds(start):0);
+        buffer.writeLong(close!=null?TimeUtil.toUTCMilliseconds(close):0);
+        buffer.writeLong(end!=null?TimeUtil.toUTCMilliseconds(end):0);
+        buffer.writeInt(status.ordinal());
+        buffer.writeInt(routingNumber);
+        return true;
     }
 
-    public void fromMap(Map<String,Object> properties){
-        this.maxEntries = ((Number)properties.get("1")).intValue();
-        this.start = TimeUtil.fromUTCMilliseconds(((Number)properties.getOrDefault("2",0)).longValue());
-        this.close = TimeUtil.fromUTCMilliseconds(((Number)properties.getOrDefault("3",0)).longValue());
-        this.end = TimeUtil.fromUTCMilliseconds(((Number)properties.getOrDefault("4",0)).longValue());
-        this.status = Tournament.Status.valueOf((String) properties.get("5"));
-        this.routingNumber = ((Number)properties.getOrDefault("6",0)).intValue();
+    @Override
+    public boolean read(DataBuffer buffer) {
+        maxEntries = buffer.readInt();
+        long _start = buffer.readLong();
+        if(_start>0) start = TimeUtil.fromUTCMilliseconds(_start);
+        long _close = buffer.readLong();
+        if(_close>0) close = TimeUtil.fromUTCMilliseconds(_close);
+        long _end = buffer.readLong();
+        if(_end>0) end = TimeUtil.fromUTCMilliseconds(_end);
+        status = Tournament.Status.values()[buffer.readInt()];
+        routingNumber = buffer.readInt();
+        return true;
     }
+
     public Tournament.RaceBoard raceBoard(){
         tournamentRaceBoard.reset();
         return tournamentRaceBoard;
@@ -134,7 +141,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     }
 
     public void load(){
-        dataStore.list(new TournamentEntryQuery(this.distributionKey()),(e)->{
+        dataStore.list(new TournamentEntryQuery(this.distributionId()),(e)->{
             e.dataStore(dataStore);
             entryIndex.put(e.systemId(),e);
             tournamentRaceBoard.addEntry(e);

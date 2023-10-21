@@ -93,7 +93,7 @@ public class TournamentHistoryRecord extends RecoverableObject implements Tourna
 
 
     public boolean load(){
-        dataStore.list(new TournamentEntryQuery(this.distributionKey()),(e)->{
+        dataStore.list(new TournamentEntryQuery(this.distributionId()),(e)->{
             e.dataStore(dataStore);
             entryIndex.put(e.systemId(),e);
             tournamentRaceBoard.addEntry(e);

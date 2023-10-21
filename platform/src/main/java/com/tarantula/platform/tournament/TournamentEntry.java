@@ -5,14 +5,14 @@ import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Tournament;
-import com.icodesoftware.util.JsonUtil;
+
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Map;
+
 
 public class TournamentEntry extends RecoverableObject implements Tournament.Entry, Portable {
 
@@ -65,23 +65,30 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     void rank(int rank){
         this.rank = rank;
     }
-    public Map<String,Object> toMap(){
-        properties.put("1",systemId);
-        properties.put("2",score);
-        properties.put("3",timestamp);
-        properties.put("4",rank);
-        properties.put("5",credits);
-        properties.put("6",finished);
-        return properties;
+
+
+    @Override
+    public boolean write(DataBuffer buffer) {
+        buffer.writeUTF8(systemId);
+        buffer.writeDouble(score);
+        buffer.writeLong(timestamp);
+        buffer.writeInt(rank);
+        buffer.writeDouble(credits);
+        buffer.writeBoolean(finished);
+        return true;
     }
-    public void fromMap(Map<String,Object> properties){
-        this.systemId = (String) properties.get("1");
-        this.score = ((Number)properties.getOrDefault("2",0)).doubleValue();
-        this.timestamp = ((Number)properties.getOrDefault("3",0)).longValue();
-        this.rank = ((Number)properties.getOrDefault("4",0)).intValue();
-        this.credits = ((Number)properties.getOrDefault("5",0)).doubleValue();
-        this.finished = (boolean)properties.getOrDefault("6",false);
+
+    @Override
+    public boolean read(DataBuffer buffer) {
+        systemId = buffer.readUTF8();
+        score = buffer.readDouble();
+        timestamp = buffer.readLong();
+        rank = buffer.readInt();
+        credits = buffer.readDouble();
+        finished = buffer.readBoolean();
+        return true;
     }
+
     @Override
     public int getFactoryId() {
         return PortableEventRegistry.OID;

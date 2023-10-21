@@ -1,5 +1,6 @@
 package com.tarantula.platform.tournament;
 
+import com.icodesoftware.Tournament;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
@@ -33,7 +34,7 @@ public class TournamentSchedule extends Application {
         return header.get("Description").getAsString();
     }
 
-    public int schedule(){ return header.get("Schedule").getAsInt();}
+    public Tournament.Schedule schedule(){ return Tournament.Schedule.values()[header.get("Schedule").getAsInt()];}
 
     public double enterCost(){ return header.get("EnterCost").getAsDouble();}
     public LocalDateTime startTime() {

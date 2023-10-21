@@ -16,29 +16,34 @@ public class TournamentHistory extends RecoverableObject implements Tournament.H
     public double score;
     public LocalDateTime dateTime;
     public TournamentHistory(){
-
+        this.onEdge = true;
+        this.label = Tournament.HISTORY_LABEL;
     }
     public TournamentHistory(String tournamentId,int rank,double score,LocalDateTime dateTime){
+        this();
         this.tournamentId = tournamentId;
         this.rank = rank;
         this.score = score;
         this.dateTime = dateTime;
     }
 
+
     @Override
-    public Map<String,Object> toMap(){
-        properties.put("1",tournamentId);
-        properties.put("2",rank);
-        properties.put("3",score);
-        properties.put("4", TimeUtil.toUTCMilliseconds(dateTime));
-        return this.properties;
+    public boolean write(DataBuffer buffer) {
+        buffer.writeUTF8(tournamentId);
+        buffer.writeInt(rank);
+        buffer.writeDouble(score);
+        buffer.writeLong(TimeUtil.toUTCMilliseconds(dateTime));
+        return true;
     }
+
     @Override
-    public void fromMap(Map<String,Object> properties){
-        this.tournamentId = (String)properties.get("1");
-        this.rank = ((Number)properties.get("2")).intValue();
-        this.score = ((Number)properties.get("3")).doubleValue();
-        this.dateTime = TimeUtil.fromUTCMilliseconds(((Number)properties.get("4")).longValue());
+    public boolean read(DataBuffer buffer) {
+        tournamentId = buffer.readUTF8();
+        rank = buffer.readInt();
+        score = buffer.readDouble();
+        dateTime = TimeUtil.fromUTCMilliseconds(buffer.readLong());
+        return true;
     }
 
     public int getFactoryId() {
