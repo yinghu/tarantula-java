@@ -5,7 +5,6 @@ import com.icodesoftware.service.ApplicationSchema;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.inventory.InventoryQuery;
-import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.inventory.UserInventory;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.VersionedConfigurableObject;
@@ -15,18 +14,12 @@ import com.icodesoftware.service.ApplicationPreSetup;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameConfigurationSetup implements ApplicationPreSetup {
-
-
-    protected String DS_CONFIG = "configuration";
-
-    protected ServiceContext serviceContext;
-    protected Listener listener;
-    protected GameCluster gameCluster;
+public class GameConfigurationSetup extends GamePreSetup implements ApplicationPreSetup {
 
     public GameConfigurationSetup(GameCluster gameCluster){
+        super(gameCluster);
         this.gameCluster = gameCluster;
-        this.listener = gameCluster;
+
     }
     public <T extends Configurable> boolean save(Descriptor application,T t){
         DataStore dataStore = parentContext.onDataStore(serviceDataStore(application));
@@ -104,24 +97,6 @@ public class GameConfigurationSetup implements ApplicationPreSetup {
         //return ret;
     }
 
-    protected String serviceDataStore(Descriptor application){
-        if(application.typeId().endsWith("-data")){
-            return application.typeId().replaceAll("-","_").replace("data","service");
-        }
-        if(application.typeId().endsWith("-lobby")){
-            return application.typeId().replaceAll("-","_").replace("lobby","service");
-        }
-        if(application.typeId().endsWith("-service")){
-            return application.typeId().replaceAll("-","_");
-        }
-        return null;
-    }
-
-
-    protected String query(String type,String category){
-        return new StringBuffer().append(type).append(Recoverable.PATH_SEPARATOR).append(category).toString();
-    }
-
 
     public <T extends Configurable> boolean save(ApplicationSchema gameCluster, T t){
         DataStore dataStore = parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));
@@ -176,14 +151,7 @@ public class GameConfigurationSetup implements ApplicationPreSetup {
         return serviceTypeId.replaceAll("-","_")+"_"+suffix;
     }
 
-    @Override
-    public void setup(ServiceContext serviceContext) {
-        this.serviceContext = serviceContext;
-    }
 
-    public void registerListener(Listener listener){
-        this.listener = listener;
-    }
     private void saveVersion(DataStore dataStore,ConfigurableObject configurableObject){
         VersionedConfigurableObject versionedConfigurableObject = new VersionedConfigurableObject(configurableObject);
         if(dataStore.createIfAbsent(versionedConfigurableObject,true)) return;
@@ -195,17 +163,16 @@ public class GameConfigurationSetup implements ApplicationPreSetup {
         });
         //dataStore.deleteEdge(configurableObject.key(),VersionedConfigurableObject.LABEL);
     }
-    public Inventory createInventory(String category,String typeId){
-        return gameCluster.createInventory(category,typeId);
-    }
+
     public List<Inventory> inventoryList(long systemId){
         DataStore ids = onDataStore(Inventory.DataStore);
         InventoryQuery query = new InventoryQuery(systemId);
         List<Inventory> inventoryList = new ArrayList<>();
         ids.list(query).forEach(t->{
             t.dataStore(ids);
-            t.list();
             t.resetListener(gameCluster);
+            t.applicationPreSetup(this);
+            t.list();
             inventoryList.add(t);
         });
         return inventoryList;
@@ -217,8 +184,9 @@ public class GameConfigurationSetup implements ApplicationPreSetup {
         List<UserInventory> inventoryList = new ArrayList<>();
         ids.list(query).forEach(t->{
             t.dataStore(ids);
-            t.list();
             t.resetListener(gameCluster);
+            t.applicationPreSetup(this);
+            t.list();
             inventoryList.add(t);
         });
         return inventoryList.isEmpty()?null:inventoryList.get(0);
@@ -229,8 +197,9 @@ public class GameConfigurationSetup implements ApplicationPreSetup {
         inventory.distributionId(inventoryId);
         if(!ids.load(inventory)) return null;
         inventory.dataStore(ids);
-        inventory.list();
         inventory.resetListener(gameCluster);
+        inventory.applicationPreSetup(this);
+        inventory.list();
         return inventory;
     }
 

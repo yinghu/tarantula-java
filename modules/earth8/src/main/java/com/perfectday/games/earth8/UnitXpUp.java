@@ -26,10 +26,6 @@ public class UnitXpUp extends BattleUpdate{
         return Earth8PortableRegistry.UNIT_XP_UP_CID;
     }
 
-    @Override
-    public int getFactoryId() {
-        return Earth8PortableRegistry.OID;
-    }
 
     public static UnitXpUp fromJson(JsonObject jsonObject){
         UnitXpUp unitXpUp = new UnitXpUp();

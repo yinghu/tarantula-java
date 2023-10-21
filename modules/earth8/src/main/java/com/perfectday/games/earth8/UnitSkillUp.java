@@ -27,10 +27,6 @@ public class UnitSkillUp extends BattleUpdate{
         return Earth8PortableRegistry.UNIT_SKILL_UP_CID;
     }
 
-    @Override
-    public int getFactoryId() {
-        return Earth8PortableRegistry.OID;
-    }
 
     public static UnitSkillUp fromJson(JsonObject jsonObject){
         UnitSkillUp unitRankUp = new UnitSkillUp();

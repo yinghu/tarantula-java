@@ -2,6 +2,7 @@ package com.perfectday.games.earth8;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
+import com.icodesoftware.util.SnowflakeKey;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,6 +15,7 @@ public class Equipment extends GameItem{
     public String primaryStatType;
     public int primaryStat;
     public ConcurrentHashMap<String,Integer> subStats;
+
     @Override
     public boolean write(DataBuffer buffer) {
         if(!super.write(buffer)) return false;

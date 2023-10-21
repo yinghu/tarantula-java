@@ -106,5 +106,9 @@ public class BattleUpdate extends RecoverableObject {
         return runUpdate(applicationPreSetup);
     }
 
+    @Override
+    public int getFactoryId() {
+        return Earth8PortableRegistry.OID;
+    }
 
 }

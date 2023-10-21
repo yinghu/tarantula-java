@@ -10,10 +10,6 @@ public class EquipmentSalvage extends BattleUpdate{
         return Earth8PortableRegistry.EQUIPMENT_SALVAGE_CID;
     }
 
-    @Override
-    public int getFactoryId() {
-        return Earth8PortableRegistry.OID;
-    }
 
     public static EquipmentSalvage fromJson(JsonObject jsonObject){
         EquipmentSalvage unitRankUp = new EquipmentSalvage();

@@ -43,4 +43,5 @@ public class GameItem extends RecoverableObject {
         jsonObject.addProperty("rank",rank);
         return jsonObject;
     }
+
 }

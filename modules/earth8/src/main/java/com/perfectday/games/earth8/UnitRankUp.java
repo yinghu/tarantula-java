@@ -26,10 +26,6 @@ public class UnitRankUp extends BattleUpdate{
         return Earth8PortableRegistry.UNIT_RANK_UP_CID;
     }
 
-    @Override
-    public int getFactoryId() {
-        return Earth8PortableRegistry.OID;
-    }
 
     public static UnitRankUp fromJson(JsonObject jsonObject){
         UnitRankUp unitRankUp = new UnitRankUp();

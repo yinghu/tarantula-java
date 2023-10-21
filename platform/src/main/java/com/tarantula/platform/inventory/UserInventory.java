@@ -3,8 +3,10 @@ package com.tarantula.platform.inventory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Inventory;
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.util.RecoverableObject;
+import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ItemPortableRegistry;
 
 import java.util.ArrayList;
@@ -22,7 +24,8 @@ public class UserInventory extends RecoverableObject implements Inventory {
 
     public String typeId;
     public String type;
-
+    private int stockFactoryId;
+    private int stockClassId;
     private Listener listener;
     private ApplicationPreSetup applicationPreSetup;
     public UserInventory(){
@@ -49,20 +52,8 @@ public class UserInventory extends RecoverableObject implements Inventory {
         this.listener = listener;
     }
 
-    public void redeem(ApplicationRedeemer commodity,Inventory.Listener inventoryListener){
-        InventoryItem inventoryItem = new InventoryItem(commodity);
-        inventoryItem.ownerKey(this.key());
-        dataStore.create(inventoryItem);
-        if(this.rechargeable){
-            balance += commodity.amount();
-        }
-        count++;
-        dataStore.update(this);
-        inventoryListener.onInventory(this.applicationPreSetup,this,inventoryItem);
-    }
-
     public void redeem(ApplicationRedeemer commodity){
-        InventoryItem inventoryItem = new InventoryItem(commodity);
+        InventoryItem inventoryItem = new InventoryItem(commodity,applicationPreSetup.distributionId());
         inventoryItem.ownerKey(this.key());
         dataStore.create(inventoryItem);
         if(this.rechargeable){
@@ -75,7 +66,16 @@ public class UserInventory extends RecoverableObject implements Inventory {
 
     public void list(){
          InventoryItemQuery query = new InventoryItemQuery(this.distributionId);
-         itemList.addAll(dataStore.list(query));
+         dataStore.list(query).forEach(inventoryItem -> {
+             if(!rechargeable){
+                 Recoverable stock = applicationPreSetup.create(stockFactoryId,stockClassId);
+                 stock.distributionId(inventoryItem.stockId());
+                 if(dataStore.load(stock)){
+                     inventoryItem.stock(stock);
+                 }
+             }
+             itemList.add(inventoryItem);
+         });
     }
     @Override
     public int getFactoryId() {
@@ -91,6 +91,8 @@ public class UserInventory extends RecoverableObject implements Inventory {
         count = buffer.readInt();
         rechargeable = buffer.readBoolean();
         constrained = buffer.readBoolean();
+        stockFactoryId = buffer.readInt();
+        stockClassId = buffer.readInt();
         return true;
     }
 
@@ -102,6 +104,8 @@ public class UserInventory extends RecoverableObject implements Inventory {
         buffer.writeInt(count);
         buffer.writeBoolean(rechargeable);
         buffer.writeBoolean(constrained);
+        buffer.writeInt(stockFactoryId);
+        buffer.writeInt(stockClassId);
         return true;
     }
 
@@ -178,5 +182,19 @@ public class UserInventory extends RecoverableObject implements Inventory {
     }
     public void applicationPreSetup(ApplicationPreSetup applicationPreSetup){
         this.applicationPreSetup = applicationPreSetup;
+    }
+
+    public int stockFactoryId(){
+        return stockFactoryId;
+    }
+    public int stockClassId(){
+        return stockClassId;
+    }
+
+    public void stockFactoryId(int stockFactoryId){
+        this.stockFactoryId = stockFactoryId;
+    }
+    public void stockClassId(int stockClassId){
+        this.stockClassId = stockClassId;
     }
 }

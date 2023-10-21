@@ -10,7 +10,6 @@ import com.tarantula.platform.item.*;
 import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.tournament.TournamentPrize;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -50,14 +49,7 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
         return category((ci)->ci.configurationType().equals(Configurable.COMMODITY_CONFIG_TYPE));
     }
     public List<Inventory> inventoryList(long systemId){
-        InventoryQuery query = new InventoryQuery(systemId);
-        List<Inventory> inventoryList = new ArrayList<>();
-        inventoryDataStore.list(query).forEach(t->{
-            t.dataStore(inventoryDataStore);
-            t.list();
-            inventoryList.add(t);
-        });
-        return inventoryList;
+        return this.applicationPreSetup.inventoryList(systemId);
     }
 
     public UserInventory inventory(long systemId, String category, String typeId){

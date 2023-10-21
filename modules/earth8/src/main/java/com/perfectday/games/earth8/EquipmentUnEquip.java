@@ -10,11 +10,6 @@ public class EquipmentUnEquip extends BattleUpdate{
         return Earth8PortableRegistry.EQUIPMENT_UN_EQUIP_CID;
     }
 
-    @Override
-    public int getFactoryId() {
-        return Earth8PortableRegistry.OID;
-    }
-
     public static EquipmentUnEquip fromJson(JsonObject jsonObject){
         EquipmentUnEquip unitRankUp = new EquipmentUnEquip();
         unitRankUp.parse(jsonObject);
