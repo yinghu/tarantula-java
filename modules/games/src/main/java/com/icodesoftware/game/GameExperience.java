@@ -2,8 +2,9 @@ package com.icodesoftware.game;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.JsonSerializable;
+import com.icodesoftware.util.RecoverableObject;
 
-public class GameExperience implements JsonSerializable {
+public class GameExperience extends RecoverableObject {
 
     public String name;
     public double statisticsDelta;

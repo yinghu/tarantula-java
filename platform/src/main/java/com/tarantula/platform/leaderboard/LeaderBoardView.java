@@ -4,12 +4,13 @@ package com.tarantula.platform.leaderboard;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.JsonSerializable;
+import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-public class LeaderBoardView implements JsonSerializable {
+public class LeaderBoardView extends RecoverableObject {
     public String category;
     public String classifier;
     public int size;
@@ -30,7 +31,7 @@ public class LeaderBoardView implements JsonSerializable {
         return jo;
     }
 
-    public static class EntryView implements JsonSerializable{
+    public static class EntryView extends RecoverableObject{
         public EntryView(int rank,String owner,double value,long timestamp){
             this.rank = rank;
             this.owner = owner;

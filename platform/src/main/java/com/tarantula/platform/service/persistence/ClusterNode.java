@@ -2,12 +2,12 @@ package com.tarantula.platform.service.persistence;
 
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
 
 
 public class ClusterNode extends RecoverableObject implements ClusterProvider.Node {
@@ -113,32 +113,36 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         return _toJson(true);
     }
 
+
     @Override
-    public Map<String,Object> toMap(){
-        properties.put("bucketName",this.bucketName);
-        properties.put("bucketId",this.bucketId);
-        properties.put("nodeName",this.nodeName);
-        properties.put("nodeId",this.nodeId);
-        properties.put("memberId",this.memberId);
-        properties.put("address",this.address);
-        properties.put("startTime",this.startTime);
-        properties.put("clusterNameSuffix",this.clusterNameSuffix);
-        properties.put("partitionNumber",this.partitionNumber);
-        properties.put("deploymentId",this.deploymentId);
-        return this.properties;
+    public byte[] toBinary() {
+        DataBuffer buffer = BufferProxy.buffer(500,false);
+        buffer.writeUTF8(bucketName);
+        buffer.writeLong(bucketId);
+        buffer.writeUTF8(nodeName);
+        buffer.writeLong(nodeId);
+        buffer.writeUTF8(memberId);
+        buffer.writeUTF8(address);
+        buffer.writeLong(startTime);
+        buffer.writeUTF8(clusterNameSuffix);
+        buffer.writeLong(deploymentId);
+        buffer.writeInt(partitionNumber);
+        return buffer.array();
     }
+
     @Override
-    public void fromMap(Map<String,Object> properties){
-        this.bucketName = (String) properties.get("bucketName");
-        this.bucketId = ((Number)properties.get("bucketId")).longValue();
-        this.nodeName = (String) properties.get("nodeName");
-        this.nodeId = ((Number)properties.get("nodeId")).longValue();
-        this.memberId = (String)properties.get("memberId");
-        this.address = (String)properties.get("address");
-        this.startTime = ((Number)properties.getOrDefault("startTime",0)).longValue();
-        this.clusterNameSuffix = (String)properties.get("clusterNameSuffix");
-        this.partitionNumber = ((Number)properties.getOrDefault("partitionNumber",0)).intValue();
-        this.deploymentId = ((Number)properties.get("deploymentId")).longValue();
+    public void fromBinary(byte[] data){
+        DataBuffer buffer = BufferProxy.wrap(data);
+        this.bucketName = buffer.readUTF8();
+        this.bucketId = buffer.readLong();
+        this.nodeName = buffer.readUTF8();
+        this.nodeId = buffer.readLong();
+        this.memberId =buffer.readUTF8();
+        this.address = buffer.readUTF8();
+        this.startTime =buffer.readLong();
+        this.clusterNameSuffix =buffer.readUTF8();
+        this.deploymentId = buffer.readLong();
+        this.partitionNumber = buffer.readInt();
     }
 
     private JsonObject _toJson(boolean toWeb){

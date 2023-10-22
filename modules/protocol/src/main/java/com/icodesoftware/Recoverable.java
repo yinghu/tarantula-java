@@ -16,14 +16,6 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable,V
     String owner();
     void owner(String owner);
 
-    //map format is back-forwarding support if keeping map key no duplicated
-    //new mappings can be added in runtime to use getOrDefault on fromMap call first time
-    Map<String,Object> toMap();
-    void fromMap(Map<String,Object> properties);
-
-    byte[] toBinary();
-    void fromBinary(byte[] payload);
-
     boolean disabled();
     void disabled(boolean disabled);
 

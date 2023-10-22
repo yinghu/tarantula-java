@@ -32,4 +32,7 @@ public interface Distributable {
 
     // marked as cluster distributing
     boolean distributable();
+
+    byte[] toBinary();
+    void fromBinary(byte[] payload);
 }

@@ -5,11 +5,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.JsonSerializable;
 import com.icodesoftware.protocol.Channel;
+import com.icodesoftware.util.RecoverableObject;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class PlayerUpdate implements JsonSerializable {
+public class PlayerUpdate extends RecoverableObject {
 
     public String systemId;
     public int stub;

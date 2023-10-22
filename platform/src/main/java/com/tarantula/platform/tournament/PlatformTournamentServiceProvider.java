@@ -3,6 +3,7 @@ package com.tarantula.platform.tournament;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
+import com.icodesoftware.util.BufferUtil;
 import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -163,7 +164,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
                 TournamentScheduleStatus status = new TournamentScheduleStatus();
                 status.distributionKey(tournament.index());
                 this.dataStore.load(status);
-                byte[] lockKey = tournament.distributionKey().getBytes();
+                byte[] lockKey = tournament.key().asBinary();
                 try{
                     scheduleStore.mapLock(lockKey);
                     if(!this.scheduleStore.mapExists(lockKey)){
@@ -225,7 +226,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
                 //midnight scheduling
                 pendingSchedule = this.scheduleStore.queuePoll();
                 if(pendingSchedule!=null){
-                    TournamentSchedule schedule = this.tournamentSchedule(new String(pendingSchedule));
+                    TournamentSchedule schedule = this.tournamentSchedule(BufferUtil.toLong(pendingSchedule));
                     if(schedule!=null && !schedule.configurableObject.disabled()){
                         registerTournament(schedule);
                     }
@@ -238,10 +239,10 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         LocalDateTime _current = LocalDateTime.now();
         TournamentScheduleStatusQuery query = new TournamentScheduleStatusQuery(this.serviceContext.node().nodeId(),TournamentScheduleStatus.TOURNAMENT_SCHEDULE_LOOKUP_INDEX);
         dataStore.list(query).forEach(ts->{
-            TournamentSchedule schedule = this.tournamentSchedule(ts.distributionKey());
+            TournamentSchedule schedule = this.tournamentSchedule(ts.distributionId());
             if(schedule!=null){
                 if(schedule.startTime().getDayOfYear() == _current.plusDays(1).getDayOfYear()){
-                    scheduleStore.queueOffer(ts.distributionKey().getBytes());
+                    scheduleStore.queueOffer(BufferUtil.fromLong(ts.distributionId()));
                 }
             }
         });
@@ -250,7 +251,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     void closeTournament(TournamentManager tournament){
         this.listeners.forEach(l->l.tournamentClosed(tournament));
-        byte[] lockKey = tournament.distributionKey().getBytes();
+        byte[] lockKey = tournament.key().asBinary();
         try {
             scheduleStore.mapLock(lockKey);
             tournament.close();
@@ -260,7 +261,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         }
     }
     void endTournament(TournamentManager tournament){
-        byte[] lockKey = tournament.distributionKey().getBytes();
+        byte[] lockKey = tournament.key().asBinary();
         try {
             scheduleStore.mapLock(lockKey);
             tournament.end();
@@ -279,7 +280,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     @Override
     public <T extends Configurable> void register(T t) {
         if(!t.configurationCategory().equals("TournamentSchedule")) throw new RuntimeException(t.configurationCategory()+" cannot be registered");
-        byte[] lockKey = t.distributionKey().getBytes();
+        byte[] lockKey = t.key().asBinary();
         try{
             scheduleStore.mapLock(lockKey);
             TournamentScheduleStatus status = new TournamentScheduleStatus();
@@ -355,7 +356,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         if(TimeUtil.expired(schedule.startTime())
                 || (schedule.startTime().getYear() ==_current.getYear() && schedule.startTime().getDayOfYear() ==_current.getDayOfYear())) throw new RuntimeException("start time already expired on daily midnight launch");
         if(schedule.startTime().getDayOfYear() == _current.plusDays(1).getDayOfYear()){
-            this.scheduleStore.queueOffer(schedule.distributionKey().getBytes());
+            this.scheduleStore.queueOffer(BufferUtil.fromLong(schedule.distributionId()));
         }
     }
     private void registerTournament(TournamentSchedule schedule){
@@ -370,13 +371,12 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         status.tournamentId = tournament.distributionId();
         status.status = Tournament.Status.STARTING;
         dataStore.update(status);
-        logger.warn(tournament.toString());
         this.serviceContext.schedule(new ScheduleRunner(SCHEDULE_RUNNER_DELAY,()->{
-            byte[] lockKey = tournament.distributionKey().getBytes();
+            byte[] lockKey = tournament.key().asBinary();
             try{
                 this.scheduleStore.mapLock(lockKey);
                 status.status = Tournament.Status.STARTED;
-                this.scheduleStore.mapSet(lockKey,status.distributionKey().getBytes());//
+                this.scheduleStore.mapSet(lockKey,status.toBinary());//
                 this.distributionItemService.onRegisterItem(gameServiceName,name(),"TournamentSchedule",tournament.distributionKey());
                 dataStore.update(status);
             }finally {
@@ -397,12 +397,12 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         TournamentScheduleStatus status = new TournamentScheduleStatus();
         status.distributionKey(tournament.index());
         this.dataStore.delete(status);
-        ConfigurableObject schedule = this.tournamentSchedule(tournament.index()).configurableObject;
+        ConfigurableObject schedule = this.tournamentSchedule(Long.parseLong(tournament.index())).configurableObject;
         schedule.released();
     }
-    private TournamentSchedule tournamentSchedule(String scheduleId){
+    private TournamentSchedule tournamentSchedule(long scheduleId){
         ConfigurableObject schedule = new ConfigurableObject();
-        schedule.distributionKey(scheduleId);
+        schedule.distributionId(scheduleId);
         return applicationPreSetup.load(application,schedule) ? new TournamentSchedule(schedule) : null;
     }
 

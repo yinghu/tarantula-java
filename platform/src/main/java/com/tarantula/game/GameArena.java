@@ -2,10 +2,11 @@ package com.tarantula.game;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Arena;
+import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.lobby.ArenaItem;
 
 
-public class GameArena implements Arena {
+public class GameArena extends RecoverableObject implements Arena {
 
     private ArenaItem arenaItem;
 

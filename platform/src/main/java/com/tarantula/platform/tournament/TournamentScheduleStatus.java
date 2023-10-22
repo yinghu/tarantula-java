@@ -1,6 +1,7 @@
 package com.tarantula.platform.tournament;
 
 import com.icodesoftware.Tournament;
+import com.icodesoftware.util.BufferUtil;
 import com.icodesoftware.util.RecoverableObject;
 
 
@@ -40,4 +41,8 @@ public class TournamentScheduleStatus extends RecoverableObject {
         return "Tournament Schedule ["+tournamentId+"]["+status+"]";
     }
 
+    @Override
+    public byte[] toBinary() {
+        return BufferUtil.fromLong(tournamentId);
+    }
 }

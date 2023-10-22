@@ -5,8 +5,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.JsonSerializable;
 import com.icodesoftware.util.JsonUtil;
+import com.icodesoftware.util.RecoverableObject;
 
-public class UpdateBatch implements JsonSerializable {
+public class UpdateBatch extends RecoverableObject {
 
     public PlayerUpdate[] playerUpdates;
 
