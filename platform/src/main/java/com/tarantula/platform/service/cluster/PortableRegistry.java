@@ -37,8 +37,6 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
 
     public static final int ON_SESSION_CID = 25;//DEPLOY OBJECT
 
-    public static final int INDEX_SET_CID = 26;
-
     public static final int ON_VIEW_OID = 28;
 
     public static final int PROPERTY_INDEX_SET_CID = 29;
@@ -107,9 +105,6 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
                 break;
             case ON_SESSION_CID:
                 _ins = new OnSessionTrack();
-                break;
-            case INDEX_SET_CID:
-                _ins = new IndexSet();
                 break;
             case ON_VIEW_OID:
                 _ins = new OnViewTrack();

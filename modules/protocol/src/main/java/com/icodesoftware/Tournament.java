@@ -8,10 +8,6 @@ public interface Tournament extends Configurable {
     String ENTRY_LABEL = "TEE";
     String HISTORY_LABEL = "History";
 
-    //int DAILY_SCHEDULE = 0;
-    //int WEEKLY_SCHEDULE = 1;
-    //int MONTHLY_SCHEDULE = 2;
-    //int ON_DEMAND_SCHEDULE = 3;
 
     enum Schedule{
         DAILY_SCHEDULE,WEEKLY_SCHEDULE,MONTHLY_SCHEDULE,ON_DEMAND_SCHEDULE
@@ -34,9 +30,6 @@ public interface Tournament extends Configurable {
     LocalDateTime endTime();
     int maxEntriesPerInstance();
     int durationMinutesPerInstance();
-
-    //void close();
-
 
     interface Entry extends Configurable {
         String systemId();

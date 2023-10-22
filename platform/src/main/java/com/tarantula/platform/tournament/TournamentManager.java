@@ -51,6 +51,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     private ClusterProvider.ClusterStore[] instanceStores;
     private AtomicInteger roundRobin;
 
+    //public long scheduleId;
+
     public TournamentManager(TournamentSchedule schedule){
         this();
         this.schedule = schedule.schedule();
