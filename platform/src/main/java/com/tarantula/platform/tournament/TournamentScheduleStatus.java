@@ -39,4 +39,5 @@ public class TournamentScheduleStatus extends RecoverableObject {
     public String toString(){
         return "Tournament Schedule ["+tournamentId+"]["+status+"]";
     }
+
 }

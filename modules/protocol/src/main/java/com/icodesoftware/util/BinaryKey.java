@@ -20,6 +20,11 @@ public class BinaryKey implements Recoverable.Key {
         return Base64.getEncoder().encodeToString(key);
     }
 
+    @Override
+    public byte[] asBinary() {
+        return key;
+    }
+
     public boolean read(Recoverable.DataBuffer buffer){
         key = buffer.array();
         return true;

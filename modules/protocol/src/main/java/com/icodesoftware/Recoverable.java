@@ -48,6 +48,7 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable,V
 
     interface Key extends Bufferable,Validatable{
         String asString();
+        byte[] asBinary();
     }
 
 

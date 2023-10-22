@@ -14,8 +14,12 @@ public class SnowflakeKey implements Recoverable.Key {
     }
 
     public String asString(){
-        byte[] data = ByteBuffer.allocate(8).order(ByteOrder.nativeOrder()).putLong(snowflakeId).flip().array();
-        return Base64.getEncoder().encodeToString(data);
+        return Base64.getEncoder().encodeToString(asBinary());
+    }
+
+    @Override
+    public byte[] asBinary() {
+        return ByteBuffer.allocate(8).order(ByteOrder.nativeOrder()).putLong(snowflakeId).flip().array();
     }
 
     public boolean read(Recoverable.DataBuffer buffer){

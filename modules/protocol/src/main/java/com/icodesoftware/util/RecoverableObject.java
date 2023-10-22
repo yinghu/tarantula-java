@@ -94,10 +94,10 @@ public class RecoverableObject implements Recoverable {
     public void fromMap(Map<String,Object> properties){
         properties.forEach((String k,Object v)->this.properties.put(k,v));
     }
-    final public byte[] toBinary(){
+    public byte[] toBinary(){
         return JsonUtil.toJson(toMap());
     }
-    final public void fromBinary(byte[] payload){
+    public void fromBinary(byte[] payload){
         fromMap(JsonUtil.toMap(payload));
     }
     public boolean backup(){

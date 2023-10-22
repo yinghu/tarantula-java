@@ -14,8 +14,8 @@ public class NaturalKey implements Recoverable.Key {
     }
 
     public String asString(){
-        byte[] data = ByteBuffer.allocate(key.length()+4).order(ByteOrder.nativeOrder()).putInt(key.length()).put(key.getBytes()).flip().array();
-        return Base64.getEncoder().encodeToString(data);
+        //byte[] data = ByteBuffer.allocate(key.length()+4).order(ByteOrder.nativeOrder()).putInt(key.length()).put(key.getBytes()).flip().array();
+        return Base64.getEncoder().encodeToString(asBinary());
     }
 
     public boolean read(Recoverable.DataBuffer buffer){
@@ -30,6 +30,11 @@ public class NaturalKey implements Recoverable.Key {
     @Override
     public String toString(){
         return key;
+    }
+
+    @Override
+    public byte[] asBinary() {
+        return ByteBuffer.allocate(key.length()+4).order(ByteOrder.nativeOrder()).putInt(key.length()).put(key.getBytes()).flip().array();
     }
 
     @Override

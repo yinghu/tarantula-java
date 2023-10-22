@@ -42,10 +42,6 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     public ClusterNode(){
     }
 
-    public ClusterNode(String memberId){
-        this.memberId = memberId;
-    }
-
     public String toString(){
         return "Bucket ["+bucketName+"] On Node ["+nodeName+"]";
     }
