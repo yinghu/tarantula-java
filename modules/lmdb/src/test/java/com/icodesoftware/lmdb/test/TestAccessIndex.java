@@ -14,7 +14,7 @@ public class TestAccessIndex extends RecoverableObject implements AccessIndex {
 
     private int referenceId;
     public TestAccessIndex(){
-        this.bucket = "DBS";
+        //this.bucket = "DBS";
         this.referenceId = 1;
     }
     public TestAccessIndex(String owner){
@@ -46,25 +46,25 @@ public class TestAccessIndex extends RecoverableObject implements AccessIndex {
 
     @Override
     public Map<String,Object> toMap(){
-        this.properties.put("1",bucket);
+        //this.properties.put("1",bucket);
         this.properties.put("3",referenceId);
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        this.bucket = (String)properties.get("1");
+        //this.bucket = (String)properties.get("1");
         this.referenceId = ((Number)properties.get("3")).intValue();
     }
 
     public boolean read(DataBuffer buffer){
-        this.bucket = buffer.readUTF8();
+        //this.bucket = buffer.readUTF8();
 
         this.referenceId = buffer.readInt();
         this.distributionId = buffer.readLong();
         return true;
     }
     public boolean write(DataBuffer buffer) {
-        buffer.writeUTF8(bucket);
+        //buffer.writeUTF8(bucket);
         buffer.writeInt(referenceId);
         buffer.writeLong(distributionId);
         return true;
@@ -82,7 +82,7 @@ public class TestAccessIndex extends RecoverableObject implements AccessIndex {
 
     @Override
     public String toString(){
-        return "Access Index ["+owner+"]->"+bucket+"/"+distributionId+"] referenceID =>"+referenceId+"]";
+        return "Access Index ["+owner+"]->"+"/"+distributionId+"] referenceID =>"+referenceId+"]";
     }
 
     public Key key(){

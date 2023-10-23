@@ -10,9 +10,6 @@ public interface Distributable {
     int INDEX_SCOPE = 3; //KEY INDEX REPLICATION SCOPE
     int LOG_SCOPE = 4; //TRANSACTION LOG SCOPE
 
-    String bucket();
-    void bucket(String bucket);
-
     long distributionId();
     void distributionId(long distributionId);
 

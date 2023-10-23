@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class RecoverableObject implements Recoverable {
 
-    protected String bucket;
+    //protected String bucket;
 
     protected transient Key ownerKey;
 
@@ -45,14 +45,6 @@ public class RecoverableObject implements Recoverable {
     }
     public void timestamp(long timestamp){
         this.timestamp = timestamp;
-    }
-
-    public String bucket() {
-        return bucket;
-    }
-
-    public void bucket(String bucket) {
-        this.bucket = bucket;
     }
 
     public Key ownerKey(){

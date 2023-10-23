@@ -44,7 +44,6 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
     public final static String GAME_COMMODITY_CATEGORY_TEMPLATE = "commodities";
     public final static String GAME_ITEM_CATEGORY_TEMPLATE = "items";
     public final static String GAME_APPLICATION_CATEGORY_TEMPLATE = "applications";
-
     public final static String GAME_COMMON_TYPE_TEMPLATE = "common-type-settings";
 
 
@@ -100,7 +99,7 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
         portableWriter.writeBoolean("1",successful);
         portableWriter.writeUTF("2",message);
         if(successful){
-            portableWriter.writeUTF("3",this.bucket);
+            //portableWriter.writeUTF("3",this.bucket);
             portableWriter.writeLong("4",distributionId);
         }
     }
@@ -110,7 +109,7 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
         successful = portableReader.readBoolean("1");
         message = portableReader.readUTF("2");
         if(successful){
-            bucket = portableReader.readUTF("3");
+            //bucket = portableReader.readUTF("3");
             distributionId = portableReader.readLong("4");
         }
     }

@@ -14,6 +14,7 @@ public interface Configurable extends Recoverable, DataStore.Updatable {
     String ASSET_CONFIG_TYPE = "asset";
     String COMMODITY_CONFIG_TYPE = "commodity";
     String ITEM_CONFIG_TYPE = "item";
+
     String APPLICATION_CONFIG_TYPE = "application";
 
     default <T extends Configurable> void registerListener(Listener<T> listener){}
@@ -40,7 +41,6 @@ public interface Configurable extends Recoverable, DataStore.Updatable {
     default boolean configureAndValidate(){ return false;}
 
     default <T extends Configurable> T setup(){ return null;}
-    default JsonObject toJson(){ return new JsonObject();}
 
     default JsonObject header(){ return null;}
     default JsonObject application(){ return null;}
