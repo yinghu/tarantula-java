@@ -140,6 +140,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         closeTime = TimeUtil.fromUTCMilliseconds(buffer.readLong());
         endTime = TimeUtil.fromUTCMilliseconds(buffer.readLong());
         maxEntriesPerInstance = buffer.readInt();
+        durationMinutes = buffer.readInt();
         enterCost = buffer.readDouble();
         index = buffer.readUTF8();
         return true;

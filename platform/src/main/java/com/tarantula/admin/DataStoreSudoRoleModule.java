@@ -68,7 +68,6 @@ public class DataStoreSudoRoleModule implements Module {
             int[] batch = {Integer.parseInt(query[2])};
             summary.addProperty("keyStartIndex",kn[0]);
             summary.addProperty("keyEndIndex",kn[0]+batch[0]);
-            Gson gson = new Gson();
             sum.list((n,h,t)->{
                 kn[0]--;
                 if(kn[0]<0) {
@@ -78,7 +77,7 @@ public class DataStoreSudoRoleModule implements Module {
                     debug.addProperty("local",h.local());
                     debug.addProperty("revision",Long.toString(h.revision()));
                     debug.addProperty("node",n.nodeName());
-                    debug.add("content",gson.toJsonTree(t));
+                    debug.add("content",t.toJson());
                     keys.add(debug);
                     batch[0]--;
                 }

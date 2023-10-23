@@ -13,6 +13,10 @@ import com.tarantula.platform.service.PresenceKey;
 import com.tarantula.platform.service.ServiceEventLog;
 import com.tarantula.platform.service.persistence.TransactionLog;
 import com.tarantula.platform.service.persistence.TransactionResult;
+import com.tarantula.platform.tournament.TournamentEntry;
+import com.tarantula.platform.tournament.TournamentInstance;
+import com.tarantula.platform.tournament.TournamentManager;
+import com.tarantula.platform.tournament.TournamentRaceBoard;
 
 
 public class PortableRegistry<T extends Recoverable> extends AbstractRecoverableListener {
@@ -54,6 +58,13 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
     public static final int ACCESS_INDEX_CID = PortableEventRegistry.ACCESS_INDEX_CID;
 
+    public static final int TOURNAMENT_CID = PortableEventRegistry.TOURNAMENT_CID;
+
+    public static final int TOURNAMENT_INSTANCE_CID = PortableEventRegistry.TOURNAMENT_INSTANCE_CID;
+
+    public static final int TOURNAMENT_ENTRY_CID = PortableEventRegistry.TOURNAMENT_ENTRY_CID;
+
+    public static final int TOURNAMENT_RACE_BOARD_CID = PortableEventRegistry.TOURNAMENT_RACE_BOARD_CID;
     public static final int GAME_ENTRY_CID = PortableEventRegistry.GAME_ENTRY_CID;
 
     public static final int PVE_ROOM_CID = PortableEventRegistry.PVE_ROOM_CID;
@@ -130,6 +141,18 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
                 break;
             case ACCESS_INDEX_CID:
                 _ins = new AccessIndexTrack();
+                break;
+            case TOURNAMENT_CID:
+                _ins = new TournamentManager();
+                break;
+            case TOURNAMENT_INSTANCE_CID:
+                _ins = new TournamentInstance();
+                break;
+            case TOURNAMENT_ENTRY_CID:
+                _ins = new TournamentEntry();
+                break;
+            case TOURNAMENT_RACE_BOARD_CID:
+                _ins = new TournamentRaceBoard();
                 break;
             case CLIENT_CONNECTION_CID:
                 _ins = new ClientConnection();

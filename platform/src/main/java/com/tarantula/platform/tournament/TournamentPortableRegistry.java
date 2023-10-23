@@ -1,7 +1,6 @@
 package com.tarantula.platform.tournament;
 
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.AbstractRecoverableListener;
 import com.tarantula.platform.event.PortableEventRegistry;
 
