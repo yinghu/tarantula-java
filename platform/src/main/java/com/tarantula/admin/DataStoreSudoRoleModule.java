@@ -92,12 +92,11 @@ public class DataStoreSudoRoleModule implements Module {
             JsonObject summary = new JsonObject();
             JsonArray data = new JsonArray();
             if(sum!=null){
-                Gson gson = new Gson();
                 sum.load(query[1].getBytes(),(n,h,t)->{
                     JsonObject debug = new JsonObject();
                     debug.addProperty("local",h.local());
                     debug.addProperty("revision",Long.toString(h.revision()));
-                    debug.add("content",gson.toJsonTree(t));
+                    debug.add("content",t.toJson());
                     data.add(debug);
                     return true;
                 });

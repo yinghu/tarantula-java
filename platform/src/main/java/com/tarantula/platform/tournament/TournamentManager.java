@@ -17,6 +17,7 @@ import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -338,6 +339,11 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         jsonObject.addProperty("TournamentId",this.distributionKey());
         jsonObject.addProperty("Type",type);
         jsonObject.addProperty("Name",name);
+        jsonObject.addProperty("StartTime",startTime.format(DateTimeFormatter.ISO_DATE_TIME));
+        jsonObject.addProperty("CloseTime",closeTime.format(DateTimeFormatter.ISO_DATE_TIME));
+        jsonObject.addProperty("EndTime",endTime.format(DateTimeFormatter.ISO_DATE_TIME));
+        jsonObject.addProperty("DurationMinutes",durationMinutes);
+        jsonObject.addProperty("MaxEntries",maxEntriesPerInstance);
         jsonObject.addProperty("EnterCost",enterCost);
         jsonObject.addProperty("ScheduleId",this.index);
         return jsonObject;

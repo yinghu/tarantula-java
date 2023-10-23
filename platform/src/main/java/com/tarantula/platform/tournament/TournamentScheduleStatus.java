@@ -1,5 +1,6 @@
 package com.tarantula.platform.tournament;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.BufferUtil;
 import com.icodesoftware.util.RecoverableObject;
@@ -44,5 +45,14 @@ public class TournamentScheduleStatus extends RecoverableObject {
     @Override
     public byte[] toBinary() {
         return BufferUtil.fromLong(tournamentId);
+    }
+
+    @Override
+    public JsonObject toJson() {
+        JsonObject json = new JsonObject();
+        json.addProperty("TournamentId",tournamentId);
+        json.addProperty("Status",status.name());
+        json.addProperty("DistributionId",distributionKey());
+        return json;
     }
 }
