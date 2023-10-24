@@ -52,7 +52,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     private ClusterProvider.ClusterStore[] instanceStores;
     private AtomicInteger roundRobin;
 
-    //public long scheduleId;
+    private long scheduleId;
 
     public TournamentManager(TournamentSchedule schedule){
         this();
@@ -83,7 +83,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.maxEntriesPerInstance = schedule.maxEntriesPerInstance();
         this.durationMinutes = schedule.durationMinutesPerInstance();
         this.enterCost = schedule.enterCost();
-        this.index = schedule.distributionKey();
+        this.scheduleId = schedule.distributionId();
     }
 
     public TournamentManager(){
@@ -127,7 +127,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         buffer.writeInt(maxEntriesPerInstance);
         buffer.writeInt(durationMinutes);
         buffer.writeDouble(enterCost);
-        buffer.writeUTF8(index);
+        buffer.writeLong(scheduleId);
         return true;
     }
 
@@ -143,7 +143,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         maxEntriesPerInstance = buffer.readInt();
         durationMinutes = buffer.readInt();
         enterCost = buffer.readDouble();
-        index = buffer.readUTF8();
+        scheduleId = buffer.readLong();
         return true;
     }
 
@@ -163,6 +163,9 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return durationMinutes;
     }
 
+    public long scheduleId(){
+        return scheduleId;
+    }
 
     TournamentInstance lookup(String instanceId){
         return this.instanceIndex.computeIfAbsent(instanceId,(k)->{
@@ -204,7 +207,6 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         portableWriter.writeLong("5",TimeUtil.toUTCMilliseconds(closeTime));
         portableWriter.writeLong("6",TimeUtil.toUTCMilliseconds(endTime));
         portableWriter.writeInt("7",durationMinutes);
-        //portableWriter.writeUTF("8",bucket);
         portableWriter.writeLong("9",distributionId);
     }
 
@@ -216,7 +218,6 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.closeTime = TimeUtil.fromUTCMilliseconds(portableReader.readLong("5"));
         this.endTime = TimeUtil.fromUTCMilliseconds(portableReader.readLong("6"));
         this.durationMinutes = portableReader.readInt("7");
-        //this.bucket = portableReader.readUTF("8");
         this.distributionId = portableReader.readLong("9");
     }
 

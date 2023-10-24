@@ -31,6 +31,8 @@ public interface Tournament extends Configurable {
     int maxEntriesPerInstance();
     int durationMinutesPerInstance();
 
+    long scheduleId();
+
     interface Entry extends Configurable {
         String systemId();
         void score(double credit,double delta);
