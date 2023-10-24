@@ -64,7 +64,7 @@ public class InventoryItem extends ConfigurableObject implements Inventory.Stock
         jsonObject.addProperty("Name",configurationName);
         jsonObject.addProperty("ItemId",Long.toString(itemId));
         jsonObject.addProperty("StockId",Long.toString(stockId));
-        jsonObject.add("Stock",stock!=null?stock.toJson():new JsonObject());
+        jsonObject.add("_stock",stock!=null?stock.toJson():new JsonObject());
         return jsonObject;
     }
 
