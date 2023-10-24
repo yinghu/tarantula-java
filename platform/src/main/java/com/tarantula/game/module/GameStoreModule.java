@@ -35,18 +35,13 @@ public class GameStoreModule extends ModuleHeader implements Configurable.Listen
             params.put(OnAccess.TYPE_ID,serviceTypeId);
             params.put(OnAccess.STORE_PRODUCT_ID,shoppingItem.skuName());
             params.put(OnAccess.SESSION,session);
+            params.put(OnAccess.STORE_BUNDLE_ID,bundleId);
             if(this.context.validator().validateToken(params)){
-                String sku = (String) params.get(OnAccess.STORE_PRODUCT_ID);
-                if(shoppingItem.skuName().equals(sku)){
-                    this.storeServiceProvider.grant(session.systemId(),shoppingItem.distributionKey());
-                    StorePurchase storePurchase = new StorePurchase();
-                    storePurchase.transactionId = (String) params.get(OnAccess.STORE_TRANSACTION_ID);
-                    storePurchase.inventoryList = inventoryServiceProvider.inventoryList(session.distributionId());
-                    session.write(storePurchase.toJson().toString().getBytes());
-                }
-                else{
-                    session.write(JsonUtil.toSimpleResponse(false,"Bundle store name not matched").getBytes());
-                }
+                //this.storeServiceProvider.grant(session.systemId(),shoppingItem.distributionKey());
+                StorePurchase storePurchase = new StorePurchase();
+                storePurchase.transactionId = (String) params.get(OnAccess.STORE_TRANSACTION_ID);
+                storePurchase.inventoryList = inventoryServiceProvider.inventoryList(session.distributionId());
+                session.write(storePurchase.toJson().toString().getBytes());
             }
             else{
                 session.write(JsonUtil.toSimpleResponse(false,(String)params.get(OnAccess.STORE_MESSAGE)).getBytes());
