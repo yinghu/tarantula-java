@@ -39,7 +39,7 @@ public class GameStoreModule extends ModuleHeader implements Configurable.Listen
             if(this.context.validator().validateToken(params)){
                 //this.storeServiceProvider.grant(session.systemId(),shoppingItem.distributionKey());
                 StorePurchase storePurchase = new StorePurchase();
-                storePurchase.transactionId = (String) params.get(OnAccess.STORE_TRANSACTION_ID);
+                //storePurchase.transactionId = (String) params.get(OnAccess.STORE_TRANSACTION_ID);
                 storePurchase.inventoryList = inventoryServiceProvider.inventoryList(session.distributionId());
                 session.write(storePurchase.toJson().toString().getBytes());
             }
