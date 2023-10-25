@@ -164,7 +164,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
                 TournamentScheduleStatus status = new TournamentScheduleStatus();
                 status.distributionId(tournament.scheduleId());
                 this.dataStore.load(status);
-                byte[] lockKey = tournament.key().asBinary();
+                byte[] lockKey = status.key().asBinary();
                 try{
                     scheduleStore.mapLock(lockKey);
                     if(!this.scheduleStore.mapExists(lockKey)){
@@ -285,9 +285,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             scheduleStore.mapLock(lockKey);
             TournamentSchedule schedule = new TournamentSchedule((ConfigurableObject) t);
             TournamentScheduleStatus status = schedule.status();
-            status.ownerKey(new SnowflakeKey(this.serviceContext.node().nodeId()));
-            dataStore.createIfAbsent(status,true);
-            if(status.status != Tournament.Status.PENDING ) throw new RuntimeException("schedule is running on tournament ["+status.tournamentId+"]");
+            if(dataStore.load(status));
+            if(dataStore.load(status) && status.status != Tournament.Status.PENDING ) throw new RuntimeException("schedule is running on tournament ["+status.tournamentId+"]");
             if(schedule.durationHoursPerSchedule() < minDurationHoursPerSchedule) throw new RuntimeException("min hours per schedule less than ["+minDurationHoursPerSchedule+"]");
             if(schedule.durationMinutesPerInstance() < minDurationMinutesPerInstance) throw new RuntimeException("min minutes per instance less than ["+minDurationMinutesPerInstance+"]");
             switch (schedule.schedule()){

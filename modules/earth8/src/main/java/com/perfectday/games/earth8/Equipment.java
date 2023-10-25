@@ -2,7 +2,6 @@ package com.perfectday.games.earth8;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
-import com.icodesoftware.util.SnowflakeKey;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -43,6 +42,8 @@ public class Equipment extends GameItem{
     }
 
     @Override
+
+
     public JsonObject toJson() {
         JsonObject jsonObject = super.toJson();
         jsonObject.addProperty("Type",type.ordinal());

@@ -2,7 +2,6 @@ package com.perfectday.games.earth8;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
-import com.icodesoftware.util.SnowflakeKey;
 
 import java.util.List;
 

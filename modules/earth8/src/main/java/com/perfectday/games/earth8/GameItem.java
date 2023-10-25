@@ -40,7 +40,7 @@ public class GameItem extends RecoverableObject {
         jsonObject.addProperty("ConfigId",configId);
         jsonObject.addProperty("Level",level);
         jsonObject.addProperty("Xp",xp);
-        jsonObject.addProperty("rank",rank);
+        jsonObject.addProperty("Rank",rank);
         return jsonObject;
     }
 
