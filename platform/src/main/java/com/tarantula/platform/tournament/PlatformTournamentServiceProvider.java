@@ -158,7 +158,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     @Override
     public void start() throws Exception {
-        TournamentManagerQuery query = new TournamentManagerQuery(this.serviceContext.node().nodeId(),TOURNAMENT_LOOKUP_INDEX);
+        TournamentManagerQuery query = new TournamentManagerQuery(this.serviceContext.node().nodeId(),this.serviceContext.node().nodeName());
         dataStore.list(query).forEach((tournament)->{
             if(tournament.status() != Tournament.Status.ENDED){
                 TournamentScheduleStatus status = new TournamentScheduleStatus();
@@ -285,8 +285,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             scheduleStore.mapLock(lockKey);
             TournamentSchedule schedule = new TournamentSchedule((ConfigurableObject) t);
             TournamentScheduleStatus status = schedule.status();
-            if(dataStore.load(status));
-            if(dataStore.load(status) && status.status != Tournament.Status.PENDING ) throw new RuntimeException("schedule is running on tournament ["+status.tournamentId+"]");
+            dataStore.createIfAbsent(status,true);
+            if(status.status != Tournament.Status.PENDING ) throw new RuntimeException("schedule is running on tournament ["+status.tournamentId+"]");
             if(schedule.durationHoursPerSchedule() < minDurationHoursPerSchedule) throw new RuntimeException("min hours per schedule less than ["+minDurationHoursPerSchedule+"]");
             if(schedule.durationMinutesPerInstance() < minDurationMinutesPerInstance) throw new RuntimeException("min minutes per instance less than ["+minDurationMinutesPerInstance+"]");
             switch (schedule.schedule()){
@@ -312,9 +312,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         try {
             scheduleStore.mapLock(lockKey);
             TournamentScheduleStatus status = new TournamentScheduleStatus();
-            status.distributionKey(t.distributionKey());
-            dataStore.load(status);
-            if (status.tournamentId == 0) { //cancel schedule
+            status.distributionId(t.distributionId());
+            if(!dataStore.load(status)) throw new RuntimeException("Tournament schedule not installed");
+            if (status.status == Tournament.Status.PENDING) { //cancel schedule
                 dataStore.delete(status);
                 t.released();
                 return;
@@ -330,6 +330,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     @Override
     public boolean onItemRegistered(String category, String itemId) {
+        logger.warn("TOURNAMENT : "+itemId+" : "+category);
         TournamentManager tournament = new TournamentManager();
         tournament.distributionKey(itemId);
         if (!this.dataStore.load(tournament)) {
@@ -359,15 +360,15 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     private void registerTournament(TournamentSchedule schedule){
         TournamentScheduleStatus status = schedule.status();
-        this.dataStore.load(status);
+        if(!this.dataStore.load(status)) throw new RuntimeException("no schedule installed");
         TournamentManager tournament = new TournamentManager(schedule);
         tournament.dataStore(dataStore);
         tournament.label(this.serviceContext.node().nodeName());
         tournament.ownerKey(new SnowflakeKey(this.serviceContext.node().nodeId()));
         tournament.onEdge(true);
-        dataStore.create(tournament);
-        status.tournamentId = tournament.distributionId();
+        if(!dataStore.create(tournament)) throw new RuntimeException("Failed to create tournament instance");
         status.status = Tournament.Status.STARTING;
+        status.tournamentId = tournament.distributionId();
         dataStore.update(status);
         this.serviceContext.schedule(new ScheduleRunner(SCHEDULE_RUNNER_DELAY,()->{
             byte[] lockKey = tournament.key().asBinary();

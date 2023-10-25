@@ -152,9 +152,9 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("MaxEntries",maxEntries);
-        jsonObject.addProperty("Start",start.format(DateTimeFormatter.ISO_DATE_TIME));
-        jsonObject.addProperty("Close",close.format(DateTimeFormatter.ISO_DATE_TIME));
-        jsonObject.addProperty("End",end.format(DateTimeFormatter.ISO_DATE_TIME));
+        jsonObject.addProperty("Start",start!=null?start.format(DateTimeFormatter.ISO_DATE_TIME):"N/A");
+        jsonObject.addProperty("Close",close!=null?close.format(DateTimeFormatter.ISO_DATE_TIME):"N/A");
+        jsonObject.addProperty("End",end!=null?end.format(DateTimeFormatter.ISO_DATE_TIME):"N/A");
         jsonObject.addProperty("Status",status.name());
         jsonObject.addProperty("TournamentId",this.distributionKey());
         return jsonObject;

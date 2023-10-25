@@ -63,8 +63,8 @@
                 });    
                 document.querySelectorAll('.tx-live-tournament-join').forEach(a=>{
                       a.onclick = ()=>{
-                        //tx_tournament_join(a.getAttribute('tx-item-id'));
-                        console.log(a.getAttribute('tx-item-id'));       
+                        tx_tournament_join(a.getAttribute('tx-item-id'));
+                        //console.log(a.getAttribute('tx-item-id')+' : '+TARA_API.query().serviceTag);       
                     }
                 });
             }
@@ -73,7 +73,7 @@
     }
 
     function tx_tournament_join(itemId){
-        TARA_API.onGet(TARA_API.query().serviceTag,'onGrant',itemId,(resp)=>{
+        TARA_API.onGet(TARA_API.query().serviceTag,'onJoin',itemId,(resp)=>{
             console.log(resp);
         });
     }

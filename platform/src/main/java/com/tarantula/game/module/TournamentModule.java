@@ -5,6 +5,7 @@ import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.tournament.TournamentContext;
 import com.tarantula.platform.tournament.TournamentHistoryContext;
+import com.tarantula.platform.tournament.TournamentInstance;
 
 public class TournamentModule extends ModuleHeader implements Tournament.Listener,Configurable.Listener {
 
@@ -26,6 +27,10 @@ public class TournamentModule extends ModuleHeader implements Tournament.Listene
             else{
                 session.write(JsonUtil.toSimpleResponse(false,"tournament not existed->"+session.name()).getBytes());
             }
+        }
+        else if(session.action().equals("onJoin")){
+            Tournament.Instance ins = tournamentServiceProvider.enter(session.name(),session.systemId());
+            session.write(ins.toJson().toString().getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action()+" not supported");

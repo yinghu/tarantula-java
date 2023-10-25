@@ -346,7 +346,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         jsonObject.addProperty("DurationMinutes",durationMinutes);
         jsonObject.addProperty("MaxEntries",maxEntriesPerInstance);
         jsonObject.addProperty("EnterCost",enterCost);
-        jsonObject.addProperty("ScheduleId",this.index);
+        jsonObject.addProperty("ScheduleId",Long.toString(this.scheduleId));
         return jsonObject;
     }
 
@@ -390,7 +390,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         instance.label(this.tournamentServiceProvider.serviceContext.node().nodeName());
         instance.ownerKey(this.key());
         this.dataStore.create(instance);
-        this.tournamentServiceProvider.logger.warn(instance.toString());
+        this.tournamentServiceProvider.logger.warn("TINS : >>>>>> "+instance);
         return instance;
     }
 
@@ -403,7 +403,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     void loadPrizes(ApplicationPreSetup applicationPreSetup, Descriptor application){
         this.prizes = new HashMap<>();
         TournamentSchedule schedule = new TournamentSchedule();
-        schedule.distributionKey(this.index);
+        schedule.distributionId(this.scheduleId);
         if(!applicationPreSetup.load(application,schedule)) return;
         schedule.setup();
         schedule.list().forEach(c-> prizes.put(c.rank(),c));
