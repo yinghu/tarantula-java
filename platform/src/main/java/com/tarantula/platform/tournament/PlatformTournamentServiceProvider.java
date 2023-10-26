@@ -321,7 +321,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             }
             if(status.status == Tournament.Status.STARTING) throw new RuntimeException("Tournament cannot be canceled during starting.");
             //forcefully end tournament
-            distributionTournamentService.onEndTournament(gameServiceName, status.index());
+            distributionTournamentService.onEndTournament(gameServiceName, Long.toString(status.tournamentId));
             t.released();
         }finally {
             scheduleStore.mapUnlock(lockKey);
