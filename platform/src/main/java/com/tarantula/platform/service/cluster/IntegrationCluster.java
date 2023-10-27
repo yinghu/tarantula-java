@@ -320,7 +320,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         });
     }
     public ClusterStore clusterStore(String size,String name){
-        return clusterStore(ClusterStore.SMALL,name,true,true,true);
+        return clusterStore(size,name,true,true,true);
     }
 
     public void closeClusterStore(String name){

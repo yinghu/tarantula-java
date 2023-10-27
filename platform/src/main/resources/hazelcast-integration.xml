@@ -106,11 +106,11 @@
         <max-size>100</max-size>
         <backup-count>1</backup-count>
     </queue>
-    <queue name="tarantula.queue.medium*">
+    <queue name="tarantula.queue.medium.*">
         <max-size>1000</max-size>
         <backup-count>1</backup-count>
     </queue>
-    <queue name="tarantula.queue.large*">
+    <queue name="tarantula.queue.large.*">
         <max-size>10000</max-size>
         <backup-count>1</backup-count>
     </queue>

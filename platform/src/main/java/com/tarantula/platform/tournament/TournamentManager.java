@@ -225,7 +225,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.tournamentServiceProvider = tournamentServiceProvider;
         //recovering local instances
         instanceIndex = new ConcurrentHashMap<>();
-        ArrayList<  String> synced = new ArrayList<>();
+        ArrayList<String> synced = new ArrayList<>();
         int[] pendingPoolSize = new int[]{0};
         pendingQueue = new ArrayBlockingQueue<>(this.tournamentServiceProvider.pendingInstancePoolSizePerSchedule);
         TournamentInstanceQuery query = new TournamentInstanceQuery(this.distributionId,this.tournamentServiceProvider.serviceContext.node().nodeName());
@@ -281,7 +281,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
     private byte[] startingInstance(int storeIndex){
         TournamentInstance instance = pendingQueue.poll();
-        byte[] joinKey = instance.distributionKey().getBytes();
+        byte[] joinKey = instance.key().asBinary();
+
         for(int m=0;m<instance.maxEntries();m++){
             this.instanceStores[storeIndex].queueOffer(joinKey);
         }
@@ -390,7 +391,6 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         instance.label(this.tournamentServiceProvider.serviceContext.node().nodeName());
         instance.ownerKey(this.key());
         this.dataStore.create(instance);
-        this.tournamentServiceProvider.logger.warn("TINS : >>>>>> "+instance);
         return instance;
     }
 
