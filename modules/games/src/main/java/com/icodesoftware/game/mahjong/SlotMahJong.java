@@ -1,6 +1,6 @@
 package com.icodesoftware.game.mahjong;
 
-public class SlotMahJong {
+public class SlotMahjong {
 
 
 }

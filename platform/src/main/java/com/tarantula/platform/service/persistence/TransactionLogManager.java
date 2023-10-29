@@ -62,7 +62,7 @@ public class TransactionLogManager{
         if(!suc) return;
         TransactionLog log = TransactionLog.log(transactionId,false,metadata.scope(),metadata.source(),metadata.label(),ak,av,0);
         ts.create(log);
-        System.out.println("EG : "+metadata.label()+" : "+suc+" : "+metadata.source());
+        //System.out.println("EG : "+metadata.label()+" : "+suc+" : "+metadata.source());
     }
 
 

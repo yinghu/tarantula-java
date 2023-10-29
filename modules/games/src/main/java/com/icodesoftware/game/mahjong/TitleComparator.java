@@ -1,14 +1,11 @@
 package com.icodesoftware.game.mahjong;
 
-
-import com.icodesoftware.game.mahjong.Tile;
-
 import java.util.Comparator;
 
 public class TitleComparator implements Comparator<Tile> {
 
     public int compare(Tile o1, Tile o2) {
-        int diff = o1.sequence-o2.sequence;
+        int diff = o1.rank-o2.rank;
         if(diff>0){
             return 1;
         }

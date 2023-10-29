@@ -75,9 +75,9 @@ public class Stack {
     }
 
     public Tile[] swap(Tile[] tiles){
-        if(tiles[0].sequence>100) tiles[0]=tileList[reel1[last]];
-        if(tiles[1].sequence>100) tiles[1]=tileList[reel1[last]];
-        if(tiles[2].sequence>100) tiles[2]=tileList[reel1[last]];
+        if(tiles[0].rank>100) tiles[0]=tileList[reel1[last]];
+        if(tiles[1].rank>100) tiles[1]=tileList[reel1[last]];
+        if(tiles[2].rank>100) tiles[2]=tileList[reel1[last]];
         last--;
         return tiles;
     }
@@ -88,4 +88,12 @@ public class Stack {
         tiles[2] = tileList[reel3[stub++]];
         return tiles;
     }
+    public void draw(Tile[] slots){
+        for(int i=0;i<slots.length;i++){
+            slots[i]=tileList[reel1[stub++]];
+        }
+    }
+    //public Tile swap(Tile drop){
+
+    //}
 }

@@ -7,7 +7,9 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 
 public class StackTest {
 
@@ -28,25 +30,24 @@ public class StackTest {
             stack.shuffle();
             for(int i=0;i<30;i++){
                Tile[] tiles = stack.draw();
-
                 Arrays.sort(tiles,comparator);
-                if(tiles[2].sequence>100){
+                if(tiles[2].rank>100){
                     stack.swap(tiles);
                     Arrays.sort(tiles,comparator);
                     swap++;
                 }
-                int mid = (tiles[0].sequence+tiles[2].sequence)/2;
-                int diff = tiles[2].sequence-tiles[0].sequence;
-                if(mid==tiles[1].sequence && diff==2)
+                int mid = (tiles[0].rank+tiles[2].rank)/2;
+                int diff = tiles[2].rank-tiles[0].rank;
+                if(mid==tiles[1].rank && diff==2)
                 {
                     chow++;
                     //print(tiles);
                 }
-                if(tiles[0].sequence==tiles[1].sequence && tiles[1]==tiles[2]){
+                if(tiles[0].rank==tiles[1].rank && tiles[1]==tiles[2]){
                     pong++;
                     //print(tiles);
                 }
-                if(tiles[0].sequence==tiles[1].sequence || tiles[1]==tiles[2]){
+                if(tiles[0].rank==tiles[1].rank || tiles[1]==tiles[2]){
                     eye++;
                     //print(tiles);
                 }
@@ -55,15 +56,32 @@ public class StackTest {
                 Assert.assertNotNull(tiles[2]);
             }
         }
-        //System.out.println("Chow->"+(chow/3000d)*100);
-        //System.out.println("Pong->"+(pong/3000d)*100);
-        //System.out.println("Pong->"+(eye/3000d)*100);
-        //System.out.println("Swap->"+(swap/3000d)*100);
+        System.out.println("Chow->"+(chow/3000d)*100);
+        System.out.println("Pong->"+(pong/3000d)*100);
+        System.out.println("Pong->"+(eye/3000d)*100);
+        System.out.println("Swap->"+(swap/3000d)*100);
+    }
+
+    @Test(groups = { "stack" })
+    public void stackSequenceTest() {
+        Stack stack = new Stack();
+        stack.shuffle();
+        Tile[] h1 = new Tile[14];
+        stack.draw(h1);
+        Arrays.sort(h1,new TitleComparator());
+        print(h1);
     }
     private void print(Tile[] tiles){
-        System.out.print(tiles[0]);
-        System.out.print(tiles[1]);
-        System.out.println(tiles[2]);
+        int line = 3;
+        for(int i=0;i< tiles.length;i++){
+            System.out.print(tiles[i]);
+            line--;
+            if(line==0){
+                System.out.println();
+                line = 3;
+            }
+        }
+        System.out.println();
     }
 
 }

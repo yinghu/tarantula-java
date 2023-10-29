@@ -65,23 +65,23 @@ public class Tile {
 
 
     public final String name;
-    public final int sequence;
+    public final int rank;
 
-    public Tile(String name,int sequence){
+    public Tile(String name,int rank){
         this.name = name;
-        this.sequence = sequence;
+        this.rank = rank;
     }
     public String toString(){
-        return "Name ["+name+"] Sequence ["+sequence+"]";
+        return "Name ["+name+"] Rank ["+rank+"]";
     }
 
     @Override
     public int hashCode(){
-        return this.name.hashCode()+ Arrays.hashCode(new int[]{sequence});
+        return Arrays.hashCode(new int[]{rank});
     }
     @Override
     public boolean equals(Object obj){
         Tile r = (Tile) obj;
-        return r.sequence == this.sequence;
+        return r.rank == this.rank;
     }
 }
