@@ -28,8 +28,11 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
     protected long syncInterval;
 
     protected int maxPendingSize;
+
+    protected TransactionLogManager transactionLogManager;
     public ScopedReplicationProxy(int scope){
         this.scope = scope;
+        transactionLogManager = new TransactionLogManager();
     }
 
 
@@ -58,6 +61,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
+        transactionLogManager.setup(serviceContext);
         Configuration configuration = serviceContext.configuration(CONFIG);
         JsonObject conf = null;
         if(scope== Distributable.INTEGRATION_SCOPE){

@@ -11,7 +11,9 @@ import java.util.List;
 
 public class TransactionLogManager{
 
-    private static final String STORE_PREFIX = "log_";
+    private static final String DATA_PREFIX = "log_d_";
+    private static final String ACCESS_PREFIX = "log_a_";
+    private static final String INDEX_PREFIX = "log_i_";
     private static final String TRANSACTION_LOG = "log_tarantula_transaction";
 
     private ServiceContext serviceContext;
@@ -24,8 +26,8 @@ public class TransactionLogManager{
     }
 
 
-    public void onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value, long transactionId) {
-        DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,STORE_PREFIX+metadata.source());
+    public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value, long transactionId) {
+        DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(metadata.scope())+metadata.source());
         DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
         if(metadata.label()==null){
             Recoverable.DataHeader header = value.readHeader();
@@ -71,7 +73,7 @@ public class TransactionLogManager{
 
     public boolean onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value, long transactionId) {
         System.out.println("DEL : "+metadata.source()+" : "+metadata.label());
-        DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,STORE_PREFIX+metadata.source());
+        DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(metadata.scope())+metadata.source());
         DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
         if(metadata.label()==null){
             byte[] ak = key.array();
@@ -113,6 +115,13 @@ public class TransactionLogManager{
         System.out.println("Aborted : "+transactionId+" : "+scope);
         DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
         ts.createIfAbsent(TransactionResult.result(transactionId,false),false);
+    }
+
+    private String logPrefix(int scope){
+        if(scope==Distributable.DATA_SCOPE) return DATA_PREFIX;
+        if(scope==Distributable.INTEGRATION_SCOPE) return ACCESS_PREFIX;
+        if(scope==Distributable.INDEX_SCOPE) return INDEX_PREFIX;
+        return "log_";
     }
 
 }

@@ -103,6 +103,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             value.rewind();
             t.revision(Long.MIN_VALUE);
             lmdbDataStoreProvider.onUpdating(metadata,key,value,txn.getId());
+            lmdbDataStoreProvider.onCommit(metadata.scope(),txn.getId());
             return true;
         }finally {
             txn.close();
@@ -135,6 +136,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
                     key.rewind();
                     update.rewind();
                     lmdbDataStoreProvider.onUpdating(metadata,key,update,txn.getId());
+                    lmdbDataStoreProvider.onCommit(metadata.scope(),txn.getId());
                     updated = true;
                 }
             }
@@ -164,6 +166,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             key.rewind();
             value.rewind();
             lmdbDataStoreProvider.onUpdating(metadata,key,value,xtxn.getId());
+            lmdbDataStoreProvider.onCommit(metadata.scope(),txn.getId());
         }
         finally {
             xtxn.close();
@@ -214,6 +217,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             key.rewind();
             value.rewind();
             lmdbDataStoreProvider.onUpdating(metadata,key,value,txn.getId());
+            lmdbDataStoreProvider.onCommit(metadata.scope(),txn.getId());
             return true;
         }
         finally {

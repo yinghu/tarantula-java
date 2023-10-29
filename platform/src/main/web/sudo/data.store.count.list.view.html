@@ -19,6 +19,8 @@
             <input id='tx-data-store-access-scope' class="w3-check tx-text-12" type="checkbox" checked>
             <label class="tx-text-12 tx-margin-right-4">Index</label>
             <input id='tx-data-store-index-scope' class="w3-check tx-text-12" type="checkbox" checked>
+            <label class="tx-text-12 tx-margin-right-4">Log</label>
+            <input id='tx-data-store-log-scope' class="w3-check tx-text-12" type="checkbox" checked>
         </div>
     </div>
     <div class="w3-panel  tx-margin-bottom-8">
@@ -100,6 +102,9 @@
     document.querySelector('#tx-data-store-index-scope').onchange = ()=>{
         _tx_load_store_list();
     };
+    document.querySelector('#tx-data-store-log-scope').onchange = ()=>{
+        _tx_load_store_list();
+    };
     dataStoreBar.innerHTML = '';
     dataStoreBar.onchange = ()=>{
         dataStoreSelected = dataStoreBar.value;
@@ -159,7 +164,8 @@
         let data = document.querySelector('#tx-data-store-data-scope').checked;
         let access = document.querySelector('#tx-data-store-access-scope').checked;
         let index = document.querySelector('#tx-data-store-index-scope').checked;
-        let query = local+'#'+data+'#'+access+'#'+index;
+        let log = document.querySelector('#tx-data-store-log-scope').checked;
+        let query = local+'#'+data+'#'+access+'#'+index+'#'+log;
         TARA_API.onGet('role/sudo/datastore','onListDataStore',query,(resp)=>{
         editor.set(resp); 
         dataStoreBar.innerHTML='';                     

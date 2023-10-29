@@ -33,7 +33,7 @@ public class TestMapStoreListener implements MapStoreListener {
     }
 
     public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
-        transactionLogManager.onDistributing(metadata,key,value,transactionId);
+        transactionLogManager.onUpdating(metadata,key,value,transactionId);
     }
     public void _onDistributing(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
         DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,"log_"+metadata.source());

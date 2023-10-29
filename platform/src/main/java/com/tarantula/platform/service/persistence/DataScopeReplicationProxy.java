@@ -11,10 +11,10 @@ import com.tarantula.platform.service.KeyIndexTrack;
 
 public class DataScopeReplicationProxy extends ScopedReplicationProxy {
     private TarantulaLogger logger = JDKLogger.getLogger(DataScopeReplicationProxy.class);
-
     public DataScopeReplicationProxy(){
         super(Distributable.DATA_SCOPE);
     }
+
 
     public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
         if(asyncDistributing){
@@ -72,6 +72,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
                     }
                     return true;
                 });
+
 
             });
             return true;

@@ -175,7 +175,7 @@ public class GameClusterTest extends DataStoreHook{
         Assert.assertEquals(ex.list(app,new ConfigurableObjectQuery(app.key(),"HardCurrency")).size(),5);
         Assert.assertEquals(ex.list(app,new VersionedConfigurableObjectQuery(g.distributionId())).size(),0);
 
-        DataStore log = dataStoreProvider.createLogDataStore("log_beam_service");
+        DataStore log = dataStoreProvider.createLogDataStore("log_d_beam_service");
         Assert.assertEquals(log.list(new ConfigurableObjectQuery(app.key(),"commodity")).size(),29);
 
     }

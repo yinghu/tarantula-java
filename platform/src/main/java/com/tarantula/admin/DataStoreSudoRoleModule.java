@@ -45,10 +45,11 @@ public class DataStoreSudoRoleModule implements Module {
             if(Boolean.parseBoolean(query[1])) dlist.addAll(this.deploymentServiceProvider.listDataStore(Distributable.DATA_SCOPE));
             if(Boolean.parseBoolean(query[2])) dlist.addAll(this.deploymentServiceProvider.listDataStore(Distributable.INTEGRATION_SCOPE));
             if(Boolean.parseBoolean(query[3])) dlist.addAll(this.deploymentServiceProvider.listDataStore(Distributable.INDEX_SCOPE));
+            if(Boolean.parseBoolean(query[4])) dlist.addAll(this.deploymentServiceProvider.listDataStore(Distributable.LOG_SCOPE));
             session.write(toJsonList(dlist).toString().getBytes());
         }
         else if(session.action().equals("onLoadDataStoreKeys")){
-            //this.context.log(session.name(),OnLog.WARN);
+            this.context.log(session.name(),OnLog.WARN);
             String[] query = session.name().split("#");
             DataStoreSummary sum = this.deploymentServiceProvider.validDataStore(query[0]);
             JsonObject summary = new JsonObject();

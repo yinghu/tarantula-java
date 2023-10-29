@@ -508,6 +508,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
          if(scope==Distributable.INDEX_SCOPE){
              return this.deploymentDataStoreProvider.createKeyIndexDataStore(name);
          }
+        if(scope==Distributable.LOG_SCOPE){
+            return this.deploymentDataStoreProvider.createLogDataStore(name);
+        }
          throw new IllegalArgumentException("scope ["+scope+"] not supported");
     }
 
@@ -844,10 +847,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             }
  	        return false;
         });
- 	    alist.addAll(availableServicesUpgraded());
+ 	    //alist.addAll(availableServicesUpgraded());
  	    return alist;
     }
-    public List<Descriptor> availableServicesUpgraded(){
+    private List<Descriptor> availableServicesUpgraded(){
         ArrayList<Descriptor> alist = new ArrayList<>();
         try{
             URL url = Thread.currentThread().getContextClassLoader().getResource("application/upgrade");

@@ -1,0 +1,135 @@
+<div class="w3-modal-content">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-game-service-list-close"><i class="fa fa-close" style="font-size:12px"></i></span>            
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">Game Service List</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
+    <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel w3-center w3-text-red tx-text-14" id="tx-game-service-list-message"></div>
+    <div class='w3-panel' id="tx-game-service-list"></div> 
+    <div class="w3-panel">
+        <fieldset class="w3-border-blue tx-text-12">
+            <legend class="tx-text-14 w3-text-blue">Service Selection</legend>
+            <div class="w3-container">
+                <label class="tx-text-14 tx-margin-right-4">Service :</label>
+                <select id='tx-game-service-selection-name' class="w3-select w3-border w3-round tx-text-14" name='gameServiceSelectionName'>
+                    
+                </select>
+            </div>
+            <div class="w3-panel">
+                <label class="tx-text-12 tx-margin-right-4">Reset Enabled</label>
+                <input id='tx-game-service-reset-enabled' class="w3-check tx-text-12" type="checkbox">
+                <label class="tx-text-12 tx-margin-right-4">Private Access</label>
+                <input id='tx-game-service-private-access' class="w3-check tx-text-12" type="checkbox">
+            </div>
+            <div class="w3-container">
+                <div class='w3-bar w3-white' id='tx-game-service-edit-bar'></div> 
+            </div>
+        </fieldset>
+    </div>
+     
+    <div class="w3-panel">
+        <div class='w3-bar w3-white w3-border-bottom w3-border-red'>
+            <span id='tx-game-service-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
+            <span id='tx-game-service-json-mode-code' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Code</span>
+            <span id='tx-game-service-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span>    
+        </div>            
+    </div>
+    <div class="w3-panel w3-center tx-text-14">
+        <div id="jsoneditor-game-service" style="width: 100%;"></div>
+    </div> 
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div>
+</div>
+<script>
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-game-service"),{mode:'tree'},{});
+    let serviceBar = document.querySelector('#tx-game-service-list');
+    let serviceSelectionList = document.querySelector('#tx-game-service-selection-name');
+    serviceSelectionList.innerHTML = '';
+    let editingIndex = 0;
+    let runningList;
+    //document.querySelector("#tx-game-service-list-message").innerHTML = "Game Cluster ID : "+TARA_API.query().gameClusterId;
+    TARA_API.onGet('role/admin',"onLoadGameCluster",TARA_API.query().gameClusterId,(resp)=>{    
+        if(resp.successful){
+            document.querySelector("#tx-game-service-list-message").innerHTML = resp.name +' ['+TARA_API.query().gameClusterId+']';
+            tx_service_bar_load();
+        }
+        else{
+            editor.set(resp);
+        }
+    });
+    
+    document.querySelector('#tx-game-service-list-close').onclick=()=>{
+        editor.destroy();
+        tx_close_current_page();       
+    }; 
+    document.querySelector('#tx-game-service-json-mode-tree').onclick=()=>{
+        editor.setMode('tree');
+    };
+    document.querySelector('#tx-game-service-json-mode-code').onclick=()=>{
+        editor.setMode('code');
+    };
+    document.querySelector('#tx-game-service-json-mode-preview').onclick=()=>{
+        editor.setMode('preview');
+    };
+    document.querySelector('#tx-game-service-selection-name').onchange = ()=>{
+        editingIndex = document.querySelector('#tx-game-service-selection-name').value/1;
+        tx_game_service_edit_setup();
+    }; 
+    document.querySelector('#tx-game-service-edit-bar').innerHTML += TARA_HTML.BarItem('tx-game-service-edit-update','Update','w3-right');
+    document.querySelector('#tx-game-service-edit-update').onclick=()=>{
+        let _resetEnabled = document.querySelector('#tx-game-service-reset-enabled').checked;
+        let _privateAccess = document.querySelector('#tx-game-service-private-access').checked;
+        let payload ={resetEnabled:_resetEnabled,privateAccess:_privateAccess};
+        let editing = runningList[editingIndex];
+        TARA_API.onSet('role/admin','onUpdateService',TARA_API.query().gameClusterId+'#'+editing.tag,payload,(resp)=>{
+            editor.set(resp);      
+        });    
+    };
+    function tx_service_bar_load(){
+        TARA_API.onGet('role/admin','availableGameServiceList',TARA_API.query().gameClusterId,(resp)=>{
+            tx_service_bar_reset(resp);       
+        });
+    }
+    function tx_game_service_edit_setup(){
+        let editing = runningList[editingIndex];
+        //document.querySelector('#tx-game-service-selected').innerHTML = editing.name;
+        document.querySelector('#tx-game-service-reset-enabled').checked = editing.resetEnabled;
+        document.querySelector('#tx-game-service-private-access').checked = editing.privateAccess;
+    }
+    function tx_service_bar_reset(resp){
+        editor.set(resp);
+        if(resp.successful){
+            runningList = resp.runningList;
+            resp.runningList.forEach((gi,i)=>{
+                serviceSelectionList.innerHTML += TARA_HTML.option(i,gi.name,i==0);
+                if(i==0){ 
+                    editingIndex = 0;
+                    tx_game_service_edit_setup();
+                }  
+            });
+            resp.pendingList.forEach((gi)=>{
+                serviceBar.innerHTML += TARA_HTML.command(gi.applicationId,gi.name,gi.typeId,'service-add','Add');  
+            });
+            document.querySelectorAll('.tx-live-service-add').forEach(a=>{
+                a.onclick=()=>{
+                    let applicationId = a.getAttribute('tx-item-id');
+                    TARA_API.onGet('role/admin','onAddService',TARA_API.query().gameClusterId+'#'+applicationId,(resp1)=>{
+                        editor.set(resp1);      
+                    });
+                };
+            });
+        }
+    }
+</script>

@@ -131,6 +131,7 @@
                     <span id='game-edit-lobby-0' tx-game-cluster-id='' view-id='game.cluster.lobby.edit' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Lobby</span>
                     <span id='game-edit-service-0' tx-game-cluster-id='' view-id='game.cluster.service.edit' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Service</span>
                     <span id='game-metrics-0' tx-game-cluster-id='' view-id='game.cluster.metrics' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Metrics</span>
+                    <span id='game-environment-0' tx-game-cluster-id='' view-id='game.cluster.environment' class='w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Environment</span>
                 </div>
                 <div class="w3-container w3-padding">
                     <!-- Lobby bar -->
@@ -537,7 +538,9 @@
                     let gml = document.querySelector('#game-metrics-'+i); 
                     gml.setAttribute('tx-game-cluster-id',g.gameClusterId);
                     let gce = document.querySelector('#game-cluster-edit-'+i);
-                    gce.setAttribute('tx-game-cluster-id',g.gameClusterId); 
+                    gce.setAttribute('tx-game-cluster-id',g.gameClusterId);
+                    let gel = document.querySelector('#game-environment-'+i); 
+                    gel.setAttribute('tx-game-cluster-id',g.gameClusterId); 
                     if(disabled == true){
                         shd.style.display='none';
                         gcl.style.display = 'none';

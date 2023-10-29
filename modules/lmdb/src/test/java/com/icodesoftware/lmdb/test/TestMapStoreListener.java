@@ -64,9 +64,7 @@ public class TestMapStoreListener implements MapStoreListener {
         );
         return suc[0]>0;
     }
-    public void onLogging(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
 
-    }
     @Override
     public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
         DataStore dataStore = provider.createKeyIndexDataStore(KeyIndexService.STORE_NAME + metadata.source());
@@ -96,12 +94,12 @@ public class TestMapStoreListener implements MapStoreListener {
 
     @Override
     public void onCommit(int scope,long transactionId) {
-
+        //System.out.println("DB Commit->"+scope+" : "+transactionId);
     }
 
     @Override
     public void onAbort(int scope,long transactionId) {
-
+        //System.out.println("DB Abort->"+scope+" : "+transactionId);
     }
 
     @Override
