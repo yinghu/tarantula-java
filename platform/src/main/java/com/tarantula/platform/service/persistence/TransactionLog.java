@@ -17,6 +17,8 @@ public class TransactionLog extends RecoverableObject {
     public String edgeLabel;
 
     public byte[] key;
+
+    public byte[] value;
     public byte[] edgeKey;
 
     public TransactionLog(){

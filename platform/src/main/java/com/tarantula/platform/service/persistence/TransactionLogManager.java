@@ -66,7 +66,9 @@ public class TransactionLogManager{
     }
 
 
-    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value
+    ) {
+        System.out.println("RCV : "+metadata.scope()+" : "+metadata.source());
         DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(metadata.scope())+metadata.source());
         if(metadata.label()==null){
 
