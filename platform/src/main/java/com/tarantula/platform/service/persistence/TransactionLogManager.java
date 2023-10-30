@@ -67,6 +67,12 @@ public class TransactionLogManager{
 
 
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
+        DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(metadata.scope())+metadata.source());
+        if(metadata.label()==null){
+
+            return false;
+        }
+        //dataStore.backup().forEachEdgeKey();
         return false;
     }
 
