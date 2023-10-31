@@ -66,8 +66,7 @@ public class TransactionLogManager{
     }
 
 
-    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value
-    ) {
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
         System.out.println("RCV : "+metadata.scope()+" : "+metadata.source());
         DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(metadata.scope())+metadata.source());
         if(metadata.label()==null){
@@ -113,16 +112,24 @@ public class TransactionLogManager{
         DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
         TransactionLogQuery query = new TransactionLogQuery(transactionId);
         ts.list(query).forEach(t->{
+            DataStore tds = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(t.scope)+t.source);
+            if(t.edgeLabel==null && !t.deleting){
+                tds.backup().get(new BinaryKey(t.key),(k,v)->{
+                    System.out.println("LOADED : "+t.source);
+                    t.value = v.array();
+                    return true;
+                });
+            }
             System.out.println("Committed : "+transactionId+" : "+t.distributionId()+" : "+t.source+" : "+t.edgeLabel+" : "+t.scope+" : "+t.deleting+" : "+t.updatingRevision);
         });
-        ts.createIfAbsent(TransactionResult.result(transactionId,true),false);
+        ts.createIfAbsent(TransactionResult.result(transactionId,scope,true),false);
     }
 
 
     public void onAbort(int scope, long transactionId) {
         System.out.println("Aborted : "+transactionId+" : "+scope);
         DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
-        ts.createIfAbsent(TransactionResult.result(transactionId,false),false);
+        ts.createIfAbsent(TransactionResult.result(transactionId,scope,false),false);
     }
 
     private String logPrefix(int scope){
