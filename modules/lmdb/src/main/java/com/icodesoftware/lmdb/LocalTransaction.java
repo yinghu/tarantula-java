@@ -27,17 +27,17 @@ public class LocalTransaction implements Transaction, Transaction.DataStoreConte
             if(!transactionContext.update(this.dataStoreContext)){
                 txn.abort();
                 this.dataStoreProvider.onAbort(scope,tid);
-                listener.afterAbort(null);
+                listener.afterAbort(tid,null);
                 return false;
             }
             txn.commit();
             this.dataStoreProvider.onCommit(scope,tid);
-            listener.afterCommit();
+            listener.afterCommit(tid);
             return true;
         }catch (Exception ex){
             txn.abort();
             this.dataStoreProvider.onAbort(scope,tid);
-            listener.afterAbort(ex);
+            listener.afterAbort(tid,ex);
             return false;
         }
         finally {
@@ -69,12 +69,12 @@ public class LocalTransaction implements Transaction, Transaction.DataStoreConte
     }
 
     @Override
-    public void afterCommit() {
+    public void afterCommit(long transactionId) {
 
     }
 
     @Override
-    public void afterAbort(Exception exception) {
+    public void afterAbort(long transactionId,Exception exception) {
 
     }
 }

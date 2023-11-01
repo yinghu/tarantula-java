@@ -6,7 +6,7 @@ import com.tarantula.platform.service.cluster.PortableRegistry;
 
 public class TransactionLog extends RecoverableObject {
 
-    public static final String LABEL = "transaction";
+    public static final String LABEL = "transaction_log";
     public boolean deleting;
 
     public long updatingRevision;

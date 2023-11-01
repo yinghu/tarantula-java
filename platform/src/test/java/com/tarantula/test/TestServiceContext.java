@@ -10,7 +10,6 @@ import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.statistics.StatisticsPortableRegistry;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +25,7 @@ public class TestServiceContext implements ServiceContext {
         this.distributionIdGenerator = distributionIdGenerator;
         this.node = new ClusterNode("BSD","T01",31);
         this.node.clusterNameSuffix = "test";
+        this.node.nodeId = 100;
         //this.node.deployDirectory = "deploy";
         this.node.servicePushAddress = "127.0.0.1";
         this.node.runAsMirror = false;

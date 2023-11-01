@@ -444,12 +444,12 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
     }
 
     @Override
-    public void afterCommit() {
+    public void afterCommit(long transactionId) {
         System.out.println("Transaction committed");
     }
 
     @Override
-    public void afterAbort(Exception exception) {
+    public void afterAbort(long transactionId,Exception exception) {
         System.out.println("Transaction aborted");
         if(exception!=null) exception.printStackTrace();
     }

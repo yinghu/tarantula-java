@@ -21,6 +21,7 @@ public class PortableEventRegistry implements PortableFactory {
 
 	public static final int OID =1;
 
+
     public static final int RESPONSIVE_EVENT_CID = 2;
 
     public static final int FAST_PLAY_EVENT_CID = 5;
@@ -35,9 +36,10 @@ public class PortableEventRegistry implements PortableFactory {
     public static final int SERVER_PUSH_EVENT_CID = 21;
 
     public static final int KEY_INDEX_EVENT_CID = 22;
+    public static final int DATA_ON_REPLICATION_EVENT_CID = 24;
 
     public static final int INTEGRATION_ON_REPLICATION_EVENT_CID = 23;
-    public static final int DATA_ON_REPLICATION_EVENT_CID = 24;
+    public static final int TRANSACTION_REPLICATION_EVENT_CID = 25;
 
     //EVENT PORTABLE OBJECTS
     public static final int SINGLETON_FORWARD_CID = 100;
@@ -124,6 +126,10 @@ public class PortableEventRegistry implements PortableFactory {
 
             case DATA_ON_REPLICATION_EVENT_CID:
                 _ins = new DataReplicationEvent();
+                break;
+
+            case TRANSACTION_REPLICATION_EVENT_CID:
+                _ins = new TransactionReplicationEvent();
                 break;
 
             case SINGLETON_FORWARD_CID:

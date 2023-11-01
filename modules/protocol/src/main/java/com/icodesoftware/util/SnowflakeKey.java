@@ -46,5 +46,9 @@ public class SnowflakeKey implements Recoverable.Key {
         SnowflakeKey r = (SnowflakeKey)obj;
         return snowflakeId == r.snowflakeId();
     }
+
+    public static SnowflakeKey from(long key){
+        return new SnowflakeKey(key);
+    }
 }
 

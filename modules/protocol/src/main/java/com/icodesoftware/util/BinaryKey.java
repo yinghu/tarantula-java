@@ -51,5 +51,9 @@ public class BinaryKey implements Recoverable.Key {
         BinaryKey r = (BinaryKey)obj;
         return Arrays.equals(key,r.key);
     }
+
+    public static BinaryKey from(byte[] key){
+        return new BinaryKey(key);
+    }
 }
 

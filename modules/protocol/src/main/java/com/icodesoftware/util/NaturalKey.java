@@ -47,5 +47,9 @@ public class NaturalKey implements Recoverable.Key {
         NaturalKey r = (NaturalKey)obj;
         return key.equals(r.key);
     }
+
+    public static NaturalKey from(String key){
+        return new NaturalKey(key);
+    }
 }
 

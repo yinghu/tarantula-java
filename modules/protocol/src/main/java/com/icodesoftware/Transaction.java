@@ -13,7 +13,7 @@ public interface Transaction extends Closable{
         default DataStore onDataStore(String name){ return null;}
     }
     interface Listener{
-        void afterCommit();
-        void afterAbort(Exception exception);
+        void afterCommit(long transactionId);
+        void afterAbort(long transactionId,Exception exception);
     }
 }
