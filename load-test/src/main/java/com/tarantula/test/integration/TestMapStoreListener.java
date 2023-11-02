@@ -8,7 +8,6 @@ import com.icodesoftware.service.Metadata;
 import com.icodesoftware.util.SnowflakeIdGenerator;
 import com.icodesoftware.util.TimeUtil;
 
-import java.nio.ByteBuffer;
 
 public class TestMapStoreListener implements MapStoreListener {
 
@@ -19,7 +18,7 @@ public class TestMapStoreListener implements MapStoreListener {
         snowflakeIdGenerator = new SnowflakeIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
     }
 
-    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer){
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer,DataStore.BufferStream bufferStream){
         return false;
     }
     public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){

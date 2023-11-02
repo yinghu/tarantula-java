@@ -19,7 +19,7 @@ public class TestMapStoreListener implements MapStoreListener {
         this.provider = provider;
     }
 
-    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,DataStore.BufferStream bufferStream){
         DataStore dataStore = provider.createKeyIndexDataStore(KeyIndexService.STORE_NAME+"data_user");
         if(metadata.label()==null){
             byte[] kbs = key.array();

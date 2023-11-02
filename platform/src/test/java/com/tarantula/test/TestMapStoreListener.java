@@ -8,14 +8,13 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.BinaryKey;
 import com.tarantula.platform.service.persistence.TransactionLog;
 import com.tarantula.platform.service.persistence.TransactionLogManager;
-import com.tarantula.platform.service.persistence.TransactionLogQuery;
-import com.tarantula.platform.service.persistence.TransactionResult;
+
 
 public class TestMapStoreListener implements MapStoreListener {
 
-    //DataStoreProvider dataStoreProvider;
     ServiceContext serviceContext;
-    private TransactionLogManager transactionLogManager;
+
+    TransactionLogManager transactionLogManager;
      @Override
     public String name() {
         return null;
@@ -93,8 +92,8 @@ public class TestMapStoreListener implements MapStoreListener {
         //ts.createIfAbsent(TransactionResult.result(transactionId,false),false);
     }
 
-    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer bufferStream){
-        return transactionLogManager.onRecovering(metadata,key,bufferStream);
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer,DataStore.BufferStream bufferStream){
+        return transactionLogManager.onRecovering(metadata,key,buffer,bufferStream);
     }
     public boolean onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
          return transactionLogManager.onDeleting(metadata,key,value,transactionId);

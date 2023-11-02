@@ -147,7 +147,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         if(updated) return true;
         key.rewind();
         Recoverable.DataBuffer value = cache.value;
-        if(!lmdbDataStoreProvider.onRecovering(metadata,key,value)){
+        if(!lmdbDataStoreProvider.onRecovering(metadata,key,value,null)){
             cache.reset();
             return false;
         }
@@ -195,7 +195,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             return true;
         });
         if(existed) return false;
-        existed = lmdbDataStoreProvider.onRecovering(metadata,key,value);
+        existed = lmdbDataStoreProvider.onRecovering(metadata,key,value,null);
         Txn<ByteBuffer> txn = env.txnWrite(); //can be reading also
         try{
             if(existed){
@@ -244,7 +244,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         }
         Recoverable.DataBuffer value = cache.value;
         key.flip();
-        if(!lmdbDataStoreProvider.onRecovering(metadata,key,value)) {
+        if(!lmdbDataStoreProvider.onRecovering(metadata,key,value,null)) {
             cache.reset();
             return false;
         }
@@ -338,7 +338,10 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             if(!query.key().write(key)) return;
             LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(scope,name,query.label());
             if(list(key.flip(),localEdgeDataStore,query,stream)) return;
-            if(lmdbDataStoreProvider.onRecovering(localEdgeDataStore.metadata,key, cache.value)){
+            if(lmdbDataStoreProvider.onRecovering(localEdgeDataStore.metadata,key, cache.value,(k,v)->{
+                System.out.println("EDGE RECOVERED 2");
+                return true;
+            })){
                 list(key.rewind(),localEdgeDataStore,query,stream);
             }
         }finally {

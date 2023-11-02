@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.persistence;
 
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
@@ -24,7 +25,7 @@ public class IndexScopeReplicationProxy extends ScopedReplicationProxy {
     public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
 
     }
-    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer){
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer, DataStore.BufferStream bufferStream){
         logger.warn("Recovering DB : "+metadata.source()+" Label : "+metadata.label());
         byte[] data = distributionKeyIndexService.recover(metadata.source(),key.array());
         if(data==null) return false;

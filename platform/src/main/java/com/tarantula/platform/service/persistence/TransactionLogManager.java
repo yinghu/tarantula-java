@@ -1,16 +1,15 @@
 package com.tarantula.platform.service.persistence;
 
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Distributable;
-import com.icodesoftware.Recoverable;
+import com.icodesoftware.*;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.BinaryKey;
+import com.tarantula.platform.event.TransactionReplicationEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TransactionLogManager{
+public class TransactionLogManager implements EventListener {
 
     private static final String DATA_PREFIX = "log_d_";
     private static final String ACCESS_PREFIX = "log_a_";
@@ -40,7 +39,6 @@ public class TransactionLogManager{
         });
         return pending;
     }
-
 
     public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value, long transactionId) {
         DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(metadata.scope())+metadata.source());
@@ -82,7 +80,7 @@ public class TransactionLogManager{
     }
 
 
-    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,DataStore.BufferStream bufferStream) {
         System.out.println("RCV : "+metadata.scope()+" : "+metadata.source());
         DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(metadata.scope())+metadata.source());
         if(metadata.label()==null){
@@ -93,10 +91,11 @@ public class TransactionLogManager{
                 return true;
             });
         }
+
         boolean[] loaded ={false};
         dataStore.backup().forEachEdgeKey(BinaryKey.from(key.array()),metadata.label(),(k,v)->{
             loaded[0]=true;
-            return true;
+            return bufferStream.on(k,v);
         });
         return loaded[0];
     }
@@ -151,4 +150,10 @@ public class TransactionLogManager{
         return "log_";
     }
 
+    @Override
+    public boolean onEvent(Event event) {
+        TransactionReplicationEvent replicationEvent = (TransactionReplicationEvent)event;
+
+        return false;
+    }
 }

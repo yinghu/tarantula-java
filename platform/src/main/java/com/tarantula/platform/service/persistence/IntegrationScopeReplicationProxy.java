@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.persistence;
 
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
@@ -34,7 +35,7 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
             this.serviceContext.keyIndexService().update(keyIndex);
         }
     }
-    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer){
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer, DataStore.BufferStream bufferStream){
         BinaryKey binaryKey = new BinaryKey(key.array());
         KeyIndex keyIndex = serviceContext.keyIndexService().lookup(metadata.label()==null?metadata.source():metadata.source()+"_"+metadata.label(),binaryKey);
         if(keyIndex==null) return false;
