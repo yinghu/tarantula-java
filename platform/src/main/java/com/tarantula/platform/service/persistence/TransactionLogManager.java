@@ -40,6 +40,12 @@ public class TransactionLogManager implements EventListener {
         return pending;
     }
 
+    public List<TransactionResult> pending(long nodeId){
+        DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
+        TransactionResultQuery query = new TransactionResultQuery(nodeId);
+        return ts.list(query);
+    }
+
     public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value, long transactionId) {
         DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(metadata.scope())+metadata.source());
         DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
@@ -152,8 +158,48 @@ public class TransactionLogManager implements EventListener {
 
     @Override
     public boolean onEvent(Event event) {
+        if(!(event instanceof TransactionReplicationEvent)) return false;
         TransactionReplicationEvent replicationEvent = (TransactionReplicationEvent)event;
-
+        for(TransactionLog log : replicationEvent.pendingLogs){
+            DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(log.scope)+log.source);
+            if(log.deleting){
+                if(log.edgeLabel==null){
+                    dataStore.backup().unset((k,v)->{
+                        for(byte b : log.key){
+                            k.writeByte(b);
+                        }
+                        return true;
+                    });
+                    continue;
+                }
+                dataStore.backup().unsetEdge(log.edgeLabel,(k,v)->{
+                    return true;
+                },log.edgeKey==null);
+                continue;
+            }
+            if(log.edgeLabel==null){//write key/value
+                dataStore.backup().set((k,v)->{
+                    for(byte b : log.key){
+                        k.writeByte(b);
+                    }
+                    for(byte b : log.value){
+                        v.writeByte(b);
+                    }
+                    return true;
+                });
+                continue;
+            }
+            //write edge
+            dataStore.backup().setEdge(log.edgeLabel,(k,v)->{
+                for(byte b : log.key){
+                    k.writeByte(b);
+                }
+                for(byte b : log.edgeKey){
+                    v.writeByte(b);
+                }
+                return true;
+            });
+        }
         return false;
     }
 }

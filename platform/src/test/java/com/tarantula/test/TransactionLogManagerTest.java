@@ -2,8 +2,17 @@ package com.tarantula.test;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
+import com.icodesoftware.util.SnowflakeKey;
+import com.tarantula.platform.PresenceIndex;
+import com.tarantula.platform.event.TransactionReplicationEvent;
+import com.tarantula.platform.presence.PresencePortableRegistry;
+import com.tarantula.platform.service.persistence.TransactionLog;
+import com.tarantula.platform.service.persistence.TransactionResult;
+import com.tarantula.platform.util.RecoverableQuery;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.util.List;
 
 
 public class TransactionLogManagerTest extends DataStoreHook{
@@ -12,8 +21,31 @@ public class TransactionLogManagerTest extends DataStoreHook{
     @Test(groups = { "TransactionLogManager" })
     public void transactionLogManagerTest(){
         DataStore dataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,"test");
-        
-        Assert.assertEquals(1,1);
+        PresenceIndex presenceIndex = new PresenceIndex();
+        presenceIndex.distributionId(serviceContext.distributionId());
+        presenceIndex.onEdge(true);
+        presenceIndex.label("presence_list");
+        presenceIndex.ownerKey(SnowflakeKey.from(100));
+        Assert.assertTrue(dataStore.createIfAbsent(presenceIndex,true));
+        List<TransactionResult> logs = transactionLogManager.pending(serviceContext.node().nodeId());
+        System.out.println("SIZE : "+logs.size());
+        logs.forEach(log->{
+            System.out.println("TID : "+log.distributionId());
+            List<TransactionLog> pg = transactionLogManager.committed(log.distributionId());
+            pg.forEach(p->{
+                p.source = "foo_test";
+                System.out.println("LBL : "+p.edgeLabel+" : "+p.value);
+            });
+            TransactionReplicationEvent event = new TransactionReplicationEvent();
+            event.pendingLogs = pg;
+            transactionLogManager.onEvent(event);
+        });
+        DataStore foo = serviceContext.dataStore(Distributable.DATA_SCOPE,"foo_test");
+        Assert.assertTrue(foo.load(presenceIndex));
+        RecoverableQuery<PresenceIndex> query = RecoverableQuery.query(100,presenceIndex, PresencePortableRegistry.INS);
+        foo.list(query).forEach(p->{
+            System.out.println("PP : "+p.distributionId());
+        });
     }
 
 }

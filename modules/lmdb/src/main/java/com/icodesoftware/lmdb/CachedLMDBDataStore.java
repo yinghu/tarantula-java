@@ -339,7 +339,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(scope,name,query.label());
             if(list(key.flip(),localEdgeDataStore,query,stream)) return;
             if(lmdbDataStoreProvider.onRecovering(localEdgeDataStore.metadata,key, cache.value,(k,v)->{
-                System.out.println("EDGE RECOVERED 2");
+                //localEdgeDataStore.dbi.put()
                 return true;
             })){
                 list(key.rewind(),localEdgeDataStore,query,stream);
