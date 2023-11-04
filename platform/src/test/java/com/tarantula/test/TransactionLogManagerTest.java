@@ -2,6 +2,7 @@ package com.tarantula.test;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
+import com.icodesoftware.util.BufferUtil;
 import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.event.TransactionReplicationEvent;
@@ -34,7 +35,12 @@ public class TransactionLogManagerTest extends DataStoreHook{
             List<TransactionLog> pg = transactionLogManager.committed(log.distributionId());
             pg.forEach(p->{
                 p.source = "foo_test";
-                System.out.println("LBL : "+p.edgeLabel+" : "+p.value);
+                //if(p.edgeLabel==null) {
+                    //System.out.println("LBL : "+p.edgeLabel+" : "+p.value+" : "+BufferUtil.toLong(p.key));
+                //}
+                //else{
+                    //System.out.println("LBL : "+p.edgeLabel+" : "+BufferUtil.toLong(p.edgeKey)+" : "+BufferUtil.toLong(p.key));
+                //}
             });
             TransactionReplicationEvent event = new TransactionReplicationEvent();
             event.pendingLogs = pg;
@@ -44,7 +50,7 @@ public class TransactionLogManagerTest extends DataStoreHook{
         Assert.assertTrue(foo.load(presenceIndex));
         RecoverableQuery<PresenceIndex> query = RecoverableQuery.query(100,presenceIndex, PresencePortableRegistry.INS);
         foo.list(query).forEach(p->{
-            System.out.println("PP : "+p.distributionId());
+            System.out.println("PP : "+p.distributionId()+" :: "+presenceIndex.distributionId());
         });
     }
 

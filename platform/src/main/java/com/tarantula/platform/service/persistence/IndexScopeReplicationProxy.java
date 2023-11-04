@@ -35,7 +35,9 @@ public class IndexScopeReplicationProxy extends ScopedReplicationProxy {
         return true;
     }
 
-
+    public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferEdgeStream bufferStream){
+        return false;
+    }
     @Override
     public void waitForData() {
         this.distributionKeyIndexService = serviceContext.clusterProvider().serviceProvider(DistributionKeyIndexService.NAME);

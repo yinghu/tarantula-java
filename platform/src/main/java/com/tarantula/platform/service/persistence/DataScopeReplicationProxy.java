@@ -78,6 +78,10 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
             return true;
         }
     }
+
+    public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferEdgeStream bufferStream){
+        return false;
+    }
     @Override
     public boolean onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
         logger.warn("DB Delete : "+metadata.source()+" : "+metadata.label());

@@ -339,7 +339,15 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(scope,name,query.label());
             if(list(key.flip(),localEdgeDataStore,query,stream)) return;
             if(lmdbDataStoreProvider.onRecovering(localEdgeDataStore.metadata,key, cache.value,(k,v)->{
-                //localEdgeDataStore.dbi.put()
+                setEdge(query.label(),(ek,ev)->{
+                    for(byte b: k.array()){
+                        ek.writeByte(b);
+                    }
+                    for(byte b: v.array()){
+                        ev.writeByte(b);
+                    }
+                    return true;
+                });
                 return true;
             })){
                 list(key.rewind(),localEdgeDataStore,query,stream);
@@ -401,7 +409,24 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         }
 
     }
-
+    public void forEachEdgeKeyValue(Recoverable.Key key,String label,BufferEdgeStream bufferStream){
+        LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(metadata.scope(),name,label);
+        BufferCache cache = lmdbDataStoreProvider.fromCache();
+        final Txn<ByteBuffer> txn = env.txnRead();
+        try{
+            if(!key.write(cache.key)) return;
+            ByteBuffer akey = cache.key.flip();
+            CursorIterable<ByteBuffer> cursor = localEdgeDataStore.dbi.iterate(txn, KeyRange.closed(akey,akey));
+            for(Iterator<CursorIterable.KeyVal<ByteBuffer>> it = cursor.iterator();it.hasNext();){
+                CursorIterable.KeyVal<ByteBuffer> kv = it.next();
+                if(dbi.get(txn,kv.val())==null) continue;
+                bufferStream.on(cache.key,BufferProxy.buffer(kv.val()),BufferProxy.buffer(txn.val()));
+            }
+        }finally {
+            txn.close();
+            cache.reset();
+        }
+    }
     @Override
     public void forEach(BufferStream stream) {
         final Txn<ByteBuffer> txn = env.txnRead();

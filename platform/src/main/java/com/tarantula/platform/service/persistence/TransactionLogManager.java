@@ -28,13 +28,15 @@ public class TransactionLogManager implements EventListener {
         ts.list(query).forEach(t->{
             DataStore tds = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(t.scope)+t.source);
             if(t.edgeLabel==null && !t.deleting){
-                tds.backup().get(new BinaryKey(t.key),(k,v)->{
+                if(!tds.backup().get(new BinaryKey(t.key),(k,v)->{
                     System.out.println("LOADED : "+t.source);
                     t.value = v.array();
+                    pending.add(t);
                     return true;
-                });
+                })) System.out.println("NO VALUE LOADED");
+            }else{
+                pending.add(t);
             }
-            pending.add(t);
             System.out.println("Committed : "+transactionId+" : "+t.distributionId()+" : "+t.source+" : "+t.edgeLabel+" : "+t.scope+" : "+t.deleting+" : "+t.updatingRevision);
         });
         return pending;
@@ -87,7 +89,7 @@ public class TransactionLogManager implements EventListener {
 
 
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,DataStore.BufferStream bufferStream) {
-        System.out.println("RCV : "+metadata.scope()+" : "+metadata.source());
+        System.out.println("RCV : "+metadata.scope()+" : "+metadata.source()+" : "+metadata.label());
         DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(metadata.scope())+metadata.source());
         if(metadata.label()==null){
             return dataStore.backup().get(BinaryKey.from(key.array()),(k,v)->{
@@ -104,6 +106,10 @@ public class TransactionLogManager implements EventListener {
             return bufferStream.on(k,v);
         });
         return loaded[0];
+    }
+
+    public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferEdgeStream bufferStream){
+        return false;
     }
 
 
@@ -162,6 +168,7 @@ public class TransactionLogManager implements EventListener {
         TransactionReplicationEvent replicationEvent = (TransactionReplicationEvent)event;
         for(TransactionLog log : replicationEvent.pendingLogs){
             DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(log.scope)+log.source);
+            System.out.println("DS : "+dataStore.name());
             if(log.deleting){
                 if(log.edgeLabel==null){
                     dataStore.backup().unset((k,v)->{
@@ -173,6 +180,13 @@ public class TransactionLogManager implements EventListener {
                     continue;
                 }
                 dataStore.backup().unsetEdge(log.edgeLabel,(k,v)->{
+                    for(byte b : log.key){
+                        k.writeByte(b);
+                    }
+                    if(log.edgeKey==null) return true;
+                    for(byte b : log.edgeKey){
+                        v.writeByte(b);
+                    }
                     return true;
                 },log.edgeKey==null);
                 continue;

@@ -371,6 +371,10 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     }
 
+    public void forEachEdgeKeyValue(Recoverable.Key key,String label,BufferEdgeStream bufferStream){
+
+    }
+
     @Override
     public void forEach(BufferStream stream) {
         final Txn<ByteBuffer> txn = env.txn(ptxn);

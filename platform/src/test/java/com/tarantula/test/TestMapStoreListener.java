@@ -95,6 +95,12 @@ public class TestMapStoreListener implements MapStoreListener {
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer,DataStore.BufferStream bufferStream){
         return transactionLogManager.onRecovering(metadata,key,buffer,bufferStream);
     }
+
+    public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferEdgeStream bufferStream){
+        return false;
+    }
+
+
     public boolean onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
          return transactionLogManager.onDeleting(metadata,key,value,transactionId);
     }
