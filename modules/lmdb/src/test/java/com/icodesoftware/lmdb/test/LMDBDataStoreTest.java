@@ -3,7 +3,6 @@ package com.icodesoftware.lmdb.test;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.Transaction;
 import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.lmdb.LMDBDataStoreProvider;
 import com.icodesoftware.lmdb.LocalDistributionIdGenerator;

@@ -109,7 +109,21 @@ public class TransactionLogManager implements EventListener {
     }
 
     public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferEdgeStream bufferStream){
-        return false;
+        System.out.println("RCVX : "+metadata.scope()+" : "+metadata.source()+" : "+metadata.label());
+        DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(metadata.scope())+metadata.source());
+        if(metadata.label()==null){
+            return dataStore.backup().get(BinaryKey.from(key.array()),(k,v)->{
+                bufferStream.on(key,key,v);
+                return true;
+            });
+        }
+
+        boolean[] loaded ={false};
+        dataStore.backup().forEachEdgeKeyValue(BinaryKey.from(key.array()),metadata.label(),(k,e,v)->{
+            loaded[0]=true;
+            return bufferStream.on(k,e,v);
+        });
+        return loaded[0];
     }
 
 

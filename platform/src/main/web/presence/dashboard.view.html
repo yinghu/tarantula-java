@@ -518,7 +518,7 @@
         });
     }
     function _tx_game_cluster_list(){
-        TARA_API.onService(true,{serviceTag:'role/admin',command:'onGameClusterList',index:TARA_API.query().gameClusterIndex},(resp)=>{
+        TARA_API.onGet('role/admin','onGameClusterList',TARA_API.query().gameClusterIndex,(resp)=>{
             //console.log(resp);
             if(resp.successful){
                 let _gameClusterId='';
