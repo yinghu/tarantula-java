@@ -6,14 +6,20 @@ import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.util.JsonUtil;
+import com.perfectday.games.earth8.analytics.AnalyticsManager;
+import com.perfectday.games.earth8.analytics.BattleEndTransaction;
+import com.perfectday.games.earth8.analytics.BattleStartTransaction;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class Earth8GameServiceProvider implements GameServiceProvider {
 
+    private AnalyticsManager analyticsManager;
     private GameContext gameContext;
     public void setup(GameContext gameContext){
+        // todo: this endpoint should be in config
+        this.analyticsManager = new AnalyticsManager("https://zz283suhd5.execute-api.us-east-1.amazonaws.com/sandbox");
         this.gameContext = gameContext;
         this.gameContext.log("Start earth 8 game service provider", OnLog.WARN);
     }
@@ -54,7 +60,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             DataStore dataStore = setup.onDataStore("battle");
             return dataStore.create(battleTransaction);
         });
-        session.write(created?battleTransaction.toJson().toString().getBytes():JsonUtil.toSimpleResponse(false,"failed to create battle transaction").getBytes());
+        session.write(created ? battleTransaction.toJson().toString().getBytes() : JsonUtil.toSimpleResponse(false,"failed to create battle transaction").getBytes());
+
+        analyticsManager.send(new BattleStartTransaction(session, battleTransaction.distributionId(), payload));
     }
     public void updateGame(Session session,byte[] payload) throws Exception{
         BattleUpdate update = BattleUpdate.fromJson(payload);
@@ -93,6 +101,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             //TO DO AFTER CURRENT BATTLE FINISHED
         }
         session.write(JsonUtil.toSimpleResponse(updated,"battle finished").getBytes());
+
+        analyticsManager.send(new BattleEndTransaction(session, battleTransaction.distributionId(), payload));
     }
     public <T extends OnAccess> void onGameEvent(T event){
         gameContext.log("EVENT : "+event.toJson().toString(),OnLog.WARN);

@@ -56,9 +56,9 @@ public class BattleTransaction extends RecoverableObject {
     @Override
     public boolean validate() {
         for(long unit : party){
-            if(unit <= 0) return false;
+            if(unit < 0) return false;
         }
-        return chapterId >0 && stageId > 0;
+        return chapterId >= 0 && stageId >= 0;
     }
 
     public static BattleTransaction fromJson(byte[] payload){
