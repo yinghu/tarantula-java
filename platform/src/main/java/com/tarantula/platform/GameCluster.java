@@ -120,7 +120,7 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
         jo.addProperty("gameClusterId",Long.toString(distributionId));
         jo.addProperty("name",name);
         jo.addProperty("mode",mode);
-        //jo.addProperty("setup",applicationSetup);
+        jo.addProperty("typeId",typeId());
         jo.addProperty("gameLobby",gameLobbyName);
         jo.addProperty("gameService",gameServiceName);
         jo.addProperty("gameData",gameDataName);
