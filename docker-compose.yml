@@ -8,6 +8,7 @@ services:
       - "8090:8090"
     volumes:
       - platform-data:/tarantula
+      - ./config:/etc/tarantula
     restart: unless-stopped
     networks:
       - gamecluster-net
