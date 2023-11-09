@@ -64,6 +64,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
         analyticsManager.send(new BattleStartTransaction(session, battleTransaction.distributionId(), payload));
     }
+
     public void updateGame(Session session,byte[] payload) throws Exception{
         BattleUpdate update = BattleUpdate.fromJson(payload);
         Transaction transaction = gameContext.applicationSchema().transaction();
@@ -72,12 +73,13 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             DataStore dataStore = applicationPreSetup.onDataStore("battle");
             if(!dataStore.create(update)) return false;
             //TO MORE TRANSACTION STUFF
-            return update.update(applicationPreSetup);
+            return update.update(applicationPreSetup, session, analyticsManager);
         });
         session.write(JsonUtil.toSimpleResponse(updated,updated?"battle updated":"failed to update").getBytes());
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         gameContext.authorVendor(OnAccess.AMAZON).upload("earth8#"+"earth8/"+date+"/"+update.distributionKey()+".json",payload);
     }
+
     public void endGame(Session session,byte[] payload) throws Exception{
         JsonObject jsonObject = JsonUtil.parse(payload);
         long battleId = jsonObject.get("BattleId").getAsLong();
