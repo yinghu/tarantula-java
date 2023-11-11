@@ -1,15 +1,16 @@
-package com.tarantula.platform.service.persistence;
+package com.icodesoftware.lmdb;
 
-import com.icodesoftware.*;
+import com.icodesoftware.DataStore;
+import com.icodesoftware.Distributable;
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.BinaryKey;
-import com.tarantula.platform.event.TransactionReplicationEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TransactionLogManager implements EventListener {
+public class TransactionLogManager {
 
     private static final String DATA_PREFIX = "log_d_";
     private static final String ACCESS_PREFIX = "log_a_";
@@ -176,11 +177,8 @@ public class TransactionLogManager implements EventListener {
         return "log_";
     }
 
-    @Override
-    public boolean onEvent(Event event) {
-        if(!(event instanceof TransactionReplicationEvent)) return false;
-        TransactionReplicationEvent replicationEvent = (TransactionReplicationEvent)event;
-        for(TransactionLog log : replicationEvent.pendingLogs){
+    public void onTransaction(List<TransactionLog> transactionLogs) {
+        for(TransactionLog log : transactionLogs){
             DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(log.scope)+log.source);
             System.out.println("DS : "+dataStore.name());
             if(log.deleting){
@@ -228,6 +226,5 @@ public class TransactionLogManager implements EventListener {
                 return true;
             });
         }
-        return false;
     }
 }

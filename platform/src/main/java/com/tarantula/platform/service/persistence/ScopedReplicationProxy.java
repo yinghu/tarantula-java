@@ -8,6 +8,7 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.event.EventOnReplication;
 

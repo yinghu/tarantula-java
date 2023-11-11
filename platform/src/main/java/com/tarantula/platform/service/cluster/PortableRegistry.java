@@ -11,8 +11,6 @@ import com.tarantula.platform.service.AccessKey;
 import com.tarantula.platform.service.KeyIndexTrack;
 import com.tarantula.platform.service.PresenceKey;
 import com.tarantula.platform.service.ServiceEventLog;
-import com.tarantula.platform.service.persistence.TransactionLog;
-import com.tarantula.platform.service.persistence.TransactionResult;
 import com.tarantula.platform.tournament.TournamentEntry;
 import com.tarantula.platform.tournament.TournamentInstance;
 import com.tarantula.platform.tournament.TournamentManager;
@@ -24,11 +22,7 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
 	public static final int OID = 1;
 
     public static final int PROPERTY_CID = 3;
-
     public static final int PARTITION_STATE_OID = 6;
-
-    public static final int TRANSACTION_LOG_CID = 7;
-    public static final int TRANSACTION_RESULT_CID = 8;
     public static final int APPLICATION_CONFIGURATION_CID = 11; //DEPLOY OBJECT
     public static final int ON_LOBBY_CID = 12;
 
@@ -89,12 +83,7 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
             case PARTITION_STATE_OID:
                 _ins = new PartitionState();
                 break;
-            case TRANSACTION_LOG_CID:
-                _ins = new TransactionLog();
-                break;
-            case TRANSACTION_RESULT_CID:
-                _ins = new TransactionResult();
-                break;
+
             case APPLICATION_CONFIGURATION_CID:
                 _ins = new ApplicationConfiguration();
                 break;

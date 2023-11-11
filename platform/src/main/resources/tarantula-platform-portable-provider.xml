@@ -7,5 +7,6 @@
     <portable-registry registry-id="5">com.tarantula.platform.statistics.StatisticsPortableRegistry</portable-registry>
     <portable-registry registry-id="6">com.tarantula.platform.leaderboard.LeaderBoardPortableRegistry</portable-registry>
     <portable-registry registry-id="7">com.tarantula.platform.item.ItemPortableRegistry</portable-registry>
+    <portable-registry registry-id="8">com.icodesoftware.lmdb.PersistencePortableRegistry</portable-registry>
     <portable-registry registry-id="10">com.tarantula.game.GamePortableRegistry</portable-registry>
 </tarantula-platform-portable-provider>

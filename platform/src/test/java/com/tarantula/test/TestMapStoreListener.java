@@ -3,11 +3,11 @@ package com.tarantula.test;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.lmdb.TransactionLog;
+import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
 
 import com.icodesoftware.util.BinaryKey;
-import com.tarantula.platform.service.persistence.TransactionLog;
-import com.tarantula.platform.service.persistence.TransactionLogManager;
 
 
 public class TestMapStoreListener implements MapStoreListener {

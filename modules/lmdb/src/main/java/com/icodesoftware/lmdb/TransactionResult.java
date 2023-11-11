@@ -1,8 +1,7 @@
-package com.tarantula.platform.service.persistence;
+package com.icodesoftware.lmdb;
 
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.SnowflakeKey;
-import com.tarantula.platform.service.cluster.PortableRegistry;
 
 public class TransactionResult extends RecoverableObject {
 
@@ -33,11 +32,11 @@ public class TransactionResult extends RecoverableObject {
 
     @Override
     public int getFactoryId() {
-        return PortableRegistry.OID;
+        return PersistencePortableRegistry.OID;
     }
     @Override
     public int getClassId() {
-        return PortableRegistry.TRANSACTION_RESULT_CID;
+        return PersistencePortableRegistry.TRANSACTION_RESULT_CID;
     }
 
     public static TransactionResult result(long transactionId,int scope,boolean committed,long nodeId){

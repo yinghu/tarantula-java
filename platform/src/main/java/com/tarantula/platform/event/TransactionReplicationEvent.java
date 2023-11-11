@@ -3,7 +3,7 @@ package com.tarantula.platform.event;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Event;
-import com.tarantula.platform.service.persistence.TransactionLog;
+import com.icodesoftware.lmdb.TransactionLog;
 
 import java.io.IOException;
 import java.util.ArrayList;

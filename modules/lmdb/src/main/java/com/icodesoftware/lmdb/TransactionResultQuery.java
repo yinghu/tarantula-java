@@ -1,4 +1,4 @@
-package com.tarantula.platform.service.persistence;
+package com.icodesoftware.lmdb;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;

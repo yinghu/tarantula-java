@@ -1,8 +1,7 @@
-package com.tarantula.platform.service.persistence;
+package com.icodesoftware.lmdb;
 
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.SnowflakeKey;
-import com.tarantula.platform.service.cluster.PortableRegistry;
 
 public class TransactionLog extends RecoverableObject {
 
@@ -25,7 +24,7 @@ public class TransactionLog extends RecoverableObject {
         this.label = LABEL;
         this.onEdge = true;
     }
-    public TransactionLog(boolean deleting,int scope,String source,String edgeLabel,byte[] key,byte[] edgeKey,long updatingRevision){
+    public TransactionLog(boolean deleting, int scope, String source, String edgeLabel, byte[] key, byte[] edgeKey, long updatingRevision){
         this();
         this.deleting = deleting;
         this.scope = scope;
@@ -81,12 +80,12 @@ public class TransactionLog extends RecoverableObject {
 
     @Override
     public int getFactoryId() {
-        return PortableRegistry.OID;
+        return PersistencePortableRegistry.OID;
     }
 
     @Override
     public int getClassId() {
-        return PortableRegistry.TRANSACTION_LOG_CID;
+        return PersistencePortableRegistry.TRANSACTION_LOG_CID;
     }
 
     public static TransactionLog log(long transactionId,boolean deleting,int scope,String source,String edgeLabel,byte[] key,byte[] edgeKey,long updatingRevision){

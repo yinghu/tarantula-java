@@ -2,13 +2,11 @@ package com.tarantula.test;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
-import com.icodesoftware.util.BufferUtil;
+import com.icodesoftware.lmdb.TransactionLog;
+import com.icodesoftware.lmdb.TransactionResult;
 import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.platform.PresenceIndex;
-import com.tarantula.platform.event.TransactionReplicationEvent;
 import com.tarantula.platform.presence.PresencePortableRegistry;
-import com.tarantula.platform.service.persistence.TransactionLog;
-import com.tarantula.platform.service.persistence.TransactionResult;
 import com.tarantula.platform.util.RecoverableQuery;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -42,9 +40,7 @@ public class TransactionLogManagerTest extends DataStoreHook{
                     //System.out.println("LBL : "+p.edgeLabel+" : "+BufferUtil.toLong(p.edgeKey)+" : "+BufferUtil.toLong(p.key));
                 //}
             });
-            TransactionReplicationEvent event = new TransactionReplicationEvent();
-            event.pendingLogs = pg;
-            transactionLogManager.onEvent(event);
+            transactionLogManager.onTransaction(pg);
         });
         DataStore foo = serviceContext.dataStore(Distributable.DATA_SCOPE,"foo_test");
         Assert.assertTrue(foo.load(presenceIndex));
