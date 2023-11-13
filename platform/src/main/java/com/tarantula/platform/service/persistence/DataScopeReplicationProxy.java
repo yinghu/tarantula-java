@@ -33,7 +33,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
             this.serviceContext.keyIndexService().update(keyIndex);
         }
     }
-    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer,DataStore.BufferStream bufferStream){
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer){
         logger.warn("Recovering DB : "+metadata.source()+" LABEL : "+metadata.label());
         BinaryKey binaryKey = new BinaryKey(key.array());
         KeyIndex keyIndex = serviceContext.keyIndexService().lookup(metadata.label()==null?metadata.source(): metadata.source()+"_"+metadata.label(),binaryKey);

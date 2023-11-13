@@ -3,23 +3,29 @@ package com.icodesoftware.lmdb.test;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.LMDBDataStoreProvider;
+import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.service.KeyIndexService;
 import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
-import com.icodesoftware.util.BinaryKey;
-
-import java.util.ArrayList;
 
 
 public class TestMapStoreListener implements MapStoreListener {
 
     LMDBDataStoreProvider provider;
+    TransactionLogManager transactionLogManager;
 
+    TestVerifier verifier;
     public TestMapStoreListener(LMDBDataStoreProvider provider){
         this.provider = provider;
+        transactionLogManager = new TransactionLogManager();
+        TestContext context = new TestContext();
+        context.lmdbDataStoreProvider = provider;
+        transactionLogManager.setup(context);
     }
 
-    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,DataStore.BufferStream bufferStream){
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
+        return transactionLogManager.onRecovering(metadata,key,value);
+        /**
         DataStore dataStore = provider.createKeyIndexDataStore(KeyIndexService.STORE_NAME+"data_user");
         if(metadata.label()==null){
             byte[] kbs = key.array();
@@ -62,13 +68,15 @@ public class TestMapStoreListener implements MapStoreListener {
                 return true;
             })
         );
-        return suc[0]>0;
+        return suc[0]>0;**/
     }
     public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferEdgeStream bufferStream){
-        return false;
+        return transactionLogManager.onRecovering(metadata,key,bufferStream);
     }
     @Override
     public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
+        transactionLogManager.onUpdating(metadata,key,value,transactionId);
+        /**
         DataStore dataStore = provider.createKeyIndexDataStore(KeyIndexService.STORE_NAME + metadata.source());
         if(metadata.label()==null){
             dataStore.backup().set((k,v)->{
@@ -91,21 +99,26 @@ public class TestMapStoreListener implements MapStoreListener {
             }
             return true;
         });
-
+        **/
     }
 
     @Override
     public void onCommit(int scope,long transactionId) {
-        //System.out.println("DB Commit->"+scope+" : "+transactionId);
+        transactionLogManager.onCommit(scope,transactionId);
+        if(verifier==null) return;
+        verifier.onCommitted(transactionId);
     }
 
     @Override
     public void onAbort(int scope,long transactionId) {
+        transactionLogManager.onAbort(scope,transactionId);
         //System.out.println("DB Abort->"+scope+" : "+transactionId);
     }
 
     @Override
     public boolean onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
+        return transactionLogManager.onDeleting(metadata,key,value,transactionId);
+        /**
         DataStore dataStore = provider.createKeyIndexDataStore(KeyIndexService.STORE_NAME +  metadata.source());
         if(metadata.label()==null){
             boolean del = dataStore.backup().unset((k,v)->{
@@ -128,7 +141,7 @@ public class TestMapStoreListener implements MapStoreListener {
             return true;
         },value==null);
         System.out.println("UNSET EDGE :"+metadata.label()+":"+del);
-        return true;
+        return true;**/
     }
 
     @Override

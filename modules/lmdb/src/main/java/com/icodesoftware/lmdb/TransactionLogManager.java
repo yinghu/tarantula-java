@@ -17,20 +17,23 @@ public class TransactionLogManager {
     private static final String INDEX_PREFIX = "log_i_";
     private static final String TRANSACTION_LOG = "log_tarantula_transaction";
 
+    private static final String DATA_TRANSACTION_LOG = "log_tarantula_transaction_1";
+    private static final String INTEGRATION_TRANSACTION_LOG = "log_tarantula_transaction_2";
+
     private ServiceContext serviceContext;
 
     public void setup(ServiceContext serviceContext){
         this.serviceContext = serviceContext;
     }
-    public List<TransactionLog> committed(long transactionId){
-        DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
+    public List<TransactionLog> committed(int scope,long transactionId){
+        DataStore ts = transactionLogStore(scope);//serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
         TransactionLogQuery query = new TransactionLogQuery(transactionId);
         List<TransactionLog> pending = new ArrayList<>();
         ts.list(query).forEach(t->{
             DataStore tds = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(t.scope)+t.source);
             if(t.edgeLabel==null && !t.deleting){
                 if(!tds.backup().get(new BinaryKey(t.key),(k,v)->{
-                    System.out.println("LOADED : "+t.source);
+                    //System.out.println("LOADED : "+t.source);
                     t.value = v.array();
                     pending.add(t);
                     return true;
@@ -38,20 +41,20 @@ public class TransactionLogManager {
             }else{
                 pending.add(t);
             }
-            System.out.println("Committed : "+transactionId+" : "+t.distributionId()+" : "+t.source+" : "+t.edgeLabel+" : "+t.scope+" : "+t.deleting+" : "+t.updatingRevision);
+            //System.out.println("Committed : "+transactionId+" : "+t.distributionId()+" : "+t.source+" : "+t.edgeLabel+" : "+t.scope+" : "+t.deleting+" : "+t.updatingRevision);
         });
         return pending;
     }
 
-    public List<TransactionResult> pending(long nodeId){
-        DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
+    public List<TransactionResult> pending(int scopeId,long nodeId){
+        DataStore ts = transactionLogStore(scopeId);//serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
         TransactionResultQuery query = new TransactionResultQuery(nodeId);
         return ts.list(query);
     }
 
     public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value, long transactionId) {
         DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(metadata.scope())+metadata.source());
-        DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
+        DataStore ts = transactionLogStore(metadata.scope());//serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
         if(metadata.label()==null){
             Recoverable.DataHeader header = value.readHeader();
             value.rewind();
@@ -89,8 +92,8 @@ public class TransactionLogManager {
     }
 
 
-    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,DataStore.BufferStream bufferStream) {
-        System.out.println("RCV : "+metadata.scope()+" : "+metadata.source()+" : "+metadata.label());
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
+        //System.out.println("RCV : "+metadata.scope()+" : "+metadata.source()+" : "+metadata.label());
         DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(metadata.scope())+metadata.source());
         if(metadata.label()==null){
             return dataStore.backup().get(BinaryKey.from(key.array()),(k,v)->{
@@ -100,25 +103,25 @@ public class TransactionLogManager {
                 return true;
             });
         }
-
-        boolean[] loaded ={false};
-        dataStore.backup().forEachEdgeKey(BinaryKey.from(key.array()),metadata.label(),(k,v)->{
-            loaded[0]=true;
-            return bufferStream.on(k,v);
-        });
-        return loaded[0];
+        return false;
+        //boolean[] loaded ={false};
+        //dataStore.backup().forEachEdgeKey(BinaryKey.from(key.array()),metadata.label(),(k,v)->{
+            //loaded[0]=true;
+            //return bufferStream.on(k,v);
+        //});
+        //return loaded[0];
     }
 
     public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferEdgeStream bufferStream){
-        System.out.println("RCVX : "+metadata.scope()+" : "+metadata.source()+" : "+metadata.label());
+        //System.out.println("RCVX : "+metadata.scope()+" : "+metadata.source()+" : "+metadata.label());
         DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(metadata.scope())+metadata.source());
-        if(metadata.label()==null){
-            return dataStore.backup().get(BinaryKey.from(key.array()),(k,v)->{
-                bufferStream.on(key,key,v);
-                return true;
-            });
-        }
-
+        if(metadata.label()==null) return false;
+            //return dataStore.backup().get(BinaryKey.from(key.array()),(k,v)->{
+                //bufferStream.on(key,key,v);
+                //return true;
+            //});
+        //}
+        //System.out.println("RCVX : "+metadata.scope()+" : "+metadata.source()+" : "+metadata.label());
         boolean[] loaded ={false};
         dataStore.backup().forEachEdgeKeyValue(BinaryKey.from(key.array()),metadata.label(),(k,e,v)->{
             loaded[0]=true;
@@ -129,9 +132,9 @@ public class TransactionLogManager {
 
 
     public boolean onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value, long transactionId) {
-        System.out.println("DEL : "+metadata.source()+" : "+metadata.label());
+        //System.out.println("DEL : "+metadata.source()+" : "+metadata.label());
         DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(metadata.scope())+metadata.source());
-        DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
+        DataStore ts = transactionLogStore(metadata.scope());//serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
         if(metadata.label()==null){
             byte[] ak = key.array();
             if(!dataStore.backup().unset((k,v)->{
@@ -158,15 +161,16 @@ public class TransactionLogManager {
     }
 
 
+
     public void onCommit(int scope, long transactionId) {
-        DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
+        DataStore ts = transactionLogStore(scope);//serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
         ts.createIfAbsent(TransactionResult.result(transactionId,scope,true,serviceContext.node().nodeId()),false);
     }
 
 
     public void onAbort(int scope, long transactionId) {
         System.out.println("Aborted : "+transactionId+" : "+scope);
-        DataStore ts = serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
+        DataStore ts = transactionLogStore(scope);//serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
         ts.createIfAbsent(TransactionResult.result(transactionId,scope,false,serviceContext.node().nodeId()),false);
     }
 
@@ -175,6 +179,16 @@ public class TransactionLogManager {
         if(scope==Distributable.INTEGRATION_SCOPE) return ACCESS_PREFIX;
         if(scope==Distributable.INDEX_SCOPE) return INDEX_PREFIX;
         return "log_";
+    }
+
+    private DataStore transactionLogStore(int scope){
+        if(scope==Distributable.DATA_SCOPE){
+            return serviceContext.dataStore(Distributable.LOG_SCOPE,DATA_TRANSACTION_LOG);
+        }
+        if(scope==Distributable.INTEGRATION_SCOPE){
+            return serviceContext.dataStore(Distributable.LOG_SCOPE,INTEGRATION_TRANSACTION_LOG);
+        }
+        return serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
     }
 
     public void onTransaction(List<TransactionLog> transactionLogs) {

@@ -142,7 +142,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         if(updated) return true;
         key.rewind();
         Recoverable.DataBuffer value = cache.value;
-        if(!lmdbDataStoreProvider.onRecovering(metadata,key,value,null)){
+        if(!lmdbDataStoreProvider.onRecovering(metadata,key,value)){
             cache.reset();
             return false;
         }
@@ -189,7 +189,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             return true;
         });
         if(existed) return false;
-        existed = lmdbDataStoreProvider.onRecovering(metadata,key,value,null);
+        existed = lmdbDataStoreProvider.onRecovering(metadata,key,value);
         Txn<ByteBuffer> txn = env.txn(ptxn); //can be reading also
         try{
             if(existed){
@@ -237,7 +237,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         }
         Recoverable.DataBuffer value = cache.value;
         key.flip();
-        if(!lmdbDataStoreProvider.onRecovering(metadata,key,value,null)) {
+        if(!lmdbDataStoreProvider.onRecovering(metadata,key,value)) {
             cache.reset();
             return false;
         }
@@ -307,8 +307,18 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             if(!query.key().write(key)) return;
             LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.localEdgeDataStore(scope,name,query.label(),ptxn);
             if(list(key.flip(),localEdgeDataStore,query,stream)) return;
-            if(lmdbDataStoreProvider.onRecovering(localEdgeDataStore.metadata,key, cache.value,(k,v)->{
-                System.out.println("EDGE RECOVERED 1");
+            if(lmdbDataStoreProvider.onRecovering(localEdgeDataStore.metadata,key,(k,e,v)->{
+                set(e.rewind(),v.rewind());
+                e.rewind();
+                setEdge(query.label(),(ek,ev)->{
+                    for(byte b: k.array()){
+                        ek.writeByte(b);
+                    }
+                    for(byte b: e.array()){
+                        ev.writeByte(b);
+                    }
+                    return true;
+                });
                 return true;
             })){
                 list(key.rewind(),localEdgeDataStore,query,stream);

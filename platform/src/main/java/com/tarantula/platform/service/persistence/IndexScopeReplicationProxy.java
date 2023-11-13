@@ -25,7 +25,7 @@ public class IndexScopeReplicationProxy extends ScopedReplicationProxy {
     public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
 
     }
-    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer, DataStore.BufferStream bufferStream){
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer){
         logger.warn("Recovering DB : "+metadata.source()+" Label : "+metadata.label());
         byte[] data = distributionKeyIndexService.recover(metadata.source(),key.array());
         if(data==null) return false;

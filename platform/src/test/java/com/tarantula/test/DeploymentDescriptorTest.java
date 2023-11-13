@@ -31,10 +31,10 @@ public class DeploymentDescriptorTest extends DataStoreHook{
             xmlParser.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("sample-presence.xml"));
             xmlParser.configurations.forEach(lb->{
                 LobbyDescriptor lobby = lb.descriptor;
-                lobby.ownerKey(new SnowflakeKey(bucketId));
+                lobby.ownerKey(SnowflakeKey.from(bucketId));
                 Assert.assertTrue(ds.create(lobby));
                 lb.applications.forEach(a->{
-                    a.ownerKey(new SnowflakeKey(lobby.distributionId()));
+                    a.ownerKey(SnowflakeKey.from(lobby.distributionId()));
                     Assert.assertTrue(ds.create(a));
                 });
             });

@@ -92,12 +92,12 @@ public class TestMapStoreListener implements MapStoreListener {
         //ts.createIfAbsent(TransactionResult.result(transactionId,false),false);
     }
 
-    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer,DataStore.BufferStream bufferStream){
-        return transactionLogManager.onRecovering(metadata,key,buffer,bufferStream);
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer){
+        return transactionLogManager.onRecovering(metadata,key,buffer);
     }
 
     public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferEdgeStream bufferStream){
-        return false;
+        return transactionLogManager.onRecovering(metadata,key,bufferStream);
     }
 
 
