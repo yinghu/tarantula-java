@@ -1,9 +1,11 @@
 package com.perfectday.games.earth8;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.Session;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
+import com.perfectday.games.earth8.analytics.AnalyticsManager;
 
 import java.util.HashMap;
 
@@ -98,12 +100,12 @@ public class BattleUpdate extends RecoverableObject {
             currencies.put(entry.getKey(),entry.getValue().getAsInt());
         });
     }
-    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup){
+    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session, AnalyticsManager analyticsManager){
         return true;
     }
 
-    public boolean update(ApplicationPreSetup applicationPreSetup){
-        return runUpdate(applicationPreSetup);
+    public boolean update(ApplicationPreSetup applicationPreSetup, Session session, AnalyticsManager analyticsManager){
+        return runUpdate(applicationPreSetup, session, analyticsManager);
     }
 
     @Override

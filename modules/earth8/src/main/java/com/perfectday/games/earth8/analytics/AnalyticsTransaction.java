@@ -13,7 +13,7 @@ public class AnalyticsTransaction {
         data = new JsonObject();
         data.addProperty("server_session_id", session.sessionId());
         data.addProperty("message_type", messageType);
-        data.addProperty("player_id", session.clientId());
+        data.addProperty("player_id", session.distributionId());
         data.addProperty("timestamp", LocalDateTime.now().toString());
     }
 
