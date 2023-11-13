@@ -175,7 +175,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
 
     public boolean load(Session session,MappingObject mappingObject){
         CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);
-        RecoverableQuery<MappingObject> query = RecoverableQuery.query(currentSaveIndex.saveId,mappingObject, GamePortableRegistry.INS);
+        RecoverableQuery<MappingObject> query = RecoverableQuery.query(currentSaveIndex.saveId,mappingObject, PresencePortableRegistry.INS);
         boolean[] loaded ={false};
         mDataStore.list(query,(m)->{
             if(m.label().equals(mappingObject.label())){
