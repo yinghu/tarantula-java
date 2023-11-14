@@ -32,10 +32,9 @@ public class AppleStoreProvider extends AuthObject{
     private final static String  PRODUCTION_VERIFY_URI = "https://buy.itunes.apple.com/verifyReceipt";
 
     private PlatformConfigurationServiceProvider configurationServiceProvider;
-    private ServiceEventLogger transactionLogger;
+
     public AppleStoreProvider(PlatformGameServiceProvider gameServiceProvider, MetricsListener metricsListener){
         super(gameServiceProvider.gameCluster().typeId(),"");
-        transactionLogger = gameServiceProvider.transactionEventLogger("apple_store");
         this.configurationServiceProvider = gameServiceProvider.configurationServiceProvider();
         this.applicationMetricsListener = metricsListener;
     }

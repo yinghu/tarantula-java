@@ -3,7 +3,6 @@ package com.perfectday.games.earth8;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
 import com.icodesoftware.service.ApplicationPreSetup;
-import com.perfectday.games.earth8.analytics.AnalyticsManager;
 import com.perfectday.games.earth8.analytics.UnitLevelUpTransaction;
 
 public class UnitXpUp extends BattleUpdate{
@@ -38,9 +37,8 @@ public class UnitXpUp extends BattleUpdate{
     }
 
     @Override
-    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session, AnalyticsManager analyticsManager){
-        System.out.println("UnitXpUp");
-        analyticsManager.send(new UnitLevelUpTransaction(session, unitId, 0, 0));
+    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session){
+        pendingAnalytics.add(new UnitLevelUpTransaction(session, unitId, 0, 0));
         return true;
     }
 }

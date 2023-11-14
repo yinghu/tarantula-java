@@ -3,11 +3,14 @@ package com.perfectday.games.earth8;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
 import com.icodesoftware.service.ApplicationPreSetup;
+import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
-import com.perfectday.games.earth8.analytics.AnalyticsManager;
+import com.perfectday.games.earth8.analytics.AnalyticsTransaction;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class BattleUpdate extends RecoverableObject {
 
@@ -18,6 +21,8 @@ public class BattleUpdate extends RecoverableObject {
     public long equipmentId;
 
     public HashMap<String,Integer> currencies = new HashMap<>();
+
+    protected List<AnalyticsTransaction> pendingAnalytics = new ArrayList<>();
 
     //Data store write contract
     @Override
@@ -100,12 +105,18 @@ public class BattleUpdate extends RecoverableObject {
             currencies.put(entry.getKey(),entry.getValue().getAsInt());
         });
     }
-    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session, AnalyticsManager analyticsManager){
+    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session){
         return true;
     }
 
-    public boolean update(ApplicationPreSetup applicationPreSetup, Session session, AnalyticsManager analyticsManager){
-        return runUpdate(applicationPreSetup, session, analyticsManager);
+    public boolean update(ApplicationPreSetup applicationPreSetup, Session session){
+        return runUpdate(applicationPreSetup, session);
+    }
+
+    public void publishAnalytics(TokenValidatorProvider.AuthVendor webhook){
+        pendingAnalytics.forEach(analyticsTransaction -> {
+            webhook.upload(Earth8GameServiceProvider.ANALYTICS_QUERY,analyticsTransaction.toString().getBytes());
+        });
     }
 
     @Override

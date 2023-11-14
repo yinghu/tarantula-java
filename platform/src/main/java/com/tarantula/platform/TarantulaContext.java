@@ -700,6 +700,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         if(name.equals(OnAccess.AMAZON)) return new ThirdPartyServiceProvider(OnAccess.AMAZON);
 
         if(name.equals(OnAccess.APPLICATION_STORE)) return new ThirdPartyServiceProvider(OnAccess.APPLICATION_STORE);
+
+        if(name.equals(OnAccess.WEB_HOOK)) return new ThirdPartyServiceProvider(OnAccess.WEB_HOOK);
+
         return null;
 
     }
