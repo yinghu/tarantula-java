@@ -5,21 +5,20 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.ApplicationPreSetup;
+import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.JsonUtil;
-import com.perfectday.games.earth8.analytics.AnalyticsManager;
+
 import com.perfectday.games.earth8.analytics.BattleEndTransaction;
 import com.perfectday.games.earth8.analytics.BattleStartTransaction;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+
 
 public class Earth8GameServiceProvider implements GameServiceProvider {
 
-    private AnalyticsManager analyticsManager;
     private GameContext gameContext;
+
+    public final static String ANALYTICS_QUERY = "earth8#Analytics";
     public void setup(GameContext gameContext){
-        // todo: this endpoint should be in config
-        this.analyticsManager = new AnalyticsManager("https://zz283suhd5.execute-api.us-east-1.amazonaws.com/sandbox");
         this.gameContext = gameContext;
         this.gameContext.log("Start earth 8 game service provider", OnLog.WARN);
     }
@@ -61,8 +60,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             return dataStore.create(battleTransaction);
         });
         session.write(created ? battleTransaction.toJson().toString().getBytes() : JsonUtil.toSimpleResponse(false,"failed to create battle transaction").getBytes());
-
-        analyticsManager.send(new BattleStartTransaction(session, battleTransaction.distributionId(), payload));
+        TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+        webhook.upload(ANALYTICS_QUERY,new BattleStartTransaction(session, battleTransaction.distributionId(), payload).toString().getBytes());
     }
 
     public void updateGame(Session session,byte[] payload) throws Exception{
@@ -73,11 +72,13 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             DataStore dataStore = applicationPreSetup.onDataStore("battle");
             if(!dataStore.create(update)) return false;
             //TO MORE TRANSACTION STUFF
-            return update.update(applicationPreSetup, session, analyticsManager);
+            return update.update(applicationPreSetup, session);
         });
+        if(updated){//do http calls outside transaction operations
+            TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+            update.publishAnalytics(webhook);
+        }
         session.write(JsonUtil.toSimpleResponse(updated,updated?"battle updated":"failed to update").getBytes());
-        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        gameContext.authorVendor(OnAccess.AMAZON).upload("earth8#"+"earth8/"+date+"/"+update.distributionKey()+".json",payload);
     }
 
     public void endGame(Session session,byte[] payload) throws Exception{
@@ -103,8 +104,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             //TO DO AFTER CURRENT BATTLE FINISHED
         }
         session.write(JsonUtil.toSimpleResponse(updated,"battle finished").getBytes());
-
-        analyticsManager.send(new BattleEndTransaction(session, battleTransaction.distributionId(), payload));
+        TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+        webhook.upload(ANALYTICS_QUERY,new BattleEndTransaction(session, battleTransaction.distributionId(), payload).toString().getBytes());
     }
     public <T extends OnAccess> void onGameEvent(T event){
         gameContext.log("EVENT : "+event.toJson().toString(),OnLog.WARN);

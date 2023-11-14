@@ -455,6 +455,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             applicationStore.setup(serviceContext);
             aMap.put(OnAccess.APPLICATION_STORE,applicationStore);
         }
+        AuthVendorRegistry webHook = (AuthVendorRegistry)this.serviceContext.authVendor(OnAccess.WEB_HOOK);
+        if(webHook!=null){
+            webHook.registerMetricsLister(serviceContext.metrics(Metrics.ACCESS));
+            webHook.setup(serviceContext);
+            aMap.put(OnAccess.WEB_HOOK,webHook);
+        }
         Configuration configuration = serviceContext.configuration("account-role-user-settings");
         maxOnSessionCount = ((Number)configuration.property("maxOnSessionCount")).intValue();
         //map only store

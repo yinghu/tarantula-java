@@ -60,5 +60,6 @@ public interface TokenValidatorProvider extends ServiceProvider,Resettable {
         void setup(ServiceContext serviceContext);
         boolean validate(Map<String,Object> params);
         boolean upload(String context,byte[] content);
+
     }
 }
