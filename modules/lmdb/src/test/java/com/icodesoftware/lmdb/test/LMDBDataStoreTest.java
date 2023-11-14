@@ -55,6 +55,8 @@ public class LMDBDataStoreTest {
         long ownerId = localDistributionIdGenerator.id();
         TestUser user = new TestUser("test001",ownerId);
         Assert.assertTrue(dataStore.create(user));
+        TestUser user1 = new TestUser("test002",ownerId);
+        Assert.assertTrue(dataStore.create(user1));
     }
 
 
