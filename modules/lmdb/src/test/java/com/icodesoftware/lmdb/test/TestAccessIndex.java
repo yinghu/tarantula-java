@@ -8,13 +8,13 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.NaturalKey;
 import com.icodesoftware.util.RecoverableObject;
 
-import java.util.Map;
 
 public class TestAccessIndex extends RecoverableObject implements AccessIndex {
 
     private int referenceId;
     public TestAccessIndex(){
-        //this.bucket = "DBS";
+        this.label = "access";
+        this.onEdge = true;
         this.referenceId = 1;
     }
     public TestAccessIndex(String owner){
@@ -44,27 +44,13 @@ public class TestAccessIndex extends RecoverableObject implements AccessIndex {
         return 100;
     }
 
-    @Override
-    public Map<String,Object> toMap(){
-        //this.properties.put("1",bucket);
-        this.properties.put("3",referenceId);
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        //this.bucket = (String)properties.get("1");
-        this.referenceId = ((Number)properties.get("3")).intValue();
-    }
 
     public boolean read(DataBuffer buffer){
-        //this.bucket = buffer.readUTF8();
-
         this.referenceId = buffer.readInt();
         this.distributionId = buffer.readLong();
         return true;
     }
     public boolean write(DataBuffer buffer) {
-        //buffer.writeUTF8(bucket);
         buffer.writeInt(referenceId);
         buffer.writeLong(distributionId);
         return true;

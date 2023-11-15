@@ -574,6 +574,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             lmdbDataStoreProvider.onUpdating(localEdgeDataStore.metadata,key,value,ptxn.getId());
             return true;
         }finally {
+            txn.close();
             cache.reset();
         }
     }
