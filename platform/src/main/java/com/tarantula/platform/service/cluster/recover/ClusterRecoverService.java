@@ -12,10 +12,8 @@ import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.util.BinaryKey;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
-import com.tarantula.platform.event.EventOnReplication;
 
 import com.tarantula.platform.event.KeyIndexEvent;
-import com.tarantula.platform.event.OnReplicationEvent;
 
 import com.tarantula.platform.service.cluster.ClusterBatch;
 import com.tarantula.platform.service.persistence.ReplicationData;
@@ -24,7 +22,6 @@ import com.tarantula.platform.TarantulaContext;
 
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -103,22 +100,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
 
     public void setup() throws Exception{
         this.tarantulaContext.clusterProvider().subscribe(tarantulaContext.node().nodeName()+"."+ RecoverService.NAME, event -> {
-            if(event instanceof EventOnReplication){
-                OnReplicationEvent dataReplicationEvent = (OnReplicationEvent)event;
-                KeyIndexEvent keyIndexEvent = new KeyIndexEvent(dataReplicationEvent.source(),this.tarantulaContext.node().nodeName());
-                String[] sources = new String[dataReplicationEvent.data().length];
-                String[] keys = new String[dataReplicationEvent.data().length];
-                for(int i=0;i<dataReplicationEvent.data().length;i++){
-                    OnReplication r = dataReplicationEvent.data()[i];
-                    DataStore dataStore = tarantulaContext.dataStore(Distributable.DATA_SCOPE,r.source());
-                    //dataStore.backup().set(r.key(),r.value());
-                    sources[i]=r.source();
-                    keys[i]=new String(r.key());
-                }
-                keyIndexEvent.owners = sources;
-                keyIndexEvent.keys = keys;
-                tarantulaContext.keyIndexService().onReplicated(keyIndexEvent);
-            }
+
             return false;
         });
         TarantulaContext._cluster_service_ready.countDown();

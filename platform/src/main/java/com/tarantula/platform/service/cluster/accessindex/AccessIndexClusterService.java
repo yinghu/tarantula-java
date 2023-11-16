@@ -17,9 +17,7 @@ import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 
-import com.tarantula.platform.event.EventOnReplication;
 import com.tarantula.platform.event.KeyIndexEvent;
-import com.tarantula.platform.event.OnReplicationEvent;
 
 import com.tarantula.platform.service.persistence.ReplicationData;
 
@@ -143,30 +141,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         TarantulaContext._integrationClusterStarted.await();
         this.deploymentServiceProvider = this.tarantulaContext.deploymentServiceProvider();
         this.tarantulaContext.clusterProvider().subscribe(tarantulaContext.node().nodeName()+"."+AccessIndexService.NAME,event -> {
-            if(event instanceof EventOnReplication){
-                OnReplicationEvent integrationReplicationEvent = (OnReplicationEvent)event;
-                String[] sources = new String[integrationReplicationEvent.data().length];
-                String[] keys = new String[integrationReplicationEvent.data().length];
-                KeyIndexEvent keyIndexEvent = new KeyIndexEvent(integrationReplicationEvent.source(),this.tarantulaContext.node().nodeName());
-                for(int i=0;i<integrationReplicationEvent.data().length;i++){
-                    OnReplication r = integrationReplicationEvent.data()[i];
-                    DataStore dso = this.dataStore();
-                    dso.backup().set((k,v)->{
-                        for(byte b : r.key()){
-                            k.writeByte(b);
-                        }
-                        for(byte b : r.value()){
-                            v.writeByte(b);
-                        }
-                        return true;
-                    });
-                    sources[i]=dso.name();
-                    keys[i]=new String(r.key());
-                }
-                keyIndexEvent.owners = sources;
-                keyIndexEvent.keys = keys;
-                tarantulaContext.keyIndexService().onReplicated(keyIndexEvent);
-            }
+
             return false;
         });
         TarantulaContext._cluster_service_ready.countDown();

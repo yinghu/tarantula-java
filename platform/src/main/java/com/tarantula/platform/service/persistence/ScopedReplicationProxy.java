@@ -10,7 +10,6 @@ import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
-import com.tarantula.platform.event.EventOnReplication;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
     private final static String CONFIG = "replication-service-settings";
-    protected final static long OVERFLOW_TIMER = 100;
+
     protected ServiceContext serviceContext;
 
     protected ClusterProvider.Node localNode;
@@ -26,7 +25,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
     private final int scope;
     protected boolean asyncDistributing;
 
-    protected ConcurrentHashMap<ClusterProvider.Node, EventOnReplication> pendingEvents;
+    //protected ConcurrentHashMap<ClusterProvider.Node, EventOnReplication> pendingEvents;
     protected long syncInterval;
 
     protected int maxPendingSize;
@@ -37,29 +36,31 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         transactionLogManager = new TransactionLogManager();
     }
 
-
+    public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
+        transactionLogManager.onUpdating(metadata,key,value,transactionId);
+    }
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer){
-        return false;
+        return transactionLogManager.onRecovering(metadata,key,buffer);
     }
 
     public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferEdgeStream bufferStream){
-        return false;
+        return transactionLogManager.onRecovering(metadata,key,bufferStream);
+    }
+    @Override
+    public boolean onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
+        return transactionLogManager.onDeleting(metadata,key,value,transactionId);
     }
 
     @Override
     public void onCommit(int scope,long transactionId) {
-
+        transactionLogManager.onCommit(scope,transactionId);
     }
 
     @Override
     public void onAbort(int scope,long transactionId) {
+        transactionLogManager.onAbort(scope,transactionId);
+    }
 
-    }
-    @Override
-    public boolean onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
-        return false;
-    }
-    public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){}
     @Override
     public String name() {
         return null;
@@ -82,7 +83,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         if(asyncDistributing){
             maxPendingSize = conf.get("maxPendingSize").getAsInt();
             syncInterval = conf.get("syncIntervalSeconds").getAsInt()*1000;
-            pendingEvents = new ConcurrentHashMap<>();
+            //pendingEvents = new ConcurrentHashMap<>();
         }
     }
 
@@ -112,10 +113,10 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
 
     protected void replicate(ClusterProvider.Node target){
-        EventOnReplication event = pendingEvents.remove(target);
-        if(event==null) return;
-        event.drain();
-        serviceContext.clusterProvider().publisher().publish(event);
+        //EventOnReplication event = pendingEvents.remove(target);
+        //if(event==null) return;
+        //event.drain();
+        //serviceContext.clusterProvider().publisher().publish(event);
     }
 
     @Override
@@ -125,9 +126,9 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
     @Override
     public void shutdown() throws Exception {
-        if(pendingEvents==null) return;
-        pendingEvents.forEach((k,v)->v.drop());
-        pendingEvents.clear();
+        //if(pendingEvents==null) return;
+        //pendingEvents.forEach((k,v)->v.drop());
+        //pendingEvents.clear();
     }
 
     @Override

@@ -18,6 +18,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -176,195 +177,127 @@ public class LMDBDataStoreTest {
         Assert.assertEquals(cnt[0],0);
     }
 
-    //@Test(groups = { "LMDB" })
-    public void createIfAbsentTest() {
-        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.STORE_NAME);
-        String key = "a100";
-        Recoverable.Key onwerKey = new SnowflakeKey(1000);
-        TestAccessIndex created = new TestAccessIndex(key);
-        created.ownerKey(onwerKey);
-        created.onEdge(true);
-        created.label("access");
-        created.distributionId(localDistributionIdGenerator.id());
-        Assert.assertTrue(ds.createIfAbsent(created,false));
-        //Assert.assertTrue(ds.createIfAbsent(created,false));
-        TestAccessIndex not_created = new TestAccessIndex(key);
-        Assert.assertFalse(ds.createIfAbsent(not_created,false));
-        Assert.assertTrue(ds.load(not_created));
-        Assert.assertTrue(ds.update(not_created));
-        Assert.assertTrue(ds.update(not_created));
-        Assert.assertTrue(ds.update(not_created));
-        Assert.assertTrue(ds.load(not_created));
-        Assert.assertEquals(not_created.revision(),Long.MIN_VALUE+3);
 
-        Assert.assertTrue(ds.backup().get(new NaturalKey(key),(keybuffer,dataBuffer) -> {
-            TestAccessIndex testAccessIndex = new TestAccessIndex();
-            Recoverable.DataHeader header = dataBuffer.readHeader();
-            testAccessIndex.read(dataBuffer);
-            Assert.assertEquals(testAccessIndex.distributionId(),created.distributionId());
-            //System.out.println(testAccessIndex.distributionId());
-            //long[] bits = testMapStoreListener.snowflakeIdGenerator.fromSnowflakeId(testAccessIndex.distributionId());
-            //System.out.println(bits[0]);
-            //System.out.println(bits[1]);
-            //System.out.println(bits[2]);
-            Assert.assertEquals(header.factoryId(),testAccessIndex.getFactoryId());
-            return true;
-        }));
-        Assert.assertEquals(ds.list(new TestAccessQuery(1000,"access")).size(),1);
-        //DataStore dataStore = lmdbDataStoreProvider.createAccessIndexDataStore(AccessIndexService.AccessIndexStore.STORE_NAME+"_backup");
-        //TestAccessIndex preset = new TestAccessIndex("preset");
-        //Assert.assertTrue(dataStore.createIfAbsent(preset,false));
-        //System.out.println("REV: "+preset.revision());
-        //Assert.assertTrue(ds.update(preset));
-        //Assert.assertTrue(ds.load(preset));
-        //Assert.assertEquals(preset.revision(),Long.MIN_VALUE+1);
-        //System.out.println(preset.revision());
-        //Assert.assertFalse(ds.createIfAbsent(preset,true));
-        //Assert.assertEquals(preset.revision(),Long.MIN_VALUE+1);
-        //TestAccessIndex preset1 = new TestAccessIndex("preset");
-        //Assert.assertTrue(ds.load(preset1));
-        //Assert.assertTrue(ds.update(preset1));
-        //Assert.assertEquals(preset1.revision(),Long.MIN_VALUE+2);
-    }
-
-    //@Test(groups = { "LMDB" })
-    public void createWithEdgeTest() {
-        DataStore ds = lmdbDataStoreProvider.createDataStore("user");
-        long ownerId1 = 10000;
-        long ownerId2 = 20000;
+    @Test(groups = { "LMDB" })
+    public void testCreateWithEdge() {
+        testMapStoreListener.verifier = (tid)->{
+            Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid).size(),2);
+        };
+        DataStore ds = lmdbDataStoreProvider.createDataStore("test_user_edge");
+        long ownerId1 = localDistributionIdGenerator.id();
         List<TestUser> empty = ds.list(new TestUserQuery(ownerId1));
         Assert.assertTrue(empty.size()==0);
+        List<TestUser> users = new ArrayList<>();
         for(int i=0;i<10;i++) {
             TestUser testUser = new TestUser("user"+i,ownerId1);
             Assert.assertTrue(ds.create(testUser));
+            users.add(testUser);
         }
-        for(int i=0;i<100;i++) {
-            TestUser testUser = new TestUser("user"+i,ownerId2);
-            Assert.assertTrue(ds.create(testUser));
-        }
-        int[] c={0};
-        ds.backup().forEach((k,v)->{
-            c[0]++;
-            return true;
+        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,TestUser.LABEL)).size(),10);
+        testMapStoreListener.verifier = (tid)->{
+            Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid).size(),1);
+        };
+        users.forEach(user->{
+            Assert.assertTrue(ds.createEdge(user,"friends"));
+            Assert.assertTrue(ds.createEdge(user,"games"));
         });
-        Assert.assertEquals(c[0],110);
-
-        c[0]=0;
-        ds.list(new TestUserQuery(ownerId1),(t)->{
-            c[0]++;
-            return true;
-        });
-        Assert.assertEquals(c[0],10);
-        List<TestUser> ulist = ds.list(new TestUserQuery(ownerId2));
-        Assert.assertEquals(ulist.size(),100);
-        ulist.forEach(u->{
-            //System.out.println(u.distributionId());
-            TestUser ux = new TestUser();
-            ux.distributionId(u.distributionId());
-            Assert.assertTrue(ds.load(ux));
-        });
-
-        List<TestUser> zerolist = ds.list(new TestUserQuery(1200));
-        Assert.assertEquals(zerolist.size(),0);
-
-        DataStore dsx = lmdbDataStoreProvider.createDataStore("user_backup");
-        int[] ct = {0};
-
-
-        dsx.backup().forEach((key,buffer)->{
-            //ct[0]++;
-            Recoverable.DataHeader h = buffer.readHeader();
-            if(h.classId()==10){
-                TestUser testUser = new TestUser();
-                testUser.read(buffer);
-                Assert.assertNotNull(testUser.login());
-                ct[0]++;
+        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),10);
+        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"games")).size(),10);
+    }
+    @Test(groups = { "LMDB" })
+    public void testCreateWithEdgeOnCommit() {
+        testMapStoreListener.verifier = (tid)->{
+            Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid).size(),20);
+        };
+        DataStore ds = lmdbDataStoreProvider.createDataStore("test_user_edge_committed");
+        long ownerId1 = localDistributionIdGenerator.id();
+        List<TestUser> empty = ds.list(new TestUserQuery(ownerId1));
+        Assert.assertTrue(empty.size()==0);
+        List<TestUser> users = new ArrayList<>();
+        Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE);
+        transaction.execute((ctx)->{
+            DataStore dataStore = ctx.onDataStore("test_user_edge_committed");
+            for(int i=0;i<10;i++) {
+                TestUser testUser = new TestUser("user"+i,ownerId1);
+                Assert.assertTrue(dataStore.create(testUser));
+                users.add(testUser);
             }
             return true;
         });
-        //Assert.assertEquals(ct[0],110);
-    }
-    //@Test(groups = { "LMDB" })
-    public void createEdgeTest() {
-        DataStore ds = lmdbDataStoreProvider.createDataStore("test_use_c");
-        long ownerId1 = 10000;
-        TestUserEx testUser = new TestUserEx("user",ownerId1);
-        Assert.assertTrue(ds.create(testUser));
-        Assert.assertTrue(ds.createEdge(testUser,"friends"));
-        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),1);
-    }
-
-    //@Test(groups = { "LMDB" })
-    public void deleteWithEdgeTest() {
-        DataStore ds = lmdbDataStoreProvider.createDataStore("test_use_d");
-        long ownerId1 = 10000;
-
-        TestUserEx testUser = new TestUserEx("user",ownerId1);
-        Assert.assertTrue(ds.create(testUser));
-        Assert.assertTrue(ds.createEdge(testUser,"friends"));
-        TestUserEx testUser1 = new TestUserEx("user1",ownerId1);
-        Assert.assertTrue(ds.create(testUser1));
-        Assert.assertTrue(ds.createEdge(testUser1,"friends"));
-
-        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,testUser.label())).size(),2);
-        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),2);
-        Assert.assertTrue(ds.deleteEdge(testUser.ownerKey(),testUser.key(),"friends"));
-        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),1);
-        Assert.assertTrue(ds.delete(testUser));
-        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,testUser.label())).size(),1);
-        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),1);
-    }
-
-    //@Test(groups = { "LMDB" })
-    public void createAssignedTest() {
-        //DataStore ds = lmdbDataStoreProvider.createDataStore("users");
-        long ownerId1 = 10000;
-        TestUserEx testUser = new TestUserEx("user",ownerId1);
-        TestMapStoreListener mapStoreListener = new TestMapStoreListener(lmdbDataStoreProvider);
-        ByteBuffer key = ByteBuffer.allocate(100);
-        Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(key);
-        localDistributionIdGenerator.assign(dataBuffer);
-        key.flip();
-        testUser.readKey(dataBuffer);
-        Assert.assertTrue(testUser.distributionId()>0);
-        key.clear();
-        testUser.writeKey(dataBuffer);
-        key.rewind();
-        TestUserEx tc = new TestUserEx("",ownerId1);
-        tc.readKey(dataBuffer);
-        Assert.assertTrue(tc.distributionId()>0);
-        //Assert.assertTrue(ds.create(testUser));
-        //Assert.assertTrue(ds.createEdge(testUser,"friends"));
-        //Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),1);
-    }
-    //@Test(groups = { "LMDB" })
-    public void backupListTest() {
-        DataStore ds = lmdbDataStoreProvider.createDataStore("data_batch_users");
-
-        int batch = 100;
-        for(int i=0;i<batch;i++){
-            TestUserEx ex = new TestUserEx("BATCH"+i,199);
-            Assert.assertTrue(ds.create(ex));
-        }
-        int[] ct ={0};
-        ds.backup().forEach((k,v)->{
-            v.readHeader();
-            TestUserEx ex = new TestUserEx(true);
-            ex.readKey(k);
-            ex.read(v);
-            ct[0]++;
-            Assert.assertTrue(ex.distributionId()>0);
-            Assert.assertNotNull(ex.login());
-            Assert.assertNotNull(ex.emailAddress());
-            Assert.assertNotNull(ex.role());
-            Assert.assertNotNull(ex.password());
+        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,TestUser.LABEL)).size(),10);
+        testMapStoreListener.verifier = (tid)->{
+            Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid).size(),20);
+        };
+        Transaction transaction1 = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE);
+        transaction1.execute((ctx)->{
+            DataStore dataStore = ctx.onDataStore("test_user_edge_committed");
+            users.forEach(user->{
+                Assert.assertTrue(dataStore.createEdge(user,"friends"));
+                Assert.assertTrue(dataStore.createEdge(user,"games"));
+            });
             return true;
         });
-        Assert.assertEquals(ct[0],batch);
-        //Assert.assertEquals(ds.count(),batch);
-        //Assert.assertTrue(ds.create(testUser));
-        //Assert.assertTrue(ds.createEdge(testUser,"friends"));
-        //Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),1);
+        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),10);
+        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"games")).size(),10);
     }
+
+    @Test(groups = { "LMDB" })
+    public void testCreateWithEdgeOnAbort() {
+        testMapStoreListener.verifier = (tid)->{
+            Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid).size(),20);
+        };
+        testMapStoreListener.abort = (tid)->{
+            System.out.println("ABORT : "+tid);
+        };
+        DataStore ds = lmdbDataStoreProvider.createDataStore("test_user_edge_aborted");
+        long ownerId1 = localDistributionIdGenerator.id();
+        List<TestUser> empty = ds.list(new TestUserQuery(ownerId1));
+        Assert.assertTrue(empty.size()==0);
+        List<TestUser> users = new ArrayList<>();
+        Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE);
+        transaction.execute((ctx)->{
+            DataStore dataStore = ctx.onDataStore("test_user_edge_aborted");
+            for(int i=0;i<10;i++) {
+                TestUser testUser = new TestUser("user"+i,ownerId1);
+                Assert.assertTrue(dataStore.create(testUser));
+                users.add(testUser);
+            }
+            return false;
+        });
+        int[] cnt={0};
+        ds.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId1),TestUser.LABEL,(k,e,v)->{
+            cnt[0]++;
+            return true;
+        });
+        Assert.assertEquals(cnt[0],0);
+
+        testMapStoreListener.verifier = (tid)->{
+            Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid).size(),20);
+        };
+        Transaction transaction1 = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE);
+        transaction1.execute((ctx)->{
+            DataStore dataStore = ctx.onDataStore("test_user_edge_aborted");
+            users.forEach(user->{
+                Assert.assertTrue(dataStore.createEdge(user,"friends"));
+                Assert.assertTrue(dataStore.createEdge(user,"games"));
+            });
+            return false;
+        });
+        cnt[0]=0;
+        ds.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId1),"friends",(k,e,v)->{
+            cnt[0]++;
+            return true;
+        });
+        Assert.assertEquals(cnt[0],0);
+        cnt[0]=0;
+        ds.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId1),"games",(k,e,v)->{
+            cnt[0]++;
+            return true;
+        });
+        Assert.assertEquals(cnt[0],0);
+    }
+
+
+
 
 }

@@ -276,6 +276,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         try{
             if(!onEdge(t.ownerKey(),label,t.key(),txn)) return false;
             txn.commit();
+            lmdbDataStoreProvider.onCommit(metadata.scope(),txn.getId());
             return true;
         }finally {
             txn.close();

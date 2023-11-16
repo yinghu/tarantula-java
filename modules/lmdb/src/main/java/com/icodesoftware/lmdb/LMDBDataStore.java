@@ -285,6 +285,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             if(!dbi.delete(txn, key.rewind())) return false;
             txn.commit();
             removeEdges(key.rewind());
+            lmdbDataStoreProvider.onCommit(metadata.scope(),txn.getId());
             return true;
         }finally {
             txn.close();
