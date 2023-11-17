@@ -22,6 +22,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.cci.udp.UDPEndpoint;
 import com.tarantula.game.service.PlatformGameServiceProvider;
+import com.tarantula.platform.event.TransactionReplicationEvent;
 import com.tarantula.platform.item.ConfigurableTemplate;
 import com.tarantula.platform.item.JsonConfigurableTemplateParser;
 import com.tarantula.platform.service.*;
@@ -1061,5 +1062,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public Transaction transaction(int scope){
          return dataStoreProvider().transaction(scope);
+    }
+
+    public void onTransactionEvent(int scope,TransactionReplicationEvent event){
+        log.warn("Replication scope ["+scope+"] "+event.destination());
     }
 }

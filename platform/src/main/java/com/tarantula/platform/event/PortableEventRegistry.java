@@ -11,6 +11,7 @@ import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.service.KeyIndexTrack;
 import com.tarantula.platform.service.cluster.ClusterBatch;
+import com.tarantula.platform.service.persistence.PortableTransactionLog;
 import com.tarantula.platform.tournament.TournamentEntry;
 import com.tarantula.platform.tournament.TournamentManager;
 import com.tarantula.platform.tournament.TournamentInstance;
@@ -37,6 +38,7 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int KEY_INDEX_EVENT_CID = 22;
 
+    public static final int TRANSACTION_LOG_CID = 24;
     public static final int TRANSACTION_REPLICATION_EVENT_CID = 25;
 
     //EVENT PORTABLE OBJECTS
@@ -117,7 +119,9 @@ public class PortableEventRegistry implements PortableFactory {
             case KEY_INDEX_EVENT_CID:
                 _ins = new KeyIndexEvent();
                 break;
-
+            case TRANSACTION_LOG_CID:
+                _ins = new PortableTransactionLog();
+                break;
             case TRANSACTION_REPLICATION_EVENT_CID:
                 _ins = new TransactionReplicationEvent();
                 break;

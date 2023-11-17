@@ -11,11 +11,6 @@ public class GameRoomQuery implements RecoverableFactory<GameRoom> {
     private String roomType;
     private int capacity;
 
-    public GameRoomQuery(long ownerId){
-        this.ownerId = ownerId;
-        this.roomType = GameZone.PLAY_MODE_PVE;
-        this.capacity = 1;
-    }
     public GameRoomQuery(long ownerId,String roomType,int capacity){
         this.ownerId = ownerId;
         this.roomType = roomType;

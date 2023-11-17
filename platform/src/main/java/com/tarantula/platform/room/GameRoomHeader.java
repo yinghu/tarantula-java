@@ -130,7 +130,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
             Entry entry = createEntry();
             entry.seat(i);
             entry.occupied(false);
-            entry.owner(this.distributionKey());
             entry.ownerKey(new SnowflakeKey(this.distributionId));
             if(!this.dataStore.create(entry)) throw new RuntimeException("cannot create room entry");
             entries[i]=entry;

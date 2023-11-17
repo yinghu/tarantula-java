@@ -106,6 +106,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             txn.commit();
             return true;
         }catch(Exception ex){
+            ex.printStackTrace();
             txn.abort();
             lmdbDataStoreProvider.onAbort(metadata.scope(),txn.getId());
             return false;

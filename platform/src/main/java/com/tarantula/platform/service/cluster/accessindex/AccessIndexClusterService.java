@@ -7,10 +7,12 @@ import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
 import com.icodesoftware.AccessIndex;
 import com.icodesoftware.DataStore;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.util.BinaryKey;
 import com.tarantula.platform.AccessIndexTrack;
@@ -19,6 +21,7 @@ import com.tarantula.platform.bootstrap.ServiceBootstrap;
 
 import com.tarantula.platform.event.KeyIndexEvent;
 
+import com.tarantula.platform.event.TransactionReplicationEvent;
 import com.tarantula.platform.service.persistence.ReplicationData;
 
 import java.util.ArrayList;
@@ -140,8 +143,10 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     public void setup() throws Exception{
         TarantulaContext._integrationClusterStarted.await();
         this.deploymentServiceProvider = this.tarantulaContext.deploymentServiceProvider();
-        this.tarantulaContext.clusterProvider().subscribe(tarantulaContext.node().nodeName()+"."+AccessIndexService.NAME,event -> {
-
+        this.tarantulaContext.clusterProvider().subscribe(MapStoreListener.INTEGRATION_MAP_STORE_NAME, event -> {
+            if(event instanceof TransactionReplicationEvent){
+                tarantulaContext.onTransactionEvent(Distributable.INTEGRATION_SCOPE,(TransactionReplicationEvent)event);
+            }
             return false;
         });
         TarantulaContext._cluster_service_ready.countDown();

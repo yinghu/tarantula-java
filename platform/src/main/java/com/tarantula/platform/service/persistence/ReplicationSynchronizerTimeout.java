@@ -2,18 +2,13 @@ package com.tarantula.platform.service.persistence;
 
 
 import com.icodesoftware.SchedulingTask;
-import com.icodesoftware.service.ClusterProvider;
 
 public class ReplicationSynchronizerTimeout implements SchedulingTask {
 
-    private final ScopedReplicationProxy proxy;
-    private final long nextSyncInterval;
+    private Runnable runnable;
 
-    private final ClusterProvider.Node targetNode;
-    public ReplicationSynchronizerTimeout(ScopedReplicationProxy proxy, long nextSyncInterval, ClusterProvider.Node target){
-        this.proxy = proxy;
-        this.nextSyncInterval = nextSyncInterval;
-        this.targetNode = target;
+    public ReplicationSynchronizerTimeout(Runnable runnable){
+        this.runnable = runnable;
     }
     @Override
     public boolean oneTime() {
@@ -27,11 +22,11 @@ public class ReplicationSynchronizerTimeout implements SchedulingTask {
 
     @Override
     public long delay() {
-        return nextSyncInterval;
+        return 100;
     }
 
     @Override
     public void run() {
-        proxy.replicate(targetNode);
+        runnable.run();
     }
 }

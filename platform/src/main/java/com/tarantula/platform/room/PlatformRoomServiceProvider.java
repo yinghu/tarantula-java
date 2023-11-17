@@ -12,6 +12,7 @@ import com.icodesoftware.protocol.GameModule;
 import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
 
+import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.cci.udp.UDPEndpoint;
@@ -233,7 +234,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             });
             if(rooms[0] < minRoomPoolSizePerZone){
                 int remaining = minRoomPoolSizePerZone - rooms[0];
-                logger.warn("Creating game room on node->"+serviceContext.node().nodeName()+" : "+remaining);
+                logger.warn("Creating game room on node->"+serviceContext.node().nodeId()+" : "+remaining);
                 for(int i=0; i<remaining;i++){
                     GameRoom gameRoom = this.createGameRoom(index,true);
                     if(gameRoom!=null) rooms[0]++;
@@ -511,7 +512,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }
         GameZone gameZone = zoneIndex.gameZone;
         GameRoom gameRoom = this.newGameRoom(gameZone.playMode(),gameZone.capacity());
-        gameRoom.ownerKey(gameZone.key());
+        gameRoom.ownerKey(SnowflakeKey.from(serviceContext.node().nodeId()));
         if(!this.dataStore.create(gameRoom)) return null;
         gameRoom.dataStore(this.dataStore);
         gameRoom.load();
