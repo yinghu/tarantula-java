@@ -9,10 +9,21 @@
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
-    <div class="w3-display-container w3-white tx-content-8"></div>
-    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-data-store-backup-message">
-        <p>Backup data store</p>
-    </div> 
+    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-data-store-backup-message"></div> 
+    <div class="w3-panel tx-margin-bottom-8 w3-border-bottom w3-border-red">
+        <div class="w3-container w3-center tx-margin-bottom-8">
+            <label class="tx-text-12 tx-margin-right-4">Local</label>
+            <input id='tx-bk-data-store-local-scope' class="w3-check tx-text-12" type="checkbox" checked>
+            <label class="tx-text-12 tx-margin-right-4">Data</label>
+            <input id='tx-bk-data-store-data-scope' class="w3-check tx-text-12" type="checkbox" checked>
+            <label class="tx-text-12 tx-margin-right-4">Access</label>
+            <input id='tx-bk-data-store-access-scope' class="w3-check tx-text-12" type="checkbox" checked>
+            <label class="tx-text-12 tx-margin-right-4">Index</label>
+            <input id='tx-bk-data-store-index-scope' class="w3-check tx-text-12" type="checkbox" checked>
+            <label class="tx-text-12 tx-margin-right-4">Log</label>
+            <input id='tx-bk-data-store-log-scope' class="w3-check tx-text-12" type="checkbox" checked>
+        </div>
+    </div>
     <div class="w3-panel w3-border-bottom w3-border-white">
         <div class="w3-container w3-center">
             <span id="tx-data-store-backup-ok" class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Backup</span>     
@@ -29,8 +40,14 @@
 </div>
 <script>
     document.querySelector('#tx-data-store-backup-ok').onclick=()=>{
-        TARA_API.onService(false,{serviceTag:'role/sudo/datastore',command:'onBackupDataStore'},(resp)=>{
-            document.querySelector('#tx-data-store-backup-message').innerHTML = resp.message;  
+        let local = document.querySelector('#tx-bk-data-store-local-scope').checked;
+        let data = document.querySelector('#tx-bk-data-store-data-scope').checked;
+        let access = document.querySelector('#tx-bk-data-store-access-scope').checked;
+        let index = document.querySelector('#tx-bk-data-store-index-scope').checked;
+        let log = document.querySelector('#tx-bk-data-store-log-scope').checked;
+        let query = local+'#'+data+'#'+access+'#'+index+'#'+log;
+        TARA_API.onGet('role/sudo/datastore','onBackupDataStore',query,(resp)=>{
+           document.querySelector('#tx-data-store-backup-message').innerHTML = resp.message;
         });    
     };
     document.querySelector('#tx-backup-store-close').onclick=()=>{

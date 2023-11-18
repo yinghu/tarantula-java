@@ -19,6 +19,7 @@ public interface DataStoreProvider extends ServiceProvider {
     void registerDistributionIdGenerator(DistributionIdGenerator distributionIdGenerator);
     void registerMapStoreListener(int scope, MapStoreListener mapStoreListener);
 
+    void backup(int scope);
 
     //create none-partitioned integration scope data store
     DataStore createAccessIndexDataStore(String name);

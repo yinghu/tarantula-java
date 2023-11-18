@@ -11,6 +11,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
+import com.hazelcast.nio.serialization.Portable;
 import com.icodesoftware.*;
 import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
 import com.icodesoftware.service.*;
@@ -1065,6 +1066,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
 
     public void onTransactionEvent(int scope,TransactionReplicationEvent event){
-        log.warn("Replication scope ["+scope+"] "+event.destination());
+        for (Portable pendingLog : event.pendingLogs) {
+            PortableTransactionLog lg = (PortableTransactionLog)pendingLog;
+            log.warn("Replication scope ["+scope+"] "+event.destination()+" : "+lg.transactionLog.source);
+        }
+
     }
 }

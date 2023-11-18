@@ -1,6 +1,7 @@
 package com.icodesoftware.lmdb;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DataStoreProvider;
@@ -8,16 +9,23 @@ import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
 
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.JsonUtil;
 import org.lmdbjava.Dbi;
 import org.lmdbjava.DbiFlags;
 import org.lmdbjava.Env;
 import org.lmdbjava.Txn;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,11 +38,12 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private TarantulaLogger logger = JDKLogger.getLogger(LMDBDataStoreProvider.class);
 
     private String name;
+
+    private String baseDir = "target/lmdb";
     private String dataPath ="target/lmdb/data";
     private String integrationPath="target/lmdb/integration";
     private String indexPath = "target/lmdb/index";
     private String localPath = "target/lmdb/local";
-
     private String logPath = "target/lmdb/log";
 
     public Env<ByteBuffer> data;
@@ -61,7 +70,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private MapStoreListener dataMapStoreListener;
     private DistributionIdGenerator distributionIdGenerator;
 
-
+    private JsonObject jsonObject;
     @Override
     public void configure(Map<String, Object> properties) {
         this.name = (String)properties.get("name");
@@ -71,6 +80,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         String _indexPath = ((JsonElement)properties.get("indexPath")).getAsString();
         String _localPath = ((JsonElement)properties.get("localPath")).getAsString();
         String _logPath = ((JsonElement)properties.get("logPath")).getAsString();
+        this.baseDir = (String)properties.get("dir");
         this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_dataPath;
         this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+_integrationPath;
         this.indexPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_indexPath;
@@ -264,6 +274,19 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
                 createLogDataStore(dname);
             }
         });
+        File backupLog = new File(baseDir+"/backup.json");
+        if(!backupLog.exists()){
+            backupLog.createNewFile();
+            jsonObject = new JsonObject();
+            jsonObject.addProperty("data",0);
+            jsonObject.addProperty("integration",0);
+            jsonObject.addProperty("index",0);
+            jsonObject.addProperty("log",0);
+            jsonObject.addProperty("local",0);
+            saveJson();
+        }
+        FileInputStream in = new FileInputStream(backupLog);
+        jsonObject = JsonUtil.parse(in);
         logger.warn("LMDB Provider started with store size ["+storeSize+"]["+pendingQueue.size()+"]");
     }
 
@@ -316,11 +339,11 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         }
         if(metadata.scope()==Distributable.DATA_SCOPE && dataMapStoreListener!=null){
             dataMapStoreListener.onUpdating(metadata,key,value,transactionId);
-            return;
+            //return;
         }
-        if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
-            keyIndexMapStoreListener.onUpdating(metadata,key,value,transactionId);
-        }
+        //if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
+            //keyIndexMapStoreListener.onUpdating(metadata,key,value,transactionId);
+        //}
     }
 
 
@@ -330,11 +353,10 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         }
         if(metadata.scope()==Distributable.DATA_SCOPE && dataMapStoreListener!=null){
             return dataMapStoreListener.onRecovering(metadata,key,buffer);
-
         }
-        if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
-            return keyIndexMapStoreListener.onRecovering(metadata,key,buffer);
-        }
+        //if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
+            //return keyIndexMapStoreListener.onRecovering(metadata,key,buffer);
+        //}
         return false;
     }
 
@@ -346,9 +368,9 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
             return dataMapStoreListener.onRecovering(metadata,key,bufferStream);
 
         }
-        if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
-            return keyIndexMapStoreListener.onRecovering(metadata,key,bufferStream);
-        }
+        //if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
+            //return keyIndexMapStoreListener.onRecovering(metadata,key,bufferStream);
+        //}
         return false;
     }
 
@@ -361,9 +383,9 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
              return dataMapStoreListener.onDeleting(metadata,key,value,transactionId);
 
         }
-        if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
-            return keyIndexMapStoreListener.onDeleting(metadata,key,value,transactionId);
-        }
+        //if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
+            //return keyIndexMapStoreListener.onDeleting(metadata,key,value,transactionId);
+        //}
         return true;
     }
 
@@ -375,11 +397,11 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         }
         if(scope==Distributable.INTEGRATION_SCOPE && this.integrationMapStoreListener!=null){
             this.integrationMapStoreListener.onCommit(scope,transactionId);
-            return;
+            //return;
         }
-        if(scope==Distributable.INDEX_SCOPE && this.keyIndexMapStoreListener!=null){
-            this.keyIndexMapStoreListener.onCommit(scope,transactionId);
-        }
+        //if(scope==Distributable.INDEX_SCOPE && this.keyIndexMapStoreListener!=null){
+            //this.keyIndexMapStoreListener.onCommit(scope,transactionId);
+        //}
     }
 
     @Override
@@ -390,17 +412,105 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         }
         if(scope==Distributable.INTEGRATION_SCOPE && this.integrationMapStoreListener!=null){
             this.integrationMapStoreListener.onAbort(scope,transactionId);
-            return;
+            //return;
         }
-        if(scope==Distributable.INDEX_SCOPE && this.keyIndexMapStoreListener!=null){
-            this.keyIndexMapStoreListener.onAbort(scope,transactionId);
-        }
+        //if(scope==Distributable.INDEX_SCOPE && this.keyIndexMapStoreListener!=null){
+            //this.keyIndexMapStoreListener.onAbort(scope,transactionId);
+        //}
     }
 
     public void assign(Recoverable.DataBuffer dataBuffer){
         this.distributionIdGenerator.assign(dataBuffer);
     }
 
+    public void backup(int scope){
+        synchronized (jsonObject){
+            int ix;
+            switch (scope){
+                case Distributable.DATA_SCOPE:
+                    ix = jsonObject.get("data").getAsInt()+1;
+                    jsonObject.addProperty("data",ix);
+                    break;
+                case Distributable.INTEGRATION_SCOPE:
+                    ix = jsonObject.get("integration").getAsInt()+1;
+                    jsonObject.addProperty("integration",ix);
+                    break;
+                case Distributable.INDEX_SCOPE:
+                    ix = jsonObject.get("index").getAsInt()+1;
+                    jsonObject.addProperty("index",ix);
+                    break;
+                case Distributable.LOG_SCOPE:
+                    ix = jsonObject.get("log").getAsInt()+1;
+                    jsonObject.addProperty("log",ix);
+                    break;
+                case Distributable.LOCAL_SCOPE:
+                default:
+                    ix = jsonObject.get("local").getAsInt()+1;
+                    jsonObject.addProperty("local",ix);
+                    break;
+            }
+            saveJson();
+            backup(scope,ix);
+        }
+    }
+    private void saveJson(){
+        try{
+            File backupLog = new File(baseDir+"/backup.json");
+            FileOutputStream fileOutputStream = new FileOutputStream(backupLog);
+            fileOutputStream.write(jsonObject.toString().getBytes());
+            fileOutputStream.close();
+        }catch (Exception exception){
+            logger.error("Failed to save json ["+jsonObject.toString()+"]",exception);
+        }
+    }
+    private void saveJsonCopyDate(File dir){
+        try{
+            FileOutputStream fileOutputStream = new FileOutputStream(dir.getAbsolutePath()+"/version.json");
+            JsonObject version = new JsonObject();
+            version.addProperty("backupDate", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+            fileOutputStream.write(version.toString().getBytes());
+            fileOutputStream.close();
+        }catch (Exception exception){
+            logger.error("Failed to save json version ["+dir+"]",exception);
+        }
+    }
+    private void backup(int scope,int sequence){
+        try{
+            if(scope==Distributable.DATA_SCOPE){
+                Path copyPath = path(baseDir+"/data_"+sequence);
+                data.copy(copyPath.toFile());
+                saveJsonCopyDate(copyPath.toFile());
+                return;
+            }
+            if(scope==Distributable.INTEGRATION_SCOPE){
+                Path copyPath = path(baseDir+"/integration_"+sequence);
+                integration.copy(copyPath.toFile());
+                saveJsonCopyDate(copyPath.toFile());
+                return;
+            }
+            if(scope==Distributable.INDEX_SCOPE){
+                Path copyPath = path(baseDir+"/index_"+sequence);
+                index.copy(copyPath.toFile());
+                saveJsonCopyDate(copyPath.toFile());
+                return;
+            }
+            if(scope==Distributable.LOG_SCOPE){
+                Path copyPath = path(baseDir+"/log_"+sequence);
+                log.copy(copyPath.toFile());
+                saveJsonCopyDate(copyPath.toFile());
+                return;
+            }
+            if(scope==Distributable.LOCAL_SCOPE){
+                Path copyPath = path(baseDir+"/local_"+sequence);
+                local.copy(copyPath.toFile());
+                saveJsonCopyDate(copyPath.toFile());
+            }
+
+        }catch (Exception ex){
+            logger.error("Failed to backup data store ["+scope+"]",ex);
+            throw new RuntimeException(ex);
+        }
+    }
     private Path path(String path) throws Exception{
         Path _path = Paths.get(path);
         if(!Files.exists(_path)) Files.createDirectories(_path);

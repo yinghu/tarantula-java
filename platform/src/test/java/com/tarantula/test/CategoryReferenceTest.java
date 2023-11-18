@@ -23,7 +23,7 @@ public class CategoryReferenceTest extends DataStoreHook{
         int[] ct = {0};
         dataStore.backup().forEachEdgeKey(new NaturalKey("String"),"category",(k,v)->{
             ct[0]++;
-            System.out.println(v.readUTF8());
+            //System.out.println(v.readUTF8());
             return true;
         });
         Assert.assertEquals(ct[0],3);

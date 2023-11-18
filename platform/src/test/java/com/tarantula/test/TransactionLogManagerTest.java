@@ -27,9 +27,9 @@ public class TransactionLogManagerTest extends DataStoreHook{
         presenceIndex.ownerKey(SnowflakeKey.from(100));
         Assert.assertTrue(dataStore.createIfAbsent(presenceIndex,true));
         List<TransactionResult> logs = transactionLogManager.pending(Distributable.DATA_SCOPE,serviceContext.node().nodeId());
-        System.out.println("SIZE : "+logs.size());
+        //System.out.println("SIZE : "+logs.size());
         logs.forEach(log->{
-            System.out.println("TID : "+log.distributionId());
+            //System.out.println("TID : "+log.distributionId());
             List<TransactionLog> pg = transactionLogManager.committed(Distributable.DATA_SCOPE,log.distributionId());
             pg.forEach(p->{
                 p.source = "foo_test";

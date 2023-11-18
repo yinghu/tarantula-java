@@ -85,7 +85,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     void registerAccessIndexListener(AccessIndexService.Listener listener);
 
     //data store backup operation API
-    void issueDataStoreBackup();
+    void issueDataStoreBackup(int scope);
     List<String> listDataStore(int scope);
     List<String> listServiceView();
     List<String> listMetricsView();

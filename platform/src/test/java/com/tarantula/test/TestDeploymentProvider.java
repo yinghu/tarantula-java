@@ -228,7 +228,7 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
 
 
     @Override
-    public void issueDataStoreBackup() {
+    public void issueDataStoreBackup(int scoppe) {
 
     }
 
