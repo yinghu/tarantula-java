@@ -64,7 +64,7 @@ public class MetricsTest extends DataStoreHook{
         metricsSnapshot.ownerKey(statistics.key());
 
         //metricsSnapshot.initialize(new MetricsProperty());
-        System.out.println(MetricsSnapshot.hourlyLabel(LocalDateTime.now()));
+        //System.out.println(MetricsSnapshot.hourlyLabel(LocalDateTime.now()));
         Assert.assertTrue(dataStore.create(metricsSnapshot));
 
         MetricsSnapshot metricsSnapshot1 = new MetricsSnapshot(SystemMetrics.ACCESS_AMAZON_S3_COUNT,LeaderBoard.DAILY);

@@ -215,6 +215,6 @@ public class GameConfigurationSetup extends GamePreSetup implements ApplicationP
 
     @Override
     public void close() {
-        System.out.println("closing resource");
+        //System.out.println("closing resource");
     }
 }

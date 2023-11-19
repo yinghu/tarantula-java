@@ -27,27 +27,20 @@ public class TransactionLogManagerTest extends DataStoreHook{
         presenceIndex.ownerKey(SnowflakeKey.from(100));
         Assert.assertTrue(dataStore.createIfAbsent(presenceIndex,true));
         List<TransactionResult> logs = transactionLogManager.pending(Distributable.DATA_SCOPE,serviceContext.node().nodeId());
-        //System.out.println("SIZE : "+logs.size());
         logs.forEach(log->{
-            //System.out.println("TID : "+log.distributionId());
             List<TransactionLog> pg = transactionLogManager.committed(Distributable.DATA_SCOPE,log.distributionId());
             pg.forEach(p->{
                 p.source = "foo_test";
-                //if(p.edgeLabel==null) {
-                    //System.out.println("LBL : "+p.edgeLabel+" : "+p.value+" : "+BufferUtil.toLong(p.key));
-                //}
-                //else{
-                    //System.out.println("LBL : "+p.edgeLabel+" : "+BufferUtil.toLong(p.edgeKey)+" : "+BufferUtil.toLong(p.key));
-                //}
             });
             transactionLogManager.onTransaction(pg);
         });
         DataStore foo = serviceContext.dataStore(Distributable.DATA_SCOPE,"foo_test");
-        //Assert.assertTrue(foo.load(presenceIndex));
         RecoverableQuery<PresenceIndex> query = RecoverableQuery.query(100,presenceIndex, PresencePortableRegistry.INS);
+        int[] recovered = {0};
         foo.list(query).forEach(p->{
-            System.out.println("PP : "+p.distributionId()+" :: "+presenceIndex.distributionId());
+            recovered[0]++;
         });
+        Assert.assertTrue(recovered[0]>0);
     }
 
 }

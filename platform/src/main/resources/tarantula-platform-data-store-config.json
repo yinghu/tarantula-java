@@ -5,8 +5,8 @@
         "properties": [
             {"dataPath":"tarantula/data"},
             {"integrationPath":"tarantula/integration"},
-            {"indexPath":"tarantula/index"},
             {"localPath":"tarantula/local"},
+            {"indexPath":"tarantula/index"},
             {"logPath":"tarantula/log"}
         ]
     }
