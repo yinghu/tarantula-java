@@ -247,7 +247,7 @@ public class LMDBDataStoreTest {
             Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid).size(),20);
         };
         testMapStoreListener.abort = (tid)->{
-            System.out.println("ABORT : "+tid);
+            //System.out.println("ABORT : "+tid);
         };
         DataStore ds = lmdbDataStoreProvider.createDataStore("test_user_edge_aborted");
         long ownerId1 = localDistributionIdGenerator.id();

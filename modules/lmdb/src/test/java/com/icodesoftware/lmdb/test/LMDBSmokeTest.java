@@ -178,17 +178,17 @@ public class LMDBSmokeTest {
 
         dbi1.put(c1x,key.rewind(),value);
         if(dbi1.get(c1x,key.rewind())!=null){
-            System.out.println("VC1 Y : "+c1x.val().getLong());
+            //System.out.println("VC1 Y : "+c1x.val().getLong());
         }
         c1x.commit();
         Dbi dbi2 = env.openDbi(c,"test2".getBytes(),null,DbiFlags.MDB_CREATE);
         final Txn<ByteBuffer> c2 = env.txn(c);
         if(dbi2.get(c2,key)!=null){
-            System.out.println("VC2 X : "+c2.val().getLong());
+            //System.out.println("VC2 X : "+c2.val().getLong());
         }
         dbi2.put(c2,key.rewind(),value.rewind());
         if(dbi2.get(c2,key.rewind())!=null){
-            System.out.println("VC2 Y : "+c2.val().getLong());
+            //System.out.println("VC2 Y : "+c2.val().getLong());
         }
         //c2.commit();
         c.commit();

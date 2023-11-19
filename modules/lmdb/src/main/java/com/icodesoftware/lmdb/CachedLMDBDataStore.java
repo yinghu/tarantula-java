@@ -416,7 +416,6 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             txn.close();
             cache.reset();
         }
-
     }
     public void forEachEdgeKeyValue(Recoverable.Key key,String label,BufferEdgeStream bufferStream){
         LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(metadata.scope(),name,label);

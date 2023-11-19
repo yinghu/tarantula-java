@@ -383,7 +383,22 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     }
 
     public void forEachEdgeKeyValue(Recoverable.Key key,String label,BufferEdgeStream bufferStream){
-
+        LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.localEdgeDataStore(metadata.scope(),name,label,ptxn);
+        BufferCache cache = lmdbDataStoreProvider.fromCache();
+        final Txn<ByteBuffer> txn = env.txn(ptxn);
+        try{
+            if(!key.write(cache.key)) return;
+            ByteBuffer akey = cache.key.flip();
+            CursorIterable<ByteBuffer> cursor = localEdgeDataStore.dbi.iterate(txn, KeyRange.closed(akey,akey));
+            for(Iterator<CursorIterable.KeyVal<ByteBuffer>> it = cursor.iterator();it.hasNext();){
+                CursorIterable.KeyVal<ByteBuffer> kv = it.next();
+                if(dbi.get(txn,kv.val())==null) continue;
+                bufferStream.on(cache.key,BufferProxy.buffer(kv.val().rewind()),BufferProxy.buffer(txn.val()));
+            }
+        }finally {
+            txn.close();
+            cache.reset();
+        }
     }
 
     @Override

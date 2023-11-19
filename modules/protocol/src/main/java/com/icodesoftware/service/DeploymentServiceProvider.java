@@ -80,7 +80,6 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     Lobby lobby(String typeId);
     //END OF CLUSTER
 
-
     //Access index set operation API
     void registerAccessIndexListener(AccessIndexService.Listener listener);
 

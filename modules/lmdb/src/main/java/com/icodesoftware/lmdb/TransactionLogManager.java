@@ -3,8 +3,6 @@ package com.icodesoftware.lmdb;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.TarantulaLogger;
-import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.BinaryKey;
@@ -14,7 +12,7 @@ import java.util.List;
 
 public class TransactionLogManager {
 
-    private TarantulaLogger logger = JDKLogger.getLogger(TransactionLogManager.class);
+
     private static final String DATA_PREFIX = "log_d_";
     private static final String ACCESS_PREFIX = "log_a_";
     private static final String INDEX_PREFIX = "log_i_";
@@ -35,11 +33,11 @@ public class TransactionLogManager {
         ts.list(query).forEach(t->{
             DataStore tds = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(t.scope)+t.source);
             if(t.edgeLabel==null && !t.deleting){
-                if(!tds.backup().get(new BinaryKey(t.key),(k,v)->{
+                tds.backup().get(new BinaryKey(t.key),(k,v)->{
                     t.value = v.array();
                     pending.add(t);
                     return true;
-                })) logger.warn("NO VALUE LOADED");
+                });
             }else{
                 pending.add(t);
             }

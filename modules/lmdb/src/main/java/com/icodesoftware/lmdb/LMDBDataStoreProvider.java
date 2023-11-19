@@ -241,21 +241,18 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         data.getDbiNames().forEach(n->{
             String dname = new String(n);
             if(!dname.contains("#")){
-                logger.warn("Data DB : "+dname);
                 createDataStore(dname);
             }
         });
         integration.getDbiNames().forEach(n->{
             String dname = new String(n);
             if(!dname.contains("#")){
-                logger.warn("Integration DB : "+dname);
                 createAccessIndexDataStore(dname);
             }
         });
         index.getDbiNames().forEach(n->{
             String dname = new String(n);
             if(!dname.contains("#")){
-                logger.warn("Index DB : "+dname);
                 createKeyIndexDataStore(dname);
             }
 
@@ -263,14 +260,12 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         local.getDbiNames().forEach(n->{
             String dname = new String(n);
             if(!dname.contains("#")){
-                logger.warn("Local DB : "+dname);
                 createLocalDataStore(dname);
             }
         });
         log.getDbiNames().forEach(n->{
             String dname = new String(n);
             if(!dname.contains("#")){
-                logger.warn("Log DB : "+dname);
                 createLogDataStore(dname);
             }
         });
