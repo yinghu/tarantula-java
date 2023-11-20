@@ -91,7 +91,7 @@ public class TransactionLogManager {
 
 
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
-        DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(metadata.scope())+metadata.source());
+        DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,logPrefix(metadata.scope())+metadata.source());
         if(metadata.label()!=null) return false;
         return dataStore.backup().get(BinaryKey.from(key.array()),(k,v)->{
             for(byte b : v.array()){
@@ -103,7 +103,7 @@ public class TransactionLogManager {
     }
 
     public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferEdgeStream bufferStream){
-        DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(metadata.scope())+metadata.source());
+        DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,logPrefix(metadata.scope())+metadata.source());
         if(metadata.label()==null) return false;
         boolean[] loaded ={false};
         dataStore.backup().forEachEdgeKeyValue(BinaryKey.from(key.array()),metadata.label(),(k,e,v)->{
@@ -174,7 +174,7 @@ public class TransactionLogManager {
 
     public void onTransaction(List<TransactionLog> transactionLogs) {
         for(TransactionLog log : transactionLogs){
-            DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(log.scope)+log.source);
+            DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,logPrefix(log.scope)+log.source);
             if(log.deleting){
                 if(log.edgeLabel==null){
                     dataStore.backup().unset((k,v)->{

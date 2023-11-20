@@ -104,6 +104,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     private final ConcurrentHashMap<String,ServiceProvider> serviceProviders = new ConcurrentHashMap();
 
     public DataStoreProvider deploymentDataStoreProvider;
+    private DataScopeReplicationProxy dataScopeReplicationProxy;
+    private IntegrationScopeReplicationProxy integrationScopeReplicationProxy;
 
     private final ConcurrentHashMap<Integer,RecoverableListener> fMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String,ConfigurableTemplate> cMap = new ConcurrentHashMap<>();
@@ -203,13 +205,15 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         pcs.parse().forEach((r)->{
             fMap.put(r.registryId(),r);
         });
+        this.dataScopeReplicationProxy = new DataScopeReplicationProxy();
+        this.integrationScopeReplicationProxy = new IntegrationScopeReplicationProxy();
         DataStoreConfigurationJsonParser sparser = new DataStoreConfigurationJsonParser("tarantula-platform-data-store-config.json",this,this.storeSizeMb,dataStoreProvider -> {
             try{
                 this.deploymentDataStoreProvider = dataStoreProvider;
                 this.deploymentDataStoreProvider.registerDistributionIdGenerator(this.distributionIdGenerator);
-                this.deploymentDataStoreProvider.registerMapStoreListener(Distributable.INDEX_SCOPE,new IndexScopeReplicationProxy());
-                this.deploymentDataStoreProvider.registerMapStoreListener(Distributable.INTEGRATION_SCOPE,new IntegrationScopeReplicationProxy());
-                this.deploymentDataStoreProvider.registerMapStoreListener(Distributable.DATA_SCOPE,new DataScopeReplicationProxy());
+                //this.deploymentDataStoreProvider.registerMapStoreListener(Distributable.INDEX_SCOPE,new IndexScopeReplicationProxy());
+                this.deploymentDataStoreProvider.registerMapStoreListener(Distributable.INTEGRATION_SCOPE,integrationScopeReplicationProxy);
+                this.deploymentDataStoreProvider.registerMapStoreListener(Distributable.DATA_SCOPE,dataScopeReplicationProxy);
                 this.deploymentDataStoreProvider.start();
                 this.deploymentDataStoreProvider.setup(this);
                 this._initMirrorClusterBackup();
@@ -1066,10 +1070,15 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
 
     public void onTransactionEvent(int scope,TransactionReplicationEvent event){
-        for (Portable pendingLog : event.pendingLogs) {
-            PortableTransactionLog lg = (PortableTransactionLog)pendingLog;
-            log.warn("Replication scope ["+scope+"] "+event.destination()+" : "+lg.transactionLog.source);
-        }
+         if(scope==Distributable.DATA_SCOPE){
+             dataScopeReplicationProxy.onTransactionReplicationEvent(event);
+             return;
+         }
+         if(scope==Distributable.INTEGRATION_SCOPE){
+             integrationScopeReplicationProxy.onTransactionReplicationEvent(event);
+             return;
+         }
+         log.warn("Event on scope ["+scope+"] not supported");
 
     }
 }

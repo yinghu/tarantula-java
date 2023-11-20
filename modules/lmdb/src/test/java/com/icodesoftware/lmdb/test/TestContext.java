@@ -37,6 +37,9 @@ public class TestContext implements ServiceContext {
         if(scope==Distributable.LOG_SCOPE){
             return lmdbDataStoreProvider.createLogDataStore(name);
         }
+        if(scope==Distributable.INDEX_SCOPE){
+            return lmdbDataStoreProvider.createKeyIndexDataStore(name);
+        }
         return null;
     }
 

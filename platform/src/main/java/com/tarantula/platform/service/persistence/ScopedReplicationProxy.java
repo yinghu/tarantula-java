@@ -2,15 +2,20 @@ package com.tarantula.platform.service.persistence;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.hazelcast.nio.serialization.Portable;
 import com.icodesoftware.Configuration;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.lmdb.TransactionLog;
 import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
+import com.tarantula.platform.event.TransactionReplicationEvent;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -134,6 +139,14 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
     @Override
     public void waitForData() {
         this.localNode = serviceContext.node();
+    }
+
+    public void onTransactionReplicationEvent(TransactionReplicationEvent event){
+        List<TransactionLog> logs = new ArrayList<>();
+        for(Portable portableTransactionLog : event.pendingLogs){
+            logs.add(((PortableTransactionLog)portableTransactionLog).transactionLog);
+        }
+        transactionLogManager.onTransaction(logs);
     }
 
 }
