@@ -2,9 +2,7 @@ package com.tarantula.platform.service.persistence;
 
 
 import com.icodesoftware.Distributable;
-import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.lmdb.TransactionLog;
-import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.event.TransactionReplicationEvent;
 
@@ -12,8 +10,6 @@ import com.tarantula.platform.event.TransactionReplicationEvent;
 import java.util.List;
 
 public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
-
-    private TarantulaLogger logger = JDKLogger.getLogger(IntegrationScopeReplicationProxy.class);
 
     public IntegrationScopeReplicationProxy(){
         super(Distributable.INTEGRATION_SCOPE);

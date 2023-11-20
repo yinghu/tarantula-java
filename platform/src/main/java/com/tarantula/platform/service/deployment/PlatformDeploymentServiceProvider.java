@@ -158,7 +158,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 fos.close();
             }
         }catch (Exception ex){
-            ex.printStackTrace();
+            log.error("content load error",ex);
         }
     }
     public Content resource(String name){
