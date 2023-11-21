@@ -4,7 +4,6 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.platform.LobbyDescriptor;
-import com.tarantula.platform.service.cluster.PortableRegistry;
 
 
 public class LobbyQuery implements RecoverableFactory<LobbyDescriptor> {

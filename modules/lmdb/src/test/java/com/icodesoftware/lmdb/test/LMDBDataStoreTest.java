@@ -7,7 +7,9 @@ import com.icodesoftware.Transaction;
 import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.lmdb.LMDBDataStoreProvider;
 import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
+import com.icodesoftware.lmdb.TransactionLog;
 import com.icodesoftware.service.AccessIndexService;
+import com.icodesoftware.util.BinaryKey;
 import com.icodesoftware.util.NaturalKey;
 
 import com.icodesoftware.util.SnowflakeKey;
@@ -17,6 +19,7 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import javax.swing.plaf.basic.BasicIconFactory;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -295,6 +298,37 @@ public class LMDBDataStoreTest {
             return true;
         });
         Assert.assertEquals(cnt[0],0);
+    }
+
+    @Test(groups = { "LMDB" })
+    public void testTransactionLogManager() {
+        DataStore foo = lmdbDataStoreProvider.createAccessIndexDataStore("test_foo_txc");
+        DataStore flog = lmdbDataStoreProvider.createLogDataStore("log_a_test_foo_txc");
+        long ownerId = localDistributionIdGenerator.id();
+        testMapStoreListener.verifier = (tid)->{
+            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
+            logs.forEach(e->{
+                e.source = "test_foo_txc";
+            });
+            testMapStoreListener.transactionLogManager.onTransaction(logs);
+        };
+        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore("test_access_txc");
+
+        int size = 5;
+        for(int i=0;i<size;i++){
+            TestAccessIndex testUser = new TestAccessIndex("user"+i);
+            testUser.ownerKey(SnowflakeKey.from(ownerId));
+            testUser.distributionId(localDistributionIdGenerator.id());
+            Assert.assertTrue(ds.createIfAbsent(testUser,false));
+        }
+
+        System.out.println(ds.list(new TestAccessQuery(ownerId,"access")).size());
+        //for(int i=0;i<5;i++){
+            //TestAccessIndex testUser = new TestAccessIndex("user"+i);
+            //System.out.println(" SINGLE LOAD : "+foo.load(testUser)+" : "+testUser.owner());
+        //}
+        System.out.println(flog.list(new TestAccessQuery(ownerId,"access")).size());
+        System.out.println(foo.list(new TestAccessQuery(ownerId,"access")).size());
     }
 
 

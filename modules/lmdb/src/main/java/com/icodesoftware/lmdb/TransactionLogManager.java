@@ -106,10 +106,19 @@ public class TransactionLogManager {
         DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,logPrefix(metadata.scope())+metadata.source());
         if(metadata.label()==null) return false;
         boolean[] loaded ={false};
+        List<Recoverable.DataBuffer> ex = new ArrayList<>();
+        List<Recoverable.DataBuffer> ev = new ArrayList<>();
         dataStore.backup().forEachEdgeKeyValue(BinaryKey.from(key.array()),metadata.label(),(k,e,v)->{
             loaded[0]=true;
-            return bufferStream.on(k,e,v);
+            ex.add(BufferProxy.wrapDirectly(e.array()));
+            ev.add(BufferProxy.wrapDirectly(v.array()));
+            return true;//bufferStream.on(BufferProxy.wrapDirectly(k.array()),BufferProxy.wrapDirectly(e.array()),BufferProxy.wrapDirectly(v.array()));
         });
+        key.rewind();
+        byte[] ka = key.array();
+        for(int i=0;i<ex.size();i++){
+            bufferStream.on(BufferProxy.wrapDirectly(ka),ex.get(i),ev.get(i));
+        }
         return loaded[0];
     }
 
@@ -183,42 +192,42 @@ public class TransactionLogManager {
                         }
                         return true;
                     });
-                    continue;
+                }else {
+                    dataStore.backup().unsetEdge(log.edgeLabel, (k, v) -> {
+                        for (byte b : log.key) {
+                            k.writeByte(b);
+                        }
+                        if (log.edgeKey == null) return true;
+                        for (byte b : log.edgeKey) {
+                            v.writeByte(b);
+                        }
+                        return true;
+                    }, log.edgeKey == null);
                 }
-                dataStore.backup().unsetEdge(log.edgeLabel,(k,v)->{
-                    for(byte b : log.key){
-                        k.writeByte(b);
-                    }
-                    if(log.edgeKey==null) return true;
-                    for(byte b : log.edgeKey){
-                        v.writeByte(b);
-                    }
-                    return true;
-                },log.edgeKey==null);
-                continue;
+            }else{
+                if(log.edgeLabel==null){//write key/value
+                    dataStore.backup().set((k,v)->{
+                        for(byte b : log.key){
+                            k.writeByte(b);
+                        }
+                        for(byte b : log.value){
+                            v.writeByte(b);
+                        }
+                        return true;
+                    });
+                }else{
+                    //write edge
+                    dataStore.backup().setEdge(log.edgeLabel,(k,v)->{
+                        for(byte b : log.key){
+                            k.writeByte(b);
+                        }
+                        for(byte b : log.edgeKey){
+                            v.writeByte(b);
+                        }
+                        return true;
+                    });
+                }
             }
-            if(log.edgeLabel==null){//write key/value
-                dataStore.backup().set((k,v)->{
-                    for(byte b : log.key){
-                        k.writeByte(b);
-                    }
-                    for(byte b : log.value){
-                        v.writeByte(b);
-                    }
-                    return true;
-                });
-                continue;
-            }
-            //write edge
-            dataStore.backup().setEdge(log.edgeLabel,(k,v)->{
-                for(byte b : log.key){
-                    k.writeByte(b);
-                }
-                for(byte b : log.edgeKey){
-                    v.writeByte(b);
-                }
-                return true;
-            });
         }
     }
 }

@@ -126,6 +126,14 @@ public class BufferProxy implements Recoverable.DataBuffer {
     public static Recoverable.DataBuffer wrap(byte[] data){
         return new BufferProxy(ByteBuffer.wrap(data));
     }
+    public static Recoverable.DataBuffer wrapDirectly(byte[] data){
+        Recoverable.DataBuffer wrap = buffer(data.length,true);
+        for(byte b : data){
+            wrap.writeByte(b);
+        }
+        return wrap;
+    }
+
     public byte[] array(){
         if(buffer.isDirect()){
             byte[] array = new byte[buffer.remaining()];
