@@ -1,5 +1,6 @@
 package com.icodesoftware.lmdb;
 
+import com.icodesoftware.Closable;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
@@ -10,7 +11,7 @@ import com.icodesoftware.util.BinaryKey;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TransactionLogManager {
+public class TransactionLogManager implements Closable {
 
 
     private static final String DATA_PREFIX = "log_d_";
@@ -102,24 +103,22 @@ public class TransactionLogManager {
 
     }
 
-    public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferEdgeStream bufferStream){
+    public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferStream bufferStream){
         DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,logPrefix(metadata.scope())+metadata.source());
         if(metadata.label()==null) return false;
-        boolean[] loaded ={false};
         List<Recoverable.DataBuffer> ex = new ArrayList<>();
         List<Recoverable.DataBuffer> ev = new ArrayList<>();
-        dataStore.backup().forEachEdgeKeyValue(BinaryKey.from(key.array()),metadata.label(),(k,e,v)->{
-            loaded[0]=true;
+        dataStore.backup().forEachEdgeKeyValue(BinaryKey.from(key.array()),metadata.label(),(e,v)->{
             ex.add(BufferProxy.wrapDirectly(e.array()));
             ev.add(BufferProxy.wrapDirectly(v.array()));
-            return true;//bufferStream.on(BufferProxy.wrapDirectly(k.array()),BufferProxy.wrapDirectly(e.array()),BufferProxy.wrapDirectly(v.array()));
+            return true;
         });
         key.rewind();
-        byte[] ka = key.array();
+        int sz = ex.size();
         for(int i=0;i<ex.size();i++){
-            bufferStream.on(BufferProxy.wrapDirectly(ka),ex.get(i),ev.get(i));
+            bufferStream.on(ex.get(i),ev.get(i));
         }
-        return loaded[0];
+        return sz>0;
     }
 
 
@@ -229,5 +228,9 @@ public class TransactionLogManager {
                 }
             }
         }
+    }
+
+    public void close(){
+        //clear resources if any
     }
 }

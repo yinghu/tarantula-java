@@ -63,7 +63,7 @@ public class TransactionTest {
         Assert.assertEquals(t1.list(new TestAccessQuery(100,"friend")).size(),2);
         Assert.assertEquals(t1.list(new TestAccessQuery(100,"slots")).size(),2);
         int[] ctn ={0};
-        t1.backup().forEachEdgeKeyValue(SnowflakeKey.from(100),"friend",(k,e,v)->{
+        t1.backup().forEachEdgeKeyValue(SnowflakeKey.from(100),"friend",(e,v)->{
             ctn[0]++;
             return true;
         });
@@ -172,7 +172,7 @@ public class TransactionTest {
             });
             Assert.assertEquals(ct[0],2);
             ct[0]=0;
-            user.backup().forEachEdgeKeyValue(new SnowflakeKey(100),"friend",(k,e,v)->{
+            user.backup().forEachEdgeKeyValue(new SnowflakeKey(100),"friend",(e,v)->{
                 ct[0]++;
                 return true;
             });

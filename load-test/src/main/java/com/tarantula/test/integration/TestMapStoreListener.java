@@ -22,7 +22,7 @@ public class TestMapStoreListener implements MapStoreListener {
         return false;
     }
 
-    public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferEdgeStream bufferStream){
+    public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferStream bufferStream){
         return false;
     }
 

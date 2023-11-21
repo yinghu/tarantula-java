@@ -308,11 +308,12 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             if(!query.key().write(key)) return;
             LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.localEdgeDataStore(scope,name,query.label(),ptxn);
             if(list(key.flip(),localEdgeDataStore,query,stream)) return;
-            if(lmdbDataStoreProvider.onRecovering(localEdgeDataStore.metadata,key,(k,e,v)->{
+            if(lmdbDataStoreProvider.onRecovering(localEdgeDataStore.metadata,key,(e,v)->{
                 set(e.rewind(),v.rewind());
                 e.rewind();
+                key.rewind();
                 setEdge(query.label(),(ek,ev)->{
-                    for(byte b: k.array()){
+                    for(byte b: key.array()){
                         ek.writeByte(b);
                     }
                     for(byte b: e.array()){
@@ -366,36 +367,38 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     public void forEachEdgeKey(Recoverable.Key key,String label,BufferStream bufferStream){
         LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.localEdgeDataStore(metadata.scope(),name,label,ptxn);
         BufferCache cache = lmdbDataStoreProvider.fromCache();
+        if(!key.write(cache.key)) return;
+        ByteBuffer akey = cache.key.flip();
         final Txn<ByteBuffer> txn = env.txn(ptxn);
+        CursorIterable<ByteBuffer> cursor = localEdgeDataStore.dbi.iterate(txn, KeyRange.closed(akey,akey));
         try{
-            if(!key.write(cache.key)) return;
-            ByteBuffer akey = cache.key.flip();
-            CursorIterable<ByteBuffer> cursor = localEdgeDataStore.dbi.iterate(txn, KeyRange.closed(akey,akey));
             for(Iterator<CursorIterable.KeyVal<ByteBuffer>> it = cursor.iterator();it.hasNext();){
                 CursorIterable.KeyVal<ByteBuffer> kv = it.next();
                 bufferStream.on(cache.key,BufferProxy.buffer(kv.val()));
             }
         }finally {
+            cursor.close();
             txn.close();
             cache.reset();
         }
 
     }
 
-    public void forEachEdgeKeyValue(Recoverable.Key key,String label,BufferEdgeStream bufferStream){
+    public void forEachEdgeKeyValue(Recoverable.Key key,String label,BufferStream bufferStream){
         LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.localEdgeDataStore(metadata.scope(),name,label,ptxn);
         BufferCache cache = lmdbDataStoreProvider.fromCache();
+        if(!key.write(cache.key)) return;
+        ByteBuffer akey = cache.key.flip();
         final Txn<ByteBuffer> txn = env.txn(ptxn);
+        CursorIterable<ByteBuffer> cursor = localEdgeDataStore.dbi.iterate(txn, KeyRange.closed(akey,akey));
         try{
-            if(!key.write(cache.key)) return;
-            ByteBuffer akey = cache.key.flip();
-            CursorIterable<ByteBuffer> cursor = localEdgeDataStore.dbi.iterate(txn, KeyRange.closed(akey,akey));
             for(Iterator<CursorIterable.KeyVal<ByteBuffer>> it = cursor.iterator();it.hasNext();){
                 CursorIterable.KeyVal<ByteBuffer> kv = it.next();
                 if(dbi.get(txn,kv.val())==null) continue;
-                bufferStream.on(cache.key,BufferProxy.buffer(kv.val().rewind()),BufferProxy.buffer(txn.val()));
+                bufferStream.on(BufferProxy.buffer(kv.val().rewind()),BufferProxy.buffer(txn.val()));
             }
         }finally {
+            cursor.close();
             txn.close();
             cache.reset();
         }

@@ -312,9 +312,25 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         }
         logger.warn("Waiting data for LMDB provider map store listeners");
     }
+    private void closeMapStore() {
+        try{
+            if(keyIndexMapStoreListener!=null){
+                keyIndexMapStoreListener.shutdown();
+            }
+            if(integrationMapStoreListener!=null){
+                integrationMapStoreListener.shutdown();
+            }
+            if(dataMapStoreListener!=null){
+                dataMapStoreListener.shutdown();
+            }
+        }catch (Exception ex){
+            logger.error("Failed to close map stores",ex);
+        }
+    }
 
     @Override
     public void shutdown() throws Exception {
+        closeMapStore();
         storeMap.forEach((k,v)->v.close());
         storeMap.clear();
         edgMap.forEach((k,v)->v.dbi.close());
@@ -355,7 +371,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         return false;
     }
 
-    public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferEdgeStream bufferStream){
+    public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferStream bufferStream){
         if(metadata.scope()==Distributable.INTEGRATION_SCOPE && integrationMapStoreListener!=null){
             return integrationMapStoreListener.onRecovering(metadata,key,bufferStream);
         }

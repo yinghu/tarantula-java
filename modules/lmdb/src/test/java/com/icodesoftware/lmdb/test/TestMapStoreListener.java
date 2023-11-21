@@ -27,7 +27,7 @@ public class TestMapStoreListener implements MapStoreListener {
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
         return transactionLogManager.onRecovering(metadata,key,value);
     }
-    public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferEdgeStream bufferStream){
+    public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferStream bufferStream){
         return transactionLogManager.onRecovering(metadata,key,bufferStream);
     }
     @Override

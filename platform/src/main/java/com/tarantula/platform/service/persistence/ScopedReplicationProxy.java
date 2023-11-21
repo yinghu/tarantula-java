@@ -48,7 +48,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         return transactionLogManager.onRecovering(metadata,key,buffer);
     }
 
-    public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferEdgeStream bufferStream){
+    public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferStream bufferStream){
         return transactionLogManager.onRecovering(metadata,key,bufferStream);
     }
     @Override
@@ -131,9 +131,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
     @Override
     public void shutdown() throws Exception {
-        //if(pendingEvents==null) return;
-        //pendingEvents.forEach((k,v)->v.drop());
-        //pendingEvents.clear();
+        transactionLogManager.close();
     }
 
     @Override

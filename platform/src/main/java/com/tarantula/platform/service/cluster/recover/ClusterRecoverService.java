@@ -175,7 +175,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     public ClusterBatch loadEdge(String source, String label, byte[] key){
         ClusterBatch clusterBatch = new ClusterBatch();
         DataStore dataStore = this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,source);
-        dataStore.backup().forEachEdgeKeyValue(new BinaryKey(key),label,(k,e,v)->{
+        dataStore.backup().forEachEdgeKeyValue(new BinaryKey(key),label,(e,v)->{
             clusterBatch.batch(v.array());
             return true;
         });

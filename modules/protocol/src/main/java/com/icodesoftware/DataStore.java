@@ -35,7 +35,7 @@ public interface DataStore extends Closable{
         boolean set(BufferStream bufferStream);
         void forEachEdgeKey(Recoverable.Key key,String label,BufferStream bufferStream);
 
-        void forEachEdgeKeyValue(Recoverable.Key key,String label,BufferEdgeStream bufferStream);
+        void forEachEdgeKeyValue(Recoverable.Key key,String label,BufferStream bufferStream);
         boolean setEdge(String label,BufferStream bufferStream);
 
         boolean unsetEdge(String label,BufferStream bufferStream,boolean fromLabel);
@@ -53,10 +53,6 @@ public interface DataStore extends Closable{
 
     interface BufferStream{
        boolean on(Recoverable.DataBuffer keyBuffer,Recoverable.DataBuffer dataBuffer);
-    }
-
-    interface BufferEdgeStream{
-        boolean on(Recoverable.DataBuffer keyBuffer,Recoverable.DataBuffer edgeBuffer,Recoverable.DataBuffer dataBuffer);
     }
 
     interface Updatable{

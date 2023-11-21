@@ -101,7 +101,7 @@ public class LMDBDataStoreTest {
         Assert.assertFalse(committed);
         DataStore dataStore = lmdbDataStoreProvider.createDataStore("test_user_abort");
         int[] cnt={0};
-        dataStore.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId),TestUser.LABEL,(k,e,v)->{
+        dataStore.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId),TestUser.LABEL,(e,v)->{
             cnt[0]++;
             return true;
         });
@@ -172,7 +172,7 @@ public class LMDBDataStoreTest {
         });
         DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore("test_access_abort");
         int[] cnt={0};
-        ds.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId),"access",(k,e,v)->{
+        ds.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId),"access",(e,v)->{
             cnt[0]++;
             return true;
         });
@@ -268,7 +268,7 @@ public class LMDBDataStoreTest {
             return false;
         });
         int[] cnt={0};
-        ds.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId1),TestUser.LABEL,(k,e,v)->{
+        ds.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId1),TestUser.LABEL,(e,v)->{
             cnt[0]++;
             return true;
         });
@@ -287,13 +287,13 @@ public class LMDBDataStoreTest {
             return false;
         });
         cnt[0]=0;
-        ds.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId1),"friends",(k,e,v)->{
+        ds.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId1),"friends",(e,v)->{
             cnt[0]++;
             return true;
         });
         Assert.assertEquals(cnt[0],0);
         cnt[0]=0;
-        ds.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId1),"games",(k,e,v)->{
+        ds.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId1),"games",(e,v)->{
             cnt[0]++;
             return true;
         });
@@ -322,13 +322,9 @@ public class LMDBDataStoreTest {
             Assert.assertTrue(ds.createIfAbsent(testUser,false));
         }
 
-        System.out.println(ds.list(new TestAccessQuery(ownerId,"access")).size());
-        //for(int i=0;i<5;i++){
-            //TestAccessIndex testUser = new TestAccessIndex("user"+i);
-            //System.out.println(" SINGLE LOAD : "+foo.load(testUser)+" : "+testUser.owner());
-        //}
-        System.out.println(flog.list(new TestAccessQuery(ownerId,"access")).size());
-        System.out.println(foo.list(new TestAccessQuery(ownerId,"access")).size());
+        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"access")).size(),size);
+        Assert.assertEquals(flog.list(new TestAccessQuery(ownerId,"access")).size(),size);
+        Assert.assertEquals(foo.list(new TestAccessQuery(ownerId,"access")).size(),size);
     }
 
 

@@ -29,7 +29,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		long bucketId = this.context.node().bucketId();
 
 		List<LobbyDescriptor> bList = datastore.list(new LobbyQuery(bucketId));
-		logger.warn("SIZE : "+bList.size());
+		logger.warn("Lobbies load : "+bList.size()+" : "+bucketId);
 		if(bList.isEmpty()){
 			bList = deployFromLocal(bucketId);
 		}
