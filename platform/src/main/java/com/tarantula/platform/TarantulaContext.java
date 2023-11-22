@@ -122,6 +122,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public int[] snowflakeEpochStart = {2020,1,1};// start from 2020 1,1
 
     public int storeSizeMb = 100;
+    public int storeKeySize = 200;
+    public int storeValueSize = 1800;
+    public int storePendingBufferSize = 32;
+
     public String dataStoreDir;
 
     public boolean dataStoreDailyBackup;
@@ -1080,5 +1084,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
          }
          log.warn("Event on scope ["+scope+"] not supported");
 
+    }
+
+    public Recoverable.DataBufferPair dataBufferPair(){
+         return deploymentDataStoreProvider.dataBufferPair();
     }
 }

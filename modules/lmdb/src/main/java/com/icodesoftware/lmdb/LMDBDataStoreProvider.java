@@ -58,7 +58,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private final static int KEY_SIZE = 200;
     private final static int VALUE_SIZE = 1800;
 
-    private final static int PENDING_BUFFER_SIZE = 16;
+    private final static int PENDING_BUFFER_SIZE = 32;
     private final static ConcurrentHashMap<String,DataStore> storeMap = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<String,LocalEdgeDataStore> edgMap = new ConcurrentHashMap<>();
 
@@ -528,9 +528,11 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         return _path;
     }
 
-    BufferCache fromCache(){
+    public Recoverable.DataBufferPair dataBufferPair(){
         BufferCache cache = pendingQueue.poll();
         if(cache!=null) return cache;
         return new BufferCache(KEY_SIZE,VALUE_SIZE,pendingQueue);
     }
+
+
 }

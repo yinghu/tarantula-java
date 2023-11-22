@@ -138,4 +138,8 @@ public class ServiceContextProxy implements ServiceContext {
     public long distributionId() {
         return this.tarantulaContext.distributionId();
     }
+
+    public Recoverable.DataBufferPair dataBufferPair(){
+        return this.tarantulaContext.dataBufferPair();
+    }
 }

@@ -5,10 +5,10 @@ import com.icodesoftware.Recoverable;
 
 import java.util.concurrent.ArrayBlockingQueue;
 
-public class BufferCache {
+public class BufferCache implements Recoverable.DataBufferPair {
 
-    public final Recoverable.DataBuffer key;
-    public final Recoverable.DataBuffer value;
+    private final Recoverable.DataBuffer key;
+    private final Recoverable.DataBuffer value;
 
     private ArrayBlockingQueue<BufferCache> bufferQueue;
 
@@ -24,4 +24,13 @@ public class BufferCache {
         bufferQueue.offer(this);
     }
 
+    @Override
+    public Recoverable.DataBuffer key() {
+        return key;
+    }
+
+    @Override
+    public Recoverable.DataBuffer value() {
+        return value;
+    }
 }

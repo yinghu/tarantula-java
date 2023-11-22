@@ -167,4 +167,8 @@ public class TestContext implements ServiceContext {
     public Transaction transaction(int scope) {
         return null;
     }
+
+    public Recoverable.DataBufferPair dataBufferPair(){
+        return null;
+    }
 }

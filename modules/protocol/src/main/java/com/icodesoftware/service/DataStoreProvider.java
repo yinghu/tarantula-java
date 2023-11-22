@@ -41,6 +41,7 @@ public interface DataStoreProvider extends ServiceProvider {
 
     Transaction transaction(int scope);
 
+    Recoverable.DataBufferPair dataBufferPair();
     interface OnStart{
         void on(DataStoreProvider dataStoreProvider);
     }

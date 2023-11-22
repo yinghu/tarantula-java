@@ -186,4 +186,8 @@ public class TestServiceContext implements ServiceContext {
     public Transaction transaction(int scope){
         return dataStoreProvider.transaction(scope);
     }
+
+    public Recoverable.DataBufferPair dataBufferPair(){
+        return null;
+    }
 }

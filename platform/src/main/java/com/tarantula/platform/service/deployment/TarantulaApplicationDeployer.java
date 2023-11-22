@@ -52,14 +52,6 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		long deploymentId = this.context.node().deploymentId();
 		List<GameCluster> glist =datastore.list(new GameClusterQuery(deploymentId));
 		glist.forEach((gc)-> deployGameCluster(gc));
-		//IndexSet moduleIndex = new IndexSet();
-		//moduleIndex.distributionId(deploymentId);
-		//moduleIndex.label(Account.ModuleLabel);
-		//if(datastore.load(moduleIndex)){
-			//moduleIndex.keySet().forEach((pc)->{
-				//deployModule(pc);
-			//});
-		//}
 	}
 	private void deployModule(long publishingId){
 		try {
@@ -68,7 +60,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 				this.context.setOnLobby(lb,this);
 			});
 		}catch (Exception ex){
-			ex.printStackTrace();
+			throw new RuntimeException(ex);
 		}
 	}
 	private void deployGameCluster(GameCluster gameCluster){
