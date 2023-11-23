@@ -102,4 +102,24 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
     public void shutdown() throws Exception {
 
     }
+
+    public static String storeIndexDir(String config){
+        JsonObject json;
+        try{
+            File f = new File("/etc/tarantula/"+config);
+            InputStream in = new FileInputStream(f);
+            json = JsonUtil.parse(in);
+        }catch (Exception ex){
+            json = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(config));
+        }
+        JsonArray props = json.get("data-source").getAsJsonObject().getAsJsonArray("properties");
+        String[] indexDir = {"tarantula/index"};
+        props.forEach(p->{
+            JsonObject pd = p.getAsJsonObject();
+            if(pd.has("indexPath")){
+                indexDir[0] = pd.get("indexPath").getAsString();
+            }
+        });
+        return indexDir[0];
+    }
 }

@@ -2,6 +2,9 @@ package com.tarantula.platform;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -61,6 +64,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     private static final String CONFIG_INTEGRATION = "hazelcast-integration.xml";
 
+    private static final String DATA_STORE_CONFIG = "tarantula-platform-data-store-config.json";
     private IntegrationCluster integrationCluster;
 	
 	private final EndpointService endpointService;
@@ -126,6 +130,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public String dataStoreDir;
 
+
     public boolean dataStoreDailyBackup;
 
     public int maxIdlesOnInstance;
@@ -181,6 +186,33 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
 	public void start() throws Exception {
  	    if(this.dataBucketNode.length() != 3) throw new RuntimeException("Node name must be 3 letters");
+        String bin = System.getProperty("user.dir");
+        File file = new File(bin+"/data.mdb");
+        if(file.exists()){
+            log.warn("Replacing index data set with remote data ["+file.getAbsolutePath()+"]");
+            String indexPath = DataStoreConfigurationJsonParser.storeIndexDir(DATA_STORE_CONFIG);
+            File ddir = Paths.get(deployDir).toFile();
+            if(ddir.exists()){
+                for(File d : ddir.listFiles()){
+                    Files.delete(d.toPath());
+                }
+            }
+            File sdir = Paths.get(dataStoreDir).toFile();
+            if(sdir.exists()){
+                for(File d : sdir.listFiles()){
+                    Files.delete(d.toPath());
+                }
+            }
+
+            Path _path = Paths.get(dataStoreDir+"/"+indexPath);
+            if(!Files.exists(_path)) Files.createDirectories(_path);
+            FileInputStream mdb = new FileInputStream(file);
+            FileOutputStream target = new FileOutputStream(new File(_path.toFile(),"data.mdb"));
+            mdb.transferTo(target);
+            target.flush();
+            mdb.close();
+            target.close();
+        }
         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(this.applicationSchedulingPoolSetting);
         this.httpClientProvider = new HttpCaller();
         this.httpClientProvider.start();
@@ -208,7 +240,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         });
         this.dataScopeReplicationProxy = new DataScopeReplicationProxy();
         this.integrationScopeReplicationProxy = new IntegrationScopeReplicationProxy();
-        DataStoreConfigurationJsonParser sparser = new DataStoreConfigurationJsonParser("tarantula-platform-data-store-config.json",this,this.storeSizeMb,dataStoreProvider -> {
+        DataStoreConfigurationJsonParser sparser = new DataStoreConfigurationJsonParser(DATA_STORE_CONFIG,this,this.storeSizeMb,dataStoreProvider -> {
             try{
                 this.deploymentDataStoreProvider = dataStoreProvider;
                 this.deploymentDataStoreProvider.registerDistributionIdGenerator(this.distributionIdGenerator);
