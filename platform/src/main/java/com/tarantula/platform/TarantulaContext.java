@@ -18,11 +18,8 @@ import com.icodesoftware.*;
 import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
 import com.icodesoftware.service.*;
 import com.icodesoftware.service.Metrics;
-import com.icodesoftware.util.HttpCaller;
-import com.icodesoftware.util.JsonUtil;
-import com.icodesoftware.util.TarantulaExecutorServiceFactory;
+import com.icodesoftware.util.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.util.TimeUtil;
 import com.tarantula.cci.udp.UDPEndpoint;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.event.TransactionReplicationEvent;
@@ -191,19 +188,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         if(file.exists()){
             log.warn("Replacing index data set with remote data ["+file.getAbsolutePath()+"]");
             String indexPath = DataStoreConfigurationJsonParser.storeIndexDir(DATA_STORE_CONFIG);
-            File ddir = Paths.get(deployDir).toFile();
-            if(ddir.exists()){
-                for(File d : ddir.listFiles()){
-                    Files.delete(d.toPath());
-                }
-            }
-            File sdir = Paths.get(dataStoreDir).toFile();
-            if(sdir.exists()){
-                for(File d : sdir.listFiles()){
-                    Files.delete(d.toPath());
-                }
-            }
-
+            FileUtil.deleteDirectory(deployDir);
+            FileUtil.deleteDirectory(dataStoreDir);
             Path _path = Paths.get(dataStoreDir+"/"+indexPath);
             if(!Files.exists(_path)) Files.createDirectories(_path);
             FileInputStream mdb = new FileInputStream(file);
