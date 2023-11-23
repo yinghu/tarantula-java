@@ -7,9 +7,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 public class FileUtil {
 
-    public static void deleteDirectory(String dir){
+    public static boolean deleteDirectory(String dir){
         Path directory = Paths.get(dir);
-        if (!Files.exists(directory)) return;
+        if (!Files.exists(directory)) return true;
         try {
             Files.walkFileTree(directory, new SimpleFileVisitor<>() {
                 @Override
@@ -24,8 +24,10 @@ public class FileUtil {
                     return FileVisitResult.CONTINUE;
                 }
             });
+            return true;
         }catch (Exception ex){
             //ignore
+            return false;
         }
     }
 }

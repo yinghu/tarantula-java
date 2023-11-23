@@ -1,9 +1,7 @@
 package com.icodesoftware.lmdb;
 
-import com.icodesoftware.Closable;
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Recoverable;
-import com.icodesoftware.RecoverableFactory;
+import com.icodesoftware.*;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DataStoreSummary;
 import com.icodesoftware.service.Metadata;
 import org.lmdbjava.*;
@@ -16,6 +14,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable {
+
+    private TarantulaLogger logger = JDKLogger.getLogger(CachedLMDBDataStore.class);
+
 
     public final Env<ByteBuffer> env;
     private final Dbi<ByteBuffer> dbi;
@@ -106,9 +107,9 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             txn.commit();
             return true;
         }catch(Exception ex){
-            ex.printStackTrace();
             txn.abort();
             lmdbDataStoreProvider.onAbort(metadata.scope(),txn.getId());
+            logger.error("Error on create",ex);
             return false;
         }
         finally {

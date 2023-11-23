@@ -188,8 +188,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         if(file.exists()){
             log.warn("Replacing index data set with remote data ["+file.getAbsolutePath()+"]");
             String indexPath = DataStoreConfigurationJsonParser.storeIndexDir(DATA_STORE_CONFIG);
-            FileUtil.deleteDirectory(deployDir);
-            FileUtil.deleteDirectory(dataStoreDir);
+            if(!FileUtil.deleteDirectory(deployDir)) throw new RuntimeException("deploy directory must be deleted");
+            if(!FileUtil.deleteDirectory(dataStoreDir)) throw new RuntimeException("data store directory must be deleted");
             Path _path = Paths.get(dataStoreDir+"/"+indexPath);
             if(!Files.exists(_path)) Files.createDirectories(_path);
             FileInputStream mdb = new FileInputStream(file);

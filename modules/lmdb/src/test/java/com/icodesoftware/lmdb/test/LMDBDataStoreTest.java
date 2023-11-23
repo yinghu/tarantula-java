@@ -320,11 +320,14 @@ public class LMDBDataStoreTest {
             testUser.ownerKey(SnowflakeKey.from(ownerId));
             testUser.distributionId(localDistributionIdGenerator.id());
             Assert.assertTrue(ds.createIfAbsent(testUser,false));
+            Assert.assertTrue(ds.createEdge(testUser,"links"));
         }
 
         Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"access")).size(),size);
         Assert.assertEquals(flog.list(new TestAccessQuery(ownerId,"access")).size(),size);
         Assert.assertEquals(foo.list(new TestAccessQuery(ownerId,"access")).size(),size);
+        Assert.assertEquals(flog.list(new TestAccessQuery(ownerId,"links")).size(),size);
+        Assert.assertEquals(foo.list(new TestAccessQuery(ownerId,"links")).size(),size);
     }
 
 
