@@ -210,7 +210,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         }
     }
     public void syncEnd(String syncKey){
-        tarantulaContext._syncLatch.get(syncKey).countDown();
+        //tarantulaContext._syncLatch.get(syncKey).countDown();
     }
 
     private DataStore dataStore(){

@@ -434,7 +434,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         this.distributionIdGenerator.assign(dataBuffer);
     }
 
-    public void backup(int scope){
+    public File backup(int scope){
         synchronized (jsonObject){
             int ix;
             switch (scope){
@@ -461,7 +461,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
                     break;
             }
             saveJson();
-            backup(scope,ix);
+            return new File(backup(scope,ix),"data.mdb");
         }
     }
     private void saveJson(){
@@ -485,37 +485,39 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
             logger.error("Failed to save json version ["+dir+"]",exception);
         }
     }
-    private void backup(int scope,int sequence){
+    private File backup(int scope,int sequence){
         try{
             if(scope==Distributable.DATA_SCOPE){
                 Path copyPath = path(baseDir+"/data_"+sequence);
                 data.copy(copyPath.toFile());
                 saveJsonCopyDate(copyPath.toFile());
-                return;
+                return copyPath.toFile();
             }
             if(scope==Distributable.INTEGRATION_SCOPE){
                 Path copyPath = path(baseDir+"/integration_"+sequence);
                 integration.copy(copyPath.toFile());
                 saveJsonCopyDate(copyPath.toFile());
-                return;
+                return copyPath.toFile();
             }
             if(scope==Distributable.INDEX_SCOPE){
                 Path copyPath = path(baseDir+"/index_"+sequence);
                 index.copy(copyPath.toFile());
                 saveJsonCopyDate(copyPath.toFile());
-                return;
+                return copyPath.toFile();
             }
             if(scope==Distributable.LOG_SCOPE){
                 Path copyPath = path(baseDir+"/log_"+sequence);
                 log.copy(copyPath.toFile());
                 saveJsonCopyDate(copyPath.toFile());
-                return;
+                return copyPath.toFile();
             }
             if(scope==Distributable.LOCAL_SCOPE){
                 Path copyPath = path(baseDir+"/local_"+sequence);
                 local.copy(copyPath.toFile());
                 saveJsonCopyDate(copyPath.toFile());
+                return copyPath.toFile();
             }
+            throw new RuntimeException("Scope ["+scope+"] not supported");
 
         }catch (Exception ex){
             logger.error("Failed to backup data store ["+scope+"]",ex);

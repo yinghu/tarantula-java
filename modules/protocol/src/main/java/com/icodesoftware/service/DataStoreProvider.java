@@ -5,6 +5,7 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Transaction;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public interface DataStoreProvider extends ServiceProvider {
     void registerDistributionIdGenerator(DistributionIdGenerator distributionIdGenerator);
     void registerMapStoreListener(int scope, MapStoreListener mapStoreListener);
 
-    void backup(int scope);
+    File backup(int scope);
 
     //create none-partitioned integration scope data store
     DataStore createAccessIndexDataStore(String name);

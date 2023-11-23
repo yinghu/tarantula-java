@@ -818,8 +818,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
 
-    public void issueDataStoreBackup(int scope){
-        this.tarantulaContext.deploymentDataStoreProvider.backup(scope);
+    public File issueDataStoreBackup(int scope){
+        return this.tarantulaContext.deploymentDataStoreProvider.backup(scope);
     }
 
     public List<String> listDataStore(int scope) {

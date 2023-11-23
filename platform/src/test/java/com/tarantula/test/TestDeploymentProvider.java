@@ -8,6 +8,7 @@ import com.icodesoftware.service.*;
 import com.tarantula.platform.item.ConfigurableTemplate;
 import com.tarantula.platform.item.JsonConfigurableTemplateParser;
 
+import java.io.File;
 import java.util.List;
 
 public class TestDeploymentProvider implements DeploymentServiceProvider {
@@ -228,8 +229,8 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
 
 
     @Override
-    public void issueDataStoreBackup(int scoppe) {
-
+    public File issueDataStoreBackup(int scope) {
+        return null;
     }
 
     @Override

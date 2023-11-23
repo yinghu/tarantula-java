@@ -169,7 +169,7 @@ public class KeyIndexClusterService implements ManagedService, RemoteService,Key
         return true;
     }
     public boolean endSync(String syncKey){
-        tarantulaContext._syncLatch.get(syncKey).countDown();
+        //tarantulaContext._syncLatch.get(syncKey).countDown();
         return true;
     }
 

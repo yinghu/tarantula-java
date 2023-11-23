@@ -11,7 +11,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
-import com.hazelcast.nio.serialization.Portable;
 import com.icodesoftware.*;
 import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
 import com.icodesoftware.service.*;
@@ -29,8 +28,7 @@ import com.tarantula.platform.item.JsonConfigurableTemplateParser;
 import com.tarantula.platform.service.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.service.cluster.*;
-import com.tarantula.platform.service.cluster.keyindex.DistributionKeyIndexService;
-import com.tarantula.platform.service.cluster.keyindex.KeyIndexServiceProxy;
+
 import com.tarantula.platform.service.deployment.*;
 
 import com.tarantula.platform.service.metrics.JVMMonitor;
@@ -148,7 +146,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public String authContext = "localhost";
 
-    public ConcurrentHashMap<String,CountDownLatch> _syncLatch = new ConcurrentHashMap<>();
+    //public ConcurrentHashMap<String,CountDownLatch> _syncLatch = new ConcurrentHashMap<>();
 
     public boolean runAsMirror;
     public boolean backupEnabled;
@@ -166,7 +164,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public boolean tarantulaServiceEventLogPersistenceEnable;
     private String serviceEventLogStore = "tarantula_service_event_log";
-    //private int maxPendingEventSize = 10;
 
     private ServiceEventLogger serviceEventLogger;
 
@@ -361,14 +358,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         bList.forEach((lb)->configurations.add(new LobbyConfiguration(lb)));
         Collections.sort(configurations,new LobbyComparator());
         configurations.forEach((c)->_setOnLobby(c,listener));
-        //IndexSet indexSet = new IndexSet();
-        //indexSet.distributionId(this.node.deploymentId());
-        //indexSet.label(Account.GameClusterLabel);
-        //indexSet.keySet.add(gameCluster.distributionKey());
-        //if(!this.masterDataStore().createIfAbsent(indexSet,true)){
-            //indexSet.keySet.add(gameCluster.distributionKey());
-            //this.masterDataStore().update(indexSet);
-        //}
     }
     private void _setOnLobby(LobbyConfiguration lc,OnLobby.Listener listener){
         if(this._lobbyMapping.containsKey(lc.descriptor.typeId)){
@@ -398,7 +387,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         try{
             OnLobby ob = this.configure(lc);
             listener.onUpdated(ob);
-        }catch (Exception ex){ex.printStackTrace();}
+        }catch (Exception ex){
+            log.error("Error on setLobby",ex);
+        }
     }
     public synchronized void setOnLobby(String typeId,long publishingId,Configurable.Listener listener){
         if(this._lobbyMapping.containsKey(typeId)){
@@ -413,16 +404,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             try{
                 OnLobby ob = this.configure(lc);
                 listener.onUpdated(ob);
-            }catch (Exception ex){ex.printStackTrace();}
+            }catch (Exception ex){
+                log.error("Error on setLobby",ex);
+            }
         });
-        //IndexSet indexSet = new IndexSet();
-        //indexSet.distributionId(this.node.deploymentId());
-        //indexSet.label(Account.ModuleLabel);
-        //indexSet.keySet.add(publishingId);
-        //if(!this.masterDataStore().createIfAbsent(indexSet,true)){
-            //indexSet.keySet.add(publishingId);
-            //this.masterDataStore().update(indexSet);
-        //}
     }
     public synchronized void unsetLobby(String typeId,Lobby.Listener listener){
         try{
@@ -452,7 +437,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             }
             _codeBase.forEach((k,v)-> listener.onLobby(v)); //clean module class loader
         }catch (Exception ex){
-            ex.printStackTrace();
+            log.error("Error on unsetLobby",ex);
         }
     }
     public synchronized void setApplicationOnLobby(String typeId,long applicationId){
@@ -501,7 +486,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             }
 
         }catch (Exception ex){
- 	        ex.printStackTrace();
+            log.error("Error on unsetApplication",ex);
         }
     }
 
@@ -576,13 +561,13 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
     public void _setup() throws Exception{
         //Waiting for all distribution service ready
-        DistributionKeyIndexService distributionKeyIndexService = clusterProvider().serviceProvider(DistributionKeyIndexService.NAME);
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-        distributionKeyIndexService.startSync(DistributionKeyIndexService.NAME);
-        _syncLatch.put(DistributionKeyIndexService.NAME,countDownLatch);
-        countDownLatch.await();
-        _syncLatch.remove(DistributionKeyIndexService.NAME);
-        log.warn("Key index data sync has finished");
+        //DistributionKeyIndexService distributionKeyIndexService = clusterProvider().serviceProvider(DistributionKeyIndexService.NAME);
+        //CountDownLatch countDownLatch = new CountDownLatch(1);
+        //distributionKeyIndexService.startSync(DistributionKeyIndexService.NAME);
+        //_syncLatch.put(DistributionKeyIndexService.NAME,countDownLatch);
+        //countDownLatch.await();
+        //_syncLatch.remove(DistributionKeyIndexService.NAME);
+        //log.warn("Key index data sync has finished");
         AccessIndex bid = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/"+node.bucketName,AccessIndex.SYSTEM_INDEX);
         node.bucketId = bid.distributionId();
         AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,AccessIndex.SYSTEM_INDEX);
@@ -688,7 +673,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             endpointService.atMidnight();
 
  	    }catch (Exception ex){
- 	        ex.printStackTrace();
+            log.error("Error on at midnight task",ex);
  	    }
         this.schedule(new MidnightCheck(this));
     }

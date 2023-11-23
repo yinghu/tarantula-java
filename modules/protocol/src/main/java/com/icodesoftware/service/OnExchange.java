@@ -21,6 +21,6 @@ public interface OnExchange extends EventListener {
     default void onError(Exception ex,String message){}
 
     default InputStream onStream(){ return null;}
-
+    default void onStream(InputStream inputStream){}
     default void close(){}
 }

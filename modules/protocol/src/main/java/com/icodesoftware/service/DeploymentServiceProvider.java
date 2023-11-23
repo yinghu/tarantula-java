@@ -5,6 +5,7 @@ import com.icodesoftware.Module;
 import com.icodesoftware.protocol.Channel;
 import com.icodesoftware.protocol.GameServerListener;
 
+import java.io.File;
 import java.util.List;
 
 public interface DeploymentServiceProvider extends ConfigurationServiceProvider,MetricsListener,EndPoint.Listener{
@@ -84,7 +85,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     void registerAccessIndexListener(AccessIndexService.Listener listener);
 
     //data store backup operation API
-    void issueDataStoreBackup(int scope);
+    File issueDataStoreBackup(int scope);
     List<String> listDataStore(int scope);
     List<String> listServiceView();
     List<String> listMetricsView();

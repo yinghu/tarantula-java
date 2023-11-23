@@ -108,22 +108,23 @@ public class DataStoreSudoRoleModule implements Module {
 
         else if(session.action().equals("onBackupDataStore")){
             String[] query = session.name().split("#");
+            StringBuffer buffer = new StringBuffer();
             if(Boolean.parseBoolean(query[0])){
-                this.deploymentServiceProvider.issueDataStoreBackup(Distributable.LOCAL_SCOPE);
+                buffer.append(this.deploymentServiceProvider.issueDataStoreBackup(Distributable.LOCAL_SCOPE));
             }
             if(Boolean.parseBoolean(query[1])){
-                this.deploymentServiceProvider.issueDataStoreBackup(Distributable.DATA_SCOPE);
+                buffer.append(this.deploymentServiceProvider.issueDataStoreBackup(Distributable.DATA_SCOPE));
             }
             if(Boolean.parseBoolean(query[2])){
-                this.deploymentServiceProvider.issueDataStoreBackup(Distributable.INTEGRATION_SCOPE);
+                buffer.append(this.deploymentServiceProvider.issueDataStoreBackup(Distributable.INTEGRATION_SCOPE));
             }
             if(Boolean.parseBoolean(query[3])){
-                this.deploymentServiceProvider.issueDataStoreBackup(Distributable.INDEX_SCOPE);
+                buffer.append(this.deploymentServiceProvider.issueDataStoreBackup(Distributable.INDEX_SCOPE));
             }
             if(Boolean.parseBoolean(query[4])){
-                this.deploymentServiceProvider.issueDataStoreBackup(Distributable.LOG_SCOPE);
+                buffer.append(this.deploymentServiceProvider.issueDataStoreBackup(Distributable.LOG_SCOPE));
             }
-            session.write(toMessage("backup command issued ["+session.name()+"]",true).toString().getBytes());
+            session.write(toMessage("backup command issued ["+buffer+"]",true).toString().getBytes());
         }
         else if(session.action().equals("onMetrics")){
             Metrics metrics = context.metrics(Metrics.PERFORMANCE);

@@ -6,6 +6,7 @@ import com.icodesoftware.service.OnExchange;
 import com.sun.net.httpserver.HttpExchange;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.UUID;
 
 
@@ -63,6 +64,20 @@ public class HttpUploadSession implements OnExchange {
     }
     public InputStream onStream(){
 	    return this.hex.getRequestBody();
+    }
+
+    public void onStream(InputStream inputStream){
+        try {
+            hex.getResponseHeaders().set(Session.HTTP_CONTENT_TYPE, "application/octet-stream");
+            hex.sendResponseHeaders(200, inputStream.available());
+            OutputStream out = hex.getResponseBody();
+            inputStream.transferTo(out);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        finally {
+            hex.close();
+        }
     }
     public void onError(Exception error,String message){
         try{

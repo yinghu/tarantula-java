@@ -21,6 +21,9 @@ public class TarantulaMain {
 
 	public static void main(String[] args){
 		try{
+			if(args.length == 3){
+				DataBootstrap.run(args[0],args[1],args[2]);
+			}
 			runtime = new TarantulaMain._Runtime();
 			runtime.bootstrap();
 		}catch(Exception ex){

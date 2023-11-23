@@ -93,6 +93,10 @@ public class HttpEndpoint implements EndPoint {
 		httpBackupHandler.resource(this.resource);
 		this.hserver.createContext(httpBackupHandler.path(),httpBackupHandler);
 
+		HttpDevelopmentHandler httpDevelopmentHandler = new HttpDevelopmentHandler(metricsListener);
+		httpDevelopmentHandler.resource(this.resource);
+		this.hserver.createContext(httpDevelopmentHandler.path(),httpDevelopmentHandler);
+
 		hserver.start();
         started = true;
         log.info("Tarantula HTTP Endpoint is listening on ["+ip+"]");

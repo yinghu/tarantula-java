@@ -8,6 +8,7 @@ import com.icodesoftware.Transaction;
 import com.icodesoftware.lmdb.LMDBDataStoreProvider;
 import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
 
+import com.icodesoftware.lmdb.TransactionLog;
 import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 import org.testng.Assert;
@@ -15,6 +16,7 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.util.List;
 
 
 public class TransactionTest {
@@ -471,6 +473,45 @@ public class TransactionTest {
             Assert.assertNotNull(a.login());
         });
         Assert.assertEquals(ct[0],8);
+    }
+
+    @Test(groups = { "LMDB" })
+    public void testTransactionLogManager() {
+        //DataStore foo = lmdbDataStoreProvider.createAccessIndexDataStore("test_bar_txc");
+        //DataStore flog = lmdbDataStoreProvider.createLogDataStore("log_a_test_bar_txc");
+        long ownerId = localDistributionIdGenerator.id();
+        testMapStoreListener.verifier = (tid)->{
+            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
+            logs.forEach(e->{
+                e.source = "test_bar_txc";
+            });
+            testMapStoreListener.transactionLogManager.onTransaction(logs);
+        };
+        //DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore("test_access_txc");
+
+        int size = 5;
+        Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.INTEGRATION_SCOPE);
+        transaction.execute(ctx->{
+            DataStore dts = ctx.onDataStore("test_access_txc");
+            int ct = 0;
+            for(int i=0;i<size;i++){
+                TestAccessIndex testUser = new TestAccessIndex("userbx"+i);
+                testUser.ownerKey(SnowflakeKey.from(ownerId));
+                testUser.distributionId(localDistributionIdGenerator.id());
+                Assert.assertTrue(dts.createIfAbsent(testUser,false));
+                ct++;
+            }
+            return ct==size;
+        });
+        Transaction transaction1 = lmdbDataStoreProvider.transaction(Distributable.INTEGRATION_SCOPE);
+        transaction1.execute(ctx->{
+            DataStore bar = ctx.onDataStore("test_bar_txc");
+            Assert.assertEquals(bar.list(new TestAccessQuery(ownerId,"access")).size(),size);
+            return true;
+        });
+        //Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"access")).size(),size);
+        //Assert.assertEquals(flog.list(new TestAccessQuery(ownerId,"access")).size(),size);
+        //Assert.assertEquals(foo.list(new TestAccessQuery(ownerId,"access")).size(),size);
     }
 
 }

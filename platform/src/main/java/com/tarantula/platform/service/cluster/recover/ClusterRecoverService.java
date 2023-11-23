@@ -230,7 +230,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     }
     public void syncEnd(String syncKey){
         int tc = _total.getAndSet(0);
-        tarantulaContext._syncLatch.get(syncKey).countDown();
+        //tarantulaContext._syncLatch.get(syncKey).countDown();
         log.warn("Total records received ["+tc+"] from master node"+">>"+syncKey);
     }
 
