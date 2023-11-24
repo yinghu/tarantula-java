@@ -198,6 +198,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             target.flush();
             mdb.close();
             target.close();
+            file.delete();
         }
         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(this.applicationSchedulingPoolSetting);
         this.httpClientProvider = new HttpCaller();
