@@ -303,7 +303,7 @@ public class LMDBDataStoreTest {
     @Test(groups = { "LMDB" })
     public void testTransactionLogManager() {
         DataStore foo = lmdbDataStoreProvider.createAccessIndexDataStore("test_foo_txc");
-        DataStore flog = lmdbDataStoreProvider.createLogDataStore("log_a_test_foo_txc");
+        DataStore flog = lmdbDataStoreProvider.createLogDataStore("index_a_test_foo_txc");
         long ownerId = localDistributionIdGenerator.id();
         testMapStoreListener.verifier = (tid)->{
             List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);

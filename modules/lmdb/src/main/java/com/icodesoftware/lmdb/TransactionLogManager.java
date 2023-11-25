@@ -17,6 +17,10 @@ public class TransactionLogManager implements Closable {
     private static final String DATA_PREFIX = "log_d_";
     private static final String ACCESS_PREFIX = "log_a_";
     private static final String INDEX_PREFIX = "log_i_";
+
+    private static final String DATA_PREFIX_I = "index_d_";
+    private static final String ACCESS_PREFIX_I = "index_a_";
+    private static final String INDEX_PREFIX_I = "index_i_";
     private static final String TRANSACTION_LOG = "log_tarantula_transaction";
 
     private static final String DATA_TRANSACTION_LOG = "log_tarantula_transaction_1";
@@ -92,7 +96,7 @@ public class TransactionLogManager implements Closable {
 
 
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
-        DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,logPrefix(metadata.scope())+metadata.source());
+        DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
         if(metadata.label()!=null) return false;
         return dataStore.backup().get(BinaryKey.from(key.array()),(k,v)->{
             for(byte b : v.array()){
@@ -104,7 +108,7 @@ public class TransactionLogManager implements Closable {
     }
 
     public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferStream bufferStream){
-        DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,logPrefix(metadata.scope())+metadata.source());
+        DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
         if(metadata.label()==null) return false;
         List<Recoverable.DataBuffer> ex = new ArrayList<>();
         List<Recoverable.DataBuffer> ev = new ArrayList<>();
@@ -169,6 +173,12 @@ public class TransactionLogManager implements Closable {
         if(scope==Distributable.INDEX_SCOPE) return INDEX_PREFIX;
         return "log_";
     }
+    private String indexPrefix(int scope){
+        if(scope==Distributable.DATA_SCOPE) return DATA_PREFIX_I;
+        if(scope==Distributable.INTEGRATION_SCOPE) return ACCESS_PREFIX_I;
+        if(scope==Distributable.INDEX_SCOPE) return INDEX_PREFIX_I;
+        return "log_";
+    }
 
     private DataStore transactionLogStore(int scope){
         if(scope==Distributable.DATA_SCOPE){
@@ -182,7 +192,7 @@ public class TransactionLogManager implements Closable {
 
     public void onTransaction(List<TransactionLog> transactionLogs) {
         for(TransactionLog log : transactionLogs){
-            DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,logPrefix(log.scope)+log.source);
+            DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(log.scope)+log.source);
             if(log.deleting){
                 if(log.edgeLabel==null){
                     dataStore.backup().unset((k,v)->{

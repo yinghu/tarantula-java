@@ -465,6 +465,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         final Txn<ByteBuffer> txn = env.txnWrite();
         try{
             if(!bufferStream.on(cache.key(),cache.value())) return false;
+            setEdge(txn,label);
             if(!localEdgeDataStore.dbi.put(txn,cache.key().flip(),cache.value().flip())) return false;
             idx.dbi.put(txn,cache.value().rewind(),cache.key().rewind(),PutFlags.MDB_NODUPDATA);
             txn.commit();
