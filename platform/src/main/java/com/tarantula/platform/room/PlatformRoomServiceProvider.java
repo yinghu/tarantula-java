@@ -172,6 +172,9 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }
         else{//local join case
             GameRoom room = gameRoomIndex.get(stub.roomId);
+            if(room==null){
+                room = loadGameRoom(index,stub.roomId);
+            }
             Channel channel = room.registerChannel(stub,timeoutListener);
             udpEndpoint.registerChannel((UDPChannel)channel);
             logger.warn("Using assigned channel ["+channel.channelId()+"/"+channel.sessionId()+"]");
