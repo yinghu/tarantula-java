@@ -48,7 +48,7 @@ public class BattleTransaction extends RecoverableObject {
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("Successful",true);
-        jsonObject.addProperty("BattleId",distributionId);
+        jsonObject.addProperty("BattleId",distributionKey());
         return jsonObject;
     }
 

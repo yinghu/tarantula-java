@@ -85,7 +85,6 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
         jp.addProperty("SystemId",distributionId);
         jp.addProperty("Stub",stub);
         jp.addProperty("Token",token);
-        //jp.addProperty("Ticket",ticket);
         jp.addProperty("Login",login);
         return jp;
     }

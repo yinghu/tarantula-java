@@ -59,23 +59,6 @@ public class PresenceIndex extends RecoverableObject implements Presence {
         return PresencePortableRegistry.PRESENCE_CID;
     }
 
-    @Override
-    public Map<String,Object> toMap(){
-        this.properties.put("2",counter);
-        this.properties.put("3",disabled);
-        this.properties.put("4",this.timestamp);
-        this.properties.put("5",this.local);
-        this.properties.put("6",this.index);
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        this.counter = ((Number)properties.getOrDefault("2",0)).intValue();
-        this.disabled = (Boolean)properties.getOrDefault("3",false);
-        this.timestamp = ((Number)properties.getOrDefault("4",0)).longValue();
-        this.local = (Boolean)properties.getOrDefault("5",true);
-        this.index = (String)properties.get("6");
-    }
     public boolean write(DataBuffer buffer){
         buffer.writeInt(counter);
         buffer.writeBoolean(local);
@@ -102,6 +85,8 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     public OnSession stub(){
         OnSessionTrack onSessionTrack = sessions.pop();
         if(onSessionTrack==null) return OnSessionTrack.SESSION_NOT_AVAILABLE;
+        counter++;
+        this.update();
         return new OnSessionTrack(distributionId,onSessionTrack.distributionId());
     }
 

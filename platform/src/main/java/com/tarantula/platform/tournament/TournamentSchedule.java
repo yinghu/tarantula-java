@@ -22,6 +22,14 @@ public class TournamentSchedule extends Application {
         this.configurableObject = configurableObject;
     }
 
+    public boolean global(){
+        return header.get("Global").getAsBoolean();
+    }
+
+    public boolean notificationOnFinish(){
+        return header.get("NotificationOnFinish").getAsBoolean();
+    }
+    public double targetScore(){ return header.get("TargetScore").getAsDouble();}
     public String name(){
         return header.get("Name").getAsString();
     }
@@ -30,19 +38,14 @@ public class TournamentSchedule extends Application {
         return header.get("Type").getAsString();
     }
 
-    public String description() {
-        return header.get("Description").getAsString();
-    }
-
     public Tournament.Schedule schedule(){ return Tournament.Schedule.values()[header.get("Schedule").getAsInt()];}
 
     public double enterCost(){ return header.get("EnterCost").getAsDouble();}
     public LocalDateTime startTime() {
         return TimeUtil.fromString("yyyy-MM-dd'T'HH:mm",header.get("StartTime").getAsString());
     }
-
-    public int durationHoursPerSchedule() {
-        return header.get("DurationHoursPerSchedule").getAsInt();
+    public LocalDateTime endTime() {
+        return TimeUtil.fromString("yyyy-MM-dd'T'HH:mm",header.get("EndTime").getAsString());
     }
 
 

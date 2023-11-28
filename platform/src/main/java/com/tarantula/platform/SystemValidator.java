@@ -43,14 +43,15 @@ public class SystemValidator{
             if(SystemUtil.hashPassword(systemValidatorProvider.messageDigest(),password).equals(access.password())){
                 Presence presence = systemValidatorProvider.presence(access.distributionId());
                 OnSession _ox = presence.stub();
+                if(!_ox.successful()) return _ox;
                 _ox.login(access.login());
                 _ox.routingNumber(access.routingNumber());
                 _ox.token(systemValidatorProvider.jwtToken(access,_ox));
-                //_ox.ticket(systemValidatorProvider.ticket());
                 _ox.successful(true);
                 return _ox;
             }
-            else{
+            else
+            {
                 //return on failed password check
                 return OnSessionTrack.PASSWORD_NOT_MATCHED;
             }

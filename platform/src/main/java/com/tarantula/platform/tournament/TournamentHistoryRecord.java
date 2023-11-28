@@ -1,6 +1,7 @@
 package com.tarantula.platform.tournament;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.Session;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
@@ -41,7 +42,9 @@ public class TournamentHistoryRecord extends RecoverableObject implements Tourna
         });
         return entryIndex.size();
     }
-
+    public int enter(Session session) {
+        return 0;
+    }
     @Override
     public boolean update(String systemId, Tournament.OnEntry updater) {
         TournamentEntry entry = entryIndex.get(systemId);

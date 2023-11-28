@@ -5,7 +5,7 @@ import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.tournament.TournamentContext;
 import com.tarantula.platform.tournament.TournamentHistoryContext;
-import com.tarantula.platform.tournament.TournamentInstance;
+
 
 public class TournamentModule extends ModuleHeader implements Tournament.Listener,Configurable.Listener {
 

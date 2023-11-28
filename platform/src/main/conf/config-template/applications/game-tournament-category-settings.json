@@ -17,6 +17,27 @@
       "application": {
         "properties": [
           {
+            "name": "Global",
+            "type": "boolean",
+            "reference": "Boolean",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "NotificationOnFinish",
+            "type": "boolean",
+            "reference": "Boolean",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "TargetScore",
+            "type": "number",
+            "reference": "Double",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
             "name": "Name",
             "type": "string",
             "reference": "String",
@@ -25,13 +46,6 @@
           },
           {
             "name": "Type",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "Description",
             "type": "string",
             "reference": "String",
             "nullable": false,
@@ -52,9 +66,9 @@
             "downloadable": false
           },
           {
-            "name": "DurationHoursPerSchedule",
-            "type": "number",
-            "reference": "Integer",
+            "name": "EndTime",
+            "type": "dateTime",
+            "reference": "DateTime",
             "nullable": false,
             "downloadable": false
           },

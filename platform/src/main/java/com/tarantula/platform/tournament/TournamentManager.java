@@ -6,6 +6,7 @@ import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Descriptor;
+import com.icodesoftware.Session;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ClusterProvider;
@@ -21,18 +22,21 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TournamentManager extends RecoverableObject implements Tournament, Portable {
 
     private Schedule schedule;
     private String type;
-    private String description;
+
     private double enterCost;
+
+    private double targetScore;
+
+    private boolean global;
+    private boolean notificationOnFinish;
+
     private Status status = Status.STARTING;
     private LocalDateTime startTime;
     private LocalDateTime closeTime;
@@ -44,6 +48,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     private ArrayBlockingQueue<TournamentInstance> pendingQueue;
     private ConcurrentHashMap<String, TournamentInstance> instanceIndex;
     private PlatformTournamentServiceProvider tournamentServiceProvider;
+    private DistributionTournamentService distributionTournamentService;
     private HashMap<Integer,TournamentPrize> prizes;
 
     ScheduledFuture<?> pendingSchedule;
@@ -59,7 +64,9 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.schedule = schedule.schedule();
         this.type = schedule.type();
         this.name = schedule.name();
-        this.description = schedule.description();
+        this.global = schedule.global();
+        this.targetScore = schedule.targetScore();
+        this.notificationOnFinish = schedule.notificationOnFinish();
         if(schedule.schedule()== Schedule.DAILY_SCHEDULE){
             this.startTime = LocalDateTime.now();
             this.endTime = this.startTime.plusHours(24);
@@ -77,7 +84,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         }
         else {
             this.startTime = LocalDateTime.now();
-            this.endTime = this.startTime.plusHours(schedule.durationHoursPerSchedule());
+            this.endTime = schedule.endTime();//this.startTime.plusHours(schedule.durationHoursPerSchedule());
             this.closeTime = this.endTime.minusMinutes(schedule.durationMinutesPerInstance());
         }
         this.maxEntriesPerInstance = schedule.maxEntriesPerInstance();
@@ -93,13 +100,16 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return this.schedule;
     }
 
+    public boolean global(){
+        return global;
+    }
+
+    public double targetScore(){
+        return targetScore;
+    }
     @Override
     public String type() {
         return type;
-    }
-
-    public String description() {
-        return description;
     }
 
     public  double enterCost(){
@@ -121,6 +131,9 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         buffer.writeInt(status.ordinal());
         buffer.writeUTF8(type);
         buffer.writeUTF8(name);
+        buffer.writeBoolean(global);
+        buffer.writeBoolean(notificationOnFinish);
+        buffer.writeDouble(targetScore);
         buffer.writeLong(TimeUtil.toUTCMilliseconds(startTime));
         buffer.writeLong(TimeUtil.toUTCMilliseconds(closeTime));
         buffer.writeLong(TimeUtil.toUTCMilliseconds(endTime));
@@ -137,6 +150,9 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         status = Status.values()[buffer.readInt()];
         type = buffer.readUTF8();
         name = buffer.readUTF8();
+        global = buffer.readBoolean();
+        notificationOnFinish = buffer.readBoolean();
+        targetScore = buffer.readDouble();
         startTime = TimeUtil.fromUTCMilliseconds(buffer.readLong());
         closeTime = TimeUtil.fromUTCMilliseconds(buffer.readLong());
         endTime = TimeUtil.fromUTCMilliseconds(buffer.readLong());
@@ -167,7 +183,10 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return scheduleId;
     }
 
-    TournamentInstance lookup(String instanceId){
+    Tournament.Instance lookup(String instanceId){
+        if(global){
+            return new TournamentInstanceProxy(this);
+        }
         return this.instanceIndex.computeIfAbsent(instanceId,(k)->{
             TournamentInstance instance = new TournamentInstance();
             instance.distributionKey(instanceId);
@@ -223,6 +242,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     public void setup(PlatformTournamentServiceProvider tournamentServiceProvider){
         this.tournamentServiceProvider = tournamentServiceProvider;
+        this.distributionTournamentService = tournamentServiceProvider.distributionTournamentService;
+        if(global) return;
         //recovering local instances
         instanceIndex = new ConcurrentHashMap<>();
         ArrayList<String> synced = new ArrayList<>();
@@ -291,10 +312,10 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.pendingQueue.offer(createInstance());
         return joinKey;
     }
-    void closeTournamentInstanceWithFullyJoined(TournamentInstance closed){
-        closed.pendingSchedule.cancel(true);
+    void closeTournamentInstanceWithFullyJoined(Tournament.Instance closed){
+        //closed.pendingSchedule.cancel(true);
         this.tournamentServiceProvider.serviceContext.schedule(new ScheduleRunner(PlatformTournamentServiceProvider.SCHEDULE_RUNNER_DELAY,()->{
-            closeTournamentInstance(closed);
+            //closeTournamentInstance(closed);
         }));
     }
     //must call from schedule threads
@@ -319,10 +340,10 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         closed.pendingSchedule = this.tournamentServiceProvider.serviceContext.schedule(new TournamentInstanceEndMonitor(this,closed));
         this.tournamentServiceProvider.logger.warn("instance closed->"+closed);
     }
-    void endTournamentInstanceWithFullyFinished(TournamentInstance ended){
-        ended.pendingSchedule.cancel(true);
+    void endTournamentInstanceWithFullyFinished(Tournament.Instance ended){
+        //ended.pendingSchedule.cancel(true);
         this.tournamentServiceProvider.serviceContext.schedule(new ScheduleRunner(PlatformTournamentServiceProvider.SCHEDULE_RUNNER_DELAY,()->{
-            endTournamentInstance(ended);
+            //endTournamentInstance(ended);
         }));
     }
     void endTournamentInstance(TournamentInstance ended){
@@ -339,6 +360,9 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("TournamentId",this.distributionKey());
+        jsonObject.addProperty("Global",global);
+        jsonObject.addProperty("TargetScore",targetScore);
+        jsonObject.addProperty("NotificationOnFinish",notificationOnFinish);
         jsonObject.addProperty("Type",type);
         jsonObject.addProperty("Name",name);
         jsonObject.addProperty("StartTime",startTime.format(DateTimeFormatter.ISO_DATE_TIME));
@@ -416,6 +440,17 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     long toEndingTime(){
         if(TimeUtil.expired(endTime)) return 1000;
         return TimeUtil.durationUTCMilliseconds(closeTime,endTime);
+    }
+
+    public Instance register(Session session){
+        System.out.println(session.distributionId()+" : "+session.stub());
+        return new TournamentInstanceProxy(this);
+    }
+
+    public boolean enter(Session session){
+        boolean entered = distributionTournamentService.onEnterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,session.distributionId());
+        System.out.println("ENTERED : "+entered);
+        return true;
     }
 
 }

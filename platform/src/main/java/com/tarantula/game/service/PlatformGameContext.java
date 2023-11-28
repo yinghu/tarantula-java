@@ -75,5 +75,8 @@ public class PlatformGameContext implements GameContext {
         return tokenValidatorProvider.authVendor(name);
     }
 
+    public  void registerTournamentListener(Tournament.Listener listener){
+        this.platformGameServiceProvider.tournamentServiceProvider().registerTournamentListener(listener);
+    }
 
 }

@@ -55,6 +55,8 @@
     };
     document.querySelector('#tx-lobby-live-start-game').onclick=()=>{
         TARA_API.onSet(TARA_API.query().serviceTag,'onStartGame',zoneId,editor.get(),(resp)=>{
+            resp.Win = true;
+            resp.Level = 10;
             editor.set(resp);
         });
     };

@@ -18,6 +18,9 @@ public class TimeUtil {
         return Duration.between(start,end).toMillis()/1000;
     }
 
+    public static long durationUTCInHours(LocalDateTime start,LocalDateTime end){
+        return Duration.between(start,end).toMillis()/(3600000);
+    }
     public static LocalDateTime midnight(){
         LocalTime mid = LocalTime.MIDNIGHT;
         LocalDate date = LocalDate.now();

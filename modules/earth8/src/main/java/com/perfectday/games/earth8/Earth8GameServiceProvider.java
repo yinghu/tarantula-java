@@ -11,6 +11,7 @@ import com.icodesoftware.util.JsonUtil;
 import com.perfectday.games.earth8.analytics.BattleEndTransaction;
 import com.perfectday.games.earth8.analytics.BattleStartTransaction;
 
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Earth8GameServiceProvider implements GameServiceProvider {
@@ -18,8 +19,11 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     private GameContext gameContext;
 
     public final static String ANALYTICS_QUERY = "earth8#Analytics";
+
+    private ConcurrentHashMap<Long,Tournament> tournamentIndex = new ConcurrentHashMap<>();
     public void setup(GameContext gameContext){
         this.gameContext = gameContext;
+        this.gameContext.registerTournamentListener(this);
         this.gameContext.log("Start earth 8 game service provider", OnLog.WARN);
     }
 
@@ -85,6 +89,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         JsonObject jsonObject = JsonUtil.parse(payload);
         long battleId = jsonObject.get("BattleId").getAsLong();
         boolean win = jsonObject.get("Win").getAsBoolean();
+        int level = jsonObject.get("Level").getAsInt();
+
         if(battleId<=0){
             session.write(JsonUtil.toSimpleResponse(false,"invalid battleId").getBytes());
             return;
@@ -101,6 +107,16 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             return dataStore.update(battleTransaction);
         });
         if(updated){
+            tournamentIndex.forEach((key,entry)->{
+                if(entry.type().equals("T100")){//LEVEL UP GLOBAL TOURNAMENT
+                    Tournament.Instance ins = entry.register(session);
+                    ins.enter(session);
+                    ins.update(session,(e)->{
+                        e.score(0,level);
+                        return true;
+                    });
+                }
+            });
             //TO DO AFTER CURRENT BATTLE FINISHED
         }
         session.write(JsonUtil.toSimpleResponse(updated,"battle finished").getBytes());
@@ -155,5 +171,21 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
         //UDP MESSAGE WITH RELAY CALL WITH SINGLE UDP MESSAGE
         //read buffer -> write header/buffer->flip->read header->callback on channel members
+    }
+
+    @Override
+    public void tournamentStarted(Tournament tournament) {
+        gameContext.log("TTM : "+tournament.distributionId()+" : "+tournament.name()+" : "+tournament.type()+" : "+tournament.global(),OnLog.WARN);
+        tournamentIndex.put(tournament.distributionId(),tournament);
+    }
+
+    @Override
+    public void tournamentClosed(Tournament tournament) {
+        tournamentIndex.remove(tournament.distributionId());
+    }
+
+    @Override
+    public void tournamentEnded(Tournament tournament) {
+
     }
 }

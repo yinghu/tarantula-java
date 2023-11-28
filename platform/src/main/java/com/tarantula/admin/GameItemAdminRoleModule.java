@@ -124,7 +124,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             ConfigurableCategory category = new ConfigurableCategory(jo);
             if((category = _categories.configurableSetting(category.name()))!=null){
                 category.parse();
-                if(category.scope.equals(ctype)){
+                if(category.scope.equals(ctype) || category.scope.startsWith(ctype)){
                     if(updated){//do update
                         category.reset(jo);
                         boolean suc = applicationPreSetup.save(gameCluster,category);

@@ -25,7 +25,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     public static final String NAME = "tournament";
 
-    private final static String TOURNAMENT_LOOKUP_INDEX = "tournament";
+    //private final static String TOURNAMENT_LOOKUP_INDEX = "tournament";
 
     final static long SCHEDULE_RUNNER_DELAY = 500;
 
@@ -191,16 +191,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     public List<Tournament.History> playerHistory(String systemId){
         ArrayList<Tournament.History> list = new ArrayList<>();
-        //IndexSet indexSet = new IndexSet(Tournament.HISTORY_LABEL);
-        //indexSet.distributionKey(systemId);
-        //this.dataStore.createIfAbsent(indexSet,true);
-        //indexSet.keySet().forEach((k)->{
-            //TournamentHistory h = new TournamentHistory();
-            //h.distributionKey(k);
-            //if(dataStore.load(h)){
-                //list.add(h);
-            //}
-        //});
         return list;
     }
     public Tournament.Instance tournamentHistory(String tournamentId){//schedule node
@@ -274,6 +264,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         finally {
             scheduleStore.mapUnlock(lockKey);
         }
+
     }
 
     ///schedule and launch
@@ -287,7 +278,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             TournamentScheduleStatus status = schedule.status();
             dataStore.createIfAbsent(status,true);
             if(status.status != Tournament.Status.PENDING ) throw new RuntimeException("schedule is running on tournament ["+status.tournamentId+"]");
-            if(schedule.durationHoursPerSchedule() < minDurationHoursPerSchedule) throw new RuntimeException("min hours per schedule less than ["+minDurationHoursPerSchedule+"]");
+            if(TimeUtil.durationUTCInHours(schedule.startTime(),schedule.endTime()) < minDurationHoursPerSchedule) throw new RuntimeException("min hours per schedule less than ["+minDurationHoursPerSchedule+"]");
             if(schedule.durationMinutesPerInstance() < minDurationMinutesPerInstance) throw new RuntimeException("min minutes per instance less than ["+minDurationMinutesPerInstance+"]");
             switch (schedule.schedule()){
                 case DAILY_SCHEDULE:
@@ -384,6 +375,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         }));
     }
     private void launch(TournamentManager tournament){
+        logger.warn("TMT : "+tournament.distributionId()+" : "+tournament.global());
         this.tournamentIndex.put(tournament.distributionKey(),tournament);
         tournament.setup(this);
         tournament.pendingSchedule = this.serviceContext.schedule(new TournamentCloseMonitor(tournament,this));
@@ -406,15 +398,23 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
 
     //distributed operation callbacks
+    public boolean onTournamentEntered(long tournamentId,long systemId){
+        logger.warn("TID : "+tournamentId+" : "+" : "+systemId);
+        //TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
+        //Tournament.Instance _ins = tournamentManager.lookup(instanceId);
+        //if(_ins.enter(systemId) == _ins.maxEntries()) tournamentManager.closeTournamentInstanceWithFullyJoined(_ins);
+        return true;
+    }
     public Tournament.Instance onTournamentEntered(String tournamentId,String instanceId,String systemId){
+        logger.warn("TID : "+tournamentId+" : "+ instanceId+" : "+systemId);
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
-        TournamentInstance _ins = tournamentManager.lookup(instanceId);
+        Tournament.Instance _ins = tournamentManager.lookup(instanceId);
         if(_ins.enter(systemId) == _ins.maxEntries()) tournamentManager.closeTournamentInstanceWithFullyJoined(_ins);
         return _ins;
     }
     public Tournament.Entry onTournamentScored(String tournamentId,String instanceId, String systemId, double credit,double delta){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
-        TournamentInstance _ins = tournamentManager.lookup(instanceId);
+        Tournament.Instance _ins = tournamentManager.lookup(instanceId);
         if(_ins==null) return new TournamentEntry();
         Tournament.Entry[] score={null};
         if(_ins.update(systemId,(e)->{
@@ -432,7 +432,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     public void onTournamentFinished(String tournamentId,String instanceId,String systemId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
-        TournamentInstance _ins = tournamentManager.lookup(instanceId);
+        Tournament.Instance _ins = tournamentManager.lookup(instanceId);
         if(_ins==null) return;
         if(_ins.update(systemId,e->{
             e.finish();
@@ -442,7 +442,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     public void onTournamentSynced(String tournamentId,String instanceId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
-        TournamentInstance synced = tournamentManager.lookup(instanceId);
+        Tournament.Instance synced = tournamentManager.lookup(instanceId);
         logger.warn("SYNC Instance : "+synced);
     }
     public void onTournamentClosed(String tournamentId){

@@ -3,8 +3,9 @@ package com.icodesoftware.protocol;
 import com.icodesoftware.Inventory;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.Session;
+import com.icodesoftware.Tournament;
 
-public interface GameServiceProvider extends UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener,Inventory.Listener{
+public interface GameServiceProvider extends UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener,Inventory.Listener, Tournament.Listener {
     void setup(GameContext gameContext);
 
     void onJoined(Session session);

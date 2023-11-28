@@ -20,8 +20,7 @@ public interface Tournament extends Configurable {
 
     String name();
 
-    String description();
-
+    boolean global();
     double enterCost();
 
     Status status();
@@ -32,6 +31,8 @@ public interface Tournament extends Configurable {
     int durationMinutesPerInstance();
 
     long scheduleId();
+
+    Instance register(Session session);
 
     interface Entry extends Configurable {
         String systemId();
@@ -50,7 +51,9 @@ public interface Tournament extends Configurable {
         LocalDateTime closeTime();
         LocalDateTime endTime();
         int enter(String systemId);
+        int enter(Session session);
         boolean update(String systemId,OnEntry onEntry);
+        default boolean update(Session session,OnEntry onEntry){return false;}
         RaceBoard raceBoard();
     }
     interface Prize extends Configurable{

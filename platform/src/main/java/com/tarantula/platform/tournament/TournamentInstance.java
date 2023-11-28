@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+import com.icodesoftware.Session;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
@@ -63,6 +64,11 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
             return entry;
         });
         return totalJoined;
+    }
+
+    @Override
+    public int enter(Session session) {
+        return 0;
     }
 
     @Override
