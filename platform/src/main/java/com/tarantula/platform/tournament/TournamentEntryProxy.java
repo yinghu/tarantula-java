@@ -14,7 +14,6 @@ public class TournamentEntryProxy extends RecoverableObject implements Tournamen
     @Override
     public void score(double credit, double delta) {
         this.delta = delta;
-        System.out.println("score :"+delta);
     }
 
     @Override

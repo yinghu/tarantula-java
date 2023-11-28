@@ -59,12 +59,12 @@
             tournamentList.innerHTML ='';
             if(resp.Successful){
                 resp._tournamentList.forEach(item => {
-                    tournamentList.innerHTML += TARA_HTML.command(item.TournamentId,item.Type,item.Name,'tournament-join','Join');
+                    tournamentList.innerHTML += TARA_HTML.command(item.TournamentId,item.Type,item.Name,'tournament-join','LeaderBoard');
                 });    
                 document.querySelectorAll('.tx-live-tournament-join').forEach(a=>{
                       a.onclick = ()=>{
-                        tx_tournament_join(a.getAttribute('tx-item-id'));
-                        //console.log(a.getAttribute('tx-item-id')+' : '+TARA_API.query().serviceTag);       
+                        tx_tournament_board(a.getAttribute('tx-item-id'));
+                        console.log(a.getAttribute('tx-item-id')+' : '+TARA_API.query().serviceTag);       
                     }
                 });
             }
@@ -72,9 +72,9 @@
         });   
     }
 
-    function tx_tournament_join(itemId){
-        TARA_API.onGet(TARA_API.query().serviceTag,'onJoin',itemId,(resp)=>{
-            console.log(resp);
+    function tx_tournament_board(itemId){
+        TARA_API.onGet(TARA_API.query().serviceTag,'onBoard',itemId,(resp)=>{
+            editor.set(resp);
         });
     }
 </script>

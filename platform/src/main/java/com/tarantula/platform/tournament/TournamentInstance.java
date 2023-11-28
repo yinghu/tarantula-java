@@ -44,7 +44,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         this.maxEntries = maxEntries;
     }
     public TournamentInstance(){
-        totalFinished = new AtomicInteger();
+        totalFinished = new AtomicInteger(0);
         this.onEdge = true;
     }
 
@@ -53,17 +53,22 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         return status;
     }
 
-    @Override
-    public int enter(String systemId) {
-        entryIndex.computeIfAbsent(systemId,(k)->{
-            TournamentEntry entry = new TournamentEntry(systemId,scoreCredits);
+    public boolean enter(String systemId,double score) {
+        return entryIndex.computeIfAbsent(systemId,(k)->{
+            if(totalJoined==maxEntries) return null;
+            TournamentEntry entry = new TournamentEntry(systemId,scoreCredits,score);
+            entry.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
             entry.ownerKey(this.key());
             this.dataStore.create(entry);
             entry.dataStore(dataStore);
             tournamentRaceBoard.addEntry(entry);
             totalJoined++;
             return entry;
-        });
+        })!=null;
+    }
+
+    public int enter(String systemId){
+        enter(systemId,0);
         return totalJoined;
     }
 

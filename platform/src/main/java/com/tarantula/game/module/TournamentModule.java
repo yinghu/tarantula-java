@@ -32,6 +32,10 @@ public class TournamentModule extends ModuleHeader implements Tournament.Listene
             Tournament.Instance ins = tournamentServiceProvider.enter(session.name(),session.systemId());
             session.write(ins.toJson().toString().getBytes());
         }
+        else if(session.action().equals("onBoard")){
+            Tournament.RaceBoard board = tournamentServiceProvider.list(session.name());
+            session.write(board.toString().getBytes());
+        }
         else{
             throw new UnsupportedOperationException(session.action()+" not supported");
         }

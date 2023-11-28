@@ -14,6 +14,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -112,5 +113,20 @@ public class MiscTest {
         Assert.assertEquals(v20[7]%20,8);
         Assert.assertEquals(v20[8]%20,9);
     }
+
+    @Test(groups = { "misc test" })
+    public void mapTest() {
+        ConcurrentHashMap<String,String> _m = new ConcurrentHashMap<>();
+        AtomicInteger size = new AtomicInteger(0);
+        for(int i=0;i<100;i++){
+            _m.computeIfAbsent("k"+i,k->{
+                if(size.get()>=10) return null;
+                size.incrementAndGet();
+                return "v"+size.get();
+            });
+        }
+        Assert.assertEquals(_m.size(),10);
+    }
+
 
 }

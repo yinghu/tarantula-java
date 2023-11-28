@@ -16,6 +16,7 @@ public interface TournamentServiceProvider extends ConfigurationServiceProvider{
     void finish(String tournamentId,String instanceId,String systemId);
 
     Tournament.RaceBoard list(String tournamentId,String instanceId);
+    Tournament.RaceBoard list(String tournamentId);
 
     List<Tournament.History> playerHistory(String systemId);
     Tournament.Instance tournamentHistory(String tournamentId);

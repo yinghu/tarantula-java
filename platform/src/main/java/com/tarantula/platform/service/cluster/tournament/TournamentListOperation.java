@@ -30,7 +30,7 @@ public class TournamentListOperation extends Operation implements PartitionAware
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        raceBoard = ais.list(serviceName,tournamentId,instanceId);
+        raceBoard = instanceId!=null?ais.list(serviceName,tournamentId,instanceId):ais.list(serviceName,tournamentId);
     }
 
     @Override

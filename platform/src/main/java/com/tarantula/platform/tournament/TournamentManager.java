@@ -443,21 +443,31 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
 
     public Instance register(Session session){
-        System.out.println(session.distributionId()+" : "+session.stub());
         return new TournamentInstanceProxy(this);
     }
 
     public boolean enter(Session session){
-        boolean entered = distributionTournamentService.onEnterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,session.distributionId());
-        System.out.println("ENTERED : "+entered);
-        return true;
+        return distributionTournamentService.onEnterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,session.distributionId());
     }
 
+    public RaceBoard raceBoard(){
+        TournamentInstanceQuery query = new TournamentInstanceQuery(this.distributionId,"global");
+        TournamentInstance[] loaded = {null};
+        this.dataStore.list(query,ins->{
+            loaded[0] = ins;
+            return false;
+        });
+        if(loaded[0]==null){
+            new TournamentRaceBoard();
+        }
+        loaded[0].dataStore(dataStore);
+        loaded[0].load();
+        return loaded[0].raceBoard();
+    }
     public boolean enter(long systemId){
         TournamentInstanceQuery query = new TournamentInstanceQuery(this.distributionId,"global");
         TournamentInstance[] loaded = {null};
         this.dataStore.list(query,ins->{
-            System.out.println("INS : "+ins.distributionId());
             loaded[0] = ins;
             return false;
         });
@@ -466,9 +476,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         }
         loaded[0].dataStore(dataStore);
         loaded[0].load();
-        System.out.println(loaded[0].raceBoard().toJson().toString());
-        loaded[0].enter(Long.toString(systemId));
-        return true;
+        return loaded[0].enter(Long.toString(systemId),targetScore);
     }
 
 }

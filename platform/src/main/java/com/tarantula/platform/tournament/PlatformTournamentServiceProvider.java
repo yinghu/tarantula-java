@@ -122,6 +122,11 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         Collections.sort(ins.list(),new TournamentEntryComparator());
         return ins;
     }
+
+    @Override
+    public Tournament.RaceBoard list(String tournamentId) {
+        return this.distributionTournamentService.onListTournament(gameServiceName,tournamentId);
+    }
     public List<Tournament> list(){
         ArrayList<Tournament> _tms = new ArrayList<>();
         tournamentIndex.forEach((k,v)->
@@ -427,6 +432,12 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         Tournament.Instance _ins = tournamentManager.lookup(instanceId);
         if(_ins == null) return new TournamentRaceBoard();
         return _ins.raceBoard();
+    }
+
+    public Tournament.RaceBoard onTournamentListed(String tournamentId){
+        TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
+        if(tournamentManager == null) return new TournamentRaceBoard();
+        return tournamentManager.raceBoard();
     }
     public void onTournamentFinished(String tournamentId,String instanceId,String systemId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);

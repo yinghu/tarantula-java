@@ -22,10 +22,11 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     private boolean finished;
     private int rank;
 
-    public TournamentEntry(String systemId,double credits){
+    public TournamentEntry(String systemId,double credits,double score){
         this();
         this.systemId = systemId;
         this.credits = credits;
+        this.score = score;
     }
     public TournamentEntry(){
         this.onEdge = true;
@@ -121,12 +122,12 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("systemId",systemId);
-        jsonObject.addProperty("credits",credits);
-        jsonObject.addProperty("score",score);
-        jsonObject.addProperty("rank",rank);
-        jsonObject.addProperty("timestamp",timestamp);
-        jsonObject.addProperty("finished",finished);
+        jsonObject.addProperty("SystemId",systemId);
+        //jsonObject.addProperty("Credits",credits);
+        jsonObject.addProperty("Score",score);
+        jsonObject.addProperty("Rank",rank);
+        jsonObject.addProperty("Timestamp",timestamp);
+        //jsonObject.addProperty("Finished",finished);
         return jsonObject;
     }
 }
