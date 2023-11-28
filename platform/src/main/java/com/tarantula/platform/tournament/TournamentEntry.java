@@ -22,10 +22,9 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     private boolean finished;
     private int rank;
 
-    public TournamentEntry(String systemId,String instanceId,double credits){
+    public TournamentEntry(String systemId,double credits){
         this();
         this.systemId = systemId;
-        this.owner = instanceId;
         this.credits = credits;
     }
     public TournamentEntry(){

@@ -259,7 +259,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         int pendingSize = this.tournamentServiceProvider.pendingInstancePoolSizePerSchedule-pendingPoolSize[0];
         if(pendingSize>0){
             for(int i=0;i<pendingSize;i++){
-                pendingQueue.offer(createInstance());
+                pendingQueue.offer(createInstance(this.tournamentServiceProvider.serviceContext.node().nodeName()));
             }
         }
         this.tournamentStore = this.tournamentServiceProvider.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,this.distributionKey(),true,false,false);
@@ -309,7 +309,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         }
         instance.starting(storeIndex);
         this.dataStore.update(instance);
-        this.pendingQueue.offer(createInstance());
+        this.pendingQueue.offer(createInstance(this.tournamentServiceProvider.serviceContext.node().nodeName()));
         return joinKey;
     }
     void closeTournamentInstanceWithFullyJoined(Tournament.Instance closed){
@@ -410,9 +410,9 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             rank++;
         }
     }
-    private TournamentInstance createInstance(){
+    private TournamentInstance createInstance(String label){
         TournamentInstance instance = new TournamentInstance(maxEntriesPerInstance);
-        instance.label(this.tournamentServiceProvider.serviceContext.node().nodeName());
+        instance.label(label);
         instance.ownerKey(this.key());
         this.dataStore.create(instance);
         return instance;
@@ -450,6 +450,24 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     public boolean enter(Session session){
         boolean entered = distributionTournamentService.onEnterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,session.distributionId());
         System.out.println("ENTERED : "+entered);
+        return true;
+    }
+
+    public boolean enter(long systemId){
+        TournamentInstanceQuery query = new TournamentInstanceQuery(this.distributionId,"global");
+        TournamentInstance[] loaded = {null};
+        this.dataStore.list(query,ins->{
+            System.out.println("INS : "+ins.distributionId());
+            loaded[0] = ins;
+            return false;
+        });
+        if(loaded[0]==null){
+            loaded[0] = createInstance("global");
+        }
+        loaded[0].dataStore(dataStore);
+        loaded[0].load();
+        System.out.println(loaded[0].raceBoard().toJson().toString());
+        loaded[0].enter(Long.toString(systemId));
         return true;
     }
 

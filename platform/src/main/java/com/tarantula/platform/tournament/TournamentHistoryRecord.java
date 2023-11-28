@@ -34,7 +34,8 @@ public class TournamentHistoryRecord extends RecoverableObject implements Tourna
     @Override
     public int enter(String systemId) {
         entryIndex.computeIfAbsent(systemId,(k)->{
-            TournamentEntry entry = new TournamentEntry(systemId,this.distributionKey(),0);
+            TournamentEntry entry = new TournamentEntry(systemId,0);
+            entry.ownerKey(key());
             this.dataStore.create(entry);
             entry.dataStore(dataStore);
             tournamentRaceBoard.addEntry(entry);

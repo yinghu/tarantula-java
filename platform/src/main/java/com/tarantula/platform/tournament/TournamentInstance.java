@@ -56,7 +56,8 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     @Override
     public int enter(String systemId) {
         entryIndex.computeIfAbsent(systemId,(k)->{
-            TournamentEntry entry = new TournamentEntry(systemId,this.distributionKey(),scoreCredits);
+            TournamentEntry entry = new TournamentEntry(systemId,scoreCredits);
+            entry.ownerKey(this.key());
             this.dataStore.create(entry);
             entry.dataStore(dataStore);
             tournamentRaceBoard.addEntry(entry);

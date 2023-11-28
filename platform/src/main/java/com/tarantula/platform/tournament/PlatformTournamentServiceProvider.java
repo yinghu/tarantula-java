@@ -400,10 +400,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     //distributed operation callbacks
     public boolean onTournamentEntered(long tournamentId,long systemId){
         logger.warn("TID : "+tournamentId+" : "+" : "+systemId);
-        //TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
-        //Tournament.Instance _ins = tournamentManager.lookup(instanceId);
-        //if(_ins.enter(systemId) == _ins.maxEntries()) tournamentManager.closeTournamentInstanceWithFullyJoined(_ins);
-        return true;
+        TournamentManager tournamentManager = this.tournamentIndex.get(Long.toString(tournamentId));
+        return tournamentManager.enter(systemId);
     }
     public Tournament.Instance onTournamentEntered(String tournamentId,String instanceId,String systemId){
         logger.warn("TID : "+tournamentId+" : "+ instanceId+" : "+systemId);
