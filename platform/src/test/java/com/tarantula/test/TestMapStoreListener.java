@@ -50,6 +50,7 @@ public class TestMapStoreListener implements MapStoreListener {
 
 
     public boolean onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
+         //System.out.println("DELETE : "+metadata.source()+" : "+metadata.label());
          return transactionLogManager.onDeleting(metadata,key,value,transactionId);
     }
 }

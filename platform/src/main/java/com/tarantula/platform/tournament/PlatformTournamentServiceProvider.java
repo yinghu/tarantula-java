@@ -6,6 +6,7 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.BufferUtil;
 import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.game.SimpleStub;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.icodesoftware.util.ScheduleRunner;
@@ -165,7 +166,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     public void start() throws Exception {
         TournamentManagerQuery query = new TournamentManagerQuery(this.serviceContext.node().nodeId(),this.serviceContext.node().nodeName());
         dataStore.list(query).forEach((tournament)->{
-            if(tournament.status() != Tournament.Status.ENDED){
+            if(tournament.status() != Tournament.Status.ENDED && tournament.status() != Tournament.Status.CLOSED ){
                 TournamentScheduleStatus status = new TournamentScheduleStatus();
                 status.distributionId(tournament.scheduleId());
                 this.dataStore.load(status);
@@ -406,7 +407,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     public boolean onTournamentEntered(long tournamentId,long systemId){
         logger.warn("TID : "+tournamentId+" : "+" : "+systemId);
         TournamentManager tournamentManager = this.tournamentIndex.get(Long.toString(tournamentId));
-        return tournamentManager.enter(systemId);
+        return tournamentManager.onEnter(systemId);
     }
     public Tournament.Instance onTournamentEntered(String tournamentId,String instanceId,String systemId){
         logger.warn("TID : "+tournamentId+" : "+ instanceId+" : "+systemId);
@@ -420,7 +421,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         Tournament.Instance _ins = tournamentManager.lookup(instanceId);
         if(_ins==null) return new TournamentEntry();
         Tournament.Entry[] score={null};
-        if(_ins.update(systemId,(e)->{
+        if(_ins.update(new SimpleStub(systemId,0),(e)->{
             e.score(credit,delta);
             score[0]=e;
             return e.finished();
@@ -437,13 +438,13 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     public Tournament.RaceBoard onTournamentListed(String tournamentId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         if(tournamentManager == null) return new TournamentRaceBoard();
-        return tournamentManager.raceBoard();
+        return tournamentManager.onRaceBoard();
     }
     public void onTournamentFinished(String tournamentId,String instanceId,String systemId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         Tournament.Instance _ins = tournamentManager.lookup(instanceId);
         if(_ins==null) return;
-        if(_ins.update(systemId,e->{
+        if(_ins.update(new SimpleStub(systemId,0),e->{
             e.finish();
             return e.finished();
         })) tournamentManager.endTournamentInstanceWithFullyFinished(_ins);

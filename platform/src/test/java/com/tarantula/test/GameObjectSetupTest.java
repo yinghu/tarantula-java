@@ -17,6 +17,9 @@ import org.testng.Assert;
 
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GameObjectSetupTest extends DataStoreHook{
 
     @Test(groups = { "GameObjectSetup" })
@@ -125,7 +128,7 @@ public class GameObjectSetupTest extends DataStoreHook{
         gameObjectSetup.setup(serviceContext);
         DeploymentDescriptor app = new DeploymentDescriptor();
         app.typeId("holee-game-data");
-        //app.oid("gameApp");
+        app.distributionId(serviceContext.distributionId());
         Configuration configuration = serviceContext.configuration("sample-admin-role-commodity-settings");
         Assert.assertNotNull(configuration);
         JsonArray list = ((JsonElement)configuration.property("list")).getAsJsonArray();
@@ -145,30 +148,7 @@ public class GameObjectSetupTest extends DataStoreHook{
             Assert.assertNotEquals(c.toJson().toString(),"{}");
         });
     }
-    @Test(groups = { "GameObjectSetup" })
-    public void configDeleteObjectTest() {
-        GameCluster gc = new GameCluster();
-        gc.gameServiceName = "woop-game-service";
-        gc.gameLobbyName = "woop-game-lobby";
-        gc.gameDataName = "woop-game-data";
-        GameObjectSetup gameObjectSetup = new GameObjectSetup(gc);
-        gameObjectSetup.setup(serviceContext);
-        DeploymentDescriptor app = new DeploymentDescriptor();
-        app.typeId("sample-game-data");
-        //app.oid("gameApp");
-        Configuration configuration = serviceContext.configuration("sample-admin-role-commodity-settings");
-        Assert.assertNotNull(configuration);
-        JsonArray list = ((JsonElement)configuration.property("list")).getAsJsonArray();
-        list.forEach(e->{
-            JsonObject jo = e.getAsJsonObject();
-            ConfigurableObject co = new ConfigurableObject();
-            Assert.assertTrue(co.configureAndValidate(jo));
-            Assert.assertTrue(gameObjectSetup.save(app,co));
-            Assert.assertTrue(gameObjectSetup.delete(app,co));
-        });
-        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"commodity")).size(),0);
-        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"Gem")).size(),0);
-    }
+
 
     @Test(groups = { "GameObjectSetup" })
     public void configTransactionTest() {
@@ -180,19 +160,31 @@ public class GameObjectSetupTest extends DataStoreHook{
         gameObjectSetup.setup(serviceContext);
         DeploymentDescriptor app = new DeploymentDescriptor();
         app.typeId("sample-game-data");
-
+        app.distributionId(serviceContext.distributionId());
         Configuration configuration = serviceContext.configuration("sample-admin-role-commodity-settings");
         Assert.assertNotNull(configuration);
         JsonArray list = ((JsonElement)configuration.property("list")).getAsJsonArray();
+        List<ConfigurableObject> added = new ArrayList<>();
         list.forEach(e->{
             JsonObject jo = e.getAsJsonObject();
             ConfigurableObject co = new ConfigurableObject();
             Assert.assertTrue(co.configureAndValidate(jo));
             Assert.assertTrue(gameObjectSetup.save(app,co));
-            Assert.assertTrue(gameObjectSetup.delete(app,co));
+            co.ownerKey(app.key());
+            Assert.assertTrue(gameObjectSetup.edge(app,co,"test"));
+            added.add(co);
+
+        });
+        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"commodity")).size(),30);
+        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"Gem")).size(),6);
+        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"test")).size(),30);
+        added.forEach(d->{
+            Assert.assertTrue(gameObjectSetup.delete(app,d));
         });
         Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"commodity")).size(),0);
         Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"Gem")).size(),0);
+        Assert.assertEquals(gameObjectSetup.list(app,new ConfigurableObjectQuery(app.key(),"test")).size(),0);
+
     }
 
 

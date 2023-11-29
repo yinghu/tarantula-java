@@ -275,17 +275,18 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             cache.reset();
             return false;
         }
-        key.flip();
-        if(!lmdbDataStoreProvider.onDeleting(metadata,key, cache.value(),ptxn.getId())){
-            cache.reset();
-            return false;
-        }
+        //key.flip();
+        //if(!lmdbDataStoreProvider.onDeleting(metadata,key, cache.value(),ptxn.getId())){
+            //cache.reset();
+            //return false;
+        //}
         final Txn<ByteBuffer> txn = env.txn(ptxn);
         try{
-            if(!dbi.delete(txn, key.rewind())) return false;
+            if(!dbi.delete(txn, key.flip())) return false;
             txn.commit();
             removeEdges(key.rewind());
-            lmdbDataStoreProvider.onCommit(metadata.scope(),txn.getId());
+            key.rewind();
+            lmdbDataStoreProvider.onDeleting(metadata,key, cache.value(),txn.getId());
             return true;
         }finally {
             txn.close();

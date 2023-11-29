@@ -51,9 +51,9 @@ public interface Tournament extends Configurable {
         LocalDateTime closeTime();
         LocalDateTime endTime();
         int enter(String systemId);
-        int enter(Session session);
-        boolean update(String systemId,OnEntry onEntry);
-        default boolean update(Session session,OnEntry onEntry){return false;}
+        //int enter(Session session);
+        //boolean update(String systemId,OnEntry onEntry);
+        boolean update(Session session,OnEntry onEntry);
         RaceBoard raceBoard();
     }
     interface Prize extends Configurable{

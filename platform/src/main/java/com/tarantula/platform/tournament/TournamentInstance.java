@@ -72,12 +72,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         return totalJoined;
     }
 
-    @Override
-    public int enter(Session session) {
-        return 0;
-    }
-
-    @Override
+    //@Override
     public boolean update(String systemId, Tournament.OnEntry updater) {
         TournamentEntry entry = entryIndex.get(systemId);
         if(updater.on(entry)) totalFinished.incrementAndGet();
@@ -85,6 +80,13 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         return status == (Tournament.Status.CLOSED)? (finished == totalJoined):(finished == totalJoined && totalJoined == maxEntries);
     }
 
+    @Override
+    public boolean update(Session session, Tournament.OnEntry onEntry) {
+        TournamentEntryProxy tournamentEntryProxy = new TournamentEntryProxy();
+        onEntry.on(tournamentEntryProxy);
+        //if(tournamentEntryProxy.score() != tournamentManager.targetScore()) return false;
+        return true;//tournamentManager.enter(session);
+    }
     public int maxEntries(){
         return maxEntries;
     }

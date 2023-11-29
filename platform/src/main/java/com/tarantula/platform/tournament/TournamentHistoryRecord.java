@@ -46,12 +46,18 @@ public class TournamentHistoryRecord extends RecoverableObject implements Tourna
     public int enter(Session session) {
         return 0;
     }
-    @Override
+   // @Override
     public boolean update(String systemId, Tournament.OnEntry updater) {
         TournamentEntry entry = entryIndex.get(systemId);
         updater.on(entry);
         return false;
     }
+
+    @Override
+    public boolean update(Session session, Tournament.OnEntry onEntry) {
+        return false;
+    }
+
     public int finish(String systemId){
         return 1;
     }

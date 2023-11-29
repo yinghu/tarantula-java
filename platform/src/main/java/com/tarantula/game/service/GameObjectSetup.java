@@ -55,12 +55,14 @@ public class GameObjectSetup extends GamePreSetup implements ApplicationPreSetup
 
     @Override
     public <T extends Configurable> boolean edge(Descriptor application, T t, String label) {
-        return false;
+        DataStore dataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,serviceDataStore(application));
+        return dataStore.createEdge(t,label);
     }
 
     @Override
     public <T extends Configurable> boolean deleteEdge(Descriptor application, T t, String label) {
-        return false;
+        DataStore dataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,serviceDataStore(application));
+        return dataStore.deleteEdge(t.ownerKey(),t.key(),label);
     }
 
     public <T extends Configurable> boolean load(Descriptor application, T t){

@@ -42,31 +42,24 @@ public class TournamentInstanceProxy extends RecoverableObject implements Tourna
     public int enter(String systemId) {
         return 0;
     }
-    @Override
-    public int enter(Session session) {
-        if(tournamentManager.global()){
-            System.out.println("skip enter proxy");
-        }
-        return 0;
-    }
-    @Override
-    public boolean update(String systemId, Tournament.OnEntry onEntry) {
-        return false;
-    }
+    //@Override
+    //public int enter(Session session) {
+        //if (tournamentManager.global()) return 0;
+        //this.tournamentManager.enter(session);
+        //return 0;
+    //}
+
 
     @Override
     public boolean update(Session session, Tournament.OnEntry onEntry) {
         TournamentEntryProxy tournamentEntryProxy = new TournamentEntryProxy();
         onEntry.on(tournamentEntryProxy);
-        if(tournamentEntryProxy.score()==tournamentManager.targetScore()){
-            System.out.println("ON BOARD : "+tournamentManager.enter(session));
-        }
-        System.out.println("SCORE : "+tournamentEntryProxy.score()+" : "+tournamentManager.targetScore());
-        return true;
+        if(tournamentEntryProxy.score() != tournamentManager.targetScore()) return false;
+        return tournamentManager.enter(session);
     }
 
     @Override
     public Tournament.RaceBoard raceBoard() {
-        return null;
+        return this.tournamentManager.raceBoard();
     }
 }

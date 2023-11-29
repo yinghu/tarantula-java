@@ -63,6 +63,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             DataStore dataStore = setup.onDataStore("battle");
             return dataStore.create(battleTransaction);
         });
+        tournamentIndex.forEach((key,entry)->{
+            gameContext.log(entry.register(session).raceBoard().toJson().toString(),OnLog.WARN);
+        });
         session.write(created ? battleTransaction.toJson().toString().getBytes() : JsonUtil.toSimpleResponse(false,"failed to create battle transaction").getBytes());
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         webhook.upload(ANALYTICS_QUERY,new BattleStartTransaction(session, battleTransaction.distributionId(), payload).toString().getBytes());
@@ -110,7 +113,6 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             tournamentIndex.forEach((key,entry)->{
                 if(entry.type().equals("T100")){//LEVEL UP GLOBAL TOURNAMENT
                     Tournament.Instance ins = entry.register(session);
-                    ins.enter(session);
                     ins.update(session,(e)->{
                         e.score(0,level);
                         return true;

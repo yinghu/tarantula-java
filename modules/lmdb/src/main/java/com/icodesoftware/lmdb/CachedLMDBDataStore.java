@@ -313,17 +313,19 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             cache.reset();
             return false;
         }
-        key.flip();
-        if(!lmdbDataStoreProvider.onDeleting(metadata,key, cache.value(),0)){
-            cache.reset();
-            return false;
-        }
+        //key.flip();
+        //if(!lmdbDataStoreProvider.onDeleting(metadata,key, cache.value(),0)){
+            //cache.reset();
+            //return false;
+        //}
         final Txn<ByteBuffer> txn = env.txnWrite();
         try{
-            if(!dbi.delete(txn, key.rewind())) return false;
+            if(!dbi.delete(txn, key.flip())) return false;
             removeEdges(txn,key.rewind());
             txn.commit();
             key.rewind();
+            lmdbDataStoreProvider.onDeleting(metadata,key, cache.value(),txn.getId());
+            lmdbDataStoreProvider.onCommit(metadata.scope(),txn.getId());
             return true;
         }finally {
             txn.close();

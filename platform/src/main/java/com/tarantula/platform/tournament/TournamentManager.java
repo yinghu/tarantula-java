@@ -449,8 +449,12 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     public boolean enter(Session session){
         return distributionTournamentService.onEnterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,session.distributionId());
     }
-
     public RaceBoard raceBoard(){
+        return distributionTournamentService.onListTournament(tournamentServiceProvider.gameServiceName,this.distributionKey());
+    }
+
+    //distributed callbacks
+    public RaceBoard onRaceBoard(){
         TournamentInstanceQuery query = new TournamentInstanceQuery(this.distributionId,"global");
         TournamentInstance[] loaded = {null};
         this.dataStore.list(query,ins->{
@@ -464,7 +468,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         loaded[0].load();
         return loaded[0].raceBoard();
     }
-    public boolean enter(long systemId){
+    public boolean onEnter(long systemId){
         TournamentInstanceQuery query = new TournamentInstanceQuery(this.distributionId,"global");
         TournamentInstance[] loaded = {null};
         this.dataStore.list(query,ins->{

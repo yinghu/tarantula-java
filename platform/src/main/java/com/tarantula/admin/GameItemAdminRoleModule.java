@@ -206,6 +206,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
             ConfigurableObject configurableObject = new ConfigurableObject();
             configurableObject.distributionKey(query[1]);
             if(preSetup.load(app,configurableObject)){
+                configurableObject.ownerKey(app.key());
                 session.write(JsonUtil.toSimpleResponse(preSetup.delete(app,configurableObject),"item deleted ["+query[1]+"]").getBytes());
             }
             else{
