@@ -11,9 +11,9 @@ import java.io.IOException;
 public class TournamentScoreOperation extends Operation implements PartitionAwareOperation {
 
     private String serviceName;
-    private String systemId;
-    private String tournamentId;
-    private String instanceId;
+    private long systemId;
+    private long tournamentId;
+    private long instanceId;
     private double credit;
     private double delta;
     private Tournament.Entry entry;
@@ -21,7 +21,7 @@ public class TournamentScoreOperation extends Operation implements PartitionAwar
     }
 
 
-    public TournamentScoreOperation(String serviceName,String tournamentId,String instanceId, String systemId,double credit,double delta) {
+    public TournamentScoreOperation(String serviceName,long tournamentId,long instanceId, long systemId,double credit,double delta) {
         this.serviceName = serviceName;
         this.tournamentId = tournamentId;
         this.instanceId = instanceId;
@@ -44,9 +44,9 @@ public class TournamentScoreOperation extends Operation implements PartitionAwar
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(this.serviceName);
-        out.writeUTF(this.tournamentId);
-        out.writeUTF(this.instanceId);
-        out.writeUTF(this.systemId);
+        out.writeLong(this.tournamentId);
+        out.writeLong(this.instanceId);
+        out.writeLong(this.systemId);
         out.writeDouble(this.credit);
         out.writeDouble(this.delta);
     }
@@ -55,9 +55,9 @@ public class TournamentScoreOperation extends Operation implements PartitionAwar
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         serviceName = in.readUTF();
-        tournamentId = in.readUTF();
-        instanceId = in.readUTF();
-        systemId = in.readUTF();
+        tournamentId = in.readLong();
+        instanceId = in.readLong();
+        systemId = in.readLong();
         credit = in.readDouble();
         delta = in.readDouble();
     }

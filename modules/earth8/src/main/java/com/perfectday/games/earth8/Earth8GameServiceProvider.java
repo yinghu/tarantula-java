@@ -31,6 +31,15 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     @Override
     public void onJoined(Session session) {
         gameContext.log("JOIN : "+session.distributionKey()+" :"+session.stub(),OnLog.WARN);
+        tournamentIndex.forEach((key,entry)->{
+            if(entry.type().equals("Q100")){//LEVEL UP GLOBAL TOURNAMENT
+                Tournament.Instance ins = entry.register(session);
+                ins.update(session,(e)->{
+                    e.score(10,100);
+                    return true;
+                });
+            }
+        });
     }
 
     public void startGame(Session session, byte[] payload) throws Exception{

@@ -67,7 +67,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
 
     }
 
-    public Tournament.Instance onEnterTournament(String serviceName,String tournamentId,String instanceId,String systemId){
+    public Tournament.Instance onEnterTournament(String serviceName,long tournamentId,long instanceId,long systemId){
         NodeEngine nodeEngine = getNodeEngine();
         TournamentJoinOperation operation = new TournamentJoinOperation(serviceName,tournamentId,instanceId,systemId);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(instanceId);
@@ -81,7 +81,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
 
     }
 
-    public Tournament.Entry onScoreTournament(String serviceName,String tournamentId,String instanceId,String systemId,double credit,double delta){
+    public Tournament.Entry onScoreTournament(String serviceName,long tournamentId,long instanceId,long systemId,double credit,double delta){
         NodeEngine nodeEngine = getNodeEngine();
         TournamentScoreOperation operation = new TournamentScoreOperation(serviceName,tournamentId,instanceId,systemId,credit,delta);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(instanceId);
@@ -96,7 +96,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
     }
 
 
-    public Tournament.RaceBoard onListTournament(String serviceName,String tournamentId,String instanceId){
+    public Tournament.RaceBoard onListTournament(String serviceName,long tournamentId,long instanceId){
         NodeEngine nodeEngine = getNodeEngine();
         TournamentListOperation operation = new TournamentListOperation(serviceName,tournamentId,instanceId);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(instanceId);
@@ -109,9 +109,9 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         return (Tournament.RaceBoard)result.result;
     }
 
-    public Tournament.RaceBoard onListTournament(String serviceName,String tournamentId){
+    public Tournament.RaceBoard onListTournament(String serviceName,long tournamentId){
         NodeEngine nodeEngine = getNodeEngine();
-        TournamentListOperation operation = new TournamentListOperation(serviceName,tournamentId,null);
+        TournamentListOperation operation = new TournamentListOperation(serviceName,tournamentId,0);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(tournamentId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{

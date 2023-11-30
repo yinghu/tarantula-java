@@ -6,6 +6,7 @@ import com.icodesoftware.util.RecoverableObject;
 public class TournamentEntryProxy extends RecoverableObject implements Tournament.Entry  {
 
     private double delta;
+    private double credit;
     @Override
     public String systemId() {
         return null;
@@ -13,6 +14,7 @@ public class TournamentEntryProxy extends RecoverableObject implements Tournamen
 
     @Override
     public void score(double credit, double delta) {
+        this.credit = credit;
         this.delta = delta;
     }
 
@@ -23,7 +25,7 @@ public class TournamentEntryProxy extends RecoverableObject implements Tournamen
 
     @Override
     public double credit() {
-        return 0;
+        return credit;
     }
 
     @Override

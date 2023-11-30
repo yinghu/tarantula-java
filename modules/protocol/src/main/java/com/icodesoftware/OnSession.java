@@ -1,6 +1,6 @@
 package com.icodesoftware;
 
-public interface OnSession extends OnApplication, Response {
+public interface OnSession extends OnApplication, Response,DataStore.Updatable {
 
     String LABEL = "onSession";
 

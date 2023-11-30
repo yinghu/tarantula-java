@@ -52,20 +52,20 @@ public class TournamentClusterService implements ManagedService, RemoteService {
         return tsp.tournamentServiceProvider().onTournamentEntered(tournamentId,systemId);
     }
 
-    public Tournament.Instance join(String serviceName,String tournamentId,String instanceId,String systemId){
+    public Tournament.Instance join(String serviceName,long tournamentId,long instanceId,long systemId){
         PlatformGameServiceProvider tsp = (PlatformGameServiceProvider) tarantulaContext.serviceProvider(serviceName);
         Tournament.Instance _ins = tsp.tournamentServiceProvider().onTournamentEntered(tournamentId,instanceId,systemId);
         return _ins;
     }
-    public Tournament.Entry score(String serviceName, String tournamentId,String instanceId, String systemId,double credit,double delta){
+    public Tournament.Entry score(String serviceName, long tournamentId,long instanceId, long systemId,double credit,double delta){
         PlatformGameServiceProvider tsp = (PlatformGameServiceProvider) tarantulaContext.serviceProvider(serviceName);
         return tsp.tournamentServiceProvider().onTournamentScored(tournamentId,instanceId,systemId,credit,delta);
     }
-    public Tournament.RaceBoard list(String serviceName,String tournamentId,String instanceId){
+    public Tournament.RaceBoard list(String serviceName,long tournamentId,long instanceId){
         PlatformGameServiceProvider tsp = (PlatformGameServiceProvider) tarantulaContext.serviceProvider(serviceName);
         return tsp.tournamentServiceProvider().onTournamentListed(tournamentId,instanceId);
     }
-    public Tournament.RaceBoard list(String serviceName,String tournamentId){
+    public Tournament.RaceBoard list(String serviceName,long tournamentId){
         PlatformGameServiceProvider tsp = (PlatformGameServiceProvider) tarantulaContext.serviceProvider(serviceName);
         return tsp.tournamentServiceProvider().onTournamentListed(tournamentId);
     }

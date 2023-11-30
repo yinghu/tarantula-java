@@ -13,8 +13,8 @@ public class TournamentListOperation extends Operation implements PartitionAware
 
     private String serviceName;
 
-    private String tournamentId;
-    private String instanceId;
+    private long tournamentId;
+    private long instanceId;
 
     private Tournament.RaceBoard raceBoard;
 
@@ -22,7 +22,7 @@ public class TournamentListOperation extends Operation implements PartitionAware
     }
 
 
-    public TournamentListOperation(String serviceName,String tournamentId, String instanceId) {
+    public TournamentListOperation(String serviceName,long tournamentId, long instanceId) {
         this.serviceName = serviceName;
         this.tournamentId = tournamentId;
         this.instanceId = instanceId;
@@ -30,7 +30,7 @@ public class TournamentListOperation extends Operation implements PartitionAware
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        raceBoard = instanceId!=null?ais.list(serviceName,tournamentId,instanceId):ais.list(serviceName,tournamentId);
+        raceBoard = instanceId!=0?ais.list(serviceName,tournamentId,instanceId):ais.list(serviceName,tournamentId);
     }
 
     @Override
@@ -42,15 +42,15 @@ public class TournamentListOperation extends Operation implements PartitionAware
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(this.serviceName);
-        out.writeUTF(this.tournamentId);
-        out.writeUTF(this.instanceId);
+        out.writeLong(this.tournamentId);
+        out.writeLong(this.instanceId);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         serviceName = in.readUTF();
-        tournamentId = in.readUTF();
-        instanceId = in.readUTF();
+        tournamentId = in.readLong();
+        instanceId = in.readLong();
     }
 }
