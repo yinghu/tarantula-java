@@ -193,6 +193,14 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         instance.load();
         return instance;
     }
+    private TournamentInstance load(long instanceId){
+        TournamentInstance instance = new TournamentInstance(maxEntriesPerInstance);
+        instance.distributionId(instanceId);
+        if(!dataStore.load(instance)) return null;
+        instance.dataStore(dataStore);
+        instance.load();
+        return instance;
+    }
     @Override
     public int getFactoryId() {
         return PortableEventRegistry.OID;
@@ -395,13 +403,14 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
 
     public Instance register(Session session){
-        if(this.global) return new TournamentInstanceProxy(this);
+        if(this.global) return new TournamentInstanceProxy(this,session);
         OnSession onSession = tournamentServiceProvider.onSession(session);
         int slot = onSession.tournamentSlot();
         long pending = distributionTournamentService.onRegisterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,slot);
         Tournament.Instance ins = this.distributionTournamentService.onEnterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,pending,session.distributionId());
         ins.distributionId(pending);
-        return new TournamentInstanceProxy(this,(TournamentInstance) ins);
+        System.out.println(ins.startTime()+" : "+ins.closeTime()+" : "+ins.endTime());
+        return new TournamentInstanceProxy(this,session,(TournamentInstance) ins);
     }
 
     public OnSession onSession(Session session){
@@ -415,13 +424,18 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     public boolean score(Session session,long instanceId,Entry entry){
         return distributionTournamentService.onScoreTournament(tournamentServiceProvider.gameServiceName,this.distributionId,instanceId,session.distributionId(),entry.credit(),entry.score());
     }
-    public RaceBoard raceBoard(){
-        return distributionTournamentService.onListTournament(tournamentServiceProvider.gameServiceName,this.distributionId());
+    public RaceBoard raceBoard(Session session){
+        if(global) {
+            return distributionTournamentService.onListTournament(tournamentServiceProvider.gameServiceName, this.distributionId());
+        }
+        OnSession onSession = onSession(session);
+        return distributionTournamentService.onListTournament(tournamentServiceProvider.gameServiceName,distributionId,onSession.tournamentId());
     }
+
 
     //distributed callbacks
     public RaceBoard onRaceBoard(){
-        TournamentInstanceQuery query = new TournamentInstanceQuery(this.distributionId,"global");
+        TournamentInstanceQuery query = new TournamentInstanceQuery(this.distributionId,Tournament.GLOBAL_INSTANCE_LABEL);
         TournamentInstance[] loaded = {null};
         this.dataStore.list(query,ins->{
             loaded[0] = ins;
@@ -460,14 +474,16 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     public boolean onScore(long systemId,long instanceId,double credits,double score){
         TournamentInstance instance = lookup(instanceId);
-        return instance.update(new SimpleStub(systemId,systemId), entry -> {
+        return instance.update(new SimpleStub("",systemId), entry -> {
             entry.score(credits,score);
             return true;
         });
     }
 
     public RaceBoard onRaceBoard(long instanceId){
-        return lookup(instanceId).raceBoard();
+        TournamentInstance instance = load(instanceId);
+        if(instance==null) return new TournamentRaceBoard();
+        return instance.raceBoard();
     }
 
 

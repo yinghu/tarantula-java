@@ -424,9 +424,10 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         return tournamentManager.onRegister(slot);
     }
     public boolean onTournamentEntered(long tournamentId,long systemId){
-        logger.warn("TID G : "+tournamentId+" : "+" : "+systemId);
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
-        return tournamentManager.onEnter(systemId);
+        boolean joined = tournamentManager.onEnter(systemId);
+        logger.warn("TID G : "+tournamentId+" : "+" : "+systemId+" : "+joined);
+        return joined;
     }
     public Tournament.Instance onTournamentEntered(long tournamentId,long instanceId,long systemId){
         logger.warn("TID T : "+tournamentId+" : "+ instanceId+" : "+systemId);

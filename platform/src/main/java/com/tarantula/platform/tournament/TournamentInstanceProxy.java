@@ -10,11 +10,14 @@ public class TournamentInstanceProxy extends RecoverableObject implements Tourna
 
     private TournamentManager tournamentManager;
     private TournamentInstance instance;
-    public TournamentInstanceProxy(TournamentManager tournamentManager){
+
+    private Session session;
+    public TournamentInstanceProxy(TournamentManager tournamentManager,Session session){
         this.tournamentManager = tournamentManager;
+        this.session = session;
     }
-    public TournamentInstanceProxy(TournamentManager tournamentManager,TournamentInstance instance){
-        this.tournamentManager = tournamentManager;
+    public TournamentInstanceProxy(TournamentManager tournamentManager,Session session,TournamentInstance instance){
+        this(tournamentManager,session);
         this.instance = instance;
     }
     @Override
@@ -59,6 +62,6 @@ public class TournamentInstanceProxy extends RecoverableObject implements Tourna
 
     @Override
     public Tournament.RaceBoard raceBoard() {
-        return this.tournamentManager.raceBoard();
+        return this.tournamentManager.raceBoard(session);
     }
 }
