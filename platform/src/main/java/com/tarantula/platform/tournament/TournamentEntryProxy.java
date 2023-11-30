@@ -8,8 +8,8 @@ public class TournamentEntryProxy extends RecoverableObject implements Tournamen
     private double delta;
     private double credit;
     @Override
-    public String systemId() {
-        return null;
+    public long systemId() {
+        return 0;
     }
 
     @Override

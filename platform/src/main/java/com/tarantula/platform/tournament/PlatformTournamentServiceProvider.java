@@ -433,9 +433,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         return tournamentManager.onEnter(systemId,instanceId);
     }
-    public Tournament.Entry onTournamentScored(long tournamentId,long instanceId, long systemId, double credit,double delta){
+    public boolean onTournamentScored(long tournamentId,long instanceId, long systemId, double credit,double delta){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
-        tournamentManager.onScore(systemId,instanceId,credit,delta);
+        return tournamentManager.onScore(systemId,instanceId,credit,delta);
         //Tournament.Instance _ins = tournamentManager.lookup(instanceId);
         //if(_ins==null) return new TournamentEntry();
         //Tournament.Entry[] score={null};
@@ -445,7 +445,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             //return e.finished();
         //})) tournamentManager.endTournamentInstanceWithFullyFinished(_ins);
         //return score[0];
-        return null;
     }
     public Tournament.RaceBoard onTournamentListed(long tournamentId,long instanceId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
@@ -462,18 +461,18 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     public void onTournamentFinished(String tournamentId,String instanceId,String systemId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
-        Tournament.Instance _ins = tournamentManager.lookup(instanceId);
-        if(_ins==null) return;
-        if(_ins.update(new SimpleStub(systemId,0),e->{
-            e.finish();
-            return e.finished();
-        })) tournamentManager.endTournamentInstanceWithFullyFinished(_ins);
+        //Tournament.Instance _ins = tournamentManager.lookup(instanceId);
+        //if(_ins==null) return;
+        //if(_ins.update(new SimpleStub(systemId,0),e->{
+            //e.finish();
+            //return e.finished();
+        //})) tournamentManager.endTournamentInstanceWithFullyFinished(_ins);
     }
 
     public void onTournamentSynced(String tournamentId,String instanceId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
-        Tournament.Instance synced = tournamentManager.lookup(instanceId);
-        logger.warn("SYNC Instance : "+synced);
+        //Tournament.Instance synced = tournamentManager.lookup(instanceId);
+        //logger.warn("SYNC Instance : "+synced);
     }
     public void onTournamentClosed(String tournamentId){
         TournamentManager index = tournamentIndex.get(tournamentId);

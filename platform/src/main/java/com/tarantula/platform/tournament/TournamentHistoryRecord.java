@@ -21,7 +21,7 @@ public class TournamentHistoryRecord extends RecoverableObject implements Tourna
     protected LocalDateTime close;
     protected LocalDateTime end;
 
-    private ConcurrentHashMap<String, TournamentEntry> entryIndex = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Long, TournamentEntry> entryIndex = new ConcurrentHashMap<>();
     private TournamentRaceBoard tournamentRaceBoard = new TournamentRaceBoard();
 
     public TournamentHistoryRecord(){
@@ -32,7 +32,7 @@ public class TournamentHistoryRecord extends RecoverableObject implements Tourna
         return status;
     }
     //@Override
-    public int enter(String systemId) {
+    public int enter(long systemId) {
         entryIndex.computeIfAbsent(systemId,(k)->{
             TournamentEntry entry = new TournamentEntry(systemId,0,0);
             entry.ownerKey(key());

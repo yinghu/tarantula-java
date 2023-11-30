@@ -17,7 +17,7 @@ public class TournamentModule extends ModuleHeader implements Tournament.Listene
             session.write(new TournamentContext(true,"tournament list",this.tournamentServiceProvider.list()).toJson().toString().getBytes());
         }
         else if(session.action().equals("onPlayerHistory")){
-            session.write(new TournamentHistoryContext(true,"player tournament list",this.tournamentServiceProvider.playerHistory(session.systemId())).toString().getBytes());
+            //session.write(new TournamentHistoryContext(true,"player tournament list",this.tournamentServiceProvider.playerHistory(session.systemId())).toString().getBytes());
         }
         else if(session.action().equals("onTournamentHistory")){
             Tournament.Instance ht = this.tournamentServiceProvider.tournamentHistory(session.name());
@@ -29,8 +29,8 @@ public class TournamentModule extends ModuleHeader implements Tournament.Listene
             }
         }
         else if(session.action().equals("onJoin")){
-            Tournament.Instance ins = tournamentServiceProvider.enter(session.name(),session.systemId());
-            session.write(ins.toJson().toString().getBytes());
+            //Tournament.Instance ins = tournamentServiceProvider.enter(session.name(),session.systemId());
+            //session.write(ins.toJson().toString().getBytes());
         }
         else if(session.action().equals("onBoard")){
             Tournament.RaceBoard board = tournamentServiceProvider.list(session.name());

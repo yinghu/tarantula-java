@@ -12,6 +12,7 @@ import com.icodesoftware.Tournament;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.util.*;
+import com.tarantula.game.SimpleStub;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.service.SystemValidatorProvider;
 
@@ -180,32 +181,17 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return scheduleId;
     }
 
-    Tournament.Instance lookup(String instanceId){
-        if(global){
-            return new TournamentInstanceProxy(this);
-        }
-        return null;
-        /**
-        return this.instanceIndex.computeIfAbsent(instanceId,(k)->{
-            TournamentInstance instance = new TournamentInstance();
-            instance.distributionKey(instanceId);
-            if(!this.dataStore.load(instance)) return null;
-            if(instance.status() == (Status.ENDED)){
-                this.tournamentServiceProvider.logger.warn(instance.toString());
-                return null;
-            }
-            instance.dataStore(dataStore);
-            if(instance.status() == (Status.STARTING)){
-                LocalDateTime _startTime = LocalDateTime.now();
-                LocalDateTime _closeTime = _startTime.plusMinutes(durationMinutes-3);
-                LocalDateTime _endTime = _startTime.plusMinutes(durationMinutes);
-                instance.started(_startTime,_closeTime,_endTime,this.tournamentServiceProvider.scoreCredits);
-                instance.update();
-            }
-            instance.load();
-            instance.pendingSchedule = this.tournamentServiceProvider.serviceContext.schedule(new TournamentInstanceCloseMonitor(this,instance));
-            return instance;
-        });**/
+    private TournamentInstance lookup(long instanceId){
+        TournamentInstance instance = new TournamentInstance(maxEntriesPerInstance);
+        instance.distributionId(instanceId);
+        instance.label(Tournament.INSTANCE_LABEL);
+        instance.ownerKey(this.key());
+        LocalDateTime start = LocalDateTime.now();
+        instance.started(start,start.plusMinutes(durationMinutes-1),start.plusMinutes(durationMinutes),tournamentServiceProvider.scoreCredits);
+        dataStore.createIfAbsent(instance,true);
+        instance.dataStore(dataStore);
+        instance.load();
+        return instance;
     }
     @Override
     public int getFactoryId() {
@@ -360,7 +346,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             dataStore.create(history);
             TournamentPrize prize = prizes.get(rank);
             if(prize!=null) {
-                this.tournamentServiceProvider.inventoryServiceProvider.redeem(entry.systemId(),prize);
+                //this.tournamentServiceProvider.inventoryServiceProvider.redeem(entry.systemId(),prize);
                 this.tournamentServiceProvider.logger.warn(entry.systemId()+" prized");
             }
             rank++;
@@ -426,10 +412,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return distributionTournamentService.onEnterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,session.distributionId());
     }
 
-    public boolean score(Session session,Entry entry){
-        //distributionTournamentService.onScoreTournament(tournamentServiceProvider.gameServiceName,this.distributionId,,)
-        System.out.println("SCORE : "+entry.credit()+" : "+entry.score());
-        return true;
+    public boolean score(Session session,long instanceId,Entry entry){
+        return distributionTournamentService.onScoreTournament(tournamentServiceProvider.gameServiceName,this.distributionId,instanceId,session.distributionId(),entry.credit(),entry.score());
     }
     public RaceBoard raceBoard(){
         return distributionTournamentService.onListTournament(tournamentServiceProvider.gameServiceName,this.distributionId());
@@ -449,18 +433,18 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return loaded[0].raceBoard();
     }
     public boolean onEnter(long systemId){
-        TournamentInstanceQuery query = new TournamentInstanceQuery(this.distributionId,"global");
+        TournamentInstanceQuery query = new TournamentInstanceQuery(this.distributionId,Tournament.GLOBAL_INSTANCE_LABEL);
         TournamentInstance[] loaded = {null};
         this.dataStore.list(query,ins->{
             loaded[0] = ins;
             return false;
         });
         if(loaded[0]==null){
-            loaded[0] = createInstance("global");
+            loaded[0] = createInstance(Tournament.GLOBAL_INSTANCE_LABEL);
         }
         loaded[0].dataStore(dataStore);
         loaded[0].load();
-        return loaded[0].enter(Long.toString(systemId),targetScore);
+        return loaded[0].enter(systemId,targetScore);
     }
 
     public long onRegister(int slot){
@@ -468,19 +452,23 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
 
     public TournamentInstance onEnter(long systemId,long instanceId){
-        TournamentInstance instance = new TournamentInstance();
-        LocalDateTime start = LocalDateTime.now();
-        instance.started(start,start,start,tournamentServiceProvider.scoreCredits);
+        System.out.println(instanceId+" : "+distributionTournamentService.ownership(instanceId));
+        TournamentInstance instance = lookup(instanceId);
+        instance.enter(systemId);
         return instance;
-         //return loaded[0].enter(Long.toString(systemId),targetScore);
     }
 
-    public void onScore(long systemId,long instanceId,double credits,double score){
-
+    public boolean onScore(long systemId,long instanceId,double credits,double score){
+        TournamentInstance instance = lookup(instanceId);
+        return instance.update(new SimpleStub(systemId,systemId), entry -> {
+            entry.score(credits,score);
+            return true;
+        });
     }
 
     public RaceBoard onRaceBoard(long instanceId){
-        return null;
+        return lookup(instanceId).raceBoard();
     }
+
 
 }

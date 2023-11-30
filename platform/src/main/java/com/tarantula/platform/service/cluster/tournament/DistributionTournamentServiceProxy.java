@@ -101,17 +101,17 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
 
     }
 
-    public Tournament.Entry onScoreTournament(String serviceName,long tournamentId,long instanceId,long systemId,double credit,double delta){
+    public boolean onScoreTournament(String serviceName,long tournamentId,long instanceId,long systemId,double credit,double delta){
         NodeEngine nodeEngine = getNodeEngine();
         TournamentScoreOperation operation = new TournamentScoreOperation(serviceName,tournamentId,instanceId,systemId,credit,delta);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(instanceId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-            Future<Tournament.Entry> future = builder.invoke();
+            Future<Boolean> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
         });
         if(!result.successful) throw new RuntimeException(result.exception);
-        return (Tournament.Entry)result.result;
+        return (boolean)result.result;
 
     }
 

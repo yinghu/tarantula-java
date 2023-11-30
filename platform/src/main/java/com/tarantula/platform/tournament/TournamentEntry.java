@@ -16,13 +16,13 @@ import java.time.LocalDateTime;
 
 public class TournamentEntry extends RecoverableObject implements Tournament.Entry, Portable {
 
-    private String systemId;
+    private long systemId;
     private double credits;
     private double score;
     private boolean finished;
     private int rank;
 
-    public TournamentEntry(String systemId,double credits,double score){
+    public TournamentEntry(long systemId,double credits,double score){
         this();
         this.systemId = systemId;
         this.credits = credits;
@@ -33,7 +33,7 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         this.label = Tournament.ENTRY_LABEL;
     }
     @Override
-    public String systemId() {
+    public long systemId() {
         return systemId;
     }
 
@@ -69,7 +69,7 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
 
     @Override
     public boolean write(DataBuffer buffer) {
-        buffer.writeUTF8(systemId);
+        buffer.writeLong(systemId);
         buffer.writeDouble(score);
         buffer.writeLong(timestamp);
         buffer.writeInt(rank);
@@ -80,7 +80,7 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
 
     @Override
     public boolean read(DataBuffer buffer) {
-        systemId = buffer.readUTF8();
+        systemId = buffer.readLong();
         score = buffer.readDouble();
         timestamp = buffer.readLong();
         rank = buffer.readInt();
@@ -101,7 +101,7 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
 
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeUTF("1",systemId);
+        portableWriter.writeLong("1",systemId);
         portableWriter.writeDouble("2",score);
         portableWriter.writeLong("3",timestamp);
         portableWriter.writeInt("4",rank);
@@ -111,7 +111,7 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
-        this.systemId = portableReader.readUTF("1");
+        this.systemId = portableReader.readLong("1");
         this.score = portableReader.readDouble("2");
         this.timestamp = portableReader.readLong("3");
         this.rank = portableReader.readInt("4");

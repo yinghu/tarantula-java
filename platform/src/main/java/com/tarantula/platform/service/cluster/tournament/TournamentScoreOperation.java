@@ -16,7 +16,7 @@ public class TournamentScoreOperation extends Operation implements PartitionAwar
     private long instanceId;
     private double credit;
     private double delta;
-    private Tournament.Entry entry;
+    private boolean scored;
     public TournamentScoreOperation() {
     }
 
@@ -32,12 +32,12 @@ public class TournamentScoreOperation extends Operation implements PartitionAwar
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        this.entry = ais.score(serviceName,tournamentId,instanceId,systemId,credit,delta);
+        this.scored = ais.score(serviceName,tournamentId,instanceId,systemId,credit,delta);
     }
 
     @Override
     public Object getResponse() {
-        return this.entry;
+        return this.scored;
     }
 
     @Override

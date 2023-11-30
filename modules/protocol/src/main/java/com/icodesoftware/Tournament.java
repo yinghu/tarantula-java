@@ -8,7 +8,7 @@ public interface Tournament extends Configurable {
     String REGISTER_LABEL = "tournament_register";
 
     String INSTANCE_LABEL = "tournament_instance";
-
+    String GLOBAL_INSTANCE_LABEL = "tournament_global";
     String ENTRY_LABEL = "tournament_entry";
 
     String HISTORY_LABEL = "tournament_history";
@@ -40,7 +40,7 @@ public interface Tournament extends Configurable {
     Instance register(Session session);
 
     interface Entry extends Configurable {
-        String systemId();
+        long systemId();
         void score(double credit,double delta);
         double score();
         double credit();

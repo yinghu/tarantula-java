@@ -33,7 +33,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     private int totalJoined;
     private AtomicInteger totalFinished;
 
-    private ConcurrentHashMap<String, TournamentEntry> entryIndex = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Long, TournamentEntry> entryIndex = new ConcurrentHashMap<>();
     private TournamentRaceBoard tournamentRaceBoard = new TournamentRaceBoard();
 
     ScheduledFuture<?> pendingSchedule;
@@ -53,7 +53,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         return status;
     }
 
-    public boolean enter(String systemId,double score) {
+    public boolean enter(long systemId,double score) {
         return entryIndex.computeIfAbsent(systemId,(k)->{
             if(totalJoined==maxEntries) return null;
             TournamentEntry entry = new TournamentEntry(systemId,scoreCredits,score);
@@ -67,25 +67,24 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         })!=null;
     }
 
-    public int enter(String systemId){
+    public int enter(long systemId){
         enter(systemId,0);
         return totalJoined;
     }
 
-    //@Override
-    public boolean update(String systemId, Tournament.OnEntry updater) {
-        TournamentEntry entry = entryIndex.get(systemId);
-        if(updater.on(entry)) totalFinished.incrementAndGet();
-        int finished = totalFinished.get();
-        return status == (Tournament.Status.CLOSED)? (finished == totalJoined):(finished == totalJoined && totalJoined == maxEntries);
-    }
+    //public boolean update(long systemId, Tournament.OnEntry updater) {
+        //TournamentEntry entry = entryIndex.get(systemId);
+        //if(updater.on(entry)) totalFinished.incrementAndGet();
+        //int finished = totalFinished.get();
+        //return status == (Tournament.Status.CLOSED)? (finished == totalJoined):(finished == totalJoined && totalJoined == maxEntries);
+    //}
 
     @Override
     public boolean update(Session session, Tournament.OnEntry onEntry) {
-        TournamentEntryProxy tournamentEntryProxy = new TournamentEntryProxy();
-        onEntry.on(tournamentEntryProxy);
-        //if(tournamentEntryProxy.score() != tournamentManager.targetScore()) return false;
-        return true;//tournamentManager.enter(session);
+        TournamentEntry entry = entryIndex.get(session.stub());
+        if(onEntry.on(entry)) totalFinished.incrementAndGet();
+        int finished = totalFinished.get();
+        return status == (Tournament.Status.CLOSED)? (finished == totalJoined):(finished == totalJoined && totalJoined == maxEntries);
     }
     public int maxEntries(){
         return maxEntries;
