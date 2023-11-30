@@ -46,18 +46,13 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     private int concurrentInstanceSize;
 
-
-    //private ArrayBlockingQueue<TournamentInstance> pendingQueue;
-    //private ConcurrentHashMap<String, TournamentInstance> instanceIndex;
+    private TournamentRegister[] pendingInstances;
     private PlatformTournamentServiceProvider tournamentServiceProvider;
     private DistributionTournamentService distributionTournamentService;
     private HashMap<Integer,TournamentPrize> prizes;
 
     ScheduledFuture<?> pendingSchedule;
 
-    private ClusterProvider.ClusterStore tournamentStore;
-    private ClusterProvider.ClusterStore[] instanceStores;
-    private AtomicInteger roundRobin;
 
     private long scheduleId;
 
@@ -96,7 +91,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
 
     public TournamentManager(){
-        roundRobin = new AtomicInteger(0);
+
     }
     public Schedule schedule(){
         return this.schedule;
@@ -247,100 +242,49 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     public void setup(PlatformTournamentServiceProvider tournamentServiceProvider){
         this.tournamentServiceProvider = tournamentServiceProvider;
         this.distributionTournamentService = tournamentServiceProvider.distributionTournamentService;
-        if(global){
+        if(global || !distributionTournamentService.ownership(this.distributionId)){
             status = Status.STARTED;
             this.dataStore.update(this);
             return;
         }
         //recovering local instances
-        //instanceIndex = new ConcurrentHashMap<>();
-        //ArrayList<String> synced = new ArrayList<>();
-        this.tournamentStore = this.tournamentServiceProvider.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,this.distributionKey(),true,false,false);
-        String storeSize = storeSize(this.maxEntriesPerInstance);
-        this.instanceStores = new ClusterProvider.ClusterStore[this.concurrentInstanceSize];
-        for(int i=0;i<this.concurrentInstanceSize;i++){
-            this.instanceStores[i] = tournamentServiceProvider.serviceContext.clusterProvider().clusterStore(storeSize,this.distributionKey()+"."+i,false,false,true);
-        }
-
-        int[] pendingPoolSize = new int[]{0};
-        //pendingQueue = new ArrayBlockingQueue<>(this.tournamentServiceProvider.pendingInstancePoolSizePerSchedule);
-        TournamentInstanceQuery query = new TournamentInstanceQuery(this.distributionId,this.tournamentServiceProvider.serviceContext.node().nodeName());
-        List<TournamentInstance> saved = dataStore.list(query);
-        saved.forEach(save->{
-            for(int i=0;i<concurrentInstanceSize;i++){
-                if(tryStartingInstance(i,save.key().asBinary())) break;
+        storeSize(this.maxEntriesPerInstance);
+        this.pendingInstances = new TournamentRegister[this.concurrentInstanceSize];
+        List<TournamentRegister> saved = dataStore.list(new TournamentRegisterQuery(this.key()));
+        int idx = 0;
+        for(TournamentRegister register : saved){
+            pendingInstances[idx] = register;
+            if(register.closed()){
+                register.setup(tournamentServiceProvider.nextInstanceId(),durationMinutes,maxEntriesPerInstance);
+                dataStore.update(register);
             }
-        });
-        for(int i=0;i<concurrentInstanceSize;i++){
-            SnowflakeKey key = SnowflakeKey.from(tournamentServiceProvider.nextInstanceId());
-            System.out.println(BufferUtil.toLong(key.asBinary()));
-            tryStartingInstance(i,key.asBinary());
+            idx++;
         }
-        for(int i=0;i<concurrentInstanceSize;i++){
-            System.out.println(BufferUtil.toLong(this.instanceStores[i].queuePoll()));
+        for(int i=idx;i<concurrentInstanceSize;i++){
+            TournamentRegister register = new TournamentRegister();
+            register.ownerKey(this.key());
+            register.setup(tournamentServiceProvider.nextInstanceId(),durationMinutes,maxEntriesPerInstance);
+            dataStore.create(register);
+            pendingInstances[i]= register;
         }
-        //int pendingSize = this.tournamentServiceProvider.pendingInstancePoolSizePerQueue-pendingPoolSize[0];
-        //System.out.println("Pz 2 : "+pendingSize);
-
-        //if(pendingSize>0){
-            //for(int i=0;i<pendingSize;i++){
-                //pendingQueue.offer(createInstance(this.tournamentServiceProvider.serviceContext.node().nodeName()));
-            //}
-        //}
-
         status = Status.STARTED;
         this.dataStore.update(this);
-        //synced.forEach(sync-> this.tournamentServiceProvider.distributionTournamentService.onSyncTournament(this.tournamentServiceProvider.gameServiceName, this.distributionKey(),sync));
-        //synced.clear();
     }
 
     public long available(int slot){
-        byte[] pending = null ;
-        for(int i=0;i<tournamentServiceProvider.instanceIdPollingRetries;i++){
-            pending = instanceStores[slot].queuePoll(this.tournamentServiceProvider.instanceIdPollingTimeoutSeconds,TimeUnit.SECONDS);
-            if(pending!=null) break;
+        int tem = slot;
+        if(tem<0 || tem> concurrentInstanceSize-1){
+            tem = 0;
         }
-        if(pending==null) throw new RuntimeException("Tournament not available on slot ["+slot+"]");
-        return BufferUtil.toLong(pending);
+        TournamentRegister register = pendingInstances[tem];
+        if(register.available()) return register.tournamentId();
+        register.setup(tournamentServiceProvider.nextInstanceId(),durationMinutes,maxEntriesPerInstance-1);//pre-cut 1
+        dataStore.update(register);
+        return register.tournamentId();
     }
 
-    public byte[] pollInstanceId(){
-        if(status == Status.CLOSED || status == Status.ENDED) return null;
-        int stub = roundRobin.getAndUpdate((v)->{
-            v = v == this.concurrentInstanceSize-1 ? 0 : (v+1);
-            return v;
-        });
-        return instanceStores[stub].queuePoll(this.tournamentServiceProvider.instanceIdPollingTimeoutSeconds,TimeUnit.SECONDS);
-    }
 
-    private boolean tryStartingInstance(int storeIndex,byte[] joinKey){
-        byte[] lockKey = this.instanceStores[storeIndex].name().getBytes();
-        if(!this.tournamentStore.tryMapLock(lockKey,this.tournamentServiceProvider.clusterLockTimeoutSeconds,TimeUnit.SECONDS)) return false;
-        try{
-            this.tournamentServiceProvider.logger.warn(instanceStores[storeIndex].name()+" : locked");
-            if(this.tournamentStore.mapSetIfAbsent(lockKey,joinKey)!=null) return false;
-            for(int i=0;i<maxEntriesPerInstance;i++){
-                this.instanceStores[storeIndex].queueOffer(joinKey);
-            }
-            return true;
-        }finally {
-            this.tournamentStore.mapUnlock(lockKey);
-            this.tournamentServiceProvider.logger.warn(instanceStores[storeIndex].name()+" : unlocked");
-        }
-    }
-    /**
-    private byte[] startingInstance(int storeIndex){
-        TournamentInstance instance = pendingQueue.poll();
-        byte[] joinKey = instance.key().asBinary();
 
-        for(int m=0;m<instance.maxEntries();m++){
-            this.instanceStores[storeIndex].queueOffer(joinKey);
-        }
-        instance.starting(storeIndex);
-        this.dataStore.update(instance);
-        //this.pendingQueue.offer(createInstance(this.tournamentServiceProvider.serviceContext.node().nodeName()));
-        return joinKey;
-    }**/
     void closeTournamentInstanceWithFullyJoined(Tournament.Instance closed){
         //closed.pendingSchedule.cancel(true);
         this.tournamentServiceProvider.serviceContext.schedule(new ScheduleRunner(PlatformTournamentServiceProvider.SCHEDULE_RUNNER_DELAY,()->{
@@ -350,20 +294,6 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     //must call from schedule threads
     void closeTournamentInstance(TournamentInstance closed){
         //close enter
-        byte[] lockKey = this.instanceStores[closed.routingNumber()].name().getBytes();
-        this.tournamentStore.mapLock(lockKey);
-        this.tournamentServiceProvider.logger.warn(instanceStores[closed.routingNumber()].name()+" : locked");
-        try{
-            byte[] joinKey = this.tournamentStore.mapGet(lockKey);
-            if(new String(joinKey).equals(closed.distributionKey())){
-                instanceStores[closed.routingNumber()].queueClear();
-                //joinKey = this.startingInstance(closed.routingNumber());
-                //this.tournamentStore.mapSet(lockKey,joinKey);
-            }
-        }finally {
-            this.tournamentStore.mapUnlock(lockKey);
-            this.tournamentServiceProvider.logger.warn(instanceStores[closed.routingNumber()].name()+" : unlocked");
-        }
         closed.closed();
         this.dataStore.update(closed);
         closed.pendingSchedule = this.tournamentServiceProvider.serviceContext.schedule(new TournamentInstanceEndMonitor(this,closed));
@@ -415,12 +345,9 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
     public void end(){
         //instanceIndex.forEach((k,ins)-> this.endTournamentInstance(ins));
-        for(int i=0;i<this.concurrentInstanceSize;i++){
-            this.instanceStores[i].destroy();
-        }
+
         status = Status.ENDED;
         this.dataStore.update(this);
-        this.tournamentStore.destroy();
     }
 
     private void rank(TournamentInstance ended){
@@ -447,21 +374,20 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return instance;
     }
 
-    private String storeSize(int size){
+    private void storeSize(int size){
         if(size<=20) {
             concurrentInstanceSize = tournamentServiceProvider.largeConcurrentInstanceSize;
-            return ClusterProvider.ClusterStore.SMALL;
+            return;
         }
         if(size<=100){
             concurrentInstanceSize = tournamentServiceProvider.mediumConcurrentInstanceSize;
-            return ClusterProvider.ClusterStore.SMALL;
+            return;
         }
         if(size<=1000){
             concurrentInstanceSize = tournamentServiceProvider.mediumConcurrentInstanceSize;
-            return ClusterProvider.ClusterStore.MEDIUM;
+            return;
         }
         concurrentInstanceSize = tournamentServiceProvider.smallConcurrentInstanceSize;
-        return ClusterProvider.ClusterStore.LARGE;
     }
 
     void loadPrizes(ApplicationPreSetup applicationPreSetup, Descriptor application){
@@ -486,11 +412,10 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         if(this.global) return new TournamentInstanceProxy(this);
         OnSession onSession = tournamentServiceProvider.onSession(session);
         int slot = onSession.tournamentSlot();
-        long pendingId = available(slot);
-        onSession.onTournament(slot,pendingId);
-        Tournament.Instance ins = this.distributionTournamentService.onEnterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,pendingId,session.distributionId());
-        ins.distributionId(pendingId);
-        return new TournamentInstanceProxy(this,(TournamentInstance)ins);
+        long pending = distributionTournamentService.onRegisterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,slot);
+        Tournament.Instance ins = this.distributionTournamentService.onEnterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,pending,session.distributionId());
+        ins.distributionId(pending);
+        return new TournamentInstanceProxy(this,(TournamentInstance) ins);
     }
 
     public OnSession onSession(Session session){
@@ -536,6 +461,10 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         loaded[0].dataStore(dataStore);
         loaded[0].load();
         return loaded[0].enter(Long.toString(systemId),targetScore);
+    }
+
+    public long onRegister(int slot){
+        return available(slot);
     }
 
     public TournamentInstance onEnter(long systemId,long instanceId){

@@ -99,7 +99,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         TournamentManager index = tournamentIndex.get(tournamentId);
         byte[] pendingId = null;
         for(int retry = 0;retry < this.instanceIdPollingRetries;retry++){
-            pendingId = index.pollInstanceId();
+            //pendingId = index.pollInstanceId();
             if(pendingId != null) break;
         }
         if(pendingId == null) return null;
@@ -418,6 +418,11 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
 
     //distributed operation callbacks
+    public long onTournamentRegistered(long tournamentId,int slot){
+        logger.warn("TID R : "+tournamentId+" : "+" : "+slot);
+        TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
+        return tournamentManager.onRegister(slot);
+    }
     public boolean onTournamentEntered(long tournamentId,long systemId){
         logger.warn("TID G : "+tournamentId+" : "+" : "+systemId);
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);

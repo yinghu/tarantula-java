@@ -46,6 +46,10 @@ public class TournamentClusterService implements ManagedService, RemoteService {
         log.warn(objectName+" destroyed");
     }
 
+    public long register(String serviceName,long tournamentId,int slot){
+        PlatformGameServiceProvider tsp = (PlatformGameServiceProvider) tarantulaContext.serviceProvider(serviceName);
+        return tsp.tournamentServiceProvider().onTournamentRegistered(tournamentId,slot);
+    }
 
     public boolean enter(String serviceName,long tournamentId,long systemId){
         PlatformGameServiceProvider tsp = (PlatformGameServiceProvider) tarantulaContext.serviceProvider(serviceName);

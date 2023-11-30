@@ -7,6 +7,8 @@ public interface DistributionTournamentService extends ServiceProvider {
 
     String NAME = "DistributionTournamentService";
 
+    boolean ownership(long tournamentId);
+    long onRegisterTournament(String serviceName,long tournamentId,int slot);
     boolean onEnterTournament(String serviceName,long tournamentId,long systemId);
     Tournament.Instance onEnterTournament(String serviceName,long tournamentId,long instanceId, long systemId);
     Tournament.Entry onScoreTournament(String serviceName,long tournamentId,long instanceId,long systemId,double credit,double delta);

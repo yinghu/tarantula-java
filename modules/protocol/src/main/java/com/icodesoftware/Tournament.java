@@ -5,8 +5,13 @@ import java.util.List;
 
 public interface Tournament extends Configurable {
 
-    String ENTRY_LABEL = "TEE";
-    String HISTORY_LABEL = "History";
+    String REGISTER_LABEL = "tournament_register";
+
+    String INSTANCE_LABEL = "tournament_instance";
+
+    String ENTRY_LABEL = "tournament_entry";
+
+    String HISTORY_LABEL = "tournament_history";
 
 
     enum Schedule{
