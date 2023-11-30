@@ -60,7 +60,7 @@ public class Stub extends PlayerGameObject {
         this.zoneId = buffer.readUTF8();
         this.roomId = buffer.readUTF8();
         this.sessionId = buffer.readInt();
-        this.tournamentId = buffer.readUTF8();
+        this.tournamentId = buffer.readLong();
         this.trackId = buffer.readUTF8();
         this.timestamp = buffer.readLong();
         this.systemId = Long.toString(buffer.readLong());
@@ -71,7 +71,7 @@ public class Stub extends PlayerGameObject {
         buffer.writeUTF8(zoneId);
         buffer.writeUTF8(roomId);
         buffer.writeInt(sessionId);
-        buffer.writeUTF8(tournamentId);
+        buffer.writeLong(tournamentId);
         buffer.writeUTF8(trackId);
         buffer.writeLong(timestamp);
         buffer.writeLong(Long.parseLong(systemId));

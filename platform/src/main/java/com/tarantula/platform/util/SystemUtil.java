@@ -82,12 +82,12 @@ public class SystemUtil {
         String hash = SystemUtil.toHexString(messageDigest.digest());
         return hash.equals(sp[1])?sp[2]:null;
     }
-    public  static OnSession validToken(MessageDigest messageDigest, String token) {
+    //public  static OnSession validToken(MessageDigest messageDigest, String token) {
         //System.out.println(token);
-        ValidationUtil.Token validated = ValidationUtil.validToken(messageDigest,token);
-        if(!validated.valid) throw new RuntimeException("Wrong session token");
-        return new OnSessionTrack(1,validated.stub,validated.ticket,validated.index);//need to update
-    }
+        //ValidationUtil.Token validated = ValidationUtil.validToken(messageDigest,token);
+        //if(!validated.valid) throw new RuntimeException("Wrong session token");
+        //return new OnSessionTrack(1,validated.stub,validated.ticket,validated.index);//need to update
+    //}
     public static String hashPassword(MessageDigest messageDigest,String password) {
         messageDigest.reset();
         messageDigest.update(password.getBytes());

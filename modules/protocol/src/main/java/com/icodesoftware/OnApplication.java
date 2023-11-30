@@ -12,8 +12,8 @@ public interface OnApplication extends Response {
     String name();
     void name(String name);
 
-    String tournamentId();
-    void tournamentId(String tournamentId);
+    long tournamentId();
+    void tournamentId(long tournamentId);
 
 
     String typeId();

@@ -48,7 +48,7 @@ public class ServiceEventHandler extends AbstractRequestHandler {
             actionEvent.action(action!=null?action:path);
             actionEvent.routingNumber(routingKey.routingNumber());
             actionEvent.destination(routingKey.route());
-            if(tournamentId!=null&&tournamentId.length()>5) actionEvent.tournamentId(tournamentId);
+            if(tournamentId!=null) actionEvent.tournamentId(Long.parseLong(tournamentId));
             actionEvent.name(name);
             actionEvent.clientId(clientId);
             this.eventService.publish(actionEvent);

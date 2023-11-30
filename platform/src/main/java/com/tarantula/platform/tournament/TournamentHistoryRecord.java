@@ -31,7 +31,7 @@ public class TournamentHistoryRecord extends RecoverableObject implements Tourna
     public Tournament.Status status(){
         return status;
     }
-    @Override
+    //@Override
     public int enter(String systemId) {
         entryIndex.computeIfAbsent(systemId,(k)->{
             TournamentEntry entry = new TournamentEntry(systemId,0,0);

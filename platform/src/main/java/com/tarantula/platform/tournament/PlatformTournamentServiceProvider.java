@@ -14,6 +14,7 @@ import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.item.ItemDistributionCallback;
+import com.tarantula.platform.service.SystemValidatorProvider;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -44,7 +45,11 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private ConcurrentHashMap<String,TournamentManager> tournamentIndex = new ConcurrentHashMap<>();
 
 
-    int concurrentInstanceSize = 8;
+    int smallConcurrentInstanceSize = 3;
+    int mediumConcurrentInstanceSize = 20;
+
+    int largeConcurrentInstanceSize = 100;
+
     int minDurationHoursPerSchedule = 1;
     int minDurationMinutesPerInstance =  5;
     int endBufferTimeMinutes = 3;
@@ -52,7 +57,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     int clusterLockTimeoutSeconds = 5;
     int instanceIdPollingTimeoutSeconds = 3;
     int instanceIdPollingRetries =3;
-    int pendingInstancePoolSizePerSchedule = 100;
     int maxPlayerHistoryRecords = 10;
 
     private String reloadKey;
@@ -60,7 +64,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private ApplicationPreSetup applicationPreSetup;
     private Descriptor application;
     PlatformInventoryServiceProvider inventoryServiceProvider;
-
+    TokenValidatorProvider systemValidatorProvider;
     private ClusterProvider.ClusterStore scheduleStore;
 
     public PlatformTournamentServiceProvider(PlatformGameServiceProvider gameServiceProvider){
@@ -86,7 +90,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
 
     @Override
-    public boolean available(String tournamentId) {
+    public boolean available(long tournamentId) {
         return tournamentIndex.get(tournamentId) != null;
     }
 
@@ -144,7 +148,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.serviceContext = serviceContext;
         this.applicationPreSetup = gameCluster.applicationPreSetup();
         Configuration configuration = serviceContext.configuration(CONFIG);
-        this.concurrentInstanceSize = ((Number)configuration.property("concurrentInstanceSize")).intValue();
+        this.smallConcurrentInstanceSize = ((Number)configuration.property("smallConcurrentInstanceSize")).intValue();
+        this.mediumConcurrentInstanceSize = ((Number)configuration.property("mediumConcurrentInstanceSize")).intValue();
+        this.largeConcurrentInstanceSize = ((Number)configuration.property("largeConcurrentInstanceSize")).intValue();
         this.minDurationHoursPerSchedule = ((Number)configuration.property("minDurationHoursPerSchedule")).intValue();
         this.minDurationMinutesPerInstance = ((Number)configuration.property("minDurationMinutesPerInstance")).intValue();
         this.endBufferTimeMinutes = ((Number)configuration.property("endBufferTimeMinutes")).intValue();
@@ -153,13 +159,13 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.clusterLockTimeoutSeconds = ((Number)configuration.property("clusterLockTimeoutSeconds")).intValue();
         this.instanceIdPollingTimeoutSeconds = ((Number)configuration.property("instanceIdPollingTimeoutSeconds")).intValue();
         this.instanceIdPollingRetries = ((Number)configuration.property("instanceIdPollingRetries")).intValue();
-        this.pendingInstancePoolSizePerSchedule = ((Number)configuration.property("pendingInstancePoolSizePerSchedule")).intValue();
         this.dataStore = applicationPreSetup.dataStore(gameCluster,name());
         this.logger = JDKLogger.getLogger(PlatformTournamentServiceProvider.class);
         this.reloadKey = this.serviceContext.clusterProvider().registerReloadListener(this);
         this.distributionTournamentService = this.serviceContext.clusterProvider().serviceProvider(DistributionTournamentService.NAME);
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.scheduleStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,gameCluster.typeId()+"."+NAME);
+        this.systemValidatorProvider = (TokenValidatorProvider)serviceContext.serviceProvider(TokenValidatorProvider.NAME);
     }
 
     @Override
@@ -186,7 +192,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
                 }
             }
         });
-        this.logger.warn("Tournament service provider started with concurrent tournament pool size->["+concurrentInstanceSize+"][ on game service ["+gameServiceName+"]["+gameCluster.name()+"]");
+        this.logger.warn("Tournament service provider started with concurrent tournament pool size->[ on game service ["+gameServiceName+"]["+gameCluster.name()+"]");
     }
 
     @Override
@@ -403,6 +409,13 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         return applicationPreSetup.load(application,schedule) ? new TournamentSchedule(schedule) : null;
     }
 
+    OnSession onSession(Session session){
+        return systemValidatorProvider.onSession(session);
+    }
+    long nextInstanceId(){
+        return serviceContext.distributionId();
+    }
+
     //distributed operation callbacks
     public boolean onTournamentEntered(long tournamentId,long systemId){
         logger.warn("TID : "+tournamentId+" : "+" : "+systemId);
@@ -413,7 +426,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         logger.warn("TID : "+tournamentId+" : "+ instanceId+" : "+systemId);
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         Tournament.Instance _ins = tournamentManager.lookup(instanceId);
-        if(_ins.enter(systemId) == _ins.maxEntries()) tournamentManager.closeTournamentInstanceWithFullyJoined(_ins);
+        //if(_ins.enter(systemId) == _ins.maxEntries()) tournamentManager.closeTournamentInstanceWithFullyJoined(_ins);
         return _ins;
     }
     public Tournament.Entry onTournamentScored(String tournamentId,String instanceId, String systemId, double credit,double delta){

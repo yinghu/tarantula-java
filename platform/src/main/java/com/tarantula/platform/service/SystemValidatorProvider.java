@@ -100,6 +100,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         }**/
         return presence;
     }
+    public OnSession onSession(Session session){
+        OnSessionTrack onSessionTrack = new OnSessionTrack();
+        onSessionTrack.distributionId(session.stub());
+        onSessionTrack.dataStore(sdatastore);
+        return sdatastore.load(onSessionTrack)? onSessionTrack: OnSessionTrack.SESSION_NOT_AVAILABLE;
+    }
     public Presence presence(long id){
         return pMap.computeIfAbsent(id,(k)->{
             PresenceIndex px = new PresenceIndex(sdatastore);

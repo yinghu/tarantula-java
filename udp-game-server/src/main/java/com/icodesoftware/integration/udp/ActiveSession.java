@@ -31,12 +31,12 @@ public class ActiveSession extends RecoverableObject implements Session {
     }
 
     @Override
-    public String tournamentId() {
-        return null;
+    public long tournamentId() {
+        return 0;
     }
 
     @Override
-    public void tournamentId(String tournamentId) {
+    public void tournamentId(long tournamentId) {
 
     }
 

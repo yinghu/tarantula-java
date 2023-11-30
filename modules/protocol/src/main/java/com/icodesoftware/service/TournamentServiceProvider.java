@@ -9,7 +9,7 @@ public interface TournamentServiceProvider extends ConfigurationServiceProvider{
     void registerTournamentListener(Tournament.Listener listener);
 
     List<Tournament> list();
-    boolean available(String tournamentId);
+    boolean available(long tournamentId);
     Tournament.Instance enter(String tournamentId,String systemId);
     Tournament.Entry score(String tournamentId,String instanceId,String systemId, double credit,double delta);
 

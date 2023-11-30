@@ -67,20 +67,44 @@ public class DataStoreSudoRoleModule implements Module {
             JsonArray keys = new JsonArray();
             int[] kn = {Integer.parseInt(query[1])};
             int[] batch = {Integer.parseInt(query[2])};
+            int factoryId = Integer.parseInt(query[3]);
+            int classId = Integer.parseInt(query[4]);
             summary.addProperty("keyStartIndex",kn[0]);
             summary.addProperty("keyEndIndex",kn[0]+batch[0]);
             sum.list((n,h,t)->{
-                kn[0]--;
-                if(kn[0]<0) {
-                    JsonObject debug = new JsonObject();
-                    debug.addProperty("name",t.getClass().getName());
-                    debug.addProperty("key",t.key().asString());
-                    debug.addProperty("local",h.local());
-                    debug.addProperty("revision",Long.toString(h.revision()));
-                    debug.addProperty("node",n.nodeName());
-                    debug.add("content",t.toJson());
-                    keys.add(debug);
-                    batch[0]--;
+                if(factoryId!=0 && classId!=0){
+                    if(h.factoryId()==factoryId&&h.classId()==classId){
+                        kn[0]--;
+                        if(kn[0]<0) {
+                            JsonObject debug = new JsonObject();
+                            debug.addProperty("name",t.getClass().getName());
+                            debug.addProperty("factoryId",t.getFactoryId());
+                            debug.addProperty("classId",t.getClassId());
+                            debug.addProperty("key",t.key().asString());
+                            debug.addProperty("local",h.local());
+                            debug.addProperty("revision",Long.toString(h.revision()));
+                            debug.addProperty("node",n.nodeName());
+                            debug.add("content",t.toJson());
+                            keys.add(debug);
+                            batch[0]--;
+                        }
+                    }
+                }
+                else{
+                    kn[0]--;
+                    if(kn[0]<0) {
+                        JsonObject debug = new JsonObject();
+                        debug.addProperty("name",t.getClass().getName());
+                        debug.addProperty("factoryId",t.getFactoryId());
+                        debug.addProperty("classId",t.getClassId());
+                        debug.addProperty("key",t.key().asString());
+                        debug.addProperty("local",h.local());
+                        debug.addProperty("revision",Long.toString(h.revision()));
+                        debug.addProperty("node",n.nodeName());
+                        debug.add("content",t.toJson());
+                        keys.add(debug);
+                        batch[0]--;
+                    }
                 }
                 return batch[0] > 0;
             });

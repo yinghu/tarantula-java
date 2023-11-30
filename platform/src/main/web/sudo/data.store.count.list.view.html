@@ -12,15 +12,15 @@
     <div class="w3-panel tx-margin-bottom-8">
         <div class="w3-container">
             <label class="tx-text-12 tx-margin-right-4">Local</label>
-            <input id='tx-data-store-local-scope' class="w3-check tx-text-12" type="checkbox" checked>
+            <input id='tx-data-store-local-scope' class="w3-check tx-text-12" type="checkbox">
             <label class="tx-text-12 tx-margin-right-4">Data</label>
             <input id='tx-data-store-data-scope' class="w3-check tx-text-12" type="checkbox" checked>
             <label class="tx-text-12 tx-margin-right-4">Access</label>
-            <input id='tx-data-store-access-scope' class="w3-check tx-text-12" type="checkbox" checked>
+            <input id='tx-data-store-access-scope' class="w3-check tx-text-12" type="checkbox">
             <label class="tx-text-12 tx-margin-right-4">Index</label>
-            <input id='tx-data-store-index-scope' class="w3-check tx-text-12" type="checkbox" checked>
+            <input id='tx-data-store-index-scope' class="w3-check tx-text-12" type="checkbox">
             <label class="tx-text-12 tx-margin-right-4">Log</label>
-            <input id='tx-data-store-log-scope' class="w3-check tx-text-12" type="checkbox" checked>
+            <input id='tx-data-store-log-scope' class="w3-check tx-text-12" type="checkbox">
         </div>
     </div>
     <div class="w3-panel  tx-margin-bottom-8">
@@ -39,14 +39,22 @@
     </div>
     <div class="w3-panel tx-margin-bottom-8">
         <div class="w3-row">
-            <div class="w3-half w3-container">
+            <div class="w3-quarter w3-container">
                 <label class="tx-text-12">Data Store Key Start Index :</label>
                 <input id ="tx-data-store-key-index" class="w3-input w3-round w3-border tx-text-16" type="number" value="0"/>
             </div>
-            <div class="w3-half w3-container">
+            <div class="w3-quarter w3-container">
                 <label class="tx-text-12">Data Store Key List Size :</label>
                 <input id ="tx-data-store-key-list-size" class="w3-input w3-round w3-border tx-text-16" type="number" value="10"/>
-            </div>   
+            </div>
+            <div class="w3-quarter w3-container">
+                <label class="tx-text-12">Object Factory ID :</label>
+                <input id ="tx-data-store-factory-id" class="w3-input w3-round w3-border tx-text-16" type="number" value="0"/>
+            </div> 
+            <div class="w3-quarter w3-container">
+                <label class="tx-text-12">Object Class ID :</label>
+                <input id ="tx-data-store-class-id" class="w3-input w3-round w3-border tx-text-16" type="number" value="0"/>
+            </div>    
         </div>    
     </div>
     <div class="w3-panel">
@@ -151,7 +159,10 @@
         keyPanel.innerHTML = '';
         let kindx = document.querySelector('#tx-data-store-key-index').value;
         let ksize = document.querySelector('#tx-data-store-key-list-size').value;
-        TARA_API.onGet('role/sudo/datastore','onLoadDataStoreKeys',dataStoreSelected+'#'+kindx+'#'+ksize,(resp)=>{
+        let fid = document.querySelector('#tx-data-store-factory-id').value;
+        let cid = document.querySelector('#tx-data-store-class-id').value;
+        let limit = dataStoreSelected+'#'+kindx+'#'+ksize+'#'+fid+'#'+cid
+        TARA_API.onGet('role/sudo/datastore','onLoadDataStoreKeys',limit,(resp)=>{
             editor.set(resp);
             resp.keys.forEach((kv,i)=>{
                 if(i==0) keySelected = kv.key;

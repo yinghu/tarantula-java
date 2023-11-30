@@ -77,7 +77,7 @@ public class OnAccessDeserializer implements JsonDeserializer<OnAccess> {
         }
 
         else if(k.equals("tournamentId")){
-            access.tournamentId((String) v);
+            access.tournamentId(((Number) v).longValue());
         }
         else if(k.equals("typeId")){
             access.typeId((String) v);

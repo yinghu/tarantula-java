@@ -58,7 +58,7 @@ public class MatchMakingModule extends ModuleHeader implements Configurable.List
             if(this.context.validator().role(session.distributionId()).accessControl()< AccessControl.admin.accessControl()){
                 throw new RuntimeException("no permission");
             }
-            session.tournamentId(session.name());
+            session.tournamentId(Long.parseLong(session.name()));
             session.clientId("device_"+session.stub());
             session.name("web_device");
             session.action("onPlay");

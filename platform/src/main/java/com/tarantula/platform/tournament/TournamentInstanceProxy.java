@@ -38,16 +38,6 @@ public class TournamentInstanceProxy extends RecoverableObject implements Tourna
         return tournamentManager.endTime();
     }
 
-    @Override
-    public int enter(String systemId) {
-        return 0;
-    }
-    //@Override
-    //public int enter(Session session) {
-        //if (tournamentManager.global()) return 0;
-        //this.tournamentManager.enter(session);
-        //return 0;
-    //}
 
 
     @Override

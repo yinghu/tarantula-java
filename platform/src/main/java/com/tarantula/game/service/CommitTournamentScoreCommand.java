@@ -12,8 +12,8 @@ public class CommitTournamentScoreCommand extends GameServiceProxyHeader {
 
    @Override
     public byte[] onService(Session stub, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        if(!tournamentEnabled || stub.tournamentId()==null) return null;
-        this.gameServiceProvider.tournamentServiceProvider().score(stub.tournamentId(),stub.trackId(),stub.systemId(),200,messageBuffer.readDouble());
+        //if(!tournamentEnabled || stub.tournamentId()==null) return null;
+        //this.gameServiceProvider.tournamentServiceProvider().score(stub.tournamentId(),stub.trackId(),stub.systemId(),200,messageBuffer.readDouble());
         return null;
     }
 }

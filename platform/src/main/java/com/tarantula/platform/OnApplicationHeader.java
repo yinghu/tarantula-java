@@ -5,7 +5,7 @@ import com.icodesoftware.OnAccess;
 
 public class OnApplicationHeader extends ResponseHeader implements OnAccess {
 
-    protected String tournamentId;
+    protected long tournamentId;
 
     protected String systemId;
 
@@ -14,7 +14,6 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
     protected long stub;
 
     protected String ticket;
-
 
 
 
@@ -28,12 +27,12 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
     }
 
 
-    public String tournamentId() {
+    public long tournamentId() {
         return this.tournamentId;
     }
 
 
-    public void tournamentId(String tournamentId) {
+    public void tournamentId(long tournamentId) {
         this.tournamentId = tournamentId;
     }
 

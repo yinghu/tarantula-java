@@ -4,9 +4,10 @@
   "endBufferTimeMinutes": 3,
   "scoreCredits": 1000,
   "maxPlayerHistoryRecords": 10,
-  "concurrentInstanceSize": 8,
+  "smallConcurrentInstanceSize": 3,
+  "mediumConcurrentInstanceSize": 10,
+  "largeConcurrentInstanceSize": 100,
   "clusterLockTimeoutSeconds": 5,
   "instanceIdPollingTimeoutSeconds": 3,
-  "instanceIdPollingRetries": 3,
-  "pendingInstancePoolSizePerSchedule" : 10
+  "instanceIdPollingRetries": 3
 }

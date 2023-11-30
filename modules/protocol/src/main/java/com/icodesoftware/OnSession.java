@@ -11,4 +11,7 @@ public interface OnSession extends OnApplication, Response {
     String login();
     void login(String login);
 
+    int tournamentSlot();
+    void onTournament(int tournamentSlot,long tournamentId);
+
 }

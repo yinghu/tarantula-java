@@ -27,7 +27,7 @@ public class FastPlayEvent extends Data implements Event {
     public void writePortable(PortableWriter out) throws IOException {
         out.writeUTF("1",this.systemId);
         out.writeUTF("2",this.destination);
-        out.writeUTF("3",this.tournamentId);
+        out.writeLong("3",this.tournamentId);
         out.writeUTF("4",this.owner);
         //out.writeDouble("5",this.balance);
         out.writeLong("6",this.stub);
@@ -42,7 +42,7 @@ public class FastPlayEvent extends Data implements Event {
     public void readPortable(PortableReader in) throws IOException {
         this.systemId = in.readUTF("1");
         this.destination = in.readUTF("2");
-        this.tournamentId = in.readUTF("3");
+        this.tournamentId = in.readLong("3");
         this.owner = in.readUTF("4");
         //this.balance = in.readDouble("5");
         this.stub = in.readLong("6");
