@@ -7,7 +7,7 @@ import com.tarantula.platform.tournament.TournamentContext;
 import com.tarantula.platform.tournament.TournamentHistoryContext;
 
 
-public class TournamentModule extends ModuleHeader implements Tournament.Listener,Configurable.Listener {
+public class TournamentModule extends ModuleHeader implements Configurable.Listener {
 
     private TournamentServiceProvider tournamentServiceProvider;
 
@@ -33,7 +33,8 @@ public class TournamentModule extends ModuleHeader implements Tournament.Listene
             session.write(ins.toJson().toString().getBytes());
         }
         else if(session.action().equals("onBoard")){
-            Tournament.RaceBoard board = tournamentServiceProvider.list(session.name());
+            Tournament tournament = tournamentServiceProvider.tournament(Long.parseLong(session.name()));
+            Tournament.RaceBoard board = tournament.register(session).raceBoard();
             session.write(board.toString().getBytes());
         }
         else{
@@ -46,24 +47,9 @@ public class TournamentModule extends ModuleHeader implements Tournament.Listene
     public void setup(ApplicationContext applicationContext) throws Exception {
         super.setup(applicationContext);
         this.tournamentServiceProvider = gameServiceProvider.tournamentServiceProvider();
-        this.tournamentServiceProvider.registerTournamentListener(this);
         this.tournamentServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
         this.context.log("Tournament module started", OnLog.WARN);
     }
 
-    @Override
-    public void tournamentStarted(Tournament tournament) {
-        this.context.log(tournament.distributionKey()+" STARTED",OnLog.WARN);
-    }
-
-    @Override
-    public void tournamentClosed(Tournament tournament) {
-        this.context.log(tournament.distributionKey()+" CLOSED",OnLog.WARN);
-    }
-
-    @Override
-    public void tournamentEnded(Tournament tournament) {
-        this.context.log(tournament.distributionKey()+" ENDED",OnLog.WARN);
-    }
 
 }

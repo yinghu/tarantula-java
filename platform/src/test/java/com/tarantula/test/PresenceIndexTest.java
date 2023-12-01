@@ -7,6 +7,7 @@ import com.tarantula.platform.OnSessionQuery;
 import com.tarantula.platform.OnSessionTrack;
 import com.tarantula.platform.PresenceIndex;
 
+import com.tarantula.platform.SessionIndex;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import java.util.List;
@@ -21,13 +22,13 @@ public class PresenceIndexTest extends DataStoreHook{
         PresenceIndex presenceIndex = new PresenceIndex();
         presenceIndex.distributionId(presenceId);
         Assert.assertTrue(dataStore.createIfAbsent(presenceIndex,true));
-        OnSessionTrack t1 = new OnSessionTrack();
+        SessionIndex t1 = new SessionIndex();
         t1.ownerKey(presenceIndex.key());
         Assert.assertTrue(dataStore.create(t1));
-        OnSessionTrack t2 = new OnSessionTrack();
+        SessionIndex t2 = new SessionIndex();
         t2.ownerKey(presenceIndex.key());
         Assert.assertTrue(dataStore.create(t2));
-        List<OnSessionTrack> tlist = dataStore.list(new OnSessionQuery<>(presenceIndex.key()));
+        List<SessionIndex> tlist = dataStore.list(new OnSessionQuery(presenceIndex.key()));
         Assert.assertEquals(tlist.size(),2);
     }
 

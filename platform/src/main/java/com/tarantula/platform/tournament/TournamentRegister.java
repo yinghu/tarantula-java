@@ -23,6 +23,7 @@ public class TournamentRegister extends OnApplicationHeader {
         buffer.writeLong(tournamentId);
         buffer.writeLong(timestamp);
         buffer.writeInt(totalJoined.get());
+        buffer.writeInt(routingNumber);
         return true;
     }
 
@@ -36,6 +37,7 @@ public class TournamentRegister extends OnApplicationHeader {
         tournamentId = buffer.readLong();
         timestamp = buffer.readLong();
         totalJoined.set(buffer.readInt());
+        routingNumber = buffer.readInt();
         return true;
     }
 

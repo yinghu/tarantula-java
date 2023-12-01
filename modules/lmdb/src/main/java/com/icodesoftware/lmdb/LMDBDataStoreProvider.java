@@ -10,10 +10,7 @@ import com.icodesoftware.service.Metadata;
 
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
-import org.lmdbjava.Dbi;
-import org.lmdbjava.DbiFlags;
-import org.lmdbjava.Env;
-import org.lmdbjava.Txn;
+import org.lmdbjava.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -59,6 +56,8 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private final static int VALUE_SIZE = 1800;
 
     private final static int PENDING_BUFFER_SIZE = 32;
+
+    private boolean envNoSyncFlag = false;
     private final static ConcurrentHashMap<String,DataStore> storeMap = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<String,LocalEdgeDataStore> edgMap = new ConcurrentHashMap<>();
 
@@ -75,6 +74,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     public void configure(Map<String, Object> properties) {
         this.name = (String)properties.get("name");
         this.storeSize = storeSize*(int)properties.get("storeSizeMb");
+        this.envNoSyncFlag = (boolean)properties.get("envNoSyncFlag");
         String _dataPath = ((JsonElement)properties.get("dataPath")).getAsString();
         String _integrationPath = ((JsonElement)properties.get("integrationPath")).getAsString();
         String _indexPath = ((JsonElement)properties.get("indexPath")).getAsString();
@@ -230,11 +230,21 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     @Override
     public void start() throws Exception {
         if(distributionIdGenerator==null) throw new RuntimeException("DistributionIdGenerator Not Registered");
-        data = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.dataPath).toFile());
-        integration = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.integrationPath).toFile());
-        index = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.indexPath).toFile());
-        local = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(localPath).toFile());
-        log = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(logPath).toFile());
+        if(envNoSyncFlag){
+            EnvFlags[] flags = new EnvFlags[]{EnvFlags.MDB_NOSYNC};
+            data = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.dataPath).toFile(),flags);
+            integration = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.integrationPath).toFile(),flags);
+            index = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.indexPath).toFile(),flags);
+            local = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(localPath).toFile(),flags);
+            log = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(logPath).toFile(),flags);
+        }
+        else{
+            data = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.dataPath).toFile());
+            integration = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.integrationPath).toFile());
+            index = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.indexPath).toFile());
+            local = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(localPath).toFile());
+            log = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(logPath).toFile());
+        }
         for(int i=0;i<PENDING_BUFFER_SIZE;i++){
             pendingQueue.offer(new BufferCache(KEY_SIZE,VALUE_SIZE,pendingQueue));
         }
@@ -287,7 +297,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         }
         FileInputStream in = new FileInputStream(backupLog);
         jsonObject = JsonUtil.parse(in);
-        logger.warn("LMDB Provider started with store size ["+storeSize+"]["+pendingQueue.size()+"]");
+        logger.warn("LMDB Provider started with store size ["+storeSize+"] queue side ["+pendingQueue.size()+"] store no sync mode ["+envNoSyncFlag+"]");
     }
 
     @Override
@@ -340,9 +350,15 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         storeMap.clear();
         edgMap.forEach((k,v)->v.dbi.close());
         edgMap.clear();
+        data.sync(true);
         data.close();
+        integration.sync(true);
         integration.close();
+        index.sync(true);
         index.close();
+        log.sync(true);
+        log.close();
+        local.sync(true);
         local.close();
         logger.warn("LMDB Shutting down with pending buffer size ["+pendingQueue.size()+"]");
         pendingQueue.clear();
@@ -355,11 +371,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         }
         if(metadata.scope()==Distributable.DATA_SCOPE && dataMapStoreListener!=null){
             dataMapStoreListener.onUpdating(metadata,key,value,transactionId);
-            //return;
         }
-        //if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
-            //keyIndexMapStoreListener.onUpdating(metadata,key,value,transactionId);
-        //}
     }
 
 
@@ -370,9 +382,6 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(metadata.scope()==Distributable.DATA_SCOPE && dataMapStoreListener!=null){
             return dataMapStoreListener.onRecovering(metadata,key,buffer);
         }
-        //if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
-            //return keyIndexMapStoreListener.onRecovering(metadata,key,buffer);
-        //}
         return false;
     }
 
@@ -384,9 +393,6 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
             return dataMapStoreListener.onRecovering(metadata,key,bufferStream);
 
         }
-        //if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
-            //return keyIndexMapStoreListener.onRecovering(metadata,key,bufferStream);
-        //}
         return false;
     }
 
@@ -399,9 +405,6 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
              return dataMapStoreListener.onDeleting(metadata,key,value,transactionId);
 
         }
-        //if(metadata.scope()==Distributable.INDEX_SCOPE && keyIndexMapStoreListener!=null){
-            //return keyIndexMapStoreListener.onDeleting(metadata,key,value,transactionId);
-        //}
         return true;
     }
 
@@ -413,11 +416,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         }
         if(scope==Distributable.INTEGRATION_SCOPE && this.integrationMapStoreListener!=null){
             this.integrationMapStoreListener.onCommit(scope,transactionId);
-            //return;
         }
-        //if(scope==Distributable.INDEX_SCOPE && this.keyIndexMapStoreListener!=null){
-            //this.keyIndexMapStoreListener.onCommit(scope,transactionId);
-        //}
     }
 
     @Override
@@ -428,11 +427,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         }
         if(scope==Distributable.INTEGRATION_SCOPE && this.integrationMapStoreListener!=null){
             this.integrationMapStoreListener.onAbort(scope,transactionId);
-            //return;
         }
-        //if(scope==Distributable.INDEX_SCOPE && this.keyIndexMapStoreListener!=null){
-            //this.keyIndexMapStoreListener.onAbort(scope,transactionId);
-        //}
     }
 
     public void assign(Recoverable.DataBuffer dataBuffer){
@@ -494,30 +489,35 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         try{
             if(scope==Distributable.DATA_SCOPE){
                 Path copyPath = path(baseDir+"/data_"+sequence);
+                data.sync(true);
                 data.copy(copyPath.toFile());
                 saveJsonCopyDate(copyPath.toFile());
                 return copyPath.toFile();
             }
             if(scope==Distributable.INTEGRATION_SCOPE){
                 Path copyPath = path(baseDir+"/integration_"+sequence);
+                integration.sync(true);
                 integration.copy(copyPath.toFile());
                 saveJsonCopyDate(copyPath.toFile());
                 return copyPath.toFile();
             }
             if(scope==Distributable.INDEX_SCOPE){
                 Path copyPath = path(baseDir+"/index_"+sequence);
+                index.sync(true);
                 index.copy(copyPath.toFile());
                 saveJsonCopyDate(copyPath.toFile());
                 return copyPath.toFile();
             }
             if(scope==Distributable.LOG_SCOPE){
                 Path copyPath = path(baseDir+"/log_"+sequence);
+                log.sync(true);
                 log.copy(copyPath.toFile());
                 saveJsonCopyDate(copyPath.toFile());
                 return copyPath.toFile();
             }
             if(scope==Distributable.LOCAL_SCOPE){
                 Path copyPath = path(baseDir+"/local_"+sequence);
+                local.sync(true);
                 local.copy(copyPath.toFile());
                 saveJsonCopyDate(copyPath.toFile());
                 return copyPath.toFile();

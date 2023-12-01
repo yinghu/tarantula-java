@@ -265,16 +265,16 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.dataStore.update(this);
     }
 
-    public long available(int slot){
+    private TournamentRegisterStatus available(int slot){
         int tem = slot;
         if(tem<0 || tem> concurrentInstanceSize-1){
             tem = 0;
         }
         TournamentRegister register = pendingInstances[tem];
-        if(register.available()) return register.tournamentId();
+        if(register.available()) return new TournamentRegisterStatus(register.tournamentId(),tem);
         register.setup(tournamentServiceProvider.nextInstanceId(),durationMinutes,maxEntriesPerInstance-1);//pre-cut 1
         dataStore.update(register);
-        return register.tournamentId();
+        return new TournamentRegisterStatus(register.tournamentId(),tem);
     }
 
 
@@ -330,7 +330,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     @Override
     public String toString(){
-        return "\nTournament ["+name+"]["+distributionKey()+"]\n Start Time ["+startTime.toString()+"]\n Close Time ["+closeTime+"]\n End Time ["+endTime+"]\n Status ["+status+"]";
+        return "\nTournament ["+name+"] Global ["+global+"] Id ["+distributionId()+"]\n Start Time ["+startTime.toString()+"]\n Close Time ["+closeTime+"]\n End Time ["+endTime+"]\n Status ["+status+"]";
     }
 
     public void close(){
@@ -339,7 +339,6 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
     public void end(){
         //instanceIndex.forEach((k,ins)-> this.endTournamentInstance(ins));
-
         status = Status.ENDED;
         this.dataStore.update(this);
     }
@@ -406,10 +405,11 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         if(this.global) return new TournamentInstanceProxy(this,session);
         OnSession onSession = tournamentServiceProvider.onSession(session);
         int slot = onSession.tournamentSlot();
-        long pending = distributionTournamentService.onRegisterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,slot);
-        Tournament.Instance ins = this.distributionTournamentService.onEnterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,pending,session.distributionId());
-        ins.distributionId(pending);
-        System.out.println(ins.startTime()+" : "+ins.closeTime()+" : "+ins.endTime());
+        TournamentRegisterStatus pending = distributionTournamentService.onRegisterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,slot+1);
+        onSession.onTournament(pending.slot,pending.instanceId);
+        onSession.update();
+        Tournament.Instance ins = this.distributionTournamentService.onEnterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,pending.instanceId,session.distributionId());
+        ins.distributionId(pending.instanceId);
         return new TournamentInstanceProxy(this,session,(TournamentInstance) ins);
     }
 
@@ -461,12 +461,11 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return loaded[0].enter(systemId,targetScore);
     }
 
-    public long onRegister(int slot){
+    public TournamentRegisterStatus onRegister(int slot){
         return available(slot);
     }
 
     public TournamentInstance onEnter(long systemId,long instanceId){
-        System.out.println(instanceId+" : "+distributionTournamentService.ownership(instanceId));
         TournamentInstance instance = lookup(instanceId);
         instance.enter(systemId);
         return instance;
@@ -485,6 +484,5 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         if(instance==null) return new TournamentRaceBoard();
         return instance.raceBoard();
     }
-
 
 }

@@ -4,8 +4,8 @@ import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.platform.OnSessionTrack;
 import com.tarantula.platform.PresenceIndex;
+import com.tarantula.platform.SessionIndex;
 import com.tarantula.platform.presence.*;
 import com.tarantula.platform.service.metrics.AccessMetrics;
 import com.tarantula.platform.util.RecoverableQuery;
@@ -22,7 +22,7 @@ public class PlatformUserService implements UserService {
     private DataStore sessionDataStore;
     private DataStore accountDataStore;
     private DataStore membershipDataStore;
-    private DataStore accountIndexDataStore;
+    //private DataStore accountIndexDataStore;
 
     private DataStore loginProviderDataStore;
     private TokenValidatorProvider tokenValidatorProvider;
@@ -72,7 +72,7 @@ public class PlatformUserService implements UserService {
         px.distributionId(access.distributionId());
         presenceDataStore.createIfAbsent(px,false);
         for(int i=0;i<maxOnSessionCount;i++){
-            OnSessionTrack onSessionTrack = new OnSessionTrack();
+            SessionIndex onSessionTrack = new SessionIndex();
             onSessionTrack.ownerKey(px.key());
             sessionDataStore.create(onSessionTrack);
         }
@@ -215,7 +215,7 @@ public class PlatformUserService implements UserService {
         userDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,User.DataStore);
         presenceDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,Presence.DataStore);
         accountDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,Account.DataStore);
-        accountIndexDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,Account.IndexDataStore);
+        //accountIndexDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,Account.IndexDataStore);
         membershipDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,Subscription.DataStore);
         sessionDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,OnSession.DataStore);
         loginProviderDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,LoginProvider.DataStore);

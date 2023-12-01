@@ -4,9 +4,7 @@ import com.icodesoftware.OnSession;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 
-import com.tarantula.platform.service.cluster.PortableRegistry;
-
-public class OnSessionQuery<T extends Recoverable> implements RecoverableFactory<T> {
+public class OnSessionQuery implements RecoverableFactory<SessionIndex> {
 
 
     private Recoverable.Key key;
@@ -16,10 +14,9 @@ public class OnSessionQuery<T extends Recoverable> implements RecoverableFactory
     }
 
     @Override
-    public T create() {
-        return new PortableRegistry<T>().create(PortableRegistry.ON_SESSION_CID);
+    public SessionIndex create() {
+        return new SessionIndex();
     }
-
 
     @Override
     public String label() {

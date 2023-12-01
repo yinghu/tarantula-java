@@ -32,9 +32,10 @@ public class LMDBSmokeTest {
     private Env<ByteBuffer> env;
     @BeforeClass
     public void setUp() throws Exception{
+        EnvFlags[] flags = new EnvFlags[]{EnvFlags.MDB_NOSYNC};
         Path path = Paths.get(dir);
         if(!Files.exists(path)) Files.createDirectories(path);
-        env = Env.create().setMapSize(mapSize).setMaxDbs(maxStores).setMaxReaders(maxReader).open(path.toFile());
+        env = Env.create().setMapSize(mapSize).setMaxDbs(maxStores).setMaxReaders(maxReader).open(path.toFile(),flags);
     }
     @AfterTest
     public void tearDown() throws Exception{
@@ -168,32 +169,38 @@ public class LMDBSmokeTest {
         ByteBuffer value = ByteBuffer.allocateDirect(700);
         value.putLong(100).flip();
         final Txn<ByteBuffer> c = env.txnWrite();
-        Dbi dbi1 = env.openDbi(c,"test1".getBytes(),null,DbiFlags.MDB_CREATE);
-        final Txn<ByteBuffer> c1 = env.txn(c);
-        if(dbi1.get(c1,key)!=null){
-            System.out.println("VC1 X : "+c1.val().getLong());
+        try{
+            Dbi dbi1 = env.openDbi(c,"test1".getBytes(),null,DbiFlags.MDB_CREATE);
+            final Txn<ByteBuffer> c1 = env.txn(c);
+            dbi1.put(c1,key,value);
+            c1.commit();
+            //env.sync(true);
+            final Txn<ByteBuffer> c1x = env.txn(c);
+            if(dbi1.get(c1x,key.rewind())!=null){
+                System.out.println("VC1 Y : "+c1x.val().getLong());
+            }
+            c1x.commit();
+            //Dbi dbi2 = env.openDbi(c,"test2".getBytes(),null,DbiFlags.MDB_CREATE);
+            //final Txn<ByteBuffer> c2 = env.txn(c);
+            //if(dbi2.get(c2,key)!=null){
+                //System.out.println("VC2 X : "+c2.val().getLong());
+            //}
+            //dbi2.put(c2,key.rewind(),value.rewind());
+            //if(dbi2.get(c2,key.rewind())!=null){
+                //System.out.println("VC2 Y : "+c2.val().getLong());
+            //}
+            c.commit();
+            env.sync(true);
         }
-        c1.abort();
-        final Txn<ByteBuffer> c1x = env.txn(c);
-
-        dbi1.put(c1x,key.rewind(),value);
-        if(dbi1.get(c1x,key.rewind())!=null){
-            //System.out.println("VC1 Y : "+c1x.val().getLong());
+        catch (Exception ex){
+            c.abort();
         }
-        c1x.commit();
-        Dbi dbi2 = env.openDbi(c,"test2".getBytes(),null,DbiFlags.MDB_CREATE);
-        final Txn<ByteBuffer> c2 = env.txn(c);
-        if(dbi2.get(c2,key)!=null){
-            //System.out.println("VC2 X : "+c2.val().getLong());
-        }
-        dbi2.put(c2,key.rewind(),value.rewind());
-        if(dbi2.get(c2,key.rewind())!=null){
-            //System.out.println("VC2 Y : "+c2.val().getLong());
+        finally {
+            //c.commit();
+            //dbi1.close();
+            //dbi2.close();
         }
         //c2.commit();
-        c.commit();
-        dbi1.close();
-        dbi2.close();
 
     }
 

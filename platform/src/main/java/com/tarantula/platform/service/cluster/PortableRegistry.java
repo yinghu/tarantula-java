@@ -104,7 +104,7 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
                 _ins = new PresenceKey();
                 break;
             case ON_SESSION_CID:
-                _ins = new OnSessionTrack();
+                _ins = new SessionIndex();
                 break;
             case ON_VIEW_OID:
                 _ins = new OnViewTrack();

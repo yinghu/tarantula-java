@@ -9,6 +9,7 @@ import com.icodesoftware.Tournament;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.tournament.TournamentRegisterStatus;
 
 import java.util.Properties;
 
@@ -46,7 +47,7 @@ public class TournamentClusterService implements ManagedService, RemoteService {
         log.warn(objectName+" destroyed");
     }
 
-    public long register(String serviceName,long tournamentId,int slot){
+    public TournamentRegisterStatus register(String serviceName, long tournamentId, int slot){
         PlatformGameServiceProvider tsp = (PlatformGameServiceProvider) tarantulaContext.serviceProvider(serviceName);
         return tsp.tournamentServiceProvider().onTournamentRegistered(tournamentId,slot);
     }

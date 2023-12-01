@@ -5,7 +5,6 @@ import com.icodesoftware.service.EventService;
 import com.icodesoftware.util.FIFOBuffer;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.event.*;
-import java.util.Map;
 import com.icodesoftware.util.RecoverableObject;
 
 public class PresenceIndex extends RecoverableObject implements Presence {
@@ -14,7 +13,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     private boolean local = true;
     private EventService eventService;
 
-    private FIFOBuffer<OnSessionTrack> sessions;
+    private FIFOBuffer<SessionIndex> sessions;
 
     private DataStore sessionDataStore;
     public PresenceIndex(){
@@ -83,7 +82,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     }
 
     public OnSession stub(){
-        OnSessionTrack onSessionTrack = sessions.pop();
+        SessionIndex onSessionTrack = sessions.pop();
         if(onSessionTrack==null) return OnSessionTrack.SESSION_NOT_AVAILABLE;
         counter++;
         this.update();
@@ -91,7 +90,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     }
 
     public boolean offSession(long stub){
-        OnSessionTrack onSessionTrack = new OnSessionTrack();
+        SessionIndex onSessionTrack = new SessionIndex();
         onSessionTrack.distributionId(stub);
         if(this.sessionDataStore.load(onSessionTrack)){
             sessions.push(onSessionTrack);
@@ -104,8 +103,8 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     }
 
     public void load(int max){
-        sessions = new FIFOBuffer<>(max,new OnSessionTrack[max]);
-        sessionDataStore.list(new OnSessionQuery<OnSessionTrack>(key()),t->{
+        sessions = new FIFOBuffer<>(max,new SessionIndex[max]);
+        sessionDataStore.list(new OnSessionQuery(key()),t->{
             sessions.push(t);
             return true;
         });

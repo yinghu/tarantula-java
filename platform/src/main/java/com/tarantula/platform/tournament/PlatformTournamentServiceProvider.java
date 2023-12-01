@@ -88,7 +88,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         return null;
     }
 
-
+    public Tournament tournament(long tournamentId){
+        return tournamentIndex.get(tournamentId);
+    }
     @Override
     public boolean available(long tournamentId) {
         return tournamentIndex.get(tournamentId) != null;
@@ -334,7 +336,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     @Override
     public boolean onItemRegistered(String category, String itemId) {
-        logger.warn("TOURNAMENT : "+itemId+" : "+category);
         TournamentManager tournament = new TournamentManager();
         tournament.distributionKey(itemId);
         if (!this.dataStore.load(tournament)) {
@@ -388,7 +389,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         }));
     }
     private void launch(TournamentManager tournament){
-        logger.warn("TMT : "+tournament.distributionId()+" : "+tournament.global());
         this.tournamentIndex.put(tournament.distributionId(),tournament);
         tournament.setup(this);
         tournament.pendingSchedule = this.serviceContext.schedule(new TournamentCloseMonitor(tournament,this));
@@ -418,19 +418,16 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
 
     //distributed operation callbacks
-    public long onTournamentRegistered(long tournamentId,int slot){
-        logger.warn("TID R : "+tournamentId+" : "+" : "+slot);
+    public TournamentRegisterStatus onTournamentRegistered(long tournamentId,int slot){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         return tournamentManager.onRegister(slot);
     }
     public boolean onTournamentEntered(long tournamentId,long systemId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         boolean joined = tournamentManager.onEnter(systemId);
-        logger.warn("TID G : "+tournamentId+" : "+" : "+systemId+" : "+joined);
         return joined;
     }
     public Tournament.Instance onTournamentEntered(long tournamentId,long instanceId,long systemId){
-        logger.warn("TID T : "+tournamentId+" : "+ instanceId+" : "+systemId);
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         return tournamentManager.onEnter(systemId,instanceId);
     }
@@ -450,9 +447,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     public Tournament.RaceBoard onTournamentListed(long tournamentId,long instanceId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         return tournamentManager.onRaceBoard(instanceId);
-        //Tournament.Instance _ins = tournamentManager.lookup(instanceId);
-        //if(_ins == null) return new TournamentRaceBoard();
-        //return _ins.raceBoard();
     }
 
     public Tournament.RaceBoard onTournamentListed(long tournamentId){

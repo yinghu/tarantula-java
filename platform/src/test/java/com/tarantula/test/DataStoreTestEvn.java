@@ -8,6 +8,8 @@ import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.service.persistence.DataStoreConfigurationJsonParser;
 import com.icodesoftware.service.MapStoreListener;
 
+import java.util.HashMap;
+
 public class DataStoreTestEvn {
 
     static {
@@ -26,7 +28,10 @@ public class DataStoreTestEvn {
         started = true;
         distributionIdGenerator = new LocalDistributionIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
         serviceContext = new TestServiceContext(distributionIdGenerator);
-        DataStoreConfigurationJsonParser parser = new DataStoreConfigurationJsonParser("test-tarantula-platform-data-store-config.json",serviceContext, 3,dataStoreProvider->{
+        HashMap<String,Object> storeAdditions = new HashMap<>();
+        storeAdditions.put("storeSizeMb",3);
+        storeAdditions.put("envNoSyncFlag",false);
+        DataStoreConfigurationJsonParser parser = new DataStoreConfigurationJsonParser("test-tarantula-platform-data-store-config.json",serviceContext, storeAdditions,dataStoreProvider->{
             try{
                 DataStoreTestEvn.dataStoreProvider = dataStoreProvider;
                 DataStoreTestEvn.dataStoreProvider.registerDistributionIdGenerator(distributionIdGenerator);

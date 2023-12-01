@@ -4,6 +4,7 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.PartitionAwareOperation;
+import com.tarantula.platform.tournament.TournamentRegisterStatus;
 
 import java.io.IOException;
 
@@ -15,7 +16,7 @@ public class RegisterTournamentOperation extends Operation implements PartitionA
 
     private int slot;
 
-    private long entered;
+    private TournamentRegisterStatus entered;
 
     public RegisterTournamentOperation() {
     }

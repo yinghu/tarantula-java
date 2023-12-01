@@ -101,7 +101,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         return presence;
     }
     public OnSession onSession(Session session){
-        OnSessionTrack onSessionTrack = new OnSessionTrack();
+        SessionIndex onSessionTrack = new SessionIndex();
         onSessionTrack.distributionId(session.stub());
         onSessionTrack.dataStore(sdatastore);
         return sdatastore.load(onSessionTrack)? onSessionTrack: OnSessionTrack.SESSION_NOT_AVAILABLE;

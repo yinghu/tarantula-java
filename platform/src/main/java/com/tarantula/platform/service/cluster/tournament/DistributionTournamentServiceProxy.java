@@ -9,6 +9,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.cluster.ClusterUtil;
 import com.tarantula.platform.tournament.DistributionTournamentService;
+import com.tarantula.platform.tournament.TournamentRegisterStatus;
 
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -59,17 +60,17 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         return nodeEngine.getPartitionService().isPartitionOwner(pid);
     }
 
-    public long onRegisterTournament(String serviceName,long tournamentId,int slot){
+    public TournamentRegisterStatus onRegisterTournament(String serviceName, long tournamentId, int slot){
         NodeEngine nodeEngine = getNodeEngine();
         RegisterTournamentOperation operation = new RegisterTournamentOperation(serviceName,tournamentId,slot);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(tournamentId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-            Future<Long> future = builder.invoke();
+            Future<TournamentRegisterStatus> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
         });
         if(!result.successful) throw new RuntimeException(result.exception);
-        return (long)result.result;
+        return (TournamentRegisterStatus)result.result;
 
     }
 

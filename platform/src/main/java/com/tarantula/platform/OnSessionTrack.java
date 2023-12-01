@@ -6,8 +6,6 @@ import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.time.LocalDateTime;
-import java.util.Map;
-
 
 public class OnSessionTrack extends OnApplicationHeader implements OnSession {
 
@@ -20,7 +18,10 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
 
     public static final OnSession SESSION_NOT_AVAILABLE = new OnSessionTrack("SESSION NOT AVAILABLE");
 
-    private int tournamentSlot;
+    protected int tournamentSlot;
+    protected double tournamentScore;
+
+    protected double tournamentCredit;
 
     public OnSessionTrack(){
         this.onEdge = true;
@@ -37,13 +38,6 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
         this.stub = stub;
         this.successful = true;
     }
-   // public OnSessionTrack(long systemId,int stub,String ticket,String index){
-      //  this();
-        //this.distributionId = systemId;
-        //this.stub = stub;
-        //this.ticket = ticket;
-        //this.index = index;
-    //}
 
     @Override
     public int getFactoryId() {
@@ -55,15 +49,6 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
         return PortableRegistry.ON_SESSION_CID;
     }
 
-    @Override
-    public Map<String,Object> toMap(){
-        this.properties.put("1",token);
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        this.token = (String)properties.get("1");
-    }
 
     public String token(){
         return this.token;
@@ -93,20 +78,6 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
         return jp;
     }
 
-    public boolean write(DataBuffer buffer){
-        buffer.writeInt(tournamentSlot);
-        buffer.writeLong(tournamentId);
-        buffer.writeLong(timestamp);
-        buffer.writeBoolean(disabled);
-        return true;
-    }
-    public boolean read(DataBuffer buffer) {
-        this.tournamentSlot = buffer.readInt();
-        this.tournamentId = buffer.readLong();
-        this.timestamp = buffer.readLong();
-        this.disabled = buffer.readBoolean();
-        return true;
-    }
 
     public int tournamentSlot(){
         return tournamentSlot;
@@ -115,5 +86,22 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
         this.tournamentSlot = tournamentSlot;
         this.tournamentId = tournamentId;
         this.timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
+    }
+
+    public double tournamentScore(){
+        return tournamentScore;
+    }
+
+    public double tournamentCredit(){
+        return tournamentCredit;
+    }
+
+    public boolean tournamentFinished(){
+        return disabled;
+    }
+
+    public void onTournamentScore(double credit,double score){
+        this.tournamentCredit -= credit;
+        this.tournamentScore += score;
     }
 }

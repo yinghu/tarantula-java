@@ -12,10 +12,7 @@ import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.service.KeyIndexTrack;
 import com.tarantula.platform.service.cluster.ClusterBatch;
 import com.tarantula.platform.service.persistence.PortableTransactionLog;
-import com.tarantula.platform.tournament.TournamentEntry;
-import com.tarantula.platform.tournament.TournamentManager;
-import com.tarantula.platform.tournament.TournamentInstance;
-import com.tarantula.platform.tournament.TournamentRaceBoard;
+import com.tarantula.platform.tournament.*;
 
 
 public class PortableEventRegistry implements PortableFactory {
@@ -40,6 +37,8 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int TRANSACTION_LOG_CID = 24;
     public static final int TRANSACTION_REPLICATION_EVENT_CID = 25;
+
+    public static final int TOURNAMENT_REGISTER_STATUS_CID = 26;
 
     //EVENT PORTABLE OBJECTS
     public static final int SINGLETON_FORWARD_CID = 100;
@@ -125,7 +124,9 @@ public class PortableEventRegistry implements PortableFactory {
             case TRANSACTION_REPLICATION_EVENT_CID:
                 _ins = new TransactionReplicationEvent();
                 break;
-
+            case TOURNAMENT_REGISTER_STATUS_CID:
+                _ins = new TournamentRegisterStatus();
+                break;
             case SINGLETON_FORWARD_CID:
                 _ins = new SessionForward();
                 break;

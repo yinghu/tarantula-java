@@ -125,6 +125,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public int storeValueSize = 1800;
     public int storePendingBufferSize = 32;
 
+    public boolean storeNoSync = false;
     public String dataStoreDir;
 
 
@@ -227,7 +228,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         });
         this.dataScopeReplicationProxy = new DataScopeReplicationProxy();
         this.integrationScopeReplicationProxy = new IntegrationScopeReplicationProxy();
-        DataStoreConfigurationJsonParser sparser = new DataStoreConfigurationJsonParser(DATA_STORE_CONFIG,this,this.storeSizeMb,dataStoreProvider -> {
+        HashMap<String,Object> storeAdditions = new HashMap<>();
+        storeAdditions.put("storeSizeMb",storeSizeMb);
+        storeAdditions.put("envNoSyncFlag",storeNoSync);
+        DataStoreConfigurationJsonParser sparser = new DataStoreConfigurationJsonParser(DATA_STORE_CONFIG,this,storeAdditions,dataStoreProvider -> {
             try{
                 this.deploymentDataStoreProvider = dataStoreProvider;
                 this.deploymentDataStoreProvider.registerDistributionIdGenerator(this.distributionIdGenerator);
