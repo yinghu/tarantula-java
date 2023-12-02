@@ -39,6 +39,11 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     ScheduledFuture<?> pendingSchedule;
 
 
+    public TournamentInstance(int maxEntries,double scoreCredits){
+        this(maxEntries);
+        this.scoreCredits = scoreCredits;
+    }
+
     public TournamentInstance(int maxEntries){
         this();
         this.maxEntries = maxEntries;

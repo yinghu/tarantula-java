@@ -32,7 +32,7 @@ public class TournamentScoreOperation extends Operation implements PartitionAwar
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        this.scored = ais.score(serviceName,tournamentId,instanceId,systemId,credit,delta);
+        this.scored = instanceId!=0?ais.score(serviceName,tournamentId,instanceId,systemId,credit,delta):ais.score(serviceName,tournamentId,systemId,credit,delta);
     }
 
     @Override

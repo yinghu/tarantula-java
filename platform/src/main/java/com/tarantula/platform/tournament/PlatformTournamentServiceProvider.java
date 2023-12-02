@@ -444,6 +444,20 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         //})) tournamentManager.endTournamentInstanceWithFullyFinished(_ins);
         //return score[0];
     }
+    public boolean onTournamentScored(long tournamentId,long systemId, double credit,double delta){
+        TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
+        logger.warn("TS : "+tournamentManager.targetScore()+" : "+credit+" : "+delta);
+        return tournamentManager.onScore(systemId,credit,delta);
+        //Tournament.Instance _ins = tournamentManager.lookup(instanceId);
+        //if(_ins==null) return new TournamentEntry();
+        //Tournament.Entry[] score={null};
+        //if(_ins.update(new SimpleStub(systemId,0),(e)->{
+        //e.score(credit,delta);
+        //score[0]=e;
+        //return e.finished();
+        //})) tournamentManager.endTournamentInstanceWithFullyFinished(_ins);
+        //return score[0];
+    }
     public Tournament.RaceBoard onTournamentListed(long tournamentId,long instanceId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         return tournamentManager.onRaceBoard(instanceId);

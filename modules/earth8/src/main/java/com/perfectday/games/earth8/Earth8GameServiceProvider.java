@@ -32,7 +32,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     public void onJoined(Session session) {
         gameContext.log("JOIN : "+session.distributionKey()+" :"+session.stub(),OnLog.WARN);
         tournamentIndex.forEach((key,entry)->{
-            if(entry.type().equals("Q100")){//LEVEL UP GLOBAL TOURNAMENT
+            if(entry.type().equals("T200")){//LEVEL UP GLOBAL TOURNAMENT
                 Tournament.Instance ins = entry.register(session);
                 ins.update(session,(e)->{
                     e.score(10,100);
@@ -121,8 +121,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         if(updated){
             tournamentIndex.forEach((key,entry)->{
                 if(entry.type().equals("T100")){//LEVEL UP GLOBAL TOURNAMENT
-                    Tournament.Instance ins = entry.register(session);
-                    ins.update(session,(e)->{
+                    entry.register(session).update(session,(e)->{
                         e.score(0,level);
                         return true;
                     });

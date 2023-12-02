@@ -1,4 +1,4 @@
-package com.tarantula.cci.udp;
+package com.tarantula.cci;
 
 import com.icodesoftware.Distributable;
 import com.icodesoftware.service.DeploymentServiceProvider;
