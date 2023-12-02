@@ -94,6 +94,13 @@
             "downloadable": false
           },
           {
+            "name": "Credit",
+            "type": "number",
+            "reference": "Double",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
             "name": "PrizeSet",
             "type": "set",
             "reference": "category:TournamentPrize",
@@ -114,7 +121,14 @@
       "application": {
         "properties": [
           {
-            "name": "Rank",
+            "name": "MinRank",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "MaxRank",
             "type": "number",
             "reference": "Integer",
             "nullable": false,

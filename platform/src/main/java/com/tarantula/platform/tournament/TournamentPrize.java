@@ -31,8 +31,8 @@ public class TournamentPrize extends Application implements Tournament.Prize {
 
     @Override
     public boolean configureAndValidate(){
-        boolean valid = this.header.has("Rank");
-        rank = header.get("Rank").getAsInt();
+        boolean valid = this.header.has("MinRank") && this.header.has("MaxRank");
+        rank = header.get("MinRank").getAsInt();
         return valid;
     }
     public String toString(){

@@ -2,7 +2,6 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.*;
 import com.tarantula.game.*;
-import com.tarantula.platform.messaging.PlatformMessagingServiceProvider;
 import com.tarantula.platform.room.GameRoom;
 
 
@@ -26,12 +25,6 @@ public class PVERoomProxy extends RoomProxyHeader {
             gameLobby.timeout(s,d);
         });
         stub.sessionId = stub.pushChannel.sessionId();
-        //if(application.tournamentEnabled() && session.tournamentId()!=null){
-          //  Tournament.Instance instance = gameServiceProvider.tournamentServiceProvider().enter(session.tournamentId(),session.systemId());
-           // stub.tournamentId(session.tournamentId());
-           // stub.trackId(instance.distributionKey());
-           // stub.tournament = instance;
-        //}
         stub.offline = true;
         stub.tag(application.tag());
         stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));
@@ -42,9 +35,6 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.joined(false);
         stub.update();
         this.gameServiceProvider.roomServiceProvider().leave(stub);
-        //if(application.tournamentEnabled()&&stub.tournament!=null){
-            //gameServiceProvider.tournamentServiceProvider().finish(stub.tournamentId(),stub.trackId(),stub.systemId());
-        //}
         return true;
     }
 }

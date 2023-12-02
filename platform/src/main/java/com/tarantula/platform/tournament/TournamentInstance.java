@@ -40,14 +40,11 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
 
 
     public TournamentInstance(int maxEntries,double scoreCredits){
-        this(maxEntries);
+        this();
+        this.maxEntries = maxEntries;
         this.scoreCredits = scoreCredits;
     }
 
-    public TournamentInstance(int maxEntries){
-        this();
-        this.maxEntries = maxEntries;
-    }
     public TournamentInstance(){
         totalFinished = new AtomicInteger(0);
         this.onEdge = true;
@@ -100,6 +97,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     @Override
     public boolean write(DataBuffer buffer) {
         buffer.writeInt(maxEntries);
+        buffer.writeDouble(scoreCredits);
         buffer.writeLong(start!=null?TimeUtil.toUTCMilliseconds(start):0);
         buffer.writeLong(close!=null?TimeUtil.toUTCMilliseconds(close):0);
         buffer.writeLong(end!=null?TimeUtil.toUTCMilliseconds(end):0);
@@ -111,6 +109,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     @Override
     public boolean read(DataBuffer buffer) {
         maxEntries = buffer.readInt();
+        scoreCredits = buffer.readDouble();
         long _start = buffer.readLong();
         if(_start>0) start = TimeUtil.fromUTCMilliseconds(_start);
         long _close = buffer.readLong();
@@ -177,8 +176,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         return rankedList;
     }
 
-    void started(LocalDateTime start,LocalDateTime close,LocalDateTime end,double scoreCredits){
-        this.scoreCredits = scoreCredits;
+    void started(LocalDateTime start,LocalDateTime close,LocalDateTime end){
         this.start = start;
         this.close = close;
         this.end = end;

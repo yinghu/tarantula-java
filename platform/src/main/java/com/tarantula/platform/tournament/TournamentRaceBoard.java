@@ -11,6 +11,7 @@ import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class TournamentRaceBoard extends RecoverableObject implements Tournament.RaceBoard, Portable {
@@ -66,12 +67,15 @@ public class TournamentRaceBoard extends RecoverableObject implements Tournament
     @Override
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("successful",true);
+        jsonObject.addProperty("Successful",true);
+        Collections.sort(onBoard,new TournamentEntryComparator());
         JsonArray plist = new JsonArray();
+        int[] rank = {1};
         onBoard.forEach((v)->{
+            ((TournamentEntry)v).rank(rank[0]++);
             plist.add(v.toJson());
         });
-        jsonObject.add("board",plist);
+        jsonObject.add("_board",plist);
         return jsonObject;
     }
 }

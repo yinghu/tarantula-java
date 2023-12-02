@@ -41,6 +41,8 @@ public class TournamentSchedule extends Application {
     public Tournament.Schedule schedule(){ return Tournament.Schedule.values()[header.get("Schedule").getAsInt()];}
 
     public double enterCost(){ return header.get("EnterCost").getAsDouble();}
+
+    public double credit(){ return header.get("Credit").getAsDouble();}
     public LocalDateTime startTime() {
         return TimeUtil.fromString("yyyy-MM-dd'T'HH:mm",header.get("StartTime").getAsString());
     }

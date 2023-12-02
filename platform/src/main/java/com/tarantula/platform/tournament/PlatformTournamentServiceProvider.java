@@ -53,10 +53,10 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     int minDurationHoursPerSchedule = 1;
     int minDurationMinutesPerInstance =  5;
     int endBufferTimeMinutes = 3;
-    double scoreCredits;
+
     int clusterLockTimeoutSeconds = 5;
-    int instanceIdPollingTimeoutSeconds = 3;
-    int instanceIdPollingRetries =3;
+    //int instanceIdPollingTimeoutSeconds = 3;
+
     int maxPlayerHistoryRecords = 10;
 
     private String reloadKey;
@@ -96,27 +96,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         return tournamentIndex.get(tournamentId) != null;
     }
 
-    @Override
-    public Tournament.Instance enter(String tournamentId, String systemId) {
-        TournamentManager index = tournamentIndex.get(tournamentId);
-        byte[] pendingId = null;
-        for(int retry = 0;retry < this.instanceIdPollingRetries;retry++){
-            //pendingId = index.pollInstanceId();
-            if(pendingId != null) break;
-        }
-        if(pendingId == null) return null;
-        String instanceId = new String(pendingId);
-        //Tournament.Instance instance = this.distributionTournamentService.onEnterTournament(gameServiceName,tournamentId,instanceId,systemId);
-        //instance.distributionKey(instanceId);
-        return null;//instance;
-    }
-
-    @Override
-    public Tournament.Entry score(String tournamentId,String instanceId, String systemId, double credit,double delta) {
-        //Tournament.Entry _e = this.distributionTournamentService.onScoreTournament(gameServiceName,tournamentId,instanceId,systemId,credit,delta);
-        //logger.warn(_e.toJson().toString());
-        return null;//_e;
-    }
 
     public void finish(String tournamentId,String instanceId, String systemId){
         this.distributionTournamentService.onFinishTournament(gameServiceName,tournamentId,instanceId,systemId);
@@ -157,11 +136,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.minDurationHoursPerSchedule = ((Number)configuration.property("minDurationHoursPerSchedule")).intValue();
         this.minDurationMinutesPerInstance = ((Number)configuration.property("minDurationMinutesPerInstance")).intValue();
         this.endBufferTimeMinutes = ((Number)configuration.property("endBufferTimeMinutes")).intValue();
-        this.scoreCredits = ((Number)configuration.property("scoreCredits")).doubleValue();
         this.maxPlayerHistoryRecords = ((Number)configuration.property("maxPlayerHistoryRecords")).intValue();
         this.clusterLockTimeoutSeconds = ((Number)configuration.property("clusterLockTimeoutSeconds")).intValue();
-        this.instanceIdPollingTimeoutSeconds = ((Number)configuration.property("instanceIdPollingTimeoutSeconds")).intValue();
-        this.instanceIdPollingRetries = ((Number)configuration.property("instanceIdPollingRetries")).intValue();
         this.dataStore = applicationPreSetup.dataStore(gameCluster,name());
         this.logger = JDKLogger.getLogger(PlatformTournamentServiceProvider.class);
         this.reloadKey = this.serviceContext.clusterProvider().registerReloadListener(this);
@@ -446,7 +422,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     public boolean onTournamentScored(long tournamentId,long systemId, double credit,double delta){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
-        logger.warn("TS : "+tournamentManager.targetScore()+" : "+credit+" : "+delta);
         return tournamentManager.onScore(systemId,credit,delta);
         //Tournament.Instance _ins = tournamentManager.lookup(instanceId);
         //if(_ins==null) return new TournamentEntry();

@@ -2,12 +2,9 @@
   "minDurationHoursPerSchedule": 1,
   "minDurationMinutesPerInstance": 5,
   "endBufferTimeMinutes": 3,
-  "scoreCredits": 1000,
   "maxPlayerHistoryRecords": 10,
   "smallConcurrentInstanceSize": 1,
   "mediumConcurrentInstanceSize": 1,
   "largeConcurrentInstanceSize": 1,
-  "clusterLockTimeoutSeconds": 5,
-  "instanceIdPollingTimeoutSeconds": 3,
-  "instanceIdPollingRetries": 3
+  "clusterLockTimeoutSeconds": 5
 }

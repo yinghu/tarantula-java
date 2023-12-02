@@ -32,6 +32,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     private String type;
 
     private double enterCost;
+    private double credit;
 
     private double targetScore;
 
@@ -88,6 +89,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.maxEntriesPerInstance = schedule.maxEntriesPerInstance();
         this.durationMinutes = schedule.durationMinutesPerInstance();
         this.enterCost = schedule.enterCost();
+        this.credit = schedule.credit();
         this.scheduleId = schedule.distributionId();
     }
 
@@ -138,6 +140,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         buffer.writeInt(maxEntriesPerInstance);
         buffer.writeInt(durationMinutes);
         buffer.writeDouble(enterCost);
+        buffer.writeDouble(credit);
         buffer.writeLong(scheduleId);
         return true;
     }
@@ -157,6 +160,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         maxEntriesPerInstance = buffer.readInt();
         durationMinutes = buffer.readInt();
         enterCost = buffer.readDouble();
+        credit = buffer.readDouble();
         scheduleId = buffer.readLong();
         return true;
     }
@@ -182,19 +186,19 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
 
     private TournamentInstance lookup(long instanceId){
-        TournamentInstance instance = new TournamentInstance(maxEntriesPerInstance);
+        TournamentInstance instance = new TournamentInstance(maxEntriesPerInstance,credit);
         instance.distributionId(instanceId);
         instance.label(Tournament.INSTANCE_LABEL);
         instance.ownerKey(this.key());
         LocalDateTime start = LocalDateTime.now();
-        instance.started(start,start.plusMinutes(durationMinutes-1),start.plusMinutes(durationMinutes),tournamentServiceProvider.scoreCredits);
+        instance.started(start,start.plusMinutes(durationMinutes-1),start.plusMinutes(durationMinutes));
         dataStore.createIfAbsent(instance,true);
         instance.dataStore(dataStore);
         instance.load();
         return instance;
     }
     private TournamentInstance load(long instanceId){
-        TournamentInstance instance = new TournamentInstance(maxEntriesPerInstance);
+        TournamentInstance instance = new TournamentInstance(maxEntriesPerInstance,credit);
         instance.distributionId(instanceId);
         if(!dataStore.load(instance)) return null;
         instance.dataStore(dataStore);
@@ -324,6 +328,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         jsonObject.addProperty("DurationMinutes",durationMinutes);
         jsonObject.addProperty("MaxEntries",maxEntriesPerInstance);
         jsonObject.addProperty("EnterCost",enterCost);
+        jsonObject.addProperty("Credit",credit);
         jsonObject.addProperty("ScheduleId",Long.toString(this.scheduleId));
         return jsonObject;
     }
@@ -360,7 +365,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         }
     }
     private TournamentInstance createInstance(String label){
-        TournamentInstance instance = new TournamentInstance(maxEntriesPerInstance,tournamentServiceProvider.scoreCredits);
+        TournamentInstance instance = new TournamentInstance(maxEntriesPerInstance,credit);
         instance.label(label);
         instance.ownerKey(this.key());
         this.dataStore.create(instance);

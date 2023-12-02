@@ -29,7 +29,7 @@ public class TournamentModule extends ModuleHeader implements Configurable.Liste
             }
         }
         else if(session.action().equals("onJoin")){
-            Tournament.Instance ins = tournamentServiceProvider.enter(session.name(),session.systemId());
+            Tournament.Instance ins = tournamentServiceProvider.tournament(Long.parseLong(session.name())).register(session);
             session.write(ins.toJson().toString().getBytes());
         }
         else if(session.action().equals("onBoard")){

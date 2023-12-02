@@ -39,11 +39,11 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
 
     @Override
     public void score(double credit,double delta) {
-        //if(credits - credit < 0) return;
+        if(credits - credit < 0) return;
         score += delta;
-        //credits -= credit;
+        credits -= credit;
         timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
-        //finished = credits <= 0;
+        finished = credits <= 0;
         this.update();
     }
     public double score(){
