@@ -8,6 +8,8 @@ public interface ServiceContext extends Context{
 
     //create data scope partitioned data store
     DataStore dataStore(int scope,String name);
+    DataStore dataStore(ApplicationSchema applicationSchema,int scope,String name);
+
     Recoverable.DataBufferPair dataBufferPair();
     EventService eventService();
     ClusterProvider clusterProvider();

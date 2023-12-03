@@ -23,6 +23,8 @@ public class TournamentPortableRegistry<T extends Recoverable> extends AbstractR
 
     public static final int TOURNAMENT_REGISTER_CID = 18;
 
+    public static final int TOURNAMENT_JOIN_CID = 19;
+
 
     public static TournamentPortableRegistry INS;
 
@@ -59,6 +61,9 @@ public class TournamentPortableRegistry<T extends Recoverable> extends AbstractR
                 break;
             case TOURNAMENT_REGISTER_CID:
                 pt = new TournamentRegister();
+                break;
+            case TOURNAMENT_JOIN_CID:
+                pt = new TournamentJoin();
                 break;
             default:
         }

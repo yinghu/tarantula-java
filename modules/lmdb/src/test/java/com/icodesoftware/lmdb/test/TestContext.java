@@ -171,4 +171,8 @@ public class TestContext implements ServiceContext {
     public Recoverable.DataBufferPair dataBufferPair(){
         return null;
     }
+
+    public DataStore dataStore(ApplicationSchema applicationSchema,int scope,String name){
+        return null;
+    }
 }

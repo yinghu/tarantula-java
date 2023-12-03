@@ -142,4 +142,8 @@ public class ServiceContextProxy implements ServiceContext {
     public Recoverable.DataBufferPair dataBufferPair(){
         return this.tarantulaContext.dataBufferPair();
     }
+
+    public DataStore dataStore(ApplicationSchema applicationSchema,int scope,String name){
+        return this.tarantulaContext.dataStore(applicationSchema,scope,name);
+    }
 }

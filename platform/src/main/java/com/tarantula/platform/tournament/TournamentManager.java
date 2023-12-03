@@ -5,10 +5,7 @@ import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.icodesoftware.Descriptor;
-import com.icodesoftware.OnSession;
-import com.icodesoftware.Session;
-import com.icodesoftware.Tournament;
+import com.icodesoftware.*;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.util.*;
@@ -364,9 +361,9 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             rank++;
         }
     }
-    private TournamentInstance createInstance(String label){
+    private TournamentInstance createGlobalInstance(){
         TournamentInstance instance = new TournamentInstance(maxEntriesPerInstance,credit);
-        instance.label(label);
+        instance.label(Tournament.GLOBAL_INSTANCE_LABEL);
         instance.ownerKey(this.key());
         this.dataStore.create(instance);
         return instance;
@@ -408,7 +405,13 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     public Instance register(Session session){
         if(this.global) {
-            if(targetScore ==0) this.distributionTournamentService.onEnterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,session.distributionId());
+            TournamentJoin join = new TournamentJoin(session.distributionId(),session.stub(),this.distributionId);
+            if(tournamentServiceProvider.joinStore().load(join) && join.tournamentId == this.distributionId) return new TournamentInstanceProxy(this,session);
+            if(targetScore ==0) {
+                if(this.distributionTournamentService.onEnterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,session.distributionId())){
+                    tournamentServiceProvider.joinStore().createIfAbsent(join,false);
+                }
+            }
             return new TournamentInstanceProxy(this, session);
         }
         OnSession onSession = tournamentServiceProvider.onSession(session);
@@ -464,7 +467,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             return false;
         });
         if(loaded[0]==null){
-            loaded[0] = createInstance(Tournament.GLOBAL_INSTANCE_LABEL);
+            loaded[0] = createGlobalInstance();
         }
         loaded[0].dataStore(dataStore);
         loaded[0].load();
@@ -488,7 +491,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             return false;
         });
         if(loaded[0]==null){
-            loaded[0] = createInstance(Tournament.GLOBAL_INSTANCE_LABEL);
+            loaded[0] = createGlobalInstance();
         }
         loaded[0].dataStore(dataStore);
         loaded[0].load();

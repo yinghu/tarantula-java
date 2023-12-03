@@ -532,6 +532,11 @@ public class TarantulaContext implements Serviceable, ServiceContext {
          throw new IllegalArgumentException("scope ["+scope+"] not supported");
     }
 
+    public DataStore dataStore(ApplicationSchema applicationSchema,int scope,String name){
+        String storeName = applicationSchema.serviceType().replaceAll("-","_")+"_app_"+name;
+        return dataStore(scope,storeName);
+    }
+
     //list the database list on deploy service
     public DataStoreProvider dataStoreProvider(){
  	    return this.deploymentDataStoreProvider;

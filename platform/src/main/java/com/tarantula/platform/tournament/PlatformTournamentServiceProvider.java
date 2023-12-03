@@ -40,6 +40,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private DistributionItemService distributionItemService;
     final String gameServiceName;
     private DataStore dataStore;
+
+    private DataStore tournamentJoin;
     private CopyOnWriteArrayList<Tournament.Listener> listeners = new CopyOnWriteArrayList<>();
 
     private ConcurrentHashMap<Long,TournamentManager> tournamentIndex = new ConcurrentHashMap<>();
@@ -102,18 +104,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         //Tournament.RaceBoard board = this.distributionTournamentService.onListTournament(gameServiceName,tournamentId,instanceId);
         //logger.warn(board.toJson().toString());
     }
-    @Override
-    public Tournament.RaceBoard list(String tournamentId,String instanceId) {
-       // Tournament.RaceBoard ins = this.distributionTournamentService.onListTournament(gameServiceName,tournamentId,instanceId);
-        //Collections.sort(ins.list(),new TournamentEntryComparator());
-        //return ins;
-        return null;
-    }
 
-    @Override
-    public Tournament.RaceBoard list(String tournamentId) {
-        return this.distributionTournamentService.onListTournament(gameServiceName,Long.parseLong(tournamentId));
-    }
     public List<Tournament> list(){
         ArrayList<Tournament> _tms = new ArrayList<>();
         tournamentIndex.forEach((k,v)->
@@ -139,6 +130,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.maxPlayerHistoryRecords = ((Number)configuration.property("maxPlayerHistoryRecords")).intValue();
         this.clusterLockTimeoutSeconds = ((Number)configuration.property("clusterLockTimeoutSeconds")).intValue();
         this.dataStore = applicationPreSetup.dataStore(gameCluster,name());
+        this.tournamentJoin = serviceContext.dataStore(gameCluster,Distributable.LOCAL_SCOPE,"tournament_join");
         this.logger = JDKLogger.getLogger(PlatformTournamentServiceProvider.class);
         this.reloadKey = this.serviceContext.clusterProvider().registerReloadListener(this);
         this.distributionTournamentService = this.serviceContext.clusterProvider().serviceProvider(DistributionTournamentService.NAME);
@@ -391,6 +383,10 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     long nextInstanceId(){
         return serviceContext.distributionId();
+    }
+
+    DataStore joinStore(){
+        return tournamentJoin;
     }
 
     //distributed operation callbacks
