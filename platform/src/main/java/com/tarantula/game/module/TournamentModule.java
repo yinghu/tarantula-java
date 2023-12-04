@@ -16,18 +16,6 @@ public class TournamentModule extends ModuleHeader implements Configurable.Liste
         if(session.action().equals("onList")){
             session.write(new TournamentContext(true,"tournament list",this.tournamentServiceProvider.list()).toJson().toString().getBytes());
         }
-        else if(session.action().equals("onPlayerHistory")){
-            session.write(new TournamentHistoryContext(true,"player tournament list",this.tournamentServiceProvider.playerHistory(session.systemId())).toString().getBytes());
-        }
-        else if(session.action().equals("onTournamentHistory")){
-            Tournament.Instance ht = this.tournamentServiceProvider.tournamentHistory(session.name());
-            if(ht!=null){
-                session.write(ht.toJson().toString().getBytes());
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,"tournament not existed->"+session.name()).getBytes());
-            }
-        }
         else if(session.action().equals("onJoin")){
             Tournament.Instance ins = tournamentServiceProvider.tournament(Long.parseLong(session.name())).register(session);
             session.write(ins.toJson().toString().getBytes());

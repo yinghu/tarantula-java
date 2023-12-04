@@ -190,6 +190,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
     @Override
     public void tournamentClosed(Tournament tournament) {
+        gameContext.log("Tournament closed : "+tournament.distributionId()+" : "+tournament.name()+" : "+tournament.type()+" : "+tournament.global(),OnLog.WARN);
         tournamentIndex.remove(tournament.distributionId());
     }
 

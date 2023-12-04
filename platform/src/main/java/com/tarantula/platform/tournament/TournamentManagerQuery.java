@@ -2,17 +2,17 @@ package com.tarantula.platform.tournament;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
+import com.icodesoftware.Tournament;
 import com.icodesoftware.util.SnowflakeKey;
 
 
 public class TournamentManagerQuery implements RecoverableFactory<TournamentManager> {
 
-    private long nodeId;
-    private String label;
+    private long bucketId;
 
-    public TournamentManagerQuery(long nodeId, String label){
-        this.nodeId = nodeId;
-        this.label = label;
+    public TournamentManagerQuery(long bucketId){
+        this.bucketId = bucketId;
+
     }
 
     public TournamentManager create() {
@@ -23,11 +23,11 @@ public class TournamentManagerQuery implements RecoverableFactory<TournamentMana
 
 
     public String label(){
-        return label;
+        return Tournament.MANAGER_LABEL;
     }
 
     @Override
     public Recoverable.Key key() {
-        return new SnowflakeKey(nodeId);
+        return new SnowflakeKey(bucketId);
     }
 }

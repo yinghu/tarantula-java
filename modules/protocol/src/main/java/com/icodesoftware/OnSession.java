@@ -11,16 +11,5 @@ public interface OnSession extends OnApplication, Response,DataStore.Updatable {
     String login();
     void login(String login);
 
-    int tournamentSlot();
-
-    double tournamentScore();
-
-    double tournamentCredit();
-
-    boolean tournamentFinished();
-
-    void onTournament(int tournamentSlot,long tournamentId);
-    void onTournamentScore(double credit,double score);
-
 
 }

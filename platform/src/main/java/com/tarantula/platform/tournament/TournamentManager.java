@@ -91,7 +91,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
 
     public TournamentManager(){
-
+        this.onEdge = true;
+        this.label = Tournament.MANAGER_LABEL;
     }
     public Schedule schedule(){
         return this.schedule;
@@ -383,6 +384,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             return;
         }
         concurrentInstanceSize = tournamentServiceProvider.smallConcurrentInstanceSize;
+
     }
 
     void loadPrizes(ApplicationPreSetup applicationPreSetup, Descriptor application){
@@ -414,11 +416,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             }
             return new TournamentInstanceProxy(this, session);
         }
-        OnSession onSession = tournamentServiceProvider.onSession(session);
-        int slot = onSession.tournamentSlot();
-        TournamentRegisterStatus pending = distributionTournamentService.onRegisterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,slot+1);
-        onSession.onTournament(pending.slot,pending.instanceId);
-        onSession.update();
+
+        TournamentRegisterStatus pending = distributionTournamentService.onRegisterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,1);
         Tournament.Instance ins = this.distributionTournamentService.onEnterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,pending.instanceId,session.distributionId());
         ins.distributionId(pending.instanceId);
         return new TournamentInstanceProxy(this,session,(TournamentInstance) ins);

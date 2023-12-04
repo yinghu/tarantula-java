@@ -8,14 +8,17 @@ import com.icodesoftware.util.RecoverableObject;
 
 public class TournamentScheduleStatus extends RecoverableObject {
 
-    public final static String TOURNAMENT_SCHEDULE_LOOKUP_INDEX = "schedule";
     public Tournament.Status status = Tournament.Status.PENDING;//-> STARTING -> STARTED -> PENDING
 
     public long tournamentId;
 
+    public TournamentScheduleStatus(long tournamentId){
+        this();
+        this.tournamentId = tournamentId;
+    }
     public TournamentScheduleStatus(){
         this.onEdge = true;
-        this.label = TOURNAMENT_SCHEDULE_LOOKUP_INDEX;
+        this.label = Tournament.SCHEDULE_LABEL;
     }
     @Override
     public boolean write(DataBuffer buffer) {

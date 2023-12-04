@@ -2,10 +2,7 @@ package com.tarantula.platform;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnSession;
-import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.service.cluster.PortableRegistry;
-
-import java.time.LocalDateTime;
 
 public class OnSessionTrack extends OnApplicationHeader implements OnSession {
 
@@ -18,10 +15,7 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
 
     public static final OnSession SESSION_NOT_AVAILABLE = new OnSessionTrack("SESSION NOT AVAILABLE");
 
-    protected int tournamentSlot;
-    protected double tournamentScore;
 
-    protected double tournamentCredit;
 
     public OnSessionTrack(){
         this.onEdge = true;
@@ -78,30 +72,4 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
         return jp;
     }
 
-
-    public int tournamentSlot(){
-        return tournamentSlot;
-    }
-    public void onTournament(int tournamentSlot,long tournamentId){
-        this.tournamentSlot = tournamentSlot;
-        this.tournamentId = tournamentId;
-        this.timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
-    }
-
-    public double tournamentScore(){
-        return tournamentScore;
-    }
-
-    public double tournamentCredit(){
-        return tournamentCredit;
-    }
-
-    public boolean tournamentFinished(){
-        return disabled;
-    }
-
-    public void onTournamentScore(double credit,double score){
-        this.tournamentCredit -= credit;
-        this.tournamentScore += score;
-    }
 }

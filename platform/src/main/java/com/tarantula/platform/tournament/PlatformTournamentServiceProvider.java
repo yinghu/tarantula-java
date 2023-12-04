@@ -6,7 +6,6 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.BufferUtil;
 import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.game.SimpleStub;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.icodesoftware.util.ScheduleRunner;
@@ -14,7 +13,6 @@ import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.item.ItemDistributionCallback;
-import com.tarantula.platform.service.SystemValidatorProvider;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -26,8 +24,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private static final String CONFIG = "game-tournament-settings";
 
     public static final String NAME = "tournament";
-
-    //private final static String TOURNAMENT_LOOKUP_INDEX = "tournament";
 
     final static long SCHEDULE_RUNNER_DELAY = 500;
 
@@ -57,7 +53,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     int endBufferTimeMinutes = 3;
 
     int clusterLockTimeoutSeconds = 5;
-    //int instanceIdPollingTimeoutSeconds = 3;
 
     int maxPlayerHistoryRecords = 10;
 
@@ -98,13 +93,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         return tournamentIndex.get(tournamentId) != null;
     }
 
-
-    public void finish(String tournamentId,String instanceId, String systemId){
-        this.distributionTournamentService.onFinishTournament(gameServiceName,tournamentId,instanceId,systemId);
-        //Tournament.RaceBoard board = this.distributionTournamentService.onListTournament(gameServiceName,tournamentId,instanceId);
-        //logger.warn(board.toJson().toString());
-    }
-
     public List<Tournament> list(){
         ArrayList<Tournament> _tms = new ArrayList<>();
         tournamentIndex.forEach((k,v)->
@@ -141,7 +129,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     @Override
     public void start() throws Exception {
-        TournamentManagerQuery query = new TournamentManagerQuery(this.serviceContext.node().nodeId(),this.serviceContext.node().nodeName());
+        TournamentManagerQuery query = new TournamentManagerQuery(this.serviceContext.node().bucketId());
         dataStore.list(query).forEach((tournament)->{
             if(tournament.status() != Tournament.Status.ENDED && tournament.status() != Tournament.Status.CLOSED ){
                 TournamentScheduleStatus status = new TournamentScheduleStatus();
@@ -172,21 +160,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.serviceContext.clusterProvider().unregisterReloadListener(reloadKey);
     }
 
-    public List<Tournament.History> playerHistory(String systemId){
-        ArrayList<Tournament.History> list = new ArrayList<>();
-        return list;
-    }
-    public Tournament.Instance tournamentHistory(String tournamentId){//schedule node
-        TournamentHistoryRecord tournament = new TournamentHistoryRecord();
-        tournament.distributionKey(tournamentId);
-        tournament.dataStore(dataStore);
-        if(!this.dataStore.load(tournament)){
-            return null;
-        }
-        tournament.load();
-        return tournament;
-    }
-
     @Override
     public void reload(int partition,boolean localMember) {
         tournamentIndex.clear();
@@ -210,7 +183,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     private void scheduleTournament(){
         LocalDateTime _current = LocalDateTime.now();
-        TournamentScheduleStatusQuery query = new TournamentScheduleStatusQuery(this.serviceContext.node().nodeId(),TournamentScheduleStatus.TOURNAMENT_SCHEDULE_LOOKUP_INDEX);
+        TournamentScheduleStatusQuery query = new TournamentScheduleStatusQuery(this.serviceContext.node().bucketId());
         dataStore.list(query).forEach(ts->{
             TournamentSchedule schedule = this.tournamentSchedule(ts.distributionId());
             if(schedule!=null){
@@ -234,6 +207,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         }
     }
     void endTournament(TournamentManager tournament){
+        logger.warn("Tournament end : "+tournament.distributionKey());
         byte[] lockKey = tournament.key().asBinary();
         try {
             scheduleStore.mapLock(lockKey);
@@ -262,7 +236,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             dataStore.createIfAbsent(status,true);
             if(status.status != Tournament.Status.PENDING ) throw new RuntimeException("schedule is running on tournament ["+status.tournamentId+"]");
             if(TimeUtil.durationUTCInHours(schedule.startTime(),schedule.endTime()) < minDurationHoursPerSchedule) throw new RuntimeException("min hours per schedule less than ["+minDurationHoursPerSchedule+"]");
-            if(schedule.durationMinutesPerInstance() < minDurationMinutesPerInstance) throw new RuntimeException("min minutes per instance less than ["+minDurationMinutesPerInstance+"]");
+            if(!schedule.global() && schedule.durationMinutesPerInstance() < minDurationMinutesPerInstance) throw new RuntimeException("min minutes per instance less than ["+minDurationMinutesPerInstance+"]");
             switch (schedule.schedule()){
                 case DAILY_SCHEDULE:
                 case WEEKLY_SCHEDULE:
@@ -336,9 +310,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         if(!this.dataStore.load(status)) throw new RuntimeException("no schedule installed");
         TournamentManager tournament = new TournamentManager(schedule);
         tournament.dataStore(dataStore);
-        tournament.label(this.serviceContext.node().nodeName());
-        tournament.ownerKey(new SnowflakeKey(this.serviceContext.node().nodeId()));
-        tournament.onEdge(true);
+        tournament.ownerKey(new SnowflakeKey(this.serviceContext.node().bucketId()));
         if(!dataStore.create(tournament)) throw new RuntimeException("Failed to create tournament instance");
         status.status = Tournament.Status.STARTING;
         status.tournamentId = tournament.distributionId();
@@ -367,9 +339,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     private void clearTournament(TournamentManager tournament){
         TournamentScheduleStatus status = new TournamentScheduleStatus();
-        status.distributionKey(tournament.index());
+        status.distributionId(tournament.scheduleId());
         this.dataStore.delete(status);
-        ConfigurableObject schedule = this.tournamentSchedule(Long.parseLong(tournament.index())).configurableObject;
+        ConfigurableObject schedule = this.tournamentSchedule(tournament.scheduleId()).configurableObject;
         schedule.released();
     }
     private TournamentSchedule tournamentSchedule(long scheduleId){

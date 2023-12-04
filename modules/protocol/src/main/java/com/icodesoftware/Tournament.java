@@ -5,8 +5,10 @@ import java.util.List;
 
 public interface Tournament extends Configurable {
 
-    String REGISTER_LABEL = "tournament_register";
+    String SCHEDULE_LABEL = "tournament_schedule";
 
+    String MANAGER_LABEL = "tournament_manager";
+    String REGISTER_LABEL = "tournament_register";
     String INSTANCE_LABEL = "tournament_instance";
     String GLOBAL_INSTANCE_LABEL = "tournament_global";
     String ENTRY_LABEL = "tournament_entry";

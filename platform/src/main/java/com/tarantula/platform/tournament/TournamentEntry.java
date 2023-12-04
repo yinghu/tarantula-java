@@ -122,11 +122,11 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("SystemId",systemId);
+        jsonObject.addProperty("SystemId",Long.toString(systemId));
         jsonObject.addProperty("Credits",credits);
         jsonObject.addProperty("Score",score);
         jsonObject.addProperty("Rank",rank);
-        jsonObject.addProperty("Timestamp",timestamp);
+        jsonObject.addProperty("Timestamp",Long.toString(timestamp));
         //jsonObject.addProperty("Finished",finished);
         return jsonObject;
     }
