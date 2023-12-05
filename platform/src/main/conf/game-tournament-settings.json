@@ -4,7 +4,7 @@
   "endBufferTimeMinutes": 3,
   "maxPlayerHistoryRecords": 10,
   "smallConcurrentInstanceSize": 1,
-  "mediumConcurrentInstanceSize": 1,
-  "largeConcurrentInstanceSize": 1,
+  "mediumConcurrentInstanceSize": 3,
+  "largeConcurrentInstanceSize": 8,
   "clusterLockTimeoutSeconds": 5
 }

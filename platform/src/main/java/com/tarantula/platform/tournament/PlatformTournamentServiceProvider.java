@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ScheduledFuture;
 
 public class PlatformTournamentServiceProvider implements TournamentServiceProvider, ReloadListener, ConfigurationServiceProvider, ItemDistributionCallback {
 
@@ -370,6 +371,10 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     DataStore joinStore(){
         return tournamentJoin;
+    }
+
+    ScheduledFuture<?> schedule(SchedulingTask task){
+        return serviceContext.schedule(task);
     }
 
     private TournamentScheduleStatus loadStatus(long scheduleId){

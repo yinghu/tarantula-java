@@ -6,11 +6,13 @@ import com.icodesoftware.SchedulingTask;
 public class TournamentInstanceEndMonitor implements SchedulingTask {
 
     private final TournamentManager tournamentHeader;
-    private final TournamentInstance tournamentInstanceHeader;
+    private final long pendingInstanceId;
+    private final long delay;
 
-    public TournamentInstanceEndMonitor(TournamentManager tournamentHeader, TournamentInstance tournamentInstanceHeader){
+    public TournamentInstanceEndMonitor(TournamentManager tournamentHeader, long instanceId,long delay){
         this.tournamentHeader = tournamentHeader;
-        this.tournamentInstanceHeader = tournamentInstanceHeader;
+        this.pendingInstanceId = instanceId;
+        this.delay = delay;
     }
     @Override
     public boolean oneTime() {
@@ -24,11 +26,11 @@ public class TournamentInstanceEndMonitor implements SchedulingTask {
 
     @Override
     public long delay() {
-        return this.tournamentInstanceHeader.toEndingTime();
+        return this.delay;
     }
 
     @Override
     public void run() {
-        tournamentHeader.endTournamentInstance(tournamentInstanceHeader);
+        tournamentHeader.endTournamentInstance(pendingInstanceId);
     }
 }

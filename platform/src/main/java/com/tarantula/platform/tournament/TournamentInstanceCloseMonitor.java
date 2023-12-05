@@ -5,11 +5,13 @@ import com.icodesoftware.SchedulingTask;
 public class TournamentInstanceCloseMonitor implements SchedulingTask {
 
     private final TournamentManager tournamentHeader;
-    private final TournamentInstance tournamentInstanceHeader;
+    private final long pendingInstanceId;
+    private final long delay;
 
-    public TournamentInstanceCloseMonitor(TournamentManager tournamentHeader, TournamentInstance tournamentInstanceHeader){
+    public TournamentInstanceCloseMonitor(TournamentManager tournamentHeader,long instanceId,long delay){
         this.tournamentHeader = tournamentHeader;
-        this.tournamentInstanceHeader = tournamentInstanceHeader;
+        this.pendingInstanceId = instanceId;
+        this.delay = delay;
     }
     @Override
     public boolean oneTime() {
@@ -23,11 +25,11 @@ public class TournamentInstanceCloseMonitor implements SchedulingTask {
 
     @Override
     public long delay() {
-        return this.tournamentInstanceHeader.toClosingTime();
+        return this.delay;
     }
 
     @Override
     public void run() {
-        tournamentHeader.closeTournamentInstance(tournamentInstanceHeader);
+        tournamentHeader.closeTournamentInstance(pendingInstanceId);
     }
 }
