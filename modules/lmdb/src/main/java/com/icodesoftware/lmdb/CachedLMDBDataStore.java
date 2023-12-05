@@ -321,7 +321,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         final Txn<ByteBuffer> txn = env.txnWrite();
         try{
             if(!dbi.delete(txn, key.flip())) return false;
-            removeEdges(txn,key.rewind());
+            //removeEdges(txn,key.rewind());
             txn.commit();
             key.rewind();
             lmdbDataStoreProvider.onDeleting(metadata,key, cache.value(),txn.getId());
@@ -508,7 +508,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             Recoverable.DataBuffer value = cache.value();
             if(!bufferStream.on(key,value)) return false;
             if(!dbi.delete(txn,key.flip())) return false;
-            removeEdges(txn,key.rewind());
+            //removeEdges(txn,key.rewind());
             txn.commit();
             return true;
         }finally {

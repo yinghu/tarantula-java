@@ -203,6 +203,19 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         instance.load();
         return instance;
     }
+
+    private TournamentInstance globalInstance(){
+        TournamentInstanceQuery query = new TournamentInstanceQuery(this.distributionId,Tournament.GLOBAL_INSTANCE_LABEL);
+        TournamentInstance[] loaded = {null};
+        this.dataStore.list(query,ins->{
+            loaded[0] = ins;
+            return false;
+        });
+        if(loaded[0]==null) return null;
+        loaded[0].dataStore(dataStore);
+        loaded[0].load();
+        return loaded[0];
+    }
     @Override
     public int getFactoryId() {
         return PortableEventRegistry.OID;
@@ -306,7 +319,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         //TournamentInstance pendingEnded = this.instanceIndex.remove(ended.distributionKey());
         //if(pendingEnded == null || pendingEnded.status() == (Status.ENDED)) return;
         //if(pendingEnded.status() != (Status.CLOSED)) closeTournamentInstance(ended);
-        //rank(pendingEnded);
+        //rank(ended);
         //pendingEnded.ended();
         //this.dataStore.update(pendingEnded);
         //this.tournamentServiceProvider.logger.warn("instance ended->"+pendingEnded);
@@ -341,7 +354,9 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.dataStore.update(this);
     }
     public void end(){
-        //instanceIndex.forEach((k,ins)-> this.endTournamentInstance(ins));
+        if(this.global && distributionTournamentService.ownership(this.distributionId)){
+            rank(globalInstance());
+        }
         status = Status.ENDED;
         this.dataStore.update(this);
     }
@@ -351,13 +366,9 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         for(TournamentEntry entry : ended.end()){
             entry.rank(rank);
             entry.update();
-            TournamentHistory history = new TournamentHistory(ended.distributionKey(),rank,entry.score(),LocalDateTime.now());
-            history.ownerKey(new SnowflakeKey(ended.distributionId()));
-            dataStore.create(history);
             TournamentPrize prize = prizes.get(rank);
             if(prize!=null) {
-                //this.tournamentServiceProvider.inventoryServiceProvider.redeem(entry.systemId(),prize);
-                this.tournamentServiceProvider.logger.warn(entry.systemId()+" prized");
+                this.tournamentServiceProvider.inventoryServiceProvider.redeem(Long.toString(entry.systemId()),prize);
             }
             rank++;
         }
@@ -393,7 +404,9 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         schedule.distributionId(this.scheduleId);
         if(!applicationPreSetup.load(application,schedule)) return;
         schedule.setup();
-        schedule.list().forEach(c-> prizes.put(c.rank(),c));
+        schedule.list().forEach(c-> {
+            prizes.put(c.rank(),c);
+        });
     }
 
     long toClosingTime(){

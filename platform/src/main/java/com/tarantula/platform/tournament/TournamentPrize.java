@@ -13,8 +13,9 @@ public class TournamentPrize extends Application implements Tournament.Prize {
 
     }
 
-    public TournamentPrize(ConfigurableObject configurableObject){
+    public TournamentPrize(ConfigurableObject configurableObject,int rank){
         super(configurableObject);
+        this.rank = rank;
     }
 
     public int getFactoryId() {
@@ -32,7 +33,7 @@ public class TournamentPrize extends Application implements Tournament.Prize {
     @Override
     public boolean configureAndValidate(){
         boolean valid = this.header.has("MinRank") && this.header.has("MaxRank");
-        rank = header.get("MinRank").getAsInt();
+        //rank = header.get("MinRank").getAsInt();
         return valid;
     }
     public String toString(){

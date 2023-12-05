@@ -70,14 +70,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     public ShoppingItem shoppingItem(String itemId){
         return shoppingItems.get(itemId);
     }
-    public boolean grant(String systemId,String itemId){
-        ShoppingItem shoppingItem = shoppingItems.get(itemId);
-        if(shoppingItem==null){
-            logger.warn("shopping item ["+itemId+"] not existed");
-            return false;
-        }
-        return this.inventoryServiceProvider.redeem(systemId,shoppingItem);
-    }
+
 
     @Override
     public <T extends Configurable> void register(T t) {

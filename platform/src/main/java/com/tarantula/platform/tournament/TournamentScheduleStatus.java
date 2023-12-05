@@ -63,7 +63,4 @@ public class TournamentScheduleStatus extends RecoverableObject {
         this.status = pending;
         dataStore.update(this);
     }
-    void delete(){
-        dataStore.delete(this);
-    }
 }
