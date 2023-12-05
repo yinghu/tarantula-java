@@ -23,6 +23,6 @@ public interface DistributionTournamentService extends ServiceProvider {
 
     void onSyncTournament(String serviceName,String tournamentId,String instanceId);
     void onCloseTournament(String serviceName,String tournamentId);
-    void onEndTournament(String serviceName,String tournamentId);
+    void onEndTournament(String serviceName,long tournamentId);
 
 }

@@ -12,6 +12,7 @@ import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 
 public class TournamentEntry extends RecoverableObject implements Tournament.Entry, Portable {
@@ -124,9 +125,9 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("SystemId",Long.toString(systemId));
         jsonObject.addProperty("Credits",credits);
-        jsonObject.addProperty("Score",score);
+        jsonObject.addProperty("Score",Double.valueOf(score).intValue());
         jsonObject.addProperty("Rank",rank);
-        jsonObject.addProperty("Timestamp",Long.toString(timestamp));
+        jsonObject.addProperty("LastUpdated",TimeUtil.fromUTCMilliseconds(timestamp).format(DateTimeFormatter.ISO_DATE_TIME));
         //jsonObject.addProperty("Finished",finished);
         return jsonObject;
     }

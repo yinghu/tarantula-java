@@ -196,7 +196,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         });
     }
 
-    public void onEndTournament(String serviceName,String tournamentId){
+    public void onEndTournament(String serviceName,long tournamentId){
         NodeEngine nodeEngine = getNodeEngine();
         EndTournamentOperation operation = new EndTournamentOperation(serviceName,tournamentId);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(tournamentId);

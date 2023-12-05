@@ -316,7 +316,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("TournamentId",this.distributionKey());
         jsonObject.addProperty("Global",global);
-        jsonObject.addProperty("TargetScore",targetScore);
+        jsonObject.addProperty("TargetScore",Double.valueOf(targetScore).intValue());
         jsonObject.addProperty("NotificationOnFinish",notificationOnFinish);
         jsonObject.addProperty("Type",type);
         jsonObject.addProperty("Name",name);

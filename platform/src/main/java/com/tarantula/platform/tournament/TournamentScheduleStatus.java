@@ -53,9 +53,17 @@ public class TournamentScheduleStatus extends RecoverableObject {
     @Override
     public JsonObject toJson() {
         JsonObject json = new JsonObject();
-        json.addProperty("TournamentId",tournamentId);
+        json.addProperty("TournamentId",Long.toString(tournamentId));
         json.addProperty("Status",status.name());
         json.addProperty("DistributionId",distributionKey());
         return json;
+    }
+
+    void update(Tournament.Status pending){
+        this.status = pending;
+        dataStore.update(this);
+    }
+    void delete(){
+        dataStore.delete(this);
     }
 }

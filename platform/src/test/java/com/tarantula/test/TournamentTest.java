@@ -3,6 +3,7 @@ package com.tarantula.test;
 import com.icodesoftware.DataStore;
 
 import com.icodesoftware.Tournament;
+import com.icodesoftware.util.BufferUtil;
 import com.icodesoftware.util.SnowflakeKey;
 
 import com.tarantula.platform.tournament.TournamentScheduleStatus;
@@ -34,6 +35,7 @@ public class TournamentTest extends DataStoreHook{
         Assert.assertTrue(dataStore.delete(load));
         Assert.assertEquals(0,dataStore.list(new TournamentScheduleStatusQuery(100)).size());
         Assert.assertFalse(dataStore.load(load));
+        Assert.assertEquals(1000,BufferUtil.toLong(status.toBinary()));
     }
 
     @Test(groups = { "Tournament" })
