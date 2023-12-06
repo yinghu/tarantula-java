@@ -30,7 +30,7 @@ public class DataStoreTestEvn {
         serviceContext = new TestServiceContext(distributionIdGenerator);
         HashMap<String,Object> storeAdditions = new HashMap<>();
         storeAdditions.put("storeSizeMb",3);
-        storeAdditions.put("envNoSyncFlag",false);
+        storeAdditions.put("envNoSyncFlag",true);
         DataStoreConfigurationJsonParser parser = new DataStoreConfigurationJsonParser("test-tarantula-platform-data-store-config.json",serviceContext, storeAdditions,dataStoreProvider->{
             try{
                 DataStoreTestEvn.dataStoreProvider = dataStoreProvider;

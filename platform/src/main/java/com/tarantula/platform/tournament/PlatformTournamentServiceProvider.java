@@ -362,15 +362,24 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         return applicationPreSetup.load(application,schedule) ? new TournamentSchedule(schedule) : null;
     }
 
-    OnSession onSession(Session session){
-        return systemValidatorProvider.onSession(session);
-    }
     long nextInstanceId(){
         return serviceContext.distributionId();
     }
 
-    DataStore joinStore(){
-        return tournamentJoin;
+    TournamentJoin tournamentJoin(Session session,long scheduleId){
+        TournamentJoin[] joined = new TournamentJoin[]{null};
+        tournamentJoin.list(new TournamentJoinQuery(SnowflakeKey.from(session.distributionId()),TournamentJoin.PLAYER_JOIN_LABEL),join->{
+            if(join.scheduleId == scheduleId){
+                joined[0]=join;
+                return false;
+            }
+            return true;
+        });
+        if(joined[0]!=null) return joined[0];
+        TournamentJoin joining = TournamentJoin.init(session,scheduleId);
+        joining.dataStore(tournamentJoin);
+        tournamentJoin.create(joining);
+        return joining;
     }
 
     ScheduledFuture<?> schedule(SchedulingTask task){

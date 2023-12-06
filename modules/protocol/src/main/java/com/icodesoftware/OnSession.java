@@ -11,5 +11,4 @@ public interface OnSession extends OnApplication, Response,DataStore.Updatable {
     String login();
     void login(String login);
 
-
 }

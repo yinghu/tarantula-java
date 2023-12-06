@@ -31,14 +31,6 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     @Override
     public void onJoined(Session session) {
         gameContext.log("JOIN : "+session.distributionKey()+" :"+session.stub(),OnLog.WARN);
-        tournamentIndex.forEach((key,entry)->{
-            if(entry.type().equals("Q100")){//LEVEL UP GLOBAL TOURNAMENT
-                entry.register(session).update(session,(e)->{
-                    e.score(10,100);
-                    return true;
-                });
-            }
-        });
     }
 
     public void startGame(Session session, byte[] payload) throws Exception{
@@ -90,6 +82,14 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             return update.update(applicationPreSetup, session);
         });
         if(updated){//do http calls outside transaction operations
+            tournamentIndex.forEach((key,entry)->{
+                if(entry.type().equals("Q100")){//LEVEL UP GLOBAL TOURNAMENT
+                    entry.register(session).update(session,(e)->{
+                        e.score(10,100);
+                        return true;
+                    });
+                }
+            });
             TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
             update.publishAnalytics(webhook);
         }

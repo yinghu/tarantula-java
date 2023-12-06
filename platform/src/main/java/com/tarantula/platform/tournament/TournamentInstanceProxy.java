@@ -9,14 +9,14 @@ import java.time.LocalDateTime;
 public class TournamentInstanceProxy extends RecoverableObject implements Tournament.Instance {
 
     private TournamentManager tournamentManager;
-    private TournamentInstance instance;
+    private TournamentJoin instance;
 
     private Session session;
     public TournamentInstanceProxy(TournamentManager tournamentManager,Session session){
         this.tournamentManager = tournamentManager;
         this.session = session;
     }
-    public TournamentInstanceProxy(TournamentManager tournamentManager,Session session,TournamentInstance instance){
+    public TournamentInstanceProxy(TournamentManager tournamentManager,Session session,TournamentJoin instance){
         this(tournamentManager,session);
         this.instance = instance;
     }
@@ -60,7 +60,7 @@ public class TournamentInstanceProxy extends RecoverableObject implements Tourna
         }
         TournamentEntryProxy tournamentEntryProxy = new TournamentEntryProxy();
         onEntry.on(tournamentEntryProxy);
-        return tournamentManager.score(session,instance.distributionId(),tournamentEntryProxy);
+        return tournamentManager.score(session,instance.instanceId,tournamentEntryProxy);
     }
 
     @Override

@@ -270,11 +270,12 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         List<TournamentRegister> saved = dataStore.list(new TournamentRegisterQuery(this.key()));
         int idx = 0;
         for(TournamentRegister register : saved){
-            pendingInstances[idx] = register;
+            pendingInstances[register.routingNumber()] = register;
             if(register.closed()){
                 register.setup(tournamentServiceProvider.nextInstanceId(),durationMinutes,maxEntriesPerInstance);
                 dataStore.update(register);
             }
+            tournamentServiceProvider.logger.warn("Tournament register on slot ["+register.routingNumber()+"]");
             idx++;
         }
         for(int i=idx;i<concurrentInstanceSize;i++){
@@ -436,25 +437,24 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
 
     public Instance register(Session session){
+        TournamentJoin join = tournamentServiceProvider.tournamentJoin(session,scheduleId);
         if(this.global) {
-            TournamentJoin join = new TournamentJoin(session.distributionId(),session.stub(),this.distributionId);
-            if(tournamentServiceProvider.joinStore().load(join) && join.tournamentId == this.distributionId) return new TournamentInstanceProxy(this,session);
-            if(targetScore ==0) {
+            if(!join.closed) return new TournamentInstanceProxy(this,session);
+            if(targetScore == 0) {
                 if(this.distributionTournamentService.onEnterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,session.distributionId())){
-                    tournamentServiceProvider.joinStore().createIfAbsent(join,false);
+                    join.onTournament(this.distributionId);
                 }
             }
             return new TournamentInstanceProxy(this, session);
         }
-
-        TournamentRegisterStatus pending = distributionTournamentService.onRegisterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,1);
+        if(!join.closed){
+            return new TournamentInstanceProxy(this,session,join);
+        }
+        TournamentRegisterStatus pending = distributionTournamentService.onRegisterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,join.slot);
         Tournament.Instance ins = this.distributionTournamentService.onEnterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,pending.instanceId,session.distributionId());
         ins.distributionId(pending.instanceId);
-        return new TournamentInstanceProxy(this,session,(TournamentInstance) ins);
-    }
-
-    public OnSession onSession(Session session){
-        return tournamentServiceProvider.onSession(session);
+        join.onTournament(this.distributionId,pending.slot,pending.instanceId);
+        return new TournamentInstanceProxy(this,session,join);
     }
 
     public boolean enter(Session session){
@@ -470,8 +470,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         if(global) {
             return distributionTournamentService.onListTournament(tournamentServiceProvider.gameServiceName, this.distributionId());
         }
-        OnSession onSession = onSession(session);
-        return distributionTournamentService.onListTournament(tournamentServiceProvider.gameServiceName,distributionId,onSession.tournamentId());
+        TournamentJoin tournamentJoin = this.tournamentServiceProvider.tournamentJoin(session,scheduleId);
+        return distributionTournamentService.onListTournament(tournamentServiceProvider.gameServiceName,distributionId,tournamentJoin.instanceId);
     }
 
 
