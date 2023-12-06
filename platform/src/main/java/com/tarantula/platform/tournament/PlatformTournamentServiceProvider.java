@@ -163,6 +163,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     @Override
     public void reload(int partition,boolean localMember) {
+        logger.warn("Reload tournament service provider : "+gameServiceName);
         tournamentIndex.clear();
     }
     public void atMidnight(){
@@ -370,6 +371,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         TournamentJoin[] joined = new TournamentJoin[]{null};
         tournamentJoin.list(new TournamentJoinQuery(SnowflakeKey.from(session.distributionId()),TournamentJoin.PLAYER_JOIN_LABEL),join->{
             if(join.scheduleId == scheduleId){
+                join.dataStore(tournamentJoin);
                 joined[0]=join;
                 return false;
             }
@@ -410,28 +412,10 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     public boolean onTournamentScored(long tournamentId,long instanceId, long systemId, double credit,double delta){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         return tournamentManager.onScore(systemId,instanceId,credit,delta);
-        //Tournament.Instance _ins = tournamentManager.lookup(instanceId);
-        //if(_ins==null) return new TournamentEntry();
-        //Tournament.Entry[] score={null};
-        //if(_ins.update(new SimpleStub(systemId,0),(e)->{
-            //e.score(credit,delta);
-            //score[0]=e;
-            //return e.finished();
-        //})) tournamentManager.endTournamentInstanceWithFullyFinished(_ins);
-        //return score[0];
     }
     public boolean onTournamentScored(long tournamentId,long systemId, double credit,double delta){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         return tournamentManager.onScore(systemId,credit,delta);
-        //Tournament.Instance _ins = tournamentManager.lookup(instanceId);
-        //if(_ins==null) return new TournamentEntry();
-        //Tournament.Entry[] score={null};
-        //if(_ins.update(new SimpleStub(systemId,0),(e)->{
-        //e.score(credit,delta);
-        //score[0]=e;
-        //return e.finished();
-        //})) tournamentManager.endTournamentInstanceWithFullyFinished(_ins);
-        //return score[0];
     }
     public Tournament.RaceBoard onTournamentListed(long tournamentId,long instanceId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);

@@ -11,13 +11,9 @@ public class TournamentInstanceProxy extends RecoverableObject implements Tourna
     private TournamentManager tournamentManager;
     private TournamentJoin instance;
 
-    private Session session;
-    public TournamentInstanceProxy(TournamentManager tournamentManager,Session session){
+
+    public TournamentInstanceProxy(TournamentManager tournamentManager,TournamentJoin instance){
         this.tournamentManager = tournamentManager;
-        this.session = session;
-    }
-    public TournamentInstanceProxy(TournamentManager tournamentManager,Session session,TournamentJoin instance){
-        this(tournamentManager,session);
         this.instance = instance;
     }
     @Override
@@ -50,13 +46,18 @@ public class TournamentInstanceProxy extends RecoverableObject implements Tourna
     @Override
     public boolean update(Session session, Tournament.OnEntry onEntry) {
         if(tournamentManager.global()){
+            if(instance.finished) return false;
             TournamentEntryProxy tournamentEntryProxy = new TournamentEntryProxy();
             onEntry.on(tournamentEntryProxy);
             if(tournamentManager.targetScore()>0){
                 if(tournamentEntryProxy.score() != tournamentManager.targetScore()) return false;
-                return tournamentManager.enter(session);
+                boolean finished = tournamentManager.enter(session);
+                instance.finished();
+                return finished;
             }
-            return tournamentManager.score(session,tournamentEntryProxy);
+            boolean finished = tournamentManager.score(session,tournamentEntryProxy);
+            if(finished) instance.finished();
+            return finished;
         }
         TournamentEntryProxy tournamentEntryProxy = new TournamentEntryProxy();
         onEntry.on(tournamentEntryProxy);
@@ -65,6 +66,6 @@ public class TournamentInstanceProxy extends RecoverableObject implements Tourna
 
     @Override
     public Tournament.RaceBoard raceBoard() {
-        return this.tournamentManager.raceBoard(session);
+        return this.tournamentManager.raceBoard(instance);
     }
 }

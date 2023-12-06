@@ -63,9 +63,17 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             DataStore dataStore = setup.onDataStore("battle");
             return dataStore.create(battleTransaction);
         });
+        //TEST CODE
         tournamentIndex.forEach((key,entry)->{
             gameContext.log(entry.register(session).raceBoard().toJson().toString(),OnLog.WARN);
+            if(entry.type().equals("A100")){//SCORE GLOBAL TOURNAMENT
+                entry.register(session).update(session,(e)->{
+                    e.score(100,200);
+                    return true;
+                });
+            }
         });
+        //END OF TEST CODE
         session.write(created ? battleTransaction.toJson().toString().getBytes() : JsonUtil.toSimpleResponse(false,"failed to create battle transaction").getBytes());
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         webhook.upload(ANALYTICS_QUERY,new BattleStartTransaction(session, battleTransaction.distributionId(), payload).toString().getBytes());
@@ -82,14 +90,19 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             return update.update(applicationPreSetup, session);
         });
         if(updated){//do http calls outside transaction operations
-            tournamentIndex.forEach((key,entry)->{
-                if(entry.type().equals("Q100")){//LEVEL UP GLOBAL TOURNAMENT
-                    entry.register(session).update(session,(e)->{
-                        e.score(10,100);
-                        return true;
-                    });
-                }
-            });
+            //TEST CODE
+            if(update.updateId == BattleUpdate.UpdateId.UnitXpUP){
+                UnitXpUp xp = (UnitXpUp)update;
+                tournamentIndex.forEach((key,entry)->{
+                    if(entry.type().equals("Q100")){//SCORE GLOBAL TOURNAMENT
+                        entry.register(session).update(session,(e)->{
+                            e.score(xp.xpGain,xp.xpGain);
+                            return true;
+                        });
+                    }
+                });
+            }
+            //END OF TEST CODE
             TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
             update.publishAnalytics(webhook);
         }
@@ -118,6 +131,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             return dataStore.update(battleTransaction);
         });
         if(updated){
+            //TEST CODE
             tournamentIndex.forEach((key,entry)->{
                 if(entry.type().equals("T100")){//LEVEL UP GLOBAL TOURNAMENT
                     entry.register(session).update(session,(e)->{
@@ -126,6 +140,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                     });
                 }
             });
+            //END OF TEST CODE
             //TO DO AFTER CURRENT BATTLE FINISHED
         }
         session.write(JsonUtil.toSimpleResponse(updated,"battle finished").getBytes());

@@ -13,10 +13,11 @@ public class TournamentJoin extends RecoverableObject{
     public long systemId;
     public long stub;
     public long scheduleId;
-
+    public long tournamentId;
     public int slot;
     public long instanceId;
     public boolean closed;
+    public boolean finished;
     public TournamentJoin(long stub,long scheduleId){
         this();
         this.stub = stub;
@@ -30,20 +31,24 @@ public class TournamentJoin extends RecoverableObject{
     @Override
     public boolean write(DataBuffer buffer) {
         buffer.writeLong(scheduleId);
+        buffer.writeLong(tournamentId);
         buffer.writeInt(slot);
         buffer.writeLong(instanceId);
         buffer.writeLong(stub);
         buffer.writeBoolean(closed);
+        buffer.writeBoolean(finished);
         return true;
     }
 
     @Override
     public boolean read(DataBuffer buffer) {
         scheduleId = buffer.readLong();
+        tournamentId = buffer.readLong();
         slot = buffer.readInt();
         instanceId = buffer.readLong();
         stub = buffer.readLong();
         closed = buffer.readBoolean();
+        finished = buffer.readBoolean();
         return true;
     }
 
@@ -61,25 +66,35 @@ public class TournamentJoin extends RecoverableObject{
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("scheduleId",Long.toString(scheduleId));
+        jsonObject.addProperty("tournamentId",Long.toString(tournamentId));
         jsonObject.addProperty("slot",slot);
         jsonObject.addProperty("instanceId",Long.toString(instanceId));
         jsonObject.addProperty("stub",Long.toString(stub));
         jsonObject.addProperty("closed",closed);
+        jsonObject.addProperty("finished",finished);
         return jsonObject;
     }
 
     void onTournament(long tournamentId){
         ownerKey = SnowflakeKey.from(tournamentId);
         this.dataStore.createEdge(this,TOURNAMENT_JOIN_LABEL);
-        closed = false;
+        this.tournamentId = tournamentId;
+        this.closed = false;
+        this.finished = false;
         this.dataStore.update(this);
     }
     void onTournament(long tournamentId,int slot,long instanceId){
         ownerKey = SnowflakeKey.from(tournamentId);
         this.dataStore.createEdge(this,TOURNAMENT_JOIN_LABEL);
+        this.tournamentId = tournamentId;
         this.closed = false;
+        this.finished = false;
         this.slot = slot;
         this.instanceId = instanceId;
+        this.dataStore.update(this);
+    }
+    void finished(){
+        finished = true;
         this.dataStore.update(this);
     }
 
