@@ -189,7 +189,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         instance.label(Tournament.INSTANCE_LABEL);
         instance.ownerKey(this.key());
         LocalDateTime start = LocalDateTime.now();
-        instance.started(start,start.plusMinutes(durationMinutes-1),start.plusMinutes(durationMinutes));
+        instance.started(start,start.plusMinutes(durationMinutes-tournamentServiceProvider.endBufferTimeMinutes),start.plusMinutes(durationMinutes));
         dataStore.createIfAbsent(instance,true);
         instance.dataStore(dataStore);
         instance.load();
@@ -259,8 +259,9 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     public void setup(PlatformTournamentServiceProvider tournamentServiceProvider){
         this.tournamentServiceProvider = tournamentServiceProvider;
         this.distributionTournamentService = tournamentServiceProvider.distributionTournamentService;
-        tournamentServiceProvider.logger.warn("Tournament :"+distributionTournamentService.ownership(this.distributionId)+" : "+distributionTournamentService.partitionId(this.distributionId));
+        tournamentServiceProvider.logger.warn("Tournament Ownership : "+distributionId+" : "+distributionTournamentService.ownership(this.distributionId)+" : "+distributionTournamentService.partitionId(this.distributionId));
         if(global || !distributionTournamentService.ownership(this.distributionId)){
+            if(status==Status.STARTED) return;
             status = Status.STARTED;
             this.dataStore.update(this);
             return;
@@ -273,8 +274,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         for(TournamentRegister register : saved){
             pendingInstances[register.routingNumber()] = register;
             if(register.closed()){
-                register.setup(tournamentServiceProvider.nextInstanceId(),durationMinutes,maxEntriesPerInstance);
-                dataStore.update(register);
+                register.setup(tournamentServiceProvider,tournamentServiceProvider.nextInstanceId(),durationMinutes,maxEntriesPerInstance);
             }
             tournamentServiceProvider.logger.warn("Tournament register on slot ["+register.routingNumber()+"]");
             idx++;
@@ -282,11 +282,12 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         for(int i=idx;i<concurrentInstanceSize;i++){
             TournamentRegister register = new TournamentRegister();
             register.ownerKey(this.key());
-            register.setup(tournamentServiceProvider.nextInstanceId(),durationMinutes,maxEntriesPerInstance);
+            register.setup(tournamentServiceProvider,tournamentServiceProvider.nextInstanceId(),durationMinutes,maxEntriesPerInstance);
             register.routingNumber(i);
             dataStore.create(register);
             pendingInstances[i]= register;
         }
+        if(status==Status.STARTED) return;
         status = Status.STARTED;
         this.dataStore.update(this);
     }
@@ -298,19 +299,10 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         }
         TournamentRegister register = pendingInstances[tem];
         if(register.available()) return new TournamentRegisterStatus(register.tournamentId(),tem);
-        register.setup(tournamentServiceProvider.nextInstanceId(),durationMinutes,maxEntriesPerInstance-1);//pre-cut 1
-        dataStore.update(register);
+        register.setup(tournamentServiceProvider,tournamentServiceProvider.nextInstanceId(),durationMinutes,maxEntriesPerInstance-1);//pre-cut 1
         return new TournamentRegisterStatus(register.tournamentId(),tem);
     }
 
-
-
-    void closeTournamentInstanceWithFullyJoined(Tournament.Instance closed){
-        //closed.pendingSchedule.cancel(true);
-        this.tournamentServiceProvider.serviceContext.schedule(new ScheduleRunner(PlatformTournamentServiceProvider.SCHEDULE_RUNNER_DELAY,()->{
-            //closeTournamentInstance(closed);
-        }));
-    }
     //must call from schedule threads
     void closeTournamentInstance(long closed){
         TournamentInstance instance = load(closed);
@@ -324,12 +316,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         pendingSchedules.putIfAbsent(closed, tournamentServiceProvider.schedule(new TournamentInstanceEndMonitor(this,instance.distributionId(),instance.toEndingTime())));
         this.tournamentServiceProvider.logger.warn("instance closed->"+closed);
     }
-    void endTournamentInstanceWithFullyFinished(Tournament.Instance ended){
-        //ended.pendingSchedule.cancel(true);
-        this.tournamentServiceProvider.serviceContext.schedule(new ScheduleRunner(PlatformTournamentServiceProvider.SCHEDULE_RUNNER_DELAY,()->{
-            //endTournamentInstance(ended);
-        }));
-    }
+
     void endTournamentInstance(long ended){
         TournamentInstance instance = load(ended);
         if(instance==null){

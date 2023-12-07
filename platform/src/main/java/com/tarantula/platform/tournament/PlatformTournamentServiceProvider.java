@@ -131,7 +131,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     @Override
     public void start() throws Exception {
         dataStore.list(new TournamentScheduleStatusQuery(this.serviceContext.node().bucketId())).forEach(status->{
-            logger.warn(status.tournamentId+" : "+status.status);
+            logger.warn("Tournament Status : "+status.tournamentId+" : "+status.status);
             if(status.status != Tournament.Status.PENDING){
                 TournamentManager tournament = new TournamentManager();
                 tournament.distributionId(status.tournamentId);
@@ -392,6 +392,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         return serviceContext.schedule(task);
     }
 
+    void updateTournamentRegister(TournamentRegister register){
+        this.dataStore.update(register);
+    }
     private TournamentScheduleStatus loadStatus(long scheduleId){
         TournamentScheduleStatus status = new TournamentScheduleStatus();
         status.distributionId(scheduleId);
