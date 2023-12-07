@@ -59,7 +59,10 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         int pid = nodeEngine.getPartitionService().getPartitionId(tournamentId);
         return nodeEngine.getPartitionService().isPartitionOwner(pid);
     }
-
+    public int partitionId(long tournamentId){
+        NodeEngine nodeEngine = getNodeEngine();
+        return nodeEngine.getPartitionService().getPartitionId(tournamentId);
+    }
     public TournamentRegisterStatus onRegisterTournament(String serviceName, long tournamentId, int slot){
         NodeEngine nodeEngine = getNodeEngine();
         RegisterTournamentOperation operation = new RegisterTournamentOperation(serviceName,tournamentId,slot);
