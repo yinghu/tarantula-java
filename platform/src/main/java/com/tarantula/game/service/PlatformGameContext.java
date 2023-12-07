@@ -2,12 +2,10 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
-import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ApplicationSchema;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 
-import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
 public class PlatformGameContext implements GameContext {
@@ -77,6 +75,9 @@ public class PlatformGameContext implements GameContext {
 
     public  void registerTournamentListener(Tournament.Listener listener){
         this.platformGameServiceProvider.tournamentServiceProvider().registerTournamentListener(listener);
+    }
+    public void recoverableRegistry(RecoverableListener recoverableListener){
+        serviceContext.recoverableRegistry(recoverableListener);
     }
 
 }

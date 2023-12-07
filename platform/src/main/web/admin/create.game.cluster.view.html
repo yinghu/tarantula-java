@@ -51,6 +51,10 @@
             <label class="tx-text-12 tx-margin-right-4">Enable Dedicated Server</label>
             <input id='tx-game-cluster-dedicated-server' class="w3-check tx-text-12" type="checkbox">
         </div>
+        <div class="w3-panel">
+            <label class="tx-text-12">Game Service Provider Name :</label>
+            <input id ="tx-game-service-provider-name" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='game service provider name'/>
+        </div>
         <!--
         <div class="w3-panel">
             <label class="tx-text-12 tx-margin-right-4">Game Module :</label>
@@ -136,6 +140,7 @@
         let _gicon = document.querySelector('#tx-game-cluster-logo').value;
         let _dicon = document.querySelector('#tx-game-cluster-developer-logo').value;
         let _developer = document.querySelector('#tx-game-cluster-developer').value;
+        let _provider = document.querySelector('#tx-game-service-provider-name').value;
         if(_n ==null | _n == ''){
             document.querySelector('#tx-create-game-cluster-message').innerHTML = 'Game cluster name cannot be null';
             return;
@@ -156,6 +161,7 @@
         cmd.gameIcon = _gicon;
         cmd.developer = _developer;
         cmd.developerIcon = _dicon;
+        cmd.gameServiceProvider = _provider;
         TARA_API.onService(true,cmd,(resp)=>{
             console.log(resp);
             if(resp.successful){

@@ -70,6 +70,8 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
 
     public String developerIcon;
 
+    public String gameServiceProvider;
+
     public boolean dedicated;
 
     public boolean tournamentEnabled;
@@ -133,13 +135,14 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
         jo.addProperty("maxLobbyCount",maxLobbyCount);
         jo.addProperty("maxZoneCount",maxZoneCount);
         jo.addProperty("maxArenaCount",maxArenaCount);
+        jo.addProperty("gameServiceProvider",gameServiceProvider);
         return jo;
     }
 
     public boolean write(DataBuffer buffer){
         buffer.writeUTF8(name);
         buffer.writeUTF8(mode);
-        //buffer.writeUTF8(applicationSetup);
+        buffer.writeUTF8(gameServiceProvider);
         buffer.writeUTF8(gameLobbyName);
         buffer.writeUTF8(gameServiceName);
         buffer.writeUTF8(gameDataName);
@@ -160,7 +163,7 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
     public boolean read(DataBuffer buffer) {
         name = buffer.readUTF8();
         mode = buffer.readUTF8();
-        //applicationSetup = buffer.readUTF8();
+        gameServiceProvider = buffer.readUTF8();
         gameLobbyName = buffer.readUTF8();
         gameServiceName = buffer.readUTF8();
         gameDataName = buffer.readUTF8();
@@ -464,5 +467,9 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
     @Override
     public void onInventory(ApplicationPreSetup applicationPreSetup,Inventory inventory, Inventory.Stock inventoryItem) {
         onInventory.forEach(listener -> listener.onInventory(applicationPreSetup,inventory,inventoryItem));
+    }
+
+    public String gameServiceProvider(){
+        return gameServiceProvider;
     }
 }

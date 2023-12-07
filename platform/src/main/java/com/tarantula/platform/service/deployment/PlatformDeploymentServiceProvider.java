@@ -624,6 +624,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         String gameIcon = (String) properties.property("gameIcon");
         String developerIcon = (String) properties.property("developerIcon");
         String developer = (String) properties.property("developer");
+        String gameServiceProvider = (String) properties.property("gameServiceProvider");
         Configuration gameClusterConfig = (Configuration)properties.property(OnAccess.GAME_CLUSTER_CONFIG);
         int maxLobbyCount = ((Number)gameClusterConfig.property("maxGameLobbyCount")).intValue();
         int maxZoneCount = ((Number)gameClusterConfig.property("maxGameZoneCount")).intValue();
@@ -637,6 +638,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             gameCluster.mode = playMode;
             gameCluster.accountId = account.distributionId();
             gameCluster.developer = developer;
+            gameCluster.gameServiceProvider = gameServiceProvider;
             gameCluster.tournamentEnabled = tournamentEnabled;
             gameCluster.disabled(true);
             gameCluster.dedicated = dedicated;

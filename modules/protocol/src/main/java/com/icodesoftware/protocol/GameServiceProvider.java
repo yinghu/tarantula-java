@@ -1,9 +1,6 @@
 package com.icodesoftware.protocol;
 
-import com.icodesoftware.Inventory;
-import com.icodesoftware.OnAccess;
-import com.icodesoftware.Session;
-import com.icodesoftware.Tournament;
+import com.icodesoftware.*;
 
 public interface GameServiceProvider extends UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener,Inventory.Listener, Tournament.Listener {
     void setup(GameContext gameContext);
@@ -15,4 +12,5 @@ public interface GameServiceProvider extends UDPEndpointServiceProvider.RequestL
     <T extends OnAccess> void onGameEvent(T event);
 
     void onLeft(Session session);
+
 }

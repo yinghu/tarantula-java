@@ -42,6 +42,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
 
     public DataStoreConfigurationJsonParser(String config,ServiceContext tx,Map<String,Object> additions, DataStoreProvider.OnStart onStart){
         this.storeSizeMb = (int)additions.get("storeSizeMb");
+        this.envNoSyncFlag = (boolean)additions.get("envNoSyncFlag");
         this.dataStoreProviderConfiguration = config;
         this.node = tx.node();
         this.dataBucketGroup = node.bucketName();

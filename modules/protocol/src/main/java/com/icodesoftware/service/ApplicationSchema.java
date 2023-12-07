@@ -41,4 +41,6 @@ public interface ApplicationSchema extends Configurable,Configurable.Listener<On
      long accountId();
 
      Descriptor application(String category);
+
+     String gameServiceProvider();
 }

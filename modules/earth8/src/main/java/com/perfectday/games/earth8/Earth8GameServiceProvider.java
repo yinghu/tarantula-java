@@ -24,6 +24,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     public void setup(GameContext gameContext){
         this.gameContext = gameContext;
         this.gameContext.registerTournamentListener(this);
+        this.gameContext.recoverableRegistry(new Earth8PortableRegistry<>());
         this.gameContext.log("Start earth 8 game service provider", OnLog.WARN);
     }
 

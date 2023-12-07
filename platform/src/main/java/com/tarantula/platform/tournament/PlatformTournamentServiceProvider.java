@@ -119,7 +119,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.maxPlayerHistoryRecords = ((Number)configuration.property("maxPlayerHistoryRecords")).intValue();
         this.clusterLockTimeoutSeconds = ((Number)configuration.property("clusterLockTimeoutSeconds")).intValue();
         this.dataStore = applicationPreSetup.dataStore(gameCluster,name());
-        this.tournamentJoin = serviceContext.dataStore(gameCluster,Distributable.LOCAL_SCOPE,"tournament_join");
+        this.tournamentJoin = serviceContext.dataStore(gameCluster,Distributable.DATA_SCOPE,"tournament_join");
         this.logger = JDKLogger.getLogger(PlatformTournamentServiceProvider.class);
         this.reloadKey = this.serviceContext.clusterProvider().registerReloadListener(this);
         this.distributionTournamentService = this.serviceContext.clusterProvider().serviceProvider(DistributionTournamentService.NAME);

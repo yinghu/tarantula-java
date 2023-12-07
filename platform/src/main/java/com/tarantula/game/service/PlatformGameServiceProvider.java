@@ -61,7 +61,7 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
 
     public PlatformGameServiceProvider(GameCluster gameCluster){
         NAME = gameCluster.serviceType();
-        this.gameServiceProvider = new Earth8GameServiceProvider();
+        //this.gameServiceProvider = new Earth8GameServiceProvider();
         this.gameCluster = gameCluster;
         metricsListener = (k,v)->{};
         this.gameServiceProviders = new ConcurrentHashMap<>();
@@ -128,8 +128,8 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
             listener.onEvent(e);
             return true;
         });
+        this.gameServiceProvider = toGameServiceProvider(gameCluster.gameServiceProvider);
         gameServiceProvider.setup(new PlatformGameContext(serviceContext,this,JDKLogger.getLogger(Earth8GameServiceProvider.class)));
-        serviceContext.recoverableRegistry(new Earth8PortableRegistry<>());
         gameCluster.addListener(gameServiceProvider);
         logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionId()+"]");
     }
@@ -329,6 +329,14 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
         }catch (Exception ex){
             this.logger.warn("Service Proxy ["+className+"] Without Implementation");
             return ErrorCommand.ERROR_COMMAND;
+        }
+    }
+    private GameServiceProvider toGameServiceProvider(String className){
+        try{
+            return (GameServiceProvider)Class.forName(className).getConstructor().newInstance();
+        }catch (Exception ex){
+            this.logger.warn("No class provided ["+className+"]");
+            throw new RuntimeException();
         }
     }
 

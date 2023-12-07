@@ -36,7 +36,7 @@ public class TarantulaMain {
 
         private String override(boolean overriding,String name,Properties user,Properties system){
 			String value = system.getProperty(name);
-			if(overriding&&user.getProperty(name)!=null){
+			if(overriding && user.getProperty(name)!=null){
 				value = user.getProperty(name);
 			}
 			return value;
