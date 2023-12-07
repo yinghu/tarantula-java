@@ -163,7 +163,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     @Override
     public void reload(int partition,boolean localMember) {
-        logger.warn("Reload tournament service provider : "+gameServiceName);
+        logger.warn("Reload tournament service provider : "+gameServiceName+" : "+partition);
         tournamentIndex.clear();
     }
     public void atMidnight(){
