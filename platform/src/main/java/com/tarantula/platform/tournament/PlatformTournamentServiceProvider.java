@@ -168,7 +168,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         tournamentIndex.forEach((k,v)->{
             int pid = distributionTournamentService.partitionId(k);
             if(pid==partition){
-                logger.warn("Reload tournament with ["+localMember+"]");
+                logger.warn("Reload tournament with partition ["+pid+"] : ["+localMember+"] : "+k);
             }
         });
     }
