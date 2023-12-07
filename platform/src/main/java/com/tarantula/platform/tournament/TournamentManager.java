@@ -257,6 +257,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
 
     public void setup(PlatformTournamentServiceProvider tournamentServiceProvider){
+        tournamentServiceProvider.logger.warn("Tournament :"+distributionTournamentService.ownership(this.distributionId)+" : "+distributionTournamentService.partitionId(this.distributionId));
         this.tournamentServiceProvider = tournamentServiceProvider;
         this.distributionTournamentService = tournamentServiceProvider.distributionTournamentService;
         if(global || !distributionTournamentService.ownership(this.distributionId)){
