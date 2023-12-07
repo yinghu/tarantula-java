@@ -607,9 +607,15 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         OnSession onSession = new OnSessionTrack();
         if(!jwt.verify(token,(h,p)->{
             long expiry = p.get("exp").getAsLong();
-            if(TimeUtil.expired(TimeUtil.fromUTCMilliseconds(expiry))) return false;
+            if(TimeUtil.expired(TimeUtil.fromUTCMilliseconds(expiry))) {
+                log.warn("TOKEN EXPIRED : ");
+                return false;
+            }
             Access.Role r = rMap.get(p.get("aud").getAsString());
-            if(r==null) return false;
+            if(r==null) {
+                log.warn("NO ROLE : ");
+                return false;
+            }
             byte[] data = decrypt(CipherUtil.fromBase64Key(h.get("kid").getAsString()));
             Recoverable.DataBuffer dataBuffer =  BufferProxy.wrap(data);
             long id = dataBuffer.readLong();

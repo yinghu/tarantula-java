@@ -35,7 +35,7 @@ public class ServiceEventHandler extends AbstractRequestHandler {
         if(path.startsWith("/service/action")){
             OnSession id = new OnSessionTrack();//place holder for public access applications
             RoutingKey routingKey = eventService.routingKey(this.bucket+"/"+exchange.id(),tag);
-            if((token!=null)&&(!token.equals("undefined"))){
+            if((token!=null) && (!token.equals("undefined"))){
                 id = auth.validateToken(token);//first entry point check
                 routingKey = eventService.routingKey(id.distributionId(),tag);
             }
