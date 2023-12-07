@@ -57,6 +57,10 @@ public class HttpEndpoint implements EndPoint {
 		healthCheckHandler.resource(this.resource);
 		this.hserver.createContext(healthCheckHandler.path(),healthCheckHandler);
 
+		MetricsScraperHandler metricsScraper = new MetricsScraperHandler(metricsListener);
+		metricsScraper.resource(this.resource);
+		this.hserver.createContext(metricsScraper.path(),metricsScraper);
+
 		HttpUserHandler httpUserHandler = new HttpUserHandler(metricsListener);
 		httpUserHandler.resource(this.resource);
 		this.hserver.createContext(httpUserHandler.path(), httpUserHandler);

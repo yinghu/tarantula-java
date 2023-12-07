@@ -115,12 +115,25 @@ public class MetricsViewAdminRoleModule implements Module {
         else if(session.action().equals("onEnableServiceView")){
             ServiceProvider serviceProvider = context.serviceProvider(session.name());
             if(serviceProvider != null){
-                viewMap.computeIfAbsent(session.name(),k->{
-                    ServiceViewSummary view = new ServiceViewSummary(session.name(),chartConfiguration,()->viewMap.remove(session.name()));
-                    ServiceViewMonitor monitor = new ServiceViewMonitor(context,serviceProvider,timerInterval,timerLoopCount,view);
-                    context.schedule(monitor);
-                    return view;
-                });
+                viewMap.computeIfAbsent(
+                    session.name(),
+                    k -> {
+                        ServiceViewSummary view = new ServiceViewSummary(
+                            session.name(),
+                            chartConfiguration,
+                            () -> viewMap.remove(session.name())
+                        );
+                        ServiceViewMonitor monitor = new ServiceViewMonitor(
+                            context,
+                            serviceProvider,
+                            timerInterval,
+                            timerLoopCount,
+                            view
+                        );
+                        context.schedule(monitor);
+                        return view;
+                    }
+                );
                 ServiceViewSummary view = viewMap.get(session.name());
                 session.write(view.toCategoryJson().toString().getBytes());
             }

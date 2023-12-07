@@ -44,7 +44,9 @@ public class MetricsViewMonitor implements SchedulingTask {
         try{
            listeners.forEach((k,r)->{
                r.reset();
-               String[] ret = r.archived?distributionMetricsService.onMetricsArchive(r.name,r.category,r.classifier,r.endTime):distributionMetricsService.onMetrics(r.name,r.category,r.classifier);
+               String[] ret = r.archived ?
+                       distributionMetricsService.onMetricsArchive(r.name,r.category,r.classifier,r.endTime)
+                       : distributionMetricsService.onMetrics(r.name,r.category,r.classifier);
                for(String f  : ret) {
                    JsonObject m = JsonUtil.parse(f);
                    r.snapshot(m);

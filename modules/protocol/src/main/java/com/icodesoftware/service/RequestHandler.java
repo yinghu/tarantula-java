@@ -19,6 +19,7 @@ public interface RequestHandler extends EventListener, ServiceProvider {
     String UPLOAD_PATH = "/upload";
     String USER_PATH = "/user";
     String VIEW_PATH = "/view";
+    String METRICS_PATH = "/metrics";
 
     String BACKUP_PATH = "/backup";
 

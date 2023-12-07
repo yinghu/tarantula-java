@@ -3,7 +3,9 @@ version: '3'
 services:
   platform:
     container_name: platform
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile-dev
     ports:
       - "8090:8090"
     volumes:
