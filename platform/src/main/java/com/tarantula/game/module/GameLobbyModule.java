@@ -20,6 +20,7 @@ GameLobbyModule extends ModuleHeader{
 
     @Override
     public void onJoin(Session session) throws Exception{
+        this.context.log("JOIN START :",OnLog.WARN);
         if(application.tournamentEnabled() && (!gameServiceProvider.tournamentServiceProvider().available(session.tournamentId()))){
             session.write(JsonUtil.toSimpleResponse(false,"no tournament available,please try later").getBytes());
             return;
