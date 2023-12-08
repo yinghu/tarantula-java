@@ -27,11 +27,9 @@ public class PresenceEventHandler extends AbstractRequestHandler {
         return PRESENCE_PATH;
     }
     public void onRequest(OnExchange exchange) throws Exception{
-        log.warn("Check permission 00");
         super.onRequest(exchange);
         String token = exchange.header(Session.TARANTULA_TOKEN);
         OnSession onSession = tokenValidator.tokenValidator().validateToken(token);
-        log.warn("Check permission");
         checkPermission(onSession,exchange.id(),Presence.LOBBY_TAG);
     }
 
@@ -51,7 +49,6 @@ public class PresenceEventHandler extends AbstractRequestHandler {
         this.deploymentServiceProvider = (DeploymentServiceProvider)tcx.serviceProvider(DeploymentServiceProvider.NAME);
     }
     public  boolean onEvent(Event event){
-        log.warn("Check permission done");
         JsonObject resp = JsonUtil.parse(event.payload());
         if(!resp.get("successful").getAsBoolean()){
             return super.onEvent(event);
