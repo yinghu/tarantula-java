@@ -20,7 +20,6 @@ GameLobbyModule extends ModuleHeader{
 
     @Override
     public void onJoin(Session session) throws Exception{
-        this.context.log("JOIN START :",OnLog.WARN);
         if(application.tournamentEnabled() && (!gameServiceProvider.tournamentServiceProvider().available(session.tournamentId()))){
             session.write(JsonUtil.toSimpleResponse(false,"no tournament available,please try later").getBytes());
             return;
@@ -54,6 +53,7 @@ GameLobbyModule extends ModuleHeader{
             this.gameLobby.validate(session);
         }
         else if(session.action().equals("onTest")){
+            this.context.log("JOIN START :",OnLog.WARN);
             if(this.context.validator().role(session.distributionId()).accessControl()< AccessControl.admin.accessControl()){
                 throw new RuntimeException("no permission");
             }
