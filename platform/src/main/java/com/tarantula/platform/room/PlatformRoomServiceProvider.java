@@ -187,8 +187,11 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
     public GameRoom join(Rating rating,GameZone gameZone){
+        long start = System.currentTimeMillis();
         GameZoneIndex index = gameZoneIndex.get(gameZone.distributionKey());
-        return dedicated?remoteJoin(rating,index):localJoin(rating,index);
+        GameRoom gameRoom = dedicated?remoteJoin(rating,index):localJoin(rating,index);
+        logger.warn("Join timed :"+(System.currentTimeMillis()-start));
+        return gameRoom;
     }
 
     public void leave(Stub stub){
