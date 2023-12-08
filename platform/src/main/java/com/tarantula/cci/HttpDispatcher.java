@@ -24,11 +24,8 @@ abstract public class HttpDispatcher implements HttpHandler {
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
-        System.out.println("PARSE : 0");
         HttpSession exchange = new HttpSession(requestHandler.snowflakeId(),httpExchange);
-        System.out.println("PARSE : 1");
         exchange.parse();
-        System.out.println("PARSE : 2");
         try{
             requestHandler.onRequest(exchange);
             metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT,1);

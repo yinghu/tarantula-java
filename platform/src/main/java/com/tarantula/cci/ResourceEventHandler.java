@@ -19,9 +19,7 @@ public class ResourceEventHandler extends AbstractRequestHandler{
         return RESOURCE_PATH;
     }
     public void onRequest(OnExchange exchange) throws Exception{
-        log.warn("LOAD RESOURCE : 1");
         String path = exchange.path();
-        log.warn("LOAD RESOURCE : "+path);
         //load js API in resources/web, public access
         Content _load = this.deploymentServiceProvider.resource(path.substring(1));
         exchange.onEvent(new ResponsiveEvent("",0,_load.data(),0,_load.type(),true));
