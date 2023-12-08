@@ -106,6 +106,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     private Content fromContext(String name){
+        log.warn("LOAD RESOURCE :"+name);
         return rMap.computeIfAbsent(name,(rk)->{
                 byte[] ret = new byte[0];
                 BufferedInputStream cin=null;
