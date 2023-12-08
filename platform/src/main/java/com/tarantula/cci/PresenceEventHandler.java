@@ -27,6 +27,7 @@ public class PresenceEventHandler extends AbstractRequestHandler {
         return PRESENCE_PATH;
     }
     public void onRequest(OnExchange exchange) throws Exception{
+        log.warn("Check permission 00");
         super.onRequest(exchange);
         String token = exchange.header(Session.TARANTULA_TOKEN);
         OnSession onSession = tokenValidator.tokenValidator().validateToken(token);
