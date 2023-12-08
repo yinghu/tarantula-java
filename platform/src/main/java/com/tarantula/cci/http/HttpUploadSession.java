@@ -7,15 +7,13 @@ import com.sun.net.httpserver.HttpExchange;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.UUID;
-
 
 public class HttpUploadSession implements OnExchange {
 
 	private final HttpExchange hex;
-    private final String id;
-	public HttpUploadSession(HttpExchange hex){
-        this.id = UUID.randomUUID().toString();
+    private final long id;
+	public HttpUploadSession(long id,HttpExchange hex){
+        this.id = id;
 	    this.hex = hex;
     }
     public boolean onEvent(Event event) {
@@ -32,7 +30,7 @@ public class HttpUploadSession implements OnExchange {
         }
         return true;
     }
-    public String id(){
+    public long id(){
 	    return id;
     }
 

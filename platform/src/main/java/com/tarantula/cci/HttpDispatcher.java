@@ -9,9 +9,9 @@ import com.tarantula.cci.http.HttpSession;
 import com.tarantula.platform.service.metrics.PerformanceMetrics;
 
 import java.io.IOException;
-import java.util.UUID;
 
 abstract public class HttpDispatcher implements HttpHandler {
+
     protected RequestHandler requestHandler;
     private MetricsListener metricsListener;
 
@@ -24,11 +24,7 @@ abstract public class HttpDispatcher implements HttpHandler {
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
-        String id = httpExchange.getRequestHeaders().getFirst("Session-id");
-        if(id==null){
-            id = UUID.randomUUID().toString();
-        }
-        HttpSession exchange = new HttpSession(id,httpExchange);
+        HttpSession exchange = new HttpSession(requestHandler.snowflakeId(),httpExchange);
         exchange.parse();
         try{
             requestHandler.onRequest(exchange);

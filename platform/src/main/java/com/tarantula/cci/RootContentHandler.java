@@ -23,7 +23,7 @@ public class RootContentHandler extends AbstractRequestHandler {
         }
         Content content = this.deploymentServiceProvider.resource("root"+path);
         byte[] _load = content.data();
-        exchange.onEvent(new ResponsiveEvent("","",_load,0,content.type(),true));
+        exchange.onEvent(new ResponsiveEvent("",0,_load,0,content.type(),true));
     }
 
     public void setup(ServiceContext tcx){

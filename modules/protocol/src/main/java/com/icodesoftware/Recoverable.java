@@ -44,14 +44,14 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable,V
 
 
     interface DataHeader{
-        boolean local();
+        //boolean local();
         long revision();
 
         int factoryId();
 
         int classId();
 
-        void update(boolean local,long revisionDelta);
+        void update(long revisionDelta);
     }
 
     interface DataBuffer{

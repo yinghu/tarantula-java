@@ -34,7 +34,7 @@ public class BackupEventHandler extends AbstractRequestHandler {
         if(path.equals("/backup/deployment")){
             String typeId = this.tokenValidator.validateAccessKey(accessKey);
             if(typeId==null) throw new IllegalAccessException("Invalid key");
-            exchange.onEvent(new ResponsiveEvent("","", JsonUtil.toSimpleResponse(true,""+serviceContext.node().deploymentId()).getBytes(),true));
+            exchange.onEvent(new ResponsiveEvent("",0, JsonUtil.toSimpleResponse(true,""+serviceContext.node().deploymentId()).getBytes(),true));
             return;
         }
         if(path.equals("/backup/system")){
@@ -48,7 +48,7 @@ public class BackupEventHandler extends AbstractRequestHandler {
         else{
             throw new IllegalAccessException("Invalid path ["+path+"]");
         }
-        exchange.onEvent(new ResponsiveEvent("","","{}".getBytes(),true));
+        exchange.onEvent(new ResponsiveEvent("",0,"{}".getBytes(),true));
         if(action.equals("onBatch")){
             OnReplication[] onReplications = new OnReplication[1];
             onReplications[0] = new ReplicationData(_payload);

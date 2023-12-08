@@ -12,13 +12,13 @@ public class ResponsiveEvent extends Data implements Event {
 
 	public ResponsiveEvent(){}
 
-	public ResponsiveEvent(String destination,String sessionId,byte[] payload,boolean closed){
+	public ResponsiveEvent(String destination,long sessionId,byte[] payload,boolean closed){
         this.destination = destination;
         this.sessionId = sessionId;
         this.payload = payload;
         this.closed = closed;
 	}
-    public ResponsiveEvent(String destination,String sessionId,byte[] payload,int batch,String contentType,boolean closed){
+    public ResponsiveEvent(String destination,long sessionId,byte[] payload,int batch,String contentType,boolean closed){
         this.destination = destination;
         this.sessionId = sessionId;
         this.payload = payload;
@@ -37,7 +37,7 @@ public class ResponsiveEvent extends Data implements Event {
     @Override
     public void writePortable(PortableWriter out) throws IOException {
 		out.writeUTF("1",this.destination);
-        out.writeUTF("2",this.sessionId);
+        out.writeLong("2",this.sessionId);
         out.writeByteArray("4",this.payload);
         out.writeUTF("5",this.contentType);
         out.writeBoolean("7",this.closed);
@@ -46,7 +46,7 @@ public class ResponsiveEvent extends Data implements Event {
     @Override
 	public void readPortable(PortableReader in) throws IOException {
 		this.destination = in.readUTF("1");
-        this.sessionId = in.readUTF("2");
+        this.sessionId = in.readLong("2");
         this.payload = in.readByteArray("4");
         this.contentType = in.readUTF("5");
         this.closed = in.readBoolean("7");

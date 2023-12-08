@@ -25,7 +25,7 @@ public class HttpRootHandler extends HttpDispatcher {
     }
 
     public void handle(HttpExchange hex) throws IOException {
-        HttpSession exchange = new HttpSession("id",hex);
+        HttpSession exchange = new HttpSession(0,hex);
         exchange.parse();
         try{
             requestHandler.onRequest(exchange);

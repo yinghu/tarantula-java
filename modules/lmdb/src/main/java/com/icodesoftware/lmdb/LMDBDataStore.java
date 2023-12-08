@@ -91,7 +91,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             lmdbDataStoreProvider.assign(key);
             key.flip();
             if(!t.readKey(key)) return false;
-            value.writeHeader(new LocalHeader(true,Long.MIN_VALUE,t.getFactoryId(),t.getClassId()));
+            value.writeHeader(new LocalHeader(Long.MIN_VALUE,t.getFactoryId(),t.getClassId()));
             if(!t.write(value)) return false;
             if(!dbi.put(txn,key.rewind(),value.flip())) throw new RuntimeException("lmdb failure to insert key/value");
             txn.commit();
@@ -123,7 +123,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
                 Recoverable.DataHeader header = proxy.readHeader();
                 if(header.revision() == t.revision()){
                     Recoverable.DataBuffer update = cache.value();
-                    header.update(header.local(),1);
+                    header.update(1);
                     update.writeHeader(header);
                     t.write(update);
                     if(!dbi.put(txn,key.rewind(),update.flip()))  throw new RuntimeException("lmdb failure to insert key/value");
@@ -152,7 +152,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             Recoverable.DataHeader header = value.readHeader();
             if(header.revision() != t.revision()) return false;
             value.clear();
-            header.update(true,1);
+            header.update(1);
             value.writeHeader(header);
             t.revision(header.revision());
             if(!t.write(value)) return false;
@@ -202,7 +202,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
               t.revision(h.revision());
               return false;
             }
-            value.writeHeader(new LocalHeader(true,Long.MIN_VALUE,t.getFactoryId(),t.getClassId()));
+            value.writeHeader(new LocalHeader(Long.MIN_VALUE,t.getFactoryId(),t.getClassId()));
             t.write(value);
             if (!dbi.put(txn, key.rewind(),value.flip())) throw new RuntimeException("lmdb failure to insert key/value");
             txn.commit();

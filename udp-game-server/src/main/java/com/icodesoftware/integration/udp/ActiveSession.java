@@ -111,12 +111,12 @@ public class ActiveSession extends RecoverableObject implements Session {
     }
 
     @Override
-    public String sessionId() {
-        return null;
+    public long sessionId() {
+        return 0;
     }
 
     @Override
-    public void sessionId(String sessionId) {
+    public void sessionId(long sessionId) {
 
     }
 

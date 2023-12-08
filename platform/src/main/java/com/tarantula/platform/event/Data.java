@@ -6,7 +6,7 @@ import com.tarantula.platform.OnApplicationHeader;
 
 abstract public class Data extends OnApplicationHeader implements Portable{
 
-    protected transient String sessionId;
+    protected transient long sessionId;
     protected boolean joined;
 
     protected transient String source;
@@ -53,11 +53,11 @@ abstract public class Data extends OnApplicationHeader implements Portable{
     }
 
 
-    public String sessionId() {
+    public long sessionId() {
         return this.sessionId;
     }
 
-    public void sessionId(String sessionId) {
+    public void sessionId(long sessionId) {
         this.sessionId = sessionId;
     }
 

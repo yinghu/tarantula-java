@@ -11,7 +11,7 @@ public class ServiceActionEvent extends Data implements EventOnAction {
 
 	public ServiceActionEvent(){}
 
-    public ServiceActionEvent(String source,String sessionId,byte[] data){
+    public ServiceActionEvent(String source,long sessionId,byte[] data){
         this.source = source;
         this.sessionId = sessionId;
         this.payload = data;
@@ -20,7 +20,7 @@ public class ServiceActionEvent extends Data implements EventOnAction {
 	@Override
 	public void writePortable(PortableWriter out) throws IOException {
 		out.writeUTF("1",this.source);
-		out.writeUTF("2",this.sessionId);
+		out.writeLong("2",this.sessionId);
         out.writeUTF("3",this.systemId);
 		//out.writeUTF("4",this.token);
         out.writeByteArray("6",this.payload);
@@ -38,7 +38,7 @@ public class ServiceActionEvent extends Data implements EventOnAction {
 	@Override
 	public void readPortable(PortableReader in) throws IOException {
 		this.source = in.readUTF("1");
-		this.sessionId = in.readUTF("2");
+		this.sessionId = in.readLong("2");
         this.systemId = in.readUTF("3");
 		//this.token = in.readUTF("4");
 		this.payload = in.readByteArray("6");

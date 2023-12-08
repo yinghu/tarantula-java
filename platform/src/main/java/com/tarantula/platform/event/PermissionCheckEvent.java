@@ -11,7 +11,7 @@ public class PermissionCheckEvent extends Data implements EventOnAction {
 
 	public PermissionCheckEvent(){}
 
-    public PermissionCheckEvent(String source, String sessionId){
+    public PermissionCheckEvent(String source, long sessionId){
         this.source = source;
         this.sessionId = sessionId;
     }
@@ -19,7 +19,7 @@ public class PermissionCheckEvent extends Data implements EventOnAction {
 	@Override
 	public void writePortable(PortableWriter out) throws IOException {
 		out.writeUTF("1",this.source);
-		out.writeUTF("2",this.sessionId);
+		out.writeLong("2",this.sessionId);
         out.writeLong("3",this.distributionId);
 		//out.writeUTF("4",this.token);
         out.writeLong("5", this.stub);
@@ -31,7 +31,7 @@ public class PermissionCheckEvent extends Data implements EventOnAction {
 	@Override
 	public void readPortable(PortableReader in) throws IOException {
 		this.source = in.readUTF("1");
-		this.sessionId = in.readUTF("2");
+		this.sessionId = in.readLong("2");
         this.distributionId = in.readLong("3");
 		//this.token = in.readUTF("4");
 		this.stub = in.readLong("5");

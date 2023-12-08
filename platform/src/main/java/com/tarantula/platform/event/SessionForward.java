@@ -8,16 +8,8 @@ public class SessionForward extends Data {
 
     public SessionForward(){}
 
-    public SessionForward(String source, String sessionId){
+    public SessionForward(String source, long sessionId){
         this.source = source;
-        this.sessionId = sessionId;
-    }
-
-    public String sessionId() {
-        return this.sessionId;
-    }
-
-    public void sessionId(String sessionId) {
         this.sessionId = sessionId;
     }
 
@@ -39,13 +31,13 @@ public class SessionForward extends Data {
     public void writePortable(PortableWriter out) throws IOException {
 
         out.writeUTF("4",this.source);
-        out.writeUTF("5",this.sessionId);
+        out.writeLong("5",this.sessionId);
     }
 
     public void readPortable(PortableReader in) throws IOException {
 
         this.source = in.readUTF("4");
-        this.sessionId = in.readUTF("5");
+        this.sessionId = in.readLong("5");
     }
     @Override
     public String toString(){

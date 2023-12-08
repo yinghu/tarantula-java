@@ -5,7 +5,7 @@ import com.icodesoftware.EventListener;
 import java.io.InputStream;
 
 public interface OnExchange extends EventListener {
-    String id();
+    long id();
     String path();
     String method();
     String header(String name);

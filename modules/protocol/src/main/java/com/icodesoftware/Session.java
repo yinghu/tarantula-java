@@ -40,8 +40,8 @@ public interface Session extends OnApplication {
     void source(String source);
 
 
-    String sessionId();
-    void sessionId(String sessionId);
+    long sessionId();
+    void sessionId(long sessionId);
 
     boolean joined();
     void joined(boolean joined);

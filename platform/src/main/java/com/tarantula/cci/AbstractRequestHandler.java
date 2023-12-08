@@ -17,9 +17,10 @@ abstract public class AbstractRequestHandler implements RequestHandler {
     protected MetricsListener metricsListener;
 
     protected boolean onEvent;
-    protected ConcurrentHashMap<String, OnExchange> eMap;
+    protected ConcurrentHashMap<Long, OnExchange> eMap;
     protected EventService eventService;
     protected TokenValidatorProvider tokenValidator;
+    protected ServiceContext serviceContext;
     protected String serviceTopic;
     public AbstractRequestHandler(boolean onEvent){
         metricsListener = (m,v)->{};
@@ -50,6 +51,7 @@ abstract public class AbstractRequestHandler implements RequestHandler {
     }
 
     public void setup(ServiceContext tcx){
+        this.serviceContext = tcx;
         this.tokenValidator = (TokenValidatorProvider) tcx.serviceProvider(TokenValidatorProvider.NAME);
         if(!onEvent) return;
         this.eventService = tcx.eventService();
@@ -65,7 +67,7 @@ abstract public class AbstractRequestHandler implements RequestHandler {
     public void onCheck(){}
     public boolean deployable(){return true;}
 
-    protected void checkPermission(OnSession id,String sessionId,String tag){
+    protected void checkPermission(OnSession id,long sessionId,String tag){
         PermissionCheckEvent actionEvent = new PermissionCheckEvent(this.serviceTopic,sessionId);
         RoutingKey routingKey = eventService.routingKey(id.distributionId(),tag);
         actionEvent.distributionId(id.distributionId());
@@ -76,5 +78,8 @@ abstract public class AbstractRequestHandler implements RequestHandler {
         actionEvent.routingNumber(routingKey.routingNumber());
         actionEvent.destination(routingKey.route());
         this.eventService.publish(actionEvent);
+    }
+    public long snowflakeId(){
+        return serviceContext.distributionId();
     }
 }

@@ -61,7 +61,7 @@ public class GameServerEventHandler extends AbstractRequestHandler {
                 resp.addProperty("overtime",(long)onAccess.property("overtime"));
                 resp.addProperty("gameModule",(String)onAccess.property("gameModule"));
             }
-            exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
+            exchange.onEvent(new ResponsiveEvent("",0,resp.toString().getBytes(),true));
         }
         else if(action.equals("onChannel")){
             ChannelStub channel = this.builder.create().fromJson(new String(_payload),ChannelStub.class);
@@ -70,12 +70,12 @@ public class GameServerEventHandler extends AbstractRequestHandler {
             boolean suc = deploymentServiceProvider.registerChannel(channel);
             JsonObject resp = new JsonObject();
             resp.addProperty("successful",suc);
-            exchange.onEvent(new ResponsiveEvent("", "",resp.toString().getBytes(), true));
+            exchange.onEvent(new ResponsiveEvent("", 0,resp.toString().getBytes(), true));
         }
         else if(action.equals("onPing")){
             JsonObject resp = new JsonObject();
             resp.addProperty("successful",true);
-            exchange.onEvent(new ResponsiveEvent("", "",resp.toString().getBytes(), true));
+            exchange.onEvent(new ResponsiveEvent("", 0,resp.toString().getBytes(), true));
             deploymentServiceProvider.verifyConnection(typeId,serverId);
         }
         else if(action.equals("onStart")){//stop the game server
@@ -85,7 +85,7 @@ public class GameServerEventHandler extends AbstractRequestHandler {
             JsonObject resp = new JsonObject();
             resp.addProperty("typeId",typeId);
             resp.addProperty("successful",true);
-            exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
+            exchange.onEvent(new ResponsiveEvent("",0,resp.toString().getBytes(),true));
         }
         else if(action.equals("onStop")){//stop the game server
             ConnectionStub connection = builder.create().fromJson(new String(_payload),ConnectionStub.class);
@@ -94,14 +94,14 @@ public class GameServerEventHandler extends AbstractRequestHandler {
             JsonObject resp = new JsonObject();
             resp.addProperty("typeId",typeId);
             resp.addProperty("successful",true);
-            exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
+            exchange.onEvent(new ResponsiveEvent("",0,resp.toString().getBytes(),true));
         }
         else if(action.equals("onUpdate")){
             JsonObject resp = new JsonObject();
             resp.addProperty("typeId",typeId);
             resp.addProperty("successful",true);
             this.deploymentServiceProvider.updateRoom(typeId,name,_payload);
-            exchange.onEvent(new ResponsiveEvent("","",resp.toString().getBytes(),true));
+            exchange.onEvent(new ResponsiveEvent("",0,resp.toString().getBytes(),true));
         }
     }
 

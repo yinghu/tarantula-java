@@ -20,7 +20,7 @@ public class UploadEventHandler extends AbstractRequestHandler {
 
     private DeploymentServiceProvider deploymentServiceProvider;
 
-    private ConcurrentHashMap<String,UploadContent> uMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Long,UploadContent> uMap = new ConcurrentHashMap<>();
     private DeployService deployService;
     private GsonBuilder builder;
 
