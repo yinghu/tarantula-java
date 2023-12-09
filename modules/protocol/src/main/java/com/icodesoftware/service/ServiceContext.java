@@ -23,7 +23,7 @@ public interface ServiceContext extends Context{
 
     ClusterProvider.Node node();
     long distributionId();
-    ServiceEventLogger serviceEventLogger();
+    //ServiceEventLogger serviceEventLogger();
     <T extends Recoverable> RecoverableRegistry<T> recoverableRegistry(int registryId);
     void recoverableRegistry(RecoverableListener recoverableListener);
 

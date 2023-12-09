@@ -8,7 +8,6 @@ import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DeployService;
 import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.ServiceEventLogger;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.cluster.ClusterUtil;
 
@@ -21,7 +20,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
     private final String objectName;
     private static TarantulaLogger logger = JDKLogger.getLogger(DeployServiceProxy.class);
 
-    private ServiceEventLogger serviceEventLogger;
+
     public DeployServiceProxy(String objectName, NodeEngine nodeEngine, ClusterDeployService deployServiceService){
         super(nodeEngine,deployServiceService);
         this.objectName = objectName;
@@ -44,7 +43,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
 
     @Override
     public void setup(ServiceContext serviceContext) {
-        serviceEventLogger = serviceContext.serviceEventLogger();
+
     }
 
     @Override

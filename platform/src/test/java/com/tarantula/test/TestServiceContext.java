@@ -180,9 +180,7 @@ public class TestServiceContext implements ServiceContext {
     public PostOffice postOffice(){
         return null;
     }
-    public ServiceEventLogger serviceEventLogger(){
-        return null;
-    }
+
     public KeyIndexService keyIndexService(){
         return null;
     }

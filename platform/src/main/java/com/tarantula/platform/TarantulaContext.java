@@ -166,9 +166,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     private HttpClientProvider httpClientProvider;
 
     public boolean tarantulaServiceEventLogPersistenceEnable;
-    private String serviceEventLogStore = "tarantula_service_event_log";
 
-    private ServiceEventLogger serviceEventLogger;
 
     public KeyIndexService keyIndexService;
 
@@ -646,8 +644,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         this.accessIndexService().onEnable();
         this.schedule(new MidnightCheck(this));
         metricsManager.start();
-        DataStore dataStore = this.dataStore(Distributable.DATA_SCOPE,serviceEventLogStore);
-        serviceEventLogger = new PlatformServiceEventLogger(dataStore,tarantulaServiceEventLogPersistenceEnable);
  	}
 
 
@@ -1073,9 +1069,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
          gMap.remove(key);
     }
 
-    public ServiceEventLogger serviceEventLogger(){
-        return serviceEventLogger;
-    }
+
 
     @Override
     public long distributionId() {

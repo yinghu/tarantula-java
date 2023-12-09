@@ -30,7 +30,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
 
     private HashMap<String,JsonObject> vendors = new HashMap<>();
 
-    private ServiceEventLogger serviceEventLogger;
+
     public PlatformConfigurationServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
         this.typeId = gameCluster.typeId();
@@ -139,7 +139,6 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             vendors.put(jo.get("configuration").getAsString(),jo);
         });
         this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME+"_credentials");
-        this.serviceEventLogger = serviceContext.serviceEventLogger();
         this.logger.warn("Configuration service provider started on ["+gameServiceName+"]["+gameCluster.property(GameCluster.NAME)+"]");
     }
 

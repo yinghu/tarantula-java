@@ -9,8 +9,6 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.GameServiceProvider;
 import com.icodesoftware.protocol.GameServiceProxy;
 import com.icodesoftware.service.*;
-import com.perfectday.games.earth8.Earth8GameServiceProvider;
-import com.perfectday.games.earth8.Earth8PortableRegistry;
 import com.tarantula.game.module.ErrorModule;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.achievement.PlatformAchievementServiceProvider;
@@ -28,7 +26,6 @@ import com.tarantula.platform.item.ItemDistributionCallback;
 
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
 import com.tarantula.platform.store.PlatformStoreServiceProvider;
-import com.tarantula.platform.store.TransactionEventLogger;
 import com.tarantula.platform.tournament.*;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -129,7 +126,7 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
             return true;
         });
         this.gameServiceProvider = toGameServiceProvider(gameCluster.gameServiceProvider);
-        gameServiceProvider.setup(new PlatformGameContext(serviceContext,this,JDKLogger.getLogger(Earth8GameServiceProvider.class)));
+        gameServiceProvider.setup(new PlatformGameContext(serviceContext,this,JDKLogger.getLogger(this.gameServiceProvider.getClass())));
         gameCluster.addListener(gameServiceProvider);
         logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionId()+"]");
     }
@@ -339,13 +336,6 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
             throw new RuntimeException();
         }
     }
-
-    public ServiceEventLogger transactionEventLogger(String storeName){
-        DataStore dataStore = this.serviceContext.dataStore(Distributable.DATA_SCOPE,gameCluster.typeId()+"_transaction_"+storeName);
-        TransactionEventLogger transactionEventLogger = new TransactionEventLogger(dataStore);
-        return transactionEventLogger;
-    }
-
 
     public GameServiceProvider gameServiceProvider(){
         return gameServiceProvider;

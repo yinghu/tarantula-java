@@ -10,7 +10,6 @@ import com.tarantula.platform.room.*;
 import com.tarantula.platform.service.AccessKey;
 import com.tarantula.platform.service.KeyIndexTrack;
 import com.tarantula.platform.service.PresenceKey;
-import com.tarantula.platform.service.ServiceEventLog;
 import com.tarantula.platform.tournament.TournamentEntry;
 import com.tarantula.platform.tournament.TournamentInstance;
 import com.tarantula.platform.tournament.TournamentManager;
@@ -39,7 +38,6 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
 
     public static final int PROPERTY_INDEX_SET_CID = 29;
 
-    public static final int SERVICE_EVENT_LOG_CID = 30;
 
     //START 100 working with EVENT PORTABLE on same OID
     public static final int SINGLETON_FORWARD_CID = PortableEventRegistry.SINGLETON_FORWARD_CID;
@@ -111,9 +109,6 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
                 break;
             case PROPERTY_INDEX_SET_CID:
                 _ins = new PropertyIndexSet();
-                break;
-            case SERVICE_EVENT_LOG_CID:
-                _ins = new ServiceEventLog();
                 break;
             case SINGLETON_FORWARD_CID:
                 _ins = new SessionForward();

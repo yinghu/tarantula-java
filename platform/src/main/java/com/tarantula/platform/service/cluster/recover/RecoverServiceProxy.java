@@ -23,7 +23,6 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
 
     private MetricsListener metricsListener;
     private ServiceContext serviceContext;
-    private ServiceEventLogger serviceEventLogger;
 
     public RecoverServiceProxy(String objectName, NodeEngine nodeEngine, ClusterRecoverService clusterRecoverService){
         super(nodeEngine,clusterRecoverService);
@@ -50,7 +49,6 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     @Override
     public void setup(ServiceContext serviceContext) {
         this.serviceContext = serviceContext;
-        this.serviceEventLogger = serviceContext.serviceEventLogger();
     }
 
     @Override
