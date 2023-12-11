@@ -5,10 +5,8 @@ import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.ServiceEventLogger;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.item.DistributionItemService;
-import com.tarantula.platform.service.cluster.ClusterFailureEvent;
 import com.tarantula.platform.service.cluster.ClusterUtil;
 
 import java.util.Set;
@@ -19,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 public class DistributionItemServiceProxy extends AbstractDistributedObject<ItemClusterService> implements DistributionItemService {
 
     private String objectName;
-    private ServiceEventLogger serviceEventLogger;
 
     public DistributionItemServiceProxy(String objectName, NodeEngine nodeEngine, ItemClusterService itemClusterService){
         super(nodeEngine,itemClusterService);
@@ -82,6 +79,6 @@ public class DistributionItemServiceProxy extends AbstractDistributedObject<Item
 
     @Override
     public void setup(ServiceContext serviceContext){
-        this.serviceEventLogger = serviceContext.serviceEventLogger();
+
     }
 }

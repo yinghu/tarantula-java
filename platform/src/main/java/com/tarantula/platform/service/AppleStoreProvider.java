@@ -9,7 +9,6 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
 
-import com.icodesoftware.service.ServiceEventLogger;
 import com.icodesoftware.util.HttpCaller;
 
 import com.tarantula.game.service.PlatformGameServiceProvider;

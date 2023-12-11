@@ -15,14 +15,14 @@ public class TransactionReplicationEvent extends Data implements Event {
     public Portable[] pendingLogs;
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeUTF("dest",destination);
-        portableWriter.writePortableArray("logs",pendingLogs);
+        portableWriter.writeUTF("1",destination);
+        portableWriter.writePortableArray("2",pendingLogs);
     }
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
-        destination = portableReader.readUTF("dest");
-        pendingLogs = portableReader.readPortableArray("logs");
+        destination = portableReader.readUTF("1");
+        pendingLogs = portableReader.readPortableArray("2");
     }
 
     @Override

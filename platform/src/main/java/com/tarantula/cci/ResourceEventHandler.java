@@ -22,7 +22,7 @@ public class ResourceEventHandler extends AbstractRequestHandler{
         String path = exchange.path();
         //load js API in resources/web, public access
         Content _load = this.deploymentServiceProvider.resource(path.substring(1));
-        exchange.onEvent(new ResponsiveEvent("","",_load.data(),0,_load.type(),true));
+        exchange.onEvent(new ResponsiveEvent("",0,_load.data(),0,_load.type(),true));
      }
     @Override
     public void start() throws Exception {

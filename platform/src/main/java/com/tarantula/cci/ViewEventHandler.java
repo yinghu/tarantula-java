@@ -33,7 +33,7 @@ public class ViewEventHandler extends AbstractRequestHandler {
             onView = this.deploymentServiceProvider.view(OnView.INVALID_VIEW_ID);
         }
         byte[] ret = this.builder.create().toJson(onView).getBytes();
-        exchange.onEvent(new ResponsiveEvent("","",ret,0,"application/json",true));
+        exchange.onEvent(new ResponsiveEvent("",0,ret,0,"application/json",true));
     }
     @Override
     public void start() throws Exception {

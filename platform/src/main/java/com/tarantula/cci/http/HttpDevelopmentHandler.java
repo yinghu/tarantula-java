@@ -25,7 +25,7 @@ public class HttpDevelopmentHandler extends HttpDispatcher {
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
-        HttpUploadSession httpUploadSession = new HttpUploadSession(httpExchange);
+        HttpUploadSession httpUploadSession = new HttpUploadSession(requestHandler.snowflakeId(),httpExchange);
         try{
             requestHandler.onRequest(httpUploadSession);
         }catch (Exception ex){

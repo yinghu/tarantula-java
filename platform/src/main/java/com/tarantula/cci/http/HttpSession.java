@@ -10,9 +10,9 @@ import java.util.Map;
 public class HttpSession extends RequestParser implements OnExchange {
 
 	private final HttpExchange hex;
-    private final String id;
+    private final long id;
     private Map<String,Object> requestMapping;
-	public HttpSession(String id,HttpExchange hex){
+	public HttpSession(long id,HttpExchange hex){
         this.id  = id;
 	    this.hex = hex;
     }
@@ -35,7 +35,7 @@ public class HttpSession extends RequestParser implements OnExchange {
         }
         return true;
     }
-    public String id(){
+    public long id(){
 	    return this.id;
     }
 

@@ -1,18 +1,13 @@
 package com.icodesoftware.test;
 
-import com.beust.ah.A;
-import com.icodesoftware.service.KeyIndexService;
+
 import com.icodesoftware.service.RNG;
 import com.icodesoftware.util.*;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -115,7 +110,7 @@ public class MiscTest {
     }
 
     @Test(groups = { "misc test" })
-    public void mapTest() {
+    public void mapTest(){
         ConcurrentHashMap<String,String> _m = new ConcurrentHashMap<>();
         AtomicInteger size = new AtomicInteger(0);
         for(int i=0;i<100;i++){
@@ -126,7 +121,22 @@ public class MiscTest {
             });
         }
         Assert.assertEquals(_m.size(),10);
+        Exception exception;
+        SampleCloseable sampleCloseable = new SampleCloseable();
+        SampleCloseable sampleCloseable1 = new SampleCloseable();
+        try(sampleCloseable;sampleCloseable1){
+            sampleCloseable.doSome();
+            sampleCloseable1.doSome();
+            throw new RuntimeException("");
+        }catch (Exception ex){
+            exception = ex;
+        }
+        finally {
+            System.out.println("final block");
+        }
+        Assert.assertNotNull(exception);
     }
+
 
 
 }

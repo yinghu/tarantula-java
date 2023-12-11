@@ -93,10 +93,6 @@ public class TestContext implements ServiceContext {
         return 0;
     }
 
-    @Override
-    public ServiceEventLogger serviceEventLogger() {
-        return null;
-    }
 
     @Override
     public <T extends Recoverable> RecoverableRegistry<T> recoverableRegistry(int registryId) {
