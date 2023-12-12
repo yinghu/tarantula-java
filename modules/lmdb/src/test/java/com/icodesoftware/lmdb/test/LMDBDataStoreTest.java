@@ -1,13 +1,7 @@
 package com.icodesoftware.lmdb.test;
 
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Distributable;
-import com.icodesoftware.Recoverable;
-import com.icodesoftware.Transaction;
-import com.icodesoftware.lmdb.BufferProxy;
-import com.icodesoftware.lmdb.LMDBDataStoreProvider;
-import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
-import com.icodesoftware.lmdb.TransactionLog;
+import com.icodesoftware.*;
+import com.icodesoftware.lmdb.*;
 import com.icodesoftware.service.AccessIndexService;
 import com.icodesoftware.util.BinaryKey;
 import com.icodesoftware.util.NaturalKey;
@@ -62,6 +56,12 @@ public class LMDBDataStoreTest {
         TestUser user1 = new TestUser("test002",ownerId);
         Assert.assertTrue(dataStore.create(user1));
         Assert.assertEquals(dataStore.list(new TestUserQuery(ownerId)).size(),2);
+        try(Recoverable.DataBufferPair cache = lmdbDataStoreProvider.dataBufferPair()){
+            cache.key().writeDouble(100);
+            cache.value().writeDouble(100);
+        }catch (Exception ex){
+
+        }
     }
     @Test(groups = { "LMDB" })
     public void testCommitOnTransaction(){

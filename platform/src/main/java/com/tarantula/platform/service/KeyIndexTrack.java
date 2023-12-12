@@ -48,12 +48,7 @@ public class KeyIndexTrack extends RecoverableObject implements KeyIndex , Porta
     public int scope(){
         return Distributable.INDEX_SCOPE;
     }
-    @Override
-    public boolean backup(){
-        return false;
-    }
-    @Override
-    public boolean distributable(){return true;}
+
     @Override
     public int getFactoryId() {
         return PortableEventRegistry.OID;

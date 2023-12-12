@@ -15,7 +15,7 @@ public class PersistencePortableRegistry<T extends Recoverable> extends Abstract
     }
 
     @Override
-    public Recoverable create(int cid) {
+    public T create(int cid) {
         Recoverable _ins;
         switch(cid){
             case TRANSACTION_LOG_CID:
@@ -27,6 +27,6 @@ public class PersistencePortableRegistry<T extends Recoverable> extends Abstract
             default:
                 throw new RuntimeException("Class ID ["+cid+"] not supported");
         }
-        return _ins;
+        return (T)_ins;
     }
 }

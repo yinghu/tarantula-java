@@ -27,9 +27,6 @@ public interface Distributable {
 
     String index();
 
-    // marked as cluster distributing
-    boolean distributable();
-
     byte[] toBinary();
     void fromBinary(byte[] payload);
 }

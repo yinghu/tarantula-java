@@ -33,4 +33,8 @@ public class BufferCache implements Recoverable.DataBufferPair {
     public Recoverable.DataBuffer value() {
         return value;
     }
+
+    public void close(){
+        reset();
+    }
 }

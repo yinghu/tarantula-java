@@ -52,11 +52,6 @@ public class TestNode implements ClusterProvider.Node {
     }
 
     @Override
-    public boolean distributable() {
-        return false;
-    }
-
-    @Override
     public byte[] toBinary() {
         return new byte[0];
     }
@@ -81,10 +76,7 @@ public class TestNode implements ClusterProvider.Node {
         return null;
     }
 
-    @Override
-    public boolean backup() {
-        return false;
-    }
+
 
     @Override
     public Key ownerKey() {

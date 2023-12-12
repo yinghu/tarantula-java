@@ -6,9 +6,6 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable,V
 
     String PATH_SEPARATOR = "/";
 
-    //marked as backup operation on remote data storage
-    boolean backup();
-
     Key ownerKey();
     void ownerKey(Key ownerKey);
 
@@ -27,7 +24,6 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable,V
     //the data store version; never use it in application
     long revision();
     void revision(long revision);
-
 
     boolean onEdge();
     void onEdge(boolean onEdge);
@@ -97,7 +93,7 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable,V
         ByteBuffer clear();
     }
 
-    interface DataBufferPair extends Resettable{
+    interface DataBufferPair extends Resettable,AutoCloseable{
         DataBuffer key();
         DataBuffer value();
     }

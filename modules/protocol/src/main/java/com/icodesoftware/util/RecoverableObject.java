@@ -11,7 +11,6 @@ import java.util.Map;
 
 public class RecoverableObject implements Recoverable {
 
-    //protected String bucket;
 
     protected transient Key ownerKey;
 
@@ -92,9 +91,6 @@ public class RecoverableObject implements Recoverable {
     public void fromBinary(byte[] payload){
         fromMap(JsonUtil.toMap(payload));
     }
-    public boolean backup(){
-        return true;
-    }
 
     public boolean disabled() {
         return this.disabled;
@@ -103,9 +99,7 @@ public class RecoverableObject implements Recoverable {
     public void index(String index){
         this.index = index;
     }
-    public boolean distributable(){
-        return scope() != Distributable.LOCAL_SCOPE;
-    }
+
     public String index(){
         return this.index;
     }

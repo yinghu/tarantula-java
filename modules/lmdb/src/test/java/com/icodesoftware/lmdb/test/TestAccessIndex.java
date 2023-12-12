@@ -28,12 +28,8 @@ public class TestAccessIndex extends RecoverableObject implements AccessIndex {
     public int scope(){
         return Distributable.INTEGRATION_SCOPE;
     }
-    @Override
-    public boolean backup(){
-        return true;
-    }
-    @Override
-    public boolean distributable(){return true;}
+
+
     @Override
     public int getFactoryId() {
         return 10;
