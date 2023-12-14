@@ -11,7 +11,6 @@ import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.statistics.StatisticsPortableRegistry;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 public class SystemStatisticsEntry extends RecoverableObject implements Statistics.Entry {
 
@@ -40,6 +39,7 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
         this.monthly = entry.monthly();
         this.yearly = entry.yearly();
         this.total = entry.total();
+        this.timestamp = entry.timestamp();
     }
 
     @Override
@@ -123,28 +123,6 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
     @Override
     public int getClassId() {
         return StatisticsPortableRegistry.SYSTEM_STATISTICS_ENTRY_CID;
-    }
-
-    @Override
-    public Map<String,Object> toMap(){
-        this.properties.put("total",total);
-        this.properties.put("hourly",hourly);
-        this.properties.put("daily",daily);
-        this.properties.put("weekly",weekly);
-        this.properties.put("monthly",monthly);
-        this.properties.put("yearly",yearly);
-        this.properties.put("timestamp",this.timestamp);
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        this.total = ((Number)properties.get("total")).doubleValue();
-        this.hourly =((Number)properties.get("hourly")).doubleValue();
-        this.daily =((Number)properties.get("daily")).doubleValue();
-        this.weekly = ((Number)properties.get("weekly")).doubleValue();
-        this.monthly =((Number)properties.get("monthly")).doubleValue();
-        this.yearly = ((Number)properties.get("yearly")).doubleValue();
-        this.timestamp =((Number)properties.get("timestamp")).longValue();
     }
 
     public boolean read(DataBuffer buffer){

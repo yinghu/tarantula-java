@@ -722,6 +722,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
         if(name.equals(OnAccess.WEB_HOOK)) return new ThirdPartyServiceProvider(OnAccess.WEB_HOOK);
 
+        if(name.equals(OnAccess.JDBC_SQL)) return new ThirdPartyServiceProvider(OnAccess.JDBC_SQL);
+
         return null;
 
     }

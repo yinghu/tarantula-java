@@ -52,6 +52,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
 
 
     private List<String> edgeList(){
+        //env.getDbiNames().forEach(n->System.out.println(new String(n)));
         ArrayList<String> elist = new ArrayList<>();
         return elist;
     }

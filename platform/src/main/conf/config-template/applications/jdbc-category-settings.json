@@ -9,7 +9,7 @@
     {
       "header": {
         "scope": "application.data",
-        "type": "MySQLCredentialConfiguration",
+        "type": "JDBCPoolCredentialConfiguration",
         "description": "access category",
         "version": "1.0",
         "rechargeable": false
@@ -17,7 +17,7 @@
       "application": {
         "properties": [
           {
-            "name": "ConnectionPool",
+            "name": "DBCPPool",
             "type": "string",
             "reference": "String",
             "nullable": false,

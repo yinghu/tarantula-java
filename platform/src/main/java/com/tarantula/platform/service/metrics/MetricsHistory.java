@@ -15,10 +15,6 @@ import java.time.LocalDateTime;
 
 public class MetricsHistory extends RecoverableObject implements Metrics.History {
 
-    private final static int HOURLY_HISTORY_BUFFER_SIZE = 24;
-
-    final static String LABEL_PREFIX = "history";
-
 
     private MetricsProperty[] metrics;
 
@@ -31,14 +27,15 @@ public class MetricsHistory extends RecoverableObject implements Metrics.History
 
     public MetricsHistory(){
         this.onEdge = true;
-        this.metrics = new MetricsProperty[HOURLY_HISTORY_BUFFER_SIZE];
-        for(int i=0;i<HOURLY_HISTORY_BUFFER_SIZE;i++){
-            this.metrics[i]=new MetricsProperty(i,"m"+i,0d,0l);
+        this.metrics = new MetricsProperty[Metrics.HOURLY_HISTORY_BUFFER_SIZE];
+        LocalDateTime _cur = LocalDateTime.now();
+        for(int i=0;i<Metrics.HOURLY_HISTORY_BUFFER_SIZE;i++){
+            this.metrics[i]=new MetricsProperty("m"+i,0d,_cur);
         }
     }
     public MetricsHistory(String category,int year,int day){
         this();
-        this.label = LABEL_PREFIX+"_"+category+"_"+year;
+        this.label = Metrics.HISTORY_LABEL_PREFIX+category+"_"+year;
         this.day = day;
     }
 
@@ -54,7 +51,7 @@ public class MetricsHistory extends RecoverableObject implements Metrics.History
         this.weeklyGain = buffer.readDouble();
         this.monthlyGain = buffer.readDouble();
         this.yearlyGain = buffer.readDouble();
-        for(int i=0; i<HOURLY_HISTORY_BUFFER_SIZE;i++){
+        for(int i=0; i<Metrics.HOURLY_HISTORY_BUFFER_SIZE;i++){
             metrics[i].value = buffer.readDouble();
             metrics[i].timestamp(buffer.readLong());
         }
@@ -66,8 +63,8 @@ public class MetricsHistory extends RecoverableObject implements Metrics.History
         buffer.writeDouble(weeklyGain);
         buffer.writeDouble(monthlyGain);
         buffer.writeDouble(yearlyGain);
-        for(int i=0; i<HOURLY_HISTORY_BUFFER_SIZE;i++){
-            buffer.writeDouble((double)metrics[i].value());
+        for(int i=0; i<Metrics.HOURLY_HISTORY_BUFFER_SIZE;i++){
+            buffer.writeDouble(metrics[i].value());
             buffer.writeLong(metrics[i].timestamp());
         }
         return true;
@@ -107,18 +104,20 @@ public class MetricsHistory extends RecoverableObject implements Metrics.History
     //key label format history_[category]_[year]_[dayofyear]  history_httpRequestCount_2022_145
 
     public void archiveHourly(Metrics.Spot property){
-        int hour  = TimeUtil.fromUTCMilliseconds(property.timestamp()).getHour();
-        MetricsProperty archive = metrics[hour>0?(hour-1):HOURLY_HISTORY_BUFFER_SIZE-1];
+        LocalDateTime _timed = TimeUtil.fromUTCMilliseconds(property.timestamp());
+        int hour  = _timed.getHour();
+        MetricsProperty archive = metrics[hour>0?(hour-1):Metrics.HOURLY_HISTORY_BUFFER_SIZE-1];
         double v = archive.value;
         double d = property.value();
         archive.value = v+d;
+        archive.timestamp(property.timestamp());
     }
 
     public void initializeHourly(LocalDateTime current){
         LocalDateTime start = current.minusHours(current.getHour());
-        for(int i=0;i<HOURLY_HISTORY_BUFFER_SIZE;i++){
+        for(int i=0;i<Metrics.HOURLY_HISTORY_BUFFER_SIZE;i++){
             LocalDateTime hour = start.plusHours(i);
-            archiveHourly(new MetricsProperty(i,MetricsProperty.historyPropertyLabel(hour),0d,hour));
+            archiveHourly(new MetricsProperty(MetricsProperty.historyPropertyLabel(hour),0d,hour));
         }
     }
 
@@ -141,7 +140,7 @@ public class MetricsHistory extends RecoverableObject implements Metrics.History
 
     public static String historyLabel(long metricsId,String category,LocalDateTime today){
         StringBuffer buffer = new StringBuffer().append(metricsId).append(Recoverable.PATH_SEPARATOR);
-        buffer.append(Recoverable.PATH_SEPARATOR).append(MetricsHistory.LABEL_PREFIX).append("_").append(category).append("_");
+        buffer.append(Recoverable.PATH_SEPARATOR).append(Metrics.HISTORY_LABEL_PREFIX).append(category).append("_");
         return buffer.append(today.getYear()).append("_").append(today.getDayOfYear()).toString();
     }
 

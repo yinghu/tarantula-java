@@ -8,10 +8,18 @@ import java.util.List;
 
 public interface Metrics extends ServiceProvider,MetricsListener{
 
+    int HOURLY_HISTORY_BUFFER_SIZE = 24;
+    String HISTORY_LABEL_PREFIX = "history_";
+
+    int SNAPSHOT_TRACKING_SIZE = 12;
+    String SNAPSHOT_LABEL_PREFIX = "snapshot_";
+
+
     String PERFORMANCE = "performance";
     String ACCESS = "access";
     String PAYMENT = "payment";
     String DEPLOYMENT = "deployment";
+
     String SYSTEM ="system";
 
     List<String> categories();

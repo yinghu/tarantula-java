@@ -10,21 +10,18 @@ import java.time.LocalDateTime;
 
 public class MetricsProperty extends RecoverableObject implements Metrics.Spot {
 
-    //public String name;
-    public double value;
 
+    public double value;
 
     public MetricsProperty(){
     }
-
-    public MetricsProperty(int index, String name, double value,LocalDateTime dateCreated){
-        this(index,name,value,TimeUtil.toUTCMilliseconds(dateCreated));
-    }
-    public MetricsProperty(int index,String name, double value,long timestamp){
-        this.routingNumber = index;
-        this.name = name;
+    public MetricsProperty(double value,LocalDateTime dateCreated){
         this.value = value;
-        this.timestamp = timestamp;
+        this.timestamp = TimeUtil.toUTCMilliseconds(dateCreated);
+    }
+    public MetricsProperty(String name, double value,LocalDateTime dateCreated){
+        this(value,dateCreated);
+        this.name = name;
     }
 
     @Override

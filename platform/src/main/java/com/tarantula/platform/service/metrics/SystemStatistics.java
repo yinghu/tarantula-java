@@ -16,8 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SystemStatistics extends RecoverableObject implements Statistics {
 
-
-
     private Map<String, SystemStatisticsEntry> mappings = new ConcurrentHashMap<>();
 
     public SystemStatistics(){
@@ -46,7 +44,7 @@ public class SystemStatistics extends RecoverableObject implements Statistics {
     //original streaming
     public void summary(Stream query){
         mappings.forEach((k,v)->{
-            query.onEntry(v);
+            query.onEntry(v.duplicate());
         });
     }
     @Override

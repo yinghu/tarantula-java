@@ -20,7 +20,6 @@
 		  <artifactId>stripe-java</artifactId>
 		  <version>8.0.2</version>
 	  </dependency>
-
    	<dependency>
 		<groupId>com.hazelcast</groupId>
 		<artifactId>hazelcast</artifactId>
@@ -41,6 +40,17 @@
 		  <artifactId>gec-lmdb</artifactId>
 		  <version>1.0</version>
 	  </dependency>
+	  <dependency>
+		  <groupId>org.apache.commons</groupId>
+		  <artifactId>commons-dbcp2</artifactId>
+		  <version>2.11.0</version>
+	  </dependency>
+	  <dependency>
+		  <groupId>org.postgresql</groupId>
+		  <artifactId>postgresql</artifactId>
+		  <version>42.7.1</version>
+	  </dependency>
+
 	  <dependency>
 		  <groupId>com.perfectday.games</groupId>
 		  <artifactId>gec-earth8</artifactId>

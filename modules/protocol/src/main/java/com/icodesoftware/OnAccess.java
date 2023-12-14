@@ -59,7 +59,7 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
     String TYPE_ID = "typeId";
     String PROVIDER = "provider";
 
-    String MYSQL = "mysql";
+    String JDBC_SQL = "jdbc";
     String WEB_HOOK = "webHook";
 
     String GAME_CLUSTER_CONFIG = "gameClusterConfig";

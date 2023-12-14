@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 
+import com.icodesoftware.service.Metrics;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.statistics.StatisticsPortableRegistry;
@@ -15,21 +16,22 @@ import java.time.format.DateTimeFormatter;
 
 public class MetricsSnapshot extends RecoverableObject  {
 
-    public final static int TRACKING_NUMBER = 12;
+
     private MetricsProperty[] metrics;
 
     public MetricsSnapshot(String category,String classifier){
         this();
         this.name = classifier;
-        this.label = "snapshot_"+category;
+        this.label = Metrics.SNAPSHOT_LABEL_PREFIX +category;
 
     }
 
     public MetricsSnapshot(){
         this.onEdge = true;
-        this.metrics = new MetricsProperty[TRACKING_NUMBER];
-        for(int i=0;i<TRACKING_NUMBER;i++){
-            this.metrics[i]=new MetricsProperty(i,"m"+i,0d,0l);
+        this.metrics = new MetricsProperty[Metrics.SNAPSHOT_TRACKING_SIZE];
+        LocalDateTime _cur = LocalDateTime.now();
+        for(int i=0;i<Metrics.SNAPSHOT_TRACKING_SIZE;i++){
+            this.metrics[i]=new MetricsProperty("m"+i,0d,_cur);
         }
     }
 
@@ -42,7 +44,7 @@ public class MetricsSnapshot extends RecoverableObject  {
     public boolean read(DataBuffer buffer){
         this.name = buffer.readUTF8();
         this.timestamp = buffer.readLong();
-        for(int i=0; i<TRACKING_NUMBER;i++){
+        for(int i=0; i<Metrics.SNAPSHOT_TRACKING_SIZE;i++){
             metrics[i].value = buffer.readDouble();
             metrics[i].timestamp(buffer.readLong());
         }
@@ -51,7 +53,7 @@ public class MetricsSnapshot extends RecoverableObject  {
     public boolean write(DataBuffer buffer) {
         buffer.writeUTF8(name);
         buffer.writeLong(timestamp);
-        for(int i=0; i<TRACKING_NUMBER;i++){
+        for(int i=0; i<Metrics.SNAPSHOT_TRACKING_SIZE;i++){
             buffer.writeDouble(metrics[i].value());
             buffer.writeLong(metrics[i].timestamp());
         }
@@ -73,21 +75,21 @@ public class MetricsSnapshot extends RecoverableObject  {
     }
 
 
-    public void initialize(MetricsProperty property,LocalDateTime timeUpdated){
-        metrics[property.routingNumber()].name(property.name());
+    public void initialize(int index,MetricsProperty property,LocalDateTime timeUpdated){
+        metrics[index].name(property.name());
         this.timestamp = TimeUtil.toUTCMilliseconds(timeUpdated);
     }
     public MetricsSnapshot update(double currentData){
-        metrics[TRACKING_NUMBER-1].value = currentData;//
+        metrics[Metrics.SNAPSHOT_TRACKING_SIZE-1].value = currentData;//
         this.timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
         return this;
     }
     public MetricsProperty push(MetricsProperty property,LocalDateTime dateTime){
-        MetricsProperty toHistory = metrics[TRACKING_NUMBER-1];
-        for(int i=0;i<TRACKING_NUMBER-1;i++){
+        MetricsProperty toHistory = metrics[Metrics.SNAPSHOT_TRACKING_SIZE-1];
+        for(int i=0;i<Metrics.SNAPSHOT_TRACKING_SIZE-1;i++){
             metrics[i]=metrics[i+1];
         }
-        metrics[TRACKING_NUMBER-1] = property;
+        metrics[Metrics.SNAPSHOT_TRACKING_SIZE-1] = property;
         this.timestamp = TimeUtil.toUTCMilliseconds(dateTime);
         return toHistory;
     }
