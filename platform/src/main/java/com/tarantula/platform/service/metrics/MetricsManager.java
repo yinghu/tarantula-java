@@ -47,7 +47,6 @@ public class MetricsManager implements SchedulingTask, Serviceable {
         this.tarantulaContext.schedule(this);
     }
 
-
     public Metrics metrics(String name){
         return metricsMap.get(name);
     }

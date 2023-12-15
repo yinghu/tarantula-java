@@ -407,67 +407,68 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.deployDataStore = this.serviceContext.dataStore(Distributable.DATA_SCOPE,DeploymentServiceProvider.DEPLOY_DATA_STORE);
         oMap = new ConcurrentHashMap<>();
         fMap = new ConcurrentHashMap<>();
-        AuthVendorRegistry google = (AuthVendorRegistry)this.serviceContext.authVendor(OnAccess.GOOGLE);
+
+        AuthVendorRegistry google = TarantulaContext.getInstance().authVendor(OnAccess.GOOGLE);
         if(google!=null){
             google.registerMetricsLister(serviceContext.metrics(Metrics.ACCESS));
             google.setup(serviceContext);
             aMap.put(OnAccess.GOOGLE,(google));
         }
-        AuthVendorRegistry facebook = (AuthVendorRegistry) this.serviceContext.authVendor(OnAccess.FACEBOOK);
+        AuthVendorRegistry facebook = TarantulaContext.getInstance().authVendor(OnAccess.FACEBOOK);
         if(facebook!=null){
             facebook.registerMetricsLister(serviceContext.metrics(Metrics.ACCESS));
             facebook.setup(serviceContext);
             aMap.put(OnAccess.FACEBOOK,facebook);
         }
-        AuthVendorRegistry appleStore = (AuthVendorRegistry) this.serviceContext.authVendor(OnAccess.APPLE_STORE);
+        AuthVendorRegistry appleStore = TarantulaContext.getInstance().authVendor(OnAccess.APPLE_STORE);
         if(appleStore!=null){
             appleStore.registerMetricsLister(serviceContext.metrics(Metrics.PAYMENT));
             appleStore.setup(serviceContext);
             aMap.put(OnAccess.APPLE_STORE,appleStore);
         }
-        AuthVendorRegistry gameCenter = (AuthVendorRegistry) this.serviceContext.authVendor(OnAccess.GAME_CENTER);
+        AuthVendorRegistry gameCenter = TarantulaContext.getInstance().authVendor(OnAccess.GAME_CENTER);
         if(gameCenter!=null){
             gameCenter.registerMetricsLister(serviceContext.metrics(Metrics.ACCESS));
             gameCenter.setup(serviceContext);
             aMap.put(OnAccess.GAME_CENTER,gameCenter);
         }
-        AuthVendorRegistry developerStore = (AuthVendorRegistry)this.serviceContext.authVendor(OnAccess.DEVELOPER_STORE);
+        AuthVendorRegistry developerStore = TarantulaContext.getInstance().authVendor(OnAccess.DEVELOPER_STORE);
         if(developerStore!=null){
             developerStore.registerMetricsLister((k,v)->{});
             developerStore.setup(serviceContext);
             aMap.put(OnAccess.DEVELOPER_STORE,developerStore);
         }
-        AuthVendorRegistry stripe = (AuthVendorRegistry)this.serviceContext.authVendor(OnAccess.STRIPE);
+        AuthVendorRegistry stripe = TarantulaContext.getInstance().authVendor(OnAccess.STRIPE);
         if(stripe!=null){
             stripe.registerMetricsLister(serviceContext.metrics(Metrics.PAYMENT));
             stripe.setup(serviceContext);
             aMap.put(OnAccess.STRIPE,(stripe));
         }
-        AuthVendorRegistry googleStore = (AuthVendorRegistry) this.serviceContext.authVendor(OnAccess.GOOGLE_STORE);
+        AuthVendorRegistry googleStore = TarantulaContext.getInstance().authVendor(OnAccess.GOOGLE_STORE);
         if(googleStore!=null){
             googleStore.registerMetricsLister(serviceContext.metrics(Metrics.PAYMENT));
             googleStore.setup(serviceContext);
             aMap.put(OnAccess.GOOGLE_STORE,googleStore);
         }
-        AuthVendorRegistry amazonAws = (AuthVendorRegistry) this.serviceContext.authVendor(OnAccess.AMAZON);
+        AuthVendorRegistry amazonAws = TarantulaContext.getInstance().authVendor(OnAccess.AMAZON);
         if(amazonAws!=null){
             amazonAws.registerMetricsLister(serviceContext.metrics(Metrics.ACCESS));
             amazonAws.setup(serviceContext);
             aMap.put(OnAccess.AMAZON,amazonAws);
         }
-        AuthVendorRegistry applicationStore = (AuthVendorRegistry)this.serviceContext.authVendor(OnAccess.APPLICATION_STORE);
+        AuthVendorRegistry applicationStore = TarantulaContext.getInstance().authVendor(OnAccess.APPLICATION_STORE);
         if(applicationStore!=null){
             applicationStore.registerMetricsLister(serviceContext.metrics(Metrics.PAYMENT));
             applicationStore.setup(serviceContext);
             aMap.put(OnAccess.APPLICATION_STORE,applicationStore);
         }
-        AuthVendorRegistry webHook = (AuthVendorRegistry)this.serviceContext.authVendor(OnAccess.WEB_HOOK);
+        AuthVendorRegistry webHook = TarantulaContext.getInstance().authVendor(OnAccess.WEB_HOOK);
         if(webHook!=null){
             webHook.registerMetricsLister(serviceContext.metrics(Metrics.ACCESS));
             webHook.setup(serviceContext);
             aMap.put(OnAccess.WEB_HOOK,webHook);
         }
-        AuthVendorRegistry jdbcPool = (AuthVendorRegistry)this.serviceContext.authVendor(OnAccess.JDBC_SQL);
+        AuthVendorRegistry jdbcPool = TarantulaContext.getInstance().authVendor(OnAccess.JDBC_SQL);
         if(jdbcPool!=null){
             jdbcPool.registerMetricsLister(serviceContext.metrics(Metrics.ACCESS));
             jdbcPool.setup(serviceContext);

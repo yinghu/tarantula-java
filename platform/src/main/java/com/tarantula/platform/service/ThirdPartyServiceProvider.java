@@ -1,6 +1,8 @@
 package com.tarantula.platform.service;
 
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.Recoverable;
+import com.icodesoftware.Statistics;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
@@ -68,6 +70,15 @@ public class ThirdPartyServiceProvider implements AuthVendorRegistry {
         if(vendor == null) return false;
         return vendor.upload(typeName[1],bytes);
     }
+
+    @Override
+    public <T extends Recoverable> boolean upload(String query, T content) {
+        String[] typeName = query.split("#");
+        TokenValidatorProvider.AuthVendor vendor = aMap.get(typeName[0]);
+        if(vendor == null) return false;
+        return vendor.upload(typeName[1],content);
+    }
+
 
     public void registerAuthVendor(TokenValidatorProvider.AuthVendor authVendor){
         authVendor.setup(serviceContext);

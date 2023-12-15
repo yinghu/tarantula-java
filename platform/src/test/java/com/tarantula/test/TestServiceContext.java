@@ -118,11 +118,6 @@ public class TestServiceContext implements ServiceContext {
     }
 
     @Override
-    public TokenValidatorProvider.AuthVendor authVendor(String s) {
-        return null;
-    }
-
-    @Override
     public Configuration configuration(String conf) {
         try{
             Map<String,Object> kv = JsonUtil.toMap(Thread.currentThread().getContextClassLoader().getResourceAsStream(conf+".json"));

@@ -10,6 +10,7 @@ import com.tarantula.platform.statistics.StatsDelta;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -70,12 +71,9 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
     protected DataStore dataStore;
     private SystemStatistics statistics;
 
-    private ArrayList<String> categories;
+    private CopyOnWriteArraySet<String> categories;
     protected TarantulaLogger logger;
     protected String name;
-
-    protected String bucket;
-    protected String oid;
 
     protected boolean paymentIncluded;
     protected boolean accessIncluded;
@@ -95,7 +93,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
     }
 
     public void setup(ServiceContext serviceContext){
-        this.categories = new ArrayList<>();
+        this.categories = new CopyOnWriteArraySet<>();
         this.pendingUpdates = new ConcurrentHashMap<>();
         this.snapshots = new ConcurrentHashMap<>();
         this.archives = new ConcurrentHashMap<>();
@@ -278,7 +276,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
     }
 
     public List<String> categories(){
-        return categories;
+        return new ArrayList<>(categories);
     }
     public Spot[] snapshot(String category, String classifier){
         MetricsSnapshot metricsSnapshot = metricsSnapshot(category,classifier);
@@ -507,7 +505,6 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
     }
     @Override
     public void updateSummary(Summary summary){
-
     }
 
 }

@@ -7,9 +7,11 @@ import com.icodesoftware.Configurable;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.Descriptor;
 
+import com.icodesoftware.OnAccess;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 
+import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.*;
@@ -17,6 +19,7 @@ import com.tarantula.platform.item.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 
 public class PlatformConfigurationServiceProvider extends PlatformItemServiceProvider {
 
@@ -30,7 +33,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
 
     private HashMap<String,JsonObject> vendors = new HashMap<>();
 
-
+    private ScheduledFuture<?> scheduledFuture;
     public PlatformConfigurationServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
         this.typeId = gameCluster.typeId();
@@ -38,6 +41,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
 
     @Override
     public void shutdown() throws Exception {
+        scheduledFuture.cancel(true);
         registered.forEach((k,v)->{
             serviceContext.unregisterAuthVendor(v);
         });
@@ -76,6 +80,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
                 });
             }
         });
+        exposeMetrics();
         return null;
     }
     @Override
@@ -162,6 +167,21 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
 
     public <T extends CredentialConfiguration> T credentialConfiguration(String vendor){
         return (T)vendorCredentials.get(vendor);
+    }
+
+    private void exposeMetrics(){
+        try {
+            TokenValidatorProvider tokenValidatorProvider = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
+            TokenValidatorProvider.AuthVendor authVendor = tokenValidatorProvider.authVendor(OnAccess.JDBC_SQL);
+            Metrics metrics = serviceContext.metrics(Metrics.PERFORMANCE);
+            String query = typeId+"#metrics";
+            authVendor.upload(query,metrics.statistics());
+        }catch (Exception ex){
+            logger.error("error",ex);
+        }
+        //scheduledFuture = serviceContext.schedule(new ScheduleRunner(5000,()->{
+            //exposeMetrics();
+        //}));
     }
 
 }

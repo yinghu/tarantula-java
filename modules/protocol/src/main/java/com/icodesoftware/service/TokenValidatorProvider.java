@@ -62,5 +62,7 @@ public interface TokenValidatorProvider extends ServiceProvider,Resettable {
         boolean validate(Map<String,Object> params);
         boolean upload(String context,byte[] content);
 
+        <T extends Recoverable> boolean upload(String context,T content);
+
     }
 }

@@ -1,10 +1,14 @@
 package com.tarantula.platform.service;
 
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.Recoverable;
+import com.icodesoftware.Statistics;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.tarantula.game.service.PlatformGameServiceProvider;
+import com.tarantula.platform.configuration.JDBCPool;
 import com.tarantula.platform.configuration.JDBCPoolCredentialConfiguration;
+import com.tarantula.platform.configuration.JDBCTask;
 import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
 
 public class SQLJDBCProvider extends AuthObject {
@@ -23,19 +27,14 @@ public class SQLJDBCProvider extends AuthObject {
     public String name() {
         return OnAccess.JDBC_SQL;
     }
-
-    public boolean upload(String query, byte[] bytes) {
+    @Override
+    public <T extends Recoverable> boolean upload(String query, T content) {
         JDBCPoolCredentialConfiguration webHookCredentialConfiguration = configurationServiceProvider.credentialConfiguration(OnAccess.JDBC_SQL);
         if(webHookCredentialConfiguration==null){
-            log.warn("No web hook configuration available for ["+typeId+"]");
+            log.warn("No JDBC configuration available for ["+typeId+"]");
             return false;
         }
-        //WebClient webClient = webHookCredentialConfiguration.webClient(query);
-        //if(webClient==null){
-            //log.warn("No web client configuration available for ["+query+"]");
-            //return false;
-        //}
-        //return webClient.post(serviceContext,bytes);
-        return true;
+        JDBCTask task = webHookCredentialConfiguration.task(query);
+        return task.execute(content);
     }
 }

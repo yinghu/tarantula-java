@@ -27,7 +27,7 @@ public interface ServiceContext extends Context{
     <T extends Recoverable> RecoverableRegistry<T> recoverableRegistry(int registryId);
     void recoverableRegistry(RecoverableListener recoverableListener);
 
-    TokenValidatorProvider.AuthVendor authVendor(String name);
+    //TokenValidatorProvider.AuthVendor authVendor(String name);
     Configuration configuration(String config);
     List<Descriptor> availableServices();
 
