@@ -5,32 +5,62 @@ import com.icodesoftware.service.ServiceContext;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+import java.util.Properties;
 
 public class JDBCPool implements VendorValidator{
 
     private BasicDataSource dataSource;
-
+    private JsonObject props;
+    private String node;
     public JDBCPool(JsonObject props){
+        this.props = props;
+    }
+    public boolean validate(ServiceContext serviceContext){
+        this.node = serviceContext.node().nodeName();
+        String url = props.get("Url").getAsString();
+        String db = props.get("Database").getAsString();
+        Properties properties = new Properties();
+        properties.setProperty("user",props.get("User").getAsString());
+        properties.setProperty("password",props.get("Password").getAsString());
+        try(Connection conn = DriverManager.getConnection(url,properties); Statement cmd = conn.createStatement()){
+            cmd.execute("CREATE DATABASE "+db);
+            return true;
+        }
+        catch (Exception ex){
+            //Ignore if database already exists
+            ex.printStackTrace();
+            return true;
+        }
+        finally {
+            try(Connection conn = DriverManager.getConnection(url+db,properties); Statement cmd = conn.createStatement()){
+                for(String metrics : serviceContext.metricsList()){
+                    System.out.println("METRICS : "+metrics);
+                    cmd.execute("CREATE TABLE IF NOT EXISTS "+metrics.replaceAll("-","_")+" (category varchar(50) NOT NULL,value DOUBLE PRECISION NOT NULL, node char(5) NOT NULL , updated TIMESTAMP NOT NULL, PRIMARY KEY(category,node))");
+                }
+            }
+            catch (Exception ex){
+                //Ignore if database already exists
+                ex.printStackTrace();
+            }
+            createPool();
+        }
+    }
+
+    public Connection connection() throws Exception{
+        return dataSource.getConnection();
+    }
+    public String node(){
+        return node;
+    }
+
+    private void createPool(){
         dataSource = new BasicDataSource();
         dataSource.setDriverClassName(props.get("DriverClassName").getAsString());
         dataSource.setUrl(props.get("Url").getAsString()+props.get("Database").getAsString());
         dataSource.setUsername(props.get("User").getAsString());
         dataSource.setPassword(props.get("Password").getAsString());
         dataSource.setMaxTotal(props.get("PoolSize").getAsInt());
-
-    }
-    public boolean validate(ServiceContext serviceContext){
-        try(Connection conn = dataSource.getConnection()){
-            if(conn.isClosed()) throw new RuntimeException("Database id closed");
-            return true;
-        }
-        catch (Exception ex){
-            ex.printStackTrace();
-            return false;
-        }
-    }
-
-    public Connection connection() throws Exception{
-        return dataSource.getConnection();
     }
 }

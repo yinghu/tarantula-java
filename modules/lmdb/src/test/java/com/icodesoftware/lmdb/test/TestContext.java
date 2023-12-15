@@ -104,8 +104,7 @@ public class TestContext implements ServiceContext {
 
     }
 
-    //@Override
-    public TokenValidatorProvider.AuthVendor authVendor(String name) {
+    public List<String> metricsList(){
         return null;
     }
 

@@ -116,7 +116,9 @@ public class TestServiceContext implements ServiceContext {
     public <T extends Recoverable> RecoverableRegistry<T> recoverableRegistry(int i) {
         return new PortableRegistry<T>();
     }
-
+    public List<String> metricsList(){
+        return null;
+    }
     @Override
     public Configuration configuration(String conf) {
         try{

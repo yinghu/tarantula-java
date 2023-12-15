@@ -179,9 +179,9 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         }catch (Exception ex){
             logger.error("error",ex);
         }
-        //scheduledFuture = serviceContext.schedule(new ScheduleRunner(5000,()->{
-            //exposeMetrics();
-        //}));
+        scheduledFuture = serviceContext.schedule(new ScheduleRunner(5000,()->{
+            exposeMetrics();
+        }));
     }
 
 }

@@ -27,7 +27,6 @@ public interface ServiceContext extends Context{
     <T extends Recoverable> RecoverableRegistry<T> recoverableRegistry(int registryId);
     void recoverableRegistry(RecoverableListener recoverableListener);
 
-    //TokenValidatorProvider.AuthVendor authVendor(String name);
     Configuration configuration(String config);
     List<Descriptor> availableServices();
 
@@ -38,6 +37,7 @@ public interface ServiceContext extends Context{
     void unregisterBackupProvider(BackupProvider backupProvider);
 
     Metrics metrics(String name);
+    List<String> metricsList();
     void registerMetrics(Metrics metrics);
     void unregisterMetrics(Metrics metrics);
 
