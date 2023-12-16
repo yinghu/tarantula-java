@@ -116,7 +116,7 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
         this.metrics = new GameClusterMetrics(gameCluster.gameServiceName);
         this.metrics.setup(serviceContext);
         serviceContext.registerMetrics(metrics);
-        this.metrics = serviceContext.metrics(gameCluster.gameServiceName);
+        //this.metrics = serviceContext.metrics(gameCluster.gameServiceName);
         this.serviceContext = serviceContext;
         this.serviceContext.deploymentServiceProvider().registerConfigurableListener(OnLobby.TYPE,gameCluster);
         this.serviceContext.clusterProvider().subscribe(gameCluster.typeId(),e->{

@@ -19,4 +19,6 @@ public interface GameContext extends Context {
 
     void registerTournamentListener(Tournament.Listener listener);
     void recoverableRegistry(RecoverableListener recoverableListener);
+
+    void onMetrics(String category,double delta);
 }

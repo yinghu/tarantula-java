@@ -173,9 +173,12 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         try {
             TokenValidatorProvider tokenValidatorProvider = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
             TokenValidatorProvider.AuthVendor authVendor = tokenValidatorProvider.authVendor(OnAccess.JDBC_SQL);
-            Metrics metrics = serviceContext.metrics(Metrics.PERFORMANCE);
-            String query = typeId+"#metrics";
-            authVendor.upload(query,metrics.statistics());
+            List<String> list = serviceContext.metricsList();
+            list.forEach(m->{
+                Metrics metrics = serviceContext.metrics(m);
+                String query = typeId+"#metrics";
+                authVendor.upload(query,metrics.statistics());
+            });
         }catch (Exception ex){
             logger.error("error",ex);
         }

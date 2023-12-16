@@ -6,7 +6,7 @@ import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 
 import java.time.LocalDateTime;
-import java.util.Map;
+
 
 public class StatisticsEntry extends RecoverableObject implements Statistics.Entry {
 
@@ -19,7 +19,6 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
     private double monthly=0;
     private double yearly=0;
 
-    private boolean loaded;
     private Statistics.Listener listener;
     public StatisticsEntry(){
         this.onEdge = true;
@@ -114,36 +113,11 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
         return StatisticsPortableRegistry.STATISTICS_ENTRY_CID;
     }
 
-    @Override
-    public Map<String,Object> toMap(){
-        this.properties.put("total",total);
-        this.properties.put("daily",daily);
-        this.properties.put("weekly",weekly);
-        this.properties.put("monthly",monthly);
-        this.properties.put("yearly",yearly);
-        this.properties.put("timestamp",this.timestamp);
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        this.total = ((Number)properties.get("total")).doubleValue();
-        this.daily =((Number)properties.get("daily")).doubleValue();
-        this.weekly = ((Number)properties.get("weekly")).doubleValue();
-        this.monthly =((Number)properties.get("monthly")).doubleValue();
-        this.yearly = ((Number)properties.get("yearly")).doubleValue();
-        this.timestamp =((Number)properties.get("timestamp")).longValue();
-    }
 
     Statistics.Entry duplicate(){
         return new StatisticsEntry(this);
     }
-    //public synchronized boolean load(){
-        //if(loaded){
-            //return false;
-        //}
-        //loaded = true;
-        //return this.dataStore.createIfAbsent(this,true);
-    //}
+
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();

@@ -1,6 +1,8 @@
 package com.tarantula.platform.configuration;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 import org.apache.commons.dbcp2.BasicDataSource;
 
@@ -11,6 +13,7 @@ import java.util.Properties;
 
 public class JDBCPool implements VendorValidator{
 
+    private static final TarantulaLogger logger = JDKLogger.getLogger(JDKLogger.class);
     private BasicDataSource dataSource;
     private JsonObject props;
     private String node;
@@ -30,19 +33,18 @@ public class JDBCPool implements VendorValidator{
         }
         catch (Exception ex){
             //Ignore if database already exists
-            ex.printStackTrace();
+            logger.warn("Should be here if database exists on server : ",ex);
             return true;
         }
         finally {
             try(Connection conn = DriverManager.getConnection(url+db,properties); Statement cmd = conn.createStatement()){
                 for(String metrics : serviceContext.metricsList()){
-                    System.out.println("METRICS : "+metrics);
-                    cmd.execute("CREATE TABLE IF NOT EXISTS "+metrics.replaceAll("-","_")+" (category varchar(50) NOT NULL,value DOUBLE PRECISION NOT NULL, node char(5) NOT NULL , updated TIMESTAMP NOT NULL, PRIMARY KEY(category,node))");
+                    cmd.execute("CREATE TABLE IF NOT EXISTS "+metrics.replaceAll("-","_")+" (category varchar(50) NOT NULL,total DOUBLE PRECISION NOT NULL, node char(3) NOT NULL , updated TIMESTAMP NOT NULL, PRIMARY KEY(category,node))");
                 }
             }
             catch (Exception ex){
-                //Ignore if database already exists
-                ex.printStackTrace();
+                logger.warn("should not be here",ex);
+                throw new RuntimeException(ex);
             }
             createPool();
         }

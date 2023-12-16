@@ -78,6 +78,10 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         session.write(created ? battleTransaction.toJson().toString().getBytes() : JsonUtil.toSimpleResponse(false,"failed to create battle transaction").getBytes());
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         webhook.upload(ANALYTICS_QUERY,new BattleStartTransaction(session, battleTransaction.distributionId(), payload).toString().getBytes());
+        gameContext.onMetrics("totalKills",100);
+        gameContext.onMetrics("totalWins",10);
+        gameContext.onMetrics("totalRounds",20);
+        gameContext.onMetrics("totalBattle",30);
     }
 
     public void updateGame(Session session,byte[] payload) throws Exception{

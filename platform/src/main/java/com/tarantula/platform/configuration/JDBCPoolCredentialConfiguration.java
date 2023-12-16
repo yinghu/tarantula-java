@@ -8,13 +8,16 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.item.ConfigurableObject;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 public class JDBCPoolCredentialConfiguration extends CredentialConfiguration {
 
     private JDBCPool jdbcPool;
-
+    private ConcurrentHashMap<String,JDBCTask> pendingTasks;
     public JDBCPoolCredentialConfiguration(String typeId, ConfigurableObject configurableObject){
         super(typeId, OnAccess.JDBC_SQL,configurableObject);
         this.typeId = typeId;
+        pendingTasks = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -26,6 +29,7 @@ public class JDBCPoolCredentialConfiguration extends CredentialConfiguration {
     }
 
     public JDBCTask task(String name){
-        return new StatisticsTask(jdbcPool);
+        pendingTasks.putIfAbsent(name,new StatisticsTask(jdbcPool));
+        return pendingTasks.get(name);
     }
 }

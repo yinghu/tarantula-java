@@ -79,5 +79,8 @@ public class PlatformGameContext implements GameContext {
     public void recoverableRegistry(RecoverableListener recoverableListener){
         serviceContext.recoverableRegistry(recoverableListener);
     }
+    public void onMetrics(String category,double delta){
+        platformGameServiceProvider.onUpdated(category,delta);
+    }
 
 }

@@ -152,9 +152,11 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
         this.statistics.dataStore(this.dataStore);
         this.statistics.load();
         //reset snapshots
-        for(String category : categories){
+        for(Statistics.Entry e : this.statistics.summary()){
             //reset statistics entry and archive history
-            SystemStatisticsEntry entry = (SystemStatisticsEntry)statistics.entry(category);
+            String category = e.name();
+            registerCategory(category);
+            SystemStatisticsEntry entry = (SystemStatisticsEntry)e;//statistics.entry(category);
             LocalDateTime lastUpdate = TimeUtil.fromUTCMilliseconds(entry.timestamp());
             MetricsHistory lastMetricsHistory = metricsHistory(category,lastUpdate);
             if(!StatisticsUtil.validateHourly(lastUpdate,_cur)){
@@ -208,9 +210,13 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
 
 
     @Override
-    public void onUpdated(String s, double delta) {
-        pendingUpdates.compute(s,(k,v)->{
-            if(v==null || delta<=0) return v;//ignore
+    public void onUpdated(String category, double delta) {
+        pendingUpdates.compute(category,(k,v)->{
+            if(delta<=0) return v;//ignore
+            if(v==null) {
+                categories.add(category);
+                return new StatsDelta(category,delta);
+            }
             v.value += delta;
             return v;
         });
@@ -245,12 +251,9 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
     }
     private void _run() {
         ArrayList<StatsDelta> pendings = new ArrayList<>();
-        for(String category : categories){
-            pendingUpdates.compute(category,(k,v)->{
-                pendings.add(v.reset());
-                return v;
-            });
-        }
+        pendingUpdates.forEach((category,v)->{
+            pendings.add(v.reset());
+        });
         pendings.forEach(p->{
             try {
                 if(p.value>0){

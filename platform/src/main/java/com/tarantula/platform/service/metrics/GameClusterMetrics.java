@@ -19,4 +19,5 @@ public class GameClusterMetrics extends AbstractMetrics{
         this.logger = JDKLogger.getLogger(GameClusterMetrics.class);
         this.dataStore = serviceContext.dataStore(Distributable.LOCAL_SCOPE,name.replaceAll("-","_")+"_game_cluster_metrics");
     }
+
 }
