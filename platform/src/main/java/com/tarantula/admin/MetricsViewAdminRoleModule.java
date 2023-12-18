@@ -37,7 +37,7 @@ public class MetricsViewAdminRoleModule implements Module {
         else if(session.action().equals("onMetricsList")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
             String serviceName = gameCluster.gameServiceName;//(String) gameCluster.property(GameCluster.GAME_SERVICE);
-            Metrics m = this.context.metrics(serviceName);
+            Metrics m = this.deploymentServiceProvider.metrics(serviceName);
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("successful",true);
             JsonArray arr = new JsonArray();
@@ -47,7 +47,7 @@ public class MetricsViewAdminRoleModule implements Module {
         }
         else if(session.action().equals("onMetricsCategory")){
             ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();
-            Metrics metrics = context.metrics(session.name());
+            Metrics metrics = deploymentServiceProvider.metrics(session.name());
             List<String> categories = metrics.categories();
             JsonObject m = new JsonObject();
             JsonArray ms = new JsonArray();

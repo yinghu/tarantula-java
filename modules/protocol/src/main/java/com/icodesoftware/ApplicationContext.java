@@ -35,7 +35,7 @@ public interface ApplicationContext extends Context{
 
     ClusterProvider clusterProvider();
 
-    Metrics metrics(String name);
+    void onMetrics(String category,double delta);
 
 
     ClusterProvider.Node node();

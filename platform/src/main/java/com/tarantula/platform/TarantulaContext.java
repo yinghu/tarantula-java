@@ -628,7 +628,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         serviceViewList.add(this.integrationCluster.name());
         this.deploymentDataStoreProvider.registerMetricsListener(this.metrics(Metrics.DATA_STORE));
         this.integrationCluster.registerMetricsListener(this.metrics(Metrics.CLUSTER));
-        this.serviceProvider(UserService.NAME).registerMetricsListener(this.metrics(Metrics.ACCESS));
+        this.serviceProvider(UserService.NAME).registerMetricsListener(this.metrics(Metrics.SYSTEM));
         this.deploymentServiceProvider.registerMetricsListener(this.metrics(Metrics.DEPLOYMENT));
         this.postOfficeSession = new PostOfficeSession(this.integrationCluster.publisher());
     }

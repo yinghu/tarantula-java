@@ -845,6 +845,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return this.tarantulaContext.metricsList();
     }
 
+    public Metrics metrics(String name){
+        return this.tarantulaContext.metrics(name);
+    }
     public Transaction transaction(int scope){
         return tarantulaContext.transaction(scope);
     }

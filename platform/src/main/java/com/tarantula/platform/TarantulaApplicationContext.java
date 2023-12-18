@@ -5,7 +5,7 @@ import com.icodesoftware.EventListener;
 import com.icodesoftware.Module;
 import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.service.ClusterProvider;
-import com.icodesoftware.service.Metrics;
+import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.event.*;
 import com.tarantula.platform.service.deployment.ApplicationContextProxy;
@@ -23,8 +23,9 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 
     private TarantulaContext tarantulaContext;
 
-     private ConcurrentHashMap<Integer,RecoverableListener> rMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Integer,RecoverableListener> rMap = new ConcurrentHashMap<>();
 
+    private MetricsListener metricsListener = (k,v)->{};
 
     private boolean logEnabled;
     private TarantulaLogger log;
@@ -168,16 +169,20 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         return this.tarantulaContext.clusterProvider();
     }
 
-    public Metrics metrics(String name){
-        return this.tarantulaContext.metrics(name);
+
+    public void onMetrics(String category,double delta){
+        metricsListener.onUpdated(category,delta);
     }
-
-
     public ClusterProvider.Node node(){
         return tarantulaContext.node();
     }
 
     public Transaction transaction(){
         return this.tarantulaContext.deploymentDataStoreProvider.transaction(Distributable.DATA_SCOPE);
+    }
+
+    public void registerMetricsListener(MetricsListener metricsListener){
+        if(metricsListener==null) return;
+        this.metricsListener = metricsListener;
     }
 }

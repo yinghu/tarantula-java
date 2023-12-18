@@ -95,18 +95,14 @@ public class ApplicationContextProxy implements ApplicationContext {
         return this.tarantulaApplicationContext.postOffice();
     }
 
-    //public Channel register(Session session, UDPEndpointServiceProvider.RequestListener requestListener,Session.TimeoutListener timeoutListener){
-        //return this.tarantulaApplicationContext.register(session,requestListener,timeoutListener);
-    //}
 
     public ClusterProvider clusterProvider(){
         return this.tarantulaApplicationContext.clusterProvider();
     }
-    public Metrics metrics(String name){
-        return this.tarantulaApplicationContext.metrics(name);
+
+    public void onMetrics(String category,double delta){
+        this.tarantulaApplicationContext.onMetrics(category,delta);
     }
-
-
     public ClusterProvider.Node node(){
         return this.tarantulaApplicationContext.node();
     }

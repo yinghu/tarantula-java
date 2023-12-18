@@ -4,7 +4,7 @@ import com.icodesoftware.*;
 
 import java.util.List;
 
-public interface UserService extends ServiceProvider,MetricsListener{
+public interface UserService extends ServiceProvider{
 
     String NAME = "UserService";
 

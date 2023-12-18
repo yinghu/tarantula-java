@@ -41,7 +41,9 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
     public void stopConnection(Connection connection) {
 
     }
-
+    public Metrics metrics(String name){
+        return null;
+    }
     @Override
     public void verifyConnection(String typeId, String serverId) {
 

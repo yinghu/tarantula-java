@@ -8,6 +8,9 @@ import com.icodesoftware.service.ServiceContext;
 
 public class SystemMetrics extends AbstractMetrics{
 
+    public final static String SYSTEM_USER_CREATION_COUNT = "systemUserCreationCount";
+    public final static String SYSTEM_ACCOUNT_CREATION_COUNT = "systemAccountCreationCount";
+    public final static String SYSTEM_SUBSCRIPTION_COUNT = "systemSubscriptionCount";
 
     @Override
     void _setup(ServiceContext serviceContext) {

@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class UserManagementApplication extends TarantulaApplicationHeader implements Configurable.Listener<OnLobby>{
 
-    //private String lobbyId;
+    private final static String METRICS_LOGIN_COUNT = "applicationLoginCount";
     private boolean activated;
     private int trialDays;
 
@@ -93,8 +93,8 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         else if(session.action().equals("onLogin")){
             //this.context.log("USER ID->"+session.id(),OnLog.WARN);
             OnSession access = this.login(session.distributionId(),(String) acc.property(OnAccess.PASSWORD),session);
-            userService.onUpdated(AccessMetrics.ACCESS_WEB_LOGIN_COUNT,1);
             onSession(access,session);
+            this.context.onMetrics(METRICS_LOGIN_COUNT,1);
         }
         else if(session.action().equals("onToken")){//exchange token
             Map<String,Object> params = acc.toMap();
@@ -224,7 +224,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             else{
                 session.write(JsonUtil.toSimpleResponse(false,"Developer not registered").getBytes());
             }
-            userService.onUpdated(AccessMetrics.ACCESS_DEVELOPER_LOGIN_COUNT,1);
         }
         else if(session.action().equals("onDeveloperRegister")){
             String deviceId = (String) acc.property(OnAccess.DEVICE_ID);
@@ -245,7 +244,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             else{
                 session.write(this.builder.create().toJson(new ResponseHeader("onDeveloper","wrong device id", false)).getBytes());
             }
-            userService.onUpdated(AccessMetrics.ACCESS_DEVELOPER_LOGIN_COUNT,1);
         }
         else{
             throw new UnsupportedOperationException(session.action());

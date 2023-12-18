@@ -42,7 +42,6 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
     public final static String ACCESS_AMAZON_S3_COUNT = "amazonS3Count";
 
     //PERFORMANCE CATEGORY
-    public final static String PERFORMANCE_DATA_STORE_COUNT = "dataStoreCount";
 
     public final static String PERFORMANCE_CLUSTER_OPERATION_TIMEOUT_COUNT = "clusterOperationTimeoutCount";
 
@@ -55,10 +54,10 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
     public final static String DEPLOYMENT_APPLICATION_COUNT = "applicationCount";
 
     //ACCOUNT CATEGORY
-    public final static String ACCOUNT_USER_CREATION_COUNT = "userCreationCount";
-    public final static String ACCOUNT_ACCOUNT_CREATION_COUNT = "accountCreationCount";
+    //public final static String ACCOUNT_USER_CREATION_COUNT = "userCreationCount";
+    //public final static String ACCOUNT_ACCOUNT_CREATION_COUNT = "accountCreationCount";
 
-    public final static String ACCOUNT_SUBSCRIPTION_COUNT = "subscriptionCount";
+    //public final static String ACCOUNT_SUBSCRIPTION_COUNT = "subscriptionCount";
 
     private ConcurrentHashMap<String, StatsDelta> pendingUpdates;
 

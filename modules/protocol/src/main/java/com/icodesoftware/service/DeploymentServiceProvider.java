@@ -89,6 +89,8 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     List<String> listDataStore(int scope);
     List<String> listServiceView();
     List<String> listMetricsView();
+
+    Metrics metrics(String name);
     DataStoreSummary validDataStore(String dataStore);
     ClusterProvider.Summary clusterSummary();
 

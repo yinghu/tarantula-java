@@ -7,12 +7,9 @@ import com.tarantula.game.GameLobbyProxy;
 import com.tarantula.game.Rating;
 import com.tarantula.game.Stub;
 import com.tarantula.platform.AccessControl;
-import com.tarantula.platform.service.metrics.GameClusterMetrics;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
-public class
-
-GameLobbyModule extends ModuleHeader{
+public class GameLobbyModule extends ModuleHeader{
 
     private GameLobbyProxy gameLobby;
     private GsonBuilder builder;

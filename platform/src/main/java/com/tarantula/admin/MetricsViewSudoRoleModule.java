@@ -43,7 +43,7 @@ public class MetricsViewSudoRoleModule implements Module {
         }
         else if(session.action().equals("onMetricsCategory")){
             ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();
-            Metrics metrics = context.metrics(session.name());
+            Metrics metrics = deploymentServiceProvider.metrics(session.name());
             List<String> categories = metrics.categories();
             JsonObject m = new JsonObject();
             JsonArray ms = new JsonArray();

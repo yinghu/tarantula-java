@@ -7,7 +7,7 @@ import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.SessionIndex;
 import com.tarantula.platform.presence.*;
-import com.tarantula.platform.service.metrics.AccessMetrics;
+import com.tarantula.platform.service.metrics.SystemMetrics;
 import com.tarantula.platform.util.RecoverableQuery;
 
 import java.time.LocalDateTime;
@@ -63,7 +63,7 @@ public class PlatformUserService implements UserService {
         }
         if(!userDataStore.createIfAbsent(acc,false)) throw new RuntimeException("Failed to create user");
         createPresenceIndex(acc);
-        //this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_USER_CREATION_COUNT,1);
+        this.metricsListener.onUpdated(SystemMetrics.SYSTEM_USER_CREATION_COUNT,1);
         return acc;
     }
 
@@ -88,7 +88,7 @@ public class PlatformUserService implements UserService {
         access.ownerKey(account.key());
         access.password(tokenValidatorProvider.tokenValidator().hashPassword(access.password()));
         Access user = createUser(access);
-        //this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_USER_CREATION_COUNT,1);
+        this.metricsListener.onUpdated(SystemMetrics.SYSTEM_ACCOUNT_CREATION_COUNT,1);
         return user;
     }
     public boolean updateEmail(OnAccess access){
@@ -127,7 +127,7 @@ public class PlatformUserService implements UserService {
         if(!accountDataStore.createIfAbsent(account,false)){
             throw new RuntimeException("Account already existed");
         }
-        //this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_ACCOUNT_CREATION_COUNT,1);
+        this.metricsListener.onUpdated(SystemMetrics.SYSTEM_ACCOUNT_CREATION_COUNT,1);
         return account;
     }
 
@@ -154,7 +154,7 @@ public class PlatformUserService implements UserService {
         membership.count(1);
         membership.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         accountDataStore.update(account);
-        this.metricsListener.onUpdated(AccessMetrics.ACCOUNT_SUBSCRIPTION_COUNT,1);
+        this.metricsListener.onUpdated(SystemMetrics.SYSTEM_SUBSCRIPTION_COUNT,1);
         return membership;
     }
 
@@ -215,7 +215,6 @@ public class PlatformUserService implements UserService {
         userDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,User.DataStore);
         presenceDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,Presence.DataStore);
         accountDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,Account.DataStore);
-        //accountIndexDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,Account.IndexDataStore);
         membershipDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,Subscription.DataStore);
         sessionDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,OnSession.DataStore);
         loginProviderDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,LoginProvider.DataStore);
@@ -230,19 +229,13 @@ public class PlatformUserService implements UserService {
     public void start() throws Exception {
 
     }
-
     @Override
     public void shutdown() throws Exception {
 
     }
-
     public void registerMetricsListener(MetricsListener metricsListener){
         if(metricsListener == null) return;
         this.metricsListener = metricsListener;
-    }
-
-    public void onUpdated(String mkey,double delta){
-        metricsListener.onUpdated(mkey,delta);
     }
 
 }

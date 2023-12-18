@@ -148,7 +148,7 @@ public class DataStoreSudoRoleModule implements Module {
             session.write(toMessage("backup command issued ["+buffer+"]",true).toString().getBytes());
         }
         else if(session.action().equals("onMetrics")){
-            Metrics metrics = context.metrics(Metrics.PERFORMANCE);
+            Metrics metrics = deploymentServiceProvider.metrics(Metrics.PERFORMANCE);
             MetricsContext adminContext = new MetricsContext();
             adminContext.metrics = metrics;
             session.write(adminContext.toJson().toString().getBytes());

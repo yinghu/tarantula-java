@@ -3,6 +3,7 @@ package com.tarantula.platform.service.deployment;
 
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.Metrics;
 import com.tarantula.platform.*;
 import com.tarantula.platform.service.ApplicationProvider;
 
@@ -43,6 +44,7 @@ public class DefaultApplication implements ApplicationProvider {
             TarantulaApplication _app = (TarantulaApplication)Class.forName(this.deploymentDescriptor.applicationClassName()).getConstructor().newInstance();
             _app.descriptor(dd);
             app = new TarantulaApplicationContext(tarantulaContext,dd,_app);
+            app.registerMetricsListener(tarantulaContext.metrics(Metrics.APPLICATION));
             return app;
 
         }catch (Exception ex){

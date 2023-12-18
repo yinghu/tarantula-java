@@ -43,7 +43,6 @@ public class MatchMakingModule extends ModuleHeader implements Configurable.List
             else{
                 session.write(JsonUtil.toSimpleResponse(false,"no lobby available").getBytes());
             }
-            this.gameServiceProvider.onUpdated(GameClusterMetrics.GAME_JOIN_COUNT,1);
         }
         else if(session.action().equals("onUpdateGame")){
             gameServiceProvider.gameServiceProvider().updateGame(session,payload);
