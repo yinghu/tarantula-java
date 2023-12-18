@@ -14,7 +14,7 @@ import com.tarantula.platform.service.persistence.ReplicationData;
 public class BackupEventHandler extends AbstractRequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(BackupEventHandler.class);
-
+    private final static String METRICS_CATEGORY = "httpBackCount";
     private BackupProvider backupProvider;
     private ServiceContext serviceContext;
 
@@ -75,6 +75,10 @@ public class BackupEventHandler extends AbstractRequestHandler {
         super.setup(tcx);
         this.backupProvider = tcx.backupProvider();
         this.serviceContext = tcx;
+    }
+
+    public String metricsCategory(){
+        return METRICS_CATEGORY;
     }
 
 }

@@ -1,24 +1,19 @@
 package com.tarantula.cci;
 
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.platform.OnAccessTrack;
-import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
-import com.tarantula.platform.util.OnAccessSerializer;
-import com.tarantula.platform.util.ResponseSerializer;
 
 
 public class PresenceEventHandler extends AbstractRequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(PresenceEventHandler.class);
-
+    private final static String METRICS_CATEGORY = "httpPresenceCount";
     private DeploymentServiceProvider deploymentServiceProvider;
-    private GsonBuilder builder;
+
     private OnView invalidView;
     public PresenceEventHandler(){
         super(true);
@@ -36,9 +31,6 @@ public class PresenceEventHandler extends AbstractRequestHandler {
     @Override
     public void start() throws Exception {
         super.start();
-        this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
-        this.builder.registerTypeAdapter(OnAccessTrack.class,new OnAccessSerializer());
         this.invalidView = this.deploymentServiceProvider.view(OnView.INVALID_VIEW_ID);
         log.info("Presence event handler started");
     }
@@ -59,5 +51,8 @@ public class PresenceEventHandler extends AbstractRequestHandler {
             ret = this.deploymentServiceProvider.resource(invalidView.moduleResourceFile());
         }
         return super.onEvent(new ResponsiveEvent("",event.sessionId(),ret.data(),0,ret.type(),true));
+    }
+    public String metricsCategory(){
+        return METRICS_CATEGORY;
     }
 }

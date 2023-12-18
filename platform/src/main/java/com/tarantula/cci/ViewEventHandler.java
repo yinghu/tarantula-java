@@ -16,7 +16,7 @@ public class ViewEventHandler extends AbstractRequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(ViewEventHandler.class);
 
-
+    private final static String METRICS_CATEGORY = "httpViewCount";
     private DeploymentServiceProvider deploymentServiceProvider;
 
     private GsonBuilder builder;
@@ -47,6 +47,10 @@ public class ViewEventHandler extends AbstractRequestHandler {
     public void setup(ServiceContext tcx){
         super.setup(tcx);
         this.deploymentServiceProvider = (DeploymentServiceProvider)tcx.serviceProvider(DeploymentServiceProvider.NAME);
+    }
+
+    public String metricsCategory(){
+        return METRICS_CATEGORY;
     }
 
 }

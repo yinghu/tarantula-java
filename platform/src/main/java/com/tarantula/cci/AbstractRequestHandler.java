@@ -61,8 +61,7 @@ abstract public class AbstractRequestHandler implements RequestHandler {
         if(!onEvent) return false;
         OnExchange hx = this.eMap.remove(event.sessionId());
         if(hx==null) return false;
-        hx.onEvent(event);
-        return true;
+        return hx.onEvent(event);
     }
     public void onCheck(){}
     public boolean deployable(){return true;}
@@ -73,7 +72,6 @@ abstract public class AbstractRequestHandler implements RequestHandler {
         actionEvent.distributionId(id.distributionId());
         actionEvent.stub(id.stub());
         actionEvent.ticket(id.ticket());
-        //actionEvent.token(token);
         actionEvent.action("onCheckPermission");
         actionEvent.routingNumber(routingKey.routingNumber());
         actionEvent.destination(routingKey.route());

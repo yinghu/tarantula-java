@@ -11,7 +11,7 @@ import com.tarantula.platform.event.ServiceActionEvent;
 public class ServiceEventHandler extends AbstractRequestHandler {
 
 	private static final JDKLogger log = JDKLogger.getLogger(ServiceEventHandler.class);
-
+    private final static String METRICS_CATEGORY = "httpServiceCount";
     private TokenValidator auth;
     private String bucket;
 
@@ -70,5 +70,9 @@ public class ServiceEventHandler extends AbstractRequestHandler {
         super.setup(tcx);
         this.auth = tokenValidator.tokenValidator();
         this.bucket = tcx.node().bucketName();
+    }
+
+    public String metricsCategory(){
+        return METRICS_CATEGORY;
     }
 }

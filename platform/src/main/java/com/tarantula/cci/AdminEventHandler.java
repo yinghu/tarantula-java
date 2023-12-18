@@ -1,23 +1,20 @@
 package com.tarantula.cci;
 
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.platform.OnAccessTrack;
-import com.tarantula.platform.ResponseHeader;
+
 import com.tarantula.platform.event.ResponsiveEvent;
-import com.tarantula.platform.util.OnAccessSerializer;
-import com.tarantula.platform.util.ResponseSerializer;
+
 
 public class AdminEventHandler extends AbstractRequestHandler{
 
     private static TarantulaLogger log = JDKLogger.getLogger(AdminEventHandler.class);
-
+    private final static String METRICS_CATEGORY = "httpAdminCount";
     private DeploymentServiceProvider deploymentServiceProvider;
-    private GsonBuilder builder;
+
     private OnView invalidView;
 
     public AdminEventHandler(){
@@ -28,6 +25,9 @@ public class AdminEventHandler extends AbstractRequestHandler{
         return ADMIN_PATH;
     }
 
+    public String metricsCategory(){
+        return METRICS_CATEGORY;
+    }
     public void onRequest(OnExchange exchange) throws Exception{
         super.onRequest(exchange);
         String token = exchange.header(Session.TARANTULA_TOKEN);
@@ -38,9 +38,6 @@ public class AdminEventHandler extends AbstractRequestHandler{
     @Override
     public void start() throws Exception {
         super.start();
-        this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
-        this.builder.registerTypeAdapter(OnAccessTrack.class,new OnAccessSerializer());
         this.invalidView = this.deploymentServiceProvider.view(OnView.INVALID_VIEW_ID);
         log.info("Admin event handler started");
     }

@@ -17,16 +17,13 @@ public class HttpUploadSession implements OnExchange {
 	    this.hex = hex;
     }
     public boolean onEvent(Event event) {
-        try{
+        try(hex){
             hex.getResponseHeaders().set(Session.HTTP_CONTENT_TYPE,event.contentType());
             hex.sendResponseHeaders(200,event.payload().length);
             hex.getResponseBody().write(event.payload());
         }catch(Exception ex){
             ex.printStackTrace();
             //skip client disconnect
-        }
-        finally{
-            this.hex.close();
         }
         return true;
     }
@@ -65,7 +62,7 @@ public class HttpUploadSession implements OnExchange {
     }
 
     public void onStream(InputStream inputStream){
-        try {
+        try(hex) {
             hex.getResponseHeaders().set(Session.HTTP_CONTENT_TYPE, "application/octet-stream");
             hex.sendResponseHeaders(200, inputStream.available());
             OutputStream out = hex.getResponseBody();
@@ -73,19 +70,13 @@ public class HttpUploadSession implements OnExchange {
         }catch (Exception ex){
             ex.printStackTrace();
         }
-        finally {
-            hex.close();
-        }
     }
     public void onError(Exception error,String message){
-        try{
+        try(hex){
             hex.sendResponseHeaders(500,message.length());
             hex.getResponseBody().write(message.getBytes());
         }catch (Exception ex){
             //skip client disconnect
-        }
-        finally {
-            hex.close();
         }
     }
 }

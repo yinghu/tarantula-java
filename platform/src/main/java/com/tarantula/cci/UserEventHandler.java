@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class UserEventHandler extends AbstractRequestHandler implements AccessIndexService.Listener{
 
     private static TarantulaLogger log = JDKLogger.getLogger(UserEventHandler.class);
-
+    private final static String METRICS_CATEGORY = "httpUserCount";
     private AccessIndexService accessIndexService;
     private String bucket;
     private GsonBuilder builder;
@@ -243,5 +243,9 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
     public void onStart() {
         log.warn("access index started");
         onIndex.set(true);
+    }
+
+    public String metricsCategory(){
+        return METRICS_CATEGORY;
     }
 }

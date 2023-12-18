@@ -28,8 +28,10 @@ public class HttpUploadHandler extends HttpDispatcher {
         HttpUploadSession httpUploadSession = new HttpUploadSession(requestHandler.snowflakeId(),httpExchange);
         try{
             requestHandler.onRequest(httpUploadSession);
+            metricsListener.onUpdated(requestHandler.metricsCategory(),1);
         }catch (Exception ex){
             httpUploadSession.onError(ex,ex.getMessage());
+            metricsListener.onUpdated(METRICS_ERROR_CATEGORY,1);
         }
     }
 }

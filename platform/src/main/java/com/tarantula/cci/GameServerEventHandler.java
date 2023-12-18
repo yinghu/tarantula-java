@@ -20,7 +20,7 @@ import java.util.Base64;
 public class GameServerEventHandler extends AbstractRequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(GameServerEventHandler.class);
-
+    private final static String METRICS_CATEGORY = "httpGameServerCount";
     private DeploymentServiceProvider deploymentServiceProvider;
 
     private GsonBuilder builder;
@@ -119,5 +119,8 @@ public class GameServerEventHandler extends AbstractRequestHandler {
     public void setup(ServiceContext tcx){
         super.setup(tcx);
         this.deploymentServiceProvider = tcx.deploymentServiceProvider();
+    }
+    public String metricsCategory(){
+        return METRICS_CATEGORY;
     }
 }

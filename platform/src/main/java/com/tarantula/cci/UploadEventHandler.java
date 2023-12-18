@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class UploadEventHandler extends AbstractRequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(UploadEventHandler.class);
-
+    private final static String METRICS_CATEGORY = "httpUploadCount";
     private DeploymentServiceProvider deploymentServiceProvider;
 
     private ConcurrentHashMap<Long,UploadContent> uMap = new ConcurrentHashMap<>();
@@ -103,6 +103,10 @@ public class UploadEventHandler extends AbstractRequestHandler {
             log.error("failed to upload context ["+typeId+"]",ex);
             return super.onEvent(new ResponsiveEvent("", event.sessionId(), JsonUtil.toSimpleResponse(false,ex.getMessage()).getBytes(),0,"text/html",true));
         }
+    }
+
+    public String metricsCategory(){
+        return METRICS_CATEGORY;
     }
 
 

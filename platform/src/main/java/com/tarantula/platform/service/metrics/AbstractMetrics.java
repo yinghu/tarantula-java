@@ -156,7 +156,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
             //reset statistics entry and archive history
             String category = e.name();
             registerCategory(category);
-            SystemStatisticsEntry entry = (SystemStatisticsEntry)e;//statistics.entry(category);
+            SystemStatisticsEntry entry = (SystemStatisticsEntry) statistics.entry(category);
             LocalDateTime lastUpdate = TimeUtil.fromUTCMilliseconds(entry.timestamp());
             MetricsHistory lastMetricsHistory = metricsHistory(category,lastUpdate);
             if(!StatisticsUtil.validateHourly(lastUpdate,_cur)){

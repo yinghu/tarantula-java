@@ -11,6 +11,7 @@ import java.io.IOException;
 
 public class HttpHealthCheckHandler extends HttpDispatcher {
 
+    private static final String METRICS_HEADER = "httpHealthCount";
     private byte[] hc = "hc".getBytes();
 
     public HttpHealthCheckHandler(MetricsListener metricsListener){
@@ -29,9 +30,13 @@ public class HttpHealthCheckHandler extends HttpDispatcher {
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
-        httpExchange.getResponseHeaders().set(Session.HTTP_CONTENT_TYPE,"text/html");
-        httpExchange.sendResponseHeaders(200,2);
-        httpExchange.getResponseBody().write(hc);
-        httpExchange.close();
+        try(httpExchange) {
+            httpExchange.getResponseHeaders().set(Session.HTTP_CONTENT_TYPE, "text/html");
+            httpExchange.sendResponseHeaders(200, 2);
+            httpExchange.getResponseBody().write(hc);
+        }
+        finally {
+            metricsListener.onUpdated(METRICS_HEADER,1);
+        }
     }
 }

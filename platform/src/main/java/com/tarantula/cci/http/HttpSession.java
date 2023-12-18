@@ -22,7 +22,7 @@ public class HttpSession extends RequestParser implements OnExchange {
 	}
 
     public boolean onEvent(Event event) {
-        try{
+        try(hex){
             Event resp = event;
             hex.getResponseHeaders().set(Session.HTTP_CONTENT_TYPE,resp.contentType());
             hex.sendResponseHeaders(200,resp.payload().length);
@@ -30,9 +30,9 @@ public class HttpSession extends RequestParser implements OnExchange {
         }catch(Exception ex){
             //skip client disconnect
         }
-        finally{
-            this.hex.close();
-        }
+        //finally{
+            //this.hex.close();
+        //}
         return true;
     }
     public long id(){
@@ -66,15 +66,16 @@ public class HttpSession extends RequestParser implements OnExchange {
         return (byte[]) this.requestMapping.get(Session.TARANTULA_PAYLOAD);
     }
     public void onError(Exception error,String message){
-        try{
+        try(hex){
             error.printStackTrace();
             hex.sendResponseHeaders(500,message.length());
             hex.getResponseBody().write(message.getBytes());
         }catch (Exception ex){
             //skip client disconnect
         }
-        finally {
-            hex.close();
-        }
+        //finally {
+            //hex.close();
+        //}
     }
+
 }

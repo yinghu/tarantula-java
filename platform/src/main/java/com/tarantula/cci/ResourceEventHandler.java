@@ -9,7 +9,7 @@ import com.tarantula.platform.event.ResponsiveEvent;
 public class ResourceEventHandler extends AbstractRequestHandler{
 
     private static TarantulaLogger log = JDKLogger.getLogger(ResourceEventHandler.class);
-
+    private final static String METRICS_CATEGORY = "httpResourceCount";
     private DeploymentServiceProvider deploymentServiceProvider;
 
     public ResourceEventHandler(){
@@ -34,5 +34,8 @@ public class ResourceEventHandler extends AbstractRequestHandler{
     public void setup(ServiceContext tcx){
         super.setup(tcx);
         this.deploymentServiceProvider = (DeploymentServiceProvider)tcx.serviceProvider(DeploymentServiceProvider.NAME);
+    }
+    public String metricsCategory(){
+        return METRICS_CATEGORY;
     }
 }

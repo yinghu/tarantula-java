@@ -15,12 +15,22 @@ public interface Metrics extends ServiceProvider,MetricsListener{
     String SNAPSHOT_LABEL_PREFIX = "snapshot_";
 
 
+    //os and jvm performance
     String PERFORMANCE = "performance";
+
+    //http / udp access
     String ACCESS = "access";
+
+    //third party payment
     String PAYMENT = "payment";
+
     String DEPLOYMENT = "deployment";
 
     String SYSTEM ="system";
+
+    String DATA_STORE = "data_store";
+    String CLUSTER = "cluster";
+
 
     List<String> categories();
 

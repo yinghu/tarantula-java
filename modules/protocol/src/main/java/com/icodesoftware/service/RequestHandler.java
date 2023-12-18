@@ -22,6 +22,8 @@ public interface RequestHandler extends EventListener, ServiceProvider {
 
     String BACKUP_PATH = "/backup";
 
+    String metricsCategory();
+
     long snowflakeId();
     void onRequest(OnExchange exchange) throws Exception;
     //void setup(ServiceContext tcx);

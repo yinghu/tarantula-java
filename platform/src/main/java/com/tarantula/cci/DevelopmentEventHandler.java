@@ -1,14 +1,12 @@
 package com.tarantula.cci;
 
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.platform.ResponseHeader;
+
 import com.tarantula.platform.event.ResponsiveEvent;
-import com.tarantula.platform.util.ResponseSerializer;
 
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,12 +15,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DevelopmentEventHandler extends AbstractRequestHandler {
 
     private static TarantulaLogger log = JDKLogger.getLogger(DevelopmentEventHandler.class);
-
+    private final static String METRICS_CATEGORY = "httpDevelopmentCount";
     private DeploymentServiceProvider deploymentServiceProvider;
 
     private ConcurrentHashMap<Long,PendingOperation> uMap = new ConcurrentHashMap<>();
-    private DeployService deployService;
-    private GsonBuilder builder;
 
     public DevelopmentEventHandler(){
         super(true);
@@ -46,8 +42,6 @@ public class DevelopmentEventHandler extends AbstractRequestHandler {
     @Override
     public void start() throws Exception {
         super.start();
-        this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
         log.info("Development handler started");
     }
 
@@ -55,7 +49,6 @@ public class DevelopmentEventHandler extends AbstractRequestHandler {
     public void setup(ServiceContext tcx){
         super.setup(tcx);
         this.deploymentServiceProvider = tcx.deploymentServiceProvider();
-        this.deployService = tcx.clusterProvider().deployService();
     }
     public boolean onEvent(Event event){
         JsonObject resp = JsonUtil.parse(event.payload());
@@ -73,6 +66,10 @@ public class DevelopmentEventHandler extends AbstractRequestHandler {
             log.error("failed on development handler",ex);
             return super.onEvent(new ResponsiveEvent("", event.sessionId(), JsonUtil.toSimpleResponse(false,ex.getMessage()).getBytes(),0,"text/html",true));
         }
+    }
+
+    public String metricsCategory(){
+        return METRICS_CATEGORY;
     }
 
 

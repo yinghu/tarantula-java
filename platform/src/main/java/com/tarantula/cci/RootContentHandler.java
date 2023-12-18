@@ -7,7 +7,7 @@ import com.tarantula.platform.event.ResponsiveEvent;
 public class RootContentHandler extends AbstractRequestHandler {
 
     private static final JDKLogger log = JDKLogger.getLogger(RootContentHandler.class);
-
+    private final static String METRICS_CATEGORY = "httpRootCount";
     private DeploymentServiceProvider deploymentServiceProvider;
 
     public RootContentHandler(){
@@ -35,6 +35,9 @@ public class RootContentHandler extends AbstractRequestHandler {
     public void start() throws Exception {
         super.start();
         log.info("Root content event handler started");
+    }
+    public String metricsCategory(){
+        return METRICS_CATEGORY;
     }
 
 }
