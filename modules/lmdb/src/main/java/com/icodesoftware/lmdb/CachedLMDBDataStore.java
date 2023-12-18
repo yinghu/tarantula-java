@@ -10,7 +10,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable {
@@ -106,6 +105,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         finally {
             txn.close();
             cache.reset();
+            lmdbDataStoreProvider.metricsListener.onUpdated(METRICS_CREATE,1);
         }
     }
 
@@ -142,7 +142,10 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             txn.close();
             if(updated) cache.reset();
         }
-        if(updated) return true;
+        if(updated){
+            lmdbDataStoreProvider.metricsListener.onUpdated(METRICS_UPDATE,1);
+            return true;
+        }
         key.rewind();
         Recoverable.DataBuffer value = cache.value();
         if(!lmdbDataStoreProvider.onRecovering(metadata,key,value)){
@@ -169,6 +172,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         finally {
             xtxn.close();
             cache.reset();
+            lmdbDataStoreProvider.metricsListener.onUpdated(METRICS_UPDATE,1);
         }
         return true;
     }
@@ -221,6 +225,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         finally {
             txn.close();//rollback if exception
             cache.reset();
+            lmdbDataStoreProvider.metricsListener.onUpdated(METRICS_CREATE_IF_ABSENT,1);
         }
 
     }
@@ -233,7 +238,10 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             t.revision(h.revision());
             return true;
         });
-        if(loaded) return true;
+        if(loaded){
+            lmdbDataStoreProvider.metricsListener.onUpdated(METRICS_LOAD,1);
+            return true;
+        }
         Recoverable.DataBufferPair cache = lmdbDataStoreProvider.dataBufferPair();
         Recoverable.DataBuffer key = cache.key();
         if(!t.writeKey(key)) {
@@ -258,6 +266,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         }finally {
             txn.close();
             cache.reset();
+            lmdbDataStoreProvider.metricsListener.onUpdated(METRICS_LOAD,1);
         }
 
     }

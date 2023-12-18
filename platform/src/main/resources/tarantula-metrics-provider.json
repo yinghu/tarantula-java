@@ -1,7 +1,9 @@
 {
   "metrics-list": [
     {"class-name":"com.tarantula.platform.service.metrics.PerformanceMetrics","enabled": true },
+    {"class-name":"com.tarantula.platform.service.metrics.DataStoreMetrics","enabled": true },
     {"class-name":"com.tarantula.platform.service.metrics.AccessMetrics","enabled": true },
+    {"class-name":"com.tarantula.platform.service.metrics.ClusterMetrics","enabled": true },
     {"class-name":"com.tarantula.platform.service.metrics.PaymentMetrics","enabled": true },
     {"class-name":"com.tarantula.platform.service.metrics.DeploymentMetrics","enabled": true },
     {"class-name":"com.tarantula.platform.service.metrics.SystemMetrics","enabled": true }

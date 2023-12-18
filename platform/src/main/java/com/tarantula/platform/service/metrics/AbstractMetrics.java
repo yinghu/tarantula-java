@@ -43,12 +43,9 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
 
     //PERFORMANCE CATEGORY
     public final static String PERFORMANCE_DATA_STORE_COUNT = "dataStoreCount";
-    public final static String PERFORMANCE_CLUSTER_INBOUND_MESSAGE_COUNT = "clusterInboundMessageCount";
-    public final static String PERFORMANCE_CLUSTER_OUTBOUND_MESSAGE_COUNT = "clusterOutboundMessageCount";
+
     public final static String PERFORMANCE_CLUSTER_OPERATION_TIMEOUT_COUNT = "clusterOperationTimeoutCount";
 
-    public final static String PERFORMANCE_HTTP_REQUEST_COUNT = "httpRequestCount";
-    public final static String PERFORMANCE_HTTP_REQUEST_ERROR_COUNT = "httpRequestErrorCount";
 
     public final static String PERFORMANCE_UDP_REQUEST_COUNT = "udpRequestCount";
 
@@ -99,6 +96,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
         this.archives = new ConcurrentHashMap<>();
         _setup(serviceContext);
         //register default categories
+        /**
         if(paymentIncluded) {
             registerCategory(PAYMENT_GOOGLE_STORE_COUNT);
             registerCategory(PAYMENT_APPLE_STORE_COUNT);
@@ -120,10 +118,6 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
 
         if(performanceIncluded){
             registerCategory(PERFORMANCE_DATA_STORE_COUNT);
-            registerCategory(PERFORMANCE_CLUSTER_INBOUND_MESSAGE_COUNT);
-            registerCategory(PERFORMANCE_CLUSTER_OUTBOUND_MESSAGE_COUNT);
-            registerCategory(PERFORMANCE_HTTP_REQUEST_COUNT);
-            registerCategory(PERFORMANCE_HTTP_REQUEST_ERROR_COUNT);
             registerCategory(PERFORMANCE_UDP_REQUEST_COUNT);
         }
 
@@ -142,7 +136,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
         if(gameIncluded) {
             registerCategory(GAME_JOIN_COUNT);
             registerCategory(GAME_TIMEOUT_COUNT);
-        }
+        }**/
         //this.serviceContext = serviceContext;
         long nodeId = serviceContext.node().nodeId();
         LocalDateTime _cur = LocalDateTime.now();

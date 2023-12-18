@@ -6,6 +6,11 @@ import java.util.List;
 
 public interface DataStore extends Closable{
 
+    String METRICS_CREATE = "dataStoreCreateCount";
+    String METRICS_CREATE_IF_ABSENT = "dataStoreCreateIfAbsentCount";
+    String METRICS_UPDATE = "dataStoreUpdateCount";
+    String METRICS_LOAD = "dataStoreLoadCount";
+
     int scope();
 
     String name();

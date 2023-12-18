@@ -30,6 +30,9 @@ import java.util.concurrent.*;
 public class IntegrationCluster extends TarantulaApplicationHeader implements ClusterProvider,EventService,LifecycleListener {
 
     private static JDKLogger log = JDKLogger.getLogger(IntegrationCluster.class);
+
+    private static final String CLUSTER_OUTBOUND_MESSAGE_COUNT = "clusterPublishMessageCount";
+    private static final String CLUSTER_INBOUND_MESSAGE_COUNT = "clusterReceiveMessageCount";
     private static String PENDING_EVENT_NUMBER = "pendingEventNumber";
     private final Config config;
     private final String bucket;
@@ -142,7 +145,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         if(message.destination()!=null){
             ITopic<Event> _t = this.topicList.computeIfAbsent(message.destination(),(String d)-> this._cluster.getTopic(d));
             _t.publish(message);
-            metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_CLUSTER_OUTBOUND_MESSAGE_COUNT,1);
+            metricsListener.onUpdated(CLUSTER_OUTBOUND_MESSAGE_COUNT,1);
         }else{
             log.warn("No destination message ->"+message);
         }
@@ -205,7 +208,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private void onDispatch(Event event){
         //dispatch event to registered callback
         this.replicationQueue.offer(event);
-        metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_CLUSTER_INBOUND_MESSAGE_COUNT,1);
+        metricsListener.onUpdated(CLUSTER_INBOUND_MESSAGE_COUNT,1);
     }
     public void registerBucketReceiver(BucketReceiver bucketReceiver){
         BucketReceiver br = bMap.computeIfAbsent(bucketReceiver.bucket(),(b)->bucketReceiver);

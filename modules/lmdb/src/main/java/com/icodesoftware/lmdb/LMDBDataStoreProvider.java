@@ -4,11 +4,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.DataStoreProvider;
-import com.icodesoftware.service.MapStoreListener;
-import com.icodesoftware.service.Metadata;
+import com.icodesoftware.service.*;
 
-import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
 import org.lmdbjava.*;
 
@@ -69,6 +66,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private MapStoreListener dataMapStoreListener;
     private DistributionIdGenerator distributionIdGenerator;
 
+    MetricsListener metricsListener = (k,v)->{};
     private JsonObject jsonObject;
     @Override
     public void configure(Map<String, Object> properties) {
@@ -541,5 +539,9 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         return new BufferCache(KEY_SIZE,VALUE_SIZE,pendingQueue);
     }
 
-
+    @Override
+    public void registerMetricsListener(MetricsListener metricsListener) {
+        if(metricsListener==null) return;
+        this.metricsListener = metricsListener;
+    }
 }

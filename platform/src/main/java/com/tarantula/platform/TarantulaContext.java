@@ -626,8 +626,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         serviceViewList.add(JVMMonitor.NAME);
         serviceViewList.add(UDPEndpoint.UDP_ENDPOINT);
         serviceViewList.add(this.integrationCluster.name());
-        this.deploymentDataStoreProvider.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
-        this.integrationCluster.registerMetricsListener(this.metrics(Metrics.PERFORMANCE));
+        this.deploymentDataStoreProvider.registerMetricsListener(this.metrics(Metrics.DATA_STORE));
+        this.integrationCluster.registerMetricsListener(this.metrics(Metrics.CLUSTER));
         this.serviceProvider(UserService.NAME).registerMetricsListener(this.metrics(Metrics.ACCESS));
         this.deploymentServiceProvider.registerMetricsListener(this.metrics(Metrics.DEPLOYMENT));
         this.postOfficeSession = new PostOfficeSession(this.integrationCluster.publisher());
