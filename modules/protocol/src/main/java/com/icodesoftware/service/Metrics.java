@@ -31,6 +31,8 @@ public interface Metrics extends ServiceProvider,MetricsListener{
     String DATA_STORE = "data_store";
     String CLUSTER = "cluster";
 
+    String APPLICATION = "application";
+
 
     List<String> categories();
 

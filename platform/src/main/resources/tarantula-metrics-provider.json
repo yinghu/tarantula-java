@@ -1,6 +1,7 @@
 {
   "metrics-list": [
     {"class-name":"com.tarantula.platform.service.metrics.PerformanceMetrics","enabled": true },
+    {"class-name":"com.tarantula.platform.service.metrics.ApplicationMetrics","enabled": true },
     {"class-name":"com.tarantula.platform.service.metrics.DataStoreMetrics","enabled": true },
     {"class-name":"com.tarantula.platform.service.metrics.AccessMetrics","enabled": true },
     {"class-name":"com.tarantula.platform.service.metrics.ClusterMetrics","enabled": true },
