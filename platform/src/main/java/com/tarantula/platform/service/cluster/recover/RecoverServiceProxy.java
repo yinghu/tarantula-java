@@ -10,7 +10,6 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.cluster.ClusterUtil;
-import com.tarantula.platform.service.metrics.PerformanceMetrics;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -78,7 +77,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<byte[]> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            });
+            },metricsListener);
             if(callResult.successful&&callResult.result!=null){
                 ret = (byte[]) callResult.result;
                 break;
@@ -97,7 +96,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<byte[]> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            });
+            },metricsListener);
             if(callResult.successful&&callResult.result!=null){
                 ret = (Batchable) callResult.result;
                 break;
@@ -116,11 +115,10 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<Void> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            });
+            },metricsListener);
             if(!callResult.successful){
                 expected = false;
                 break;
-                //metricsListener.onUpdated();
             }
         }
         return expected;
@@ -136,11 +134,10 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<Void> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            });
+            },metricsListener);
             if(!callResult.successful){
                 expected = false;
                 break;
-                //metricsListener.onUpdated();
             }
         }
         return expected;
@@ -156,11 +153,10 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<Void> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            });
+            },metricsListener);
             if(!callResult.successful){
                 expected = false;
                 break;
-                //metricsListener.onUpdated();
             }
         }
         return expected;
@@ -178,9 +174,8 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<Void> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            });
+            },metricsListener);
             if(result.successful) expected++;
-            if(result.retries>0)  metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_CLUSTER_OPERATION_TIMEOUT_COUNT,result.retries);
         }
         return expected;
     }
@@ -195,7 +190,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Void> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!result.successful){
 
         }
@@ -207,7 +202,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Integer> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         return result.successful? (int) result.result:0;
 
     }
@@ -218,7 +213,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Void> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
     }
     public void onEndSync(String memberId,String syncKey){
@@ -228,7 +223,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Void> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
     }
 
@@ -239,7 +234,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<String[]> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
         return (String[]) result.result;
     }
@@ -250,7 +245,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<byte[]> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
         return (byte[]) result.result;
     }
@@ -274,7 +269,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<byte[]> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         return callResult.successful?(byte[])callResult.result:null;
     }
 }

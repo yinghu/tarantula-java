@@ -1,10 +1,13 @@
 package com.tarantula.platform.service.cluster;
 
+import com.icodesoftware.service.MetricsListener;
+import com.tarantula.platform.service.metrics.ClusterMetrics;
+
 import java.util.concurrent.Callable;
 
 public class ClusterUtil {
 
-    public static CallResult call(int retries,long retryInterval,Callable<Object> callable){
+    public static CallResult call(int retries, long retryInterval, Callable<Object> callable, MetricsListener metricsListener){
         CallResult ret = new CallResult();
         for(int i=0;i<retries;i++){
             try{
@@ -17,6 +20,8 @@ public class ClusterUtil {
                 waitForRetry(retryInterval);
             }
         }
+        metricsListener.onUpdated(ret.successful? ClusterMetrics.CLUSTER_REMOTE_CALL_COUNT : ClusterMetrics.CLUSTER_REMOTE_CALL_FAILURE_COUNT,1);
+        if(ret.retries>0) metricsListener.onUpdated(ClusterMetrics.CLUSTER_REMOTE_RETRY_COUNT,ret.retries);
         return ret;
     }
     private static void waitForRetry(long retryInterval){

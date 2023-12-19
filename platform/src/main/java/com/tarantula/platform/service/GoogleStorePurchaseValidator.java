@@ -14,6 +14,7 @@ import com.tarantula.platform.configuration.GoogleCredentialConfiguration;
 import com.tarantula.platform.configuration.GoogleServiceAccount;
 import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
 import com.tarantula.platform.service.metrics.GameClusterMetrics;
+import com.tarantula.platform.service.metrics.PaymentMetrics;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -79,7 +80,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
             }
             JsonObject payload = JsonUtil.parse(responseData.dataAsString);
             logger.warn("Response:"+payload.toString());
-            onMetrics(GameClusterMetrics.PAYMENT_GOOGLE_STORE_COUNT);
+            onMetrics(PaymentMetrics.PAYMENT_GOOGLE_STORE_COUNT);
             return payload.has("orderId") && payload.get("orderId").getAsString().equals(orderId);
         }catch (Exception ex){
             logger.error("Error on google pay",ex);

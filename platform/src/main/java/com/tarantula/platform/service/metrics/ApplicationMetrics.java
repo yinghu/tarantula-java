@@ -12,8 +12,6 @@ public class ApplicationMetrics extends AbstractMetrics{
     @Override
     void _setup(ServiceContext serviceContext) {
         this.name = Metrics.APPLICATION;
-        this.accessIncluded = true;
-        this.accountIncluded = true;
         this.logger = JDKLogger.getLogger(ApplicationMetrics.class);
         this.dataStore = serviceContext.dataStore(Distributable.LOCAL_SCOPE,"tarantula_access_metrics");
     }

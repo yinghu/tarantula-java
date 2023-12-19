@@ -13,7 +13,6 @@ import com.icodesoftware.service.*;
 import com.tarantula.platform.TarantulaContext;
 
 import com.tarantula.platform.service.cluster.ClusterUtil;
-import com.tarantula.platform.service.metrics.PerformanceMetrics;
 
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -23,7 +22,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
 
     private TarantulaLogger logger = JDKLogger.getLogger(AccessIndexServiceProxy.class);
     private final String objectName;//unique proxy name
-    private ServiceContext serviceContext;
+
     private MetricsListener metricsListener;
 
 
@@ -52,7 +51,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<AccessIndex> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!callResult.successful) throw new RuntimeException(callResult.exception);
         return (AccessIndex)callResult.result;
     }
@@ -65,13 +64,13 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<AccessIndex> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!callResult.successful) throw new RuntimeException(callResult.exception);
         return (AccessIndex)callResult.result;
     }
     @Override
     public void setup(ServiceContext serviceContext){
-        this.serviceContext = serviceContext;
+        //this.serviceContext = serviceContext;
     }
     public void waitForData(){}
     @Override
@@ -83,8 +82,11 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<AccessIndex> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
-        if(!callResult.successful) throw new RuntimeException(callResult.exception);
+        },metricsListener);
+        if(!callResult.successful){
+
+            throw new RuntimeException(callResult.exception);
+        }
         return (AccessIndex)callResult.result;
     }
 
@@ -98,7 +100,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
             ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<Void> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            });
+            },metricsListener);
             if(callResult.successful) expected--;
         }
         return expected==0;
@@ -113,7 +115,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
             ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<Void> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            });
+            },metricsListener);
             if(callResult.successful) expected--;
         }
         return expected==0;
@@ -128,10 +130,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Void> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
-        if(!callResult.successful){
-            metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_CLUSTER_OPERATION_TIMEOUT_COUNT,1);
-        }
+        },metricsListener);
     }
     public int onReplicate(String nodeName, byte[] key, byte[] value,  ClusterProvider.Node[] nodes){
         NodeEngine nodeEngine = getNodeEngine();
@@ -145,7 +144,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
             ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<Void> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            });
+            },metricsListener);
             if(callResult.successful) replicated++;
         }
         return replicated;
@@ -162,7 +161,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
             ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<byte[]> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            });
+            },metricsListener);
             if(callResult.successful){
                 ret = (byte[])callResult.result;
                 break;
@@ -178,7 +177,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Integer> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         return callResult.successful?(int)callResult.result:-1;
     }
     public void onSync(int size,byte[][] keys,byte[][] values,String memberId,int partition){
@@ -188,7 +187,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Void> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!callResult.successful) throw new RuntimeException(callResult.exception);
     }
     public void onEndSync(String memberId,String syncKey){
@@ -198,7 +197,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Void> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!callResult.successful) throw new RuntimeException(callResult.exception);
     }
     @Override
@@ -235,7 +234,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<byte[]> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         return callResult.successful?(byte[])callResult.result:null;
     }
 }

@@ -13,9 +13,6 @@ public class GameClusterMetrics extends AbstractMetrics{
     }
     @Override
     void _setup(ServiceContext serviceContext) {
-        this.gameIncluded = true;
-        this.paymentIncluded = true;
-        this.accessIncluded = true;
         this.logger = JDKLogger.getLogger(GameClusterMetrics.class);
         this.dataStore = serviceContext.dataStore(Distributable.LOCAL_SCOPE,name.replaceAll("-","_")+"_game_cluster_metrics");
     }

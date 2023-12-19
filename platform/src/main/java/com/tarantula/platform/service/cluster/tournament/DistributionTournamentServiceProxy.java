@@ -5,6 +5,7 @@ import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.icodesoftware.Tournament;
+import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.cluster.ClusterUtil;
@@ -18,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 public class DistributionTournamentServiceProxy extends AbstractDistributedObject<TournamentClusterService> implements DistributionTournamentService {
 
     private String objectName;
-
+    private MetricsListener metricsListener;
     public DistributionTournamentServiceProxy(String objectName, NodeEngine nodeEngine, TournamentClusterService tournamentClusterService){
         super(nodeEngine,tournamentClusterService);
         this.objectName = objectName;
@@ -71,7 +72,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<TournamentRegisterStatus> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
         return (TournamentRegisterStatus)result.result;
 
@@ -85,7 +86,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Boolean> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
         return (boolean)result.result;
 
@@ -99,7 +100,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Tournament.Instance> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
         return (Tournament.Instance)result.result;
 
@@ -113,7 +114,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Boolean> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
         return (boolean)result.result;
 
@@ -127,7 +128,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Boolean> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
         return (boolean)result.result;
 
@@ -142,7 +143,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Tournament.RaceBoard> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
         return (Tournament.RaceBoard)result.result;
     }
@@ -155,7 +156,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Tournament.RaceBoard> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
         return (Tournament.RaceBoard)result.result;
     }
@@ -168,7 +169,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Tournament.Entry> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
     }
 
@@ -180,7 +181,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Tournament.Instance> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
 
     }
@@ -194,7 +195,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
             ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<Void> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            });
+            },metricsListener);
             if(!result.successful) throw new RuntimeException(result.exception);
         });
     }
@@ -207,7 +208,14 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Void> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
+    }
+
+    public void registerMetricsListener(MetricsListener metricsListener){
+        this.metricsListener = metricsListener;
+    }
+    public void releaseMetricsListener(){
+        this.metricsListener = (k,v)->{};
     }
 }

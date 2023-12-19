@@ -40,7 +40,6 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private DataStore pdataStore;//presence
     private DataStore udataStore;//user
     private DataStore adataStore;//account
-    private DataStore idataStore;//account index
     private DataStore mdatastore;//membership
 
     private DataStore sdatastore;//onsession
@@ -401,7 +400,6 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.pdataStore =  this.serviceContext.dataStore(Distributable.DATA_SCOPE,Presence.DataStore);
         this.udataStore =  this.serviceContext.dataStore(Distributable.DATA_SCOPE,Access.DataStore);
         this.adataStore =  this.serviceContext.dataStore(Distributable.DATA_SCOPE,Account.DataStore);
-        this.idataStore = this.serviceContext.dataStore(Distributable.DATA_SCOPE,Account.IndexDataStore);
         this.mdatastore =  this.serviceContext.dataStore(Distributable.DATA_SCOPE,Subscription.DataStore);
         this.sdatastore = this.serviceContext.dataStore(Distributable.DATA_SCOPE,OnSession.DataStore);
         this.deployDataStore = this.serviceContext.dataStore(Distributable.DATA_SCOPE,DeploymentServiceProvider.DEPLOY_DATA_STORE);

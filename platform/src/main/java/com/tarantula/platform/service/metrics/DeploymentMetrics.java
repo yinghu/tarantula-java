@@ -13,7 +13,6 @@ public class DeploymentMetrics extends AbstractMetrics{
     @Override
     void _setup(ServiceContext serviceContext) {
         this.name = Metrics.DEPLOYMENT;
-        this.deploymentIncluded = true;
         this.logger = JDKLogger.getLogger(DeploymentMetrics.class);
         this.dataStore = serviceContext.dataStore(Distributable.LOCAL_SCOPE,"tarantula_deployment_metrics");
     }

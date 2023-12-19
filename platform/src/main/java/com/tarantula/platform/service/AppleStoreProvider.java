@@ -15,7 +15,7 @@ import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.configuration.AppleCredentialConfiguration;
 import com.tarantula.platform.configuration.AppleStoreKey;
 import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
-import com.tarantula.platform.service.metrics.GameClusterMetrics;
+import com.tarantula.platform.service.metrics.PaymentMetrics;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -69,7 +69,7 @@ public class AppleStoreProvider extends AuthObject{
                 return response.statusCode();
             });
             if(code!=200) return false;
-            onMetrics(GameClusterMetrics.PAYMENT_APPLE_STORE_AMOUNT);
+            onMetrics(PaymentMetrics.PAYMENT_APPLE_STORE_AMOUNT);
             return checkResponsePayload(responseData.dataAsString,params);
         }catch (Exception ex){
             logger.error("apple store error ["+typeId+"]",ex);
@@ -103,10 +103,6 @@ public class AppleStoreProvider extends AuthObject{
         if(!validated){
             params.put(OnAccess.STORE_MESSAGE,"transaction cannot be validated");
         }
-        //TransactionLog transaction = new TransactionLog(systemId,(String)params.get(OnAccess.STORE_BUNDLE_ID),resp);
-        //transaction.distributionKey(pendingTransactionId);
-        //serviceEventLogger.log(transaction);
-        //this.metricsListener.onUpdated(VendorMetrics.APPLE_STORE_COUNT,1);
         return validated;
     }
     private JsonObject toRequestPayload(AppleStoreKey appleStoreKey,String serviceTypeId,String receipt){

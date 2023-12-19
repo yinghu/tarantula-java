@@ -4,6 +4,7 @@ import com.hazelcast.core.Member;
 import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
+import com.icodesoftware.service.MetricsListener;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.cluster.ClusterUtil;
 import com.tarantula.platform.service.metrics.DistributionMetricsService;
@@ -17,7 +18,7 @@ public class DistributionMetricsServiceProxy extends AbstractDistributedObject<M
 
     private String objectName;
 
-
+    private MetricsListener metricsListener;
     public DistributionMetricsServiceProxy(String objectName, NodeEngine nodeEngine, MetricsClusterService metricsClusterService){
         super(nodeEngine,metricsClusterService);
         this.objectName = objectName;
@@ -45,7 +46,7 @@ public class DistributionMetricsServiceProxy extends AbstractDistributedObject<M
             ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<String> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            });
+            },metricsListener);
             ret[i++]= result.successful? (String) result.result : "{}";
         }
         return ret;
@@ -61,7 +62,7 @@ public class DistributionMetricsServiceProxy extends AbstractDistributedObject<M
             ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<String> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            });
+            },metricsListener);
             ret[i++]= result.successful? (String) result.result : "{}";
         }
         return ret;
@@ -77,7 +78,7 @@ public class DistributionMetricsServiceProxy extends AbstractDistributedObject<M
             ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<String> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            });
+            },metricsListener);
             ret[i++]= result.successful? (String) result.result : "{}";
         }
         return ret;
@@ -96,5 +97,11 @@ public class DistributionMetricsServiceProxy extends AbstractDistributedObject<M
     @Override
     public void shutdown() throws Exception {
 
+    }
+    public void registerMetricsListener(MetricsListener metricsListener){
+        this.metricsListener = metricsListener;
+    }
+    public void releaseMetricsListener(){
+        this.metricsListener = (k,v)->{};
     }
 }

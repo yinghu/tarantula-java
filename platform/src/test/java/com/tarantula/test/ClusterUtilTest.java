@@ -1,5 +1,6 @@
 package com.tarantula.test;
 
+import com.icodesoftware.service.MetricsListener;
 import com.tarantula.platform.service.cluster.ClusterUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -12,11 +13,12 @@ public class ClusterUtilTest {
     @Test(groups = { "ClusterUtil" })
     public void callSuccessTest() {
         int[] t = {0};
+        MetricsListener metricsListener = (k,v)->{};
         ClusterUtil.CallResult callResult = ClusterUtil.call(3,100,()->{
                 t[0]++;
                 if(t[0]<2) throw new IllegalArgumentException("less 2");
                 return t[0];
-        });
+        },metricsListener);
         Assert.assertTrue(callResult.successful);
         Assert.assertEquals(callResult.result,2);
         Assert.assertEquals(callResult.retries,1);
@@ -25,11 +27,12 @@ public class ClusterUtilTest {
     @Test(groups = { "ClusterUtil" })
     public void callFailTest() {
         int[] t = {0};
+        MetricsListener metricsListener = (k,v)->{};
         ClusterUtil.CallResult callResult = ClusterUtil.call(3,100,()->{
             t[0]++;
             if(t[0]<4) throw new IllegalArgumentException("less 2");
             return t[0];
-        });
+        },metricsListener);
         Assert.assertFalse(callResult.successful);
         Assert.assertNull(callResult.result);
         Assert.assertEquals(callResult.retries,3);

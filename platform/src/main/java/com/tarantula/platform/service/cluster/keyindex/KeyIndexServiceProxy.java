@@ -8,10 +8,7 @@ import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.ClusterProvider;
-import com.icodesoftware.service.DataStoreSummary;
-import com.icodesoftware.service.KeyIndex;
-import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.service.*;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.cluster.ClusterUtil;
 
@@ -24,6 +21,8 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
     private static TarantulaLogger logger = JDKLogger.getLogger(KeyIndexServiceProxy.class);
     private final String objectName;
     private ServiceContext serviceContext;
+
+    private MetricsListener metricsListener;
     public KeyIndexServiceProxy(String objectName, NodeEngine nodeEngine, KeyIndexClusterService keyIndexService){
         super(nodeEngine,keyIndexService);
         this.objectName = objectName;
@@ -50,7 +49,7 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
         ClusterUtil.CallResult ret = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()-> {
             Future<KeyIndex> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!ret.successful) throw new RuntimeException(ret.exception);
         return (byte[]) ret.result;
     }
@@ -62,7 +61,7 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
         ClusterUtil.CallResult ret = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()-> {
             Future<Boolean> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!ret.successful) throw new RuntimeException(ret.exception);
         return (boolean)ret.result;
     }
@@ -75,7 +74,7 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
         ClusterUtil.CallResult ret = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()-> {
             Future<Void> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!ret.successful) throw new RuntimeException(ret.exception);
     }
 
@@ -87,7 +86,7 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
         ClusterUtil.CallResult ret = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()-> {
             Future<Boolean> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!ret.successful) throw new RuntimeException(ret.exception);
         return (boolean)ret.result;
     }
@@ -102,7 +101,7 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
             ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<byte[]> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            });
+            },metricsListener);
             if(callResult.successful){
                 ClusterProvider.Node node = serviceContext.clusterProvider().summary().node(m.getUuid());
                 //view.on(node,key,(byte[]) callResult.result);
@@ -127,5 +126,12 @@ public class KeyIndexServiceProxy  extends AbstractDistributedObject<KeyIndexClu
     @Override
     public void setup(ServiceContext serviceContext){
         this.serviceContext = serviceContext;
+    }
+
+    public void registerMetricsListener(MetricsListener metricsListener){
+        this.metricsListener = metricsListener;
+    }
+    public void releaseMetricsListener(){
+        this.metricsListener = (k,v)->{};
     }
 }

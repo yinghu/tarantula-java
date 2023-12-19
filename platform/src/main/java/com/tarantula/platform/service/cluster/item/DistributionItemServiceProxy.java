@@ -4,6 +4,7 @@ import com.hazelcast.core.Member;
 import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
+import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.item.DistributionItemService;
@@ -17,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class DistributionItemServiceProxy extends AbstractDistributedObject<ItemClusterService> implements DistributionItemService {
 
     private String objectName;
-
+    private MetricsListener metricsListener;
     public DistributionItemServiceProxy(String objectName, NodeEngine nodeEngine, ItemClusterService itemClusterService){
         super(nodeEngine,itemClusterService);
         this.objectName = objectName;
@@ -42,7 +43,7 @@ public class DistributionItemServiceProxy extends AbstractDistributedObject<Item
             ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<Boolean> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            });
+            },metricsListener);
             if(!result.successful) throw new RuntimeException(result.exception);
         }
         return true;
@@ -57,7 +58,7 @@ public class DistributionItemServiceProxy extends AbstractDistributedObject<Item
             ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<Boolean> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            });
+            },metricsListener);
             if(!result.successful) throw new RuntimeException(result.exception);
         }
         return true;
@@ -80,5 +81,11 @@ public class DistributionItemServiceProxy extends AbstractDistributedObject<Item
     @Override
     public void setup(ServiceContext serviceContext){
 
+    }
+    public void registerMetricsListener(MetricsListener metricsListener){
+        this.metricsListener = metricsListener;
+    }
+    public void releaseMetricsListener(){
+        this.metricsListener = (k,v)->{};
     }
 }

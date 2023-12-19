@@ -7,10 +7,9 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.ClientConnection;
 import com.icodesoftware.util.ScheduleRunner;
-import com.tarantula.platform.service.metrics.PerformanceMetrics;
+import com.tarantula.platform.service.metrics.AccessMetrics;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,7 +39,7 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
     private long packetRemoveInterval;
     private long packetTimeout;
     private long packetRemoveTimer;
-    private MetricsListener metricsListener;
+    private MetricsListener metricsListener =(k,v)->{};
 
 
     private Thread receiverDaemon;
@@ -228,7 +227,7 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
             long stub = messageBuffer.readLong();
             String ticket = messageBuffer.readUTF8();
             boolean suc = tokenValidator.validateTicket(systemId,stub,ticket);
-            metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_UDP_REQUEST_COUNT,1);
+            metricsListener.onUpdated(AccessMetrics.UDP_REQUEST_COUNT,1);
             boolean joined = sessionId == messageHeader.sessionId && suc && pendingJoins.remove(sessionId)!=null;
             if(joined) channels.get(sessionId).validated();
             return joined;
@@ -251,7 +250,7 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
         }
         UDPChannel udpChannel = channels.get(messageHeader.sessionId);
         udpChannel.onRequest(messageHeader,messageBuffer);
-        metricsListener.onUpdated(PerformanceMetrics.PERFORMANCE_UDP_REQUEST_COUNT,1);
+        metricsListener.onUpdated(AccessMetrics.UDP_REQUEST_COUNT,1);
         return null;
     }
 

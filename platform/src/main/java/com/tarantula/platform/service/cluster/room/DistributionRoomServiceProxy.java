@@ -3,6 +3,7 @@ package com.tarantula.platform.service.cluster.room;
 import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
+import com.icodesoftware.service.MetricsListener;
 import com.tarantula.platform.room.*;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.cluster.ClusterUtil;
@@ -13,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 public class DistributionRoomServiceProxy extends AbstractDistributedObject<RoomClusterService> implements DistributionRoomService {
 
     private String objectName;
-
+    private MetricsListener metricsListener;
     public DistributionRoomServiceProxy(String objectName, NodeEngine nodeEngine, RoomClusterService roomClusterService){
         super(nodeEngine,roomClusterService);
         this.objectName = objectName;
@@ -38,7 +39,7 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<GameRoom> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
         return (GameRoom) result.result;
 
@@ -51,7 +52,7 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<GameRoom> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
         return (GameRoom) result.result;
     }
@@ -64,7 +65,7 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Void> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
         //return (GameRoom) result.result;
     }
@@ -77,7 +78,7 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Void> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        });
+        },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
     }
 
@@ -94,5 +95,12 @@ public class DistributionRoomServiceProxy extends AbstractDistributedObject<Room
     @Override
     public void shutdown() throws Exception {
 
+    }
+
+    public void registerMetricsListener(MetricsListener metricsListener){
+        this.metricsListener = metricsListener;
+    }
+    public void releaseMetricsListener(){
+        this.metricsListener = (k,v)->{};
     }
 }

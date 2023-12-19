@@ -18,14 +18,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 abstract public class AbstractMetrics implements Metrics, SchedulingTask {
 
-    //PAYMENT CATEGORY
-    public final static String PAYMENT_GOOGLE_STORE_COUNT = "googleStoreCount";
-    public final static String PAYMENT_APPLE_STORE_COUNT = "appleStoreCount";
-    public final static String PAYMENT_STRIPE_COUNT = "stripeCount";
-    public final static String PAYMENT_GOOGLE_STORE_AMOUNT = "googleStoreAmount";
-    public final static String PAYMENT_APPLE_STORE_AMOUNT = "appleStoreAmount";
-    public final static String PAYMENT_STRIPE_AMOUNT = "stripeAmount";
-
 
     //GAME CATEGORY
     public final static String GAME_JOIN_COUNT = "joinCount";
@@ -41,23 +33,6 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
     public final static String ACCESS_DEVELOPER_LOGIN_COUNT = "developerLoginCount";
     public final static String ACCESS_AMAZON_S3_COUNT = "amazonS3Count";
 
-    //PERFORMANCE CATEGORY
-
-    public final static String PERFORMANCE_CLUSTER_OPERATION_TIMEOUT_COUNT = "clusterOperationTimeoutCount";
-
-
-    public final static String PERFORMANCE_UDP_REQUEST_COUNT = "udpRequestCount";
-
-    //DEPLOYMENT CATEGORY
-    public final static String DEPLOYMENT_GAME_CLUSTER_COUNT = "gameClusterCount";
-    public final static String DEPLOYMENT_MESSAGE_RECEIVER_COUNT = "messageReceiverCount";
-    public final static String DEPLOYMENT_APPLICATION_COUNT = "applicationCount";
-
-    //ACCOUNT CATEGORY
-    //public final static String ACCOUNT_USER_CREATION_COUNT = "userCreationCount";
-    //public final static String ACCOUNT_ACCOUNT_CREATION_COUNT = "accountCreationCount";
-
-    //public final static String ACCOUNT_SUBSCRIPTION_COUNT = "subscriptionCount";
 
     private ConcurrentHashMap<String, StatsDelta> pendingUpdates;
 
@@ -70,13 +45,6 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
     private CopyOnWriteArraySet<String> categories;
     protected TarantulaLogger logger;
     protected String name;
-
-    protected boolean paymentIncluded;
-    protected boolean accessIncluded;
-    protected boolean performanceIncluded;
-    protected boolean deploymentIncluded;
-    protected boolean accountIncluded;
-    protected boolean gameIncluded;
 
     private Lock lock = new ReentrantLock();
 
@@ -94,49 +62,6 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
         this.snapshots = new ConcurrentHashMap<>();
         this.archives = new ConcurrentHashMap<>();
         _setup(serviceContext);
-        //register default categories
-        /**
-        if(paymentIncluded) {
-            registerCategory(PAYMENT_GOOGLE_STORE_COUNT);
-            registerCategory(PAYMENT_APPLE_STORE_COUNT);
-            registerCategory(PAYMENT_STRIPE_COUNT);
-            registerCategory(PAYMENT_GOOGLE_STORE_AMOUNT);
-            registerCategory(PAYMENT_APPLE_STORE_AMOUNT);
-            registerCategory(PAYMENT_STRIPE_AMOUNT);
-        }
-
-        if(accessIncluded) {
-            registerCategory(ACCESS_GOOGLE_LOGIN_COUNT);
-            registerCategory(ACCESS_WEB_LOGIN_COUNT);
-            registerCategory(ACCESS_DEVICE_LOGIN_COUNT);
-            registerCategory(ACCESS_FACEBOOK_LOGIN_COUNT);
-            registerCategory(ACCESS_GAME_CENTER_LOGIN_COUNT);
-            registerCategory(ACCESS_DEVELOPER_LOGIN_COUNT);
-            registerCategory(ACCESS_AMAZON_S3_COUNT);
-        }
-
-        if(performanceIncluded){
-            registerCategory(PERFORMANCE_DATA_STORE_COUNT);
-            registerCategory(PERFORMANCE_UDP_REQUEST_COUNT);
-        }
-
-        if(deploymentIncluded){
-            registerCategory(DEPLOYMENT_GAME_CLUSTER_COUNT);
-            registerCategory(DEPLOYMENT_MESSAGE_RECEIVER_COUNT);
-            registerCategory(DEPLOYMENT_APPLICATION_COUNT);
-        }
-
-        if(accountIncluded){
-            registerCategory(ACCOUNT_USER_CREATION_COUNT);
-            registerCategory(ACCOUNT_ACCOUNT_CREATION_COUNT);
-            registerCategory(ACCOUNT_SUBSCRIPTION_COUNT);
-        }
-
-        if(gameIncluded) {
-            registerCategory(GAME_JOIN_COUNT);
-            registerCategory(GAME_TIMEOUT_COUNT);
-        }**/
-        //this.serviceContext = serviceContext;
         long nodeId = serviceContext.node().nodeId();
         LocalDateTime _cur = LocalDateTime.now();
         this.statistics = new SystemStatistics();

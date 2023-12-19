@@ -8,12 +8,11 @@ import com.icodesoftware.service.ServiceContext;
 
 public class AccessMetrics extends AbstractMetrics{
 
+    public final static String UDP_REQUEST_COUNT = "udpRequestCount";
 
     @Override
     void _setup(ServiceContext serviceContext) {
         this.name = Metrics.ACCESS;
-        this.accessIncluded = true;
-        this.accountIncluded = true;
         this.logger = JDKLogger.getLogger(AccessMetrics.class);
         this.dataStore = serviceContext.dataStore(Distributable.LOCAL_SCOPE,"tarantula_access_metrics");
     }

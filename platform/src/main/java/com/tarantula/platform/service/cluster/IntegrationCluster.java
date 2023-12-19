@@ -18,7 +18,7 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.service.*;
-import com.tarantula.platform.service.metrics.PerformanceMetrics;
+import com.tarantula.platform.service.metrics.ClusterMetrics;
 import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -31,8 +31,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private static JDKLogger log = JDKLogger.getLogger(IntegrationCluster.class);
 
-    private static final String CLUSTER_OUTBOUND_MESSAGE_COUNT = "clusterPublishMessageCount";
-    private static final String CLUSTER_INBOUND_MESSAGE_COUNT = "clusterReceiveMessageCount";
     private static String PENDING_EVENT_NUMBER = "pendingEventNumber";
     private final Config config;
     private final String bucket;
@@ -145,7 +143,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         if(message.destination()!=null){
             ITopic<Event> _t = this.topicList.computeIfAbsent(message.destination(),(String d)-> this._cluster.getTopic(d));
             _t.publish(message);
-            metricsListener.onUpdated(CLUSTER_OUTBOUND_MESSAGE_COUNT,1);
+            metricsListener.onUpdated(ClusterMetrics.CLUSTER_OUTBOUND_MESSAGE_COUNT,1);
         }else{
             log.warn("No destination message ->"+message);
         }
@@ -203,12 +201,13 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         _wait();
         T serviceProvider = this._cluster.getDistributedObject(name,name);
         serviceProvider.setup(tarantulaContext);
+        serviceProvider.registerMetricsListener(this.metricsListener);
         return serviceProvider;
     }
     private void onDispatch(Event event){
         //dispatch event to registered callback
         this.replicationQueue.offer(event);
-        metricsListener.onUpdated(CLUSTER_INBOUND_MESSAGE_COUNT,1);
+        metricsListener.onUpdated(ClusterMetrics.CLUSTER_INBOUND_MESSAGE_COUNT,1);
     }
     public void registerBucketReceiver(BucketReceiver bucketReceiver){
         BucketReceiver br = bMap.computeIfAbsent(bucketReceiver.bucket(),(b)->bucketReceiver);
@@ -265,6 +264,8 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         if(metricsListener == null) return;
         this.metricsListener = metricsListener;
         this.recoverService.registerMetricsListener(this.metricsListener);
+        this.accessIndexService.registerMetricsListener(this.metricsListener);
+        this.deployService.registerMetricsListener(this.metricsListener);
     }
 
     @Override
