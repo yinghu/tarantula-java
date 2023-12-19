@@ -17,10 +17,10 @@ public class GameLobbyModule extends ModuleHeader{
 
     @Override
     public void onJoin(Session session) throws Exception{
-        if(application.tournamentEnabled() && (!gameServiceProvider.tournamentServiceProvider().available(session.tournamentId()))){
-            session.write(JsonUtil.toSimpleResponse(false,"no tournament available,please try later").getBytes());
-            return;
-        }
+        //if(application.tournamentEnabled() && (!gameServiceProvider.tournamentServiceProvider().available(session.tournamentId()))){
+            //session.write(JsonUtil.toSimpleResponse(false,"no tournament available,please try later").getBytes());
+            //return;
+        //}
         Rating rating = gameServiceProvider.presenceServiceProvider().rating(session);
         Stub stub = gameLobby.join(session,rating);
         session.write(stub.toJson().toString().getBytes());

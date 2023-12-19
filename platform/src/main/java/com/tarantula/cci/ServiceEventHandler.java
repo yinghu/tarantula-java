@@ -27,7 +27,7 @@ public class ServiceEventHandler extends AbstractRequestHandler {
         String token = exchange.header(Session.TARANTULA_TOKEN);//authenticated token
         String action = exchange.header(Session.TARANTULA_ACTION);
         String tag = exchange.header(Session.TARANTULA_TAG);
-        String tournamentId = exchange.header(Session.TARANTULA_TOURNAMENT_ID);//instance Id
+        //String tournamentId = exchange.header(Session.TARANTULA_TOURNAMENT_ID);//instance Id
         String name = exchange.header(Session.TARANTULA_NAME);//key name
         String clientId = exchange.header(Session.TARANTULA_CLIENT_ID);
         String trackId = exchange.header(Session.TARANTULA_TRACK_ID);
@@ -48,7 +48,7 @@ public class ServiceEventHandler extends AbstractRequestHandler {
             actionEvent.action(action!=null?action:path);
             actionEvent.routingNumber(routingKey.routingNumber());
             actionEvent.destination(routingKey.route());
-            if(tournamentId!=null) actionEvent.tournamentId(Long.parseLong(tournamentId));
+            //if(tournamentId!=null) actionEvent.tournamentId(Long.parseLong(tournamentId));
             actionEvent.name(name);
             actionEvent.clientId(clientId);
             this.eventService.publish(actionEvent);
