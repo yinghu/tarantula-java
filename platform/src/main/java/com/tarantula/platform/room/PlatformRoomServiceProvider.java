@@ -177,7 +177,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             }
             Channel channel = room.registerChannel(stub,timeoutListener);
             udpEndpoint.registerChannel((UDPChannel)channel);
-            logger.warn("Using assigned channel ["+channel.channelId()+"/"+channel.sessionId()+"]");
+            //logger.warn("Using assigned channel ["+channel.channelId()+"/"+channel.sessionId()+"]");
             return channel;
         }
     }

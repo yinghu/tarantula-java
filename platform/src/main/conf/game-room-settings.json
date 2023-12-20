@@ -2,7 +2,7 @@
   "checkInterval": 10000,
   "dedicatedCheckInterval": 1000,
   "pve": {
-    "maxRoomPoolSizePerZone": 100,
+    "maxRoomPoolSizePerZone": 5000,
     "minRoomPoolSizePerZone": 10,
     "maxDedicatedServerConnections": 10
   },

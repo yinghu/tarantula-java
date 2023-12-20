@@ -32,18 +32,13 @@ public class ServiceEventHandler extends AbstractRequestHandler {
         String clientId = exchange.header(Session.TARANTULA_CLIENT_ID);
         String trackId = exchange.header(Session.TARANTULA_TRACK_ID);
         byte[]  _payload = exchange.payload();
-        if(path.startsWith("/service/action")){
-            OnSession id = new OnSessionTrack();//place holder for public access applications
-            RoutingKey routingKey = eventService.routingKey(this.bucket+"/"+exchange.id(),tag);
-            if((token!=null) && (!token.equals("undefined"))){
-                id = auth.validateToken(token);//first entry point check
-                routingKey = eventService.routingKey(id.distributionId(),tag);
-            }
+        if(path.startsWith("/service/action") && token!=null && !token.equals("undefined")){
+            OnSession id = auth.validateToken(token);//new OnSessionTrack();//place holder for public access applications
+            RoutingKey  routingKey = eventService.routingKey(id.distributionId(),tag);
             ServiceActionEvent actionEvent = new ServiceActionEvent(this.serviceTopic,exchange.id(),_payload);
             actionEvent.distributionId(id.distributionId());
             actionEvent.stub(id.stub());
             actionEvent.ticket(id.ticket());
-            //actionEvent.token(token);
             actionEvent.trackId(trackId);
             actionEvent.action(action!=null?action:path);
             actionEvent.routingNumber(routingKey.routingNumber());
@@ -54,6 +49,7 @@ public class ServiceEventHandler extends AbstractRequestHandler {
             this.eventService.publish(actionEvent);
         }
         else{
+            log.warn("Token : "+token+" : "+tag+" : "+action);
             throw new UnsupportedOperationException("HTTP ["+exchange.method()+"] request ["+path+"] not supported");
         }
      }

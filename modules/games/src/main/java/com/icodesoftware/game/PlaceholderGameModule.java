@@ -16,11 +16,11 @@ public class PlaceholderGameModule extends GameModuleHeader {
     }
 
     public void close(){
-        this.gameContext.log("room close",OnLog.WARN);
+        //this.gameContext.log("room close",OnLog.WARN);
     }
 
     public void reset(){
-        this.gameContext.log("room reset",OnLog.WARN);
+        //this.gameContext.log("room reset",OnLog.WARN);
     }
 
     @Override

@@ -132,17 +132,25 @@ public class JWTUtil {
             return Base64.getUrlEncoder().encodeToString(json.toString().getBytes());
         }
 
-        private String sign(byte[] data,byte[] signature) throws Exception{
-            if(mac != null) return Base64.getUrlEncoder().withoutPadding().encodeToString(mac.doFinal(data));
+        private synchronized String sign(byte[] data,byte[] signature) throws Exception{
+            if(mac != null){
+                synchronized (mac) {
+                    return Base64.getUrlEncoder().withoutPadding().encodeToString(mac.doFinal(data));
+                }
+            }
             if(signer!= null) {
-                signer.update(data);
-                return Base64.getUrlEncoder().withoutPadding().encodeToString(signer.sign());
+                synchronized (signer) {
+                    signer.update(data);
+                    return Base64.getUrlEncoder().withoutPadding().encodeToString(signer.sign());
+                }
             }
             if(verifier!=null){
-                verifier.update(data);
-                byte[] original = Base64.getUrlDecoder().decode(signature);
-                if(verifier.verify(original)) return Base64.getUrlEncoder().withoutPadding().encodeToString(original);
-                return "bad signature";
+                synchronized (verifier){
+                    verifier.update(data);
+                    byte[] original = Base64.getUrlDecoder().decode(signature);
+                    if(verifier.verify(original)) return Base64.getUrlEncoder().withoutPadding().encodeToString(original);
+                    return "bad signature";
+                }
             }
             throw new IllegalArgumentException("no sign tool provided");
         }
