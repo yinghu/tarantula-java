@@ -4,10 +4,14 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.perfectday.games.earth8.analytics.UnitLevelUpTransaction;
+import com.perfectday.games.earth8.analytics.UnitXpUpTransaction;
 
 public class UnitXpUp extends BattleUpdate{
 
     public int xpGain;
+    public int fromLevel;
+    public int toLevel;
+
     @Override
     public boolean write(DataBuffer buffer) {
         if(!super.write(buffer)) return false;
@@ -32,13 +36,19 @@ public class UnitXpUp extends BattleUpdate{
     public static UnitXpUp fromJson(JsonObject jsonObject){
         UnitXpUp unitXpUp = new UnitXpUp();
         unitXpUp.parse(jsonObject);
-        unitXpUp.xpGain = jsonObject.get("XpGain").getAsInt();
+        unitXpUp.xpGain = GetJsonInt(jsonObject, "XpGain", 0);
+        unitXpUp.fromLevel = GetJsonInt(jsonObject, "FromLevel", 0);
+        unitXpUp.toLevel = GetJsonInt(jsonObject, "ToLevel", 0);
         return unitXpUp;
     }
 
     @Override
     protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session){
-        pendingAnalytics.add(new UnitLevelUpTransaction(session, unitId, 0, 0));
+        pendingAnalytics.add(new UnitXpUpTransaction(session, unitId, 0));
+        if(toLevel > fromLevel)
+        {
+            pendingAnalytics.add(new UnitLevelUpTransaction(session, unitId, fromLevel, toLevel));
+        }
         return true;
     }
 }

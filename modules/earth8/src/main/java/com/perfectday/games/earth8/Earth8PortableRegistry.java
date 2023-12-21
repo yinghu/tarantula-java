@@ -24,6 +24,8 @@ public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecov
 
     public static final int UNIT_CID = 10;
     public static final int EQUIPMENT_CID = 11;
+    
+    public static final int CAMPAIGN_PROGRESS_CID = 12;
 
 
 
@@ -68,6 +70,9 @@ public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecov
                 break;
             case EQUIPMENT_CID:
                 pt = new Equipment();
+                break;
+            case CAMPAIGN_PROGRESS_CID:
+                pt = new CampaignProgress();
                 break;
             default:
         }

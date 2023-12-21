@@ -1,7 +1,5 @@
-# syntax=docker/dockerfile:1
-
 #### BUILD
-FROM maven:3.9.4-eclipse-temurin-17 AS build
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
@@ -15,7 +13,7 @@ RUN mvn clean
 RUN mvn clean install -DskipTests
 
 #### PACKAGE
-FROM gcr.io/distroless/java17-debian11
+FROM gcr.io/distroless/java21:debug
 
 COPY --from=build /app/platform/target/release/gec-platform-2.0-bin/gec-platform-2.0 /platform
 EXPOSE 8090

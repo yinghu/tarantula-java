@@ -34,9 +34,9 @@ public class TarantulaMain {
 	public static  class _Runtime{
         private  ShutdownHook hook;
 
-        private String override(boolean overriding,String name,Properties user,Properties system){
+        private String override(boolean overriding, String name, Properties user, Properties system){
 			String value = system.getProperty(name);
-			if(overriding && user.getProperty(name)!=null){
+			if(overriding && user.getProperty(name) != null){
 				value = user.getProperty(name);
 			}
 			return value;
@@ -51,6 +51,7 @@ public class TarantulaMain {
 			_config.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("tarantula-default.properties"));
 			Properties _user = new Properties();
 			boolean overriding = true;
+
 			try{
 				log.info("Loading user configuration from /etc/tarantula/tarantula.properties");
 				File f = new File("/etc/tarantula/tarantula.properties");
@@ -66,6 +67,28 @@ public class TarantulaMain {
 				log.warn("No user configurations used to override system configurations");
 				overriding = false;
 			}
+
+			// This block uses the hostname to generate node id for both bucket and snowflake config
+			// This allows us to not need to specify unique config for every node
+			try {
+				var useHostname = System.getenv("USE_HOSTNAME");
+				if(useHostname.equals("true"))
+				{
+					var hostname = System.getenv("HOSTNAME");
+					log.info("Hostname is " + hostname);
+
+					var index = hostname.substring(hostname.lastIndexOf('-') + 1);
+					if(index.length() == 1)
+					{
+						index = "0" + index;
+					}
+					log.info("Hostname Index is " + index);
+
+					_user.setProperty("tarantula.data.bucket.node", "N" + index);
+					_user.setProperty("tarantula.snowflake.node.number", index);
+				}
+			} catch (Exception ignored) {}
+
 			TarantulaContext btx = TarantulaContext.getInstance();
 			TarantulaContext.memberDiscovery = (ScopedMemberDiscovery) Class.forName(override(overriding,"tarantula.member.discovery.name",_user,_config)).getConstructor().newInstance();
 			TarantulaContext.operationTimeout = Integer.parseInt(override(overriding,"tarantula.operation.timeout.seconds",_user,_config));

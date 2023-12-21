@@ -10,6 +10,7 @@ import com.icodesoftware.util.JsonUtil;
 
 import com.perfectday.games.earth8.analytics.BattleEndTransaction;
 import com.perfectday.games.earth8.analytics.BattleStartTransaction;
+import com.perfectday.games.earth8.analytics.ServerConnectTransaction;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,7 +32,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     //callbacks from HTTP
     @Override
     public void onJoined(Session session) {
-        gameContext.log("JOIN : "+session.distributionKey()+" :"+session.stub(),OnLog.WARN);
+        TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+        webhook.upload(ANALYTICS_QUERY,new ServerConnectTransaction(session).toString().getBytes());
     }
 
     public void startGame(Session session, byte[] payload) throws Exception{
@@ -41,22 +43,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             return;
         }
         //single read to validate party items
-        ApplicationPreSetup applicationPreSetup = gameContext.applicationSchema().applicationPreSetup();
-        //applicationPreSetup.list()
-        //Inventory gem = applicationPreSetup.inventory(session.distributionId(),"Unit");
-        //if(gem!=null) this.gameContext.log(gem.balance()+" : "+gem.rechargeable()+" : "+gem.count(0),OnLog.WARN);
-        applicationPreSetup.inventoryList(session.distributionId()).forEach(t->{
-            t.onStock().forEach(configurable -> {
-                this.gameContext.log(configurable.distributionId()+" : "+configurable.stockId()+" : "+t.type(),OnLog.WARN);
 
-                //Configurable stock = applicationPreSetup.load(gameContext.applicationSchema().application("item"),configurable.stockId());
-                //this.gameContext.log(stock.header().toString(),OnLog.WARN);
-                //this.gameContext.log(stock.application().toString(),OnLog.WARN);
-                //this.gameContext.log(stock.reference().toString(),OnLog.WARN);
-                //stock.setup();
-                //this.gameContext.log(stock.toJson().toString(),OnLog.WARN);
-            });
-        });
         //if party check fail return false;
         Transaction transaction = gameContext.applicationSchema().transaction();
         boolean created = transaction.execute(ctx->{
@@ -64,28 +51,19 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             DataStore dataStore = setup.onDataStore("battle");
             return dataStore.create(battleTransaction);
         });
-        //TEST CODE
-        tournamentIndex.forEach((key,entry)->{
-            gameContext.log(entry.register(session).raceBoard().toJson().toString(),OnLog.WARN);
-            if(entry.type().equals("A100")){//SCORE GLOBAL TOURNAMENT
-                entry.register(session).update(session,(e)->{
-                    e.score(100,200);
-                    return true;
-                });
-            }
-        });
-        //END OF TEST CODE
+
         session.write(created ? battleTransaction.toJson().toString().getBytes() : JsonUtil.toSimpleResponse(false,"failed to create battle transaction").getBytes());
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         webhook.upload(ANALYTICS_QUERY,new BattleStartTransaction(session, battleTransaction.distributionId(), payload).toString().getBytes());
-        gameContext.onMetrics("totalKills",100);
-        gameContext.onMetrics("totalWins",10);
-        gameContext.onMetrics("totalRounds",20);
-        gameContext.onMetrics("totalBattle",30);
+//        gameContext.onMetrics("totalKills",100);
+//        gameContext.onMetrics("totalWins",10);
+//        gameContext.onMetrics("totalRounds",20);
+        gameContext.onMetrics("totalBattle",1);
     }
 
     public void updateGame(Session session,byte[] payload) throws Exception{
         BattleUpdate update = BattleUpdate.fromJson(payload);
+//        gameContext.log("Update Game : " + update.updateId, OnLog.INFO);
         Transaction transaction = gameContext.applicationSchema().transaction();
         boolean updated = transaction.execute(ctx->{
             ApplicationPreSetup applicationPreSetup = (ApplicationPreSetup)ctx;
@@ -94,20 +72,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             //TO MORE TRANSACTION STUFF
             return update.update(applicationPreSetup, session);
         });
-        if(updated){//do http calls outside transaction operations
-            //TEST CODE
-            if(update.updateId == BattleUpdate.UpdateId.UnitXpUP){
-                UnitXpUp xp = (UnitXpUp)update;
-                tournamentIndex.forEach((key,entry)->{
-                    if(entry.type().equals("Q100")){//SCORE GLOBAL TOURNAMENT
-                        entry.register(session).update(session,(e)->{
-                            e.score(xp.xpGain,xp.xpGain);
-                            return true;
-                        });
-                    }
-                });
-            }
-            //END OF TEST CODE
+
+        if(updated)
+        {
             TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
             update.publishAnalytics(webhook);
         }
@@ -118,7 +85,6 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         JsonObject jsonObject = JsonUtil.parse(payload);
         long battleId = jsonObject.get("BattleId").getAsLong();
         boolean win = jsonObject.get("Win").getAsBoolean();
-        int level = jsonObject.get("Level").getAsInt();
 
         if(battleId<=0){
             session.write(JsonUtil.toSimpleResponse(false,"invalid battleId").getBytes());
@@ -135,19 +101,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             battleTransaction.disabled(true);
             return dataStore.update(battleTransaction);
         });
-        if(updated){
-            //TEST CODE
-            tournamentIndex.forEach((key,entry)->{
-                if(entry.type().equals("T100")){//LEVEL UP GLOBAL TOURNAMENT
-                    entry.register(session).update(session,(e)->{
-                        e.score(0,level);
-                        return true;
-                    });
-                }
-            });
-            //END OF TEST CODE
-            //TO DO AFTER CURRENT BATTLE FINISHED
-        }
+
         session.write(JsonUtil.toSimpleResponse(updated,"battle finished").getBytes());
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         webhook.upload(ANALYTICS_QUERY,new BattleEndTransaction(session, battleTransaction.distributionId(), payload).toString().getBytes());

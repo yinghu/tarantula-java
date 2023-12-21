@@ -1,9 +1,11 @@
 package com.perfectday.games.earth8;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.Session;
+import com.icodesoftware.service.ApplicationPreSetup;
+import com.perfectday.games.earth8.analytics.EquipmentUnequipTransaction;
 
 public class EquipmentUnEquip extends BattleUpdate{
-
 
     @Override
     public int getClassId() {
@@ -16,4 +18,9 @@ public class EquipmentUnEquip extends BattleUpdate{
         return unitRankUp;
     }
 
+    @Override
+    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session){
+        pendingAnalytics.add(new EquipmentUnequipTransaction(session, equipmentId, unitId));
+        return true;
+    }
 }

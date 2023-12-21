@@ -36,7 +36,10 @@ public class WebHookCredentialConfiguration extends CredentialConfiguration {
 
     private WebClient toWebClient(JsonObject config){
         try{
-            WebClient wc = new WebClient(config.get("Host").getAsString(),config.get("Path").getAsString());
+            WebClient wc = new WebClient(
+                    config.get("Host").getAsString(),
+                    config.get("Path").getAsString()
+            );
             return wc;
         }catch (Exception ex){
             return null;
