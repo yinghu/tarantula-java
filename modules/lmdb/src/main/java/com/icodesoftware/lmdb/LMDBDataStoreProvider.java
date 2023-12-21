@@ -54,7 +54,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     private final static int PENDING_BUFFER_SIZE = 32;
 
-    private boolean envNoSyncFlag = false;
+    private boolean envNoSyncFlag = true;
     private final static ConcurrentHashMap<String,DataStore> storeMap = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<String,LocalEdgeDataStore> edgMap = new ConcurrentHashMap<>();
 

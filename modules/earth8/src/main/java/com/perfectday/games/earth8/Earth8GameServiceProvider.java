@@ -140,7 +140,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     }
     @Override
     public void onLeft(Session session) {
-        gameContext.log(" LEAVE : "+session.distributionKey()+" : "+session.stub(),OnLog.WARN);
+        //gameContext.log(" LEAVE : "+session.distributionKey()+" : "+session.stub(),OnLog.WARN);
     }
 
     //Callbacks from UDP channel
