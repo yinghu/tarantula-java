@@ -14,7 +14,17 @@ import java.util.List;
 
 public class BattleUpdate extends RecoverableObject {
 
-    public enum UpdateId {UnitXpUP,UnitRankUp,UnitSkillUp,EquipmentXpUp,EquipmentRankUp,EquipmentSalvage,EquipmentEquip,EquipmentUnEquip}
+    public enum UpdateId {
+        UnitXpUP,
+        UnitRankUp,
+        UnitSkillUp,
+        EquipmentXpUp,
+        EquipmentRankUp,
+        EquipmentSalvage,
+        EquipmentEquip,
+        EquipmentUnEquip,
+        CampaignProgress,
+    }
 
     public UpdateId updateId;
     public long unitId;
@@ -89,6 +99,9 @@ public class BattleUpdate extends RecoverableObject {
             case EquipmentUnEquip:
                 update = EquipmentUnEquip.fromJson(jsonObject);
                 break;
+            case CampaignProgress:
+                update = CampaignProgress.fromJson(jsonObject);
+                break;
             default:
                 throw new UnsupportedOperationException("operation not supported");
         }
@@ -96,9 +109,10 @@ public class BattleUpdate extends RecoverableObject {
     }
 
     protected void parse(JsonObject json){
-        updateId = UpdateId.values()[json.get("UpdateId").getAsInt()];
-        unitId = json.get("UnitId").getAsLong();
-        equipmentId = json.get("EquipmentId").getAsLong();
+        updateId = UpdateId.values()[GetJsonInt(json, "UpdateId", 0)];
+        unitId = GetJsonLong(json, "UnitId", 0);
+        equipmentId = GetJsonLong(json, "EquipmentId", 0);
+
         if(!json.has("Currencies")) return;
         JsonObject cmap = json.get("Currencies").getAsJsonObject();
         cmap.entrySet().forEach(entry->{
@@ -122,6 +136,24 @@ public class BattleUpdate extends RecoverableObject {
     @Override
     public int getFactoryId() {
         return Earth8PortableRegistry.OID;
+    }
+
+    protected static int GetJsonInt(JsonObject obj, String key, int defaultVal)
+    {
+        if(obj.has(key)) return obj.get(key).getAsInt();
+        return defaultVal;
+    }
+
+    protected static long GetJsonLong(JsonObject obj, String key, long defaultVal)
+    {
+        if(obj.has(key)) return obj.get(key).getAsLong();
+        return defaultVal;
+    }
+
+    protected static String GetJsonString(JsonObject obj, String key, String defaultVal)
+    {
+        if(obj.has(key)) return obj.get(key).getAsString();
+        return defaultVal;
     }
 
 }

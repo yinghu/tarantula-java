@@ -38,7 +38,7 @@ public class UnitRankUp extends BattleUpdate{
 
     @Override
     protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session){
-        pendingAnalytics.add(new UnitRankUpTransaction(session, unitId, 0));
+        pendingAnalytics.add(new UnitRankUpTransaction(session, unitId, rank));
         return true;
     }
 }

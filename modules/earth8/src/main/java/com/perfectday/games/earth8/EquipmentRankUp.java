@@ -1,6 +1,9 @@
 package com.perfectday.games.earth8;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.Session;
+import com.icodesoftware.service.ApplicationPreSetup;
+import com.perfectday.games.earth8.analytics.EquipmentRankUpTransaction;
 
 public class EquipmentRankUp extends BattleUpdate{
 
@@ -32,6 +35,12 @@ public class EquipmentRankUp extends BattleUpdate{
         unitRankUp.parse(jsonObject);
         unitRankUp.rank = jsonObject.get("Rank").getAsInt();
         return unitRankUp;
+    }
+
+    @Override
+    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session){
+        pendingAnalytics.add(new EquipmentRankUpTransaction(session, equipmentId, rank));
+        return true;
     }
 
 }

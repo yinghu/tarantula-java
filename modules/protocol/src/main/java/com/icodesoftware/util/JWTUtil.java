@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.*;;
+import java.security.*;
 import java.util.Base64;
 
 public class JWTUtil {
