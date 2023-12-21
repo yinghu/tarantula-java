@@ -64,7 +64,7 @@ public class Player implements Runnable{
         boolean suc = json.get("Successful").getAsBoolean();
         if(!suc) return false;
         token = json.get("Token").getAsString();
-        ticket = json.get("Ticket").getAsString();
+        //ticket = json.get("Ticket").getAsString();
         return true;
     }
     private void join() {
@@ -105,8 +105,7 @@ public class Player implements Runnable{
                     Session.TARANTULA_ACTION,"onPlay",
                     Session.TARANTULA_TOKEN,token,
                     Session.TARANTULA_NAME,deviceName,
-                    Session.TARANTULA_CLIENT_ID,clientId,
-                    Session.TARANTULA_TOURNAMENT_ID,"n/a"
+                    Session.TARANTULA_CLIENT_ID,clientId
             };
             requestStart = System.currentTimeMillis();
             resp = httpCaller.get("service/action",headers);
@@ -219,6 +218,7 @@ public class Player implements Runnable{
         LoadResult.totalSuccessJoin.incrementAndGet();
         joined = true;
         tag = joinPayload.get("Tag").getAsString();
+        ticket = joinPayload.get("Ticket").getAsString();
         if(!udpTested) return;
         JsonObject channel = joinPayload.get("_pushChannel").getAsJsonObject();
         byte[] serverKey = Base64.getDecoder().decode(channel.get("ServerKey").getAsString());
@@ -240,7 +240,6 @@ public class Player implements Runnable{
         messageBuffer = new MessageBuffer();
         messageBuffer.writeHeader(messageHeader);
         messageBuffer.writeInt(sessionId);
-        messageBuffer.writeUTF8(token);
         messageBuffer.writeUTF8(ticket);
         messageBuffer.flip();
         messageBuffer.readHeader();

@@ -70,7 +70,6 @@ public class ScheduledPlayer{
         boolean suc = json.get("Successful").getAsBoolean();
         if(!suc) return false;
         token = json.get("Token").getAsString();
-        ticket = json.get("Ticket").getAsString();
         return true;
     }
     public void join() {
@@ -263,6 +262,7 @@ public class ScheduledPlayer{
         LoadResult.totalSuccessJoin.incrementAndGet();
         joined = true;
         tag = joinPayload.get("Tag").getAsString();
+        ticket = joinPayload.get("Ticket").getAsString();
         zoneId = joinPayload.get("_zone").getAsJsonObject().get("ZoneId").getAsString();
         if(!udpTested) return;
         JsonObject channel = joinPayload.get("_pushChannel").getAsJsonObject();
@@ -287,7 +287,6 @@ public class ScheduledPlayer{
         messageBuffer = new MessageBuffer();
         messageBuffer.writeHeader(messageHeader);
         messageBuffer.writeInt(sessionId);
-        messageBuffer.writeUTF8(token);
         messageBuffer.writeUTF8(ticket);
         messageBuffer.flip();
         messageBuffer.readHeader();

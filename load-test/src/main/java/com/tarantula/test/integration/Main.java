@@ -4,6 +4,7 @@ import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.TarantulaThreadFactory;
 
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.Properties;
 import java.util.UUID;
@@ -17,9 +18,19 @@ public class Main {
     static ExecutorService pool;
     static ScheduledExecutorService scheduler;
 
+    static boolean onFile = false;
     public static void main(String[] args) throws Exception{
         Properties properties = new Properties();
-        properties.load(new FileInputStream("load.properties"));
+        try(InputStream inputStream = new FileInputStream("load.properties")){
+            properties.load(inputStream);
+            onFile = true;
+        }catch (Exception ex){
+            try(InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("load.properties")){
+                properties.load(inputStream);
+            }catch (Exception exx){
+                throw new RuntimeException("No load properties found");
+            }
+        }
         String host = properties.getProperty("host");
         String game = properties.getProperty("game");
         int batch = Integer.parseInt(properties.getProperty("batch"));
@@ -58,14 +69,14 @@ public class Main {
             for(int x=0;x<poolSize;x++){
                 String uname = playerPrefix!=null?(playerPrefix+"-"+ix):UUID.randomUUID().toString();
                 ix++;
-                Player simulator = new Player(httpCaller,waiting,uname,game,x,udpTested,timeout,duration);
+                Player simulator = new Player(httpCaller,waiting,game,uname,x,udpTested,timeout,duration);
                 pool.execute(simulator);
                 Thread.sleep(requestWaiting);
             }
             waiting.await();
         }
         pool.shutdown();
-        LoadResult.print();
+        LoadResult.print(onFile);
     }
 
     private static void runSimulationOnSchedule(String game,String host,String playerPrefix,int batch,int poolSize,boolean udpTested,int timeout,int udpRounds,long requestWaiting,long udpPlayInterval) throws Exception{
@@ -85,6 +96,6 @@ public class Main {
         }
         waiting.await();
         scheduler.shutdown();
-        LoadResult.print();
+        LoadResult.print(onFile);
     }
 }

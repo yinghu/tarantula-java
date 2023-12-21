@@ -61,55 +61,55 @@ public class LoadResult {
     static LocalDateTime startTime;
 
 
-    public static void print(){
-        try{
+    public static void print(boolean onFile){
+
             LocalDateTime localDateTime = LocalDateTime.now();
-            FileOutputStream fos = new FileOutputStream(localDateTime.format(DateTimeFormatter.ISO_DATE_TIME)+".txt");
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-            bw.write("###### Load Test Summary ######\n");
-            bw.write("Server Host ["+host+"]\n");
-            bw.write("Batch Size ["+batch+"]\n");
-            bw.write("Pool Size ["+poolSize+"]\n");
-            bw.write("Player Prefix ["+playerPrefix+"]\n");
-            bw.write("Test UDP Enabled ["+udpTested+"]\n");
-            bw.write("Test UDP Receive Timeout ["+udpReceiveTimeout+"]\n");
-            bw.write("Test UDP Rounds ["+udpTestRounds+"]\n");
-            bw.write("Start time ["+startTime.format(DateTimeFormatter.ISO_DATE_TIME)+"]\n");
-            bw.write("End time ["+localDateTime.format(DateTimeFormatter.ISO_DATE_TIME)+"]\n\n");
+            try(OutputStream fos = onFile?new FileOutputStream(localDateTime.format(DateTimeFormatter.ISO_DATE_TIME)+".txt"):System.out;
+                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos))
+            ){
+                bw.write("###### Load Test Summary ######\n");
+                bw.write("Server Host ["+host+"]\n");
+                bw.write("Batch Size ["+batch+"]\n");
+                bw.write("Pool Size ["+poolSize+"]\n");
+                bw.write("Player Prefix ["+playerPrefix+"]\n");
+                bw.write("Test UDP Enabled ["+udpTested+"]\n");
+                bw.write("Test UDP Receive Timeout ["+udpReceiveTimeout+"]\n");
+                bw.write("Test UDP Rounds ["+udpTestRounds+"]\n");
+                bw.write("Start time ["+startTime.format(DateTimeFormatter.ISO_DATE_TIME)+"]\n");
+                bw.write("End time ["+localDateTime.format(DateTimeFormatter.ISO_DATE_TIME)+"]\n\n");
 
-            bw.write("###### HTTP Operation Summary ######\n");
-            bw.write("Total Rounds ["+totalRounds.get()+"]\n");
-            bw.write("Total Failure Other ["+totalFailureOther.get()+"]\n");
-            bw.write("Total Success Register Count ["+totalSuccessRegister.get()+"]\n");
-            bw.write("Total Failure Register Count ["+totalFailureRegister.get()+"]\n");
-            bw.write("Total Success Login Count ["+totalSuccessLogin.get()+"]\n");
-            bw.write("Total Failure Login Count ["+totalFailureLogin.get()+"]\n");
-            bw.write("Total Success Join Count ["+totalSuccessJoin.get()+"]\n");
-            bw.write("Total Failure Join Count ["+totalFailureJoin.get()+"]\n");
-            bw.write("Total Success Statistics Count ["+totalSuccessStatistics.get()+"]\n");
-            bw.write("Total Failure Statistics Count ["+totalFailureStatistics.get()+"]\n");
+                bw.write("###### HTTP Operation Summary ######\n");
+                bw.write("Total Rounds ["+totalRounds.get()+"]\n");
+                bw.write("Total Failure Other ["+totalFailureOther.get()+"]\n");
+                bw.write("Total Success Register Count ["+totalSuccessRegister.get()+"]\n");
+                bw.write("Total Failure Register Count ["+totalFailureRegister.get()+"]\n");
+                bw.write("Total Success Login Count ["+totalSuccessLogin.get()+"]\n");
+                bw.write("Total Failure Login Count ["+totalFailureLogin.get()+"]\n");
+                bw.write("Total Success Join Count ["+totalSuccessJoin.get()+"]\n");
+                bw.write("Total Failure Join Count ["+totalFailureJoin.get()+"]\n");
+                bw.write("Total Success Statistics Count ["+totalSuccessStatistics.get()+"]\n");
+                bw.write("Total Failure Statistics Count ["+totalFailureStatistics.get()+"]\n");
 
-            bw.write("Total Success Leave Count ["+totalSuccessLeave.get()+"]\n");
-            bw.write("Total Failure Leave Count ["+totalFailureLeave.get()+"]\n");
-            bw.write("Total Http Request Count ["+totalHttpRequestCount.get()+"]\n");
-            bw.write("Average HTTP Request Duration (ms) ["+(totalHttpRequestTime.get()/totalHttpRequestCount.get())+"]\n\n");
+                bw.write("Total Success Leave Count ["+totalSuccessLeave.get()+"]\n");
+                bw.write("Total Failure Leave Count ["+totalFailureLeave.get()+"]\n");
+                bw.write("Total Http Request Count ["+totalHttpRequestCount.get()+"]\n");
+                bw.write("Average HTTP Request Duration (ms) ["+(totalHttpRequestTime.get()/totalHttpRequestCount.get())+"]\n\n");
 
-            bw.write("###### UDP Operation Summary ######\n");
-            bw.write("Total Success Play Count ["+totalSuccessPlay.get()+"]\n");
-            bw.write("Total Failure Play Count ["+totalFailurePlay.get()+"]\n");
+                bw.write("###### UDP Operation Summary ######\n");
+                bw.write("Total Success Play Count ["+totalSuccessPlay.get()+"]\n");
+                bw.write("Total Failure Play Count ["+totalFailurePlay.get()+"]\n");
 
-            bw.write("Total UDP Receive Duration (ms) ["+(totalUDPReceiveTime.get())+"]\n");
-            bw.write("Total Success UDP Received Count ["+totalSuccessUDPReceived.get()+"]\n");
-            bw.write("Total UDP Sent Duration (ms) ["+(totalUDPSentTime.get())+"]\n");
-            bw.write("Total Success UDP Sent Count ["+totalSuccessUDPSent.get()+"]\n");
+                bw.write("Total UDP Receive Duration (ms) ["+(totalUDPReceiveTime.get())+"]\n");
+                bw.write("Total Success UDP Received Count ["+totalSuccessUDPReceived.get()+"]\n");
+                bw.write("Total UDP Sent Duration (ms) ["+(totalUDPSentTime.get())+"]\n");
+                bw.write("Total Success UDP Sent Count ["+totalSuccessUDPSent.get()+"]\n");
 
-            bw.write("Total Bytes UDP Sent ["+totalUDPBytesSent.get()+"]\n");
-            bw.write("Total Bytes UDP Received ["+totalUDPBytesReceived.get()+"]\n");
-            bw.write("Total UDP Receive Timeout Count ["+totalUDPReceiveTimeout.get()+"]\n");
-            bw.close();
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
+                bw.write("Total Bytes UDP Sent ["+totalUDPBytesSent.get()+"]\n");
+                bw.write("Total Bytes UDP Received ["+totalUDPBytesReceived.get()+"]\n");
+                bw.write("Total UDP Receive Timeout Count ["+totalUDPReceiveTimeout.get()+"]\n");
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
     }
 }
 
