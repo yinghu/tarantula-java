@@ -10,7 +10,6 @@ import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
 
 import com.icodesoftware.lmdb.TransactionLog;
 import com.icodesoftware.util.SnowflakeKey;
-import com.icodesoftware.util.TimeUtil;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
@@ -20,24 +19,17 @@ import java.util.List;
 
 
 public class TransactionTest {
-    static {
-        System.setProperty("java.util.logging.manager","com.icodesoftware.logging.TarantulaLogManager");
-    }
+
     LMDBDataStoreProvider lmdbDataStoreProvider;
     TestMapStoreListener testMapStoreListener;
 
     LocalDistributionIdGenerator localDistributionIdGenerator;
     @BeforeClass
     public void setUp() throws Exception{
-
-        lmdbDataStoreProvider = new LMDBDataStoreProvider();
-        localDistributionIdGenerator = new LocalDistributionIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
-        lmdbDataStoreProvider.registerDistributionIdGenerator(localDistributionIdGenerator);
-        lmdbDataStoreProvider.start();
-        testMapStoreListener = new TestMapStoreListener(lmdbDataStoreProvider);
-        lmdbDataStoreProvider.registerMapStoreListener(Distributable.DATA_SCOPE,testMapStoreListener);
-        lmdbDataStoreProvider.registerMapStoreListener(Distributable.INTEGRATION_SCOPE,testMapStoreListener);
-
+        TestSetup.setUp();
+        lmdbDataStoreProvider = TestSetup.lmdbDataStoreProvider;
+        localDistributionIdGenerator = TestSetup.localDistributionIdGenerator;//new LocalDistributionIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
+        testMapStoreListener = TestSetup.testMapStoreListener;//new TestMapStoreListener(lmdbDataStoreProvider);
     }
     @AfterTest
     public void tearDown() throws Exception{
