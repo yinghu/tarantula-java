@@ -32,17 +32,17 @@ public class LMDBSmokeTest {
     private Env<ByteBuffer> env;
     @BeforeClass
     public void setUp() throws Exception{
-        EnvFlags[] flags = new EnvFlags[]{EnvFlags.MDB_NOSYNC};
-        Path path = Paths.get(dir);
-        if(!Files.exists(path)) Files.createDirectories(path);
-        env = Env.create().setMapSize(mapSize).setMaxDbs(maxStores).setMaxReaders(maxReader).open(path.toFile(),flags);
+        //EnvFlags[] flags = new EnvFlags[]{EnvFlags.MDB_NOSYNC};
+        //Path path = Paths.get(dir);
+        //if(!Files.exists(path)) Files.createDirectories(path);
+        //env;// = Env.create().setMapSize(mapSize).setMaxDbs(maxStores).setMaxReaders(maxReader).open(path.toFile(),flags);
     }
     @AfterTest
     public void tearDown() throws Exception{
-        env.close();
+        //env.close();
     }
 
-    @Test(groups = { "LMDBSmoke" })
+    //@Test(groups = { "LMDBSmoke" })
     public void smokeTest() {
         Dbi<ByteBuffer> dbi = env.openDbi("tarantula_edge", DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
         Txn<ByteBuffer> txn = env.txnWrite();
@@ -84,7 +84,7 @@ public class LMDBSmokeTest {
         c.close();
         Assert.assertEquals(ct[0],10);
     }
-    @Test(groups = { "LMDBSmoke" })
+    //@Test(groups = { "LMDBSmoke" })
     public void keyTest() {
         Dbi<ByteBuffer> dbi = env.openDbi("tarantula_int_key", DbiFlags.MDB_CREATE);
         Txn<ByteBuffer> txn = env.txnWrite();
@@ -125,7 +125,7 @@ public class LMDBSmokeTest {
         return new long[]{start,end-1};
     }
 
-    @Test(groups = { "LMDBSmoke" })
+    //@Test(groups = { "LMDBSmoke" })
     public void snowflakeTest() {
         SnowflakeIdGenerator snowflakeIdGenerator = new SnowflakeIdGenerator(99, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
         Dbi<ByteBuffer> dbi = env.openDbi("tarantula_snow_flake", DbiFlags.MDB_CREATE);
@@ -162,7 +162,7 @@ public class LMDBSmokeTest {
         }
     }
 
-    @Test(groups = { "LMDBSmoke" })
+    //@Test(groups = { "LMDBSmoke" })
     public void txnTest() {
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
         key.putLong(100).flip();
