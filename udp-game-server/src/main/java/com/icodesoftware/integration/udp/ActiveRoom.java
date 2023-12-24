@@ -2,7 +2,6 @@ package com.icodesoftware.integration.udp;
 
 import com.icodesoftware.Arena;
 import com.icodesoftware.Room;
-import com.icodesoftware.protocol.GameModule;
 import com.icodesoftware.util.RecoverableObject;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -20,7 +19,7 @@ public class ActiveRoom extends RecoverableObject implements Room {
     private AtomicInteger totalJoined;
     private AtomicInteger totalLeft;
 
-    public GameModule gameModule;
+    //public GameModule gameModule;
     public GameUserChannel gameUserChannel;
 
     private long countdownTimer;
@@ -99,7 +98,7 @@ public class ActiveRoom extends RecoverableObject implements Room {
 
     public void onCountdown(long delta){
         countdownTimer -= delta;
-        this.gameModule.countdown(countdownTimer);
+        //this.gameModule.countdown(countdownTimer);
     }
 
     public int join(){

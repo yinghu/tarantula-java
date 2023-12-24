@@ -151,9 +151,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         //UDP REQUEST RESPONSE CAN BE REPACKING FOR LARGE PAYLOAD
         this.gameContext.log("On Request : "+session.distributionKey(), OnLog.WARN);
 
-        //Statistics statistics = gameContext.statistics(session);
-        //statistics.entry("kills").update(1).update();
-        //this.gameContext.log("On Statistics : "+statistics.entry("kills").total(), OnLog.WARN);
+        Statistics statistics = gameContext.statistics(session);
+        statistics.entry("kills").update(1).update();
+        this.gameContext.log("On Statistics : "+statistics.entry("kills").total(), OnLog.WARN);
         return null;//callback on caller only if byte not null
     }
 

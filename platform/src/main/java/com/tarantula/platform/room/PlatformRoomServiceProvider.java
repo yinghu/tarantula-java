@@ -71,7 +71,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private ScheduledFuture scheduledFuture;
     private boolean started;
 
-    private PlatformGameContext gameUpdateContext;
     private UDPEndpoint udpEndpoint;
     private ConcurrentHashMap<String, PendingReleaseRoom> pendingReleaseRooms;
 
@@ -115,7 +114,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         });
         this.scheduledFuture = this.serviceContext.schedule(schedulingTask);
         this.logger = JDKLogger.getLogger(PlatformRoomServiceProvider.class);
-        this.gameUpdateContext = new PlatformGameContext(serviceContext,gameServiceProvider,this.logger);
         this.pendingReleaseRooms = new ConcurrentHashMap<>(this.maxRoomPoolSizePerZone);
     }
 
@@ -600,12 +598,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         return clusterProvider.clusterStore(ClusterProvider.ClusterStore.SMALL,serverId,false,false,true);
     }
 
-    //private GameModule gameModule(String moduleName,Room room){
-      //  GameModule gameModule = SystemUtil.gameModule(moduleName);
-       // gameModule.setup(room,gameServiceProvider.gameContext(gameModule.getClass()));
-        //gameModule.registerRoomListener(this);
-        //return gameModule;
-    //}
 
     @Override
     public void onStarted(Room room) {
