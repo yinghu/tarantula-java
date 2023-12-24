@@ -31,9 +31,11 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
     //callbacks from HTTP
     @Override
-    public void onJoined(Session session) {
+    public void onJoined(Session session,Room room) {
+        //use room.distributionId/key as game session id
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         webhook.upload(ANALYTICS_QUERY,new ServerConnectTransaction(session).toString().getBytes());
+        this.gameContext.log("JOINED : "+room.distributionKey(), OnLog.WARN);
     }
 
     public void startGame(Session session, byte[] payload) throws Exception{
@@ -140,19 +142,25 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     }
     @Override
     public void onLeft(Session session) {
-        //gameContext.log(" LEAVE : "+session.distributionKey()+" : "+session.stub(),OnLog.WARN);
+        gameContext.log(" LEAVE : "+session.distributionKey()+" : "+session.stub(),OnLog.WARN);
     }
 
     //Callbacks from UDP channel
     @Override
     public byte[] onRequest(Session session, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         //UDP REQUEST RESPONSE CAN BE REPACKING FOR LARGE PAYLOAD
+        this.gameContext.log("On Request : "+session.distributionKey(), OnLog.WARN);
+
+        //Statistics statistics = gameContext.statistics(session);
+        //statistics.entry("kills").update(1).update();
+        //this.gameContext.log("On Statistics : "+statistics.entry("kills").total(), OnLog.WARN);
         return null;//callback on caller only if byte not null
     }
 
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
         //UDP MESSAGE WITH RELAY CALL WITH SINGLE UDP MESSAGE
+        this.gameContext.log("On Action : "+messageHeader.sessionId, OnLog.WARN);
         //read buffer -> write header/buffer->flip->read header->callback on channel members
     }
 

@@ -1,6 +1,5 @@
 package com.tarantula.platform.room;
 
-import com.icodesoftware.protocol.GameModule;
 import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.game.GameZone;
 
@@ -17,7 +16,7 @@ public class GameZoneIndex {
     public LinkedBlockingDeque<ConnectionStub>  pendingConnections;
     public ArrayBlockingQueue<UDPChannel> pendingPushChannels;
     public GameRoom gameRoom;
-    public GameModule gameModule;
+    //public GameModule gameModule;
 
     //none dedicated settings
     //public IndexSet roomIndex;

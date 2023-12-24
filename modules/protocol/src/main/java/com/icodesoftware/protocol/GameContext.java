@@ -21,4 +21,6 @@ public interface GameContext extends Context {
     void recoverableRegistry(RecoverableListener recoverableListener);
 
     void onMetrics(String category,double delta);
+
+    Statistics statistics(Session session);
 }

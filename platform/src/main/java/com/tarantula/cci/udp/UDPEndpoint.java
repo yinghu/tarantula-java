@@ -239,7 +239,7 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
 
     @Override
     public byte[] onRequest(Session session,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        //logger.warn("Message header->"+messageHeader.toString()+">>"+messageHeader.commandId+">"+messageHeader.encrypted);
+        //logger.warn("Request : Message header->"+messageHeader.toString()+">>"+messageHeader.commandId+">"+messageHeader.encrypted);
         PacketTrack packetTrack = packetTracks.compute(messageHeader.copy(),(k,v)->{
             if(v==null) v = new PacketTrack(packetTimeout);
             v.count++;
@@ -315,7 +315,7 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
 
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
-        //logger.warn("Message header->"+messageHeader.toString()+">>"+messageHeader.commandId+">"+messageHeader.encrypted);
+        //logger.warn("Action : Message header->"+messageHeader.toString()+">>"+messageHeader.commandId+">"+messageHeader.encrypted);
         UDPChannel channel = channels.get(messageHeader.sessionId);
         channel.onAction(messageHeader,messageBuffer,callback);
     }

@@ -83,4 +83,7 @@ public class PlatformGameContext implements GameContext {
         platformGameServiceProvider.onUpdated(category,delta);
     }
 
+    public Statistics statistics(Session session){
+        return this.platformGameServiceProvider.presenceServiceProvider().statistics(session);
+    }
 }

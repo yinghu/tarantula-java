@@ -42,7 +42,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     protected ConcurrentHashMap<Long,Entry> joinIndex;
     protected Entry[] entries;
 
-    private GameModule gameModule;
+    private GameServiceProvider gameModule;
     private ArrayBlockingQueue<Channel> pendingChannels;
 
     private long countdownTimer;
@@ -261,7 +261,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
 
     public void reset(){
-        if(gameModule!=null) gameModule.reset();
+        //if(gameModule!=null) gameModule.reset();
         if(pendingChannels!=null) pendingChannels.clear();
         joinIndex.clear();
         for(int i=0;i<capacity;i++){
@@ -276,7 +276,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
 
     public void close(){
-        if(gameModule!=null) gameModule.close();
+        //if(gameModule!=null) gameModule.close();
     }
 
     protected GameRoom duplicate(){
@@ -286,13 +286,13 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         return new GameEntry();
     }
 
-    public void setup(GameZone gameZone,GameModule gameModule,boolean dedicated){
+    public void setup(GameServiceProvider gameServiceProvider,GameZone gameZone,boolean dedicated){
         this.capacity = gameZone.capacity();
         this.duration = gameZone.roundDuration();
         this.overtime = gameZone.roundOvertime();
         this.joinsOnStart = gameZone.joinsOnStart();
         this.dedicated = dedicated;
-        this.gameModule = gameModule;
+        this.gameModule = gameServiceProvider;
         this.owner = gameZone.distributionKey();
         this.countdownTimer = this.duration+this.overtime;
         this.arena = gameZone.arena(1);
@@ -308,7 +308,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
 
     public Channel registerChannel(Session session,Session.TimeoutListener timeoutListener){
         Channel channel = pendingChannels.poll();
-        ((UDPChannel)channel).register(session,this,this,this,timeoutListener);
+        ((UDPChannel)channel).register(session,this,this.gameModule,this.gameModule,timeoutListener);
         return channel;
     }
     @Override
@@ -316,40 +316,41 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         return "ROOM ["+distributionKey()+"] Capacity ["+capacity+"][ Total Joined ["+totalJoined+"] Round ["+round+"] Channel ["+channelId+"]";
     }
 
-    public byte[] onRequest(Session session,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer){
-        return gameModule.onRequest(session,messageHeader,messageBuffer);
-    }
+    //public byte[] onRequest(Session session,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer){
+        //return gameModule.onRequest(session,messageHeader,messageBuffer);
+
+    //}
 
 
-    public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback){
-        gameModule.onAction(messageHeader,messageBuffer,callback);
-    }
+    //public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback){
+        //gameModule.onAction(messageHeader,messageBuffer,callback);
+    //}
 
     @Override
     public void onValidated(Channel channel) {
-        gameModule.onValidated(channel);
+        //gameModule.onValidated(channel);
     }
 
 
     @Override
     public void onJoined(Channel channel) {
-       gameModule.onJoined(channel);
+       //gameModule.onJoined(channel);
     }
 
     @Override
     public void onLeft(Channel channel) {
-       gameModule.onLeft(channel);
+       //gameModule.onLeft(channel);
     }
 
-    @Override
-    public void onUpdated(GameServiceProvider gameServiceProvider, byte[] payload){
-        gameModule.update(gameServiceProvider,payload);
-    }
+    //@Override
+    //public void onUpdated(GameServiceProvider gameServiceProvider, byte[] payload){
+        //gameModule.update(gameServiceProvider,payload);
+    //}
 
     @Override
     public void onCountdown(long delta){
         countdownTimer -= delta;
-        gameModule.countdown(countdownTimer);
+        //gameModule.countdown(countdownTimer);
     }
 
 

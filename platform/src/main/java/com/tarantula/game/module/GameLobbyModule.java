@@ -26,7 +26,7 @@ public class GameLobbyModule extends ModuleHeader{
         session.write(stub.toJson().toString().getBytes());
         if(!stub.joined()) return;
         gameServiceProvider.presenceServiceProvider().onPlay(session.systemId());
-        gameServiceProvider.gameServiceProvider().onJoined(session);
+        gameServiceProvider.gameServiceProvider().onJoined(session, stub.room);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class GameLobbyModule extends ModuleHeader{
             session.write(stub.toJson().toString().getBytes());
             if(stub.joined()) {
                 gameServiceProvider.presenceServiceProvider().onPlay(session.systemId());
-                this.gameServiceProvider.gameServiceProvider().onJoined(session);
+                this.gameServiceProvider.gameServiceProvider().onJoined(session,stub.room);
             }
         }
         else if(session.action().equals("onTestScore")){
