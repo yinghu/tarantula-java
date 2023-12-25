@@ -24,4 +24,6 @@ public interface GameContext extends Context {
 
     Statistics statistics(Session session);
     Rating rating(Session session);
+
+    Achievement achievement(Session session);
 }

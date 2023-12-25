@@ -3,7 +3,7 @@ package com.tarantula.platform.presence;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.AbstractRecoverableListener;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.achievement.Achievement;
+import com.tarantula.platform.achievement.AchievementItem;
 import com.tarantula.platform.achievement.AchievementProgress;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.PresenceIndex;
@@ -85,7 +85,7 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
                 pt = new GameCluster();
                 break;
             case ACHIEVEMENT_CID:
-                pt = new Achievement();
+                pt = new AchievementItem();
                 break;
             case ACHIEVEMENT_PROGRESS_CID:
                 pt = new AchievementProgress();

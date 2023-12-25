@@ -91,4 +91,10 @@ public class PlatformGameContext implements GameContext {
     public Rating rating(Session session) {
         return this.platformGameServiceProvider.presenceServiceProvider().rating(session);
     }
+
+    @Override
+    public Achievement achievement(Session session) {
+        return this.platformGameServiceProvider.achievementServiceProvider().achievement(session);
+
+    }
 }

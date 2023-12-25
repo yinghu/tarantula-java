@@ -2,12 +2,12 @@ package com.tarantula.game.module;
 
 import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.platform.achievement.Achievement;
+import com.tarantula.platform.achievement.AchievementItem;
 import com.tarantula.platform.achievement.AchievementProgress;
 import com.tarantula.platform.achievement.PlatformAchievementServiceProvider;
 import com.tarantula.platform.achievement.ItemAchievementContext;
 
-public class AchievementModule extends ModuleHeader implements Configurable.Listener<Achievement> {
+public class AchievementModule extends ModuleHeader implements Configurable.Listener<AchievementItem> {
 
     private PlatformAchievementServiceProvider achievementServiceProvider;
     @Override
@@ -15,10 +15,10 @@ public class AchievementModule extends ModuleHeader implements Configurable.List
         if(session.action().equals("onList")) {
             session.write(new ItemAchievementContext(true, "achievement list", this.achievementServiceProvider.list()).toJson().toString().getBytes());
         }
-        else if(session.action().equals("onProgress")){
-            AchievementProgress progress = achievementServiceProvider.onProgress(session,Double.parseDouble(session.name()));
-            session.write(progress!=null?progress.toJson().toString().getBytes():JsonUtil.toSimpleResponse(false,"achievement not available").getBytes());
-        }
+        //else if(session.action().equals("onProgress")){
+            //AchievementProgress progress = achievementServiceProvider.onProgress(session,Double.parseDouble(session.name()));
+            //session.write(progress!=null?progress.toJson().toString().getBytes():JsonUtil.toSimpleResponse(false,"achievement not available").getBytes());
+        //}
         else{
             throw new UnsupportedOperationException(session.action());
         }

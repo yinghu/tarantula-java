@@ -35,7 +35,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         //use room.distributionId/key as game session id
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         webhook.upload(ANALYTICS_QUERY,new ServerConnectTransaction(session).toString().getBytes());
-        this.gameContext.log("JOINED : "+room.distributionKey(), OnLog.WARN);
+        //this.gameContext.log("JOINED : "+room.distributionKey(), OnLog.WARN);
     }
 
     public void startGame(Session session, byte[] payload) throws Exception{
@@ -157,6 +157,10 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         Rating rating = gameContext.rating(session);
         rating.update(10,1000).update();
         this.gameContext.log("On Rating : "+rating.rank()+" : "+rating.level()+" : "+rating.xp(), OnLog.WARN);
+
+        Achievement achievement = gameContext.achievement(session);
+        achievement.onProgress(1);
+        this.gameContext.log("On Achievement : "+achievement.name()+" : "+achievement.tier()+" : "+achievement.target()+" : "+achievement.objective(), OnLog.WARN);
         return null;//callback on caller only if byte not null
     }
 

@@ -7,9 +7,9 @@ import java.util.List;
 
 public class ItemAchievementContext extends ResponseHeader {
 
-    private List<Achievement> itemList;
+    private List<AchievementItem> itemList;
 
-    public ItemAchievementContext(boolean successful, String message, List<Achievement> itemList){
+    public ItemAchievementContext(boolean successful, String message, List<AchievementItem> itemList){
         this.successful = successful;
         this.message = message;
         this.itemList = itemList;

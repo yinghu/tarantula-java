@@ -4,10 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Inventory;
 import com.icodesoftware.util.RecoverableObject;
-import com.tarantula.platform.achievement.Achievement;
+import com.tarantula.platform.achievement.AchievementItem;
 import com.tarantula.platform.presence.dailygiveaway.DailyGiveaway;
 import com.tarantula.platform.store.Shop;
-import com.tarantula.platform.store.ShoppingItem;
 
 import java.util.List;
 
@@ -17,7 +16,7 @@ public class Inbox extends RecoverableObject {
     public List<Inventory> inventoryList;
     public List<PendingReward> rewardList;
 
-    public List<Achievement> achievementList;
+    public List<AchievementItem> achievementList;
 
     public List<DailyGiveaway> dailyGiveawayList;
     @Override
