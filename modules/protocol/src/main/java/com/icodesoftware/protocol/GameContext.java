@@ -23,4 +23,5 @@ public interface GameContext extends Context {
     void onMetrics(String category,double delta);
 
     Statistics statistics(Session session);
+    Rating rating(Session session);
 }

@@ -23,7 +23,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     }
 
     @Override
-    public Stub join(Session session, Rating rating) {
+    public Stub join(Session session, GameRating rating) {
         if(!started) return new Stub("lobby not started");
         Stub stub = gameServiceProvider.presenceServiceProvider().stub(session,application);
         if(stub.joined()) {
@@ -76,7 +76,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     public void shutdown() throws Exception {
         //defaultLobby.shutdown();
     }
-    private GameZone gameZone(Rating rating){
+    private GameZone gameZone(GameRating rating){
         if(rating.level>0 && rating.level<101) return zoneIndex.get(1);
         if(rating.level>100 && rating.level<201) return zoneIndex.get(2);
         if(rating.level>200 && rating.level<301) return zoneIndex.get(3);

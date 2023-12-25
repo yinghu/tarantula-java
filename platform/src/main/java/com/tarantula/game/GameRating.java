@@ -3,12 +3,12 @@ package com.tarantula.game;
 import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.icodesoftware.DataStore;
+import com.icodesoftware.Rating;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 
-public class Rating extends PlayerGameObject implements DataStore.Updatable {
+public class GameRating extends PlayerGameObject implements Rating {
 
 
     public static int RANK_UP_LEVEL_BASE = 100;
@@ -19,12 +19,12 @@ public class Rating extends PlayerGameObject implements DataStore.Updatable {
     public boolean granted;
     private double levelUpXp =0;  //xp of arena level
 
-    public Rating(){
+    public GameRating(){
         this.onEdge = true;
         this.label = "rating";
     }
 
-    public Rating update(double xpDelta,double levelUpLimit){
+    public Rating update(double xpDelta, double levelUpLimit){
         levelUpXp += xpDelta;
         xp += xpDelta;
         if(levelUpXp < levelUpLimit) return this;
@@ -86,5 +86,20 @@ public class Rating extends PlayerGameObject implements DataStore.Updatable {
         jsonObject.addProperty("Level",level);
         jsonObject.addProperty("Xp",xp);
         return jsonObject;
+    }
+
+    @Override
+    public int rank() {
+        return rank;
+    }
+
+    @Override
+    public int level() {
+        return level;
+    }
+
+    @Override
+    public double xp() {
+        return xp;
     }
 }

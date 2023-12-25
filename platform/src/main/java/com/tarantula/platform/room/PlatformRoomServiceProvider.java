@@ -16,7 +16,6 @@ import com.icodesoftware.util.TimeUtil;
 import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.cci.udp.UDPEndpoint;
 import com.tarantula.game.*;
-import com.tarantula.game.service.PlatformGameContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.OnAccessTrack;
@@ -182,7 +181,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         return gameZoneIndex.get(zoneId).gameZone;
     }
 
-    public GameRoom join(Rating rating,GameZone gameZone){
+    public GameRoom join(GameRating rating, GameZone gameZone){
         GameZoneIndex index = gameZoneIndex.get(gameZone.distributionKey());
         GameRoom gameRoom = dedicated?remoteJoin(rating,index):localJoin(rating,index);
         return gameRoom;
@@ -539,7 +538,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         gameRoom.leave(systemId,listener);
     }
 
-    private GameRoom joinGameRoom(GameZoneIndex index,GameRoom gameRoom,Rating rating){
+    private GameRoom joinGameRoom(GameZoneIndex index, GameRoom gameRoom, GameRating rating){
         GameRoom joined = gameRoom.join(rating.distributionId(),(room,entry)->{
             if(room.available()){
                 index.runningRooms.addFirst(room);
@@ -548,7 +547,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         //joined.setup(index.gameZone,null,rating);
         return joined;
     }
-    private GameRoom localJoin(Rating rating, GameZoneIndex index){
+    private GameRoom localJoin(GameRating rating, GameZoneIndex index){
         GameRoom gameRoom = index.runningRooms.poll();
         if(gameRoom != null) return joinGameRoom(index,gameRoom,rating);
         gameRoom = index.pendingRooms.poll();
@@ -558,7 +557,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         return joinGameRoom(index,gameRoom,rating);
     }
 
-    private GameRoom remoteJoin(Rating rating,GameZoneIndex gameZoneIndex){
+    private GameRoom remoteJoin(GameRating rating, GameZoneIndex gameZoneIndex){
         GameZone gameZone = gameZoneIndex.gameZone;
         ConnectionStub connectionStub = gameZoneIndex.pendingConnections.poll();
         if(connectionStub==null){

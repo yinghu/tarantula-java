@@ -4,7 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.GameLobbyProxy;
-import com.tarantula.game.Rating;
+import com.tarantula.game.GameRating;
 import com.tarantula.game.Stub;
 import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.util.OnAccessDeserializer;
@@ -21,7 +21,7 @@ public class GameLobbyModule extends ModuleHeader{
             //session.write(JsonUtil.toSimpleResponse(false,"no tournament available,please try later").getBytes());
             //return;
         //}
-        Rating rating = gameServiceProvider.presenceServiceProvider().rating(session);
+        GameRating rating = gameServiceProvider.presenceServiceProvider().rating(session);
         Stub stub = gameLobby.join(session,rating);
         session.write(stub.toJson().toString().getBytes());
         if(!stub.joined()) return;
@@ -53,7 +53,7 @@ public class GameLobbyModule extends ModuleHeader{
             if(this.context.validator().role(session.distributionId()).accessControl()< AccessControl.admin.accessControl()){
                 throw new RuntimeException("no permission");
             }
-            Rating rating = gameServiceProvider.presenceServiceProvider().rating(session);
+            GameRating rating = gameServiceProvider.presenceServiceProvider().rating(session);
             rating.level = this.context.descriptor().accessRank()*100-99;
             Stub stub = gameLobby.join(session,rating);
             session.write(stub.toJson().toString().getBytes());

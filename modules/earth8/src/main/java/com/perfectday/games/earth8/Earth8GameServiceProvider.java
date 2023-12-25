@@ -154,6 +154,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         Statistics statistics = gameContext.statistics(session);
         statistics.entry("kills").update(1).update();
         this.gameContext.log("On Statistics : "+statistics.entry("kills").total(), OnLog.WARN);
+        Rating rating = gameContext.rating(session);
+        rating.update(10,1000).update();
+        this.gameContext.log("On Rating : "+rating.rank()+" : "+rating.level()+" : "+rating.xp(), OnLog.WARN);
         return null;//callback on caller only if byte not null
     }
 

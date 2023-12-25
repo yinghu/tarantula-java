@@ -10,7 +10,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.GamePortableRegistry;
-import com.tarantula.game.Rating;
+import com.tarantula.game.GameRating;
 
 import com.tarantula.game.Stub;
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -108,10 +108,10 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         profile.dataStore(this.dataStore);
         return profile;
     }
-    public Rating rating(Session session){
-        Rating[] loaded  = {new Rating()};
+    public GameRating rating(Session session){
+        GameRating[] loaded  = {new GameRating()};
         CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);
-        RecoverableQuery<Rating> query = RecoverableQuery.query(currentSaveIndex.saveId,loaded[0], GamePortableRegistry.INS);
+        RecoverableQuery<GameRating> query = RecoverableQuery.query(currentSaveIndex.saveId,loaded[0], GamePortableRegistry.INS);
         mDataStore.list(query,(m)->{
             if(m.label().equals(loaded[0].label())){
                 loaded[0]=m;
@@ -129,6 +129,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         //if(rating.granted) return rating;
         //rating.granted = this.platformGameServiceProvider.resourceServiceProvider().initializeInventory(session.systemId());
         //rating.update();
+        loaded[0].dataStore(mDataStore);
         return loaded[0];
     }
     public Stub stub(Session session,Descriptor lobby){

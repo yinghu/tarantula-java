@@ -7,11 +7,10 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.MatchMakingComparator;
-import com.tarantula.game.Rating;
+import com.tarantula.game.GameRating;
 import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.lobby.LobbyItem;
-import com.tarantula.platform.service.metrics.GameClusterMetrics;
 import com.tarantula.platform.util.ResponseSerializer;
 
 import java.util.Collections;
@@ -33,7 +32,7 @@ public class MatchMakingModule extends ModuleHeader implements Configurable.List
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         //check Rating to match the game zone to join 
         if(session.action().equals("onPlay")){
-            Rating rating = this.gameServiceProvider.presenceServiceProvider().rating(session);
+            GameRating rating = this.gameServiceProvider.presenceServiceProvider().rating(session);
             int mix = rating.rank > maxRank? maxRank : rating.rank;
             Descriptor lobby = mLobby.get(mix);
             if(lobby != null) {
@@ -61,7 +60,7 @@ public class MatchMakingModule extends ModuleHeader implements Configurable.List
             session.clientId("device_"+session.stub());
             session.name("web_device");
             session.action("onPlay");
-            Rating rating = this.gameServiceProvider.presenceServiceProvider().rating(session);
+            GameRating rating = this.gameServiceProvider.presenceServiceProvider().rating(session);
             int mix = rating.rank>maxRank?maxRank:rating.rank;
             Descriptor lobby = mLobby.get(mix);
             if(lobby!=null) {

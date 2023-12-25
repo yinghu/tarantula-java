@@ -5,11 +5,10 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.GamePortableRegistry;
-import com.tarantula.game.Rating;
+import com.tarantula.game.GameRating;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 import com.tarantula.platform.presence.saves.SavedGame;
-import com.tarantula.platform.presence.saves.SavedGameQuery;
 import com.tarantula.platform.util.RecoverableQuery;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -52,11 +51,11 @@ public class SavedGameTest extends DataStoreHook{
         load.distributionId(save.distributionId());
         Assert.assertTrue(dataStore.load(load));
         Assert.assertEquals(load.stub,save.stub);
-        Rating rating = new Rating();
+        GameRating rating = new GameRating();
         rating.ownerKey(load.key());
         Assert.assertTrue(dataStoreForRanking.create(rating));
         GamePortableRegistry registry = new GamePortableRegistry();
-        List<Rating> rlist = dataStoreForRanking.list(new RecoverableQuery<>(save.key(),rating.label(),GamePortableRegistry.RATING_CID,registry));
+        List<GameRating> rlist = dataStoreForRanking.list(new RecoverableQuery<>(save.key(),rating.label(),GamePortableRegistry.RATING_CID,registry));
         Assert.assertEquals(rlist.size(),1);
     }
 }

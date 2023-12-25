@@ -86,4 +86,9 @@ public class PlatformGameContext implements GameContext {
     public Statistics statistics(Session session){
         return this.platformGameServiceProvider.presenceServiceProvider().statistics(session);
     }
+
+    @Override
+    public Rating rating(Session session) {
+        return this.platformGameServiceProvider.presenceServiceProvider().rating(session);
+    }
 }

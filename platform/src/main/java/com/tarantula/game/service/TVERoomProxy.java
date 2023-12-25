@@ -6,7 +6,7 @@ import com.tarantula.game.*;
 public class TVERoomProxy extends RoomProxyHeader {
 
     @Override
-    public Stub join(Session session, Rating rating) {
+    public Stub join(Session session, GameRating rating) {
         return new Stub();
     }
     public boolean leave(Stub stub){

@@ -12,7 +12,7 @@ public class PVPRoomProxy extends RoomProxyHeader{
         super.setup(applicationContext,gameLobby,gameZone);
     }
     @Override
-    public Stub join(Session session, Rating rating) {
+    public Stub join(Session session, GameRating rating) {
         Stub stub = new Stub();
         stub.distributionKey(session.systemId());
         stub.stub(session.stub());
