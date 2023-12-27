@@ -21,7 +21,7 @@ import java.nio.file.Paths;
 public class LMDBSmokeTest {
 
 
-    private String dir = "target/smoke";
+    private String dir = "target/lmdb/smoke";
     private long mapSize = 1_048_576L;
 
     long offset = 1_000_000_000_000l;
@@ -32,17 +32,17 @@ public class LMDBSmokeTest {
     private Env<ByteBuffer> env;
     @BeforeClass
     public void setUp() throws Exception{
-        //EnvFlags[] flags = new EnvFlags[]{EnvFlags.MDB_NOSYNC};
-        //Path path = Paths.get(dir);
-        //if(!Files.exists(path)) Files.createDirectories(path);
-        //env;// = Env.create().setMapSize(mapSize).setMaxDbs(maxStores).setMaxReaders(maxReader).open(path.toFile(),flags);
+        EnvFlags[] flags = new EnvFlags[]{EnvFlags.MDB_NOSYNC};
+        Path path = Paths.get(dir);
+        if(!Files.exists(path)) Files.createDirectories(path);
+        env = Env.create().setMapSize(mapSize).setMaxDbs(maxStores).setMaxReaders(maxReader).open(path.toFile(),flags);
     }
     @AfterTest
     public void tearDown() throws Exception{
-        //env.close();
+        env.close();
     }
 
-    //@Test(groups = { "LMDBSmoke" })
+    @Test(groups = { "LMDBSmoke" })
     public void smokeTest() {
         Dbi<ByteBuffer> dbi = env.openDbi("tarantula_edge", DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
         Txn<ByteBuffer> txn = env.txnWrite();

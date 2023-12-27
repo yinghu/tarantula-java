@@ -40,8 +40,8 @@ public class CredentialConfiguration extends Application {
             }
             return true;
         });
-        if(!conf.existed()&&pending[0]==null) throw new IllegalArgumentException("config content not existed ["+label+"]");
-        if(conf.existed()&&pending[0]==null){
+        if(!conf.existed() && pending[0]==null) throw new IllegalArgumentException("config content not existed ["+label+"]");
+        if(conf.existed() && pending[0]==null){
             pending[0] = new ConfigurationObject(label);
             pending[0].value(conf.data());
             pending[0].ownerKey(this.key());
@@ -49,7 +49,7 @@ public class CredentialConfiguration extends Application {
             deploymentServiceProvider.deleteResource(fileName);
             return pending[0];
         }
-        if(conf.existed()&&pending[0]!=null) {
+        if(conf.existed() && pending[0]!=null) {
             pending[0].value(conf.data());
             dataStore.update(pending[0]);
             deploymentServiceProvider.deleteResource(fileName);
