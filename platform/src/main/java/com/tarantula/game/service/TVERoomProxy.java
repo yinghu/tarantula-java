@@ -1,12 +1,13 @@
 package com.tarantula.game.service;
 
+import com.icodesoftware.Rating;
 import com.icodesoftware.Session;
 import com.tarantula.game.*;
 
 public class TVERoomProxy extends RoomProxyHeader {
 
     @Override
-    public Stub join(Session session, GameRating rating) {
+    public Stub join(Session session, Rating rating) {
         return new Stub();
     }
     public boolean leave(Stub stub){

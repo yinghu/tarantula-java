@@ -187,4 +187,15 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     public void tournamentEnded(Tournament tournament) {
         tournamentIndex.remove(tournament.distributionId());
     }
+
+    //UDP Channel Listener Callbacks
+    public void onValidated(Channel channel){
+        this.gameContext.log("On Channel Validated : " +channel.channelId(), OnLog.WARN);
+    }
+    public void onJoined(Channel channel){
+        this.gameContext.log("On Channel Joined : " +channel.channelId(), OnLog.WARN);
+    }
+    public void onLeft(Channel channel){
+        this.gameContext.log("On Channel Left : " +channel.channelId(), OnLog.WARN);
+    }
 }

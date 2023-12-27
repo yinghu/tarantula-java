@@ -21,8 +21,8 @@ public class GameLobbyModule extends ModuleHeader{
             //session.write(JsonUtil.toSimpleResponse(false,"no tournament available,please try later").getBytes());
             //return;
         //}
-        GameRating rating = gameServiceProvider.presenceServiceProvider().rating(session);
-        Stub stub = gameLobby.join(session,rating);
+        //GameRating rating = gameServiceProvider.presenceServiceProvider().rating(session);
+        Stub stub = gameLobby.join(session);
         session.write(stub.toJson().toString().getBytes());
         if(!stub.joined()) return;
         gameServiceProvider.presenceServiceProvider().onPlay(session.systemId());
@@ -53,9 +53,9 @@ public class GameLobbyModule extends ModuleHeader{
             if(this.context.validator().role(session.distributionId()).accessControl()< AccessControl.admin.accessControl()){
                 throw new RuntimeException("no permission");
             }
-            GameRating rating = gameServiceProvider.presenceServiceProvider().rating(session);
-            rating.level = this.context.descriptor().accessRank()*100-99;
-            Stub stub = gameLobby.join(session,rating);
+            //GameRating rating = gameServiceProvider.presenceServiceProvider().rating(session);
+            //rating.level = this.context.descriptor().accessRank()*100-99;
+            Stub stub = gameLobby.join(session);
             session.write(stub.toJson().toString().getBytes());
             if(stub.joined()) {
                 gameServiceProvider.presenceServiceProvider().onPlay(session.systemId());

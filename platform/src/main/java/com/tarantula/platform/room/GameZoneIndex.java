@@ -16,11 +16,8 @@ public class GameZoneIndex {
     public LinkedBlockingDeque<ConnectionStub>  pendingConnections;
     public ArrayBlockingQueue<UDPChannel> pendingPushChannels;
     public GameRoom gameRoom;
-    //public GameModule gameModule;
 
-    //none dedicated settings
-    //public IndexSet roomIndex;
     public ArrayBlockingQueue<GameRoom> pendingRooms;
     public LinkedBlockingDeque<GameRoom> runningRooms;
-    public LinkedBlockingDeque<GameRoom>[] rankingRooms;
+
 }

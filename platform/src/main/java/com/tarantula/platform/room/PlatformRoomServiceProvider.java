@@ -160,8 +160,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                     }
                 }
             }
-            GameRoom room = index.gameRoom;
-            channel.register(stub,room,this.gameServiceProvider.gameServiceProvider(),this.gameServiceProvider.gameServiceProvider(),timeoutListener);
+            //GameRoom room = index.gameRoom;
+            channel.register(stub,this.gameServiceProvider.gameServiceProvider(),this.gameServiceProvider.gameServiceProvider(),this.gameServiceProvider.gameServiceProvider(),timeoutListener);
             udpEndpoint.registerChannel(channel);
             return channel;
         }
@@ -181,7 +181,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         return gameZoneIndex.get(zoneId).gameZone;
     }
 
-    public GameRoom join(GameRating rating, GameZone gameZone){
+    public GameRoom join(Rating rating, GameZone gameZone){
         GameZoneIndex index = gameZoneIndex.get(gameZone.distributionKey());
         GameRoom gameRoom = dedicated?remoteJoin(rating,index):localJoin(rating,index);
         return gameRoom;
@@ -207,10 +207,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             index.pendingPushChannels = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone*gameZone.capacity());
             index.pendingConnections = new LinkedBlockingDeque<>(maxDedicatedServerConnections);
             index.gameRoom = this.newGameRoom(gameZone.playMode(),gameZone.capacity());
-            //GameModule gameModule = gameModule(gameZone.gameModule(),index.gameRoom);
-            //index.gameModule = new DedicatedGameModuleProxy(gameModule);
-            //index.gameModule.setup(index.gameRoom,gameServiceProvider.gameContext(index.gameModule.getClass()));
-            //index.gameModule.registerRoomListener(this);
             index.gameRoom.setup(gameServiceProvider.gameServiceProvider(),gameZone,dedicated);
             if(started){
                 for(int i=0;i<minRoomPoolSizePerZone;i++){
@@ -538,7 +534,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         gameRoom.leave(systemId,listener);
     }
 
-    private GameRoom joinGameRoom(GameZoneIndex index, GameRoom gameRoom, GameRating rating){
+    private GameRoom joinGameRoom(GameZoneIndex index, GameRoom gameRoom, Rating rating){
         GameRoom joined = gameRoom.join(rating.distributionId(),(room,entry)->{
             if(room.available()){
                 index.runningRooms.addFirst(room);
@@ -547,7 +543,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         //joined.setup(index.gameZone,null,rating);
         return joined;
     }
-    private GameRoom localJoin(GameRating rating, GameZoneIndex index){
+    private GameRoom localJoin(Rating rating, GameZoneIndex index){
         GameRoom gameRoom = index.runningRooms.poll();
         if(gameRoom != null) return joinGameRoom(index,gameRoom,rating);
         gameRoom = index.pendingRooms.poll();
@@ -557,7 +553,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         return joinGameRoom(index,gameRoom,rating);
     }
 
-    private GameRoom remoteJoin(GameRating rating, GameZoneIndex gameZoneIndex){
+    private GameRoom remoteJoin(Rating rating, GameZoneIndex gameZoneIndex){
         GameZone gameZone = gameZoneIndex.gameZone;
         ConnectionStub connectionStub = gameZoneIndex.pendingConnections.poll();
         if(connectionStub==null){

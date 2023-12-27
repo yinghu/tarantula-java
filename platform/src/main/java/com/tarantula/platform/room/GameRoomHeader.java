@@ -276,7 +276,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
 
     public void close(){
-        //if(gameModule!=null) gameModule.close();
+
     }
 
     protected GameRoom duplicate(){
@@ -308,7 +308,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
 
     public Channel registerChannel(Session session,Session.TimeoutListener timeoutListener){
         Channel channel = pendingChannels.poll();
-        ((UDPChannel)channel).register(session,this,this.gameModule,this.gameModule,timeoutListener);
+        ((UDPChannel)channel).register(session,this.gameModule,this.gameModule,this.gameModule,timeoutListener);
         return channel;
     }
     @Override
@@ -316,41 +316,11 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         return "ROOM ["+distributionKey()+"] Capacity ["+capacity+"][ Total Joined ["+totalJoined+"] Round ["+round+"] Channel ["+channelId+"]";
     }
 
-    //public byte[] onRequest(Session session,MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer){
-        //return gameModule.onRequest(session,messageHeader,messageBuffer);
 
-    //}
-
-
-    //public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback){
-        //gameModule.onAction(messageHeader,messageBuffer,callback);
-    //}
-
-    @Override
-    public void onValidated(Channel channel) {
-        //gameModule.onValidated(channel);
-    }
-
-
-    @Override
-    public void onJoined(Channel channel) {
-       //gameModule.onJoined(channel);
-    }
-
-    @Override
-    public void onLeft(Channel channel) {
-       //gameModule.onLeft(channel);
-    }
-
-    //@Override
-    //public void onUpdated(GameServiceProvider gameServiceProvider, byte[] payload){
-        //gameModule.update(gameServiceProvider,payload);
-    //}
 
     @Override
     public void onCountdown(long delta){
         countdownTimer -= delta;
-        //gameModule.countdown(countdownTimer);
     }
 
 

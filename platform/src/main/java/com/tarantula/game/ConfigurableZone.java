@@ -3,6 +3,7 @@ package com.tarantula.game;
 import com.google.gson.JsonObject;
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.DataStore;
+import com.icodesoftware.Rating;
 import com.icodesoftware.Session;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.lobby.LobbyItem;
@@ -105,7 +106,7 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
     }
 
     @Override
-    public Stub join(Session session, GameRating rating) {
+    public Stub join(Session session, Rating rating) {
 
         return roomProxy.join(session,rating);
     }
