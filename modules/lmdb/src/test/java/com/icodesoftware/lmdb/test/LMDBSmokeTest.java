@@ -1,7 +1,6 @@
 package com.icodesoftware.lmdb.test;
 
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.Transaction;
 import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.util.SnowflakeIdGenerator;
 import com.icodesoftware.util.TimeUtil;
@@ -24,9 +23,6 @@ public class LMDBSmokeTest {
     private String dir = "target/lmdb/smoke";
     private long mapSize = 1_048_576L;
 
-    long offset = 1_000_000_000_000l;
-
-
     private int maxStores = 100;
     private int maxReader = 100;
     private Env<ByteBuffer> env;
@@ -43,165 +39,174 @@ public class LMDBSmokeTest {
     }
 
     @Test(groups = { "LMDBSmoke" })
-    public void smokeTest() {
-        Dbi<ByteBuffer> dbi = env.openDbi("tarantula_edge", DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
-        Txn<ByteBuffer> txn = env.txnWrite();
-        //Cursor<ByteBuffer> cursor = dbi.openCursor(txn);
+    public void keyEdgeTest() {
+        Dbi<ByteBuffer> dbi = env.openDbi("tarantula_data_edge", DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
-
+        key.putLong(100).flip();
         ByteBuffer edge = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        for(int i=0;i<10;i++){
-            key.put("key".getBytes()).flip();
-            edge.put(("1edge"+i).getBytes()).flip();
-            dbi.put(txn,key,edge,PutFlags.MDB_NODUPDATA);
-            edge.clear();
-            key.clear();
+        try(Txn<ByteBuffer> txn = env.txnWrite()){
+            for(int i=0;i<10;i++){
+                edge.clear().putLong(i).flip();
+                Assert.assertTrue(dbi.put(txn,key,edge,PutFlags.MDB_NODUPDATA));
+            }
+            for(int i=0;i<10;i++){
+                edge.clear().putLong(i).flip();
+                Assert.assertFalse(dbi.put(txn,key.rewind(),edge,PutFlags.MDB_NODUPDATA));
+            }
+            for(int i=0;i<10;i++){
+                edge.clear().putLong(i).flip();
+                Assert.assertFalse(dbi.put(txn,key.rewind(),edge,PutFlags.MDB_NODUPDATA));
+            }
+            txn.commit();
         }
-        for(int i=0;i<10;i++){
-            key.put("key2".getBytes()).flip();
-            edge.put(("2edge"+i).getBytes()).flip();
-            dbi.put(txn,key,edge,PutFlags.MDB_NODUPDATA);
-            edge.clear();
-            key.clear();
+        try(Txn<ByteBuffer> read = env.txnRead()){
+            key.rewind();
+            try(CursorIterable<ByteBuffer> c = dbi.iterate(read, KeyRange.closed(key, key))){
+                int[] ct ={0};
+                c.iterator().forEachRemaining((kv->{
+                    ct[0]++;
+                }));
+                Assert.assertEquals(ct[0],10);
+            }
         }
-        for(int i=0;i<10;i++){
-            key.put("key2".getBytes()).flip();
-            edge.put(("2edge"+i).getBytes()).flip();
-            dbi.put(txn,key,edge,PutFlags.MDB_NODUPDATA);
-            edge.clear();
-            key.clear();
+        try(Txn<ByteBuffer> txn = env.txnWrite()){
+            for(int i=0;i<10;i++){
+                edge.clear().putLong(i).flip();
+                Assert.assertTrue(dbi.delete(txn,key,edge));
+            }
+            txn.commit();
         }
-        txn.commit();
-        txn.close();
-        Txn<ByteBuffer> read = env.txnRead();
-        key.clear();
-        key.put("key2".getBytes()).flip();
-        CursorIterable<ByteBuffer> c = dbi.iterate(read, KeyRange.closed(key, key));
-        int[] ct ={0};
-        c.iterator().forEachRemaining((kv->{
-            ct[0]++;
-        }));
-        c.close();
-        Assert.assertEquals(ct[0],10);
+        try(Txn<ByteBuffer> read = env.txnRead()){
+            key.rewind();
+            try(CursorIterable<ByteBuffer> c = dbi.iterate(read, KeyRange.closed(key, key))){
+                int[] ct ={0};
+                c.iterator().forEachRemaining((kv->{
+                    ct[0]++;
+                }));
+                Assert.assertEquals(ct[0],0);
+            }
+        }
     }
-    //@Test(groups = { "LMDBSmoke" })
-    public void keyTest() {
-        Dbi<ByteBuffer> dbi = env.openDbi("tarantula_int_key", DbiFlags.MDB_CREATE);
-        Txn<ByteBuffer> txn = env.txnWrite();
-        ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        ByteBuffer value = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        for(long k=11 ; k<20;k++){
-            key.putLong(k).flip();
-            value.putLong(k).flip();
-            dbi.put(txn,key,value);
-            key.clear();
-            value.clear();
+    @Test(groups = { "LMDBSmoke" })
+    public void keyValueTest() {
+        Dbi<ByteBuffer> dbi = env.openDbi("tarantula_data_value", DbiFlags.MDB_CREATE);
+        try (Txn<ByteBuffer> txn = env.txnWrite()) {
+            ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
+            ByteBuffer value = ByteBuffer.allocateDirect(env.getMaxKeySize());
+            int delta = 100;
+            for (int k = 1; k < 11; k++) {
+                key.putLong(k).flip();
+                value.putLong(k + delta).flip();
+                dbi.put(txn, key, value);
+                key.clear();
+                value.clear();
+            }
+            delta = 1000;
+            for (long k = 1; k < 11; k++) {
+                key.putLong(k).flip();
+                value.putLong(k + delta).flip();
+                dbi.put(txn, key, value);
+                key.clear();
+                value.clear();
+            }
+            txn.commit();
         }
-        for(long k=1 ; k<11;k++){
-            key.putLong(k).flip();
-            value.putLong(k).flip();
-            dbi.put(txn,key,value);
-            key.clear();
-            value.clear();
+        try (Txn<ByteBuffer> txn = env.txnRead()) {
+            ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
+            for (long k = 1; k < 11; k++) {
+                key.putLong(k).flip();
+                dbi.get(txn,key);
+                Assert.assertEquals(txn.val().getLong(),k+1000);
+                key.clear();
+            }
         }
-        CursorIterable<ByteBuffer> c = dbi.iterate(txn, KeyRange.all());
-        long[] k = {1};
-        c.iterator().forEachRemaining((kv->{
-            Assert.assertEquals(kv.key().getLong(),k[0]++);
-        }));
-       txn.commit();
-       txn.close();
-       dbi.close();
-       for(int i=1;i<20;i++){
-           long[] r = range(i);
-           Assert.assertEquals(r[1]-r[0],offset-1);
-           //System.out.println("Range ["+i+"]"+r[0]+"-"+r[1]);
-       }
-    }
-
-    private long[] range(int section){
-        long end = offset*section;
-        long start = end-offset;
-        return new long[]{start,end-1};
-    }
-
-    //@Test(groups = { "LMDBSmoke" })
-    public void snowflakeTest() {
-        SnowflakeIdGenerator snowflakeIdGenerator = new SnowflakeIdGenerator(99, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
-        Dbi<ByteBuffer> dbi = env.openDbi("tarantula_snow_flake", DbiFlags.MDB_CREATE);
-        Txn<ByteBuffer> txn = env.txnWrite();
-        long k =  snowflakeIdGenerator.snowflakeId();
-        long v =  snowflakeIdGenerator.snowflakeId();
-        //System.out.println(snowflakeIdGenerator.fromSnowflakeId(v)[2]);
-        ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        Recoverable.DataBuffer kp = BufferProxy.buffer(key);
-        //key.order(ByteOrder.LITTLE_ENDIAN);
-        kp.writeLong(k);
-        key.flip();
-        ByteBuffer value = ByteBuffer.allocateDirect(env.getMaxKeySize());
-        Recoverable.DataBuffer vp = BufferProxy.buffer(value);
-        //value.order(ByteOrder.LITTLE_ENDIAN);
-        vp.writeLong(v);
-        value.flip();
-        dbi.put(txn,key,value);
-        //txn.commit();
-        //txn.close();
-        key.rewind();
-        value.clear();
-        //Txn<ByteBuffer> read = env.txnRead();
-        if(dbi.get(txn,key)!=null){
-            txn.val().order(ByteOrder.LITTLE_ENDIAN);
-            Recoverable.DataBuffer p = BufferProxy.buffer(txn.val());
-            long vx = p.readLong();
-            long[] v1 = snowflakeIdGenerator.fromSnowflakeId(v);
-            long[] v2 = snowflakeIdGenerator.fromSnowflakeId(vx);
-            Assert.assertEquals(v1[0],v2[0]);
-            Assert.assertEquals(v1[1],v2[1]);
-            Assert.assertEquals(v1[2],v2[2]);
-            //System.out.println(snowflakeIdGenerator.fromSnowflakeId(vx)[1]);
+        try (Txn<ByteBuffer> txn = env.txnRead()) {
+            int[] ct={0};
+            dbi.iterate(txn).iterator().forEachRemaining(kv->{
+                ct[0]++;
+            });
+            Assert.assertEquals(ct[0],10);
         }
     }
 
-    //@Test(groups = { "LMDBSmoke" })
-    public void txnTest() {
+    @Test(groups = { "LMDBSmoke" })
+    public void cursorTest() {
+        Dbi<ByteBuffer> dbi = env.openDbi("tarantula_data_cursor", DbiFlags.MDB_CREATE);
+        try (Txn<ByteBuffer> txn = env.txnWrite()) {
+            ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
+            ByteBuffer value = ByteBuffer.allocateDirect(env.getMaxKeySize());
+            int delta = 100;
+            for (int k = 1; k < 11; k++) {
+                key.putLong(k).flip();
+                value.putLong(k + delta).flip();
+                dbi.put(txn, key, value);
+                key.clear();
+                value.clear();
+            }
+            delta = 1000;
+            for (long k = 1; k < 11; k++) {
+                key.putLong(k).flip();
+                value.putLong(k + delta).flip();
+                dbi.put(txn, key, value);
+                key.clear();
+                value.clear();
+            }
+            txn.commit();
+        }
+        try (Txn<ByteBuffer> txn = env.txnWrite()) {
+            try(Cursor<ByteBuffer> cursor = dbi.openCursor(txn)){
+                while (cursor.next()){
+                    if(cursor.key().getLong()==1) cursor.delete();
+                }
+            }
+            txn.commit();
+        }
+        try (Txn<ByteBuffer> txn = env.txnRead();Cursor<ByteBuffer> cursor = dbi.openCursor(txn)) {
+            int[] ct={0};
+            while (cursor.next()){
+                ct[0]++;
+            }
+            Assert.assertEquals(ct[0],9);
+        }
+    }
+
+    @Test(groups = { "LMDBSmoke" })
+    public void txnNestedTest() {
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
         key.putLong(100).flip();
         ByteBuffer value = ByteBuffer.allocateDirect(700);
         value.putLong(100).flip();
-        final Txn<ByteBuffer> c = env.txnWrite();
-        try{
+        Exception exception = null;
+        try(final Txn<ByteBuffer> c = env.txn(null)){
             Dbi dbi1 = env.openDbi(c,"test1".getBytes(),null,DbiFlags.MDB_CREATE);
-            final Txn<ByteBuffer> c1 = env.txn(c);
-            dbi1.put(c1,key,value);
-            c1.commit();
-            //env.sync(true);
-            final Txn<ByteBuffer> c1x = env.txn(c);
-            if(dbi1.get(c1x,key.rewind())!=null){
-                System.out.println("VC1 Y : "+c1x.val().getLong());
+            try(final Txn<ByteBuffer> w = env.txn(c)){
+                dbi1.put(w,key,value);
+                w.commit();
             }
-            c1x.commit();
-            //Dbi dbi2 = env.openDbi(c,"test2".getBytes(),null,DbiFlags.MDB_CREATE);
-            //final Txn<ByteBuffer> c2 = env.txn(c);
-            //if(dbi2.get(c2,key)!=null){
-                //System.out.println("VC2 X : "+c2.val().getLong());
-            //}
-            //dbi2.put(c2,key.rewind(),value.rewind());
-            //if(dbi2.get(c2,key.rewind())!=null){
-                //System.out.println("VC2 Y : "+c2.val().getLong());
-            //}
+            Dbi dbi2 = env.openDbi(c,"test2".getBytes(),null,DbiFlags.MDB_CREATE);
+            try(final Txn<ByteBuffer> w = env.txn(c)){
+                dbi2.put(w,key.rewind(),value.rewind());
+                w.commit();
+            }
             c.commit();
-            env.sync(true);
         }
         catch (Exception ex){
-            c.abort();
+            exception = ex;
         }
         finally {
-            //c.commit();
-            //dbi1.close();
-            //dbi2.close();
+            env.sync(true);
         }
-        //c2.commit();
-
+        Assert.assertNull(exception);
+        Dbi dbi1 = env.openDbi("test1",DbiFlags.MDB_CREATE);
+        Dbi dbi2 = env.openDbi("test2",DbiFlags.MDB_CREATE);
+        try(final Txn<ByteBuffer> r = env.txnRead()){
+            Assert.assertTrue(dbi1.get(r,key.rewind())!=null);
+            Assert.assertEquals(r.val().getLong(),100);
+        }
+        try(final Txn<ByteBuffer> r = env.txnRead()){
+            Assert.assertTrue(dbi2.get(r,key.rewind())!=null);
+            Assert.assertEquals(r.val().getLong(),100);
+        }
     }
 
 
