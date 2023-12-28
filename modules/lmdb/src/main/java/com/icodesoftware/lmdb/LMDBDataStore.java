@@ -360,39 +360,46 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     public void forEachEdgeKey(Recoverable.Key key,String label,BufferStream bufferStream){
         LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.localEdgeDataStore(metadata.scope(),name,label,ptxn);
         Recoverable.DataBufferPair cache = lmdbDataStoreProvider.dataBufferPair();
-        if(!key.write(cache.key())) return;
-        ByteBuffer akey = cache.key().flip();
-        final Txn<ByteBuffer> txn = env.txn(ptxn);
-        CursorIterable<ByteBuffer> cursor = localEdgeDataStore.dbi.iterate(txn, KeyRange.closed(akey,akey));
-        try{
-            for(Iterator<CursorIterable.KeyVal<ByteBuffer>> it = cursor.iterator();it.hasNext();){
-                CursorIterable.KeyVal<ByteBuffer> kv = it.next();
-                bufferStream.on(cache.key(),BufferProxy.buffer(kv.val()));
+        if(!key.write(cache.key())) {
+            cache.reset();
+            return;
+        }
+        try(final Txn<ByteBuffer> txn = env.txn(ptxn)){
+            try(Cursor<ByteBuffer> cursor = localEdgeDataStore.dbi.openCursor(txn)){
+                if(cursor.get(cache.key().flip(),GetOp.MDB_SET)){
+                    if(cursor.seek(SeekOp.MDB_FIRST_DUP)) bufferStream.on(cache.key(),BufferProxy.buffer(cursor.val()));
+                    while (cursor.seek(SeekOp.MDB_NEXT_DUP)){
+                        bufferStream.on(cache.key(),BufferProxy.buffer(cursor.val()));
+                    }
+                }
             }
-        }finally {
-            cursor.close();
-            txn.close();
+        }
+        finally {
             cache.reset();
         }
-
     }
 
     public void forEachEdgeKeyValue(Recoverable.Key key,String label,BufferStream bufferStream){
         LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.localEdgeDataStore(metadata.scope(),name,label,ptxn);
         Recoverable.DataBufferPair cache = lmdbDataStoreProvider.dataBufferPair();
-        if(!key.write(cache.key())) return;
-        ByteBuffer akey = cache.key().flip();
-        final Txn<ByteBuffer> txn = env.txn(ptxn);
-        CursorIterable<ByteBuffer> cursor = localEdgeDataStore.dbi.iterate(txn, KeyRange.closed(akey,akey));
-        try{
-            for(Iterator<CursorIterable.KeyVal<ByteBuffer>> it = cursor.iterator();it.hasNext();){
-                CursorIterable.KeyVal<ByteBuffer> kv = it.next();
-                if(dbi.get(txn,kv.val())==null) continue;
-                bufferStream.on(BufferProxy.buffer(kv.val().rewind()),BufferProxy.buffer(txn.val()));
+        if(!key.write(cache.key())){
+            cache.reset();
+            return;
+        }
+        try(final Txn<ByteBuffer> txn = env.txn(ptxn)){
+            try(Cursor<ByteBuffer> cursor = localEdgeDataStore.dbi.openCursor(txn)){
+                if(cursor.get(cache.key().flip(),GetOp.MDB_SET)){
+                    if(cursor.seek(SeekOp.MDB_FIRST_DUP)){
+                        if(dbi.get(txn,cursor.val()) !=null) bufferStream.on(cache.key(),BufferProxy.buffer(txn.val()));
+                    }
+                    while (cursor.seek(SeekOp.MDB_NEXT_DUP)){
+                        if(dbi.get(txn,cursor.val()) ==null) continue;
+                        bufferStream.on(cache.key(),BufferProxy.buffer(txn.val()));
+                    }
+                }
             }
-        }finally {
-            cursor.close();
-            txn.close();
+        }
+        finally {
             cache.reset();
         }
     }
@@ -468,29 +475,41 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     //help methods
 
     private <T extends Recoverable> boolean list(ByteBuffer key,LocalEdgeDataStore localEdgeDataStore,RecoverableFactory<T> query, Stream<T> stream){
-        final Txn<ByteBuffer> txn = env.txn(ptxn);
-        CursorIterable<ByteBuffer> cursor = localEdgeDataStore.dbi.iterate(txn, KeyRange.closed(key,key));
         int[] matched ={0,0};
-        try{
-            for(Iterator<CursorIterable.KeyVal<ByteBuffer>> it = cursor.iterator();it.hasNext();){
-                CursorIterable.KeyVal<ByteBuffer> kv = it.next();
-                T t = query.create();
-                matched[0]++;
-                if(dbi.get(txn,kv.val())!=null){
-                    matched[1]++;
-                    Recoverable.DataBuffer proxy = BufferProxy.buffer(txn.val());
-                    Recoverable.DataHeader local = proxy.readHeader();
-                    t.read(proxy);
-                    t.revision(local.revision());
-                    t.readKey(BufferProxy.buffer(kv.val()));
-                    t.label(query.label());
-                    if(!stream.on(t)) break;
+        try(final Txn<ByteBuffer> txn = env.txn(ptxn)){
+            try(Cursor<ByteBuffer> cursor = localEdgeDataStore.dbi.openCursor(txn)){
+                if(cursor.get(key,GetOp.MDB_SET)) {
+                    boolean keepGoing = true;
+                    if(cursor.seek(SeekOp.MDB_FIRST_DUP)){
+                        matched[0]++;
+                        if(dbi.get(txn,cursor.val())!=null){
+                            matched[1]++;
+                            T t = query.create();
+                            Recoverable.DataBuffer proxy = BufferProxy.buffer(txn.val());
+                            Recoverable.DataHeader local = proxy.readHeader();
+                            t.read(proxy);
+                            t.revision(local.revision());
+                            t.readKey(BufferProxy.buffer(cursor.val().rewind()));
+                            t.label(query.label());
+                            keepGoing = stream.on(t);
+                        }
+                    }
+                    while (keepGoing && cursor.seek(SeekOp.MDB_NEXT_DUP)){
+                        matched[0]++;
+                        if(dbi.get(txn,cursor.val())!=null){
+                            matched[1]++;
+                            T t = query.create();
+                            Recoverable.DataBuffer proxy = BufferProxy.buffer(txn.val());
+                            Recoverable.DataHeader local = proxy.readHeader();
+                            t.read(proxy);
+                            t.revision(local.revision());
+                            t.readKey(BufferProxy.buffer(cursor.val().rewind()));
+                            t.label(query.label());
+                            keepGoing = stream.on(t);
+                        }
+                    }
                 }
             }
-
-        }finally {
-            cursor.close();
-            txn.close();
         }
         int ifOdd = matched[0]+matched[1];
         return  (ifOdd >0 && ifOdd % 2 ==0);

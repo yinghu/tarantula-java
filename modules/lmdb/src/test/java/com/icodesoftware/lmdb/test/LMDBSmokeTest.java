@@ -1,9 +1,5 @@
 package com.icodesoftware.lmdb.test;
 
-import com.icodesoftware.Recoverable;
-import com.icodesoftware.lmdb.BufferProxy;
-import com.icodesoftware.util.SnowflakeIdGenerator;
-import com.icodesoftware.util.TimeUtil;
 import org.lmdbjava.*;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
@@ -11,7 +7,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,47 +38,83 @@ public class LMDBSmokeTest {
         Dbi<ByteBuffer> dbi = env.openDbi("tarantula_data_edge", DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
         ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
         key.putLong(100).flip();
+        ByteBuffer key1 = ByteBuffer.allocateDirect(env.getMaxKeySize());
+        key1.putLong(200).flip();
+
         ByteBuffer edge = ByteBuffer.allocateDirect(env.getMaxKeySize());
         try(Txn<ByteBuffer> txn = env.txnWrite()){
             for(int i=0;i<10;i++){
                 edge.clear().putLong(i).flip();
                 Assert.assertTrue(dbi.put(txn,key,edge,PutFlags.MDB_NODUPDATA));
+                Assert.assertTrue(dbi.put(txn,key1,edge.rewind(),PutFlags.MDB_NODUPDATA));
             }
             for(int i=0;i<10;i++){
                 edge.clear().putLong(i).flip();
                 Assert.assertFalse(dbi.put(txn,key.rewind(),edge,PutFlags.MDB_NODUPDATA));
+                Assert.assertFalse(dbi.put(txn,key1,edge.rewind(),PutFlags.MDB_NODUPDATA));
             }
             for(int i=0;i<10;i++){
                 edge.clear().putLong(i).flip();
                 Assert.assertFalse(dbi.put(txn,key.rewind(),edge,PutFlags.MDB_NODUPDATA));
+                Assert.assertFalse(dbi.put(txn,key1,edge.rewind(),PutFlags.MDB_NODUPDATA));
             }
             txn.commit();
         }
         try(Txn<ByteBuffer> read = env.txnRead()){
-            key.rewind();
-            try(CursorIterable<ByteBuffer> c = dbi.iterate(read, KeyRange.closed(key, key))){
+            //key.rewind();
+            try(Cursor<ByteBuffer> c = dbi.openCursor(read)){
                 int[] ct ={0};
-                c.iterator().forEachRemaining((kv->{
+                c.get(key.rewind(),GetOp.MDB_SET);
+                if(c.seek(SeekOp.MDB_FIRST_DUP)) ct[0]++;
+                while (c.seek(SeekOp.MDB_NEXT_DUP)){
                     ct[0]++;
-                }));
+                }
                 Assert.assertEquals(ct[0],10);
             }
         }
         try(Txn<ByteBuffer> txn = env.txnWrite()){
             for(int i=0;i<10;i++){
+                key.rewind();
                 edge.clear().putLong(i).flip();
                 Assert.assertTrue(dbi.delete(txn,key,edge));
             }
             txn.commit();
         }
         try(Txn<ByteBuffer> read = env.txnRead()){
-            key.rewind();
-            try(CursorIterable<ByteBuffer> c = dbi.iterate(read, KeyRange.closed(key, key))){
+            try(Cursor<ByteBuffer> c = dbi.openCursor(read)){
                 int[] ct ={0};
-                c.iterator().forEachRemaining((kv->{
-                    ct[0]++;
-                }));
+                if(c.get(key.rewind(),GetOp.MDB_SET)){
+                    if(c.seek(SeekOp.MDB_FIRST_DUP)) ct[0]++;
+                    while (c.seek(SeekOp.MDB_NEXT_DUP)){
+                        ct[0]++;
+                    }
+                }
                 Assert.assertEquals(ct[0],0);
+            }
+        }
+        try(Txn<ByteBuffer> read = env.txnRead()){
+            try(Cursor<ByteBuffer> c = dbi.openCursor(read)){
+                int[] ct ={0};
+                if(c.get(key1.rewind(),GetOp.MDB_SET)){
+                    if(c.seek(SeekOp.MDB_FIRST_DUP)) ct[0]++;
+                    while (c.seek(SeekOp.MDB_NEXT_DUP)){
+                        ct[0]++;
+                    }
+                }
+                Assert.assertEquals(ct[0],10);
+            }
+        }
+        try(Txn<ByteBuffer> read = env.txnRead()){
+            key1.rewind();
+            try(Cursor<ByteBuffer> cursor = dbi.openCursor(read)){
+                Assert.assertTrue(cursor.get(key1,GetOp.MDB_SET));
+                Assert.assertEquals(cursor.count(),10);
+                cursor.seek(SeekOp.MDB_FIRST_DUP);
+                int[] ct={1};
+                while (cursor.seek(SeekOp.MDB_NEXT_DUP)){
+                    ct[0]++;
+                }
+                Assert.assertEquals(ct[0],10);
             }
         }
     }
@@ -178,12 +209,12 @@ public class LMDBSmokeTest {
         value.putLong(100).flip();
         Exception exception = null;
         try(final Txn<ByteBuffer> c = env.txn(null)){
-            Dbi dbi1 = env.openDbi(c,"test1".getBytes(),null,DbiFlags.MDB_CREATE);
+            Dbi dbi1 = env.openDbi(c,"test1".getBytes(),null,false,DbiFlags.MDB_CREATE);
             try(final Txn<ByteBuffer> w = env.txn(c)){
                 dbi1.put(w,key,value);
                 w.commit();
             }
-            Dbi dbi2 = env.openDbi(c,"test2".getBytes(),null,DbiFlags.MDB_CREATE);
+            Dbi dbi2 = env.openDbi(c,"test2".getBytes(),null,false,DbiFlags.MDB_CREATE);
             try(final Txn<ByteBuffer> w = env.txn(c)){
                 dbi2.put(w,key.rewind(),value.rewind());
                 w.commit();
