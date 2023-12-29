@@ -4,7 +4,6 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.service.Content;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ItemPortableRegistry;
@@ -13,7 +12,7 @@ import com.tarantula.platform.util.RecoverableQuery;
 public class CredentialConfiguration extends Application {
 
     protected String typeId;
-    //private String name;
+
     public CredentialConfiguration(String typeId,String name,ConfigurableObject configurableObject){
         super(configurableObject);
         this.name = name;
@@ -28,21 +27,21 @@ public class CredentialConfiguration extends Application {
         return true;
     }
 
-    protected ConfigurationObject saveConfigurationObject(String label,DeploymentServiceProvider deploymentServiceProvider, DataStore dataStore){
-        String fileName = header.get(label).getAsString();
+    protected ConfigurationObject saveConfigurationObject(String nLabel,DeploymentServiceProvider deploymentServiceProvider, DataStore dataStore){
+        String fileName = header.get(nLabel).getAsString();
         Content conf = deploymentServiceProvider.resource(fileName);
-        RecoverableQuery<ConfigurationObject> query = new RecoverableQuery<>(new SnowflakeKey(this.distributionId),ConfigurationObject.LABEL, ItemPortableRegistry.CONFIGURATION_OBJECT_CID,ItemPortableRegistry.INS);
+        RecoverableQuery<ConfigurationObject> query = new RecoverableQuery<>(this.key(),ConfigurationObject.LABEL, ItemPortableRegistry.CONFIGURATION_OBJECT_CID,ItemPortableRegistry.INS);
         ConfigurationObject[] pending = {null};
         dataStore.list(query,(t)->{
-            if(t.name().equals(label)){
+            if(t.name().equals(nLabel)){
                 pending[0]=t;
                 return false;
             }
             return true;
         });
-        if(!conf.existed() && pending[0]==null) throw new IllegalArgumentException("config content not existed ["+label+"]");
+        if(!conf.existed() && pending[0]==null) throw new IllegalArgumentException("config content not existed ["+nLabel+"]");
         if(conf.existed() && pending[0]==null){
-            pending[0] = new ConfigurationObject(label);
+            pending[0] = new ConfigurationObject(nLabel);
             pending[0].value(conf.data());
             pending[0].ownerKey(this.key());
             dataStore.create(pending[0]);

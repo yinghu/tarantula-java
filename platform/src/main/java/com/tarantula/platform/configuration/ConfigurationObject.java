@@ -12,9 +12,9 @@ public class ConfigurationObject extends MappingObject {
         super();
         this.label = LABEL;
     }
-    public ConfigurationObject(String label){
+    public ConfigurationObject(String name){
         this();
-        this.name = label;
+        this.name = name;
     }
     @Override
     public int getFactoryId() {

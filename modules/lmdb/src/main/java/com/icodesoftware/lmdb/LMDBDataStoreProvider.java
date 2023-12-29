@@ -26,6 +26,7 @@ import java.util.Map;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener{
 
@@ -68,6 +69,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     MetricsListener metricsListener = (k,v)->{};
     private JsonObject jsonObject;
+
     @Override
     public void configure(Map<String, Object> properties) {
         this.name = (String)properties.get("name");

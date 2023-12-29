@@ -127,6 +127,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         if(!applicationPreSetup.load(app,configurableObject)){
             return false;
         }
+        logger.warn("");
         return true;
     }
 

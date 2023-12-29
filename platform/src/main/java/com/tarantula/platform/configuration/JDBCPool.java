@@ -33,7 +33,7 @@ public class JDBCPool implements VendorValidator{
         }
         catch (Exception ex){
             //Ignore if database already exists
-            logger.warn("Should be here if database exists on server : ",ex);
+            logger.warn("Should be here if database exists on server : "+db,ex);
             return true;
         }
         finally {
