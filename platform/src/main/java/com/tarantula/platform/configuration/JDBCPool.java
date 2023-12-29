@@ -65,4 +65,12 @@ public class JDBCPool implements VendorValidator{
         dataSource.setPassword(props.get("Password").getAsString());
         dataSource.setMaxTotal(props.get("PoolSize").getAsInt());
     }
+    public void close(){
+        try{
+            logger.warn("Closing data store ...");
+            dataSource.close();
+        }catch (Exception ex){
+            logger.error("failed to close data store",ex);
+        }
+    }
 }

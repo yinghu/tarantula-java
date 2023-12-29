@@ -9,7 +9,7 @@ import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ItemPortableRegistry;
 import com.tarantula.platform.util.RecoverableQuery;
 
-public class CredentialConfiguration extends Application {
+public class CredentialConfiguration extends Application{
 
     protected String typeId;
 
@@ -55,5 +55,9 @@ public class CredentialConfiguration extends Application {
             return pending[0];
         }
         return pending[0];
+    }
+
+    public void release(){
+
     }
 }

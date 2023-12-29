@@ -15,6 +15,7 @@ import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.*;
+import com.tarantula.platform.util.RecoverableQuery;
 
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +59,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
                     CredentialConfiguration credentialConfiguration = (CredentialConfiguration) Class.forName(cname).getConstructor(String.class,ConfigurableObject.class).newInstance(this.typeId,a);
                     if(credentialConfiguration.setup(serviceContext,dataStore)){
                         vendorCredentials.put(credentialConfiguration.name(),credentialConfiguration);
+                        vendorCredentials.put(credentialConfiguration.distributionKey(),credentialConfiguration);
                     }
                 }catch (Exception nex){
                     logger.warn("Credential Configuration Setup failed",nex);
@@ -112,6 +114,8 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             CredentialConfiguration credentialConfiguration = (CredentialConfiguration) Class.forName(cname).getConstructor(String.class, ConfigurableObject.class).newInstance(this.typeId,configurableObject);
             if (credentialConfiguration.setup(serviceContext, dataStore)) {
                 vendorCredentials.put(credentialConfiguration.name(), credentialConfiguration);
+                vendorCredentials.put(credentialConfiguration.distributionKey(),credentialConfiguration);
+                logger.warn(credentialConfiguration.name()+" : "+credentialConfiguration.distributionKey());
             }
             return true;
         }catch (Exception ex){
@@ -127,7 +131,9 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         if(!applicationPreSetup.load(app,configurableObject)){
             return false;
         }
-        logger.warn("");
+        CredentialConfiguration credentialConfiguration = vendorCredentials.remove(itemId);
+        CredentialConfiguration cx = vendorCredentials.remove(credentialConfiguration.name());
+        cx.release();
         return true;
     }
 
@@ -152,9 +158,13 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
 
     }
     public <T extends Configurable> void onUpdated(Descriptor application,T t){
-
+        logger.warn("APP Updated : "+t.distributionKey());
     }
     public <T extends Configurable> void onDeleted(Descriptor application,T t){
+        RecoverableQuery<ConfigurationObject> query = new RecoverableQuery<>(t.key(),ConfigurationObject.LABEL, ItemPortableRegistry.CONFIGURATION_OBJECT_CID,ItemPortableRegistry.INS);
+        dataStore.list(query).forEach(c->{
+            dataStore.delete(c);
+        });
     }
     public <T extends Configurable> void onCreated(GameCluster application,T t){
 
