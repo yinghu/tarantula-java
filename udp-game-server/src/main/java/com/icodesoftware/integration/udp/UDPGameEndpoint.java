@@ -71,11 +71,11 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     private Thread sender;
     private boolean running = true;
 
-    private GameServiceProxy gameServiceProxy;
+    //private GameServiceProxy gameServiceProxy;
 
     public UDPGameEndpoint(JsonObject config){
         this.config = config;
-        gameServiceProxy = new EmptyGameServiceProxy();
+        //gameServiceProxy = new EmptyGameServiceProxy();
     }
 
 
@@ -314,9 +314,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         }
     }
 
-    public GameServiceProxy gameServiceProxy(short serviceId) {
-        return gameServiceProxy;
-    }
+
 
     @Override
     public void onStarted(Room room) {

@@ -475,15 +475,12 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     //help methods
 
     private <T extends Recoverable> boolean list(ByteBuffer key,LocalEdgeDataStore localEdgeDataStore,RecoverableFactory<T> query, Stream<T> stream){
-        int[] matched ={0,0};
         try(final Txn<ByteBuffer> txn = env.txn(ptxn)){
             try(Cursor<ByteBuffer> cursor = localEdgeDataStore.dbi.openCursor(txn)){
                 if(cursor.get(key,GetOp.MDB_SET)) {
                     boolean keepGoing = true;
                     if(cursor.seek(SeekOp.MDB_FIRST_DUP)){
-                        matched[0]++;
                         if(dbi.get(txn,cursor.val())!=null){
-                            matched[1]++;
                             T t = query.create();
                             Recoverable.DataBuffer proxy = BufferProxy.buffer(txn.val());
                             Recoverable.DataHeader local = proxy.readHeader();
@@ -495,9 +492,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
                         }
                     }
                     while (keepGoing && cursor.seek(SeekOp.MDB_NEXT_DUP)){
-                        matched[0]++;
                         if(dbi.get(txn,cursor.val())!=null){
-                            matched[1]++;
                             T t = query.create();
                             Recoverable.DataBuffer proxy = BufferProxy.buffer(txn.val());
                             Recoverable.DataHeader local = proxy.readHeader();
@@ -508,11 +503,11 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
                             keepGoing = stream.on(t);
                         }
                     }
+                    return true;
                 }
+                return false;
             }
         }
-        int ifOdd = matched[0]+matched[1];
-        return  (ifOdd >0 && ifOdd % 2 ==0);
     }
     private boolean set(ByteBuffer key, ByteBuffer value){
         final Txn<ByteBuffer> txn = env.txn(ptxn);

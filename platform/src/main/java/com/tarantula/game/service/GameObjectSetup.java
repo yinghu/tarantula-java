@@ -94,7 +94,6 @@ public class GameObjectSetup extends GamePreSetup implements ApplicationPreSetup
         if(!load(application,ret)) return null;
         ret.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
         return ret.setup();
-        //return ret;
     }
 
 

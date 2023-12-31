@@ -47,16 +47,7 @@
                 <tag>game/item</tag>
                 <module-name>com.tarantula.game.module.GameItemModule</module-name>
             </application>
-            <!--
-            <application>
-                <type-id>game-service</type-id>
-                <name>ServiceProxy</name>
-                <type>application</type>
-                <category>proxy</category>
-                <tag>game/proxy</tag>
-                <module-name>com.tarantula.game.module.GameServiceProxyModule</module-name>
-            </application>
-            -->
+
             <application><!-- tournament module-->
                 <type-id>game-service</type-id>
                 <name>Tournament</name>

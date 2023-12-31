@@ -120,9 +120,9 @@ public class MetricsTest extends DataStoreHook{
         metrics.onUpdated(PERFORMANCE_HTTP_REQUEST_COUNT,2D);
         metrics.run();//update statistics entry
         Metrics.Spot[] mc = metrics.snapshot(PERFORMANCE_HTTP_REQUEST_COUNT, LeaderBoard.HOURLY);
-        for(Metrics.Spot p : mc){
-            System.out.println(p.name()+" : "+p.value());
-        }
+        //for(Metrics.Spot p : mc){
+            //System.out.println(p.name()+" : "+p.value());
+        //}
         Assert.assertEquals((mc[11].value()),3.0d);
         //Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).hourly()==3,true);
         //Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).daily()==3,true);

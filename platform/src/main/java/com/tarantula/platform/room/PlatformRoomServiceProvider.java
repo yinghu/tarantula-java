@@ -313,7 +313,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 mappingObject.value(batch.toBytes());
                 mappingObject.owner(update.systemId);
                 mappingObject.distributionKey(index.gameZone.distributionKey());
-                this.serviceContext.postOffice().onTag(gameServiceProvider.serviceProxy().tag()).send(update.systemId,mappingObject);
+                //this.serviceContext.postOffice().onTag(gameServiceProvider.serviceProxy().tag()).send(update.systemId,mappingObject);
             }
         }));
     }

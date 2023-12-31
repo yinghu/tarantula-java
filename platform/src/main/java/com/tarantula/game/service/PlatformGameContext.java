@@ -57,14 +57,6 @@ public class PlatformGameContext implements GameContext {
     }
 
     @Override
-    public GameServiceProxy gameServiceProxy(short serviceId) {
-        return platformGameServiceProvider.gameServiceProxy(serviceId);
-    }
-
-    public GameServiceProvider gameServiceProvider(){
-        return platformGameServiceProvider.gameServiceProvider();
-    }
-    @Override
     public ApplicationSchema applicationSchema(){
         return platformGameServiceProvider.gameCluster();
     }
