@@ -31,9 +31,11 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
     //callbacks from HTTP
     @Override
-    public void onJoined(Session session) {
+    public void onJoined(Session session,Room room) {
+        //use room.distributionId/key as game session id
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         webhook.upload(ANALYTICS_QUERY,new ServerConnectTransaction(session).toString().getBytes());
+        //this.gameContext.log("JOINED : "+room.distributionKey(), OnLog.WARN);
     }
 
     public void startGame(Session session, byte[] payload) throws Exception{
@@ -140,19 +142,32 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     }
     @Override
     public void onLeft(Session session) {
-        //gameContext.log(" LEAVE : "+session.distributionKey()+" : "+session.stub(),OnLog.WARN);
+        gameContext.log(" LEAVE : "+session.distributionKey()+" : "+session.stub(),OnLog.WARN);
     }
 
     //Callbacks from UDP channel
     @Override
     public byte[] onRequest(Session session, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         //UDP REQUEST RESPONSE CAN BE REPACKING FOR LARGE PAYLOAD
+        this.gameContext.log("On Request : "+session.distributionKey(), OnLog.WARN);
+
+        Statistics statistics = gameContext.statistics(session);
+        statistics.entry("kills").update(1).update();
+        this.gameContext.log("On Statistics : "+statistics.entry("kills").total(), OnLog.WARN);
+        Rating rating = gameContext.rating(session);
+        rating.update(10,1000).update();
+        this.gameContext.log("On Rating : "+rating.rank()+" : "+rating.level()+" : "+rating.xp(), OnLog.WARN);
+
+        Achievement achievement = gameContext.achievement(session);
+        achievement.onProgress(1);
+        this.gameContext.log("On Achievement : "+achievement.name()+" : "+achievement.tier()+" : "+achievement.target()+" : "+achievement.objective(), OnLog.WARN);
         return null;//callback on caller only if byte not null
     }
 
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
         //UDP MESSAGE WITH RELAY CALL WITH SINGLE UDP MESSAGE
+        this.gameContext.log("On Action : "+messageHeader.sessionId, OnLog.WARN);
         //read buffer -> write header/buffer->flip->read header->callback on channel members
     }
 
@@ -171,5 +186,16 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     @Override
     public void tournamentEnded(Tournament tournament) {
         tournamentIndex.remove(tournament.distributionId());
+    }
+
+    //UDP Channel Listener Callbacks
+    public void onValidated(Channel channel){
+        this.gameContext.log("On Channel Validated : " +channel.channelId(), OnLog.WARN);
+    }
+    public void onJoined(Channel channel){
+        this.gameContext.log("On Channel Joined : " +channel.channelId(), OnLog.WARN);
+    }
+    public void onLeft(Channel channel){
+        this.gameContext.log("On Channel Left : " +channel.channelId(), OnLog.WARN);
     }
 }

@@ -33,7 +33,7 @@ public class JDBCPool implements VendorValidator{
         }
         catch (Exception ex){
             //Ignore if database already exists
-            logger.warn("Should be here if database exists on server : ",ex);
+            logger.warn("Should be here if database exists on server : "+db,ex);
             return true;
         }
         finally {
@@ -64,5 +64,13 @@ public class JDBCPool implements VendorValidator{
         dataSource.setUsername(props.get("User").getAsString());
         dataSource.setPassword(props.get("Password").getAsString());
         dataSource.setMaxTotal(props.get("PoolSize").getAsInt());
+    }
+    public void close(){
+        try{
+            logger.warn("Closing data store ...");
+            dataSource.close();
+        }catch (Exception ex){
+            logger.error("failed to close data store",ex);
+        }
     }
 }

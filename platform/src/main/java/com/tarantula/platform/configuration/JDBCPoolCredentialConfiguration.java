@@ -32,4 +32,8 @@ public class JDBCPoolCredentialConfiguration extends CredentialConfiguration {
         pendingTasks.putIfAbsent(name,new StatisticsTask(jdbcPool));
         return pendingTasks.get(name);
     }
+    @Override
+    public void release(){
+        jdbcPool.close();
+    }
 }

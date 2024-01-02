@@ -3,6 +3,7 @@ package com.tarantula.game;
 import com.google.gson.JsonObject;
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.DataStore;
+import com.icodesoftware.Rating;
 import com.icodesoftware.Session;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.lobby.LobbyItem;

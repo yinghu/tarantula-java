@@ -57,14 +57,6 @@ public class PlatformGameContext implements GameContext {
     }
 
     @Override
-    public GameServiceProxy gameServiceProxy(short serviceId) {
-        return platformGameServiceProvider.gameServiceProxy(serviceId);
-    }
-
-    public GameServiceProvider gameServiceProvider(){
-        return platformGameServiceProvider.gameServiceProvider();
-    }
-    @Override
     public ApplicationSchema applicationSchema(){
         return platformGameServiceProvider.gameCluster();
     }
@@ -83,4 +75,18 @@ public class PlatformGameContext implements GameContext {
         platformGameServiceProvider.onUpdated(category,delta);
     }
 
+    public Statistics statistics(Session session){
+        return this.platformGameServiceProvider.presenceServiceProvider().statistics(session);
+    }
+
+    @Override
+    public Rating rating(Session session) {
+        return this.platformGameServiceProvider.presenceServiceProvider().rating(session);
+    }
+
+    @Override
+    public Achievement achievement(Session session) {
+        return this.platformGameServiceProvider.achievementServiceProvider().achievement(session);
+
+    }
 }

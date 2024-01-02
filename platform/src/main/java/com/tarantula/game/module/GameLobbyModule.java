@@ -4,7 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.GameLobbyProxy;
-import com.tarantula.game.Rating;
+import com.tarantula.game.GameRating;
 import com.tarantula.game.Stub;
 import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.util.OnAccessDeserializer;
@@ -21,12 +21,12 @@ public class GameLobbyModule extends ModuleHeader{
             //session.write(JsonUtil.toSimpleResponse(false,"no tournament available,please try later").getBytes());
             //return;
         //}
-        Rating rating = gameServiceProvider.presenceServiceProvider().rating(session);
-        Stub stub = gameLobby.join(session,rating);
+        //GameRating rating = gameServiceProvider.presenceServiceProvider().rating(session);
+        Stub stub = gameLobby.join(session);
         session.write(stub.toJson().toString().getBytes());
         if(!stub.joined()) return;
         gameServiceProvider.presenceServiceProvider().onPlay(session.systemId());
-        gameServiceProvider.gameServiceProvider().onJoined(session);
+        gameServiceProvider.gameServiceProvider().onJoined(session, stub.room);
     }
 
     @Override
@@ -53,13 +53,13 @@ public class GameLobbyModule extends ModuleHeader{
             if(this.context.validator().role(session.distributionId()).accessControl()< AccessControl.admin.accessControl()){
                 throw new RuntimeException("no permission");
             }
-            Rating rating = gameServiceProvider.presenceServiceProvider().rating(session);
-            rating.level = this.context.descriptor().accessRank()*100-99;
-            Stub stub = gameLobby.join(session,rating);
+            //GameRating rating = gameServiceProvider.presenceServiceProvider().rating(session);
+            //rating.level = this.context.descriptor().accessRank()*100-99;
+            Stub stub = gameLobby.join(session);
             session.write(stub.toJson().toString().getBytes());
             if(stub.joined()) {
                 gameServiceProvider.presenceServiceProvider().onPlay(session.systemId());
-                this.gameServiceProvider.gameServiceProvider().onJoined(session);
+                this.gameServiceProvider.gameServiceProvider().onJoined(session,stub.room);
             }
         }
         else if(session.action().equals("onTestScore")){

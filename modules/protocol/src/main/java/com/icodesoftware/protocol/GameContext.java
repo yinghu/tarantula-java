@@ -1,19 +1,14 @@
 package com.icodesoftware.protocol;
 
 import com.icodesoftware.*;
-import com.icodesoftware.service.ApplicationPreSetup;
+
 import com.icodesoftware.service.ApplicationSchema;
 import com.icodesoftware.service.TokenValidatorProvider;
 
-import java.util.List;
-
 public interface GameContext extends Context {
 
-    GameServiceProxy gameServiceProxy(short serviceId);
 
     ApplicationSchema applicationSchema();
-
-    GameServiceProvider gameServiceProvider();
 
     TokenValidatorProvider.AuthVendor authorVendor(String name);
 
@@ -21,4 +16,9 @@ public interface GameContext extends Context {
     void recoverableRegistry(RecoverableListener recoverableListener);
 
     void onMetrics(String category,double delta);
+
+    Statistics statistics(Session session);
+    Rating rating(Session session);
+
+    Achievement achievement(Session session);
 }

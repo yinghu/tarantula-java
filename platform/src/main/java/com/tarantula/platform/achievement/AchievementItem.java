@@ -3,13 +3,13 @@ package com.tarantula.platform.achievement;
 import com.tarantula.platform.item.*;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
-public class Achievement extends Application{
+public class AchievementItem extends Application{
 
-    public Achievement(){}
+    public AchievementItem(){}
 
-    public Achievement(ConfigurableObject configurableObject){
-        super(configurableObject);
-    }
+    //public AchievementItem(ConfigurableObject configurableObject){
+        //super(configurableObject);
+    //}
 
     public int getFactoryId() {
         return PresencePortableRegistry.OID;

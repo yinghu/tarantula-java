@@ -26,6 +26,7 @@ import java.util.Map;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener{
 
@@ -68,6 +69,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     MetricsListener metricsListener = (k,v)->{};
     private JsonObject jsonObject;
+
     @Override
     public void configure(Map<String, Object> properties) {
         this.name = (String)properties.get("name");
@@ -170,23 +172,23 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     public DataStore createDataStore(int scope,String name,Txn<ByteBuffer> txn){
         if(scope==Distributable.DATA_SCOPE){
-            Dbi<ByteBuffer> dbi = txn==null? data.openDbi(name,DbiFlags.MDB_CREATE) : data.openDbi(txn,name.getBytes(),null,DbiFlags.MDB_CREATE);
+            Dbi<ByteBuffer> dbi = txn==null? data.openDbi(name,DbiFlags.MDB_CREATE) : data.openDbi(txn,name.getBytes(),null,false,DbiFlags.MDB_CREATE);
             return txn==null? new CachedLMDBDataStore(scope,name,dbi,data,this) : new LMDBDataStore(scope,name,dbi,data,this,txn);
         }
         if(scope==Distributable.INTEGRATION_SCOPE){
-            Dbi<ByteBuffer> dbi = txn==null? integration.openDbi(name,DbiFlags.MDB_CREATE) : integration.openDbi(txn,name.getBytes(),null,DbiFlags.MDB_CREATE);
+            Dbi<ByteBuffer> dbi = txn==null? integration.openDbi(name,DbiFlags.MDB_CREATE) : integration.openDbi(txn,name.getBytes(),null,false,DbiFlags.MDB_CREATE);
             return txn==null? new CachedLMDBDataStore(scope,name,dbi,integration,this) : new LMDBDataStore(scope,name,dbi,integration,this,txn);
         }
         if(scope==Distributable.INDEX_SCOPE){
-            Dbi<ByteBuffer> dbi = txn==null? index.openDbi(name,DbiFlags.MDB_CREATE) : index.openDbi(txn,name.getBytes(),null,DbiFlags.MDB_CREATE);
+            Dbi<ByteBuffer> dbi = txn==null? index.openDbi(name,DbiFlags.MDB_CREATE) : index.openDbi(txn,name.getBytes(),null,false,DbiFlags.MDB_CREATE);
             return txn==null? new CachedLMDBDataStore(scope,name,dbi,index,this) : new LMDBDataStore(scope,name,dbi,index,this,txn);
         }
         if(scope==Distributable.LOCAL_SCOPE){
-            Dbi<ByteBuffer> dbi = txn==null? local.openDbi(name,DbiFlags.MDB_CREATE) : local.openDbi(txn,name.getBytes(),null,DbiFlags.MDB_CREATE);
+            Dbi<ByteBuffer> dbi = txn==null? local.openDbi(name,DbiFlags.MDB_CREATE) : local.openDbi(txn,name.getBytes(),null,false,DbiFlags.MDB_CREATE);
             return txn==null? new CachedLMDBDataStore(scope,name,dbi,local,this) : new LMDBDataStore(scope,name,dbi,local,this,txn);
         }
         if(scope==Distributable.LOG_SCOPE){
-            Dbi<ByteBuffer> dbi = txn==null? log.openDbi(name,DbiFlags.MDB_CREATE) : log.openDbi(txn,name.getBytes(),null,DbiFlags.MDB_CREATE);
+            Dbi<ByteBuffer> dbi = txn==null? log.openDbi(name,DbiFlags.MDB_CREATE) : log.openDbi(txn,name.getBytes(),null,false,DbiFlags.MDB_CREATE);
             return txn==null? new CachedLMDBDataStore(scope,name,dbi,log,this) : new LMDBDataStore(scope,name,dbi,log,this,txn);
         }
         throw new RuntimeException("Scope ["+scope+"] not supported");
@@ -194,27 +196,27 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     public LocalEdgeDataStore localEdgeDataStore(int scope,String source,String label,Txn<ByteBuffer> txn){
         if(scope==Distributable.DATA_SCOPE){
             String edgeName = source+"#"+label;
-            Dbi<ByteBuffer> dbi = txn==null? data.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : data.openDbi(txn,edgeName.getBytes(),null,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
+            Dbi<ByteBuffer> dbi = txn==null? data.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : data.openDbi(txn,edgeName.getBytes(),null,false,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
             return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
         }
         if(scope==Distributable.INTEGRATION_SCOPE){
             String edgeName = source+"#"+label;
-            Dbi<ByteBuffer> dbi = txn==null? integration.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : integration.openDbi(txn,edgeName.getBytes(),null,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
+            Dbi<ByteBuffer> dbi = txn==null? integration.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : integration.openDbi(txn,edgeName.getBytes(),null,false,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
             return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
         }
         if(scope==Distributable.INDEX_SCOPE){
             String edgeName = source+"#"+label;
-            Dbi<ByteBuffer> dbi = txn==null? index.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : index.openDbi(txn,edgeName.getBytes(),null,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
+            Dbi<ByteBuffer> dbi = txn==null? index.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : index.openDbi(txn,edgeName.getBytes(),null,false,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
             return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
         }
         if(scope==Distributable.LOCAL_SCOPE){
             String edgeName = source+"#"+label;
-            Dbi<ByteBuffer> dbi = txn==null? local.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : local.openDbi(txn,edgeName.getBytes(),null,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
+            Dbi<ByteBuffer> dbi = txn==null? local.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : local.openDbi(txn,edgeName.getBytes(),null,false,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
             return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
         }
         if(scope==Distributable.LOG_SCOPE){
             String edgeName = source+"#"+label;
-            Dbi<ByteBuffer> dbi = txn==null? log.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : log.openDbi(txn,edgeName.getBytes(),null,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
+            Dbi<ByteBuffer> dbi = txn==null? log.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : log.openDbi(txn,edgeName.getBytes(),null,false,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
             return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
         }
         throw new RuntimeException("Scope ["+scope+"] not supported");

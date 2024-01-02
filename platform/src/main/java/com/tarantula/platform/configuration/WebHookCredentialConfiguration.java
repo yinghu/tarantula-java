@@ -46,7 +46,4 @@ public class WebHookCredentialConfiguration extends CredentialConfiguration {
         }
     }
 
-
-
-
 }

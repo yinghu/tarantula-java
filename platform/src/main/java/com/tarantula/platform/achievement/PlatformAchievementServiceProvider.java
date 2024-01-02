@@ -6,6 +6,7 @@ import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.inventory.ApplicationRedeemer;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
 import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 
@@ -18,7 +19,7 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
 
     public static final String NAME = "achievement";
 
-    private ConcurrentHashMap<String,Achievement> achievements;
+    private ConcurrentHashMap<String, AchievementItem> achievements;
 
     public PlatformAchievementServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
@@ -32,26 +33,37 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
         this.logger.warn("Achievement service provider started on ->"+gameServiceName);
     }
 
-    public AchievementProgress onProgress(Session session,double delta){
+    public Achievement achievement(Session session){
         CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);
         AchievementProgress achievementProgress = new AchievementProgress();
         achievementProgress.distributionId(currentSaveIndex.saveId);
+        return new AchievementProxy(achievementProgress,delta ->onProgress(session,achievementProgress,delta));
+    }
+
+    private void onProgress(Session session,AchievementProgress achievementProgress,double delta){
         Transaction transaction = gameCluster.transaction();
         transaction.execute(ctx->{
             ApplicationPreSetup preSetup = (ApplicationPreSetup)ctx;
             DataStore ds = preSetup.onDataStore(NAME);
             ds.createIfAbsent(achievementProgress,true);
             achievementProgress.dataStore(ds);
+            logger.warn("STATUS : "+achievementProgress.disabled()+" : "+delta+" : "+achievementProgress.progress());
             if(achievementProgress.disabled()) tryNextAchievement(achievementProgress);
             if(achievementProgress.disabled()) return true;
             if(achievementProgress.onProgress(delta)){
-                Achievement achievement = achievements.get(achievementProgress.name());
+                AchievementItem achievement = achievements.get(achievementProgress.name());
                 if(achievement==null) {
                     achievementProgress.disabled(true);
                     achievementProgress.update();
                     return true;
                 }
-                //platformGameServiceProvider.inboxServiceProvider().claim(session.systemId(),achievement);
+                logger.warn("Achieved : "+achievement.configurationTypeId());
+                Descriptor app = gameCluster.application(achievement.configurationTypeId());
+                ApplicationRedeemer redeemer = new ApplicationRedeemer(session.systemId(),preSetup);
+                redeemer.distributionKey(achievement.distributionKey());
+                if(!preSetup.load(app,redeemer)) return false;
+                redeemer.redeem();
+                logger.warn("Redeemed : "+achievement.configurationTypeId());
                 if(!tryNextAchievement(achievementProgress)){
                     achievementProgress.disabled(true);
                     achievementProgress.update();
@@ -59,23 +71,9 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
             }
             return true;
         });
-        if(achievementProgress.disabled()) tryNextAchievement(achievementProgress);
-        if(achievementProgress.disabled()) return null;
-        if(achievementProgress.onProgress(delta)){
-            //tier_{tier}_target_{target}
-            Achievement achievement = achievements.get(achievementProgress.name());
-            if(achievement==null) return null;
-            platformGameServiceProvider.inboxServiceProvider().claim(session.systemId(),achievement);
-            if(!tryNextAchievement(achievementProgress)){
-                achievementProgress.disabled(true);
-                achievementProgress.update();
-            }
-            return achievementProgress;
-        }
-        return achievementProgress;
     }
-    public List<Achievement> list(){
-        ArrayList<Achievement> _item = new ArrayList<>();
+    public List<AchievementItem> list(){
+        ArrayList<AchievementItem> _item = new ArrayList<>();
         achievements.forEach((k,v)->_item.add(v));
         return _item;
     }
@@ -90,7 +88,7 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
         distributionItemService.onReleaseItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
     public boolean onItemRegistered(String category,String itemId){
-        Achievement configurableObject = new Achievement();
+        AchievementItem configurableObject = new AchievementItem();
         configurableObject.distributionKey(itemId);
         GameCluster _gc = serviceContext.deploymentServiceProvider().gameCluster(gameCluster.distributionId());
         Descriptor app = _gc.serviceWithCategory(category);
@@ -112,7 +110,7 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
 
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        List<Achievement> items = applicationPreSetup.list(descriptor,new AchievementObjectQuery(descriptor.key(),"Achievement"));
+        List<AchievementItem> items = applicationPreSetup.list(descriptor,new AchievementObjectQuery(descriptor.key(),"Achievement"));
         items.forEach((a)-> {
             logger.warn("<><><>"+a.name()+"<><>"+a.objective());
             a.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
@@ -123,7 +121,7 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
     }
     private boolean tryNextAchievement(AchievementProgress achievementProgress){
         String key = "tier_"+achievementProgress.tier()+"_target_"+(achievementProgress.target()+1);//target up 1
-        Achievement achievement = achievements.get(key);
+        AchievementItem achievement = achievements.get(key);
         if(achievement!=null){
             achievementProgress.reset(achievement.tier(),achievement.target(),achievement.objective());
             return true;

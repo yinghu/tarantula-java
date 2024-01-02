@@ -1,13 +1,11 @@
 package com.tarantula.game.service;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.GameServiceProvider;
-import com.icodesoftware.protocol.GameServiceProxy;
+
 import com.icodesoftware.service.*;
 import com.tarantula.game.module.ErrorModule;
 import com.tarantula.platform.GameCluster;
@@ -33,7 +31,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlatformGameServiceProvider implements MetricsListener,ItemDistributionCallback, ServiceProvider {
 
-    private static final String CONFIG = "game-service-proxy-settings";
 
     private TarantulaLogger logger;
     private final String NAME;
@@ -50,20 +47,16 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
     private ConcurrentHashMap<String,ServiceProvider> gameServiceProviders;
     private ConcurrentHashMap<String,EventListener> eventListeners;
     private ConcurrentHashMap<String, Module> moduleExported;
-    private ConcurrentHashMap<Short, GameServiceProxy> serviceExported;
-
-    private Descriptor serviceProxy;
 
     private GameServiceProvider gameServiceProvider;
 
     public PlatformGameServiceProvider(GameCluster gameCluster){
         NAME = gameCluster.serviceType();
-        //this.gameServiceProvider = new Earth8GameServiceProvider();
         this.gameCluster = gameCluster;
         metricsListener = (k,v)->{};
         this.gameServiceProviders = new ConcurrentHashMap<>();
         this.moduleExported = new ConcurrentHashMap<>();
-        this.serviceExported = new ConcurrentHashMap<>();
+
         this.eventListeners = new ConcurrentHashMap<>();
     }
 
@@ -104,15 +97,7 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
             p.setup(serviceContext);
             p.waitForData();
         });
-        Configuration config = serviceContext.configuration(CONFIG);
-        JsonArray proxies = ((JsonElement)config.property("proxies")).getAsJsonArray();
-        proxies.forEach((proxy->{
-            JsonObject cc = proxy.getAsJsonObject();
-            short serviceId = cc.get("serviceId").getAsShort();
-            String className = cc.get("className").getAsString();
-            GameServiceProxy serviceProxy = toGameServiceProxy(serviceId,className);
-            serviceExported.put(serviceId,serviceProxy);
-        }));
+
         this.metrics = new GameClusterMetrics(gameCluster.gameServiceName);
         this.metrics.setup(serviceContext);
         serviceContext.registerMetrics(metrics);
@@ -234,18 +219,11 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
     public void removeServiceModule(String tag){
         moduleExported.remove(tag);
     }
-    public void exportServiceModule(ModuleExport moduleExport){
-        moduleExported.forEach((k,m)->{
-            moduleExport.export(m);
-        });
-    }
+
     public Module serviceModule(String module){
         return moduleExported.getOrDefault(module, ErrorModule.ERROR_MODULE);
     }
 
-    public GameServiceProxy gameServiceProxy(short serviceId){
-        return serviceExported.getOrDefault(serviceId,ErrorCommand.ERROR_COMMAND);
-    }
 
     public ItemDistributionCallback clusterConfigurationCallback(String serviceName){
         if(serviceName.equals(PlatformDailyGiveawayServiceProvider.NAME)){
@@ -308,26 +286,7 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
         return this.gameCluster.typeId();
     }
 
-    public PlatformGameContext gameContext(Class module){
-        return new PlatformGameContext(this.serviceContext,this,JDKLogger.getLogger(module));
-    }
 
-    public void registerServiceProxyModule(Descriptor descriptor){
-        this.serviceProxy = descriptor;
-    }
-    public Descriptor serviceProxy(){
-        return this.serviceProxy;
-    }
-
-    private GameServiceProxy toGameServiceProxy(short serviceId,String className){
-        try {
-            GameServiceProxy serviceMessageListener = (GameServiceProxy) Class.forName(className).getConstructor(short.class, PlatformGameServiceProvider.class).newInstance(serviceId,this);
-            return serviceMessageListener;
-        }catch (Exception ex){
-            this.logger.warn("Service Proxy ["+className+"] Without Implementation");
-            return ErrorCommand.ERROR_COMMAND;
-        }
-    }
     private GameServiceProvider toGameServiceProvider(String className){
         try{
             return (GameServiceProvider)Class.forName(className).getConstructor().newInstance();

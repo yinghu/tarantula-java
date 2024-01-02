@@ -1,5 +1,6 @@
 package com.tarantula.game.service;
 
+import com.icodesoftware.Rating;
 import com.icodesoftware.Session;
 import com.tarantula.game.*;
 

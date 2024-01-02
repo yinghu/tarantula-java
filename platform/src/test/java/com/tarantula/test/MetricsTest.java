@@ -120,27 +120,27 @@ public class MetricsTest extends DataStoreHook{
         metrics.onUpdated(PERFORMANCE_HTTP_REQUEST_COUNT,2D);
         metrics.run();//update statistics entry
         Metrics.Spot[] mc = metrics.snapshot(PERFORMANCE_HTTP_REQUEST_COUNT, LeaderBoard.HOURLY);
-        for(Metrics.Spot p : mc){
-            System.out.println(p.name()+" : "+p.value());
-        }
+        //for(Metrics.Spot p : mc){
+            //System.out.println(p.name()+" : "+p.value());
+        //}
         Assert.assertEquals((mc[11].value()),3.0d);
-        //Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).hourly()==3,true);
-        //Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).daily()==3,true);
-        //Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).weekly()==3,true);
-        //Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).monthly()==3,true);
-        //Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).yearly()==3,true);
-        //Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).total()==3,true);
-        //metrics.atHourly();//swap statistics
-        //Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).hourly()==0,true);
-        //Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).daily()==0,true);
-        //Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).weekly()==3,true);
-        //Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).monthly() ==0,true);
-        //Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).yearly() ==0,true);
-        //Assert.assertEquals(metrics.statistics().entry(PerformanceMetrics.PERFORMANCE_HTTP_REQUEST_COUNT).total()==3,true);
+        Assert.assertEquals(metrics.statistics().entry(PERFORMANCE_HTTP_REQUEST_COUNT).hourly()==3,true);
+        Assert.assertEquals(metrics.statistics().entry(PERFORMANCE_HTTP_REQUEST_COUNT).daily()==3,true);
+        Assert.assertEquals(metrics.statistics().entry(PERFORMANCE_HTTP_REQUEST_COUNT).weekly()==3,true);
+        Assert.assertEquals(metrics.statistics().entry(PERFORMANCE_HTTP_REQUEST_COUNT).monthly()==3,true);
+        Assert.assertEquals(metrics.statistics().entry(PERFORMANCE_HTTP_REQUEST_COUNT).yearly()==3,true);
+        Assert.assertEquals(metrics.statistics().entry(PERFORMANCE_HTTP_REQUEST_COUNT).total()==3,true);
+        metrics.atHourly();//swap statistics
+        Assert.assertEquals(metrics.statistics().entry(PERFORMANCE_HTTP_REQUEST_COUNT).hourly()==0,true);
+        Assert.assertEquals(metrics.statistics().entry(PERFORMANCE_HTTP_REQUEST_COUNT).daily()==0,true);
+        Assert.assertEquals(metrics.statistics().entry(PERFORMANCE_HTTP_REQUEST_COUNT).weekly()==3,true);
+        Assert.assertEquals(metrics.statistics().entry(PERFORMANCE_HTTP_REQUEST_COUNT).monthly() ==0,true);
+        Assert.assertEquals(metrics.statistics().entry(PERFORMANCE_HTTP_REQUEST_COUNT).yearly() ==0,true);
+        Assert.assertEquals(metrics.statistics().entry(PERFORMANCE_HTTP_REQUEST_COUNT).total()==3,true);
 
     }
 
-    //@Test(groups = { "PerformanceMetrics" })
+    @Test(groups = { "PerformanceMetrics" })
     public void metricsMonthlyTest() {
 
         LocalDateTime end = LocalDate.parse("2022-07-31").atTime(23,50,0,0);//Mon
@@ -164,7 +164,7 @@ public class MetricsTest extends DataStoreHook{
         Assert.assertEquals(metrics.statistics().entry(PERFORMANCE_HTTP_REQUEST_COUNT).total()==3,true);
     }
 
-    //@Test(groups = { "PerformanceMetrics" })
+    @Test(groups = { "PerformanceMetrics" })
     public void metricsWeeklyTest() {
 
         LocalDateTime end = LocalDate.parse("2022-08-07").atTime(23,50,0,0);//Mon
@@ -187,7 +187,7 @@ public class MetricsTest extends DataStoreHook{
         Assert.assertEquals(metrics.statistics().entry(PERFORMANCE_HTTP_REQUEST_COUNT).total()==3,true);
     }
 
-    //@Test(groups = { "PerformanceMetrics" })
+    @Test(groups = { "PerformanceMetrics" })
     public void metricsDailyTest() {
 
         LocalDateTime end = LocalDate.parse("2022-08-10").atTime(23,50,0,0);//Sun

@@ -23,13 +23,14 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     }
 
     @Override
-    public Stub join(Session session, Rating rating) {
+    public Stub join(Session session) {
         if(!started) return new Stub("lobby not started");
         Stub stub = gameServiceProvider.presenceServiceProvider().stub(session,application);
         if(stub.joined()) {
             stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));
             return stub;
         }
+        Rating rating = gameServiceProvider.presenceServiceProvider().rating(session);
         GameZone _zone = gameZone(rating);
         return _zone.join(session,rating);
     }
@@ -61,6 +62,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         if(!removed.joined()) return false;
         GameZone gameZone = this.gameServiceProvider.roomServiceProvider().gameZoneFromZoneId(removed.zoneId);
         gameZone.leave(removed);
+        context.log("timeout : "+systemId+" : "+stub,OnLog.WARN);
         //gameServiceProvider.onUpdated(GameClusterMetrics.GAME_TIMEOUT_COUNT,1);
         return  true;
     }
@@ -76,15 +78,15 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         //defaultLobby.shutdown();
     }
     private GameZone gameZone(Rating rating){
-        if(rating.level>0 && rating.level<101) return zoneIndex.get(1);
-        if(rating.level>100 && rating.level<201) return zoneIndex.get(2);
-        if(rating.level>200 && rating.level<301) return zoneIndex.get(3);
-        if(rating.level>300 && rating.level<401) return zoneIndex.get(4);
-        if(rating.level>400 && rating.level<501) return zoneIndex.get(5);
-        if(rating.level>500 && rating.level<601) return zoneIndex.get(6);
-        if(rating.level>600 && rating.level<701) return zoneIndex.get(7);
-        if(rating.level>700 && rating.level<801) return zoneIndex.get(8);
-        if(rating.level>800 && rating.level<901) return zoneIndex.get(9);
+        if(rating.level()>0 && rating.level()<101) return zoneIndex.get(1);
+        if(rating.level()>100 && rating.level()<201) return zoneIndex.get(2);
+        if(rating.level()>200 && rating.level()<301) return zoneIndex.get(3);
+        if(rating.level()>300 && rating.level()<401) return zoneIndex.get(4);
+        if(rating.level()>400 && rating.level()<501) return zoneIndex.get(5);
+        if(rating.level()>500 && rating.level()<601) return zoneIndex.get(6);
+        if(rating.level()>600 && rating.level()<701) return zoneIndex.get(7);
+        if(rating.level()>700 && rating.level()<801) return zoneIndex.get(8);
+        if(rating.level()>800 && rating.level()<901) return zoneIndex.get(9);
         return zoneIndex.get(10);
     }
 

@@ -18,6 +18,7 @@ public class AchievementProgress extends RecoverableObject {
         this.tier = 1;
         this.disabled = true;
     }
+
     public int getFactoryId() {
         return PresencePortableRegistry.OID;
     }

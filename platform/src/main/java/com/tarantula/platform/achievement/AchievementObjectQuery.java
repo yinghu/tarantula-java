@@ -3,9 +3,7 @@ package com.tarantula.platform.achievement;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 
-import com.tarantula.platform.presence.PresencePortableRegistry;
-
-public class AchievementObjectQuery implements RecoverableFactory<Achievement> {
+public class AchievementObjectQuery implements RecoverableFactory<AchievementItem> {
 
     public String label;
     Recoverable.Key key;
@@ -16,8 +14,8 @@ public class AchievementObjectQuery implements RecoverableFactory<Achievement> {
     }
 
     @Override
-    public Achievement create() {
-        return new Achievement();
+    public AchievementItem create() {
+        return new AchievementItem();
     }
 
     @Override

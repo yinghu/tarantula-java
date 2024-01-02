@@ -10,7 +10,7 @@ import com.icodesoftware.service.Serviceable;
 public interface GameLobby extends Configurable, Serviceable {
 
 
-    Stub join(Session session, Rating rating);
+    Stub join(Session session);
     boolean leave(Session session);
 
     void validate(Session session);
