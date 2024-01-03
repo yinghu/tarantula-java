@@ -630,6 +630,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             return true;
         })) return OnSessionTrack.INVALID_TOKEN;
         onSession.ticket(ticket(onSession.distributionId(),onSession.stub(),timeoutInSeconds));
+        onSession.successful(true);
         return onSession;
     }
 
