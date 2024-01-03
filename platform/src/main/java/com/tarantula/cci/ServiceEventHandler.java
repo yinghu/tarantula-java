@@ -33,7 +33,8 @@ public class ServiceEventHandler extends AbstractRequestHandler {
         String trackId = exchange.header(Session.TARANTULA_TRACK_ID);
         byte[]  _payload = exchange.payload();
         if(path.startsWith("/service/action") && token!=null && !token.equals("undefined")){
-            OnSession id = auth.validateToken(token);//new OnSessionTrack();//place holder for public access applications
+            OnSession id = auth.validateToken(token);
+            if(!id.successful()) throw new IllegalAccessException(id.message());
             RoutingKey  routingKey = eventService.routingKey(id.distributionId(),tag);
             ServiceActionEvent actionEvent = new ServiceActionEvent(this.serviceTopic,exchange.id(),_payload);
             actionEvent.distributionId(id.distributionId());

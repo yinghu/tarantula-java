@@ -1,5 +1,5 @@
 {
-  "trialMaxUserCount": 3,
-  "subscribedMaxUserCount": 10,
+  "trialMaxUserCount": 100,
+  "subscribedMaxUserCount": 100,
   "maxOnSessionCount": 5
 }
