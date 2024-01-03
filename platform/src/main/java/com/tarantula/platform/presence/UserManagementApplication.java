@@ -225,22 +225,12 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 ThirdPartyLogin developerLogin = createDeveloperLogin(session,acc);
                 OnSession access = this.login(session.distributionId(),developerLogin.password(),session);
                 onSession(access,session);
-                //session.write(JsonUtil.toSimpleResponse(false,"Developer not registered").getBytes());
             }
         }
         else if(session.action().equals("onDeveloperRegister")){
             String deviceId = (String) acc.property(OnAccess.DEVICE_ID);
             AccessIndex accessIndex = this.accessIndexService.get(deviceId);
             if(accessIndex!=null){
-                //create association with the master account
-                //GameCluster gameCluster = this.tokenValidatorProvider.validateGameClusterAccessKey(session.trackId());
-                //long owner = gameCluster.accountId;
-                //ThirdPartyLogin developerLogin = new ThirdPartyLogin("developer",SystemUtil.oid(),deviceId);
-                //developerLogin.distributionKey(session.systemId());
-                //acc.property("login",deviceId);
-                //acc.property("password",developerLogin.password());
-                //this.createLogin(owner,acc,session.systemId(),AccessControl.admin.name(),true,"key",false);
-                //userService.createLoginProvider(developerLogin);
                 ThirdPartyLogin developerLogin = createDeveloperLogin(session,acc);
                 OnSession access = this.login(session.distributionId(),developerLogin.password(),session);
                 onSession(access,session);
