@@ -51,7 +51,7 @@ public class GameLobbyAdminRoleModule implements Module {
                 if(!eMap.containsKey(lobbyIndex)) {
                     Descriptor desc = lobby.entryList().get(0).copy();
                     desc.name("Game Lobby " + lobbyIndex);
-                    desc.tag(((String) gameCluster.property(GameCluster.NAME)).toLowerCase() + "/lobby" + lobbyIndex);
+                    desc.tag(gameCluster.name().toLowerCase() + "/lobby" + lobbyIndex);
                     desc.accessRank(lobbyIndex);
                     String configName = gameCluster.playMode();
                     if(this.deploymentServiceProvider.createApplication(desc,configName,true)){

@@ -2,11 +2,9 @@ package com.tarantula.platform.service;
 
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.Statistics;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MetricsListener;
 import com.tarantula.game.service.PlatformGameServiceProvider;
-import com.tarantula.platform.configuration.JDBCPool;
 import com.tarantula.platform.configuration.JDBCPoolCredentialConfiguration;
 import com.tarantula.platform.configuration.JDBCTask;
 import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;

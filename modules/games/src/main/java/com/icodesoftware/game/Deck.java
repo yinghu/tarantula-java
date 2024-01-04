@@ -1,6 +1,5 @@
 package com.icodesoftware.game;
 
-import com.icodesoftware.game.Card;
 import com.icodesoftware.service.RNG;
 import com.icodesoftware.util.*;
 

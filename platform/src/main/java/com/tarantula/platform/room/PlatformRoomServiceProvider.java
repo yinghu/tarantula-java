@@ -281,8 +281,12 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     @Override
     public OnAccess onConnection(Connection connection) {
         GameZoneIndex index = gameZoneIndex(connection.configurationName());
-        if(index==null || !this.dedicated) {
+        if(index==null) {
             logger.warn("No game lobby available for ["+connection.configurationName()+"]");
+            return null;
+        }
+        if(!dedicated){
+            logger.warn("Game cluster needs to setup as dedicated for ["+typeId()+"]");
             return null;
         }
         byte[] lockKey = index.gameZone.distributionKey().getBytes();
@@ -469,7 +473,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private GameZoneIndex gameZoneIndex(String configurationName){
         GameZoneIndex[] gameZone ={null};
         gameZoneIndex.forEach((k,v)->{
-            if(configurationName.equals(v.gameZone.configurationTypeId()+"/"+v.gameZone.configurationName())){
+            if(configurationName.trim().equals(v.gameZone.configurationTypeId()+"/"+v.gameZone.configurationName())){
                 gameZone[0] = v;
             }
         });

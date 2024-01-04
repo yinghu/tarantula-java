@@ -31,7 +31,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     private ScheduleRunner countdownTimer;
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
 
-    private String moduleName;
     private long gameModuleCountdownInterval;
     private ActiveRoom roomTemplate;
 
@@ -71,11 +70,9 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     private Thread sender;
     private boolean running = true;
 
-    //private GameServiceProxy gameServiceProxy;
 
     public UDPGameEndpoint(JsonObject config){
         this.config = config;
-        //gameServiceProxy = new EmptyGameServiceProxy();
     }
 
 
@@ -115,7 +112,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         long duration = jo.get("duration").getAsLong();
         long overtime = jo.get("overtime").getAsLong();
         int joinsOnStart = jo.get("joinsOnStart").getAsInt();
-        this.moduleName = jo.get("gameModule").getAsString();
         this.roomTemplate = new ActiveRoom(capacity,duration,overtime,joinsOnStart,timeout);
         this.cipherListener = this.udpEndpointServiceProvider.registerCipherListener(serverKey);
         int channelRegistered =0;

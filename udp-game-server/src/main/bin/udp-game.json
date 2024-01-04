@@ -3,18 +3,18 @@
     "inboundThreadPoolSetting":"udp-messaging,8,8,8,30,0",
     "schedulerSetting": "game-scheduler,3,3",
     "maxChannelSize": 10,
-    "binding":"192.168.1.23",
+    "binding":"10.0.0.18",
     "port":16693,
     "receiverTimeout": 3000,
     "gameModuleCountdownInterval": 10000,
     "register":{
-        "url":"http://192.168.1.23:8090",
+        "url":"http://10.0.0.18:8090",
         "path":"server",
-        "accessKey":"BDS/8dcb3df02086450cb6e83bd0be62c4e8-AA3E1FE0226E46B8673308E49167E5DC8B791566-4830E2A832E33FF8D744C7D5627AEF81"
+        "accessKey":"529944455172591616-9F9F706F94AAAFA0DA2078D126A6EFBAEFE4C08C-0C8AB15D2DF88A737C87F364D3F3B50E"
     },
     "connection":{
-        "configurationName":"lobby1/rank1",
-        "host":"192.168.1.23",
+        "configurationName":"lobby1_rank1_1.0/rank1",
+        "host":"10.0.0.18",
         "port":16693,
         "type":"udp",
         "secured":true

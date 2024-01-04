@@ -222,7 +222,11 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         node_started = new AtomicBoolean(false);
         PortableProviderConfigurationParser pcs = new PortableProviderConfigurationParser("tarantula-platform-portable-provider.xml");
         pcs.parse().forEach((r)->{
+            if(fMap.contains(r.registryId())){
+                throw new RuntimeException("Duplicate portable registry ["+r.registryId()+"]");
+            }
             fMap.put(r.registryId(),r);
+            log.warn("Portable registry ["+r.registryId()+"] added");
         });
         this.dataScopeReplicationProxy = new DataScopeReplicationProxy();
         this.integrationScopeReplicationProxy = new IntegrationScopeReplicationProxy();

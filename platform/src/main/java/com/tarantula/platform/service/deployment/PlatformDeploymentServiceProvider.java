@@ -34,7 +34,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private TarantulaLogger log = JDKLogger.getLogger(PlatformDeploymentServiceProvider.class);
 
-    //private EventService integrationEventService;
     private ClusterProvider integrationCluster;
     private SecureRandom secureRandom;
 
@@ -339,7 +338,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(!ds.load(query)){
             return false;
         }
-        descriptor.owner(query.index());
+        descriptor.ownerKey(SnowflakeKey.from(query.lobbyId()));
         descriptor.label(ApplicationProvider.LABEL);
         descriptor.onEdge(true);
         if(!ds.create(descriptor)) return false;
