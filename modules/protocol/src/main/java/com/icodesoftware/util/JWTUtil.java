@@ -132,7 +132,7 @@ public class JWTUtil {
             return Base64.getUrlEncoder().encodeToString(json.toString().getBytes());
         }
 
-        private synchronized String sign(byte[] data,byte[] signature) throws Exception{
+        private String sign(byte[] data,byte[] signature) throws Exception{
             if(mac != null){
                 synchronized (mac) {
                     return Base64.getUrlEncoder().withoutPadding().encodeToString(mac.doFinal(data));
