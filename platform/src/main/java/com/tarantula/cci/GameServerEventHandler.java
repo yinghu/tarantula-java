@@ -59,7 +59,6 @@ public class GameServerEventHandler extends AbstractRequestHandler {
                 resp.addProperty("joinsOnStart",(int)onAccess.property("joinsOnStart"));
                 resp.addProperty("duration",(long)onAccess.property("duration"));
                 resp.addProperty("overtime",(long)onAccess.property("overtime"));
-                resp.addProperty("gameModule",(String)onAccess.property("gameModule"));
             }
             exchange.onEvent(new ResponsiveEvent("",0,resp.toString().getBytes(),true));
         }

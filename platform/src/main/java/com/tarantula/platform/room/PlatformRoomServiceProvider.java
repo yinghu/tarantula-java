@@ -138,9 +138,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         if(scheduledFuture!=null && !scheduledFuture.isCancelled()) scheduledFuture.cancel(true);
         this.clusterProvider.unregisterReloadListener(reloadKey);
         this.serviceContext.deploymentServiceProvider().unregisterGameServerListener(registerKey);
-        //gameZoneIndex.forEach((k,z)->{
-            //if(dedicated) z.gameModule.close();
-        //});
         gameRoomIndex.forEach((k,r)->r.close());
     }
 
@@ -160,7 +157,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                     }
                 }
             }
-            //GameRoom room = index.gameRoom;
             channel.register(stub,this.gameServiceProvider.gameServiceProvider(),this.gameServiceProvider.gameServiceProvider(),this.gameServiceProvider.gameServiceProvider(),timeoutListener);
             udpEndpoint.registerChannel(channel);
             return channel;
@@ -251,7 +247,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public <T extends Configurable> void release(T t) {
         GameZoneIndex index = gameZoneIndex.remove(t.distributionKey());
         if(dedicated){
-            //index.gameModule.close();
             UDPChannel udpChannel;
             do{
                 udpChannel = index.pendingPushChannels.poll();
@@ -302,13 +297,12 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         onAccess.property("duration",index.gameZone.roundDuration());
         onAccess.property("overtime",index.gameZone.roundOvertime());
         onAccess.property("joinsOnStart",index.gameZone.joinsOnStart());
-        //onAccess.property("gameModule",index.gameZone.gameModule());
         return onAccess;
     }
 
+
     public void onUpdate(String lobby,byte[] payload){
         serviceContext.schedule(new ScheduleRunner(1000,()->{
-            //logger.warn("Update ["+new String(payload)+"]["+lobby+"]");
             GameZoneIndex index = gameZoneIndex(lobby);
             UpdateBatch updateBatch = UpdateBatch.fromBytes(payload);
             for(PlayerUpdate update : updateBatch.playerUpdates){

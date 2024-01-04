@@ -2,7 +2,6 @@ package com.tarantula.platform.inbox;
 
 import com.google.gson.JsonObject;
 import com.tarantula.platform.item.Application;
-import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.util.Map;
