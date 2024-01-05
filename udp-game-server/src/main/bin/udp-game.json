@@ -3,7 +3,7 @@
     "inboundThreadPoolSetting":"udp-messaging,8,8,8,30,0",
     "schedulerSetting": "game-scheduler,3,3",
     "maxChannelSize": 10,
-    "binding":"10.0.0.18",
+    "binding":"10.0.0.20",
     "port":16693,
     "receiverTimeout": 3000,
     "gameModuleCountdownInterval": 10000,

@@ -2,6 +2,7 @@ package com.tarantula.platform.util;
 
 import com.icodesoftware.protocol.ValidationUtil;
 import com.icodesoftware.service.ApplicationPreSetup;
+import com.icodesoftware.util.Base64Util;
 import com.icodesoftware.util.TimeUtil;
 
 import java.io.PrintWriter;
@@ -148,10 +149,10 @@ public class SystemUtil {
     }
 
     public static String toBase64String(byte[] data){
-        return Base64.getEncoder().encodeToString(data);
+        return Base64Util.toBase64String(data);
     }
     public static byte[] fromBase64String(String data){
-        return Base64.getDecoder().decode(data);
+        return Base64Util.fromBase64String(data);
     }
 
     public static byte[] fromPemString(String base64Key){

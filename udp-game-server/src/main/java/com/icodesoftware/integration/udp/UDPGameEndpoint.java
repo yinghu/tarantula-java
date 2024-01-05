@@ -3,16 +3,15 @@ package com.icodesoftware.integration.udp;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.game.PendingReleaseRoom;
+import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.ApplicationSchema;
 import com.icodesoftware.service.Serviceable;
 import com.icodesoftware.service.TokenValidatorProvider;
-import com.icodesoftware.util.HttpCaller;
-import com.icodesoftware.util.JsonUtil;
-import com.icodesoftware.util.ScheduleRunner;
-import com.icodesoftware.util.TarantulaExecutorServiceFactory;
+import com.icodesoftware.util.*;
 
+import javax.crypto.Cipher;
 import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -70,6 +69,8 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     private Thread sender;
     private boolean running = true;
 
+    private Cipher cipher;
+
 
     public UDPGameEndpoint(JsonObject config){
         this.config = config;
@@ -113,6 +114,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         long overtime = jo.get("overtime").getAsLong();
         int joinsOnStart = jo.get("joinsOnStart").getAsInt();
         this.roomTemplate = new ActiveRoom(capacity,duration,overtime,joinsOnStart,timeout);
+        this.cipher = CipherUtil.decrypt(serverKey);
         this.cipherListener = this.udpEndpointServiceProvider.registerCipherListener(serverKey);
         int channelRegistered =0;
         for(int i=0;i<maxChannelSize;i++){
@@ -205,14 +207,16 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     public boolean validate(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         try{
             int sessionId = messageBuffer.readInt();
-            String token = messageBuffer.readUTF8();
+            long systemId = messageBuffer.readLong();
+            long stub = messageBuffer.readLong();
+            //String token = messageBuffer.readUTF8();
             String ticket = messageBuffer.readUTF8();
-            MessageDigest mda = (MessageDigest)messageDigest.clone();
-            ValidationUtil.Token session = ValidationUtil.validToken(mda,token);
-            boolean suc = ValidationUtil.validTicket(mda,session.systemId,session.stub,ticket)!=null;
+            //MessageDigest mda = (MessageDigest)messageDigest.clone();
+            //ValidationUtil.Token session = ValidationUtil.validToken(mda,token);
+            boolean suc = this.validateTicket(systemId,stub,ticket);
             if(suc && sessionId == messageHeader.sessionId){
                 ActiveRoom activeGame = activeGameIndex.get(messageHeader.channelId);
-                ActiveChannel activeChannel = new ActiveChannel(session.systemId,activeGame.channelId(),sessionId);
+                ActiveChannel activeChannel = new ActiveChannel(Long.toString(systemId),activeGame.channelId(),sessionId);
                 activeChannel.register(activeGame.gameUserChannel,this.cipherListener);
                 //activeGame.gameModule.onValidated(activeChannel);
                 return true;
@@ -356,5 +360,17 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
 
     private void onCountdown(){
         pendingReleaseRooms.forEach((k,v)->v.room.onCountdown(gameModuleCountdownInterval));
+    }
+
+    private boolean validateTicket(long key,long stub,String ticket){
+        try{
+            synchronized (cipher){
+                byte[] mark = cipher.doFinal(Base64Util.fromBase64String(ticket));
+                Recoverable.DataBuffer buffer = BufferProxy.wrap(mark);
+                return buffer.readLong()==(key) && buffer.readLong() == stub;
+            }
+        }catch (Exception ex){
+            return false;
+        }
     }
 }
