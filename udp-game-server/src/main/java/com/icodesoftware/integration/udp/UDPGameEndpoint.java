@@ -3,19 +3,13 @@ package com.icodesoftware.integration.udp;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.game.PendingReleaseRoom;
-import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.*;
-import com.icodesoftware.service.ApplicationSchema;
 import com.icodesoftware.service.Serviceable;
-import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.*;
 
-import javax.crypto.Cipher;
-import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -40,8 +34,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     private int maxChannelSize;
 
     private AtomicInteger keySync;
-
-    private MessageDigest messageDigest;
 
 
     private HttpCaller httpCaller;
@@ -69,8 +61,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     private Thread sender;
     private boolean running = true;
 
-    private Cipher cipher;
-
 
     public UDPGameEndpoint(JsonObject config){
         this.config = config;
@@ -82,7 +72,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(config.get("schedulerSetting").getAsString());
         this.activeGameIndex = new ConcurrentHashMap<>();
         this.pendingReleaseRooms = new ConcurrentHashMap<>();
-        this.messageDigest = MessageDigest.getInstance(TokenValidatorProvider.MDA);
         this.serverId = UUID.randomUUID().toString();
         this.keySync = new AtomicInteger(1);
         this.udpEndpointServiceProvider = (UDPEndpointServiceProvider)Class.forName(config.get("endpointServiceProvider").getAsString()).getConstructor().newInstance();
@@ -105,7 +94,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         String resp = httpCaller.post(registerPath,connection.toString().getBytes(),headers);
         JsonObject jo = JsonUtil.parse(resp);
         if(!jo.get("successful").getAsBoolean()) throw new RuntimeException(resp);
-        byte[] serverKey = Base64.getDecoder().decode(jo.get("serverKey").getAsString());
+        byte[] serverKey = Base64Util.fromBase64String(jo.get("serverKey").getAsString());
         this.typeId = jo.get("typeId").getAsString();
         int timeout = jo.get("sessionTimeout").getAsInt();
         this.udpEndpointServiceProvider.sessionTimeout(timeout);
@@ -113,8 +102,8 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         long duration = jo.get("duration").getAsLong();
         long overtime = jo.get("overtime").getAsLong();
         int joinsOnStart = jo.get("joinsOnStart").getAsInt();
+        logger.warn("Room setting : "+jo);
         this.roomTemplate = new ActiveRoom(capacity,duration,overtime,joinsOnStart,timeout);
-        this.cipher = CipherUtil.decrypt(serverKey);
         this.cipherListener = this.udpEndpointServiceProvider.registerCipherListener(serverKey);
         int channelRegistered =0;
         for(int i=0;i<maxChannelSize;i++){
@@ -350,13 +339,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             logger.warn("failed to create channel");
         }
     }
-    public GameServiceProvider gameServiceProvider(){
-        return null;
-    }
-    //@Override
-    public ApplicationSchema applicationSchema() {
-        return null;
-    }
 
     private void onCountdown(){
         pendingReleaseRooms.forEach((k,v)->v.room.onCountdown(gameModuleCountdownInterval));
@@ -364,14 +346,22 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
 
     private boolean validateTicket(long key,long stub,String ticket){
         try{
-            headers[5]="onTicket";
+           String[] requestHeaders = new String[]{
+                    Session.TARANTULA_ACCESS_KEY,
+                    headers[1],
+                    Session.TARANTULA_SERVER_ID,
+                    headers[3],
+                    Session.TARANTULA_ACTION,
+                    "onTicket"
+            };
             JsonObject req = new JsonObject();
             req.addProperty("systemId",key);
             req.addProperty("stub",stub);
             req.addProperty("ticket",ticket);
-            JsonObject resp = JsonUtil.parse(httpCaller.post(registerPath,req.toString().getBytes(),headers));
+            JsonObject resp = JsonUtil.parse(httpCaller.post(registerPath,req.toString().getBytes(),requestHeaders));
             return resp.get("successful").getAsBoolean();
         }catch (Exception ex){
+            logger.error("failed to validate ticket",ex);
             return false;
         }
     }
