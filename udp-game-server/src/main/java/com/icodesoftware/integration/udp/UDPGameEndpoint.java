@@ -364,11 +364,13 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
 
     private boolean validateTicket(long key,long stub,String ticket){
         try{
-            synchronized (cipher){
-                byte[] mark = cipher.doFinal(Base64Util.fromBase64String(ticket));
-                Recoverable.DataBuffer buffer = BufferProxy.wrap(mark);
-                return buffer.readLong()==(key) && buffer.readLong() == stub;
-            }
+            headers[5]="onTicket";
+            JsonObject req = new JsonObject();
+            req.addProperty("systemId",key);
+            req.addProperty("stub",stub);
+            req.addProperty("ticket",ticket);
+            JsonObject resp = JsonUtil.parse(httpCaller.post(registerPath,req.toString().getBytes(),headers));
+            return resp.get("successful").getAsBoolean();
         }catch (Exception ex){
             return false;
         }

@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
@@ -42,7 +43,14 @@ public class GameServerEventHandler extends AbstractRequestHandler {
         GameCluster gameCluster = tokenValidator.validateGameClusterAccessKey(accessKey);
         if(gameCluster==null) throw new RuntimeException("Illegal access");
         String typeId = gameCluster.gameLobbyName;
-        if(action.equals("onConnect")){//start game server
+        if(action.equals("onTicket")){
+            JsonObject resp = JsonUtil.parse(_payload);
+            boolean valid = tokenValidator.validateTicket(resp.get("systemId").getAsLong(),resp.get("stub").getAsLong(),resp.get("ticket").getAsString());
+            resp = new JsonObject();
+            resp.addProperty("successful",valid);
+            exchange.onEvent(new ResponsiveEvent("",0,resp.toString().getBytes(),true));
+        }
+        else if(action.equals("onConnect")){//start game server
             ConnectionStub connection = builder.create().fromJson(new String(_payload),ConnectionStub.class);
             byte[] serverKey = this.deploymentServiceProvider.serverKey(typeId);
             connection.configurationTypeId(typeId);
