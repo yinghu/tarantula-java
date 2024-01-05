@@ -48,6 +48,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     //push event cache mappings
     ConcurrentHashMap<String, GameServerListener> cListeners = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, GameClusterEventListener> eListeners = new ConcurrentHashMap<>();
 
 
     //module class loader mappings
@@ -262,6 +263,19 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             }
         });
         return response;
+    }
+
+    public <T extends OnAccess> void onGameClusterEvent(T event){
+        if(event.typeId()==null) return;
+        GameClusterEventListener gameClusterEventListener = eListeners.get(event.typeId());
+        if(gameClusterEventListener==null) return;
+        gameClusterEventListener.onGameClusterEvent(event);
+    }
+    public void registerGameClusterEventListener(GameClusterEventListener gameClusterEventListener){
+        this.eListeners.put(gameClusterEventListener.typeId(),gameClusterEventListener);
+    }
+    public void unregisterGameClusterEventListener(GameClusterEventListener gameClusterEventListener){
+        this.eListeners.remove(gameClusterEventListener.typeId());
     }
     public List<Descriptor> gameServiceList(){
         return this.tarantulaContext.availableServices();

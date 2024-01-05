@@ -31,7 +31,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
     private ConcurrentHashMap<String,OnLobby> onLobbyIndex;
 
 
-
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
@@ -123,13 +122,15 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         else if(session.action().equals("onTokenRegister")){
             Map<String,Object> params = acc.toMap();
             params.put(OnAccess.SYSTEM_ID,session.systemId());
+            String typeId = (String) params.get(OnAccess.TYPE_ID);
             if(this.context.validator().validateToken(params)){
                 AccessIndex _query = accessIndexService.get((String) acc.property("login"));
                 if(_query!=null){
-                    ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin((String)params.get("provider"),SystemUtil.oid(),"");
+                    ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin(typeId+"#"+params.get("provider"),SystemUtil.oid(),"");
                     thirdPartyLogin.distributionKey(session.systemId());
                     userService.createLoginProvider(thirdPartyLogin);
                     acc.property(OnAccess.PASSWORD,thirdPartyLogin.password());
+                    acc.typeId(typeId);
                     createLogin(acc,session.distributionId(),AccessControl.player.name(),true,acc.name(),true);
                     OnSession onSession = login(session.distributionId(),thirdPartyLogin.password(),session);
                     onSession(onSession,session);
@@ -248,7 +249,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         GameCluster gameCluster = this.tokenValidatorProvider.validateGameClusterAccessKey(session.trackId());
         long owner = gameCluster.accountId;
         String deviceId = (String) acc.property(OnAccess.DEVICE_ID);
-        ThirdPartyLogin developerLogin = new ThirdPartyLogin("developer",SystemUtil.oid(),deviceId);
+        ThirdPartyLogin developerLogin = new ThirdPartyLogin(gameCluster.typeId()+"#developer",SystemUtil.oid(),deviceId);
         developerLogin.distributionKey(session.systemId());
         acc.property("login",deviceId);
         acc.property("password",developerLogin.password());
@@ -289,7 +290,9 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         Account account = new UserAccount();
         account.distributionId(accountId);
         payload.ownerKey(new SnowflakeKey(accountId));
-        return userService.createUser(account,toAccess(payload));
+        Access access =userService.createUser(account,toAccess(payload));
+        this.deploymentServiceProvider.onGameClusterEvent(payload);
+        return access;
     }
     private Access createLogin(OnAccess payload,long systemId,String roleName,boolean validated,String validator,boolean primary){
         payload.property(OnAccess.SYSTEM_ID,systemId);
@@ -298,7 +301,9 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         payload.property(OnAccess.VALIDATED,validated);
         payload.property(OnAccess.PRIMARY_USER,primary);
         payload.property(OnAccess.ACTIVATED,activated);
-        return userService.createUser(payload);
+        Access access = userService.createUser(payload);
+        this.deploymentServiceProvider.onGameClusterEvent(payload);
+        return access;
     }
 
     private Access toAccess(OnAccess onAccess){

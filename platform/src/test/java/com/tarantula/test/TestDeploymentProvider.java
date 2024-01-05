@@ -182,7 +182,11 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
     public <T extends OnAccess> T createGameCluster(Account accountId, String name, OnAccess properties) {
         return null;
     }
+    public <T extends OnAccess> void onGameClusterEvent(T event){
 
+    }
+    public void registerGameClusterEventListener(GameClusterEventListener gameClusterEventListener){}
+    public void unregisterGameClusterEventListener(GameClusterEventListener gameClusterEventListener){}
     @Override
     public <T extends OnAccess> List<T> gameClusterList(Access access) {
         return null;
