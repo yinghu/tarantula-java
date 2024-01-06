@@ -278,11 +278,11 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameZoneIndex index = gameZoneIndex(connection.configurationName());
         if(index==null) {
             logger.warn("No game lobby available for ["+connection.configurationName()+"]");
-            return null;
+            return new OnAccessTrack(false,"game lobby ["+connection.configurationName()+"] not available");
         }
         if(!dedicated){
             logger.warn("Game cluster needs to setup as dedicated for ["+typeId()+"]");
-            return null;
+            return new OnAccessTrack(false,"game cluster needs to setup as dedicated");
         }
         byte[] lockKey = index.gameZone.distributionKey().getBytes();
         serverClusterStore.mapLock(lockKey);
@@ -292,6 +292,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         connection.timeout(timeout);
         this.clusterProvider.deployService().onRegisterConnection(connection);
         OnAccess onAccess = new OnAccessTrack();
+        onAccess.successful(true);
         onAccess.property("sessionTimeout",timeout);
         onAccess.property("capacity",index.gameZone.capacity());
         onAccess.property("duration",index.gameZone.roundDuration());

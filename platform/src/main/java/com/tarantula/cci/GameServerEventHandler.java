@@ -3,6 +3,7 @@ package com.tarantula.cci;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
+import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.JsonUtil;
@@ -51,63 +52,94 @@ public class GameServerEventHandler extends AbstractRequestHandler {
             exchange.onEvent(new ResponsiveEvent("",0,resp.toString().getBytes(),true));
         }
         else if(action.equals("onConnect")){//start game server
-            ConnectionStub connection = builder.create().fromJson(new String(_payload),ConnectionStub.class);
-            byte[] serverKey = this.deploymentServiceProvider.serverKey(typeId);
-            connection.configurationTypeId(typeId);
-            connection.serverKey = serverKey;
-            OnAccess onAccess = this.deploymentServiceProvider.registerConnection(connection);
-            boolean suc = onAccess!=null;
+            GameServerListener gameServerListener = deploymentServiceProvider.gameServerListener(typeId);
             JsonObject resp = new JsonObject();
-            resp.addProperty("successful",suc);
-            if(suc) {
-                resp.addProperty("typeId",typeId);
-                resp.addProperty("serverKey", Base64.getEncoder().encodeToString(serverKey));
-                resp.addProperty("sessionTimeout",(int)onAccess.property("sessionTimeout"));
-                resp.addProperty("capacity",(int)onAccess.property("capacity"));
-                resp.addProperty("joinsOnStart",(int)onAccess.property("joinsOnStart"));
-                resp.addProperty("duration",(long)onAccess.property("duration"));
-                resp.addProperty("overtime",(long)onAccess.property("overtime"));
+            if(gameServerListener!=null) {
+                ConnectionStub connection = builder.create().fromJson(new String(_payload), ConnectionStub.class);
+                byte[] serverKey = this.deploymentServiceProvider.serverKey(typeId);
+                connection.configurationTypeId(typeId);
+                connection.serverKey = serverKey;
+                OnAccess onAccess = gameServerListener.onConnection(connection);
+                resp.addProperty("successful", onAccess.successful());
+                if (onAccess.successful()) {
+                    resp.addProperty("typeId", typeId);
+                    resp.addProperty("serverKey", Base64.getEncoder().encodeToString(serverKey));
+                    resp.addProperty("sessionTimeout", (int) onAccess.property("sessionTimeout"));
+                    resp.addProperty("capacity", (int) onAccess.property("capacity"));
+                    resp.addProperty("joinsOnStart", (int) onAccess.property("joinsOnStart"));
+                    resp.addProperty("duration", (long) onAccess.property("duration"));
+                    resp.addProperty("overtime", (long) onAccess.property("overtime"));
+                } else {
+                    resp.addProperty("message", onAccess.message());
+                }
+            }
+            else{
+                resp.addProperty("successful",false);
+                resp.addProperty("message","game server listener not available");
             }
             exchange.onEvent(new ResponsiveEvent("",0,resp.toString().getBytes(),true));
         }
         else if(action.equals("onChannel")){
-            ChannelStub channel = this.builder.create().fromJson(new String(_payload),ChannelStub.class);
-            channel.serverId = serverId;
-            channel.configurationTypeId(typeId);
-            boolean suc = deploymentServiceProvider.registerChannel(channel);
+            GameServerListener gameServerListener = deploymentServiceProvider.gameServerListener(typeId);
             JsonObject resp = new JsonObject();
-            resp.addProperty("successful",suc);
+            if(gameServerListener!=null){
+                ChannelStub channel = this.builder.create().fromJson(new String(_payload),ChannelStub.class);
+                channel.serverId = serverId;
+                channel.configurationTypeId(typeId);
+                boolean suc = gameServerListener.onChannel(channel);
+                resp.addProperty("successful",suc);
+            }
+            else{
+                resp.addProperty("successful",false);
+            }
             exchange.onEvent(new ResponsiveEvent("", 0,resp.toString().getBytes(), true));
         }
         else if(action.equals("onPing")){
             JsonObject resp = new JsonObject();
             resp.addProperty("successful",true);
             exchange.onEvent(new ResponsiveEvent("", 0,resp.toString().getBytes(), true));
-            deploymentServiceProvider.verifyConnection(typeId,serverId);
+            serviceContext.clusterProvider().deployService().onVerifyConnection(typeId,serverId);
         }
         else if(action.equals("onStart")){//stop the game server
-            ConnectionStub connection = builder.create().fromJson(new String(_payload),ConnectionStub.class);
-            connection.configurationTypeId(typeId);
-            this.deploymentServiceProvider.startConnection(connection);
+            GameServerListener gameServerListener = deploymentServiceProvider.gameServerListener(typeId);
             JsonObject resp = new JsonObject();
-            resp.addProperty("typeId",typeId);
-            resp.addProperty("successful",true);
+            if(gameServerListener!=null){
+                ConnectionStub connection = builder.create().fromJson(new String(_payload),ConnectionStub.class);
+                connection.configurationTypeId(typeId);
+                gameServerListener.onStartConnection(connection);
+                resp.addProperty("typeId",typeId);
+                resp.addProperty("successful",true);
+            }
+            else{
+                resp.addProperty("successful",false);
+            }
             exchange.onEvent(new ResponsiveEvent("",0,resp.toString().getBytes(),true));
         }
         else if(action.equals("onStop")){//stop the game server
-            ConnectionStub connection = builder.create().fromJson(new String(_payload),ConnectionStub.class);
-            connection.configurationTypeId(typeId);
-            this.deploymentServiceProvider.stopConnection(connection);
+            GameServerListener gameServerListener = deploymentServiceProvider.gameServerListener(typeId);
             JsonObject resp = new JsonObject();
-            resp.addProperty("typeId",typeId);
-            resp.addProperty("successful",true);
+            if(gameServerListener!=null){
+                ConnectionStub connection = builder.create().fromJson(new String(_payload),ConnectionStub.class);
+                connection.configurationTypeId(typeId);
+                gameServerListener.onDisConnection(connection);
+                resp.addProperty("typeId",typeId);
+                resp.addProperty("successful",true);
+            }else{
+                resp.addProperty("successful",false);
+            }
             exchange.onEvent(new ResponsiveEvent("",0,resp.toString().getBytes(),true));
         }
         else if(action.equals("onUpdate")){
+            GameServerListener gameServerListener = deploymentServiceProvider.gameServerListener(typeId);
             JsonObject resp = new JsonObject();
-            resp.addProperty("typeId",typeId);
-            resp.addProperty("successful",true);
-            this.deploymentServiceProvider.updateRoom(typeId,name,_payload);
+            if(gameServerListener!=null){
+                resp.addProperty("typeId",typeId);
+                resp.addProperty("successful",true);
+                gameServerListener.onUpdate(name,_payload);
+            }
+            else{
+                resp.addProperty("successful",false);
+            }
             exchange.onEvent(new ResponsiveEvent("",0,resp.toString().getBytes(),true));
         }
     }

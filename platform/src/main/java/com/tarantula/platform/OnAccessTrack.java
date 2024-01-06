@@ -1,6 +1,5 @@
 package com.tarantula.platform;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnAccess;
 import com.tarantula.platform.presence.UserPortableRegistry;
@@ -13,6 +12,14 @@ public class OnAccessTrack extends OnApplicationHeader implements OnAccess {
     protected String accessId;
     protected byte[] payload;
 
+    public OnAccessTrack(){
+
+    }
+
+    public OnAccessTrack(boolean successful,String message){
+        this.successful = successful;
+        this.message = message;
+    }
     public String accessKey(){
         return this.accessKey;
     }
