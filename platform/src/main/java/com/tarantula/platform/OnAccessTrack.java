@@ -1,5 +1,7 @@
 package com.tarantula.platform;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.icodesoftware.OnAccess;
 import com.tarantula.platform.presence.UserPortableRegistry;
 import com.icodesoftware.util.JsonUtil;
@@ -54,6 +56,11 @@ public class OnAccessTrack extends OnApplicationHeader implements OnAccess {
     }
     @Override
     public String toString(){
-        return new String(JsonUtil.toJson(properties));
+        return toJson().toString();
+    }
+
+    @Override
+    public JsonObject toJson(){
+        return JsonUtil.toJsonObject(properties);
     }
 }

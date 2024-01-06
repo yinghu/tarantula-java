@@ -79,6 +79,11 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     List<Descriptor> gameServiceList();
     <T extends Configuration,S extends OnAccess> T configuration(S gameCluster,String config);
     Lobby lobby(String typeId);
+
+    <T extends OnAccess> void onGameClusterEvent(T event);
+    void registerGameClusterEventListener(GameClusterEventListener gameClusterEventListener);
+    void unregisterGameClusterEventListener(GameClusterEventListener gameClusterEventListener);
+
     //END OF CLUSTER
 
     //Access index set operation API
@@ -128,6 +133,11 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
         void onConfigurableUpdated(String key);
 
+    }
+
+    interface GameClusterEventListener{
+        <T extends OnAccess> void onGameClusterEvent(T event);
+        String typeId();
     }
 
 }
