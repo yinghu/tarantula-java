@@ -6,6 +6,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.util.Base64Util;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.ResponseHeader;
@@ -15,9 +16,6 @@ import com.tarantula.platform.room.ConnectionStub;
 import com.tarantula.platform.util.ChannelDeserializer;
 import com.tarantula.platform.util.ConnectionDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
-
-import java.util.Base64;
-
 
 public class GameServerEventHandler extends AbstractRequestHandler {
 
@@ -63,12 +61,13 @@ public class GameServerEventHandler extends AbstractRequestHandler {
                 resp.addProperty("successful", onAccess.successful());
                 if (onAccess.successful()) {
                     resp.addProperty("typeId", typeId);
-                    resp.addProperty("serverKey", Base64.getEncoder().encodeToString(serverKey));
+                    resp.addProperty("serverKey", Base64Util.toBase64String(serverKey));
                     resp.addProperty("sessionTimeout", (int) onAccess.property("sessionTimeout"));
                     resp.addProperty("capacity", (int) onAccess.property("capacity"));
                     resp.addProperty("joinsOnStart", (int) onAccess.property("joinsOnStart"));
                     resp.addProperty("duration", (long) onAccess.property("duration"));
                     resp.addProperty("overtime", (long) onAccess.property("overtime"));
+                    resp.addProperty("gameServiceProvider",(String)onAccess.property("gameServiceProvider"));
                 } else {
                     resp.addProperty("message", onAccess.message());
                 }

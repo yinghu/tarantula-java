@@ -298,6 +298,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         onAccess.property("duration",index.gameZone.roundDuration());
         onAccess.property("overtime",index.gameZone.roundOvertime());
         onAccess.property("joinsOnStart",index.gameZone.joinsOnStart());
+        onAccess.property("gameServiceProvider",gameCluster.gameServiceProvider);
         return onAccess;
     }
 

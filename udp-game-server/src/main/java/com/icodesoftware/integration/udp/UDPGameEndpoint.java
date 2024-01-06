@@ -61,7 +61,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     private Thread sender;
     private boolean running = true;
 
-
+    private GameServiceProvider gameServiceProvider;
     public UDPGameEndpoint(JsonObject config){
         this.config = config;
     }
@@ -102,6 +102,8 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         long duration = jo.get("duration").getAsLong();
         long overtime = jo.get("overtime").getAsLong();
         int joinsOnStart = jo.get("joinsOnStart").getAsInt();
+        this.gameServiceProvider = toGameServiceProvider(jo.get("gameServiceProvider").getAsString());
+        this.gameServiceProvider.setup(new GameServiceContext());
         logger.warn("Room setting : "+jo);
         this.roomTemplate = new ActiveRoom(capacity,duration,overtime,joinsOnStart,timeout);
         this.cipherListener = this.udpEndpointServiceProvider.registerCipherListener(serverKey);
@@ -363,6 +365,14 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         }catch (Exception ex){
             logger.error("failed to validate ticket",ex);
             return false;
+        }
+    }
+    private GameServiceProvider toGameServiceProvider(String className){
+        try{
+            return (GameServiceProvider)Class.forName(className).getConstructor().newInstance();
+        }catch (Exception ex){
+            this.logger.warn("No class provided ["+className+"]");
+            throw new RuntimeException();
         }
     }
 }
