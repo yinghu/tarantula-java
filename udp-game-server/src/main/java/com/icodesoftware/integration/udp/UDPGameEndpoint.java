@@ -181,7 +181,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     public void onLeft(int channelId, int sessionId) {
         ActiveRoom activeGame = activeGameIndex.get(channelId);
         int totalLeft = activeGame.leave();
-        //activeGame.gameModule.onLeft(new ActiveChannel(sessionId));
         if(totalLeft == activeGame.capacity()){
             pendingReleaseRooms.remove(channelId);
         }
@@ -191,7 +190,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     public void onJoined(int channelId, int sessionId){
         ActiveRoom activeGame = activeGameIndex.get(channelId);
         activeGame.join();
-        //activeGame.gameModule.onJoined(new ActiveChannel(sessionId));
+
     }
 
     @Override
@@ -200,16 +199,12 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             int sessionId = messageBuffer.readInt();
             long systemId = messageBuffer.readLong();
             long stub = messageBuffer.readLong();
-            //String token = messageBuffer.readUTF8();
             String ticket = messageBuffer.readUTF8();
-            //MessageDigest mda = (MessageDigest)messageDigest.clone();
-            //ValidationUtil.Token session = ValidationUtil.validToken(mda,token);
             boolean suc = this.validateTicket(systemId,stub,ticket);
             if(suc && sessionId == messageHeader.sessionId){
                 ActiveRoom activeGame = activeGameIndex.get(messageHeader.channelId);
                 ActiveChannel activeChannel = new ActiveChannel(Long.toString(systemId),activeGame.channelId(),sessionId);
                 activeChannel.register(activeGame.gameUserChannel,this.cipherListener);
-                //activeGame.gameModule.onValidated(activeChannel);
                 return true;
             }
             return false;
@@ -239,7 +234,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             JsonObject jo = JsonUtil.parse(resp);
             if(!jo.get("successful").getAsBoolean()) return false;
             ActiveRoom activeRoom =  roomTemplate.assign(channelId);
-            //activeRoom.gameModule = this.createGameModule(activeRoom);
             activeRoom.gameUserChannel =  new GameUserChannel(channelId, udpEndpointServiceProvider, this.cipherListener,this, this,this);
             activeGameIndex.put(channelId, activeRoom);
             udpEndpointServiceProvider.registerUserChannel(activeRoom.gameUserChannel);
@@ -259,7 +253,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
         ActiveRoom activeGame = activeGameIndex.get(messageHeader.channelId);
-        //activeGame.gameModule.onAction(messageHeader,messageBuffer,callback);
     }
 
 
