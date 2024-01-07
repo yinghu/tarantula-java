@@ -34,12 +34,12 @@ public class MahjongServiceProvider implements GameServiceProvider {
 
     @Override
     public void onJoined(Channel channel) {
-        this.gameContext.log("on joined",OnLog.INFO);
+        this.gameContext.log("on joined channel",OnLog.INFO);
     }
 
     @Override
     public void onLeft(Channel channel) {
-        this.gameContext.log("on left",OnLog.INFO);
+        this.gameContext.log("on left channel",OnLog.INFO);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class MahjongServiceProvider implements GameServiceProvider {
 
     @Override
     public void onJoined(Session session, Room room) {
-
+        this.gameContext.log("Mahjong service on joined",OnLog.INFO);
     }
 
     @Override
@@ -75,16 +75,17 @@ public class MahjongServiceProvider implements GameServiceProvider {
 
     @Override
     public void onLeft(Session session) {
-
+        this.gameContext.log("Mahjong service on left",OnLog.INFO);
     }
 
     @Override
     public byte[] onRequest(Session session, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+        this.gameContext.log("Mahjong service on request",OnLog.INFO);
         return new byte[0];
     }
 
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
-
+        this.gameContext.log("Mahjong service on action",OnLog.INFO);
     }
 }

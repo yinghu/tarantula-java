@@ -3,10 +3,9 @@ package com.tarantula.game.service;
 import com.icodesoftware.*;
 import com.tarantula.game.*;
 import com.tarantula.platform.room.GameRoom;
-import com.tarantula.platform.room.PVEGameRoom;
 
-
-public class PVERoomProxy extends RoomProxyHeader {
+public class
+PVERoomProxy extends RoomProxyHeader {
 
     @Override
     public void setup(ApplicationContext applicationContext, GameLobby gameLobby,GameZone gameZone) {

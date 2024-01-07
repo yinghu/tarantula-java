@@ -3,11 +3,9 @@ package com.tarantula.platform.room;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
-import com.icodesoftware.game.PendingReleaseRoom;
-import com.icodesoftware.game.PlayerUpdate;
-import com.icodesoftware.game.UpdateBatch;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.Channel;
+import com.icodesoftware.protocol.PendingReleaseRoom;
 import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
 
@@ -306,15 +304,15 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public void onUpdate(String lobby,byte[] payload){
         serviceContext.schedule(new ScheduleRunner(1000,()->{
             GameZoneIndex index = gameZoneIndex(lobby);
-            UpdateBatch updateBatch = UpdateBatch.fromBytes(payload);
-            for(PlayerUpdate update : updateBatch.playerUpdates){
-                UpdateBatch batch = new UpdateBatch(new PlayerUpdate[]{update});
-                GameUpdateObject mappingObject = new GameUpdateObject();
-                mappingObject.value(batch.toBytes());
-                mappingObject.owner(update.systemId);
-                mappingObject.distributionKey(index.gameZone.distributionKey());
+            //UpdateBatch updateBatch = UpdateBatch.fromBytes(payload);
+            //for(PlayerUpdate update : updateBatch.playerUpdates){
+                //UpdateBatch batch = new UpdateBatch(new PlayerUpdate[]{update});
+                //GameUpdateObject mappingObject = new GameUpdateObject();
+                //mappingObject.value(batch.toBytes());
+                //mappingObject.owner(update.systemId);
+                //mappingObject.distributionKey(index.gameZone.distributionKey());
                 //this.serviceContext.postOffice().onTag(gameServiceProvider.serviceProxy().tag()).send(update.systemId,mappingObject);
-            }
+            //}
         }));
     }
     @Override
