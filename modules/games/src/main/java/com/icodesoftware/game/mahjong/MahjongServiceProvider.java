@@ -29,17 +29,17 @@ public class MahjongServiceProvider implements GameServiceProvider {
 
     @Override
     public void onValidated(Channel channel) {
-
+        this.gameContext.log("on validated",OnLog.INFO);
     }
 
     @Override
     public void onJoined(Channel channel) {
-
+        this.gameContext.log("on joined",OnLog.INFO);
     }
 
     @Override
     public void onLeft(Channel channel) {
-
+        this.gameContext.log("on left",OnLog.INFO);
     }
 
     @Override

@@ -184,13 +184,14 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         if(totalLeft == activeGame.capacity()){
             pendingReleaseRooms.remove(channelId);
         }
+        logger.warn("Left :"+channelId+" : "+sessionId);
     }
 
     @Override
     public void onJoined(int channelId, int sessionId){
         ActiveRoom activeGame = activeGameIndex.get(channelId);
         activeGame.join();
-
+        logger.warn("Joined :"+channelId+" : "+sessionId);
     }
 
     @Override
@@ -205,6 +206,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
                 ActiveRoom activeGame = activeGameIndex.get(messageHeader.channelId);
                 ActiveChannel activeChannel = new ActiveChannel(Long.toString(systemId),activeGame.channelId(),sessionId);
                 activeChannel.register(activeGame.gameUserChannel,this.cipherListener);
+                gameServiceProvider.onValidated(activeChannel);
                 return true;
             }
             return false;
@@ -253,6 +255,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
         ActiveRoom activeGame = activeGameIndex.get(messageHeader.channelId);
+        gameServiceProvider.onAction(messageHeader,messageBuffer,callback);
     }
 
 
@@ -266,39 +269,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             return this.scheduledExecutorService.scheduleAtFixedRate(task,task.initialDelay(),task.delay(),TimeUnit.MILLISECONDS);
         }
     }
-
-    public void log(String message,int level){
-        switch (level){
-            case OnLog.DEBUG:
-                this.logger.debug(message);
-                break;
-            case OnLog.INFO:
-                this.logger.info(message);
-                break;
-            case OnLog.WARN:
-                this.logger.warn(message);
-                break;
-        }
-
-    }
-
-    public void log(String message,Exception error,int level){
-        switch (level){
-            case OnLog.WARN:
-                if(error!=null){
-                    this.logger.warn(message);
-                }
-                else{
-                    this.logger.warn(message,error);
-                }
-                break;
-            case OnLog.ERROR:
-                this.logger.error(message,error);
-                break;
-        }
-    }
-
-
 
     @Override
     public void onStarted(Room room) {
