@@ -127,9 +127,9 @@ public class BattleUpdate extends RecoverableObject {
         return runUpdate(applicationPreSetup, session);
     }
 
-    public void publishAnalytics(TokenValidatorProvider.AuthVendor webhook){
+    public void publishAnalytics(TokenValidatorProvider.AuthVendor webhook,String query){
         pendingAnalytics.forEach(analyticsTransaction -> {
-            webhook.upload(Earth8GameServiceProvider.ANALYTICS_QUERY,analyticsTransaction.toString().getBytes());
+            webhook.upload(query,analyticsTransaction.toString().getBytes());
         });
     }
 

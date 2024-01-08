@@ -29,7 +29,7 @@ import com.tarantula.platform.tournament.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class PlatformGameServiceProvider implements MetricsListener,ItemDistributionCallback, ServiceProvider {
+public class PlatformGameServiceProvider implements MetricsListener,ItemDistributionCallback, ServiceProvider, DeploymentServiceProvider.GameClusterEventListener {
 
 
     private TarantulaLogger logger;
@@ -113,6 +113,7 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
         this.gameServiceProvider = toGameServiceProvider(gameCluster.gameServiceProvider);
         gameServiceProvider.setup(new PlatformGameContext(serviceContext,this,JDKLogger.getLogger(this.gameServiceProvider.getClass())));
         gameCluster.addListener(gameServiceProvider);
+        serviceContext.deploymentServiceProvider().registerGameClusterEventListener(this);
         logger.info("Game service provider ["+ NAME+"] started on game cluster ["+gameCluster.distributionId()+"]");
     }
     @Override
@@ -150,6 +151,7 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
             }catch (Exception nex){}
         });
         gameServiceProviders.clear();
+        this.serviceContext.deploymentServiceProvider().unregisterGameClusterEventListener(this);
         this.logger.warn("Game service provider ["+NAME+"] shutting down");
     }
 
@@ -301,4 +303,13 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
     }
 
 
+    @Override
+    public <T extends OnAccess> void onGameClusterEvent(T event) {
+        this.gameServiceProvider.onGameEvent(event);
+    }
+
+    @Override
+    public String typeId() {
+        return gameCluster.typeId();
+    }
 }

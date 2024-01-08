@@ -8,6 +8,7 @@ import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.JsonUtil;
 
+import com.icodesoftware.util.ScheduleRunner;
 import com.perfectday.games.earth8.analytics.BattleEndTransaction;
 import com.perfectday.games.earth8.analytics.BattleStartTransaction;
 import com.perfectday.games.earth8.analytics.ServerConnectTransaction;
@@ -18,15 +19,17 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Earth8GameServiceProvider implements GameServiceProvider {
 
     private GameContext gameContext;
-
-    public final static String ANALYTICS_QUERY = "earth8#Analytics";
+    private final static String ANALYTICS_QUERY_HEADER = "#Analytics";
+    private final static long EVENT_DISPATCH_DELAY = 100; //100ms
+    private String ANALYTICS_QUERY;
 
     private ConcurrentHashMap<Long,Tournament> tournamentIndex = new ConcurrentHashMap<>();
     public void setup(GameContext gameContext){
         this.gameContext = gameContext;
         this.gameContext.registerTournamentListener(this);
         this.gameContext.recoverableRegistry(new Earth8PortableRegistry<>());
-        this.gameContext.log("Start earth 8 game service provider", OnLog.WARN);
+        ANALYTICS_QUERY = this.gameContext.applicationSchema().typeId()+ANALYTICS_QUERY_HEADER;
+        this.gameContext.log("Start earth 8 game service provider with typeId : "+this.gameContext.applicationSchema().typeId(), OnLog.WARN);
     }
 
     //callbacks from HTTP
@@ -34,8 +37,14 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     public void onJoined(Session session,Room room) {
         //use room.distributionId/key as game session id
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
-        webhook.upload(ANALYTICS_QUERY,new ServerConnectTransaction(session).toString().getBytes());
-        //this.gameContext.log("JOINED : "+room.distributionKey(), OnLog.WARN);
+        gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
+                webhook.upload(ANALYTICS_QUERY,new ServerConnectTransaction(session).toString().getBytes()))
+        );
+    }
+
+    @Override
+    public void onLeft(Session session) {
+
     }
 
     public void startGame(Session session, byte[] payload) throws Exception{
@@ -56,16 +65,14 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
         session.write(created ? battleTransaction.toJson().toString().getBytes() : JsonUtil.toSimpleResponse(false,"failed to create battle transaction").getBytes());
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
-        webhook.upload(ANALYTICS_QUERY,new BattleStartTransaction(session, battleTransaction.distributionId(), payload).toString().getBytes());
-//        gameContext.onMetrics("totalKills",100);
-//        gameContext.onMetrics("totalWins",10);
-//        gameContext.onMetrics("totalRounds",20);
+        gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
+                webhook.upload(ANALYTICS_QUERY,new BattleStartTransaction(session, battleTransaction.distributionId(), payload).toString().getBytes()))
+        );
         gameContext.onMetrics("totalBattle",1);
     }
 
     public void updateGame(Session session,byte[] payload) throws Exception{
         BattleUpdate update = BattleUpdate.fromJson(payload);
-//        gameContext.log("Update Game : " + update.updateId, OnLog.INFO);
         Transaction transaction = gameContext.applicationSchema().transaction();
         boolean updated = transaction.execute(ctx->{
             ApplicationPreSetup applicationPreSetup = (ApplicationPreSetup)ctx;
@@ -78,7 +85,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         if(updated)
         {
             TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
-            update.publishAnalytics(webhook);
+            gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
+                    update.publishAnalytics(webhook,ANALYTICS_QUERY))
+            );
         }
         session.write(JsonUtil.toSimpleResponse(updated,updated?"battle updated":"failed to update").getBytes());
     }
@@ -106,10 +115,17 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
         session.write(JsonUtil.toSimpleResponse(updated,"battle finished").getBytes());
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
-        webhook.upload(ANALYTICS_QUERY,new BattleEndTransaction(session, battleTransaction.distributionId(), payload).toString().getBytes());
+        gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
+                webhook.upload(ANALYTICS_QUERY,new BattleEndTransaction(session, battleTransaction.distributionId(), payload).toString().getBytes()))
+        );
     }
+
+    //System level game event callbacks
     public <T extends OnAccess> void onGameEvent(T event){
-        gameContext.log("EVENT : "+event.toJson().toString(),OnLog.WARN);
+        TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+        gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
+                webhook.upload(ANALYTICS_QUERY,event.toJson().toString().getBytes()))
+        );
     }
 
     public void onInventory(ApplicationPreSetup applicationPreSetup,Inventory inventory, Inventory.Stock stock){
@@ -140,36 +156,6 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         }
         this.gameContext.log("Inventory type ["+inventory.type()+"] not supported",OnLog.WARN);
     }
-    @Override
-    public void onLeft(Session session) {
-        gameContext.log(" LEAVE : "+session.distributionKey()+" : "+session.stub(),OnLog.WARN);
-    }
-
-    //Callbacks from UDP channel
-    @Override
-    public byte[] onRequest(Session session, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        //UDP REQUEST RESPONSE CAN BE REPACKING FOR LARGE PAYLOAD
-        this.gameContext.log("On Request : "+session.distributionKey(), OnLog.WARN);
-
-        Statistics statistics = gameContext.statistics(session);
-        statistics.entry("kills").update(1).update();
-        this.gameContext.log("On Statistics : "+statistics.entry("kills").total(), OnLog.WARN);
-        Rating rating = gameContext.rating(session);
-        rating.update(10,1000).update();
-        this.gameContext.log("On Rating : "+rating.rank()+" : "+rating.level()+" : "+rating.xp(), OnLog.WARN);
-
-        Achievement achievement = gameContext.achievement(session);
-        achievement.onProgress(1);
-        this.gameContext.log("On Achievement : "+achievement.name()+" : "+achievement.tier()+" : "+achievement.target()+" : "+achievement.objective(), OnLog.WARN);
-        return null;//callback on caller only if byte not null
-    }
-
-    @Override
-    public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
-        //UDP MESSAGE WITH RELAY CALL WITH SINGLE UDP MESSAGE
-        this.gameContext.log("On Action : "+messageHeader.sessionId, OnLog.WARN);
-        //read buffer -> write header/buffer->flip->read header->callback on channel members
-    }
 
     @Override
     public void tournamentStarted(Tournament tournament) {
@@ -190,12 +176,24 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
     //UDP Channel Listener Callbacks
     public void onValidated(Channel channel){
-        this.gameContext.log("On Channel Validated : " +channel.channelId(), OnLog.WARN);
+        //UDP channel connection validation callback
     }
     public void onJoined(Channel channel){
-        this.gameContext.log("On Channel Joined : " +channel.channelId(), OnLog.WARN);
+        //UDP channel join callback
     }
     public void onLeft(Channel channel){
-        this.gameContext.log("On Channel Left : " +channel.channelId(), OnLog.WARN);
+        //UDP channel disconnect callback
+    }
+
+    //Callbacks from UDP channel
+    @Override
+    public byte[] onRequest(Session session, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+        //UDP REQUEST RESPONSE CAN BE REPACKING FOR LARGE PAYLOAD
+        return null;
+    }
+
+    @Override
+    public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
+        //UDP MESSAGE WITH RELAY CALL WITH SINGLE UDP MESSAGE
     }
 }

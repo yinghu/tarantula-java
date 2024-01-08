@@ -26,6 +26,10 @@
             <label class="tx-text-12">Validation Email</label>     
             <input id ="tx-email-r"  class="w3-input w3-round w3-border tx-text-16" type="email" placeholder='validation email'/>
         </div>
+        <div class="w3-panel"> 
+            <label class="tx-text-12">Game TypeId</label>     
+            <input id ="tx-type-r"  class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='type Id'/>
+        </div>
         <div class="w3-panel">
             <span id="tx-sign-on" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Sign On</span>     
         </div>
@@ -44,8 +48,8 @@
         let _n = document.querySelector('#tx-user-name-r').value;
         let _p = document.querySelector('#tx-password-r').value;
         let _m = document.querySelector('#tx-email-r').value;
-        
-        TARA_API.onRegister({login:_n,password:_p,emailAddress:_m,typeId:'robotquest'},function(resp){
+        let _t = document.querySelector('#tx-type-r').value;
+        TARA_API.onRegister({login:_n,password:_p,emailAddress:_m,typeId:_t},function(resp){
             if(resp.successful){
                 tx_on_login();                
             }
