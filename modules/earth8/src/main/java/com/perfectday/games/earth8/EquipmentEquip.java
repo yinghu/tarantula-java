@@ -3,9 +3,12 @@ package com.perfectday.games.earth8;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
 import com.icodesoftware.service.ApplicationPreSetup;
+import com.perfectday.games.earth8.analytics.AnalyticsEquipmentData;
 import com.perfectday.games.earth8.analytics.EquipmentEquipTransaction;
 
 public class EquipmentEquip extends BattleUpdate{
+
+    private AnalyticsEquipmentData _equipmentData;
 
     @Override
     public int getClassId() {
@@ -14,14 +17,15 @@ public class EquipmentEquip extends BattleUpdate{
 
 
     public static EquipmentEquip fromJson(JsonObject jsonObject){
-        EquipmentEquip unitRankUp = new EquipmentEquip();
-        unitRankUp.parse(jsonObject);
-        return unitRankUp;
+        EquipmentEquip self = new EquipmentEquip();
+        self.parse(jsonObject);
+        self._equipmentData = new AnalyticsEquipmentData(jsonObject);
+        return self;
     }
 
     @Override
     protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session){
-        pendingAnalytics.add(new EquipmentEquipTransaction(session, equipmentId, unitId));
+        pendingAnalytics.add(new EquipmentEquipTransaction(session, _equipmentData, equipmentId, unitId));
         return true;
     }
 

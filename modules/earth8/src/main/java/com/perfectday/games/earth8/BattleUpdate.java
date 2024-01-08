@@ -138,19 +138,19 @@ public class BattleUpdate extends RecoverableObject {
         return Earth8PortableRegistry.OID;
     }
 
-    protected static int GetJsonInt(JsonObject obj, String key, int defaultVal)
+    public static int GetJsonInt(JsonObject obj, String key, int defaultVal)
     {
         if(obj.has(key)) return obj.get(key).getAsInt();
         return defaultVal;
     }
 
-    protected static long GetJsonLong(JsonObject obj, String key, long defaultVal)
+    public static long GetJsonLong(JsonObject obj, String key, long defaultVal)
     {
         if(obj.has(key)) return obj.get(key).getAsLong();
         return defaultVal;
     }
 
-    protected static String GetJsonString(JsonObject obj, String key, String defaultVal)
+    public static String GetJsonString(JsonObject obj, String key, String defaultVal)
     {
         if(obj.has(key)) return obj.get(key).getAsString();
         return defaultVal;
