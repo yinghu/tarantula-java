@@ -6,6 +6,7 @@ import com.icodesoftware.service.ApplicationPreSetup;
 
 public class MahjongServiceProvider implements GameServiceProvider {
 
+
     private GameContext gameContext;
     @Override
     public void onInventory(ApplicationPreSetup applicationPreSetup, Inventory inventory, Inventory.Stock inventoryItem) {
@@ -80,12 +81,24 @@ public class MahjongServiceProvider implements GameServiceProvider {
 
     @Override
     public byte[] onRequest(Session session, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        this.gameContext.log("Mahjong service on request",OnLog.INFO);
+        this.gameContext.log("Mahjong service on request : "+session.systemId()+" : "+session.stub(),OnLog.INFO);
+        if(messageHeader.commandId == Messenger.REQUEST){
+            short cmd = messageBuffer.readShort();
+            String name = messageBuffer.readUTF8();
+            float value = messageBuffer.readFloat();
+            this.gameContext.log("Request : "+cmd+" : "+name+" : "+value,OnLog.INFO);
+        }
         return new byte[0];
     }
 
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
         this.gameContext.log("Mahjong service on action",OnLog.INFO);
+        if(messageHeader.commandId == Messenger.ACTION){
+            short cmd = messageBuffer.readShort();
+            float value = messageBuffer.readFloat();
+            String name = messageBuffer.readUTF8();
+            this.gameContext.log("Action : "+cmd+" : "+name+" : "+value,OnLog.INFO);
+        }
     }
 }
