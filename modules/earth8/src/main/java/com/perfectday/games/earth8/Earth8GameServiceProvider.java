@@ -21,7 +21,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     private GameContext gameContext;
     private final static String ANALYTICS_QUERY_HEADER = "#Analytics";
     private final static long EVENT_DISPATCH_DELAY = 100; //100ms
-    public static String ANALYTICS_QUERY;
+    private String ANALYTICS_QUERY;
 
     private ConcurrentHashMap<Long,Tournament> tournamentIndex = new ConcurrentHashMap<>();
     public void setup(GameContext gameContext){
@@ -86,7 +86,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         {
             TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
             gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
-                    update.publishAnalytics(webhook))
+                    update.publishAnalytics(webhook,ANALYTICS_QUERY))
             );
         }
         session.write(JsonUtil.toSimpleResponse(updated,updated?"battle updated":"failed to update").getBytes());
