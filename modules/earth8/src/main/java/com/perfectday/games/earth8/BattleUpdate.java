@@ -156,4 +156,10 @@ public class BattleUpdate extends RecoverableObject {
         return defaultVal;
     }
 
+    public static boolean GetJsonBool(JsonObject obj, String key, boolean defaultVal)
+    {
+        if(obj.has(key)) return obj.get(key).getAsBoolean();
+        return defaultVal;
+    }
+
 }

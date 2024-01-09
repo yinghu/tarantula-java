@@ -12,6 +12,8 @@ public class UnitXpUp extends BattleUpdate{
     public int fromLevel;
     public int toLevel;
 
+    private String _unitName;
+
     @Override
     public boolean write(DataBuffer buffer) {
         if(!super.write(buffer)) return false;
@@ -34,20 +36,22 @@ public class UnitXpUp extends BattleUpdate{
 
 
     public static UnitXpUp fromJson(JsonObject jsonObject){
-        UnitXpUp unitXpUp = new UnitXpUp();
-        unitXpUp.parse(jsonObject);
-        unitXpUp.xpGain = GetJsonInt(jsonObject, "XpGain", 0);
-        unitXpUp.fromLevel = GetJsonInt(jsonObject, "FromLevel", 0);
-        unitXpUp.toLevel = GetJsonInt(jsonObject, "ToLevel", 0);
-        return unitXpUp;
+        UnitXpUp self = new UnitXpUp();
+        self.parse(jsonObject);
+        self.xpGain = GetJsonInt(jsonObject, "XpGain", 0);
+        self.fromLevel = GetJsonInt(jsonObject, "FromLevel", 0);
+        self.toLevel = GetJsonInt(jsonObject, "ToLevel", 0);
+
+        self._unitName = GetJsonString(jsonObject, "TEMP_UnitName", "");
+        return self;
     }
 
     @Override
     protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session){
-        pendingAnalytics.add(new UnitXpUpTransaction(session, unitId, 0));
+        pendingAnalytics.add(new UnitXpUpTransaction(session, unitId, 0, _unitName));
         if(toLevel > fromLevel)
         {
-            pendingAnalytics.add(new UnitLevelUpTransaction(session, unitId, fromLevel, toLevel));
+            pendingAnalytics.add(new UnitLevelUpTransaction(session, unitId, fromLevel, toLevel, _unitName));
         }
         return true;
     }
