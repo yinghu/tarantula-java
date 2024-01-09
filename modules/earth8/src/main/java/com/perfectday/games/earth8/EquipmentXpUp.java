@@ -3,10 +3,13 @@ package com.perfectday.games.earth8;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
 import com.icodesoftware.service.ApplicationPreSetup;
+import com.perfectday.games.earth8.analytics.AnalyticsEquipmentData;
 import com.perfectday.games.earth8.analytics.EquipmentLevelUpTransaction;
 import com.perfectday.games.earth8.analytics.EquipmentXpUpTransaction;
 
 public class EquipmentXpUp extends BattleUpdate{
+
+    private AnalyticsEquipmentData _equipmentData;
 
     public int xpGain;
     public int fromLevel;
@@ -35,20 +38,21 @@ public class EquipmentXpUp extends BattleUpdate{
 
 
     public static EquipmentXpUp fromJson(JsonObject jsonObject){
-        EquipmentXpUp unitRankUp = new EquipmentXpUp();
-        unitRankUp.parse(jsonObject);
-        unitRankUp.xpGain = GetJsonInt(jsonObject, "XpGain", 0);
-        unitRankUp.fromLevel = GetJsonInt(jsonObject, "FromLevel", 0);
-        unitRankUp.toLevel = GetJsonInt(jsonObject, "ToLevel", 0);
-        return unitRankUp;
+        EquipmentXpUp self = new EquipmentXpUp();
+        self.parse(jsonObject);
+        self.xpGain = GetJsonInt(jsonObject, "XpGain", 0);
+        self.fromLevel = GetJsonInt(jsonObject, "FromLevel", 0);
+        self.toLevel = GetJsonInt(jsonObject, "ToLevel", 0);
+        self._equipmentData = new AnalyticsEquipmentData(jsonObject);
+        return self;
     }
 
     @Override
     protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session){
-        pendingAnalytics.add(new EquipmentXpUpTransaction(session, equipmentId, xpGain));
+        pendingAnalytics.add(new EquipmentXpUpTransaction(session, _equipmentData, equipmentId, xpGain));
         if(toLevel > fromLevel)
         {
-            pendingAnalytics.add(new EquipmentLevelUpTransaction(session, equipmentId, fromLevel, toLevel));
+            pendingAnalytics.add(new EquipmentLevelUpTransaction(session, _equipmentData, equipmentId, fromLevel, toLevel));
         }
         return true;
     }

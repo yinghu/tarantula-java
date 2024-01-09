@@ -1,15 +1,15 @@
 package com.perfectday.games.earth8.analytics;
 
 import com.icodesoftware.Session;
-import com.icodesoftware.util.JsonUtil;
 
 public class EquipmentRankUpTransaction extends AnalyticsTransaction {
     private static final String MESSAGE_TYPE = "/earth8/equipment/0.0.1/rankUp";
 
-    public EquipmentRankUpTransaction(Session session, long equipmentId, int rank)
+    public EquipmentRankUpTransaction(Session session, AnalyticsEquipmentData equipmentData, long equipmentId, int rank)
     {
         super(MESSAGE_TYPE, session);
         data.addProperty("equipment_id", equipmentId);
         data.addProperty("rank", rank);
+        equipmentData.addToObject(data);
     }
 }
