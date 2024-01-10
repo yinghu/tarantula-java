@@ -18,9 +18,9 @@ public class CampaignProgress extends BattleUpdate{
     public static CampaignProgress fromJson(JsonObject jsonObject){
         CampaignProgress progress = new CampaignProgress();
         progress.parse(jsonObject);
-        progress.stageId = jsonObject.get("StageID").getAsString();
-        progress.battleId = jsonObject.get("BattleId").getAsLong();
-        progress.stars = jsonObject.get("Stars").getAsInt();
+        progress.stageId = GetJsonString(jsonObject, "StageID", "");
+        progress.battleId = GetJsonLong(jsonObject, "BattleId", 0);
+        progress.stars = GetJsonInt(jsonObject, "Stars", 0);
         return progress;
     }
 

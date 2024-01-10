@@ -101,6 +101,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             session.write(JsonUtil.toSimpleResponse(false,"invalid battleId").getBytes());
             return;
         }
+
         BattleTransaction battleTransaction = new BattleTransaction();
         battleTransaction.distributionId(battleId);
         Transaction transaction = gameContext.applicationSchema().transaction();
@@ -112,6 +113,30 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             battleTransaction.disabled(true);
             return dataStore.update(battleTransaction);
         });
+
+        if(updated
+            && battleTransaction.TEMP_BattleStage.equals("Chapter3_Stage7_HardConfig")
+            && battleTransaction.win
+        ) {
+            // hard coded 7 day tournament completion
+            tournamentIndex.forEach((key,entry)->{
+                if(entry.type().startsWith("SevenDayTournament")) {
+                    // register this user to the tournament the first time they finish the campaign
+                    entry.register(session).update(session,(e)->{
+                        this.gameContext.log("Test Register Player to tournament", OnLog.INFO);
+                        if(e.score() > 0)
+                        {
+                            this.gameContext.log("Player already registered", OnLog.INFO);
+                            return false;
+                        }
+
+                        this.gameContext.log("Player registering", OnLog.INFO);
+                        e.score(0,1);
+                        return true;
+                    });
+                }
+            });
+        }
 
         session.write(JsonUtil.toSimpleResponse(updated,"battle finished").getBytes());
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
