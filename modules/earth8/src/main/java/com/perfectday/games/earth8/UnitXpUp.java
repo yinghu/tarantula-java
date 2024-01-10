@@ -48,7 +48,7 @@ public class UnitXpUp extends BattleUpdate{
 
     @Override
     protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session){
-        pendingAnalytics.add(new UnitXpUpTransaction(session, unitId, 0, _unitName));
+        pendingAnalytics.add(new UnitXpUpTransaction(session, unitId, xpGain, _unitName));
         if(toLevel > fromLevel)
         {
             pendingAnalytics.add(new UnitLevelUpTransaction(session, unitId, fromLevel, toLevel, _unitName));

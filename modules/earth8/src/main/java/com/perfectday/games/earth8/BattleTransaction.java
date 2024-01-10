@@ -14,6 +14,8 @@ public class BattleTransaction extends RecoverableObject {
 
     public boolean win;
 
+    public String TEMP_BattleStage;
+
     //Data store write contract
     @Override
     public boolean write(DataBuffer buffer) {
@@ -25,6 +27,8 @@ public class BattleTransaction extends RecoverableObject {
         }
         buffer.writeBoolean(win);
         buffer.writeBoolean(disabled);
+
+        buffer.writeUTF8(TEMP_BattleStage);
         return true;
     }
 
@@ -40,6 +44,7 @@ public class BattleTransaction extends RecoverableObject {
         }
         win = buffer.readBoolean();
         disabled = buffer.readBoolean();
+        TEMP_BattleStage = buffer.readUTF8();
         return true;
     }
 
@@ -58,20 +63,23 @@ public class BattleTransaction extends RecoverableObject {
         for(long unit : party){
             if(unit < 0) return false;
         }
-        return chapterId >= 0 && stageId >= 0;
+        return true;
     }
 
     public static BattleTransaction fromJson(byte[] payload){
         JsonObject json = JsonUtil.parse(payload);
-        BattleTransaction battleTransaction = new BattleTransaction();
-        battleTransaction.chapterId = json.get("ChapterId").getAsLong();
-        battleTransaction.stageId = json.get("StageId").getAsLong();
+        BattleTransaction self = new BattleTransaction();
+        self.chapterId = json.get("ChapterId").getAsLong();
+        self.stageId = json.get("StageId").getAsLong();
         JsonArray party = json.get("Party").getAsJsonArray();
-        battleTransaction.party = new long[party.size()];
-        for(int i=0;i<battleTransaction.party.length;i++){
-            battleTransaction.party[i]=party.get(i).getAsLong();
+        self.party = new long[party.size()];
+        for(int i=0;i<self.party.length;i++){
+            self.party[i]=party.get(i).getAsLong();
         }
-        return battleTransaction;
+
+        self.TEMP_BattleStage = BattleUpdate.GetJsonString(json, "TEMP_StageName", "");
+
+        return self;
     }
 
     @Override
