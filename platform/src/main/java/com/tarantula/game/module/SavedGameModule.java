@@ -29,8 +29,9 @@ public class SavedGameModule extends ModuleHeader {
             session.write(savedGame!=null?savedGame.toJson().toString().getBytes():JsonUtil.toSimpleResponse(false,"save in use").getBytes());
         }
         else if(session.action().equals("onSet")){
-            if(bytes.length > savedGameServiceProvider.mappingObjectMaxSize()){
-                session.write(JsonUtil.toSimpleResponse(false,"data size must be less than ["+4000+"]").getBytes());
+            this.context.log("SZ : "+bytes.length+" : "+session.name().length()+" : "+savedGameServiceProvider.mappingObjectMaxSize(),OnLog.WARN);
+            if((bytes.length+session.name().length()+4) > savedGameServiceProvider.mappingObjectMaxSize()){
+                session.write(JsonUtil.toSimpleResponse(false,"data size must be less than ["+savedGameServiceProvider.mappingObjectMaxSize()+"]").getBytes());
             }else{
                 MappingObject mo = new MappingObject();
                 mo.label(session.name());

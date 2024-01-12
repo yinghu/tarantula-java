@@ -14,7 +14,7 @@
   "savedGame":{
       "saveSize": 3,
       "saveTimeout": 1,
-      "mappingObjectMaxSize": 4000
+      "mappingObjectMaxSize": 2000
   },
   "inbox": {
       "pendingReward": true
