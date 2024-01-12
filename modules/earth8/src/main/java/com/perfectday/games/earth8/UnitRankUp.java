@@ -3,6 +3,7 @@ package com.perfectday.games.earth8;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
 import com.icodesoftware.service.ApplicationPreSetup;
+import com.icodesoftware.util.JsonUtil;
 import com.perfectday.games.earth8.analytics.UnitRankUpTransaction;
 
 public class UnitRankUp extends BattleUpdate{
@@ -34,8 +35,8 @@ public class UnitRankUp extends BattleUpdate{
     public static UnitRankUp fromJson(JsonObject jsonObject){
         UnitRankUp self = new UnitRankUp();
         self.parse(jsonObject);
-        self.rank = GetJsonInt(jsonObject, "Rank", 0);
-        self._unitName = GetJsonString(jsonObject, "TEMP_UnitName", "");
+        self.rank = JsonUtil.getJsonInt(jsonObject, "Rank", 0);
+        self._unitName = JsonUtil.getJsonString(jsonObject, "TEMP_UnitName", "");
         return self;
     }
 

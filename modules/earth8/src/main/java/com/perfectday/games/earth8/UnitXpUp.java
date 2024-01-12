@@ -3,6 +3,7 @@ package com.perfectday.games.earth8;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
 import com.icodesoftware.service.ApplicationPreSetup;
+import com.icodesoftware.util.JsonUtil;
 import com.perfectday.games.earth8.analytics.UnitLevelUpTransaction;
 import com.perfectday.games.earth8.analytics.UnitXpUpTransaction;
 
@@ -38,11 +39,11 @@ public class UnitXpUp extends BattleUpdate{
     public static UnitXpUp fromJson(JsonObject jsonObject){
         UnitXpUp self = new UnitXpUp();
         self.parse(jsonObject);
-        self.xpGain = GetJsonInt(jsonObject, "XpGain", 0);
-        self.fromLevel = GetJsonInt(jsonObject, "FromLevel", 0);
-        self.toLevel = GetJsonInt(jsonObject, "ToLevel", 0);
+        self.xpGain = JsonUtil.getJsonInt(jsonObject, "XpGain", 0);
+        self.fromLevel = JsonUtil.getJsonInt(jsonObject, "FromLevel", 0);
+        self.toLevel = JsonUtil.getJsonInt(jsonObject, "ToLevel", 0);
 
-        self._unitName = GetJsonString(jsonObject, "TEMP_UnitName", "");
+        self._unitName = JsonUtil.getJsonString(jsonObject, "TEMP_UnitName", "");
         return self;
     }
 
