@@ -1,7 +1,5 @@
 package com.perfectday.games.earth8;
 
-
-import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.ApplicationPreSetup;
@@ -93,25 +91,44 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     }
 
     public void endGame(Session session,byte[] payload) throws Exception{
-        JsonObject jsonObject = JsonUtil.parse(payload);
-        long battleId = jsonObject.get("BattleId").getAsLong();
-        boolean win = jsonObject.get("Win").getAsBoolean();
-
-        if(battleId<=0){
+        BattleTransaction battleTransaction = BattleTransaction.fromJson(payload);
+        if(battleTransaction.distributionId()<=0){
             session.write(JsonUtil.toSimpleResponse(false,"invalid battleId").getBytes());
             return;
         }
-        BattleTransaction battleTransaction = new BattleTransaction();
-        battleTransaction.distributionId(battleId);
+        boolean win = battleTransaction.win;
         Transaction transaction = gameContext.applicationSchema().transaction();
         boolean updated = transaction.execute(ctx->{
             ApplicationPreSetup applicationPreSetup = (ApplicationPreSetup)ctx;
             DataStore dataStore = applicationPreSetup.onDataStore("battle");
             if(!dataStore.load(battleTransaction)) return false;
-            battleTransaction.win = win;
             battleTransaction.disabled(true);
+            battleTransaction.win = win;
             return dataStore.update(battleTransaction);
         });
+        if(updated
+            && battleTransaction.TEMP_BattleStage.equals("Chapter3_Stage7_HardConfig")
+            && battleTransaction.win
+        ) {
+            // hard coded 7 day tournament completion
+            tournamentIndex.forEach((key,entry)->{
+                if(entry.type().startsWith("SevenDayTournament")) {
+                    // register this user to the tournament the first time they finish the campaign
+                    entry.register(session).update(session,(e)->{
+                        this.gameContext.log("Test Register Player to tournament", OnLog.INFO);
+                        if(e.score() > 0)
+                        {
+                            this.gameContext.log("Player already registered", OnLog.INFO);
+                            return false;
+                        }
+
+                        this.gameContext.log("Player registering", OnLog.INFO);
+                        e.score(0,1);
+                        return true;
+                    });
+                }
+            });
+        }
 
         session.write(JsonUtil.toSimpleResponse(updated,"battle finished").getBytes());
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);

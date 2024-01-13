@@ -9,6 +9,7 @@ import com.perfectday.games.earth8.analytics.EquipmentEquipTransaction;
 public class EquipmentEquip extends BattleUpdate{
 
     private AnalyticsEquipmentData _equipmentData;
+    private String _tempUnitName;
 
     @Override
     public int getClassId() {
@@ -20,12 +21,13 @@ public class EquipmentEquip extends BattleUpdate{
         EquipmentEquip self = new EquipmentEquip();
         self.parse(jsonObject);
         self._equipmentData = new AnalyticsEquipmentData(jsonObject);
+        self._tempUnitName = GetJsonString(jsonObject, "TEMP_UnitName", "unknown");
         return self;
     }
 
     @Override
     protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session){
-        pendingAnalytics.add(new EquipmentEquipTransaction(session, _equipmentData, equipmentId, unitId));
+        pendingAnalytics.add(new EquipmentEquipTransaction(session, _equipmentData, equipmentId, unitId, _tempUnitName));
         return true;
     }
 

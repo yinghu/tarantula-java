@@ -24,7 +24,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
 
     public static final String NAME = "save";
 
-    private int mappingObjectMaxSize = 4000;
+    private int mappingObjectMaxSize = 2000;
     private int saveSize = 3;
 
     private long saveTimeout = 1; //1 hour
@@ -44,7 +44,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         saveTimeout = saveGame.get("saveTimeout").getAsInt()*saveTimeout;
         dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
         this.logger = JDKLogger.getLogger(PlatformSavedGameServiceProvider.class);
-        this.logger.warn("Saved game service provider started on ->"+gameServiceName);
+        this.logger.warn("Saved game service provider started on ->"+gameServiceName+" : "+mappingObjectMaxSize);
     }
 
 

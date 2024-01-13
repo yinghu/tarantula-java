@@ -11,8 +11,10 @@ public class BattleTransactionTest {
     @Test(groups = { "BattleTransaction" })
     public void parsePayloadTest() {
         JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("BattleId",1000);
         jsonObject.addProperty("ChapterId",100);
         jsonObject.addProperty("StageId",200);
+        jsonObject.addProperty("Win",true);
         JsonArray party = new JsonArray();
         party.add(1000);
         party.add(2000);
@@ -26,9 +28,9 @@ public class BattleTransactionTest {
         Assert.assertEquals(battleTransaction.party[2],3000);
         Assert.assertTrue(battleTransaction.validate());
 
-        battleTransaction.distributionId(5000);
+        //battleTransaction.distributionId(5000);
         JsonObject response = battleTransaction.toJson();
-        Assert.assertEquals(response.get("BattleId").getAsLong(),5000);
+        Assert.assertEquals(response.get("BattleId").getAsLong(),1000);
         Assert.assertEquals(response.get("Successful").getAsBoolean(),true);
 
     }

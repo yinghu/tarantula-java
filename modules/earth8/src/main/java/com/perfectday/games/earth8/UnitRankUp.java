@@ -8,6 +8,8 @@ import com.perfectday.games.earth8.analytics.UnitRankUpTransaction;
 public class UnitRankUp extends BattleUpdate{
 
     public int rank;
+    private String _unitName;
+
     @Override
     public boolean write(DataBuffer buffer) {
         if(!super.write(buffer)) return false;
@@ -30,15 +32,16 @@ public class UnitRankUp extends BattleUpdate{
 
 
     public static UnitRankUp fromJson(JsonObject jsonObject){
-        UnitRankUp unitRankUp = new UnitRankUp();
-        unitRankUp.parse(jsonObject);
-        unitRankUp.rank = jsonObject.get("Rank").getAsInt();
-        return unitRankUp;
+        UnitRankUp self = new UnitRankUp();
+        self.parse(jsonObject);
+        self.rank = GetJsonInt(jsonObject, "Rank", 0);
+        self._unitName = GetJsonString(jsonObject, "TEMP_UnitName", "");
+        return self;
     }
 
     @Override
     protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session){
-        pendingAnalytics.add(new UnitRankUpTransaction(session, unitId, rank));
+        pendingAnalytics.add(new UnitRankUpTransaction(session, unitId, rank, _unitName));
         return true;
     }
 }
