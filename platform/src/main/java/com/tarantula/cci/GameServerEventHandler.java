@@ -112,11 +112,12 @@ public class GameServerEventHandler extends AbstractRequestHandler {
 
             var event = new ResponsiveEvent("",0,resp.toString().getBytes(),true);
             exchange.onEvent(event);
-
-            event.typeId(suggestedTypeId);
-            event.property(OnAccess.TYPE_ID, "onAction");
-            event.property(OnAccess.PAYLOAD, _payload);
-            this.deploymentServiceProvider.onGameClusterEvent(event);
+            if(suggestedTypeId.equals(typeId)){
+                event.typeId(suggestedTypeId);
+                event.property(OnAccess.TYPE_ID, "onAction");
+                event.property(OnAccess.PAYLOAD, _payload);
+                this.deploymentServiceProvider.onGameClusterEvent(event);
+            }
         }
     }
 
