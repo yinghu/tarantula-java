@@ -31,7 +31,7 @@ public class SQLJDBCProvider extends AuthObject {
     public <T extends Recoverable> boolean upload(String query, T content) {
         JDBCPoolCredentialConfiguration webHookCredentialConfiguration = configurationServiceProvider.credentialConfiguration(OnAccess.JDBC_SQL);
         if(webHookCredentialConfiguration==null){
-            log.warn("No JDBC configuration available for ["+typeId+"]");
+            //log.warn("No JDBC configuration available for ["+typeId+"]");
             return false;
         }
         JDBCTask task = webHookCredentialConfiguration.task(query);

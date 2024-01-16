@@ -1,6 +1,7 @@
 package com.perfectday.games.earth8.analytics;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.util.JsonUtil;
 import com.perfectday.games.earth8.BattleUpdate;
 
 public class AnalyticsEquipmentData {
@@ -14,13 +15,13 @@ public class AnalyticsEquipmentData {
 
     public AnalyticsEquipmentData(JsonObject data)
     {
-        EquipmentName = BattleUpdate.GetJsonString(data, "TEMP_EquipmentName", "");
-        EquipmentSet = BattleUpdate.GetJsonString(data, "TEMP_EquipmentSet", "");
-        EquipmentType = BattleUpdate.GetJsonString(data, "TEMP_EquipmentType", "");
-        EquipmentPrimaryStat = BattleUpdate.GetJsonString(data, "TEMP_EquipmentPrimaryStat", "");
-        EquipmentRarity = BattleUpdate.GetJsonString(data, "TEMP_EquipmentRarity", "");
-        EquipmentLevel = BattleUpdate.GetJsonInt(data, "TEMP_EquipmentLevel", 0);
-        EquipmentRank = BattleUpdate.GetJsonInt(data, "TEMP_EquipmentRank", 0);
+        EquipmentName = JsonUtil.getJsonString(data, "TEMP_EquipmentName", "");
+        EquipmentSet = JsonUtil.getJsonString(data, "TEMP_EquipmentSet", "");
+        EquipmentType = JsonUtil.getJsonString(data, "TEMP_EquipmentType", "");
+        EquipmentPrimaryStat = JsonUtil.getJsonString(data, "TEMP_EquipmentPrimaryStat", "");
+        EquipmentRarity = JsonUtil.getJsonString(data, "TEMP_EquipmentRarity", "");
+        EquipmentLevel = JsonUtil.getJsonInt(data, "TEMP_EquipmentLevel", 0);
+        EquipmentRank = JsonUtil.getJsonInt(data, "TEMP_EquipmentRank", 0);
     }
 
     public void addToObject(JsonObject data)

@@ -13,9 +13,9 @@ public class BattleEndTransaction extends AnalyticsTransaction {
         var object = JsonUtil.parse(clientData);
         data.addProperty("battle_id", battleId);
 
-        var win = BattleUpdate.GetJsonBool(object, "Win", false);
+        var win = JsonUtil.getJsonBool(object, "Win", false);
         data.addProperty("outcome", win ? "win" : "loss");
-        var fastSpeed = BattleUpdate.GetJsonBool(object,"EndedWithFastSpeed", false);
+        var fastSpeed = JsonUtil.getJsonBool(object,"EndedWithFastSpeed", false);
         data.addProperty("battle_speed_x2", fastSpeed);
     }
 }

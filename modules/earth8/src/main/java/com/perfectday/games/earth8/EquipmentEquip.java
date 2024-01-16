@@ -3,6 +3,7 @@ package com.perfectday.games.earth8;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
 import com.icodesoftware.service.ApplicationPreSetup;
+import com.icodesoftware.util.JsonUtil;
 import com.perfectday.games.earth8.analytics.AnalyticsEquipmentData;
 import com.perfectday.games.earth8.analytics.EquipmentEquipTransaction;
 
@@ -21,7 +22,7 @@ public class EquipmentEquip extends BattleUpdate{
         EquipmentEquip self = new EquipmentEquip();
         self.parse(jsonObject);
         self._equipmentData = new AnalyticsEquipmentData(jsonObject);
-        self._tempUnitName = GetJsonString(jsonObject, "TEMP_UnitName", "unknown");
+        self._tempUnitName = JsonUtil.getJsonString(jsonObject, "TEMP_UnitName", "unknown");
         return self;
     }
 

@@ -10,6 +10,7 @@ import com.icodesoftware.util.ScheduleRunner;
 import com.perfectday.games.earth8.analytics.BattleEndTransaction;
 import com.perfectday.games.earth8.analytics.BattleStartTransaction;
 import com.perfectday.games.earth8.analytics.ServerConnectTransaction;
+import com.perfectday.games.earth8.analytics.ServerMetadataTransaction;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -133,16 +134,32 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         session.write(JsonUtil.toSimpleResponse(updated,"battle finished").getBytes());
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
-                webhook.upload(ANALYTICS_QUERY,new BattleEndTransaction(session, battleTransaction.distributionId(), payload).toString().getBytes()))
+                webhook.upload(ANALYTICS_QUERY,new BattleEndTransaction(session, battleTransaction.distributionId(), payload).toBytes()))
         );
     }
 
     //System level game event callbacks
     public <T extends OnAccess> void onGameEvent(T event){
+        var eventType = (String)event.property(OnAccess.TYPE_ID);
+        if(eventType.equals("onAction"))
+        {
+            var data = (byte[])event.property(OnAccess.PAYLOAD);
+            var jsonData = JsonUtil.parse(data);
+
+            var playerId = JsonUtil.getJsonLong(jsonData, "playerId", 0);
+
+            // this gets player inventory, but I think we want to give it via inbox?
+            //ApplicationPreSetup applicationPreSetup = gameContext.applicationSchema().applicationPreSetup();
+            //var inventory = applicationPreSetup.inventory(playerId, "some inventory id");
+
+            // item to give Sku.Signal is the catagory, not sure if we need it here
+            // Sku.Signal SevenDayTournamentFormComplete
+        }
+
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
-                webhook.upload(ANALYTICS_QUERY,event.toJson().toString().getBytes()))
-        );
+                webhook.upload(ANALYTICS_QUERY, new ServerMetadataTransaction(event).toBytes())
+        ));
     }
 
     public void onInventory(ApplicationPreSetup applicationPreSetup,Inventory inventory, Inventory.Stock stock){

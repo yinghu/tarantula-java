@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
@@ -102,6 +103,21 @@ public class GameServerEventHandler extends AbstractRequestHandler {
             resp.addProperty("successful",true);
             this.deploymentServiceProvider.updateRoom(typeId,name,_payload);
             exchange.onEvent(new ResponsiveEvent("",0,resp.toString().getBytes(),true));
+        }
+        else if(action.equals("onAction")) {
+            String suggestedTypeId = exchange.header(Session.TARANTULA_TYPE_ID);
+            JsonObject resp = new JsonObject();
+            resp.addProperty("typeId", suggestedTypeId);
+            resp.addProperty("successful", true);
+
+            var event = new ResponsiveEvent("",0,resp.toString().getBytes(),true);
+            exchange.onEvent(event);
+            if(suggestedTypeId.equals(typeId)){
+                event.typeId(suggestedTypeId);
+                event.property(OnAccess.TYPE_ID, "onAction");
+                event.property(OnAccess.PAYLOAD, _payload);
+                this.deploymentServiceProvider.onGameClusterEvent(event);
+            }
         }
     }
 

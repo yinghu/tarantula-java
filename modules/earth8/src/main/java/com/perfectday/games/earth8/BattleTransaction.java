@@ -69,18 +69,18 @@ public class BattleTransaction extends RecoverableObject {
     public static BattleTransaction fromJson(byte[] payload){
         JsonObject json = JsonUtil.parse(payload);
         BattleTransaction self = new BattleTransaction();
-        self.distributionId(BattleUpdate.GetJsonLong(json,"BattleId",0));
-        self.win = BattleUpdate.GetJsonBool(json,"Win",false);
-        self.chapterId = BattleUpdate.GetJsonLong(json,"ChapterId",0);
-        self.stageId = BattleUpdate.GetJsonLong(json,"StageId",0);
-        if(json.has("Party")){
-            JsonArray party = json.get("Party").getAsJsonArray();
-            self.party = new long[party.size()];
-            for(int i=0;i<self.party.length;i++){
-                self.party[i]=party.get(i).getAsLong();
-            }
+        self.distributionId(JsonUtil.getJsonLong(json,"BattleId",0));
+        self.win = JsonUtil.getJsonBool(json,"Win",false);
+        self.chapterId = JsonUtil.getJsonLong(json,"ChapterId",0);
+        self.stageId = JsonUtil.getJsonLong(json,"StageId",0);
+
+        JsonArray party = JsonUtil.getJsonArray(json, "Party");
+        self.party = new long[party.size()];
+        for(int i=0;i<self.party.length;i++){
+            self.party[i]=party.get(i).getAsLong();
         }
-        self.TEMP_BattleStage = BattleUpdate.GetJsonString(json, "TEMP_StageName", "");
+
+        self.TEMP_BattleStage = JsonUtil.getJsonString(json, "TEMP_StageName", "");
         return self;
     }
 
