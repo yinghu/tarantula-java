@@ -56,7 +56,6 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
         metricsListener = (k,v)->{};
         this.gameServiceProviders = new ConcurrentHashMap<>();
         this.moduleExported = new ConcurrentHashMap<>();
-
         this.eventListeners = new ConcurrentHashMap<>();
     }
 

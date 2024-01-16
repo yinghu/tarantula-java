@@ -24,6 +24,7 @@ PVERoomProxy extends RoomProxyHeader {
         stub.pushChannel = this.gameServiceProvider.roomServiceProvider().registerChannel(stub,(s,d)->{
             gameLobby.timeout(s,d);
         });
+        room.setup(stub.pushChannel);
         stub.sessionId = stub.pushChannel.sessionId();
         stub.offline = true;
         stub.tag(application.tag());
