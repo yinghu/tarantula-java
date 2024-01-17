@@ -2,6 +2,8 @@ package com.icodesoftware.protocol;
 
 import com.icodesoftware.*;
 
+import java.util.List;
+
 public interface GameServiceProvider extends UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener,Inventory.Listener, Tournament.Listener,ChannelListener {
     void setup(GameContext gameContext);
 
@@ -13,4 +15,5 @@ public interface GameServiceProvider extends UDPEndpointServiceProvider.RequestL
 
     void onLeft(Session session);
 
+    <T extends OnAccess> List<T> inbox(Session session);
 }

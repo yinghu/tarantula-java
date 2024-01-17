@@ -1,5 +1,7 @@
 package com.tarantula.test.integration;
 
+import com.google.gson.JsonObject;
+import com.icodesoftware.Session;
 import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.TarantulaThreadFactory;
 
@@ -19,7 +21,22 @@ public class Main {
     static ScheduledExecutorService scheduler;
 
     static boolean onFile = false;
+
     public static void main(String[] args) throws Exception{
+        HttpCaller httpCaller = new HttpCaller("http://10.0.0.18:8090");
+        httpCaller._init();
+        String[] headers = new String[]{
+                Session.TARANTULA_ACCESS_KEY,
+                "535221202214457344-770A154A79E7F9DC65147205B1A5B7E2D060B9BB-111AD341F16C9772C5419B936120DA37",
+                Session.TARANTULA_ACTION,
+                "onAction",
+                Session.TARANTULA_TYPE_ID,
+                "earth8"};
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("playerId", 535221986201178113L);
+        System.out.println(httpCaller.post("server",jsonObject.toString().getBytes(),headers));
+    }
+    public static void _main(String[] args) throws Exception{
         Properties properties = new Properties();
         try(InputStream inputStream = new FileInputStream("load.properties")){
             properties.load(inputStream);

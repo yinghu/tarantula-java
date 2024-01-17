@@ -1,6 +1,5 @@
 package com.tarantula.platform;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnAccess;
 import com.tarantula.platform.presence.UserPortableRegistry;
