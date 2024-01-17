@@ -3,6 +3,7 @@ package com.tarantula.platform.inbox;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Inventory;
+import com.icodesoftware.OnAccess;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.achievement.AchievementItem;
 import com.tarantula.platform.presence.dailygiveaway.DailyGiveaway;
@@ -19,6 +20,8 @@ public class Inbox extends RecoverableObject {
     public List<AchievementItem> achievementList;
 
     public List<DailyGiveaway> dailyGiveawayList;
+
+    public List<OnAccess> accessList;
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
@@ -40,9 +43,11 @@ public class Inbox extends RecoverableObject {
         dailyGiveawayList.forEach((v)->dailyGiveaways.add(v.toJson()));
         jsonObject.add("_dailyGiveawayList",dailyGiveaways);
 
-        //JsonArray shoppingItems = new JsonArray();
-        //shoppingItemList.forEach((v)->shoppingItems.add(v.toJson()));
         jsonObject.add("_shop",shop.toJson());
+
+        JsonArray accesses = new JsonArray();
+        accessList.forEach((v)->accesses.add(v.toJson()));
+        jsonObject.add("_accessList",accesses);
 
         return jsonObject;
     }

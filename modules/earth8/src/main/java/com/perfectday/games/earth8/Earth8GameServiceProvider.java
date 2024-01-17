@@ -7,11 +7,16 @@ import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.JsonUtil;
 
 import com.icodesoftware.util.ScheduleRunner;
+import com.icodesoftware.util.SnowflakeKey;
 import com.perfectday.games.earth8.analytics.BattleEndTransaction;
 import com.perfectday.games.earth8.analytics.BattleStartTransaction;
 import com.perfectday.games.earth8.analytics.ServerConnectTransaction;
 import com.perfectday.games.earth8.analytics.ServerMetadataTransaction;
+import com.perfectday.games.earth8.inbox.PlayerAction;
+import com.perfectday.games.earth8.inbox.PlayerActionQuery;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -145,17 +150,16 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         {
             var data = (byte[])event.property(OnAccess.PAYLOAD);
             var jsonData = JsonUtil.parse(data);
-
             var playerId = JsonUtil.getJsonLong(jsonData, "playerId", 0);
-
-            // this gets player inventory, but I think we want to give it via inbox?
-            //ApplicationPreSetup applicationPreSetup = gameContext.applicationSchema().applicationPreSetup();
-            //var inventory = applicationPreSetup.inventory(playerId, "some inventory id");
-
-            // item to give Sku.Signal is the catagory, not sure if we need it here
-            // Sku.Signal SevenDayTournamentFormComplete
+            if(playerId>0){
+                gameContext.applicationSchema().transaction().execute(ctx->{
+                    DataStore playerActionStore = ctx.onDataStore("player_action");
+                    PlayerAction playerAction = new PlayerAction("ShippingFormCompleted",true);
+                    playerAction.ownerKey(SnowflakeKey.from(playerId));
+                    return playerActionStore.create(playerAction);
+                });
+            }
         }
-
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
                 webhook.upload(ANALYTICS_QUERY, new ServerMetadataTransaction(event).toBytes())
@@ -189,6 +193,18 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             return;
         }
         this.gameContext.log("Inventory type ["+inventory.type()+"] not supported",OnLog.WARN);
+    }
+
+    public <T extends OnAccess> List<T> inbox(Session session){
+        List<OnAccess> inbox = new ArrayList<>();
+        gameContext.applicationSchema().transaction().execute(ctx->{
+            DataStore dataStore = ctx.onDataStore("player_action");
+            dataStore.list(new PlayerActionQuery(session.distributionId())).forEach(playerAction -> {
+                inbox.add(playerAction);
+            });
+            return true;
+        });
+        return (List<T>)inbox;
     }
 
     @Override

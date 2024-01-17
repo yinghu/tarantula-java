@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
@@ -112,7 +111,7 @@ public class GameServerEventHandler extends AbstractRequestHandler {
 
             var event = new ResponsiveEvent("",0,resp.toString().getBytes(),true);
             exchange.onEvent(event);
-            if(suggestedTypeId.equals(typeId)){
+            if(suggestedTypeId.equals(gameCluster.typeId())){
                 event.typeId(suggestedTypeId);
                 event.property(OnAccess.TYPE_ID, "onAction");
                 event.property(OnAccess.PAYLOAD, _payload);
