@@ -7,7 +7,6 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceSetup;
-
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.Application;
 
@@ -32,13 +31,15 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
     }
 
 
-    public Inbox inbox(long systemId){
+    public Inbox inbox(Session session){
+        long systemId = session.distributionId();
         Inbox inbox = new Inbox();
         inbox.shop = this.platformGameServiceProvider.storeServiceProvider().shop("Tami");
         inbox.inventoryList = this.applicationPreSetup.inventoryList(systemId);
         inbox.rewardList = this.rewardList(systemId);
         inbox.achievementList = this.platformGameServiceProvider.achievementServiceProvider().list();
         inbox.dailyGiveawayList = this.platformGameServiceProvider.dailyGiveawayServiceProvider().list();
+        inbox.accessList = this.platformGameServiceProvider.gameServiceProvider().inbox(session);
         return inbox;
     }
 

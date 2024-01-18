@@ -3,6 +3,7 @@ package com.perfectday.games.earth8;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
 import com.icodesoftware.service.ApplicationPreSetup;
+import com.icodesoftware.util.JsonUtil;
 import com.perfectday.games.earth8.analytics.CampaignProgressTransaction;
 
 public class CampaignProgress extends BattleUpdate{
@@ -18,9 +19,9 @@ public class CampaignProgress extends BattleUpdate{
     public static CampaignProgress fromJson(JsonObject jsonObject){
         CampaignProgress progress = new CampaignProgress();
         progress.parse(jsonObject);
-        progress.stageId = GetJsonString(jsonObject, "StageID", "");
-        progress.battleId = GetJsonLong(jsonObject, "BattleId", 0);
-        progress.stars = GetJsonInt(jsonObject, "Stars", 0);
+        progress.stageId = JsonUtil.getJsonString(jsonObject, "StageID", "");
+        progress.battleId = JsonUtil.getJsonLong(jsonObject, "BattleId", 0);
+        progress.stars = JsonUtil.getJsonInt(jsonObject, "Stars", 0);
         return progress;
     }
 

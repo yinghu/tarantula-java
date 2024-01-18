@@ -24,6 +24,7 @@ public class BattleUpdate extends RecoverableObject {
         EquipmentEquip,
         EquipmentUnEquip,
         CampaignProgress,
+        ManualAnalytics,
     }
 
     public UpdateId updateId;
@@ -102,6 +103,9 @@ public class BattleUpdate extends RecoverableObject {
             case CampaignProgress:
                 update = CampaignProgress.fromJson(jsonObject);
                 break;
+            case ManualAnalytics:
+                update = ManualAnalytics.fromJson(jsonObject);
+                break;
             default:
                 throw new UnsupportedOperationException("operation not supported");
         }
@@ -109,9 +113,9 @@ public class BattleUpdate extends RecoverableObject {
     }
 
     protected void parse(JsonObject json){
-        updateId = UpdateId.values()[GetJsonInt(json, "UpdateId", 0)];
-        unitId = GetJsonLong(json, "UnitId", 0);
-        equipmentId = GetJsonLong(json, "EquipmentId", 0);
+        updateId = UpdateId.values()[JsonUtil.getJsonInt(json, "UpdateId", 0)];
+        unitId = JsonUtil.getJsonLong(json, "UnitId", 0);
+        equipmentId = JsonUtil.getJsonLong(json, "EquipmentId", 0);
 
         if(!json.has("Currencies")) return;
         JsonObject cmap = json.get("Currencies").getAsJsonObject();
@@ -136,30 +140,6 @@ public class BattleUpdate extends RecoverableObject {
     @Override
     public int getFactoryId() {
         return Earth8PortableRegistry.OID;
-    }
-
-    public static int GetJsonInt(JsonObject obj, String key, int defaultVal)
-    {
-        if(obj.has(key)) return obj.get(key).getAsInt();
-        return defaultVal;
-    }
-
-    public static long GetJsonLong(JsonObject obj, String key, long defaultVal)
-    {
-        if(obj.has(key)) return obj.get(key).getAsLong();
-        return defaultVal;
-    }
-
-    public static String GetJsonString(JsonObject obj, String key, String defaultVal)
-    {
-        if(obj.has(key)) return obj.get(key).getAsString();
-        return defaultVal;
-    }
-
-    public static boolean GetJsonBool(JsonObject obj, String key, boolean defaultVal)
-    {
-        if(obj.has(key)) return obj.get(key).getAsBoolean();
-        return defaultVal;
     }
 
 }
