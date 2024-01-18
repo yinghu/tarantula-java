@@ -4,6 +4,9 @@ import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.ApplicationPreSetup;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MahjongServiceProvider implements GameServiceProvider {
 
 
@@ -100,5 +103,9 @@ public class MahjongServiceProvider implements GameServiceProvider {
             String name = messageBuffer.readUTF8();
             this.gameContext.log("Action : "+cmd+" : "+name+" : "+value,OnLog.INFO);
         }
+    }
+
+    public <T extends OnAccess> List<T> inbox(Session session){
+        return new ArrayList<>();
     }
 }
