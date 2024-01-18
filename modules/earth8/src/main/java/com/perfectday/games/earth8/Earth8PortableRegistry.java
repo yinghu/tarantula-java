@@ -27,6 +27,8 @@ public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecov
     
     public static final int CAMPAIGN_PROGRESS_CID = 12;
 
+    public static final int PLAYER_ACTION_CID = 13;
+    public static final int MANUAL_ANALYTICS_CID =14;
 
 
     public static Earth8PortableRegistry INS;
