@@ -32,30 +32,34 @@ public class Stack {
     };
 
     private final static int STACK_SIZE = 144;
+    private final static int MAX_REEL_SIZE = 3;
+    private final static int MIN_REEL_SIZE = 1;
 
-    private int[] reel1;
-    private int[] reel2;
-    private int[] reel3;
 
-    private RNG rnd;
+    private static final int[][] reels = new int[MAX_REEL_SIZE][];
+    private static final int[][] index = new int[MAX_REEL_SIZE][];
+
+    private final RNG rnd;
 
     //private int cutter;
+
+    private final int size;
     private int stub;
     private int last;
 
-    public Stack(){
+    private Stack(int size){
+        this.size = size;
         rnd = new JvmRNG();
-        reel1 = new int[STACK_SIZE];
-        init(reel1);
-        reel2 = new int[STACK_SIZE];
-        init(reel2);
-        reel3 = new int[STACK_SIZE];
-        init(reel3);
+        for(int i=0;i<reels.length;i++){
+            reels[i]=new int[STACK_SIZE];
+            index[i]= new int[]{0,0};
+            init(reels[i]);
+        }
     }
     public void shuffle(){
-        shuffle(reel1);
-        shuffle(reel2);
-        shuffle(reel3);
+        for(int i=0;i<size;i++){
+            shuffle(reels[i]);
+        }
     }
     private void init(int[] reel){
         for(int i=0;i<reel.length;i++){
@@ -69,31 +73,37 @@ public class Stack {
             reel[_rx] = reel[i];
             reel[i] = tmp;
         }
-        //cutter = 144-rnd.onNext(13);
         this.stub = 0;
         this.last = STACK_SIZE-1;
     }
 
     public Tile[] swap(Tile[] tiles){
-        if(tiles[0].rank>100) tiles[0]=tileList[reel1[last]];
-        if(tiles[1].rank>100) tiles[1]=tileList[reel1[last]];
-        if(tiles[2].rank>100) tiles[2]=tileList[reel1[last]];
+        if(tiles[0].rank>100) tiles[0]=tileList[reels[0][last]];
+        if(tiles[1].rank>100) tiles[1]=tileList[reels[1][last]];
+        if(tiles[2].rank>100) tiles[2]=tileList[reels[2][last]];
         last--;
         return tiles;
     }
     public Tile[] draw(){
-        Tile[] tiles = new Tile[3];
-        tiles[0] = tileList[reel1[stub]];
-        tiles[1] = tileList[reel2[stub]];
-        tiles[2] = tileList[reel3[stub++]];
+        Tile[] tiles = new Tile[size];
+        int ix = 0;
+        for(int i=0;i<size;i++){
+            tiles[ix++]=tileList[reels[i][stub]];
+        }
+        stub++;
         return tiles;
     }
     public void draw(Tile[] slots){
         for(int i=0;i<slots.length;i++){
-            slots[i]=tileList[reel1[stub++]];
+            slots[i]=tileList[reels[0][stub++]];
         }
     }
-    //public Tile swap(Tile drop){
 
-    //}
+    public static Stack stack(int reels){
+        int size = reels;
+        if(reels<MIN_REEL_SIZE) size = MIN_REEL_SIZE;
+        if(reels>MAX_REEL_SIZE) size = MAX_REEL_SIZE;
+        Stack stack = new Stack(size);
+        return stack;
+    }
 }

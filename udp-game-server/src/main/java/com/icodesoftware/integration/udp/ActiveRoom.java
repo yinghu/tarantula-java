@@ -19,7 +19,6 @@ public class ActiveRoom extends RecoverableObject implements Room {
     private AtomicInteger totalJoined;
     private AtomicInteger totalLeft;
 
-    //public GameModule gameModule;
     public GameUserChannel gameUserChannel;
 
     private long countdownTimer;

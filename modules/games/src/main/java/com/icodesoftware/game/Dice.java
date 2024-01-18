@@ -5,8 +5,8 @@ import com.icodesoftware.util.JvmRNG;
 
 public class Dice {
 
-    private RNG rnd;
-    private final int[] diceSet ={1,2,3,4,5,6};
+    private final RNG rnd;
+    private static final int[] diceSet ={1,2,3,4,5,6};
     private final int size;
     public Dice(int size){
         rnd = new JvmRNG();

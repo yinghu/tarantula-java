@@ -45,7 +45,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     private GameServiceProvider gameModule;
     private ArrayBlockingQueue<Channel> pendingChannels;
 
-    private long countdownTimer;
     private Entry placeHolder;
     public int channelId(){
         return channelId;
@@ -139,7 +138,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     @Override
     public void setup(Channel channel){
         //this.arena = gameZone.arena(rating.arenaLevel);
-        if(!dedicated) return;
+        //if(!dedicated) return;
         this.connection = channel.connection();
         this.channelId = channel.channelId();
         this.sessionId = channel.sessionId();
@@ -185,13 +184,11 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
             plist.add(ge.toJson());
         }
         jsonObject.add("_players",plist);
-        //jsonObject.add("_arena",arena.toJson());
         return jsonObject;
     }
 
     public void writePortable(PortableWriter portableWriter) throws IOException {
         portableWriter.writeInt("1",round);
-        //portableWriter.writeUTF("2",bucket);
         portableWriter.writeLong("3",distributionId);
         portableWriter.writeInt("4",capacity);
         portableWriter.writePortableArray("5",entries);
@@ -199,7 +196,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
 
     public void readPortable(PortableReader portableReader) throws IOException {
         this.round = portableReader.readInt("1");
-        //this.bucket = portableReader.readUTF("2");
         this.distributionId = portableReader.readLong("3");
         this.entries = new Entry[portableReader.readInt("4")];
         for(Portable p : portableReader.readPortableArray("5")){
@@ -271,7 +267,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         totalJoined = 0;
         totalLeft = 0;
         round++;
-        countdownTimer = duration+overtime;
         this.dataStore.update(this);
     }
 
@@ -294,7 +289,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.dedicated = dedicated;
         this.gameModule = gameServiceProvider;
         this.owner = gameZone.distributionKey();
-        this.countdownTimer = this.duration+this.overtime;
         this.arena = gameZone.arena(1);
     }
 
@@ -320,7 +314,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
 
     @Override
     public void onCountdown(long delta){
-        countdownTimer -= delta;
+
     }
 
 

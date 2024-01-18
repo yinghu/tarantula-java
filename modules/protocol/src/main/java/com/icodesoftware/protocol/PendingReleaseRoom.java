@@ -1,4 +1,4 @@
-package com.icodesoftware.game;
+package com.icodesoftware.protocol;
 
 import com.icodesoftware.Room;
 
@@ -9,7 +9,7 @@ public class PendingReleaseRoom {
     public Room room;
     public LocalDateTime pendingSchedule;
 
-    public PendingReleaseRoom(Room room,LocalDateTime pendingSchedule){
+    public PendingReleaseRoom(Room room, LocalDateTime pendingSchedule){
         this.room = room;
         this.pendingSchedule = pendingSchedule;
     }

@@ -2,21 +2,13 @@ package com.icodesoftware.integration.udp;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
-import com.icodesoftware.game.PendingReleaseRoom;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.*;
-import com.icodesoftware.service.ApplicationSchema;
 import com.icodesoftware.service.Serviceable;
-import com.icodesoftware.service.TokenValidatorProvider;
-import com.icodesoftware.util.HttpCaller;
-import com.icodesoftware.util.JsonUtil;
-import com.icodesoftware.util.ScheduleRunner;
-import com.icodesoftware.util.TarantulaExecutorServiceFactory;
+import com.icodesoftware.util.*;
 
-import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,7 +23,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     private ScheduleRunner countdownTimer;
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
 
-    private String moduleName;
     private long gameModuleCountdownInterval;
     private ActiveRoom roomTemplate;
 
@@ -42,8 +33,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     private int maxChannelSize;
 
     private AtomicInteger keySync;
-
-    private MessageDigest messageDigest;
 
 
     private HttpCaller httpCaller;
@@ -71,11 +60,9 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     private Thread sender;
     private boolean running = true;
 
-    //private GameServiceProxy gameServiceProxy;
-
+    private GameServiceProvider gameServiceProvider;
     public UDPGameEndpoint(JsonObject config){
         this.config = config;
-        //gameServiceProxy = new EmptyGameServiceProxy();
     }
 
 
@@ -84,7 +71,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(config.get("schedulerSetting").getAsString());
         this.activeGameIndex = new ConcurrentHashMap<>();
         this.pendingReleaseRooms = new ConcurrentHashMap<>();
-        this.messageDigest = MessageDigest.getInstance(TokenValidatorProvider.MDA);
         this.serverId = UUID.randomUUID().toString();
         this.keySync = new AtomicInteger(1);
         this.udpEndpointServiceProvider = (UDPEndpointServiceProvider)Class.forName(config.get("endpointServiceProvider").getAsString()).getConstructor().newInstance();
@@ -107,7 +93,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         String resp = httpCaller.post(registerPath,connection.toString().getBytes(),headers);
         JsonObject jo = JsonUtil.parse(resp);
         if(!jo.get("successful").getAsBoolean()) throw new RuntimeException(resp);
-        byte[] serverKey = Base64.getDecoder().decode(jo.get("serverKey").getAsString());
+        byte[] serverKey = Base64Util.fromBase64String(jo.get("serverKey").getAsString());
         this.typeId = jo.get("typeId").getAsString();
         int timeout = jo.get("sessionTimeout").getAsInt();
         this.udpEndpointServiceProvider.sessionTimeout(timeout);
@@ -115,7 +101,9 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         long duration = jo.get("duration").getAsLong();
         long overtime = jo.get("overtime").getAsLong();
         int joinsOnStart = jo.get("joinsOnStart").getAsInt();
-        this.moduleName = jo.get("gameModule").getAsString();
+        this.gameServiceProvider = toGameServiceProvider(jo.get("gameServiceProvider").getAsString());
+        this.gameServiceProvider.setup(new GameServiceContext());
+        logger.warn("Room setting : "+jo);
         this.roomTemplate = new ActiveRoom(capacity,duration,overtime,joinsOnStart,timeout);
         this.cipherListener = this.udpEndpointServiceProvider.registerCipherListener(serverKey);
         int channelRegistered =0;
@@ -192,33 +180,32 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     public void onLeft(int channelId, int sessionId) {
         ActiveRoom activeGame = activeGameIndex.get(channelId);
         int totalLeft = activeGame.leave();
-        //activeGame.gameModule.onLeft(new ActiveChannel(sessionId));
         if(totalLeft == activeGame.capacity()){
             pendingReleaseRooms.remove(channelId);
         }
+        logger.warn("Left :"+channelId+" : "+sessionId);
     }
 
     @Override
     public void onJoined(int channelId, int sessionId){
         ActiveRoom activeGame = activeGameIndex.get(channelId);
         activeGame.join();
-        //activeGame.gameModule.onJoined(new ActiveChannel(sessionId));
+        logger.warn("Joined :"+channelId+" : "+sessionId);
     }
 
     @Override
     public boolean validate(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         try{
             int sessionId = messageBuffer.readInt();
-            String token = messageBuffer.readUTF8();
+            long systemId = messageBuffer.readLong();
+            long stub = messageBuffer.readLong();
             String ticket = messageBuffer.readUTF8();
-            MessageDigest mda = (MessageDigest)messageDigest.clone();
-            ValidationUtil.Token session = ValidationUtil.validToken(mda,token);
-            boolean suc = ValidationUtil.validTicket(mda,session.systemId,session.stub,ticket)!=null;
+            boolean suc = this.validateTicket(systemId,stub,ticket);
             if(suc && sessionId == messageHeader.sessionId){
                 ActiveRoom activeGame = activeGameIndex.get(messageHeader.channelId);
-                ActiveChannel activeChannel = new ActiveChannel(session.systemId,activeGame.channelId(),sessionId);
+                ActiveChannel activeChannel = new ActiveChannel(Long.toString(systemId),activeGame.channelId(),sessionId);
                 activeChannel.register(activeGame.gameUserChannel,this.cipherListener);
-                //activeGame.gameModule.onValidated(activeChannel);
+                gameServiceProvider.onValidated(activeChannel);
                 return true;
             }
             return false;
@@ -248,7 +235,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             JsonObject jo = JsonUtil.parse(resp);
             if(!jo.get("successful").getAsBoolean()) return false;
             ActiveRoom activeRoom =  roomTemplate.assign(channelId);
-            //activeRoom.gameModule = this.createGameModule(activeRoom);
             activeRoom.gameUserChannel =  new GameUserChannel(channelId, udpEndpointServiceProvider, this.cipherListener,this, this,this);
             activeGameIndex.put(channelId, activeRoom);
             udpEndpointServiceProvider.registerUserChannel(activeRoom.gameUserChannel);
@@ -268,7 +254,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
         ActiveRoom activeGame = activeGameIndex.get(messageHeader.channelId);
-        //activeGame.gameModule.onAction(messageHeader,messageBuffer,callback);
+        gameServiceProvider.onAction(messageHeader,messageBuffer,callback);
     }
 
 
@@ -282,39 +268,6 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             return this.scheduledExecutorService.scheduleAtFixedRate(task,task.initialDelay(),task.delay(),TimeUnit.MILLISECONDS);
         }
     }
-
-    public void log(String message,int level){
-        switch (level){
-            case OnLog.DEBUG:
-                this.logger.debug(message);
-                break;
-            case OnLog.INFO:
-                this.logger.info(message);
-                break;
-            case OnLog.WARN:
-                this.logger.warn(message);
-                break;
-        }
-
-    }
-
-    public void log(String message,Exception error,int level){
-        switch (level){
-            case OnLog.WARN:
-                if(error!=null){
-                    this.logger.warn(message);
-                }
-                else{
-                    this.logger.warn(message,error);
-                }
-                break;
-            case OnLog.ERROR:
-                this.logger.error(message,error);
-                break;
-        }
-    }
-
-
 
     @Override
     public void onStarted(Room room) {
@@ -350,15 +303,38 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             logger.warn("failed to create channel");
         }
     }
-    public GameServiceProvider gameServiceProvider(){
-        return null;
-    }
-    //@Override
-    public ApplicationSchema applicationSchema() {
-        return null;
-    }
 
     private void onCountdown(){
         pendingReleaseRooms.forEach((k,v)->v.room.onCountdown(gameModuleCountdownInterval));
+    }
+
+    private boolean validateTicket(long key,long stub,String ticket){
+        try{
+           String[] requestHeaders = new String[]{
+                    Session.TARANTULA_ACCESS_KEY,
+                    headers[1],
+                    Session.TARANTULA_SERVER_ID,
+                    headers[3],
+                    Session.TARANTULA_ACTION,
+                    "onTicket"
+            };
+            JsonObject req = new JsonObject();
+            req.addProperty("systemId",key);
+            req.addProperty("stub",stub);
+            req.addProperty("ticket",ticket);
+            JsonObject resp = JsonUtil.parse(httpCaller.post(registerPath,req.toString().getBytes(),requestHeaders));
+            return resp.get("successful").getAsBoolean();
+        }catch (Exception ex){
+            logger.error("failed to validate ticket",ex);
+            return false;
+        }
+    }
+    private GameServiceProvider toGameServiceProvider(String className){
+        try{
+            return (GameServiceProvider)Class.forName(className).getConstructor().newInstance();
+        }catch (Exception ex){
+            this.logger.warn("No class provided ["+className+"]");
+            throw new RuntimeException();
+        }
     }
 }

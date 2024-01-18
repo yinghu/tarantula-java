@@ -19,7 +19,7 @@ public class StackTest {
 
     @Test(groups = { "stack" })
     public void stackInitTest() {
-        Stack stack = new Stack();
+        Stack stack = Stack.stack(3);
         //stack.shuffle();
         TitleComparator comparator = new TitleComparator();
         int chow = 0;
@@ -64,7 +64,7 @@ public class StackTest {
 
     @Test(groups = { "stack" })
     public void stackSequenceTest() {
-        Stack stack = new Stack();
+        Stack stack = Stack.stack(3);
         stack.shuffle();
         Tile[] h1 = new Tile[14];
         stack.draw(h1);
@@ -75,6 +75,7 @@ public class StackTest {
         int line = 3;
         for(int i=0;i< tiles.length;i++){
             System.out.print(tiles[i]);
+            System.out.print(",");
             line--;
             if(line==0){
                 System.out.println();

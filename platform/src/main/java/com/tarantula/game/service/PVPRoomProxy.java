@@ -14,11 +14,11 @@ public class PVPRoomProxy extends RoomProxyHeader{
     }
     @Override
     public Stub join(Session session, Rating rating) {
-        Stub stub = new Stub();
-        stub.distributionKey(session.systemId());
-        stub.stub(session.stub());
-        stub.label(application.tag());
-        this.dataStore.createIfAbsent(stub,true);
+        Stub stub = gameServiceProvider.presenceServiceProvider().stub(session,application);
+        //stub.distributionKey(session.distributionKey());
+        //stub.stub(session.stub());
+        //stub.label(application.tag());
+        //this.dataStore.createIfAbsent(stub,true);
         GameRoom room = gameServiceProvider.roomServiceProvider().join(rating,gameZone);
         stub.joined(room!=null);
         if(!stub.joined()) return stub;

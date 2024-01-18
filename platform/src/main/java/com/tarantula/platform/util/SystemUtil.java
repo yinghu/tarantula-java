@@ -1,17 +1,10 @@
 package com.tarantula.platform.util;
 
-import com.icodesoftware.protocol.ValidationUtil;
-import com.icodesoftware.service.ApplicationPreSetup;
-import com.icodesoftware.util.TimeUtil;
+import com.icodesoftware.util.Base64Util;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
-import java.time.*;
 import java.util.Arrays;
-
-import java.util.Base64;
 import java.util.UUID;
 
 
@@ -19,43 +12,15 @@ public class SystemUtil {
 
 
     public static String toHexString(byte[] hash){
-        return ValidationUtil.toHexString(hash);
-    }
-    public static String ticket(MessageDigest messageDigest, String systemId, int stub, int durationSeconds,String waterMark) {
-        LocalDateTime _st = LocalDateTime.now().plusSeconds(durationSeconds);
-        long end = TimeUtil.toUTCMilliseconds(_st);
-        StringBuffer _ticket = new StringBuffer();
-        _ticket.append("tarantula").append(" ").append(end).append(" ");
-        messageDigest.reset();
-        messageDigest.update(systemId.getBytes());
-        messageDigest.update(Integer.toHexString(stub).getBytes());
-        messageDigest.update(Long.toHexString(end).getBytes());
-        String hash = SystemUtil.toHexString(messageDigest.digest());
-        _ticket.append(hash).append(" ").append(waterMark);
-        return _ticket.toString();
-    }
-
-    public static String validTicket(MessageDigest messageDigest,String systemId,int stub,String ticket){
-        return ValidationUtil.validTicket(messageDigest,systemId,stub,ticket);
-    }
-    public static  String token(MessageDigest messageDigest, String systemId,int stub,int timeoutMinutes,String mark,String index) {
-        //{systemId} {ticket}-{routing}-{stub}-{cid}-{start}-{hash}
-        //ticket=> {tarantula} {stub} {end} {hash}
-        StringBuffer token = new StringBuffer(systemId);
-        messageDigest.reset();
-        messageDigest.update(systemId.getBytes());
-        messageDigest.update(Integer.toHexString(stub).getBytes());
-        long start = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
-        messageDigest.update(Long.toHexString(start).getBytes());
-        messageDigest.update(index.getBytes());
-        String hash = SystemUtil.toHexString(messageDigest.digest());
-        String ticket = SystemUtil.ticket(messageDigest,systemId,stub,timeoutMinutes*60,mark);//assign a ticket
-        token.append(" ").append(ticket);//0 embedded to token
-        token.append("-").append(stub);//1
-        token.append("-").append(start); //2
-        token.append("-").append(index);//3 -- cluster name suffix
-        token.append("-").append(hash); //4 -- hash
-        return token.toString();
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < hash.length; i++){
+            int v = hash[i] & 0xff;
+            if (v < 16) {
+                sb.append('0');
+            }
+            sb.append(Integer.toHexString(v));
+        }
+        return sb.toString().toUpperCase();
     }
     public static  String accessKey(MessageDigest messageDigest,String typeId,String gameClusterId,long timestamp,String waterMark) {
         //{gameClusterId}-{hash}
@@ -79,12 +44,7 @@ public class SystemUtil {
         String hash = SystemUtil.toHexString(messageDigest.digest());
         return hash.equals(sp[1])?sp[2]:null;
     }
-    //public  static OnSession validToken(MessageDigest messageDigest, String token) {
-        //System.out.println(token);
-        //ValidationUtil.Token validated = ValidationUtil.validToken(messageDigest,token);
-        //if(!validated.valid) throw new RuntimeException("Wrong session token");
-        //return new OnSessionTrack(1,validated.stub,validated.ticket,validated.index);//need to update
-    //}
+
     public static String hashPassword(MessageDigest messageDigest,String password) {
         messageDigest.reset();
         messageDigest.update(password.getBytes());
@@ -139,31 +99,17 @@ public class SystemUtil {
         return contentType;
     }
 
-    public static ApplicationPreSetup applicationPreSetup(String className){
-        try{
-            return (ApplicationPreSetup)Class.forName(className).getConstructor().newInstance();
-        }catch (Exception ex){
-            throw new RuntimeException(ex);
-        }
-    }
 
     public static String toBase64String(byte[] data){
-        return Base64.getEncoder().encodeToString(data);
+        return Base64Util.toBase64String(data);
     }
     public static byte[] fromBase64String(String data){
-        return Base64.getDecoder().decode(data);
+        return Base64Util.fromBase64String(data);
     }
 
     public static byte[] fromPemString(String base64Key){
         String privateKeyPEM = base64Key.replace("-----BEGIN PRIVATE KEY-----", "").replaceAll("\n", "").replace("-----END PRIVATE KEY-----", "");
-        return Base64.getDecoder().decode(privateKeyPEM);
-    }
-
-    public static String toString(Exception ex){
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw, true);
-        ex.printStackTrace(pw);
-        return sw.getBuffer().toString();
+        return Base64Util.fromBase64String(privateKeyPEM);
     }
 
 

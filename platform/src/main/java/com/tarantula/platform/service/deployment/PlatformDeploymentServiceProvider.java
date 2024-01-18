@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.protocol.Channel;
 import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
@@ -12,7 +11,6 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.admin.GameClusterQuery;
 import com.tarantula.platform.*;
-import com.tarantula.platform.room.ChannelStub;
 import com.tarantula.platform.service.*;
 
 import com.tarantula.platform.service.persistence.DataStoreViewer;
@@ -34,7 +32,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     private TarantulaLogger log = JDKLogger.getLogger(PlatformDeploymentServiceProvider.class);
 
-    //private EventService integrationEventService;
     private ClusterProvider integrationCluster;
     private SecureRandom secureRandom;
 
@@ -277,6 +274,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public void unregisterGameClusterEventListener(GameClusterEventListener gameClusterEventListener){
         this.eListeners.remove(gameClusterEventListener.typeId());
     }
+
     public List<Descriptor> gameServiceList(){
         return this.tarantulaContext.availableServices();
     }
@@ -353,7 +351,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(!ds.load(query)){
             return false;
         }
-        descriptor.owner(query.index());
+        descriptor.ownerKey(SnowflakeKey.from(query.lobbyId()));
         descriptor.label(ApplicationProvider.LABEL);
         descriptor.onEdge(true);
         if(!ds.create(descriptor)) return false;
@@ -772,45 +770,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         byte[] existing = clusterStore.mapSetIfAbsent(typeId.getBytes(),key);
         return existing!=null?existing:key;
     }
-    public OnAccess registerConnection(Connection connection){
-        GameServerListener gameServerListener = cListeners.get(connection.configurationTypeId());
-        if(gameServerListener==null) return null;
-        return gameServerListener.onConnection(connection);
-    }
-
-    public boolean registerChannel(Channel configurable){
-        ChannelStub channelStub = (ChannelStub)configurable;
-        GameServerListener gameServerListener = cListeners.get(channelStub.configurationTypeId());
-        if(gameServerListener==null) return false;
-        return gameServerListener.onChannel(channelStub);
-    }
-
-    public void startConnection(Connection connection){
-        GameServerListener gameServerListener = cListeners.get(connection.configurationTypeId());
-        if(gameServerListener==null) return;
-        gameServerListener.onStartConnection(connection);
-    }
-
-    public void stopConnection(Connection connection){
-        GameServerListener gameServerListener = cListeners.get(connection.configurationTypeId());
-        if(gameServerListener==null) return;
-        gameServerListener.onDisConnection(connection);
-    }
-
-    public void verifyConnection(String typeId,String serverId){
-        this.integrationCluster.deployService().onVerifyConnection(typeId,serverId);
-    }
-
-    public void updateRoom(String typeId,String lobby,byte[] payload){
-        GameServerListener gameServerListener = cListeners.get(typeId);
-        if(gameServerListener==null) return;
-        gameServerListener.onUpdate(lobby,payload);
-    }
 
     public String registerGameServerListener(GameServerListener gameChannelListener){
         String regKey = gameChannelListener.typeId();//UUID.randomUUID().toString();
         cListeners.put(regKey,gameChannelListener);
         return regKey;
+    }
+    public GameServerListener gameServerListener(String typeId){
+        return cListeners.get(typeId);
     }
 
     public void unregisterGameServerListener(String registerKey){

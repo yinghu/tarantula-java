@@ -3,11 +3,9 @@ package com.tarantula.platform.room;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
-import com.icodesoftware.game.PendingReleaseRoom;
-import com.icodesoftware.game.PlayerUpdate;
-import com.icodesoftware.game.UpdateBatch;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.Channel;
+import com.icodesoftware.protocol.PendingReleaseRoom;
 import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
 
@@ -138,9 +136,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         if(scheduledFuture!=null && !scheduledFuture.isCancelled()) scheduledFuture.cancel(true);
         this.clusterProvider.unregisterReloadListener(reloadKey);
         this.serviceContext.deploymentServiceProvider().unregisterGameServerListener(registerKey);
-        //gameZoneIndex.forEach((k,z)->{
-            //if(dedicated) z.gameModule.close();
-        //});
         gameRoomIndex.forEach((k,r)->r.close());
     }
 
@@ -160,7 +155,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                     }
                 }
             }
-            //GameRoom room = index.gameRoom;
             channel.register(stub,this.gameServiceProvider.gameServiceProvider(),this.gameServiceProvider.gameServiceProvider(),this.gameServiceProvider.gameServiceProvider(),timeoutListener);
             udpEndpoint.registerChannel(channel);
             return channel;
@@ -251,7 +245,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public <T extends Configurable> void release(T t) {
         GameZoneIndex index = gameZoneIndex.remove(t.distributionKey());
         if(dedicated){
-            //index.gameModule.close();
             UDPChannel udpChannel;
             do{
                 udpChannel = index.pendingPushChannels.poll();
@@ -281,9 +274,13 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     @Override
     public OnAccess onConnection(Connection connection) {
         GameZoneIndex index = gameZoneIndex(connection.configurationName());
-        if(index==null || !this.dedicated) {
+        if(index==null) {
             logger.warn("No game lobby available for ["+connection.configurationName()+"]");
-            return null;
+            return new OnAccessTrack(false,"game lobby ["+connection.configurationName()+"] not available");
+        }
+        if(!dedicated){
+            logger.warn("Game cluster needs to setup as dedicated for ["+typeId()+"]");
+            return new OnAccessTrack(false,"game cluster needs to setup as dedicated");
         }
         byte[] lockKey = index.gameZone.distributionKey().getBytes();
         serverClusterStore.mapLock(lockKey);
@@ -293,28 +290,29 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         connection.timeout(timeout);
         this.clusterProvider.deployService().onRegisterConnection(connection);
         OnAccess onAccess = new OnAccessTrack();
+        onAccess.successful(true);
         onAccess.property("sessionTimeout",timeout);
         onAccess.property("capacity",index.gameZone.capacity());
         onAccess.property("duration",index.gameZone.roundDuration());
         onAccess.property("overtime",index.gameZone.roundOvertime());
         onAccess.property("joinsOnStart",index.gameZone.joinsOnStart());
-        //onAccess.property("gameModule",index.gameZone.gameModule());
+        onAccess.property("gameServiceProvider",gameCluster.gameServiceProvider);
         return onAccess;
     }
 
+
     public void onUpdate(String lobby,byte[] payload){
         serviceContext.schedule(new ScheduleRunner(1000,()->{
-            //logger.warn("Update ["+new String(payload)+"]["+lobby+"]");
             GameZoneIndex index = gameZoneIndex(lobby);
-            UpdateBatch updateBatch = UpdateBatch.fromBytes(payload);
-            for(PlayerUpdate update : updateBatch.playerUpdates){
-                UpdateBatch batch = new UpdateBatch(new PlayerUpdate[]{update});
-                GameUpdateObject mappingObject = new GameUpdateObject();
-                mappingObject.value(batch.toBytes());
-                mappingObject.owner(update.systemId);
-                mappingObject.distributionKey(index.gameZone.distributionKey());
+            //UpdateBatch updateBatch = UpdateBatch.fromBytes(payload);
+            //for(PlayerUpdate update : updateBatch.playerUpdates){
+                //UpdateBatch batch = new UpdateBatch(new PlayerUpdate[]{update});
+                //GameUpdateObject mappingObject = new GameUpdateObject();
+                //mappingObject.value(batch.toBytes());
+                //mappingObject.owner(update.systemId);
+                //mappingObject.distributionKey(index.gameZone.distributionKey());
                 //this.serviceContext.postOffice().onTag(gameServiceProvider.serviceProxy().tag()).send(update.systemId,mappingObject);
-            }
+            //}
         }));
     }
     @Override
@@ -469,7 +467,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private GameZoneIndex gameZoneIndex(String configurationName){
         GameZoneIndex[] gameZone ={null};
         gameZoneIndex.forEach((k,v)->{
-            if(configurationName.equals(v.gameZone.configurationTypeId()+"/"+v.gameZone.configurationName())){
+            if(configurationName.trim().equals(v.gameZone.configurationTypeId()+"/"+v.gameZone.configurationName())){
                 gameZone[0] = v;
             }
         });
