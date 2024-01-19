@@ -8,7 +8,8 @@ public class ProtocolPortableRegistry<T extends Recoverable> extends AbstractRec
     public static final int OID = 9;
 
     //public static final int TRANSACTION_LOG_CID = 1;
-    //public static final int TRANSACTION_RESULT_CID = 2;
+    public static final int STATISTICS_CID = 3;
+    public static final int STATISTICS_ENTRY_CID = 5;
     @Override
     public int registryId() {
         return OID;

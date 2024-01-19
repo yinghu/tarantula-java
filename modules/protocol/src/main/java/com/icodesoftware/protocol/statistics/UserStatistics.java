@@ -1,7 +1,8 @@
-package com.tarantula.platform.statistics;
+package com.icodesoftware.protocol.statistics;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Statistics;
+import com.icodesoftware.protocol.ProtocolPortableRegistry;
 import com.icodesoftware.util.RecoverableObject;
 
 import java.util.ArrayList;
@@ -55,12 +56,12 @@ public class UserStatistics extends RecoverableObject implements Statistics {
     }
     @Override
     public int getFactoryId() {
-        return StatisticsPortableRegistry.OID;
+        return ProtocolPortableRegistry.OID;
     }
 
     @Override
     public int getClassId() {
-        return StatisticsPortableRegistry.STATISTICS_CID;
+        return ProtocolPortableRegistry.STATISTICS_CID;
     }
 
 
@@ -68,7 +69,7 @@ public class UserStatistics extends RecoverableObject implements Statistics {
     public JsonObject toJson() {
         JsonObject jo  = new JsonObject();
         JsonArray ja = new JsonArray();
-        for(Statistics.Entry entry : summary()){
+        for(Entry entry : summary()){
             ja.add(entry.toJson());
         }
         jo.addProperty("Successful",true);

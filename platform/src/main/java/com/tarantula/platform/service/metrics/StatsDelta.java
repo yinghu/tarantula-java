@@ -1,4 +1,4 @@
-package com.tarantula.platform.statistics;
+package com.tarantula.platform.service.metrics;
 
 import com.icodesoftware.util.RecoverableObject;
 
@@ -10,7 +10,7 @@ public class StatsDelta extends RecoverableObject {
     public StatsDelta(){
 
     }
-    public StatsDelta(String name,double value){
+    public StatsDelta(String name, double value){
         this.name = name;
         this.value = value;
     }

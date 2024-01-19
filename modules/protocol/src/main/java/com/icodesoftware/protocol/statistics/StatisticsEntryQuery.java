@@ -1,4 +1,4 @@
-package com.tarantula.platform.statistics;
+package com.icodesoftware.protocol.statistics;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;

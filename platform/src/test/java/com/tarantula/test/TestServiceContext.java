@@ -8,8 +8,8 @@ import com.tarantula.platform.ApplicationConfiguration;
 import com.tarantula.platform.item.ItemPortableRegistry;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.service.cluster.PortableRegistry;
+import com.tarantula.platform.service.metrics.StatisticsPortableRegistry;
 import com.tarantula.platform.service.persistence.ClusterNode;
-import com.tarantula.platform.statistics.StatisticsPortableRegistry;
 import com.tarantula.platform.tournament.TournamentPortableRegistry;
 
 import java.util.List;

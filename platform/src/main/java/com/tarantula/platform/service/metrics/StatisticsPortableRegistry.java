@@ -1,16 +1,15 @@
-package com.tarantula.platform.statistics;
+package com.tarantula.platform.service.metrics;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.AbstractRecoverableListener;
-import com.tarantula.platform.service.metrics.*;
 
 public class StatisticsPortableRegistry<T extends Recoverable> extends AbstractRecoverableListener {
 
     public static final int OID = 5;
 
 
-    public static final int STATISTICS_CID = 3;
-    public static final int STATISTICS_ENTRY_CID = 5;
+    //public static final int STATISTICS_CID = 3;
+    //public static final int STATISTICS_ENTRY_CID = 5;
     public static final int STATISTICS_DELTA_CID = 7;
 
     public static final int SYSTEM_STATISTICS_ENTRY_CID = 8;
@@ -28,12 +27,6 @@ public class StatisticsPortableRegistry<T extends Recoverable> extends AbstractR
     public T create(int i) {
         Recoverable pt = null;
         switch (i){
-            case STATISTICS_CID:
-                pt = new UserStatistics();
-                break;
-            case STATISTICS_ENTRY_CID:
-                pt = new StatisticsEntry();
-                break;
             case STATISTICS_DELTA_CID:
                 pt = new StatsDelta();
                 break;

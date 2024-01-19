@@ -1,7 +1,8 @@
-package com.tarantula.platform.statistics;
+package com.icodesoftware.protocol.statistics;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Statistics;
+import com.icodesoftware.protocol.ProtocolPortableRegistry;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 
@@ -24,7 +25,7 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
         this.onEdge = true;
         this.label = LABEL;
     }
-    public StatisticsEntry(Key ownerKey,String name){
+    public StatisticsEntry(Key ownerKey, String name){
         this();
         this.ownerKey = ownerKey;
         this.name = name;
@@ -105,12 +106,12 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
     }
     @Override
     public int getFactoryId() {
-        return StatisticsPortableRegistry.OID;
+        return ProtocolPortableRegistry.OID;
     }
 
     @Override
     public int getClassId() {
-        return StatisticsPortableRegistry.STATISTICS_ENTRY_CID;
+        return ProtocolPortableRegistry.STATISTICS_ENTRY_CID;
     }
 
 

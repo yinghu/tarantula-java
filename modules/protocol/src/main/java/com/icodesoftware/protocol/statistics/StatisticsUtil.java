@@ -1,4 +1,4 @@
-package com.tarantula.platform.statistics;
+package com.icodesoftware.protocol.statistics;
 
 import java.time.LocalDateTime;
 

@@ -8,8 +8,6 @@ import com.icodesoftware.Statistics;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 
-import com.tarantula.platform.statistics.StatisticsPortableRegistry;
-
 import java.time.LocalDateTime;
 
 public class SystemStatisticsEntry extends RecoverableObject implements Statistics.Entry {

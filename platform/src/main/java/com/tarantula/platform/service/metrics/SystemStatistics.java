@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.util.RecoverableObject;
 
-import com.tarantula.platform.statistics.StatisticsPortableRegistry;
 import com.tarantula.platform.util.RecoverableQuery;
 
 import java.time.LocalDateTime;
