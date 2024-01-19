@@ -4,8 +4,7 @@ import com.icodesoftware.*;
 import com.tarantula.game.*;
 import com.tarantula.platform.room.GameRoom;
 
-public class
-PVERoomProxy extends RoomProxyHeader {
+public class PVERoomProxy extends RoomProxyHeader {
 
     @Override
     public void setup(ApplicationContext applicationContext, GameLobby gameLobby,GameZone gameZone) {
@@ -21,11 +20,13 @@ PVERoomProxy extends RoomProxyHeader {
         stub.roomId = stub.room.roomId();
         stub.zone = gameZone;
         stub.zoneId = gameZone.distributionKey();
-        stub.pushChannel = this.gameServiceProvider.roomServiceProvider().registerChannel(stub,(s,d)->{
-            gameLobby.timeout(s,d);
-        });
-        room.setup(stub.pushChannel);
-        stub.sessionId = stub.pushChannel.sessionId();
+        if(!room.dedicated()){
+            stub.pushChannel = this.gameServiceProvider.roomServiceProvider().registerChannel(stub,(s,d)->{
+                gameLobby.timeout(s,d);
+            });
+            room.setup(stub.pushChannel);
+            stub.sessionId = stub.pushChannel.sessionId();
+        }
         stub.offline = true;
         stub.tag(application.tag());
         stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));

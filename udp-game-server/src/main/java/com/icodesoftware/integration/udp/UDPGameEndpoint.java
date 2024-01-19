@@ -13,7 +13,7 @@ import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.PingListener, UDPEndpointServiceProvider.ActionListener,RoomListener{
+public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.UserSessionValidator,UDPEndpointServiceProvider.SessionListener,UDPEndpointServiceProvider.PingListener, UDPEndpointServiceProvider.ActionListener,RoomListener, UDPEndpointServiceProvider.RequestListener {
 
     private TarantulaLogger logger = JDKLogger.getLogger(UDPGameEndpoint.class);
 
@@ -235,7 +235,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             JsonObject jo = JsonUtil.parse(resp);
             if(!jo.get("successful").getAsBoolean()) return false;
             ActiveRoom activeRoom =  roomTemplate.assign(channelId);
-            activeRoom.gameUserChannel =  new GameUserChannel(channelId, udpEndpointServiceProvider, this.cipherListener,this, this,this);
+            activeRoom.gameUserChannel =  new GameUserChannel(channelId, udpEndpointServiceProvider, this.cipherListener,this, this,this,this);
             activeGameIndex.put(channelId, activeRoom);
             udpEndpointServiceProvider.registerUserChannel(activeRoom.gameUserChannel);
             return true;
@@ -257,7 +257,10 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
         gameServiceProvider.onAction(messageHeader,messageBuffer,callback);
     }
 
-
+    @Override
+    public byte[] onRequest(Session session, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+        return gameServiceProvider.onRequest(session,messageHeader,messageBuffer);
+    }
 
     //game context
 
