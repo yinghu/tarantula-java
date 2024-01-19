@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 public class MessageBuffer {
 
+    public final static int MAX_BATCH_SIZE = 5;
     public final static int PAYLOAD_SIZE = 485;//SIZE - HEADER_SIZE
     public final static int SIZE = 508;
     public final static int PENDING_ACK_SIZE = 10;
@@ -27,14 +28,17 @@ public class MessageBuffer {
         byteBuffer.clear();
         byteBuffer.put(data,offset,length);
     }
-    public void reset(){
+    public MessageBuffer reset(){
         byteBuffer.clear();
+        return this;
     }
-    public void flip(){
+    public MessageBuffer flip(){
         byteBuffer.flip();
+        return this;
     }
-    public void rewind(){
+    public MessageBuffer rewind(){
         byteBuffer.rewind();
+        return this;
     }
     public MessageBuffer writeHeader(MessageHeader header){
         int bits = header.ack?1:0;

@@ -1,5 +1,7 @@
 package com.icodesoftware.game.mahjong;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.ApplicationPreSetup;
@@ -91,7 +93,15 @@ public class MahjongServiceProvider implements GameServiceProvider {
             float value = messageBuffer.readFloat();
             this.gameContext.log("Request : "+cmd+" : "+name+" : "+value,OnLog.INFO);
         }
-        return new byte[0];
+        JsonObject jsonObject = new JsonObject();
+        JsonArray data = new JsonArray();
+        for(int i=0;i<100;i++){
+            JsonObject e = new JsonObject();
+            e.addProperty("e"+i,i);
+            data.add(e);
+        }
+        jsonObject.add("stats",data);
+        return jsonObject.toString().getBytes();
     }
 
     @Override
@@ -102,6 +112,12 @@ public class MahjongServiceProvider implements GameServiceProvider {
             float value = messageBuffer.readFloat();
             String name = messageBuffer.readUTF8();
             this.gameContext.log("Action : "+cmd+" : "+name+" : "+value,OnLog.INFO);
+            messageHeader.commandId = Messenger.ON_ACTION;
+            messageHeader.ack = true;
+            messageHeader.encrypted = false;
+            messageHeader.broadcasting = true;
+            messageBuffer.reset().writeHeader(messageHeader).writeUTF8("RSP : HELLO");
+            callback.onRelay(messageHeader,messageBuffer.flip());
         }
     }
 
