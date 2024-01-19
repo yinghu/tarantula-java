@@ -60,6 +60,9 @@ public class ChannelHeader extends RecoverableObject implements Channel {
         boolean encrypted = messageHeader.encrypted;
         int batchSize = encrypted? MessageBuffer.PAYLOAD_SIZE- CipherUtil.cipherSize(payload.length) : MessageBuffer.PAYLOAD_SIZE;
         BatchUtil.Batch batch = BatchUtil.batch(payload.length,batchSize);
+        if(batch.size > MessageBuffer.MAX_BATCH_SIZE){
+            return;
+        }
         synchronized (messageBuffer){
             for(BatchUtil.Offset offset : batch.offsets){
                 messageBuffer.reset();
@@ -92,5 +95,6 @@ public class ChannelHeader extends RecoverableObject implements Channel {
     public void close(){
         userChannel.kickoff(sessionId);
     }
+
 
 }

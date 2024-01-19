@@ -7,15 +7,12 @@ import com.icodesoftware.protocol.UserChannel;
 
 public class ActiveChannel extends ChannelHeader {
 
-    public ActiveChannel(String owner,int channelId,int sessionId){
-        this.owner = owner;
+    public ActiveChannel(String owner,long stub,int channelId,int sessionId){
         this.channelId = channelId;
         this.sessionId = sessionId;
+        this.stub = new ActiveSession(owner,stub);
     }
 
-    public ActiveChannel(int sessionId){
-        this.sessionId = sessionId;
-    }
 
     public void register(UserChannel userChannel, UDPEndpointServiceProvider.CipherListener cipherListener){
         this.messageBuffer = new MessageBuffer();

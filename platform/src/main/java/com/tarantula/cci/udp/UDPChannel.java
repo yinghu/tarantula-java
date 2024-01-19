@@ -47,7 +47,6 @@ public class UDPChannel extends GameChannel {
         int batchSize = encrypted? MessageBuffer.PAYLOAD_SIZE- CipherUtil.cipherSize(ret.length) : MessageBuffer.PAYLOAD_SIZE;
         BatchUtil.Batch batch = BatchUtil.batch(ret.length,batchSize);
         if(batch.size > MessageBuffer.MAX_BATCH_SIZE){
-            System.out.println("BSZIE : "+batchSize);
             return;
         }
         for(BatchUtil.Offset offset : batch.offsets){

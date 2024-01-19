@@ -42,6 +42,8 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     private JsonObject config;
 
     private ConcurrentHashMap<Integer, ActiveRoom> activeGameIndex;
+
+    private ConcurrentHashMap<Integer,ActiveChannel> activeChannelIndex;
     private ConcurrentHashMap<Integer, PendingReleaseRoom> pendingReleaseRooms;
 
     private int pingRetries;
@@ -70,6 +72,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     public void start() throws Exception {
         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(config.get("schedulerSetting").getAsString());
         this.activeGameIndex = new ConcurrentHashMap<>();
+        this.activeChannelIndex = new ConcurrentHashMap<>();
         this.pendingReleaseRooms = new ConcurrentHashMap<>();
         this.serverId = UUID.randomUUID().toString();
         this.keySync = new AtomicInteger(1);
@@ -203,7 +206,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             boolean suc = this.validateTicket(systemId,stub,ticket);
             if(suc && sessionId == messageHeader.sessionId){
                 ActiveRoom activeGame = activeGameIndex.get(messageHeader.channelId);
-                ActiveChannel activeChannel = new ActiveChannel(Long.toString(systemId),activeGame.channelId(),sessionId);
+                ActiveChannel activeChannel = new ActiveChannel(Long.toString(systemId),stub,activeGame.channelId(),sessionId);
                 activeChannel.register(activeGame.gameUserChannel,this.cipherListener);
                 gameServiceProvider.onValidated(activeChannel);
                 return true;
@@ -253,13 +256,15 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
 
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
-        ActiveRoom activeGame = activeGameIndex.get(messageHeader.channelId);
+        //ActiveRoom activeGame = activeGameIndex.get(messageHeader.channelId);
         gameServiceProvider.onAction(messageHeader,messageBuffer,callback);
     }
 
     @Override
     public byte[] onRequest(Session session, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
-        return gameServiceProvider.onRequest(session,messageHeader,messageBuffer);
+        ActiveChannel activeChannel = activeChannelIndex.get(messageHeader.sessionId);
+        //return gameServiceProvider.onRequest(,messageHeader,messageBuffer);
+        return null;
     }
 
     //game context
