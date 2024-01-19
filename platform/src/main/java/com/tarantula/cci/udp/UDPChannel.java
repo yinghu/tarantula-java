@@ -4,8 +4,6 @@ import com.icodesoftware.protocol.ChannelListener;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
 import com.icodesoftware.protocol.*;
-import com.icodesoftware.util.BatchUtil;
-import com.icodesoftware.util.CipherUtil;
 
 public class UDPChannel extends GameChannel {
 
@@ -42,30 +40,9 @@ public class UDPChannel extends GameChannel {
     //udp request call
     public void onRequest(MessageBuffer.MessageHeader messageHeader,MessageBuffer messageBuffer){
         byte[] ret = this.requestListener.onRequest(stub,messageHeader,messageBuffer);
-        if(ret==null) return;
-        boolean encrypted = messageHeader.encrypted;
-        int batchSize = encrypted? MessageBuffer.PAYLOAD_SIZE- CipherUtil.cipherSize(ret.length) : MessageBuffer.PAYLOAD_SIZE;
-        BatchUtil.Batch batch = BatchUtil.batch(ret.length,batchSize);
-        if(batch.size > MessageBuffer.MAX_BATCH_SIZE){
-            return;
-        }
-        for(BatchUtil.Offset offset : batch.offsets){
-            messageBuffer.reset();
-            messageHeader.ack = false;
-            messageHeader.commandId = Messenger.ON_REQUEST;
-            messageHeader.encrypted = encrypted;
-            messageHeader.batch = offset.batch;
-            messageHeader.batchSize = batch.size;
-            messageBuffer.writeHeader(messageHeader);
-            messageBuffer.writePayload(ret,offset.offset,offset.length);
-            messageBuffer.flip();
-            if(encrypted){
-                messageBuffer.readHeader();
-                if(!cipherListener.encrypt(messageHeader,messageBuffer)) break;
-                messageBuffer.rewind();
-            }
-            userChannel.queue(messageHeader.sessionId,messageBuffer);
-        }
+        if(ret==null || ret.length == 0) return;
+        messageHeader.commandId = Messenger.ON_REQUEST;
+        super.onBatch(messageHeader,ret);
     }
 
     //udp RPC call

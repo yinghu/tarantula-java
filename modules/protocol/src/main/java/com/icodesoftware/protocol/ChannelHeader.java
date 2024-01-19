@@ -57,6 +57,22 @@ public class ChannelHeader extends RecoverableObject implements Channel {
     public void write(Session.Header header, byte[] payload) {
         if(payload==null||payload.length==0) return;
         MessageBuffer.MessageHeader messageHeader = (MessageBuffer.MessageHeader)header;
+        messageHeader.commandId = Messenger.ON_PUSH;
+        onBatch(header,payload);
+    }
+
+    @Override
+    public Connection connection() {
+        return connection;
+    }
+
+    @Override
+    public void close(){
+        userChannel.kickoff(sessionId);
+    }
+
+    protected void onBatch(Session.Header header,byte[] payload){
+        MessageBuffer.MessageHeader messageHeader = (MessageBuffer.MessageHeader)header;
         boolean encrypted = messageHeader.encrypted;
         int batchSize = encrypted? MessageBuffer.PAYLOAD_SIZE- CipherUtil.cipherSize(payload.length) : MessageBuffer.PAYLOAD_SIZE;
         BatchUtil.Batch batch = BatchUtil.batch(payload.length,batchSize);
@@ -67,7 +83,7 @@ public class ChannelHeader extends RecoverableObject implements Channel {
             for(BatchUtil.Offset offset : batch.offsets){
                 messageBuffer.reset();
                 messageHeader.ack = false;
-                messageHeader.commandId = Messenger.ON_PUSH;
+                //messageHeader.commandId = Messenger.ON_PUSH;
                 messageHeader.channelId = channelId;
                 messageHeader.sessionId = sessionId;
                 messageHeader.encrypted = encrypted;
@@ -84,16 +100,6 @@ public class ChannelHeader extends RecoverableObject implements Channel {
                 userChannel.queue(messageHeader.sessionId,messageBuffer);
             }
         }
-    }
-
-    @Override
-    public Connection connection() {
-        return connection;
-    }
-
-    @Override
-    public void close(){
-        userChannel.kickoff(sessionId);
     }
 
 

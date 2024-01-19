@@ -1,5 +1,6 @@
 package com.icodesoftware.integration.udp;
 
+import com.icodesoftware.Session;
 import com.icodesoftware.protocol.ChannelHeader;
 import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
@@ -18,5 +19,9 @@ public class ActiveChannel extends ChannelHeader {
         this.messageBuffer = new MessageBuffer();
         this.userChannel = userChannel;
         this.cipherListener = cipherListener;
+    }
+
+    Session session(){
+        return stub;
     }
 }

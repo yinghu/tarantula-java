@@ -256,15 +256,13 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
 
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
-        //ActiveRoom activeGame = activeGameIndex.get(messageHeader.channelId);
         gameServiceProvider.onAction(messageHeader,messageBuffer,callback);
     }
 
     @Override
     public byte[] onRequest(Session session, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         ActiveChannel activeChannel = activeChannelIndex.get(messageHeader.sessionId);
-        //return gameServiceProvider.onRequest(,messageHeader,messageBuffer);
-        return null;
+        return gameServiceProvider.onRequest(activeChannel.session(),messageHeader,messageBuffer);
     }
 
     //game context
