@@ -1,10 +1,7 @@
 package com.icodesoftware.integration.udp;
 
 import com.icodesoftware.Session;
-import com.icodesoftware.protocol.ChannelHeader;
-import com.icodesoftware.protocol.MessageBuffer;
-import com.icodesoftware.protocol.UDPEndpointServiceProvider;
-import com.icodesoftware.protocol.UserChannel;
+import com.icodesoftware.protocol.*;
 
 public class ActiveChannel extends ChannelHeader {
 
@@ -23,5 +20,11 @@ public class ActiveChannel extends ChannelHeader {
 
     Session session(){
         return stub;
+    }
+
+    void onRequest(MessageBuffer.MessageHeader header,byte[] payload){
+        if(payload==null || payload.length==0) return;
+        header.commandId = Messenger.ON_REQUEST;
+        super.onBatch(header,payload);
     }
 }

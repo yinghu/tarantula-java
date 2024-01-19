@@ -65,6 +65,5 @@ public class GameUserChannel extends UserChannel {
     @Override
     protected void onRequest(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         requestListener.onRequest(null,messageHeader,messageBuffer);
-        //this.queue();
     }
 }

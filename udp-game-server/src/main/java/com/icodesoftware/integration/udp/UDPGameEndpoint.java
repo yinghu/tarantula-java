@@ -187,6 +187,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
             pendingReleaseRooms.remove(channelId);
         }
         logger.warn("Left :"+channelId+" : "+sessionId);
+        activeChannelIndex.remove(sessionId);
     }
 
     @Override
@@ -209,6 +210,7 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
                 ActiveChannel activeChannel = new ActiveChannel(Long.toString(systemId),stub,activeGame.channelId(),sessionId);
                 activeChannel.register(activeGame.gameUserChannel,this.cipherListener);
                 gameServiceProvider.onValidated(activeChannel);
+                activeChannelIndex.put(sessionId,activeChannel);
                 return true;
             }
             return false;
@@ -262,7 +264,9 @@ public class UDPGameEndpoint implements Serviceable,UDPEndpointServiceProvider.U
     @Override
     public byte[] onRequest(Session session, MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         ActiveChannel activeChannel = activeChannelIndex.get(messageHeader.sessionId);
-        return gameServiceProvider.onRequest(activeChannel.session(),messageHeader,messageBuffer);
+        byte[] ret = gameServiceProvider.onRequest(activeChannel.session(),messageHeader,messageBuffer);
+        activeChannel.onRequest(messageHeader,ret);
+        return null;
     }
 
     //game context
