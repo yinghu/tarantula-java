@@ -97,7 +97,6 @@ public class ActiveRoom extends RecoverableObject implements Room {
 
     public void onCountdown(long delta){
         countdownTimer -= delta;
-        //this.gameModule.countdown(countdownTimer);
     }
 
     public int join(){
