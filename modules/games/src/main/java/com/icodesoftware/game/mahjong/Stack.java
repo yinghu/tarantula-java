@@ -37,28 +37,31 @@ public class Stack {
 
 
     private static final int[][] reels = new int[MAX_REEL_SIZE][];
-    private static final int[][] index = new int[MAX_REEL_SIZE][];
 
     private final RNG rnd;
 
     //private int cutter;
 
     private final int size;
-    private int stub;
-    private int last;
+    private int reelIndex;
+    private int[] stackIndex;
 
     private Stack(int size){
         this.size = size;
         rnd = new JvmRNG();
         for(int i=0;i<reels.length;i++){
             reels[i]=new int[STACK_SIZE];
-            index[i]= new int[]{0,0};
             init(reels[i]);
         }
+        stackIndex = new int[size];
     }
     public void shuffle(){
         for(int i=0;i<size;i++){
             shuffle(reels[i]);
+        }
+        reelIndex = 0;
+        for(int i=0;i<size;i++){
+            stackIndex[i] = 0;
         }
     }
     private void init(int[] reel){
@@ -73,29 +76,23 @@ public class Stack {
             reel[_rx] = reel[i];
             reel[i] = tmp;
         }
-        this.stub = 0;
-        this.last = STACK_SIZE-1;
     }
 
     public Tile[] swap(Tile[] tiles){
-        if(tiles[0].rank>100) tiles[0]=tileList[reels[0][last]];
-        if(tiles[1].rank>100) tiles[1]=tileList[reels[1][last]];
-        if(tiles[2].rank>100) tiles[2]=tileList[reels[2][last]];
-        last--;
+        draw(tiles);
         return tiles;
     }
     public Tile[] draw(){
-        Tile[] tiles = new Tile[size];
-        int ix = 0;
-        for(int i=0;i<size;i++){
-            tiles[ix++]=tileList[reels[i][stub]];
-        }
-        stub++;
-        return tiles;
+        Tile[] slots = new Tile[size];
+        draw(slots);
+        return slots;
     }
-    public void draw(Tile[] slots){
+    public synchronized void draw(Tile[] slots){
         for(int i=0;i<slots.length;i++){
-            slots[i]=tileList[reels[0][stub++]];
+            System.out.println("1 : REEL : "+reelIndex+" : "+stackIndex[reelIndex]);
+            slots[i]=tileList[reels[reelIndex][stackIndex[reelIndex]]];
+            stackIndex[reelIndex]++;
+            reelIndex = (reelIndex>=size-1)? 0 : (reelIndex+1);
         }
     }
 
