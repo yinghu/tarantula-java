@@ -40,11 +40,11 @@ public class Stack {
 
     private final RNG rnd;
 
-    //private int cutter;
-
     private final int size;
     private int reelIndex;
     private int[] stackIndex;
+    private int[] stackCutter;
+
 
     private Stack(int size){
         this.size = size;
@@ -54,14 +54,16 @@ public class Stack {
             init(reels[i]);
         }
         stackIndex = new int[size];
+        stackCutter = new int[size];
     }
-    public void shuffle(){
+    public void shuffle(int cutter){
         for(int i=0;i<size;i++){
             shuffle(reels[i]);
         }
         reelIndex = 0;
         for(int i=0;i<size;i++){
             stackIndex[i] = 0;
+            stackCutter[i] = STACK_SIZE-cutter-1;
         }
     }
     private void init(int[] reel){
@@ -78,22 +80,51 @@ public class Stack {
         }
     }
 
-    public Tile[] swap(Tile[] tiles){
-        draw(tiles);
-        return tiles;
+    public
+    Tile swap(Tile tile){
+        if(tile==null || !tile.swappable) throw new IllegalArgumentException("Must be a swappable tile");
+        return fromCutter();
     }
-    public Tile[] draw(){
-        Tile[] slots = new Tile[size];
-        draw(slots);
-        return slots;
+
+    public Tile swap(Tile[] fourKind){
+        if(fourKind==null || fourKind.length != 4) throw new IllegalArgumentException("Must be a four kind tiles");
+        for(int i=1;i<4;i++){
+            if(fourKind[i].rank != fourKind[i-1].rank){
+                throw new IllegalArgumentException("Must be a four kind tiles");
+            }
+        }
+        return fromCutter();
     }
-    public synchronized void draw(Tile[] slots){
+
+    private synchronized Tile fromCutter(){
+        Tile swap = tileList[reels[reelIndex][stackCutter[reelIndex]]];
+        stackCutter[reelIndex]--;
+        reelIndex = (reelIndex>=size-1)? 0 : (reelIndex+1);
+        return swap;
+    }
+
+    public synchronized boolean draw(Tile[] slots){
+        if(slots==null || slots.length==0) return false;
+        boolean onHand = true;
         for(int i=0;i<slots.length;i++){
-            System.out.println("1 : REEL : "+reelIndex+" : "+stackIndex[reelIndex]);
+            if(stackIndex[reelIndex]==stackCutter[reelIndex]){
+                onHand = false;
+                break;
+            }
             slots[i]=tileList[reels[reelIndex][stackIndex[reelIndex]]];
             stackIndex[reelIndex]++;
             reelIndex = (reelIndex>=size-1)? 0 : (reelIndex+1);
         }
+        return onHand;
+    }
+
+    public synchronized int[] debug(){
+        int[] debug = new int[size+1];
+        debug[0]=reelIndex;
+        for(int i=1;i<debug.length;i++){
+            debug[i]=stackIndex[i-1];
+        }
+        return debug;
     }
 
     public static Stack stack(int reels){

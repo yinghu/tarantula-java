@@ -8,7 +8,7 @@ public class Dice {
     private final RNG rnd;
     private static final int[] diceSet ={1,2,3,4,5,6};
     private final int size;
-    public Dice(int size){
+    private Dice(int size){
         rnd = new JvmRNG();
         this.size = size;
     }
@@ -19,4 +19,9 @@ public class Dice {
         }
         return pts;
     }
+
+    public static Dice dice(int size){
+        return new Dice(size);
+    }
+
 }

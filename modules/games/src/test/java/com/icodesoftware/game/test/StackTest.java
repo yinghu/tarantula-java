@@ -18,71 +18,60 @@ public class StackTest {
     }
 
     @Test(groups = { "stack" })
-    public void stackInitTest() {
-        Stack stack = Stack.stack(3);
-        //stack.shuffle();
-        TitleComparator comparator = new TitleComparator();
-        int chow = 0;
-        int pong = 0;
-        int eye = 0;
-        int swap = 0;
-        for(int r=0;r<100;r++){
-            stack.shuffle();
-            for(int i=0;i<30;i++){
-               Tile[] tiles = stack.draw();
-                Arrays.sort(tiles,comparator);
-                if(tiles[2].rank>100){
-                    stack.swap(tiles);
-                    Arrays.sort(tiles,comparator);
-                    swap++;
-                }
-                int mid = (tiles[0].rank+tiles[2].rank)/2;
-                int diff = tiles[2].rank-tiles[0].rank;
-                if(mid==tiles[1].rank && diff==2)
-                {
-                    chow++;
-                    //print(tiles);
-                }
-                if(tiles[0].rank==tiles[1].rank && tiles[1]==tiles[2]){
-                    pong++;
-                    //print(tiles);
-                }
-                if(tiles[0].rank==tiles[1].rank || tiles[1]==tiles[2]){
-                    eye++;
-                    //print(tiles);
-                }
-                Assert.assertNotNull(tiles[0]);
-                Assert.assertNotNull(tiles[1]);
-                Assert.assertNotNull(tiles[2]);
+    public void stackSetupTest() {
+        for(int size = 1;size<4;size++){
+            Stack stack = Stack.stack(size);
+            stack.shuffle(6);
+            Tile[] h1 = new Tile[14];
+            Assert.assertTrue(stack.draw(h1));
+            int[] debug = stack.debug();
+            Assert.assertEquals(debug.length,size+1);
+            Arrays.sort(h1,new TitleComparator());
+            for(int i=1;i<14;i++){
+                Assert.assertTrue(h1[i].rank>=h1[i-1].rank);
             }
         }
-        System.out.println("Chow->"+(chow/3000d)*100);
-        System.out.println("Pong->"+(pong/3000d)*100);
-        System.out.println("Pong->"+(eye/3000d)*100);
-        System.out.println("Swap->"+(swap/3000d)*100);
     }
-
     @Test(groups = { "stack" })
-    public void stackSequenceTest() {
+    public void drawTest() {
         Stack stack = Stack.stack(3);
-        stack.shuffle();
-        Tile[] h1 = new Tile[14];
-        stack.draw(h1);
-        Arrays.sort(h1,new TitleComparator());
-        print(h1);
-    }
-    private void print(Tile[] tiles){
-        int line = 3;
-        for(int i=0;i< tiles.length;i++){
-            System.out.print(tiles[i]);
-            System.out.print(",");
-            line--;
-            if(line==0){
-                System.out.println();
-                line = 3;
-            }
+        stack.shuffle(3);
+        Tile[] h1 = new Tile[1];
+        Assert.assertTrue(stack.draw(h1));
+        Assert.assertNotNull(h1[0]);
+
+        Tile[] h3 = new Tile[3];
+        Assert.assertTrue(stack.draw(h3));
+        for(Tile t : h3){
+            Assert.assertNotNull(t);
         }
-        System.out.println();
+
+        Tile[] h10 = new Tile[10];
+        Assert.assertTrue(stack.draw(h10));
+        for(Tile t : h10){
+            Assert.assertNotNull(t);
+        }
+    }
+    @Test(groups = { "stack" })
+    public void swapTest() {
+        Stack stack = Stack.stack(1);
+        stack.shuffle(3);
+        Assert.assertNotNull(stack.swap(Tile.F1));
+        Assert.assertNotNull(stack.swap(new Tile[]{Tile.B1,Tile.B1,Tile.B1,Tile.B1}));
+        Exception exception = null;
+        try{
+            stack.swap(Tile.B1);
+        }catch (Exception ex){
+            exception = ex;
+        }
+        Assert.assertNotNull(exception);
+        exception = null;
+        try{
+            stack.swap(new Tile[0]);
+        }catch (Exception ex){
+            exception = ex;
+        }
+        Assert.assertNotNull(exception);
     }
 
 }

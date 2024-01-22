@@ -3,16 +3,22 @@ package com.icodesoftware.game.mahjong;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
+import com.icodesoftware.game.Dice;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.ApplicationPreSetup;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MahjongServiceProvider implements GameServiceProvider {
 
 
     private GameContext gameContext;
+
+    private Stack stack;
+    private Dice dice;
+
     @Override
     public void onInventory(ApplicationPreSetup applicationPreSetup, Inventory inventory, Inventory.Stock inventoryItem) {
 
@@ -52,6 +58,8 @@ public class MahjongServiceProvider implements GameServiceProvider {
     public void setup(GameContext gameContext) {
         this.gameContext = gameContext;
         this.gameContext.log("Mahjong service provider started",OnLog.INFO);
+        this.stack = Stack.stack(3);
+        this.dice = Dice.dice(2);
     }
 
     @Override
@@ -106,20 +114,79 @@ public class MahjongServiceProvider implements GameServiceProvider {
 
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
-        this.gameContext.log("Mahjong service on action",OnLog.INFO);
         if(messageHeader.commandId == Messenger.ACTION){
             short cmd = messageBuffer.readShort();
-            float value = messageBuffer.readFloat();
-            String name = messageBuffer.readUTF8();
-            this.gameContext.log("Action : "+cmd+" : "+name+" : "+value,OnLog.INFO);
-            messageHeader.commandId = Messenger.ON_ACTION;
+            switch (cmd){
+                case ClassicMahjong.SHUFFLE:
+                    handleShuffle(messageHeader,messageBuffer,callback);
+                    break;
+                case ClassicMahjong.START:
+                    handleStart(messageHeader,messageBuffer,callback);
+                    break;
+                case ClassicMahjong.SWAP:
+                    handle3(messageHeader,messageBuffer,callback);
+                    break;
+                default:
+                    this.gameContext.log("Command ["+cmd+"] not supported",OnLog.WARN);
+            }
+        }
+    }
+
+    private void handleShuffle(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback){
+        float value = messageBuffer.readFloat();
+        String name = messageBuffer.readUTF8();
+        this.gameContext.log("Action : "+name+" : "+value,OnLog.INFO);
+        int[] cutter = dice.roll();
+        stack.shuffle(cutter[0]+cutter[1]);
+        messageHeader.commandId = 1001;
+        messageHeader.ack = true;
+        messageHeader.encrypted = false;
+        messageHeader.broadcasting = true;
+        messageBuffer.reset().writeHeader(messageHeader).writeUTF8("RSP : "+name);
+        callback.onRelay(messageHeader,messageBuffer.flip());
+    }
+
+    private void handleStart(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback){
+        float value = messageBuffer.readFloat();
+        String name = messageBuffer.readUTF8();
+        this.gameContext.log("Action : "+name+" : "+value,OnLog.INFO);
+        Tile[] hand = new Tile[14];
+        if(!stack.draw(hand)){
+            messageHeader.commandId = 1000;
             messageHeader.ack = true;
             messageHeader.encrypted = false;
             messageHeader.broadcasting = true;
-            messageBuffer.reset().writeHeader(messageHeader).writeUTF8("RSP : HELLO");
+            messageBuffer.reset().writeHeader(messageHeader).writeUTF8("RSP : "+name);
             callback.onRelay(messageHeader,messageBuffer.flip());
+            return;
         }
+        messageHeader.commandId = 1002;
+        messageHeader.ack = true;
+        messageHeader.encrypted = false;
+        messageHeader.broadcasting = true;
+        messageBuffer.reset();
+        messageBuffer.writeHeader(messageHeader);
+        messageBuffer.writeInt(hand.length);
+        Arrays.sort(hand,new TitleComparator());
+        for(Tile tile : hand){
+            messageBuffer.writeInt(tile.rank).writeUTF8(tile.name);
+        }
+        callback.onRelay(messageHeader,messageBuffer.flip());
     }
+    private void handle3(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback){
+        float value = messageBuffer.readFloat();
+        String name = messageBuffer.readUTF8();
+        this.gameContext.log("Action : "+name+" : "+value,OnLog.INFO);
+        //Tile[] hand = new Tile[3];
+        //stack.draw()
+        messageHeader.commandId = 1003;
+        messageHeader.ack = true;
+        messageHeader.encrypted = false;
+        messageHeader.broadcasting = true;
+        messageBuffer.reset().writeHeader(messageHeader).writeUTF8("RSP : "+name);
+        callback.onRelay(messageHeader,messageBuffer.flip());
+    }
+
 
     public <T extends OnAccess> List<T> inbox(Session session){
         return new ArrayList<>();

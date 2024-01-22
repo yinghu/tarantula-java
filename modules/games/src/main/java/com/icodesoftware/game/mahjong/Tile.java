@@ -64,27 +64,37 @@ public class Tile {
     public final static Tile W7 = new Tile("White",91,DRAGON_SCORE);
 
     //Flowers And Seasons 8
-    public final static Tile F1 = new Tile("PlumBlossom",101,FLOWER_SCORE);
-    public final static Tile F2 = new Tile("Orchid",102,FLOWER_SCORE);
-    public final static Tile F3 = new Tile("Chrysanthemum",103,FLOWER_SCORE);
-    public final static Tile F4 = new Tile("Bamboo",104,FLOWER_SCORE);
+    public final static Tile F1 = new Tile("PlumBlossom",101,FLOWER_SCORE,true);
+    public final static Tile F2 = new Tile("Orchid",102,FLOWER_SCORE,true);
+    public final static Tile F3 = new Tile("Chrysanthemum",103,FLOWER_SCORE,true);
+    public final static Tile F4 = new Tile("Bamboo",104,FLOWER_SCORE,true);
 
-    public final static Tile S1 = new Tile("Spring",201,SEASON_SCORE);
-    public final static Tile S2 = new Tile("Summer",202,SEASON_SCORE);
+    public final static Tile S1 = new Tile("Spring",201,SEASON_SCORE,true);
+    public final static Tile S2 = new Tile("Summer",202,SEASON_SCORE,true);
 
-    public final static Tile S3 = new Tile("Autumn",203,SEASON_SCORE);
-    public final static Tile S4 = new Tile("Winter",204,SEASON_SCORE);
+    public final static Tile S3 = new Tile("Autumn",203,SEASON_SCORE,true);
+    public final static Tile S4 = new Tile("Winter",204,SEASON_SCORE,true);
 
 
 
     public final String name;
+
     public final int rank;
     public final int score;
+    public boolean swappable;
+
+    public Tile(String name,int rank,int score,boolean swappable){
+        this.name = name;
+        this.rank = rank;
+        this.score = score;
+        this.swappable = swappable;
+    }
 
     public Tile(String name,int rank,int score){
         this.name = name;
         this.rank = rank;
         this.score = score;
+        this.swappable = false;
     }
     public String toString(){
         return "Name :["+name+"] Rank :["+rank+"] Score :["+score+"]";
