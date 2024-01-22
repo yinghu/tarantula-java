@@ -146,7 +146,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     //System level game event callbacks
     public <T extends OnAccess> void onGameEvent(T event){
         var eventType = (String)event.property(OnAccess.TYPE_ID);
-        if(eventType.equals("onAction"))
+        if(eventType != null && eventType.equals("onAction"))
         {
             var data = (byte[])event.property(OnAccess.PAYLOAD);
             var jsonData = JsonUtil.parse(data);
