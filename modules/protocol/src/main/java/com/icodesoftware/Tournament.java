@@ -67,6 +67,8 @@ public interface Tournament extends Configurable {
     interface RaceBoard extends Configurable{
         int size();
         List<Entry> list();
+
+        Entry myPosition();
     }
     interface History extends Configurable{
         String tournamentId();

@@ -251,6 +251,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             status.ownerKey(SnowflakeKey.from(this.serviceContext.node().bucketId()));
             dataStore.createIfAbsent(status,true);
             if(status.status != Tournament.Status.PENDING) throw new RuntimeException("schedule is running on tournament ["+status.tournamentId+"]");
+            if(schedule.maxEntriesPerInstance()<=0) throw new RuntimeException("max entries per instance must be more than 0");
             if(TimeUtil.durationUTCInHours(schedule.startTime(),schedule.endTime()) < minDurationHoursPerSchedule) throw new RuntimeException("min hours per schedule less than ["+minDurationHoursPerSchedule+"]");
             if(!schedule.global() && schedule.durationMinutesPerInstance() < minDurationMinutesPerInstance) throw new RuntimeException("min minutes per instance less than ["+minDurationMinutesPerInstance+"]");
             switch (schedule.schedule()){

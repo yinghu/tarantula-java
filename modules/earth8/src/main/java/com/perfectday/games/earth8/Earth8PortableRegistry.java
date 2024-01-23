@@ -2,6 +2,7 @@ package com.perfectday.games.earth8;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.AbstractRecoverableListener;
+import com.perfectday.games.earth8.inbox.PlayerAction;
 
 
 public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecoverableListener {
@@ -28,7 +29,9 @@ public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecov
     public static final int CAMPAIGN_PROGRESS_CID = 12;
 
     public static final int PLAYER_ACTION_CID = 13;
-    public static final int MANUAL_ANALYTICS_CID =14;
+
+    public static final int MANUAL_ANALYTICS_CID = 14;
+    public static final int CURRENCY_UPDATE_CID = 15;
 
 
     public static Earth8PortableRegistry INS;
@@ -76,6 +79,17 @@ public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecov
             case CAMPAIGN_PROGRESS_CID:
                 pt = new CampaignProgress();
                 break;
+
+            case PLAYER_ACTION_CID:
+                pt = new PlayerAction();
+                break;
+            case MANUAL_ANALYTICS_CID:
+                pt = new ManualAnalytics();
+                break;
+            case CURRENCY_UPDATE_CID:
+                pt = new CurrencyUpdate();
+                break;
+
             default:
         }
         return (T)pt;
