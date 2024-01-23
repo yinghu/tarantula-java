@@ -119,10 +119,13 @@ public class Stack {
     }
 
     public synchronized int[] debug(){
-        int[] debug = new int[size+1];
+        int[] debug = new int[size*2+1];
         debug[0]=reelIndex;
-        for(int i=1;i<debug.length;i++){
+        for(int i=1;i<size+1;i++){
             debug[i]=stackIndex[i-1];
+        }
+        for(int i=size+1;i<debug.length;i++){
+            debug[i]=stackCutter[i-(size+1)];
         }
         return debug;
     }

@@ -97,6 +97,14 @@ public class MessageBuffer {
         byteBuffer.put(data);
         return this;
     }
+
+    public MessageBuffer writeBoolean(boolean data){
+        byteBuffer.put(data?(byte) 1:0);
+        return this;
+    }
+    public boolean readBoolean(){
+        return byteBuffer.get()==1;
+    }
     public float readFloat(){
         return byteBuffer.getFloat();
     }

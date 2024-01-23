@@ -25,7 +25,7 @@ public class StackTest {
             Tile[] h1 = new Tile[14];
             Assert.assertTrue(stack.draw(h1));
             int[] debug = stack.debug();
-            Assert.assertEquals(debug.length,size+1);
+            Assert.assertEquals(debug.length,size*2+1);
             Arrays.sort(h1,new TitleComparator());
             for(int i=1;i<14;i++){
                 Assert.assertTrue(h1[i].rank>=h1[i-1].rank);
