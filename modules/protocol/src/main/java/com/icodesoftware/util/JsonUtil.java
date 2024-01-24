@@ -44,24 +44,24 @@ public class JsonUtil {
         resp.addProperty("Message",message);
         return resp.toString();
     }
-    public static JsonElement parseAsJsonElement(byte[] json){
+    public synchronized static JsonElement parseAsJsonElement(byte[] json){
         return JsonParser.parseReader(new InputStreamReader(new ByteArrayInputStream(json)));
     }
-    public static JsonArray parseAsJsonArray(String json){
+    public synchronized static JsonArray parseAsJsonArray(String json){
         return JsonParser.parseString(json).getAsJsonArray();
     }
-    public static JsonObject parse(String json){
+    public synchronized static JsonObject parse(String json){
         return JsonParser.parseString(json).getAsJsonObject();
     }
 
     public static JsonObject parse(byte[] json){
         return parse(new ByteArrayInputStream(json));
     }
-    public static JsonObject parse(InputStream jsonInput){
+    public synchronized static JsonObject parse(InputStream jsonInput){
         InputStreamReader inr = new InputStreamReader(jsonInput);
         return JsonParser.parseReader(inr).getAsJsonObject();
     }
-    public static Map<String,Object> toMap(InputStream jsonInput){
+    public synchronized static Map<String,Object> toMap(InputStream jsonInput){
         InputStreamReader inr = new InputStreamReader(jsonInput);
         JsonElement j = JsonParser.parseReader(inr);
         Map<String,Object> _mv = new HashMap<>();
