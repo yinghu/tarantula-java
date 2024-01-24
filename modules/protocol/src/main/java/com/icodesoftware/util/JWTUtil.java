@@ -119,9 +119,10 @@ public class JWTUtil {
                 String signature = sign(buffer.toString().getBytes(),parts[2].getBytes());
                 JsonObject h = json(parts[0]);
                 JsonObject p = json(parts[1]);
-                return signature.equals(parts[2]) && onVerify.process(h,p);
+                if(!signature.equals(parts[2])) throw new RuntimeException("Bad signature");//need to verify json parser sync issue
+                return onVerify.process(h,p);
             }catch (Exception ex){
-                return false;
+                throw new RuntimeException(ex);
             }
         }
 
