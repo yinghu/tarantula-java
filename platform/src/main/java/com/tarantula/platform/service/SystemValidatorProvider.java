@@ -610,25 +610,31 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
     public OnSession jwtToken(String token){
         OnSession onSession = new OnSessionTrack();
-        if(!jwt.verify(token,(h,p)->{
-            long expiry = p.get("exp").getAsLong();
-            if(TimeUtil.expired(TimeUtil.fromUTCMilliseconds(expiry))) {
-                log.warn("TOKEN EXPIRED : ");
-                return false;
-            }
-            Access.Role r = rMap.get(p.get("aud").getAsString());
-            if(r==null) {
-                log.warn("NO ROLE : ");
-                return false;
-            }
-            byte[] data = decrypt(CipherUtil.fromBase64Key(h.get("kid").getAsString()));
-            Recoverable.DataBuffer dataBuffer =  BufferProxy.wrap(data);
-            long id = dataBuffer.readLong();
-            long stub = dataBuffer.readLong();
-            onSession.distributionId(id);
-            onSession.stub(stub);
-            return true;
-        })) return OnSessionTrack.INVALID_TOKEN;
+        try {
+            if (!jwt.verify(token, (h, p) -> {
+                long expiry = p.get("exp").getAsLong();
+                if (TimeUtil.expired(TimeUtil.fromUTCMilliseconds(expiry))) {
+                    log.warn("TOKEN EXPIRED : ");
+                    return false;
+                }
+                Access.Role r = rMap.get(p.get("aud").getAsString());
+                if (r == null) {
+                    log.warn("NO ROLE : ");
+                    return false;
+                }
+                byte[] data = decrypt(CipherUtil.fromBase64Key(h.get("kid").getAsString()));
+                Recoverable.DataBuffer dataBuffer = BufferProxy.wrap(data);
+                long id = dataBuffer.readLong();
+                long stub = dataBuffer.readLong();
+                onSession.distributionId(id);
+                onSession.stub(stub);
+                return true;
+            })) return OnSessionTrack.INVALID_TOKEN;
+        }
+        catch (Exception ex){
+            log.error("Token issue",ex);
+            return OnSessionTrack.INVALID_TOKEN;
+        }
         onSession.ticket(ticket(onSession.distributionId(),onSession.stub(),timeoutInSeconds));
         onSession.successful(true);
         return onSession;
