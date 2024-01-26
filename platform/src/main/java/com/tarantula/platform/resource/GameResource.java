@@ -1,5 +1,6 @@
 package com.tarantula.platform.resource;
 
+import com.icodesoftware.protocol.ApplicationResource;
 import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.Item;
@@ -8,7 +9,7 @@ import com.tarantula.platform.presence.PresencePortableRegistry;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameResource extends Application {
+public class GameResource extends Application implements ApplicationResource {
 
     public GameResource(){
 

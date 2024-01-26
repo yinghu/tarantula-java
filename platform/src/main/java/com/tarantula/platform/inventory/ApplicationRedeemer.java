@@ -8,12 +8,8 @@ import com.tarantula.platform.item.ConfigurableObject;
 public class ApplicationRedeemer extends ConfigurableObject{
 
     protected String systemId;
-    protected PlatformInventoryServiceProvider inventoryServiceProvider;
     protected ApplicationPreSetup applicationPreSetup;
-    public ApplicationRedeemer(String systemId, PlatformInventoryServiceProvider inventoryServiceProvider){
-        this.systemId = systemId;
-        this.inventoryServiceProvider = inventoryServiceProvider;
-    }
+
     public ApplicationRedeemer(String systemId, ApplicationPreSetup applicationPreSetup){
         this.systemId = systemId;
         this.applicationPreSetup = applicationPreSetup;
@@ -28,7 +24,6 @@ public class ApplicationRedeemer extends ConfigurableObject{
         this.header = inventoryRedeemer.header;
         this.application = inventoryRedeemer.application;
         this.reference = inventoryRedeemer.reference;
-        this.inventoryServiceProvider = inventoryRedeemer.inventoryServiceProvider;
         this.applicationPreSetup = inventoryRedeemer.applicationPreSetup;
         this.distributionKey(inventoryRedeemer.distributionKey());
     }

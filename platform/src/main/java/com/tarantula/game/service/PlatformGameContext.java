@@ -89,4 +89,8 @@ public class PlatformGameContext implements GameContext {
         return this.platformGameServiceProvider.achievementServiceProvider().achievement(session);
 
     }
+
+    public ApplicationResource.Redeemer redeemer(Session session){
+        return new ApplicationRedeemerProxy(session,platformGameServiceProvider.gameCluster());
+    }
 }

@@ -7,11 +7,10 @@ import com.icodesoftware.Configuration;
 import com.icodesoftware.Descriptor;
 
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.RNG;
+
 import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.util.JvmRNG;
+
 import com.tarantula.game.service.PlatformGameServiceProvider;
-import com.tarantula.platform.configuration.ConfigurationObject;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.*;
 
@@ -23,9 +22,6 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
 
     public static final String NAME = "resource";
 
-    private static final String GRANT_POLICY_RANDOM = "random";
-    private static final String GRANT_POLICY_ROUND_ROBIN = "robin";
-
     private final PlatformInventoryServiceProvider inventoryServiceProvider;
 
     private ConcurrentHashMap<String, GameResource> gameResourceIndex;
@@ -36,9 +32,7 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
     private String startingResourceName;
     private String grantingPolicy;
 
-    private RNG rng;
 
-    private int grantingNumber;
 
     public PlatformResourceServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
@@ -55,8 +49,6 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
         JsonObject startingInventory = ((JsonElement)configuration.property("startingInventory")).getAsJsonObject();
         startingResourceName = startingInventory.get("resourceName").getAsString();
         grantingPolicy = startingInventory.get("grantPolicy").getAsString();
-        if(grantingPolicy.equals(GRANT_POLICY_RANDOM)) rng = new JvmRNG();
-        grantingNumber = startingInventory.get("grantNumber").getAsInt();
         this.logger = JDKLogger.getLogger(PlatformResourceServiceProvider.class);
         this.logger.warn("Resource service provider started on ->"+gameServiceName);
     }
@@ -85,6 +77,7 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
         gameResource.setup();
         setup(gameResource);
         gameResourceIndex.put(gameResource.name(),gameResource);
+        this.platformGameServiceProvider.gameServiceProvider().onApplicationResourceRegistered(gameResource);
         return true;
     }
     public boolean onItemReleased(String category,String itemId){
@@ -97,6 +90,7 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
         });
         if(released[0]!=null) {
             GameResource removed = gameResourceIndex.remove(released[0]);
+            this.platformGameServiceProvider.gameServiceProvider().onApplicationResourceReleased(removed);
             clear(removed);
         }
         return true;
@@ -111,6 +105,7 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
             if(!a.disabled()) {
                 setup(a);
                 gameResourceIndex.put(a.name(),a);
+                this.platformGameServiceProvider.gameServiceProvider().onApplicationResourceRegistered(a);
             }
         });
         this.application = descriptor;
@@ -150,22 +145,6 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
         return this.inventoryServiceProvider.redeem(systemId,item);
     }
 
-    public boolean initializeInventory(String systemId){
-        if(grantingPolicy.equals(GRANT_POLICY_RANDOM)){
-            String itemId;
-            synchronized (startingInventory){
-                if(startingInventory.isEmpty()) return false;
-                int index = rng.onNext(startingInventory.size());
-                itemId = startingInventory.get(index);
-            }
-            if(itemId==null) return false;
-            Item item = itemIndex.get(itemId);
-            if(item==null) return false;
-            return this.inventoryServiceProvider.redeem(systemId,item);
-        }
-        this.logger.warn("Granting policy not supported ["+grantingPolicy+"]");
-        return false;
-    }
 
     private void setup(GameResource gameResource){
         List<Item> items = gameResource.list();
