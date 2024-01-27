@@ -197,4 +197,17 @@ public class UserInventory extends RecoverableObject implements Inventory {
     public void stockClassId(int stockClassId){
         this.stockClassId = stockClassId;
     }
+
+    public Stock stock(long stockId){
+        InventoryItem inventoryItem = new InventoryItem();
+        inventoryItem.distributionId(stockId);
+        return dataStore.load(inventoryItem) ? inventoryItem : null;
+    }
+    public void removeStock(Stock stock){
+        if(rechargeable) return;
+        if(this.dataStore.delete(stock)){
+            count--;
+            this.dataStore.update(this);
+        }
+    }
 }
