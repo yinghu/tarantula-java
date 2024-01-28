@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -34,12 +33,13 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     private AtomicInteger totalFinished;
 
     private ConcurrentHashMap<Long, TournamentEntry> entryIndex = new ConcurrentHashMap<>();
-    private TournamentRaceBoard tournamentRaceBoard = new TournamentRaceBoard();
+    private TournamentRaceBoard tournamentRaceBoard;
 
     public TournamentInstance(int maxEntries,double scoreCredits){
         this();
         this.maxEntries = maxEntries;
         this.scoreCredits = scoreCredits;
+        this.tournamentRaceBoard = new TournamentRaceBoard(maxEntries);
     }
 
     public TournamentInstance(){
@@ -65,6 +65,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
             return entry;
         })!=null;
     }
+
 
     public int enter(long systemId){
         enter(systemId,0);

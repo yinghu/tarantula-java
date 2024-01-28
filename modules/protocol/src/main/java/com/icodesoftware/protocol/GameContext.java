@@ -21,4 +21,6 @@ public interface GameContext extends Context {
     Rating rating(Session session);
 
     Achievement achievement(Session session);
+
+    ApplicationResource.Redeemer redeemer(Session session);
 }

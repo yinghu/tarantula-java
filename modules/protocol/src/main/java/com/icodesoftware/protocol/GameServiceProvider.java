@@ -4,7 +4,7 @@ import com.icodesoftware.*;
 
 import java.util.List;
 
-public interface GameServiceProvider extends UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener,Inventory.Listener, Tournament.Listener,ChannelListener {
+public interface GameServiceProvider extends UDPEndpointServiceProvider.RequestListener,UDPEndpointServiceProvider.ActionListener,Inventory.Listener, Tournament.Listener,ChannelListener,ApplicationResource.Listener {
     void setup(GameContext gameContext);
 
     void onJoined(Session session,Room room);

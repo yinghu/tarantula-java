@@ -19,6 +19,13 @@ public class TournamentRaceBoard extends RecoverableObject implements Tournament
     private List<Tournament.Entry> onBoard = new ArrayList<>();
     private Portable[] pending;
     private int size;
+
+    public TournamentRaceBoard(){
+
+    }
+    public TournamentRaceBoard(int size){
+        this.size = size;
+    }
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
         portableWriter.writePortableArray("1",pending);
@@ -62,6 +69,10 @@ public class TournamentRaceBoard extends RecoverableObject implements Tournament
                 pending[i]=(Portable)onBoard.get(i);
             }
         }
+    }
+
+    public Tournament.Entry myPosition(){
+        return null;
     }
 
     @Override
