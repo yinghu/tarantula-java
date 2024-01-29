@@ -117,6 +117,14 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                 ApplicationResource.Redeemer redeemer = gameContext.redeemer(session);
                 redeemer.redeem(applicationPreSetup,resource);
             });
+            /** Inventory item remove from the Inventory
+             * Rechargeable item  cannot be removed
+            Inventory inventory = applicationPreSetup.inventory(session.distributionId(),"Hero");
+            Inventory.Stock removed = inventory.stock(1234);
+            if(removed!=null){
+                inventory.removeStock(removed);
+            }
+            **/
             return true;
         });
         if(updated
