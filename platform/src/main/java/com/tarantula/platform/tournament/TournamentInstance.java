@@ -149,6 +149,9 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     }
 
     public void load(){
+        if(tournamentRaceBoard==null){
+            tournamentRaceBoard = new TournamentRaceBoard(maxEntries);
+        }
         dataStore.list(new TournamentEntryQuery(this.distributionId()),(e)->{
             e.dataStore(dataStore);
             entryIndex.put(e.systemId(),e);
