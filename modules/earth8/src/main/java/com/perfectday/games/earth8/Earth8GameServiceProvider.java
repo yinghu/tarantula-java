@@ -120,7 +120,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             return true;
         });
         if(updated
-            && battleTransaction.TEMP_BattleStage.equals("Chapter3_Stage7_HardConfig")
+            && (battleTransaction.TEMP_BattleStage.equals("Chapter3_Stage7_HardConfig")
+                || battleTransaction.TEMP_BattleStage.endsWith("EpicConfig")
+            )
             && battleTransaction.win
         ) {
             // hard coded 7 day tournament completion
