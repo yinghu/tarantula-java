@@ -13,11 +13,14 @@ public interface Inventory extends Configurable,Balance,Countable{
     String typeId();
     String type();
     List<Stock> onStock();
+    Stock stock(long stockId);
 
     int stockFactoryId();
     int stockClassId();
     void stockFactoryId(int stockFactoryId);
     void stockClassId(int stockClassId);
+
+    void removeStock(Stock stock);
 
     interface Stock extends Configurable{
 

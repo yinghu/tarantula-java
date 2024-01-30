@@ -28,6 +28,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     private String ANALYTICS_QUERY;
 
     private ConcurrentHashMap<Long,Tournament> tournamentIndex = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String,ApplicationResource> resourceIndex = new ConcurrentHashMap<>();
+
     public void setup(GameContext gameContext){
         this.gameContext = gameContext;
         this.gameContext.registerTournamentListener(this);
@@ -110,10 +112,25 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             if(!dataStore.load(battleTransaction)) return false;
             battleTransaction.disabled(true);
             battleTransaction.win = win;
-            return dataStore.update(battleTransaction);
+            dataStore.update(battleTransaction);
+            resourceIndex.forEach((k,resource)->{
+                ApplicationResource.Redeemer redeemer = gameContext.redeemer(session);
+                redeemer.redeem(applicationPreSetup,resource);
+            });
+            /** Inventory item remove from the Inventory
+             * Rechargeable item  cannot be removed
+            Inventory inventory = applicationPreSetup.inventory(session.distributionId(),"Hero");
+            Inventory.Stock removed = inventory.stock(1234);
+            if(removed!=null){
+                inventory.removeStock(removed);
+            }
+            **/
+            return true;
         });
         if(updated
-            && battleTransaction.TEMP_BattleStage.equals("Chapter3_Stage7_HardConfig")
+            && (battleTransaction.TEMP_BattleStage.equals("Chapter3_Stage7_HardConfig")
+                || battleTransaction.TEMP_BattleStage.endsWith("EpicConfig")
+            )
             && battleTransaction.win
         ) {
             // hard coded 7 day tournament completion
@@ -217,6 +234,15 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     public void tournamentClosed(Tournament tournament) {
         gameContext.log("Tournament closed : "+tournament.distributionId()+" : "+tournament.name()+" : "+tournament.type()+" : "+tournament.global(),OnLog.WARN);
         tournamentIndex.remove(tournament.distributionId());
+    }
+
+    public void onApplicationResourceRegistered(ApplicationResource resource){
+        this.resourceIndex.put(resource.name(),resource);
+        this.gameContext.log(resource.name()+" registered",OnLog.INFO);
+    }
+    public void onApplicationResourceReleased(ApplicationResource resource){
+        this.resourceIndex.remove(resource.name());
+        this.gameContext.log(resource.name()+" released",OnLog.INFO);
     }
 
     @Override

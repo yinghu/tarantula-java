@@ -6,9 +6,6 @@ import com.icodesoftware.service.ApplicationPreSetup;
 
 public class ItemRedeemer extends ApplicationRedeemer {
 
-    public ItemRedeemer(String systemId, PlatformInventoryServiceProvider inventoryServiceProvider){
-        super(systemId,inventoryServiceProvider);
-    }
     public ItemRedeemer(String systemId, ApplicationPreSetup applicationPreSetup){
         super(systemId,applicationPreSetup);
     }

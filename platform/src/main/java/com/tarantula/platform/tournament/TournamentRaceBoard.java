@@ -64,8 +64,8 @@ public class TournamentRaceBoard extends RecoverableObject implements Tournament
     }
     public void reset(){
         synchronized (onBoard){
-            pending = new Portable[size];
-            for(int i=0;i<size;i++){
+            pending = new Portable[onBoard.size()];
+            for(int i=0;i<onBoard.size();i++){
                 pending[i]=(Portable)onBoard.get(i);
             }
         }
