@@ -85,22 +85,11 @@
 
 ### Run on local box
 
+[Run in Docker](doc/docker.md)
+
 cd to `target/release/gec-platform-2.0-bin/gec-platform-2.0/bin`
 run tarantula.bat on Windows 
 run tatantula.sh on unix-like OS 
- 
-### Run on docker container
-
-To run with docker rather than directly on your machine, make sure you have [Docker](https://www.docker.com/products/docker-desktop/) and docker-compose (included with docker-desktop) installed.
-
-1. Ensure `platform/src/main/conf/tarantula.properties` has these properties set
-```
-tarantula.data.store.dir=/tarantula/data
-tarantula.service.deployment.dir=/tarantula/deploy
-```
-2. Simply run `docker-compose up -d` and navigate to `localhost:8090`
-
-If you make a code change, the image will need to get rebuilt, and can be done by running `docker-compose up --build -d`
 
 ## Test web
 open index page `localhost:8090`
