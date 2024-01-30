@@ -25,6 +25,12 @@
 
 # Document List
 
+## Simplest way to run locally
+[Run in Docker](doc/docker.md)
+
+## Build and Push image to AWS
+[Image Build](doc/image.md)
+
 ## How to set up and run as a single cluster node locally or on docker container
 [Setup](doc/setup.md)
 
