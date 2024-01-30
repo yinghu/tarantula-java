@@ -2,6 +2,7 @@ package com.icodesoftware.integration.udp;
 
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.protocol.ApplicationResource;
 import com.icodesoftware.protocol.GameContext;
 import com.icodesoftware.service.ApplicationSchema;
 import com.icodesoftware.service.TokenValidatorProvider;
@@ -86,6 +87,11 @@ public class GameServiceContext implements GameContext {
 
     @Override
     public Achievement achievement(Session session) {
+        return null;
+    }
+
+    @Override
+    public ApplicationResource.Redeemer redeemer(Session session) {
         return null;
     }
 }
