@@ -6,6 +6,8 @@ import com.icodesoftware.util.RecoverableObject;
 
 public class MappingObject extends RecoverableObject {
 
+    //key length 4 + value length 4 + datastore header size 16 => 24
+    public static final int MAP_OBJECT_HEADER_SIZE = 24;
     private byte[] value;
     @Override
     public int getFactoryId() {
