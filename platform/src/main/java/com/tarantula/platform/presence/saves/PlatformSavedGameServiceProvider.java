@@ -13,6 +13,7 @@ import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 
 import com.tarantula.platform.item.PlatformItemServiceProvider;
+import com.tarantula.platform.presence.MappingObject;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.util.RecoverableQuery;
 
@@ -39,7 +40,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         super.setup(serviceContext);
         Configuration configuration = serviceContext.configuration("game-presence-settings");
         JsonObject saveGame = ((JsonElement)configuration.property("savedGame")).getAsJsonObject();
-        mappingObjectMaxSize = saveGame.get("mappingObjectMaxSize").getAsInt();
+        mappingObjectMaxSize = saveGame.get("mappingObjectMaxSize").getAsInt() - MappingObject.MAP_OBJECT_HEADER_SIZE;
         saveSize = saveGame.get("saveSize").getAsInt();
         saveTimeout = saveGame.get("saveTimeout").getAsInt()*saveTimeout;
         dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
