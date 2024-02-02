@@ -72,6 +72,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         RecoverOperation operation = new RecoverOperation(source,key);
         Set<Member> members = nodeEngine.getClusterService().getMembers();
         for(Member member : members){
+            logger.warn("MEMBER :"+member.getAddress().toString());
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,member.getAddress());
             ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<byte[]> future = builder.invoke();
