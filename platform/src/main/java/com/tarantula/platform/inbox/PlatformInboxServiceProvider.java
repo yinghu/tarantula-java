@@ -4,7 +4,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceSetup;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
@@ -32,6 +34,11 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
 
 
     public Inbox inbox(Session session){
+        RecoverService recoverService = serviceContext.clusterProvider().recoverService();
+        byte[] dt = recoverService.onRecover(Presence.DataStore, SnowflakeKey.from(session.distributionId()).asBinary(),null);
+        if(dt!=null){
+            logger.warn("load data from master");
+        }
         long systemId = session.distributionId();
         Inbox inbox = new Inbox();
         inbox.shop = this.platformGameServiceProvider.storeServiceProvider().shop("Tami");

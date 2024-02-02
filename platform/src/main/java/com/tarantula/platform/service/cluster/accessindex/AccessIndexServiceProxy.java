@@ -153,6 +153,20 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         NodeEngine nodeEngine = getNodeEngine();
         byte[] ret = null;
         AccessIndexRecoverOperation operation = new AccessIndexRecoverOperation(source,key);
+        Set<Member> members = nodeEngine.getClusterService().getMembers();
+        for(Member member : members){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,member.getAddress());
+            ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<byte[]> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            },metricsListener);
+            if(callResult.successful){
+                ret = (byte[])callResult.result;
+                break;
+            }
+        }
+        return ret;
+        /**
         for(ClusterProvider.Node node : nodes){
             if(node==null) continue; //next node
             Member m = nodeEngine.getClusterService().getMember(node.memberId());
@@ -166,8 +180,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
                 ret = (byte[])callResult.result;
                 break;
             }
-        }
-        return ret;
+        }**/
     }
 
     public int onStartSync(int partition,String syncKey){

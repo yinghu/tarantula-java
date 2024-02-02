@@ -70,6 +70,20 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         NodeEngine nodeEngine = getNodeEngine();
         byte[] ret = null;
         RecoverOperation operation = new RecoverOperation(source,key);
+        Set<Member> members = nodeEngine.getClusterService().getMembers();
+        for(Member member : members){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,member.getAddress());
+            ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<byte[]> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            },metricsListener);
+            if(callResult.successful){
+                ret = (byte[])callResult.result;
+                break;
+            }
+        }
+        return ret;
+        /**
         for(ClusterProvider.Node node : nodes){
             Member m = nodeEngine.getClusterService().getMember(node.memberId());
             if(m==null) continue;
@@ -83,7 +97,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
                 break;
             }
         }
-        return ret;
+        return ret;**/
     }
     public Batchable onRecover(String source,String label,byte[] key,ClusterProvider.Node[] nodes){
         NodeEngine nodeEngine = getNodeEngine();
