@@ -77,7 +77,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
                 Future<byte[]> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
             },metricsListener);
-            if(callResult.successful){
+            if(callResult.successful && callResult.result != null){
                 ret = (byte[])callResult.result;
                 break;
             }
