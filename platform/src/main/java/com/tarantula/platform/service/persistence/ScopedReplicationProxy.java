@@ -100,4 +100,8 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         transactionLogManager.onTransaction(logs);
     }
 
+    public TransactionLogManager transactionLogManager(){
+        return transactionLogManager;
+    }
+
 }

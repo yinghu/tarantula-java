@@ -5,15 +5,12 @@ import com.hazelcast.core.DistributedObject;
 import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
-import com.icodesoftware.AccessIndex;
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Distributable;
-import com.icodesoftware.TarantulaLogger;
-import com.icodesoftware.service.AccessIndexService;
-import com.icodesoftware.service.DeploymentServiceProvider;
+import com.icodesoftware.*;
+import com.icodesoftware.lmdb.BufferCache;
+import com.icodesoftware.lmdb.LocalMetadata;
+import com.icodesoftware.lmdb.TransactionLogManager;
+import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.MapStoreListener;
-import com.icodesoftware.service.OnReplication;
 import com.icodesoftware.util.BinaryKey;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.TarantulaContext;
@@ -168,16 +165,12 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         }
     }
 
-    public byte[] recover(String source,byte[] key){
-        DataStore dataStore = this.tarantulaContext.deploymentDataStoreProvider.createAccessIndexDataStore(AccessIndexService.STORE_NAME);
-        byte[][] data ={null};
-        if(!dataStore.backup().get(new BinaryKey(key),(k,v)->{
-            data[0] = v.array();
-            return true;
-        })){
-            return null;
-        }
-        return data[0];
+    public byte[] recover(byte[] key){
+        TransactionLogManager transactionLogManager = this.tarantulaContext.transactionLogManager(Distributable.INTEGRATION_SCOPE);
+        Metadata metadata = new LocalMetadata(Distributable.INTEGRATION_SCOPE,AccessIndexService.STORE_NAME);
+        byte[] loaded = transactionLogManager.onRecovering(metadata,key);
+        log.warn("Loaded :"+ (loaded!=null));
+        return loaded;
     }
     public int syncStart(String memberId,int partition,String syncKey){
         AccessIndexService recoverService = tarantulaContext.integrationCluster().accessIndexService();

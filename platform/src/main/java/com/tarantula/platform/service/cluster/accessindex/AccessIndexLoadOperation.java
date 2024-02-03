@@ -25,7 +25,7 @@ public class AccessIndexLoadOperation extends Operation implements PartitionAwar
     @Override
     public void run() throws Exception {
         AccessIndexClusterService ais = this.getService();
-        value = ais.recover(source,key);
+        value = ais.recover(key);
     }
 
     @Override

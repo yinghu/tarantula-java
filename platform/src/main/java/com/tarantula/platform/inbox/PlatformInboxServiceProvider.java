@@ -35,11 +35,6 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
 
 
     public Inbox inbox(Session session){
-        RecoverService recoverService = serviceContext.clusterProvider().recoverService();
-        byte[] dt = recoverService.onRecover(Presence.DataStore, SnowflakeKey.from(session.distributionId()).asBinary());
-        if(dt!=null){
-            logger.warn("load data from master");
-        }
         long systemId = session.distributionId();
         Inbox inbox = new Inbox();
         inbox.shop = this.platformGameServiceProvider.storeServiceProvider().shop("Tami");

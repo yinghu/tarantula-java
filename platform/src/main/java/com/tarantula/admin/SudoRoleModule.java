@@ -90,17 +90,6 @@ public class SudoRoleModule implements Module {
         }
         else if(session.action().equals("onFindUser")){
             AccessIndex accessIndex = accessIndexService.get(session.name());
-            NaturalKey naturalKey = NaturalKey.from(session.name());
-            byte[] ret = accessIndexService.onRecover("", naturalKey.asBinary());
-            this.context.log("FIND USER",OnLog.WARN);
-            if(ret!=null){
-                AccessIndex rd = new AccessIndexTrack();
-                rd.owner(session.name());
-                Recoverable.DataBuffer buffer = BufferProxy.wrap(ret);
-                buffer.readHeader();
-                rd.read(buffer);
-                this.context.log(rd.toString(),OnLog.WARN);
-            }
             if(accessIndex!=null){
                 session.write(accessIndex.toJson().toString().getBytes());
             }else{

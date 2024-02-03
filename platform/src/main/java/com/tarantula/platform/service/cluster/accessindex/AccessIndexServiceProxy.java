@@ -149,10 +149,10 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         }
         return replicated;
     }
-    public byte[] onRecover(String source,byte[] key){
+    public byte[] onRecover(byte[] key){
         NodeEngine nodeEngine = getNodeEngine();
         byte[] ret = null;
-        AccessIndexRecoverOperation operation = new AccessIndexRecoverOperation(source,key);
+        AccessIndexRecoverOperation operation = new AccessIndexRecoverOperation(key);
         Set<Member> members = nodeEngine.getClusterService().getMembers();
         for(Member member : members){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,member.getAddress());

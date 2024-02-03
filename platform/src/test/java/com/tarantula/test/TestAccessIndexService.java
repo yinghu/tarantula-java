@@ -59,7 +59,7 @@ public class TestAccessIndexService implements AccessIndexService {
     }
 
     @Override
-    public byte[] onRecover(String partition, byte[] key) {
+    public byte[] onRecover( byte[] key) {
         return  null;
     }
 

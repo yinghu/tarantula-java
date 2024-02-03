@@ -16,6 +16,7 @@ import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
 import com.icodesoftware.*;
 import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
+import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.util.*;
@@ -1096,7 +1097,16 @@ public class TarantulaContext implements Serviceable, ServiceContext {
              return;
          }
          log.warn("Event on scope ["+scope+"] not supported");
+    }
 
+    public TransactionLogManager transactionLogManager(int scope){
+        if(scope==Distributable.DATA_SCOPE){
+            return dataScopeReplicationProxy.transactionLogManager();
+        }
+        if(scope==Distributable.INTEGRATION_SCOPE){
+            return integrationScopeReplicationProxy.transactionLogManager();
+        }
+        throw new RuntimeException("transaction manager on scope ["+scope+"] not supported");
     }
 
     public Recoverable.DataBufferPair dataBufferPair(){

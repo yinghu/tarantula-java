@@ -73,7 +73,7 @@ public class TransactionLogManager implements Closable {
                 }
                 return true;
             });
-            if(!suc) return;
+            if(!suc || transactionId <0 ) return;
             TransactionLog log = TransactionLog.log(transactionId,false, metadata.scope(), metadata.source(),metadata.label(),ak,null,header.revision());
             ts.create(log);
             return;
@@ -89,7 +89,7 @@ public class TransactionLogManager implements Closable {
             }
             return true;
         });
-        if(!suc) return;
+        if(!suc || transactionId <0 ) return;
         TransactionLog log = TransactionLog.log(transactionId,false,metadata.scope(),metadata.source(),metadata.label(),ak,av,0);
         ts.create(log);
     }
@@ -104,7 +104,17 @@ public class TransactionLogManager implements Closable {
             }
             return true;
         });
+    }
 
+    public byte[] onRecovering(Metadata metadata,byte[] key){
+        DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
+        if(metadata.label()!=null) return null;
+        byte[][] loaded = new byte[1][];
+        if(dataStore.backup().get(BinaryKey.from(key),(k,v)->{
+            loaded[0] = v.array();
+            return true;
+        })) return loaded[0];
+        return null;
     }
 
     public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferStream bufferStream){
@@ -239,8 +249,8 @@ public class TransactionLogManager implements Closable {
             }
         }
     }
-
     public void close(){
         //clear resources if any
     }
+
 }

@@ -6,7 +6,6 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.event.TransactionReplicationEvent;
 
-
 import java.util.List;
 
 public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
@@ -38,8 +37,19 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
     @Override
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer) {
         boolean recovery = super.onRecovering(metadata, key, buffer);
-        logger.warn(name()+ " : Recovery : "+recovery);
-        return recovery;
+        if(recovery) return true;
+        key.rewind();
+        byte[] fromCluster = serviceContext.clusterProvider().accessIndexService().onRecover(key.array());
+        if(fromCluster==null) return false;
+        key.rewind();
+        for(byte b : fromCluster){
+            buffer.writeByte(b);
+        }
+        buffer.flip();
+        transactionLogManager.onUpdating(metadata,key,buffer,-1);
+        key.rewind();
+        buffer.clear();
+        return super.onRecovering(metadata,key,buffer);
     }
 
     @Override
