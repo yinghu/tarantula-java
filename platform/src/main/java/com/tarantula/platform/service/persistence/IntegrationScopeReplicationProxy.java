@@ -1,8 +1,8 @@
 package com.tarantula.platform.service.persistence;
 
-
-import com.icodesoftware.Distributable;
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.TransactionLog;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.event.TransactionReplicationEvent;
 
@@ -12,13 +12,13 @@ import java.util.List;
 public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
 
     public IntegrationScopeReplicationProxy(){
-        super(Distributable.INTEGRATION_SCOPE);
+        super("integration");
     }
 
     @Override
     public void onCommit(int scope,long transactionId) {
         super.onCommit(scope,transactionId);
-        serviceContext.schedule(new ReplicationSynchronizerTimeout(()->{
+        ReplicationSynchronizerTimeout replicationEvent = new ReplicationSynchronizerTimeout(asyncInterval,()->{
             List<TransactionLog> logs = transactionLogManager.committed(scope,transactionId);
             TransactionReplicationEvent transactionReplicationEvent = new TransactionReplicationEvent();
             transactionReplicationEvent.destination(MapStoreListener.INTEGRATION_MAP_STORE_NAME);
@@ -27,6 +27,24 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
                 transactionReplicationEvent.pendingLogs[i]= new PortableTransactionLog(logs.get(i));
             }
             serviceContext.clusterProvider().publisher().publish(transactionReplicationEvent);
-        }));
+        });
+        if (!asyncDistributing) {
+            replicationEvent.run();
+            return;
+        }
+        serviceContext.schedule(replicationEvent);
+    }
+
+    @Override
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer) {
+        boolean recovery = super.onRecovering(metadata, key, buffer);
+        logger.warn(name()+ " : Recovery : "+recovery);
+        return recovery;
+    }
+
+    @Override
+    public void setup(ServiceContext serviceContext) {
+        logger = JDKLogger.getLogger(IntegrationScopeReplicationProxy.class);
+        super.setup(serviceContext);
     }
 }

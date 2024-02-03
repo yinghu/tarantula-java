@@ -6,9 +6,9 @@ import com.hazelcast.nio.serialization.Portable;
 import com.icodesoftware.Configuration;
 
 import com.icodesoftware.DataStore;
-import com.icodesoftware.Distributable;
 
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.lmdb.TransactionLog;
 import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
@@ -16,8 +16,6 @@ import com.tarantula.platform.event.TransactionReplicationEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-
 
 public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
@@ -25,19 +23,17 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
     protected ServiceContext serviceContext;
 
-    protected ClusterProvider.Node localNode;
+    protected TarantulaLogger logger;
 
-    private final int scope;
-    protected boolean asyncDistributing;
+    private final String name;
+    protected boolean asyncDistributing = true;
 
-    //protected ConcurrentHashMap<ClusterProvider.Node, EventOnReplication> pendingEvents;
-    protected long syncInterval;
+    protected long asyncInterval = 100;
 
-    protected int maxPendingSize;
 
     protected TransactionLogManager transactionLogManager;
-    public ScopedReplicationProxy(int scope){
-        this.scope = scope;
+    public ScopedReplicationProxy(String name){
+        this.name = name;
         transactionLogManager = new TransactionLogManager();
     }
 
@@ -68,7 +64,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
     @Override
     public String name() {
-        return null;
+        return name;
     }
 
     @Override
@@ -76,52 +72,14 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         this.serviceContext = serviceContext;
         transactionLogManager.setup(serviceContext);
         Configuration configuration = serviceContext.configuration(CONFIG);
-        JsonObject conf = null;
-        if(scope== Distributable.INTEGRATION_SCOPE){
-            conf = ((JsonElement)configuration.property("integration")).getAsJsonObject();
+        JsonObject conf = ((JsonElement)configuration.property(name)).getAsJsonObject();
+        if(conf==null) {
+            logger.warn("Using default replication setting ["+asyncDistributing+" : "+asyncInterval+"]");
+            return;
         }
-        else if(scope==Distributable.DATA_SCOPE){
-            conf = ((JsonElement)configuration.property("data")).getAsJsonObject();
-        }
-        if(conf==null) return;
         asyncDistributing = conf.get("asyncDistributing").getAsBoolean();
-        if(asyncDistributing){
-            maxPendingSize = conf.get("maxPendingSize").getAsInt();
-            syncInterval = conf.get("syncIntervalSeconds").getAsInt()*1000;
-            //pendingEvents = new ConcurrentHashMap<>();
-        }
-    }
-
-
-    public int maxReplicationNumber(){
-        return serviceContext.clusterProvider().maxReplicationNumber();
-    }
-    protected ClusterProvider.Node nextNode(){
-        return serviceContext.keyIndexService().nextNode();
-    }
-
-    protected ClusterProvider.Node[] nextNodeList(int expected){
-        return serviceContext.keyIndexService().nextNodeList(expected);
-    }
-
-    protected ClusterProvider.Node[] nodeList(KeyIndex keyIndex){
-        return serviceContext.keyIndexService().nodeList(keyIndex);
-    }
-
-    protected ClusterProvider.Node[] nodeList(KeyIndex keyIndex,int expected){
-        return serviceContext.keyIndexService().nodeList(keyIndex,expected);
-    }
-
-    protected KeyIndex lookup(String source,Recoverable.Key key){
-        return this.serviceContext.keyIndexService().lookup(source,key);
-    }
-
-
-    protected void replicate(ClusterProvider.Node target){
-        //EventOnReplication event = pendingEvents.remove(target);
-        //if(event==null) return;
-        //event.drain();
-        //serviceContext.clusterProvider().publisher().publish(event);
+        if(asyncDistributing) asyncInterval = conf.get("asyncInterval").getAsLong();
+        logger.warn("Using configuration replication setting ["+asyncDistributing+" : "+asyncInterval+"]");
     }
 
     @Override
@@ -132,11 +90,6 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
     @Override
     public void shutdown() throws Exception {
         transactionLogManager.close();
-    }
-
-    @Override
-    public void waitForData() {
-        this.localNode = serviceContext.node();
     }
 
     public void onTransactionReplicationEvent(TransactionReplicationEvent event){

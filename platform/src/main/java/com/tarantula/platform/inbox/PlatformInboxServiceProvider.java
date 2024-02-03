@@ -9,6 +9,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceSetup;
+import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.Application;
 
@@ -35,7 +36,7 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
 
     public Inbox inbox(Session session){
         RecoverService recoverService = serviceContext.clusterProvider().recoverService();
-        byte[] dt = recoverService.onRecover(Presence.DataStore, SnowflakeKey.from(session.distributionId()).asBinary(),null);
+        byte[] dt = recoverService.onRecover(Presence.DataStore, SnowflakeKey.from(session.distributionId()).asBinary());
         if(dt!=null){
             logger.warn("load data from master");
         }

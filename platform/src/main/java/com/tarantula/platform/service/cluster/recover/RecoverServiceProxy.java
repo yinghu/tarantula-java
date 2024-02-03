@@ -66,13 +66,12 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     }
 
     @Override
-    public byte[] onRecover(String source, byte[] key,ClusterProvider.Node[] nodes) {
+    public byte[] onRecover(String source, byte[] key) {
         NodeEngine nodeEngine = getNodeEngine();
         byte[] ret = null;
         RecoverOperation operation = new RecoverOperation(source,key);
         Set<Member> members = nodeEngine.getClusterService().getMembers();
         for(Member member : members){
-            logger.warn("MEMBER :"+member.getAddress().toString());
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,member.getAddress());
             ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<byte[]> future = builder.invoke();
@@ -84,21 +83,6 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             }
         }
         return ret;
-        /**
-        for(ClusterProvider.Node node : nodes){
-            Member m = nodeEngine.getClusterService().getMember(node.memberId());
-            if(m==null) continue;
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
-            ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<byte[]> future = builder.invoke();
-                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            },metricsListener);
-            if(callResult.successful&&callResult.result!=null){
-                ret = (byte[]) callResult.result;
-                break;
-            }
-        }
-        return ret;**/
     }
     public Batchable onRecover(String source,String label,byte[] key,ClusterProvider.Node[] nodes){
         NodeEngine nodeEngine = getNodeEngine();
@@ -112,7 +96,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
                 Future<byte[]> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
             },metricsListener);
-            if(callResult.successful&&callResult.result!=null){
+            if(callResult.successful && callResult.result!=null){
                 ret = (Batchable) callResult.result;
                 break;
             }

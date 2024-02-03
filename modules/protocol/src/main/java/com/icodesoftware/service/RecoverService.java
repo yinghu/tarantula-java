@@ -8,7 +8,7 @@ public interface RecoverService extends ServiceProvider{
     boolean onDelete(String source,byte[] key);
     boolean onDeleteEdge(String source,String label,byte[] key);
     boolean onDeleteEdge(String source,String label,byte[] key,byte[] edge);
-    byte[] onRecover(String source,byte[] key,ClusterProvider.Node[] nodes);
+    byte[] onRecover(String source,byte[] key);
     Batchable onRecover(String source,String label,byte[] key,ClusterProvider.Node[] nodes);
 
     int onReplicate(String nodeName,String source,String label, byte[] key, byte[] value, ClusterProvider.Node[] nodes);

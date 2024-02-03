@@ -6,8 +6,10 @@ import com.icodesoftware.SchedulingTask;
 public class ReplicationSynchronizerTimeout implements SchedulingTask {
 
     private Runnable runnable;
+    private long delay;
 
-    public ReplicationSynchronizerTimeout(Runnable runnable){
+    public ReplicationSynchronizerTimeout(long delay,Runnable runnable){
+        this.delay = delay;
         this.runnable = runnable;
     }
     @Override
@@ -22,7 +24,7 @@ public class ReplicationSynchronizerTimeout implements SchedulingTask {
 
     @Override
     public long delay() {
-        return 100;
+        return delay;
     }
 
     @Override

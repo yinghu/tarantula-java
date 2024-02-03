@@ -149,7 +149,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         }
         return replicated;
     }
-    public byte[] onRecover(String source,byte[] key,ClusterProvider.Node[] nodes){
+    public byte[] onRecover(String source,byte[] key){
         NodeEngine nodeEngine = getNodeEngine();
         byte[] ret = null;
         AccessIndexRecoverOperation operation = new AccessIndexRecoverOperation(source,key);
@@ -160,27 +160,12 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
                 Future<byte[]> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
             },metricsListener);
-            if(callResult.successful){
+            if(callResult.successful && callResult.result != null){
                 ret = (byte[])callResult.result;
                 break;
             }
         }
         return ret;
-        /**
-        for(ClusterProvider.Node node : nodes){
-            if(node==null) continue; //next node
-            Member m = nodeEngine.getClusterService().getMember(node.memberId());
-            if(m==null) continue; //next node
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
-            ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<byte[]> future = builder.invoke();
-                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            },metricsListener);
-            if(callResult.successful){
-                ret = (byte[])callResult.result;
-                break;
-            }
-        }**/
     }
 
     public int onStartSync(int partition,String syncKey){

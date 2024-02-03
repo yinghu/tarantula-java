@@ -59,7 +59,7 @@ public class TestAccessIndexService implements AccessIndexService {
     }
 
     @Override
-    public byte[] onRecover(String partition, byte[] key,ClusterProvider.Node[] nodes) {
+    public byte[] onRecover(String partition, byte[] key) {
         return  null;
     }
 
