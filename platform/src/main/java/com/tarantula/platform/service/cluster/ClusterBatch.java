@@ -41,8 +41,9 @@ public class ClusterBatch implements Batchable, Portable {
     public void writePortable(PortableWriter out) throws IOException {
         int sz = data.size();
         out.writeInt("size",sz);
-        for(int i=0;i<sz;i++){
-            out.writeByteArray("k"+i,key.get(i));
+        for(int i=0;i< sz ; i++){
+            System.out.println("I : "+i);
+            out.writeByteArray("a"+i,key.get(i));
             out.writeByteArray("d"+i,data.get(i));
         }
     }
@@ -50,8 +51,8 @@ public class ClusterBatch implements Batchable, Portable {
     @Override
     public void readPortable(PortableReader in) throws IOException {
         int sz = in.readInt("size");
-        for(int i=0;i<sz;i++){
-            key.add(in.readByteArray("k"+i));
+        for(int i=0; i<sz; i++){
+            key.add(in.readByteArray("a"+i));
             data.add(in.readByteArray("d"+i));
         }
     }
