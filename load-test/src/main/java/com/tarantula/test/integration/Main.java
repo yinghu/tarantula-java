@@ -22,7 +22,7 @@ public class Main {
 
     static boolean onFile = false;
 
-    public static void main(String[] args) throws Exception{
+    public static void _main(String[] args) throws Exception{
         HttpCaller httpCaller = new HttpCaller("http://10.0.0.18:8090");
         httpCaller._init();
         String[] headers = new String[]{
@@ -36,7 +36,7 @@ public class Main {
         jsonObject.addProperty("playerId", 535221986201178113L);
         System.out.println(httpCaller.post("server",jsonObject.toString().getBytes(),headers));
     }
-    public static void _main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception{
         Properties properties = new Properties();
         try(InputStream inputStream = new FileInputStream("load.properties")){
             properties.load(inputStream);

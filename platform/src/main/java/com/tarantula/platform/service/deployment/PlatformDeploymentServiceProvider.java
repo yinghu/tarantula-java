@@ -692,8 +692,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                 if(mds.load(lobbyTypeIdIndex)){//stop existed
                     throw new RuntimeException("["+name+"] duplicated");
                 }
-                //String cname = (String) gameClusterConfig.property(ApplicationPreSetup.SET_UP_NAME);
-                //gameCluster.applicationSetup = (cname);
                 Descriptor descriptor = configuration.descriptor;
                 descriptor.ownerKey(new SnowflakeKey(publishingId));
                 descriptor.label(LobbyDescriptor.LABEL);
@@ -726,7 +724,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     }
                 }
             );
-            this.integrationCluster.deployService().onCreateGameCluster(gameCluster.distributionId());
+            //this.integrationCluster.deployService().onCreateGameCluster(gameCluster.distributionId());
         }catch (Exception ex){
             log.error("error on create game cluster",ex);
             gameCluster.message(ex.getMessage());

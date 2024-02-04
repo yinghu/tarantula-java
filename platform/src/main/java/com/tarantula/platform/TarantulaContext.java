@@ -1048,7 +1048,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
              GameCluster gc = new GameCluster();
              gc.distributionId(key);
              gc.dataStore(this.masterDataStore());
-             if(!this.masterDataStore().load(gc)) return null;
+             if(!this.masterDataStore().load(gc)){
+                 log.warn("Game cluster not existed ["+key+"]");
+                 return null;
+             }
              gc.gameLobby = this.lobby(gc.lobbyType());
              gc.serviceLobby = this.lobby(gc.serviceType());
              gc.dataLobby = this.lobby(gc.dataType());
