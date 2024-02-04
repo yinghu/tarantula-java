@@ -21,6 +21,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
         super.onCommit(scope, transactionId);
         ReplicationSynchronizerTimeout replicationEvent = new ReplicationSynchronizerTimeout(asyncInterval, () -> {
             List<TransactionLog> logs = transactionLogManager.committed(scope, transactionId);
+            transactionLogManager.onTransaction(logs);
             TransactionReplicationEvent transactionReplicationEvent = new TransactionReplicationEvent();
             transactionReplicationEvent.destination(MapStoreListener.DATA_MAP_STORE_NAME);
             transactionReplicationEvent.pendingLogs = new PortableTransactionLog[logs.size()];

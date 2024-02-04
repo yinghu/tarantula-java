@@ -128,6 +128,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         AccessIndexRecoverOperation operation = new AccessIndexRecoverOperation(key);
         Set<Member> members = nodeEngine.getClusterService().getMembers();
         for(Member member : members){
+            if(member.localMember()) continue;
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,member.getAddress());
             ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<byte[]> future = builder.invoke();
