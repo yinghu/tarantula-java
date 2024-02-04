@@ -1,12 +1,10 @@
 package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.DataStore;
-import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableRegistry;
 
 import com.icodesoftware.service.DataStoreSummary;
-import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.util.BinaryKey;
 import com.tarantula.platform.TarantulaContext;
 
@@ -111,9 +109,6 @@ public class DataStoreViewer implements DataStoreSummary {
 
     public void load(byte[] key, DataStoreSummary.View view){
         BinaryKey akey = new BinaryKey(Base64.getDecoder().decode(key));
-        if(dataStore.scope() != Distributable.INDEX_SCOPE){
-            KeyIndex keyIndex = tarantulaContext.keyIndexService.lookup(dataStore.name(),akey);
-        }
         System.out.println("DB : "+dataStore.name()+" : "+dataStore.scope());
         this.dataStore.backup().get(akey,(k,v)->{
             Recoverable.DataHeader h = v.readHeader();

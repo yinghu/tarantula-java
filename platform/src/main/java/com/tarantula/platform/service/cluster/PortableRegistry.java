@@ -1,6 +1,5 @@
 package com.tarantula.platform.service.cluster;
 
-import com.hazelcast.cache.impl.ICacheService;
 import com.icodesoftware.Recoverable;
 
 import com.icodesoftware.util.AbstractRecoverableListener;
@@ -10,7 +9,6 @@ import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.event.SessionForward;
 import com.tarantula.platform.room.*;
 import com.tarantula.platform.service.AccessKey;
-import com.tarantula.platform.service.KeyIndexTrack;
 import com.tarantula.platform.service.PresenceKey;
 import com.tarantula.platform.tournament.TournamentEntry;
 import com.tarantula.platform.tournament.TournamentInstance;
@@ -68,7 +66,6 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
     public static final int TVT_ROOM_CID = PortableEventRegistry.TVT_ROOM_CID;
     public static final int CLIENT_CONNECTION_CID = PortableEventRegistry.CLIENT_CONNECTION_CID;
 
-    public static final int KEY_INDEX_CID = PortableEventRegistry.KEY_INDEX_CID;
 
     public static PortableRegistry INS;
     public PortableRegistry(){
@@ -162,9 +159,6 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
                 break;
             case TVT_ROOM_CID:
                 _ins = new TVTGameRoom();
-                break;
-            case KEY_INDEX_CID:
-                _ins = new KeyIndexTrack();
                 break;
             default:
                 throw new IllegalArgumentException("Not supported event type ["+cid+"]");

@@ -4,7 +4,6 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.LMDBDataStoreProvider;
 import com.icodesoftware.lmdb.TransactionLogManager;
-import com.icodesoftware.service.KeyIndexService;
 import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
 

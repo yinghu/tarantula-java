@@ -48,11 +48,11 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 	public final static  CountDownLatch _storageInstanceStarted = new CountDownLatch(1);
     public final static  CountDownLatch _storageStarted = new CountDownLatch(1); //data store provider waitForData call finished;
  	public final static  CountDownLatch _integrationClusterStarted = new CountDownLatch(1);
-    public final static  CountDownLatch _keyIndexServiceStarted = new CountDownLatch(1);
+   
     public final static  CountDownLatch _accessIndexServiceStarted = new CountDownLatch(1);
     public final static  CountDownLatch _deployServiceStarted = new CountDownLatch(1);
     public final static  CountDownLatch _recoverServiceStarted = new CountDownLatch(1);
-    public final static CountDownLatch _cluster_service_ready = new CountDownLatch(4);
+    public final static CountDownLatch _cluster_service_ready = new CountDownLatch(3);
     public final static CountDownLatch _systemServiceStarted = new CountDownLatch(1);
  	public final static  CountDownLatch _tarantulaApplicationStarted = new CountDownLatch(1);
 
@@ -150,8 +150,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public String authContext = "localhost";
 
-    //public ConcurrentHashMap<String,CountDownLatch> _syncLatch = new ConcurrentHashMap<>();
-
     public boolean runAsMirror;
     public boolean backupEnabled;
     public String backupUrl;
@@ -169,7 +167,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public boolean tarantulaServiceEventLogPersistenceEnable;
 
 
-    public KeyIndexService keyIndexService;
+    //public KeyIndexService keyIndexService;
 
     private DataStoreProvider.DistributionIdGenerator distributionIdGenerator;
  	private TarantulaContext(){
@@ -557,9 +555,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         return this.integrationCluster.accessIndexService();
     }
 
-    public KeyIndexService keyIndexService(){
-        return keyIndexService;
-    }
     @Override
     public DeploymentServiceProvider deploymentServiceProvider(){
  	    return this.deploymentServiceProvider;
@@ -591,14 +586,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
  	    this.serviceProviders.put(serviceProvider.name(),serviceProvider);
     }
     public void _setup() throws Exception{
-        //Waiting for all distribution service ready
-        //DistributionKeyIndexService distributionKeyIndexService = clusterProvider().serviceProvider(DistributionKeyIndexService.NAME);
-        //CountDownLatch countDownLatch = new CountDownLatch(1);
-        //distributionKeyIndexService.startSync(DistributionKeyIndexService.NAME);
-        //_syncLatch.put(DistributionKeyIndexService.NAME,countDownLatch);
-        //countDownLatch.await();
-        //_syncLatch.remove(DistributionKeyIndexService.NAME);
-        //log.warn("Key index data sync has finished");
         AccessIndex bid = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/"+node.bucketName,AccessIndex.SYSTEM_INDEX);
         node.bucketId = bid.distributionId();
         AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,AccessIndex.SYSTEM_INDEX);

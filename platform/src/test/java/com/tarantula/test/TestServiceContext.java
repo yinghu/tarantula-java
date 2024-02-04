@@ -178,9 +178,6 @@ public class TestServiceContext implements ServiceContext {
         return null;
     }
 
-    public KeyIndexService keyIndexService(){
-        return null;
-    }
     public Transaction transaction(int scope){
         return dataStoreProvider.transaction(scope);
     }

@@ -11,21 +11,14 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.lmdb.LocalMetadata;
 import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
-import com.icodesoftware.util.BinaryKey;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
-
-import com.tarantula.platform.event.KeyIndexEvent;
-
 import com.tarantula.platform.event.TransactionReplicationEvent;
 import com.tarantula.platform.service.cluster.ClusterBatch;
-import com.tarantula.platform.service.persistence.ReplicationData;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
 
-
-import java.util.ArrayList;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicInteger;
+
 
 public class ClusterRecoverService implements ManagedService, RemoteService {
 

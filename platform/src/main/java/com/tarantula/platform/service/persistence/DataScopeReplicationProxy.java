@@ -2,8 +2,6 @@ package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.lmdb.BufferProxy;
-import com.icodesoftware.lmdb.LocalMetadata;
 import com.icodesoftware.lmdb.TransactionLog;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Batchable;
