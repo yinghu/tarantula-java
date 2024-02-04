@@ -4,6 +4,7 @@ import com.icodesoftware.Closable;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.service.Batchable;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.BinaryKey;
@@ -106,7 +107,7 @@ public class TransactionLogManager implements Closable {
         });
     }
 
-    public byte[] onRecovering(Metadata metadata,byte[] key){
+    public byte[] loadFromCommitted(Metadata metadata,byte[] key){
         DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
         if(metadata.label()!=null) return null;
         byte[][] loaded = new byte[1][];
@@ -116,6 +117,18 @@ public class TransactionLogManager implements Closable {
         })) return loaded[0];
         return null;
     }
+
+    public Batchable loadEdgeValueFromCommitted(Metadata metadata, byte[] key){
+        DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
+        EdgeValueSet edgeValueSet = new EdgeValueSet();
+        if(metadata.label()==null) return edgeValueSet;
+        dataStore.backup().forEachEdgeKeyValue(BinaryKey.from(key),metadata.label(),(e,v)->{
+            edgeValueSet.onEdgeValue(e.array(),v.array());
+            return true;
+        });
+        return edgeValueSet;
+    }
+
 
     public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferStream bufferStream){
         DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
@@ -198,6 +211,10 @@ public class TransactionLogManager implements Closable {
             return serviceContext.dataStore(Distributable.LOG_SCOPE,INTEGRATION_TRANSACTION_LOG);
         }
         return serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
+    }
+
+    public DataStore onTransaction(Metadata metadata){
+        return serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
     }
 
     public void onTransaction(List<TransactionLog> transactionLogs) {

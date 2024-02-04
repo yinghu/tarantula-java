@@ -4,6 +4,10 @@ import com.icodesoftware.*;
 import com.icodesoftware.lmdb.*;
 
 
+import com.icodesoftware.service.Batchable;
+import com.icodesoftware.service.Metadata;
+import com.icodesoftware.util.BufferUtil;
+import com.icodesoftware.util.NaturalKey;
 import com.icodesoftware.util.SnowflakeKey;
 
 import org.testng.Assert;
@@ -56,20 +60,45 @@ public class LMDBDataStoreTest {
     public void testCommitOnTransaction(){
         long ownerId = localDistributionIdGenerator.id();
         testMapStoreListener.verifier = (tid)->{
-            Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid).size(),4);
+            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
+            Assert.assertEquals(logs.size(),4);
+            testMapStoreListener.transactionLogManager.onTransaction(logs);
         };
         Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE);
+        TestUser user = new TestUser("test001",ownerId);
+        TestUser user1 = new TestUser("test002",ownerId);
         boolean committed = transaction.execute(ctx->{
             DataStore dataStore = ctx.onDataStore("test_user_committed");
-            TestUser user = new TestUser("test001",ownerId);
+            //TestUser user = new TestUser("test001",ownerId);
             Assert.assertTrue(dataStore.create(user));
-            TestUser user1 = new TestUser("test002",ownerId);
+            //TestUser user1 = new TestUser("test002",ownerId);
             Assert.assertTrue(dataStore.create(user1));
             return true;
         });
         Assert.assertTrue(committed);
         DataStore dataStore = lmdbDataStoreProvider.createDataStore("test_user_committed");
         Assert.assertEquals(dataStore.list(new TestUserQuery(ownerId)).size(),2);
+        byte[] data = testMapStoreListener.transactionLogManager.loadFromCommitted(new LocalMetadata(Distributable.DATA_SCOPE,"test_user_committed"), SnowflakeKey.from(user.distributionId()).asBinary());
+        Assert.assertNotNull(data);
+        Recoverable.DataBuffer bufferProxy = BufferProxy.wrap(data);
+        bufferProxy.readHeader();
+        TestUser testUser = new TestUser();
+        testUser.read(bufferProxy);
+        Assert.assertEquals(testUser.login,"test001");
+        Metadata metadata = new LocalMetadata(Distributable.DATA_SCOPE,"test_user_committed",TestUser.LABEL);
+        Batchable batchable = testMapStoreListener.transactionLogManager.loadEdgeValueFromCommitted(metadata,SnowflakeKey.from(ownerId).asBinary());
+        Assert.assertEquals(batchable.size(),2);
+        List<byte[]> kp = batchable.key();
+        List<byte[]> vp = batchable.data();
+        for(int i=0;i<batchable.size();i++){
+            TestUser tx = new TestUser();
+            tx.readKey(BufferProxy.wrap(kp.get(i)));
+            Recoverable.DataBuffer buffer = BufferProxy.wrap(vp.get(i));
+            buffer.readHeader();
+            tx.read(buffer);
+            Assert.assertTrue(tx.login().startsWith("test00"));
+            Assert.assertTrue(tx.distributionId()>0);
+        }
     }
     @Test(groups = { "LMDB" })
     public void testAbortOnTransaction(){

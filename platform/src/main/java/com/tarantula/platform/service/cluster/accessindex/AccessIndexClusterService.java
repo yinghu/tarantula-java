@@ -6,22 +6,19 @@ import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
 import com.icodesoftware.*;
-import com.icodesoftware.lmdb.BufferCache;
+
 import com.icodesoftware.lmdb.LocalMetadata;
 import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.util.BinaryKey;
+
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 
-import com.tarantula.platform.event.KeyIndexEvent;
-
 import com.tarantula.platform.event.TransactionReplicationEvent;
-import com.tarantula.platform.service.persistence.ReplicationData;
 
-import java.util.ArrayList;
+
 import java.util.Properties;
 
 
@@ -36,53 +33,12 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     private DeploymentServiceProvider deploymentServiceProvider;
     private String bucket;
 
-    private Thread replicationWriter;
-    private ArrayList<OnReplication> pendingUpdates;
-    private boolean running = true;
-    private ArrayList<OnReplication> updates;
 
     @Override
     public void init(NodeEngine nodeEngine, Properties properties) {
         this.tarantulaContext = TarantulaContext.getInstance();
         this.bucket = this.tarantulaContext.dataBucketGroup;
         this.nodeEngine = nodeEngine;
-
-        pendingUpdates = new ArrayList<>();
-        updates = new ArrayList<>();
-        replicationWriter = new Thread(()->{
-            while (running){
-                try{
-                    synchronized (pendingUpdates){
-                        pendingUpdates.forEach(c->updates.add(c));
-                        pendingUpdates.clear();
-                    }
-                    if(updates.size()>0){
-                        updates.forEach(r->{
-                            DataStore dso = this.dataStore();
-                            if(dso.backup().set((k,v)->{
-                                for(byte b : r.key()){
-                                    k.writeByte(b);
-                                }
-                                for(byte b : r.value()){
-                                    v.writeByte(b);
-                                }
-                                return true;
-                            })){
-                                log.warn("Publishing key index event");
-                                KeyIndexEvent keyIndexEvent = new KeyIndexEvent(dso.name(),r.key(),r.nodeName(),this.tarantulaContext.node().nodeName());
-                                tarantulaContext.keyIndexService().onReplicated(keyIndexEvent);
-                            }
-                        });
-                        updates.clear();
-                    }
-                    Thread.sleep(10);
-                }catch (Exception ex){
-                    //ignore
-                }
-            }
-            log.warn("Stopping access index replication thread");
-        },"tarantula-access-index-replication-writer");
-        replicationWriter.start();
         new ServiceBootstrap(TarantulaContext._integrationClusterStarted,TarantulaContext._accessIndexServiceStarted,new AccessIndexServiceBootstrap(this),"access-index-service",true).start();
     }
 
@@ -93,7 +49,6 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
 
     @Override
     public void shutdown(boolean b) {
-        this.running = false;
         log.warn("Shutting down access index cluster service");
     }
 
@@ -150,60 +105,10 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         log.warn("Access index service is ready on ["+nodeEngine.getLocalMember().getUuid()+"]["+bucket+"]");
     }
 
-
-    public void replicate(String nodeName,byte[] key,byte[] value){
-        log.warn("replicating->"+nodeName);
-        synchronized (pendingUpdates){
-            pendingUpdates.add(new ReplicationData(nodeName,key,value));
-        }
-    }
-    public void replicate(OnReplication[] onReplications){
-        synchronized (pendingUpdates){
-            for(OnReplication onReplication : onReplications){
-                pendingUpdates.add(onReplication);
-            }
-        }
-    }
-
     public byte[] recover(byte[] key){
         TransactionLogManager transactionLogManager = this.tarantulaContext.transactionLogManager(Distributable.INTEGRATION_SCOPE);
         Metadata metadata = new LocalMetadata(Distributable.INTEGRATION_SCOPE,AccessIndexService.STORE_NAME);
-        byte[] loaded = transactionLogManager.onRecovering(metadata,key);
-        log.warn("Loaded :"+ (loaded!=null));
-        return loaded;
-    }
-    public int syncStart(String memberId,int partition,String syncKey){
-        AccessIndexService recoverService = tarantulaContext.integrationCluster().accessIndexService();
-        new Thread(()->{
-            if(!memberId.equals(nodeEngine.getLocalMember().getUuid())){
-                int[] batch={0};
-                byte[][] keys = new byte[tarantulaContext.recoverBatchSize][];
-                byte[][] values = new byte[tarantulaContext.recoverBatchSize][];
-                this.dataStore().backup().forEach((k,v)->{
-                    if(batch[0] == tarantulaContext.recoverBatchSize){
-                        //recoverService.onSync(batch[0],keys,values,memberId,partition);
-                        batch[0] = 0;
-                    }
-                    //keys[batch[0]]=k;
-                    //values[batch[0]]=v;
-                    batch[0]++;
-                    //total[0]++;
-                    return true;
-                });
-                //last batch
-                if(batch[0]>0) recoverService.onSync(batch[0],keys,values,memberId,partition);
-            }
-            recoverService.onEndSync(memberId,syncKey);
-        }).start();
-        return this.tarantulaContext.node().partitionNumber();
-    }
-    public void replicateAsBatch(String nodeName,OnReplication[] batch){
-        for(OnReplication d : batch) {
-            replicate(nodeName,d.key(), d.value());
-        }
-    }
-    public void syncEnd(String syncKey){
-        //tarantulaContext._syncLatch.get(syncKey).countDown();
+        return transactionLogManager.loadFromCommitted(metadata,key);
     }
 
     private DataStore dataStore(){

@@ -84,19 +84,18 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         }
         return ret;
     }
-    public Batchable onRecover(String source,String label,byte[] key,ClusterProvider.Node[] nodes){
+    public Batchable onRecover(String source,String label,byte[] key){
         NodeEngine nodeEngine = getNodeEngine();
         Batchable ret = null;
         RecoverEdgeOperation operation = new RecoverEdgeOperation(source,label,key);
-        for(ClusterProvider.Node node : nodes){
-            Member m = nodeEngine.getClusterService().getMember(node.memberId());
-            if(m==null) continue;
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
+        Set<Member> members = nodeEngine.getClusterService().getMembers();
+        for(Member member : members){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,member.getAddress());
             ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<byte[]> future = builder.invoke();
+                Future<Batchable> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
             },metricsListener);
-            if(callResult.successful && callResult.result!=null){
+            if(callResult.successful && callResult.result != null){
                 ret = (Batchable) callResult.result;
                 break;
             }
@@ -159,71 +158,6 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             }
         }
         return expected;
-    }
-    @Override
-    public int onReplicate(String nodeName,String source,String label, byte[] key, byte[] value, ClusterProvider.Node[] nodes){
-        NodeEngine nodeEngine = getNodeEngine();
-        int expected = 0;
-        for(ClusterProvider.Node node : nodes){
-            if(node==null) continue;
-            Member m = nodeEngine.getClusterService().getMember(node.memberId());
-            if(m==null) continue;
-            ReplicateOnDataScopeOperation operation = new ReplicateOnDataScopeOperation(nodeName,source,label,key,value);
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
-            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<Void> future = builder.invoke();
-                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            },metricsListener);
-            if(result.successful) expected++;
-        }
-        return expected;
-    }
-
-    public void onReplicate(String nodeName,OnReplication[] batch, int size, ClusterProvider.Node node){
-
-        NodeEngine nodeEngine = getNodeEngine();
-        Member m = nodeEngine.getClusterService().getMember(node.memberId());
-        if(m==null) return;
-        BatchReplicateOnDataScopeOperation operation = new BatchReplicateOnDataScopeOperation(nodeName,batch,size);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
-        ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-            Future<Void> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        },metricsListener);
-        if(!result.successful){
-
-        }
-    }
-    public int onStartSync(String source,String syncKey){
-        NodeEngine nodeEngine = getNodeEngine();
-        DataStoreSyncStartOperation operation = new DataStoreSyncStartOperation(nodeEngine.getLocalMember().getUuid(),source,syncKey);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getMasterAddress());
-        ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-            Future<Integer> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        },metricsListener);
-        return result.successful? (int) result.result:0;
-
-    }
-    public void onSync(int partition,byte[][] keys,byte[][] values,String memberId,String source){
-        NodeEngine nodeEngine = getNodeEngine();
-        DataStoreSyncBatchOperation operation = new DataStoreSyncBatchOperation(partition,keys,values,source);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
-        ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-            Future<Void> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        },metricsListener);
-        if(!result.successful) throw new RuntimeException(result.exception);
-    }
-    public void onEndSync(String memberId,String syncKey){
-        NodeEngine nodeEngine = getNodeEngine();
-        DataStoreSyncEndOperation operation = new DataStoreSyncEndOperation(syncKey);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,nodeEngine.getClusterService().getMember(memberId).getAddress());
-        ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-            Future<Void> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        },metricsListener);
-        if(!result.successful) throw new RuntimeException(result.exception);
     }
 
     public String[] onListModules(){

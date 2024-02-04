@@ -27,7 +27,7 @@ public class RecoverEdgeOperation extends Operation {
     @Override
     public void run() throws Exception {
         ClusterRecoverService cis = this.getService();
-        value = cis.loadEdge(source,label,key);
+        value = cis.loadEdgeValueSet(source,label,key);
     }
 
     @Override

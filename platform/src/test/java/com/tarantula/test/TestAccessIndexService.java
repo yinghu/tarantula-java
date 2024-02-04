@@ -24,21 +24,6 @@ public class TestAccessIndexService implements AccessIndexService {
     }
 
     @Override
-    public int onStartSync(int partition, String syncKey) {
-        return 0;
-    }
-
-    @Override
-    public void onSync(int size, byte[][] keys, byte[][] values, String memberId, int partition) {
-
-    }
-
-    @Override
-    public void onEndSync(String memberId, String syncKey) {
-
-    }
-
-    @Override
     public boolean onEnable() {
         return false;
     }
@@ -48,15 +33,7 @@ public class TestAccessIndexService implements AccessIndexService {
         return false;
     }
 
-    @Override
-    public int onReplicate(String nodeName,byte[] key, byte[] value,  ClusterProvider.Node[] nodes) {
-        return 0;
-    }
 
-    @Override
-    public void onReplicate(String nodeName,OnReplication[] batch, int size, ClusterProvider.Node node) {
-        //return 0;
-    }
 
     @Override
     public byte[] onRecover( byte[] key) {

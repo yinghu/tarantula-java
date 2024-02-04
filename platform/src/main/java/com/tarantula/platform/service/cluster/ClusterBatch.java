@@ -14,8 +14,17 @@ import java.util.List;
 
 public class ClusterBatch implements Batchable, Portable {
 
+
+    private List<byte[]> key = new ArrayList<>();
+
     private List<byte[]> data = new ArrayList<>();
+
     public ClusterBatch(){
+    }
+
+    public ClusterBatch(Batchable batchable){
+        key = batchable.key();
+        data = batchable.data();
     }
 
     @Override
@@ -33,6 +42,7 @@ public class ClusterBatch implements Batchable, Portable {
         int sz = data.size();
         out.writeInt("size",sz);
         for(int i=0;i<sz;i++){
+            out.writeByteArray("k"+i,key.get(i));
             out.writeByteArray("d"+i,data.get(i));
         }
     }
@@ -41,6 +51,7 @@ public class ClusterBatch implements Batchable, Portable {
     public void readPortable(PortableReader in) throws IOException {
         int sz = in.readInt("size");
         for(int i=0;i<sz;i++){
+            key.add(in.readByteArray("k"+i));
             data.add(in.readByteArray("d"+i));
         }
     }
@@ -55,9 +66,9 @@ public class ClusterBatch implements Batchable, Portable {
         return data;
     }
 
-    public void batch(byte[] batch){
-        data.add(batch);
+    @Override
+    public List<byte[]> key() {
+        return key;
     }
-
 
 }

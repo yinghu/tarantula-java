@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.persistence;
 
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.TransactionLog;
 import com.icodesoftware.logging.JDKLogger;
@@ -39,14 +40,19 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
         boolean recovery = super.onRecovering(metadata, key, buffer);
         if(recovery) return true;
         key.rewind();
-        byte[] fromCluster = serviceContext.clusterProvider().accessIndexService().onRecover(key.array());
+        byte[] akey = key.array();
+        byte[] fromCluster = serviceContext.clusterProvider().accessIndexService().onRecover(akey);
         if(fromCluster==null) return false;
-        key.rewind();
-        for(byte b : fromCluster){
-            buffer.writeByte(b);
-        }
-        buffer.flip();
-        transactionLogManager.onUpdating(metadata,key,buffer,-1);
+        DataStore dataStore = transactionLogManager().onTransaction(metadata);
+        dataStore.backup().set((k,v)->{
+            for(byte b : akey){
+                k.writeByte(b);
+            }
+            for(byte b : fromCluster){
+                v.writeByte(b);
+            }
+            return true;
+        });
         key.rewind();
         buffer.clear();
         return super.onRecovering(metadata,key,buffer);

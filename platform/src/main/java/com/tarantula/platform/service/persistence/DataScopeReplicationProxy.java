@@ -1,8 +1,12 @@
 package com.tarantula.platform.service.persistence;
 
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.lmdb.BufferProxy;
+import com.icodesoftware.lmdb.LocalMetadata;
 import com.icodesoftware.lmdb.TransactionLog;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.Batchable;
 import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
@@ -36,8 +40,63 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
     @Override
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer buffer) {
         boolean recovery = super.onRecovering(metadata, key, buffer);
-        logger.warn(name()+ " : Recovery : "+recovery);
-        return recovery;
+        if(recovery) return true;
+        key.rewind();
+        byte[] akey = key.array();
+        byte[] fromCluster = serviceContext.clusterProvider().recoverService().onRecover(metadata.source(),akey);
+        if(fromCluster==null) return false;
+        DataStore dataStore = transactionLogManager().onTransaction(metadata);
+        dataStore.backup().set((k,v)->{
+            for(byte b : akey){
+                k.writeByte(b);
+            }
+            for(byte b : fromCluster){
+                v.writeByte(b);
+            }
+            return true;
+        });
+        key.rewind();
+        buffer.clear();
+        return super.onRecovering(metadata,key,buffer);
+    }
+
+    @Override
+    public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferStream bufferStream){
+        boolean recovery = super.onRecovering(metadata,key,bufferStream);
+        if(recovery) return true;
+        if(metadata.label()==null) return false;
+        key.rewind();
+        byte[] akey = key.array();
+        Batchable fromCluster = serviceContext.clusterProvider().recoverService().onRecover(metadata.source(),metadata.label(),akey);
+        if(fromCluster==null) return false;
+        int sz = fromCluster.size();
+        List<byte[]> kx = fromCluster.key();
+        List<byte[]> vx = fromCluster.data();
+        DataStore dataStore = transactionLogManager().onTransaction(metadata);
+        for(int i=0;i<sz;i++){
+            byte[] ak = kx.get(i);
+            byte[] av = vx.get(i);
+            dataStore.backup().set((k,v)->{
+                for(byte b : ak){
+                    k.writeByte(b);
+                }
+                for(byte b : av){
+                    v.writeByte(b);
+                }
+                return true;
+            });
+            dataStore.backup().setEdge(metadata.label(),(k,v)->{
+                for(byte b : akey){
+                    k.writeByte(b);
+                }
+                for(byte b : ak){
+                    v.writeByte(b);
+                }
+                return true;
+            });
+        }
+        key.rewind();
+        return super.onRecovering(metadata,key,bufferStream);
     }
 
     @Override

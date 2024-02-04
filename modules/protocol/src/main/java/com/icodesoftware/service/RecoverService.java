@@ -9,15 +9,7 @@ public interface RecoverService extends ServiceProvider{
     boolean onDeleteEdge(String source,String label,byte[] key);
     boolean onDeleteEdge(String source,String label,byte[] key,byte[] edge);
     byte[] onRecover(String source,byte[] key);
-    Batchable onRecover(String source,String label,byte[] key,ClusterProvider.Node[] nodes);
-
-    int onReplicate(String nodeName,String source,String label, byte[] key, byte[] value, ClusterProvider.Node[] nodes);
-    void onReplicate(String nodeName,OnReplication[] batch, int size, ClusterProvider.Node node);
-
-    //operates on master node
-    int onStartSync(String source,String syncKey);
-    void onSync(int size,byte[][] keys,byte[][] values,String memberId,String source);
-    void onEndSync(String memberId,String syncKey);
+    Batchable onRecover(String source,String label,byte[] key);
 
     String[] onListModules();
     byte[] onLoadModuleJarFile(String name);
