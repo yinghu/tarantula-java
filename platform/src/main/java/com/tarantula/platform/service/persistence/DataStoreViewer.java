@@ -2,6 +2,7 @@ package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.*;
 
+import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.DataStoreSummary;
 import com.icodesoftware.util.BinaryKey;
@@ -114,8 +115,14 @@ public class DataStoreViewer implements DataStoreSummary {
             DistributionAccessIndexViewer viewer = (DistributionAccessIndexViewer) tarantulaContext.clusterProvider().accessIndexService();
             viewer.scan(akey.asBinary(),(m,k,v)->{
                 ClusterProvider.Node node = tarantulaContext.clusterProvider().summary().node(m.getUuid());
-                tarantulaContext.log("aaa : "+node.nodeName(), OnLog.WARN);
-                //view.on(null,v.readHeader(),)
+                if(v==null) return true;
+                Recoverable.DataBuffer buffer = BufferProxy.wrap(v);
+                Recoverable.DataHeader header = buffer.readHeader();
+                RecoverableRegistry registry = tarantulaContext.recoverableRegistry(header.factoryId());
+                Recoverable r = registry.create(header.classId());
+                r.readKey(BufferProxy.wrap(k));
+                r.read(buffer);
+                view.on(node,header,r);
                 return true;
             });
             return;
