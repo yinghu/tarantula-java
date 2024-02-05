@@ -19,12 +19,18 @@ public class ClusterBatch implements Batchable, Portable {
 
     private List<byte[]> data = new ArrayList<>();
 
+    private KeyValueSet[] batch;
+
     public ClusterBatch(){
     }
 
     public ClusterBatch(Batchable batchable){
         key = batchable.key();
         data = batchable.data();
+        batch = new KeyValueSet[batchable.size()];
+        for(int i=0;i< batchable.size();i++){
+            batch[i]=new KeyValueSet(key.get(i),data.get(i));
+        }
     }
 
     @Override
@@ -39,27 +45,22 @@ public class ClusterBatch implements Batchable, Portable {
 
     @Override
     public void writePortable(PortableWriter out) throws IOException {
-        int sz = data.size();
-        out.writeInt("size",sz);
-        for(int i=0;i< sz ; i++){
-            System.out.println("I : "+i);
-            out.writeByteArray("a"+i,key.get(i));
-            out.writeByteArray("d"+i,data.get(i));
-        }
+        out.writePortableArray("batch",batch);
     }
 
     @Override
     public void readPortable(PortableReader in) throws IOException {
-        int sz = in.readInt("size");
-        for(int i=0; i<sz; i++){
-            key.add(in.readByteArray("a"+i));
-            data.add(in.readByteArray("d"+i));
-        }
+        batch = (KeyValueSet[])in.readPortableArray("batch");
     }
 
     @Override
     public int size() {
-        return data.size();
+        int sz = batch.length;
+        for(KeyValueSet kv : batch){
+            key.add(kv.key);
+            data.add(kv.value);
+        }
+        return sz;
     }
 
     @Override
