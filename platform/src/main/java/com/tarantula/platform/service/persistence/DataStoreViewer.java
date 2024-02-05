@@ -116,13 +116,7 @@ public class DataStoreViewer implements DataStoreSummary {
             viewer.scan(akey.asBinary(),(m,k,v)->{
                 ClusterProvider.Node node = tarantulaContext.clusterProvider().summary().node(m.getUuid());
                 if(v==null) return true;
-                Recoverable.DataBuffer buffer = BufferProxy.wrap(v);
-                Recoverable.DataHeader header = buffer.readHeader();
-                RecoverableRegistry registry = tarantulaContext.recoverableRegistry(header.factoryId());
-                Recoverable r = registry.create(header.classId());
-                r.readKey(BufferProxy.wrap(k));
-                r.read(buffer);
-                view.on(node,header,r);
+                onView(node,k,v,view);
                 return true;
             });
             return;
@@ -131,9 +125,20 @@ public class DataStoreViewer implements DataStoreSummary {
             DistributionDataViewer viewer = (DistributionDataViewer) tarantulaContext.clusterProvider().recoverService();
             viewer.scan(dataStore.name(),akey.asBinary(),(m,k,v)->{
                 ClusterProvider.Node node = tarantulaContext.clusterProvider().summary().node(m.getUuid());
-                tarantulaContext.log("bbb : "+node.nodeName(), OnLog.WARN);
+                if(v==null) return true;
+                onView(node,k,v,view);
                 return true;
             });
         }
+    }
+
+    private void onView(ClusterProvider.Node node,byte[] key, byte[] value, DataStoreSummary.View view){
+        Recoverable.DataBuffer buffer = BufferProxy.wrap(value);
+        Recoverable.DataHeader header = buffer.readHeader();
+        RecoverableRegistry registry = tarantulaContext.recoverableRegistry(header.factoryId());
+        Recoverable r = registry.create(header.classId());
+        r.readKey(BufferProxy.wrap(key));
+        r.read(buffer);
+        view.on(node,header,r);
     }
 }
