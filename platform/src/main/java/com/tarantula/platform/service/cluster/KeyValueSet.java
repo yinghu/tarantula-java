@@ -3,22 +3,17 @@ package com.tarantula.platform.service.cluster;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+import com.icodesoftware.lmdb.EdgeValueSet;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 
-public class KeyValueSet implements Portable {
-
-    public byte[] key;
-    public byte[] value;
+public class KeyValueSet extends EdgeValueSet implements Portable {
 
     public KeyValueSet(){
-
     }
-
     public KeyValueSet(byte[] key,byte[] value){
-        this.key = key;
-        this.value = value;
+        super(key,value);
     }
     @Override
     public int getFactoryId() {
@@ -32,8 +27,8 @@ public class KeyValueSet implements Portable {
 
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeByteArray("key",key);
-        portableWriter.writeByteArray("value",value);
+        portableWriter.writeByteArray("key",key());
+        portableWriter.writeByteArray("value",value());
     }
 
     @Override

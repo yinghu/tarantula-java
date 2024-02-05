@@ -2,31 +2,29 @@ package com.icodesoftware.lmdb;
 
 import com.icodesoftware.service.Batchable;
 
-import java.util.ArrayList;
-import java.util.List;
 
-public class EdgeValueSet implements Batchable {
+public class EdgeValueSet implements Batchable.BatchData {
 
-    private List<byte[]> key = new ArrayList<>();
+    protected byte[] key;
+    protected byte[] value;
 
-    private List<byte[]> data = new ArrayList<>();
-    @Override
-    public int size() {
-        return this.data.size();
+    public EdgeValueSet(){
+
+    }
+    public EdgeValueSet(byte[] key,byte[] value){
+        this.key = key;
+        this.value = value;
     }
 
     @Override
-    public List<byte[]> key() {
+    public byte[] key() {
         return key;
     }
 
     @Override
-    public List<byte[]> data() {
-        return data;
+    public byte[] value() {
+        return value;
     }
 
-    public void onEdgeValue(byte[] k,byte[] v){
-        key.add(k);
-        data.add(v);
-    }
+
 }

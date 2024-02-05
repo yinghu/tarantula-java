@@ -17,6 +17,7 @@ import com.tarantula.platform.service.cluster.ClusterBatch;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
 
+import java.util.List;
 import java.util.Properties;
 
 
@@ -106,7 +107,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
     public ClusterBatch loadEdgeValueSet(String source, String label, byte[] key){
         TransactionLogManager transactionLogManager = this.tarantulaContext.transactionLogManager(Distributable.DATA_SCOPE);
         Metadata metadata = new LocalMetadata(Distributable.DATA_SCOPE, source,label);
-        Batchable batchable = transactionLogManager.loadEdgeValueFromCommitted(metadata,key);
+        List<Batchable.BatchData> batchable = transactionLogManager.loadEdgeValueFromCommitted(metadata,key);
         return new ClusterBatch(batchable);
     }
 

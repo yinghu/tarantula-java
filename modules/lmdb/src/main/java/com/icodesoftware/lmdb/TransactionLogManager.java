@@ -118,12 +118,12 @@ public class TransactionLogManager implements Closable {
         return null;
     }
 
-    public Batchable loadEdgeValueFromCommitted(Metadata metadata, byte[] key){
+    public List<Batchable.BatchData> loadEdgeValueFromCommitted(Metadata metadata, byte[] key){
         DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
-        EdgeValueSet edgeValueSet = new EdgeValueSet();
+        List<Batchable.BatchData> edgeValueSet = new ArrayList<>();
         if(metadata.label()==null) return edgeValueSet;
         dataStore.backup().forEachEdgeKeyValue(BinaryKey.from(key),metadata.label(),(e,v)->{
-            edgeValueSet.onEdgeValue(e.array(),v.array());
+            edgeValueSet.add(new EdgeValueSet(e.array(),v.array()));
             return true;
         });
         return edgeValueSet;

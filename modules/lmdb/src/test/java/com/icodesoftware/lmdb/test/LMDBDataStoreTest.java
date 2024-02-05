@@ -86,14 +86,15 @@ public class LMDBDataStoreTest {
         testUser.read(bufferProxy);
         Assert.assertEquals(testUser.login,"test001");
         Metadata metadata = new LocalMetadata(Distributable.DATA_SCOPE,"test_user_committed",TestUser.LABEL);
-        Batchable batchable = testMapStoreListener.transactionLogManager.loadEdgeValueFromCommitted(metadata,SnowflakeKey.from(ownerId).asBinary());
+        List<Batchable.BatchData> batchable = testMapStoreListener.transactionLogManager.loadEdgeValueFromCommitted(metadata,SnowflakeKey.from(ownerId).asBinary());
         Assert.assertEquals(batchable.size(),2);
-        List<byte[]> kp = batchable.key();
-        List<byte[]> vp = batchable.data();
+        //List<byte[]> kp = batchable.key();
+        //List<byte[]> vp = batchable.data();
         for(int i=0;i<batchable.size();i++){
             TestUser tx = new TestUser();
-            tx.readKey(BufferProxy.wrap(kp.get(i)));
-            Recoverable.DataBuffer buffer = BufferProxy.wrap(vp.get(i));
+            Batchable.BatchData batchData = batchable.get(i);
+            tx.readKey(BufferProxy.wrap(batchData.key()));
+            Recoverable.DataBuffer buffer = BufferProxy.wrap(batchData.value());
             buffer.readHeader();
             tx.read(buffer);
             Assert.assertTrue(tx.login().startsWith("test00"));

@@ -9,27 +9,23 @@ import com.icodesoftware.service.Batchable;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ClusterBatch implements Batchable, Portable {
 
 
-    private List<byte[]> key = new ArrayList<>();
-
-    private List<byte[]> data = new ArrayList<>();
-
+    private int size;
     private Portable[] batch;
 
     public ClusterBatch(){
     }
 
-    public ClusterBatch(Batchable batchable){
-        key = batchable.key();
-        data = batchable.data();
-        batch = new KeyValueSet[batchable.size()];
+    public ClusterBatch(List<Batchable.BatchData> batchable){
+        this.size = batchable.size();
+        batch = new KeyValueSet[size];
         for(int i=0;i< batchable.size();i++){
-            batch[i]=new KeyValueSet(key.get(i),data.get(i));
+            BatchData data = batchable.get(i);
+            batch[i]=new KeyValueSet(data.key(), data.value());
         }
     }
 
@@ -45,33 +41,27 @@ public class ClusterBatch implements Batchable, Portable {
 
     @Override
     public void writePortable(PortableWriter out) throws IOException {
+        out.writeInt("size",size);
         out.writePortableArray("batch",batch);
     }
 
     @Override
     public void readPortable(PortableReader in) throws IOException {
+        size = in.readInt("size");
         batch = in.readPortableArray("batch");
     }
 
     @Override
     public int size() {
-        int sz = batch.length;
-        for(Portable p : batch){
-            KeyValueSet kv = (KeyValueSet)p;
-            key.add(kv.key);
-            data.add(kv.value);
+        return size;
+    }
+
+    @Override
+    public BatchData[] batch() {
+        BatchData[] batchData = new BatchData[size];
+        for(int i=0;i<size;i++){
+            batchData[i]= (BatchData)batch[i];
         }
-        return sz;
+        return batchData;
     }
-
-    @Override
-    public List<byte[]> data() {
-        return data;
-    }
-
-    @Override
-    public List<byte[]> key() {
-        return key;
-    }
-
 }
