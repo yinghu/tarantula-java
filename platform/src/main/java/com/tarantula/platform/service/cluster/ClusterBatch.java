@@ -19,7 +19,7 @@ public class ClusterBatch implements Batchable, Portable {
 
     private List<byte[]> data = new ArrayList<>();
 
-    private KeyValueSet[] batch;
+    private Portable[] batch;
 
     public ClusterBatch(){
     }
@@ -50,13 +50,14 @@ public class ClusterBatch implements Batchable, Portable {
 
     @Override
     public void readPortable(PortableReader in) throws IOException {
-        batch = (KeyValueSet[])in.readPortableArray("batch");
+        batch = in.readPortableArray("batch");
     }
 
     @Override
     public int size() {
         int sz = batch.length;
-        for(KeyValueSet kv : batch){
+        for(Portable p : batch){
+            KeyValueSet kv = (KeyValueSet)p;
             key.add(kv.key);
             data.add(kv.value);
         }

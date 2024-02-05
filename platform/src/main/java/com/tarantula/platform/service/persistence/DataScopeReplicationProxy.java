@@ -67,8 +67,12 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
         key.rewind();
         byte[] akey = key.array();
         Batchable fromCluster = serviceContext.clusterProvider().recoverService().onRecover(metadata.source(),metadata.label(),akey);
-        if(fromCluster==null) return false;
+        if(fromCluster==null) {
+            logger.warn("No data from cluster");
+            return false;
+        }
         int sz = fromCluster.size();
+        logger.warn("Data from cluster size : "+sz);
         List<byte[]> kx = fromCluster.key();
         List<byte[]> vx = fromCluster.data();
         DataStore dataStore = transactionLogManager().onTransaction(metadata);
