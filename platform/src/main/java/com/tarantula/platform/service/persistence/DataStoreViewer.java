@@ -123,7 +123,8 @@ public class DataStoreViewer implements DataStoreSummary {
         if(dataStore.scope()== Distributable.DATA_SCOPE){
             DistributionDataViewer viewer = (DistributionDataViewer) tarantulaContext.clusterProvider().recoverService();
             viewer.scan(dataStore.name(),akey.asBinary(),(m,k,v)->{
-                //
+                ClusterProvider.Node node = tarantulaContext.clusterProvider().summary().node(m.getUuid());
+                tarantulaContext.log("bbb : "+node.nodeName(), OnLog.WARN);
                 return true;
             });
         }

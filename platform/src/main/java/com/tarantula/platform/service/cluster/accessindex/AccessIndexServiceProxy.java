@@ -181,7 +181,6 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
             },metricsListener);
             if(callResult.successful){
-                logger.warn("Loaded");
                 if(!view.onData(m,key,(byte[])callResult.result)) break;
             }
         }
