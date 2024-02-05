@@ -724,7 +724,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
                     }
                 }
             );
-            //this.integrationCluster.deployService().onCreateGameCluster(gameCluster.distributionId());
         }catch (Exception ex){
             log.error("error on create game cluster",ex);
             gameCluster.message(ex.getMessage());

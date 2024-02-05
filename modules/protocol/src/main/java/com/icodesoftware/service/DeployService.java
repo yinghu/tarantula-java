@@ -14,8 +14,6 @@ public interface DeployService extends ServiceProvider {
     boolean onShutdownApplication(String typeId,long applicationId);
 
 
-    void onCreateGameCluster(long gameClusterId);
-
     boolean onStartGameService(long gameClusterKey);
     boolean onLaunchGameCluster(long gameClusterKey);
     boolean onShutdownGameCluster(long gameClusterKey);

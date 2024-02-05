@@ -62,21 +62,6 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
 
     }
 
-    public void onCreateGameCluster(long gameClusterId){
-        NodeEngine nodeEngine = getNodeEngine();
-        OnCreateGameClusterOperation operation = new OnCreateGameClusterOperation(gameClusterId);
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        for(Member m :mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<Void> future = builder.invoke();
-                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            },metricsListener);
-            if(!result.successful) throw new RuntimeException(result.exception);
-        }
-    }
-
-
     public boolean onUpdateView(OnView onView){
         NodeEngine nodeEngine = getNodeEngine();
         UpdateViewOperation operation = new UpdateViewOperation(onView);

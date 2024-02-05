@@ -100,7 +100,6 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
         void onGameClusterLaunched(long gameClusterId);
         void onGameClusterShutdown(long gameClusterId);
-        void onGameClusterCreated(long gameClusterId);
 
         void onModuleLaunched(String typeId);
         void onModuleShutdown(String typeId);

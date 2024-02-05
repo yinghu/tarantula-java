@@ -59,16 +59,6 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
     }
 
     @Override
-    public void onGameClusterCreated(long gameClusterId) {
-        GameCluster gameCluster = this.tarantulaContext.loadGameCluster(gameClusterId);
-        if(gameCluster==null){
-            log.warn("No game cluster found ["+gameClusterId+"]");
-            return;
-        }
-        gameCluster.setup(this.tarantulaContext);
-    }
-
-    @Override
     public void onModuleLaunched(String typeId) {
         AccessIndex accessIndex = this.tarantulaContext.clusterProvider().accessIndexService().get(typeId);
         this.tarantulaContext.setOnLobby(typeId,accessIndex.distributionId(),new OnLobbyListener(platformDeploymentServiceProvider));

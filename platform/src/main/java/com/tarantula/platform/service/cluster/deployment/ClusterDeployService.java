@@ -60,10 +60,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void destroyDistributedObject(String s) {
     }
 
-    public void onCreateGameCluster(long gameClusterId){
-        this.deploymentServiceProvider.distributionCallback().onGameClusterCreated(gameClusterId);
-    }
-
     public void onUpdateView(OnView onView){
         this.deploymentServiceProvider.distributionCallback().onViewUpdated(onView);
     }
