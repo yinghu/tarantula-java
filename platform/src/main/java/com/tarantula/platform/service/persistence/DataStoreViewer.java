@@ -1,12 +1,13 @@
 package com.tarantula.platform.service.persistence;
 
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Recoverable;
-import com.icodesoftware.RecoverableRegistry;
+import com.icodesoftware.*;
 
+import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.DataStoreSummary;
 import com.icodesoftware.util.BinaryKey;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.service.cluster.accessindex.DistributionAccessIndexViewer;
+import com.tarantula.platform.service.cluster.recover.DistributionDataViewer;
 
 import java.util.Base64;
 import java.util.List;
@@ -109,15 +110,22 @@ public class DataStoreViewer implements DataStoreSummary {
 
     public void load(byte[] key, DataStoreSummary.View view){
         BinaryKey akey = new BinaryKey(Base64.getDecoder().decode(key));
-        System.out.println("DB : "+dataStore.name()+" : "+dataStore.scope());
-        this.dataStore.backup().get(akey,(k,v)->{
-            Recoverable.DataHeader h = v.readHeader();
-            RecoverableRegistry registry = tarantulaContext.recoverableRegistry(h.factoryId());
-            Recoverable recoverable = registry.create(h.classId());
-            recoverable.read(v);
-            recoverable.readKey(k);
-            view.on(null,h,recoverable);
-            return true;
-        });
+        if(dataStore.scope()== Distributable.INTEGRATION_SCOPE){
+            DistributionAccessIndexViewer viewer = (DistributionAccessIndexViewer) tarantulaContext.clusterProvider().accessIndexService();
+            viewer.scan(akey.asBinary(),(m,k,v)->{
+                ClusterProvider.Node node = tarantulaContext.clusterProvider().summary().node(m.getUuid());
+                tarantulaContext.log("aaa : "+node.nodeName(), OnLog.WARN);
+                //view.on(null,v.readHeader(),)
+                return true;
+            });
+            return;
+        }
+        if(dataStore.scope()== Distributable.DATA_SCOPE){
+            DistributionDataViewer viewer = (DistributionDataViewer) tarantulaContext.clusterProvider().recoverService();
+            viewer.scan(dataStore.name(),akey.asBinary(),(m,k,v)->{
+                //
+                return true;
+            });
+        }
     }
 }

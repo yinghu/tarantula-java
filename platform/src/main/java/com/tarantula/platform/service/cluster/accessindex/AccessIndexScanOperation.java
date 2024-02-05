@@ -7,19 +7,16 @@ import com.hazelcast.spi.PartitionAwareOperation;
 
 import java.io.IOException;
 
-public class AccessIndexLoadOperation extends Operation implements PartitionAwareOperation {
+public class AccessIndexScanOperation extends Operation implements PartitionAwareOperation {
 
-
-    private String source;
 
     private byte[] key;
     private byte[] value;
-    public AccessIndexLoadOperation() {
+    public AccessIndexScanOperation() {
     }
 
 
-    public AccessIndexLoadOperation(String source, byte[] key) {
-        this.source = source;
+    public AccessIndexScanOperation(byte[] key) {
         this.key = key;
     }
     @Override
@@ -36,14 +33,12 @@ public class AccessIndexLoadOperation extends Operation implements PartitionAwar
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-        out.writeUTF(source);
         out.writeByteArray(key);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        this.source = in.readUTF();
         this.key = in.readByteArray();
     }
 }

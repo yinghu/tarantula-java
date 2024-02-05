@@ -6,12 +6,15 @@ import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.icodesoftware.AccessIndex;
+import com.icodesoftware.DataStore;
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 
 import com.tarantula.platform.TarantulaContext;
 
+import com.tarantula.platform.service.cluster.ClusterDataView;
 import com.tarantula.platform.service.cluster.ClusterUtil;
 
 import java.util.Set;
@@ -167,16 +170,20 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
 
     //DistributionAccessIndexViewer methods
     @Override
-    public byte[] load(String source, byte[] key, ClusterProvider.Node node) {
+    public void scan(byte[] key, ClusterDataView view) {
         NodeEngine nodeEngine = getNodeEngine();
-        AccessIndexLoadOperation operation = new AccessIndexLoadOperation(source,key);
-        Member m = nodeEngine.getClusterService().getMember(node.memberId());
-        if(m==null) return null;
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
-        ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-            Future<byte[]> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        },metricsListener);
-        return callResult.successful?(byte[])callResult.result:null;
+        AccessIndexScanOperation operation = new AccessIndexScanOperation(key);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        for(Member m : mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
+            ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<byte[]> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            },metricsListener);
+            if(callResult.successful){
+                logger.warn("Loaded");
+                if(!view.onData(m,key,(byte[])callResult.result)) break;
+            }
+        }
     }
 }

@@ -9,6 +9,7 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.service.cluster.ClusterDataView;
 import com.tarantula.platform.service.cluster.ClusterUtil;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -195,16 +196,19 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
 
     //DistributionDataViewer method
     @Override
-    public byte[] load(String source, byte[] key, ClusterProvider.Node node) {
+    public void scan(String source, byte[] key, ClusterDataView view) {
         NodeEngine nodeEngine = getNodeEngine();
-        Member m = nodeEngine.getClusterService().getMember(node.memberId());
-        if(m==null) return null;
-        LoadDataOperation operation = new LoadDataOperation(source,key);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
-        ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-            Future<byte[]> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        },metricsListener);
-        return callResult.successful?(byte[])callResult.result:null;
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        for(Member m : mlist){
+            LoadDataOperation operation = new LoadDataOperation(source,key);
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
+            ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<byte[]> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            },metricsListener);
+            if(callResult.successful){
+                if(!view.onData(m,key,(byte[])callResult.result)) break;
+            }
+        }
     }
 }

@@ -39,12 +39,12 @@ public class ClusterSummary extends RecoverableObject implements ClusterProvider
     //operations
     public void register(ClusterProvider.Node node){
         nodeList.put(node.nodeName(),node);
-        //nodeList.put(node.memberId(),node);
+        nodeList.put(node.memberId(),node);
     }
     public void unregister(ClusterProvider.Node node){
         ClusterProvider.Node removed = nodeList.remove(node.nodeName());
-        //if(removed==null) return;
-        //nodeList.remove(removed.memberId());
+        if(removed==null) return;
+        nodeList.remove(removed.memberId());
     }
 
     public ClusterProvider.Node node(String nodeName){
