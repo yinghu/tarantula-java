@@ -32,7 +32,7 @@ public class RecoverEdgeOperation extends Operation {
 
     @Override
     public Object getResponse() {
-        return this.value.size()==0? null : this.value;
+        return this.value;
     }
 
     @Override
