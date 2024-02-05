@@ -10,7 +10,6 @@ import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.event.TransactionReplicationEvent;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DataScopeReplicationProxy extends ScopedReplicationProxy {
@@ -69,11 +68,11 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
         byte[] akey = key.array();
         Batchable fromCluster = serviceContext.clusterProvider().recoverService().onRecover(metadata.source(),metadata.label(),akey);
         if(fromCluster==null) {
-            logger.warn("No data from cluster");
+            //logger.warn("No data from cluster");
             return false;
         }
         int sz = fromCluster.size();
-        logger.warn("Data from cluster size : "+sz);
+        //logger.warn("Data from cluster size : "+sz);
         Batchable.BatchData[] batch = fromCluster.batch();
         DataStore dataStore = transactionLogManager().onTransaction(metadata);
         for(int i=0;i<sz;i++){

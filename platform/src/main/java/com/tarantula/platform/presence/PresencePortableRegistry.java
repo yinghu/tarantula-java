@@ -60,9 +60,6 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
     public static final int PERSONAL_DATA_OBJECT_CID = 20;
 
     public static final int DEVICE_SAVE_INDEX_CID = 21;
-
-    public static final int PLAYER_SESSION_INDEX_CID = 22;
-
     public static final int MAPPING_OBJECT_CID = 23;
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
@@ -137,9 +134,6 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
                 break;
             case DEVICE_SAVE_INDEX_CID:
                 pt = new DeviceSaveIndex();
-                break;
-            case PLAYER_SESSION_INDEX_CID:
-                pt = new PlayerSessionIndex();
                 break;
             case MAPPING_OBJECT_CID:
                 pt = new MappingObject();

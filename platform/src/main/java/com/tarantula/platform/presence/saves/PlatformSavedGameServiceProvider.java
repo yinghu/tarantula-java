@@ -140,21 +140,12 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
     }
 
     public void checkSavedGame(String systemId){
-        //PlayerSessionIndex playerSessionIndex = playerSessionIndex(systemId);
-        //playerSessionIndex.check(saveTimeout,selected-> platformGameServiceProvider.presenceServiceProvider().expireSavedGame(selected));
-        //free previous save selection
     }
     private PlayerSaveIndex playerSaveIndex(String indexId){
         PlayerSaveIndex playerSaveIndex = new PlayerSaveIndex(indexId);
         this.dataStore.createIfAbsent(playerSaveIndex,true);
         playerSaveIndex.dataStore(this.dataStore);
         return playerSaveIndex;
-    }
-    private PlayerSessionIndex playerSessionIndex(String systemId){
-        PlayerSessionIndex playerSessionIndex = new PlayerSessionIndex(systemId);
-        this.dataStore.createIfAbsent(playerSessionIndex,true);
-        playerSessionIndex.dataStore(dataStore);
-        return playerSessionIndex;
     }
 
 
