@@ -121,7 +121,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
         void onAccessIndexDisabled();
         void onAccessIndexEnabled();
 
-        void onConfigurableUpdated(String key);
+        //void onConfigurableUpdated(String key);
 
     }
 

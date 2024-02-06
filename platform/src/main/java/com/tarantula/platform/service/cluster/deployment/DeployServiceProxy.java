@@ -251,23 +251,6 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         return expected==0;
     }
 
-    public boolean onUpdateConfigurable(String key){
-        NodeEngine nodeEngine = getNodeEngine();
-        DataSyncOperation operation = new DataSyncOperation(key);
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        int expected = mlist.size();
-        for(Member m :mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<Void> future = builder.invoke();
-                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            },metricsListener);
-            if(result.successful) expected--;
-        }
-        return expected==0;
-    }
-
-
     public void onRegisterConnection(Connection connection){
         NodeEngine nodeEngine = getNodeEngine();
         RegisterConnectionOperation operation = new RegisterConnectionOperation(connection.configurationTypeId(),connection);

@@ -26,8 +26,7 @@ public interface DeployService extends ServiceProvider {
     boolean onUpdateModule(Descriptor descriptor);
     boolean onDeployModule(String context,String moduleFile);
 
-    boolean onUpdateConfigurable(String key);
-
+    //boolean onUpdateConfigurable(String key);
     //boolean onRegisterChannel(String typeId,Channel channel);
     void onVerifyConnection(String typeId,String serverId);
     void onRegisterConnection(Connection connection);

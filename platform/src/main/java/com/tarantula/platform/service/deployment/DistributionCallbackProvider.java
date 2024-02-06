@@ -250,12 +250,5 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
         platformDeploymentServiceProvider.aListeners.forEach((a)->a.onStart());
     }
 
-    @Override
-    public void onConfigurableUpdated(String key) {
-        if(platformDeploymentServiceProvider.vMap.containsKey(key)){
-            Configurable configurable = platformDeploymentServiceProvider.vMap.get(key);
-            configurable.updated(new ServiceContextProxy(this.tarantulaContext));
-        }
-    }
 
 }
