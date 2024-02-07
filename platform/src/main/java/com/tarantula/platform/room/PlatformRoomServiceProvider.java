@@ -175,7 +175,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         return gameZoneIndex.get(zoneId).gameZone;
     }
 
-    public GameRoom join(Rating rating, GameZone gameZone){
+    public GameRoom join(Stub rating, GameZone gameZone){
         GameZoneIndex index = gameZoneIndex.get(gameZone.distributionKey());
         GameRoom gameRoom = dedicated?remoteJoin(rating,index):localJoin(rating,index);
         return gameRoom;
@@ -187,7 +187,10 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
         Channel channel = udpEndpoint.channel(stub.sessionId);
         if(channel!=null) channel.close();
-        localLeave(stub.distributionId(),index,stub.roomId,(room,entry)->{});
+        localLeave(stub.distributionId(),index,stub.roomId,(room,entry)->{
+            if(room.totalJoined() != room.totalLeft()) return;
+            resetGameRoom(index,room,true);
+        });
     }
 
     @Override
@@ -532,8 +535,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         gameRoom.leave(systemId,listener);
     }
 
-    private GameRoom joinGameRoom(GameZoneIndex index, GameRoom gameRoom, Rating rating){
-        GameRoom joined = gameRoom.join(rating.distributionId(),(room,entry)->{
+    private GameRoom joinGameRoom(GameZoneIndex index, GameRoom gameRoom, Stub stub){
+        GameRoom joined = gameRoom.join(stub.distributionId(),(room,entry)->{
             if(room.available()){
                 index.runningRooms.addFirst(room);
             }
@@ -541,17 +544,17 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         //joined.setup(index.gameZone,null,rating);
         return joined;
     }
-    private GameRoom localJoin(Rating rating, GameZoneIndex index){
+    private GameRoom localJoin(Stub stub, GameZoneIndex index){
         GameRoom gameRoom = index.runningRooms.poll();
-        if(gameRoom != null) return joinGameRoom(index,gameRoom,rating);
+        if(gameRoom != null) return joinGameRoom(index,gameRoom,stub);
         gameRoom = index.pendingRooms.poll();
-        if(gameRoom != null) return joinGameRoom(index,gameRoom,rating);
+        if(gameRoom != null) return joinGameRoom(index,gameRoom,stub);
         gameRoom = createGameRoom(index,false);
         if(gameRoom == null) return null;
-        return joinGameRoom(index,gameRoom,rating);
+        return joinGameRoom(index,gameRoom,stub);
     }
 
-    private GameRoom remoteJoin(Rating rating, GameZoneIndex gameZoneIndex){
+    private GameRoom remoteJoin(Stub stub, GameZoneIndex gameZoneIndex){
         GameZone gameZone = gameZoneIndex.gameZone;
         ConnectionStub connectionStub = gameZoneIndex.pendingConnections.poll();
         if(connectionStub==null){

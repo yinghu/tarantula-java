@@ -25,14 +25,9 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     @Override
     public Stub join(Session session) {
         if(!started) return new Stub("lobby not started");
-        //Stub stub = gameServiceProvider.presenceServiceProvider().stub(session,application);
-        //if(stub.joined()) {
-            //stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));
-            //return stub;
-        //}
         Rating rating = gameServiceProvider.presenceServiceProvider().rating(session);
         GameZone _zone = gameZone(rating);
-        return _zone.join(session,rating);
+        return _zone.join(session);
     }
 
     @Override

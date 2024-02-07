@@ -125,10 +125,6 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
             loaded[0].xp = 100;
             mDataStore.create(loaded[0]);
         }
-        //this.platformGameServiceProvider.savedGameServiceProvider().createIfAbsent(session,rating);
-        //if(rating.granted) return rating;
-        //rating.granted = this.platformGameServiceProvider.resourceServiceProvider().initializeInventory(session.systemId());
-        //rating.update();
         loaded[0].dataStore(mDataStore);
         return loaded[0];
     }

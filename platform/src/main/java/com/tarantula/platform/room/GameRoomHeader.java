@@ -227,7 +227,9 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
 
     public void leave(long systemId,Listener listener){
         Entry entry = joinIndex.remove(systemId);
-        if(entry == null) return;
+        if(entry == null){
+            return;
+        }
         synchronized (entries){
             entries[entry.seat()].reset();
             totalLeft++;
@@ -257,7 +259,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
 
     public void reset(){
-        //if(gameModule!=null) gameModule.reset();
         if(pendingChannels!=null) pendingChannels.clear();
         joinIndex.clear();
         for(int i=0;i<capacity;i++){

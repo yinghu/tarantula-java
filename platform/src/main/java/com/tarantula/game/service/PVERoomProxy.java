@@ -11,9 +11,9 @@ public class PVERoomProxy extends RoomProxyHeader {
         super.setup(applicationContext,gameLobby,gameZone);
     }
     @Override
-    public Stub join(Session session, Rating rating) {
+    public Stub join(Session session) {
         Stub stub = gameServiceProvider.presenceServiceProvider().stub(session,application);
-        GameRoom room = this.gameServiceProvider.roomServiceProvider().join(rating,gameZone);
+        GameRoom room = this.gameServiceProvider.roomServiceProvider().join(stub,gameZone);
         stub.joined(room!=null);
         if(!stub.joined()) return stub;
         stub.room = room;

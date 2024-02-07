@@ -1,7 +1,6 @@
 package com.tarantula.game.service;
 
 import com.icodesoftware.ApplicationContext;
-import com.icodesoftware.Rating;
 import com.icodesoftware.Session;
 import com.tarantula.game.*;
 import com.tarantula.platform.room.GameRoom;
@@ -13,13 +12,9 @@ public class PVPRoomProxy extends RoomProxyHeader{
         super.setup(applicationContext,gameLobby,gameZone);
     }
     @Override
-    public Stub join(Session session, Rating rating) {
+    public Stub join(Session session) {
         Stub stub = gameServiceProvider.presenceServiceProvider().stub(session,application);
-        //stub.distributionKey(session.distributionKey());
-        //stub.stub(session.stub());
-        //stub.label(application.tag());
-        //this.dataStore.createIfAbsent(stub,true);
-        GameRoom room = gameServiceProvider.roomServiceProvider().join(rating,gameZone);
+        GameRoom room = gameServiceProvider.roomServiceProvider().join(stub,gameZone);
         stub.joined(room!=null);
         if(!stub.joined()) return stub;
         stub.roomId = room.roomId();
