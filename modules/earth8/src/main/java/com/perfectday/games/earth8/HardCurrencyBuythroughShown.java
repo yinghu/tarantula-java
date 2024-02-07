@@ -4,8 +4,6 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.perfectday.games.earth8.analytics.HardCurrencyBuythroughShownTransaction;
-import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.TarantulaLogger;
 
 public class HardCurrencyBuythroughShown extends BattleUpdate{
     public String currency;
@@ -24,14 +22,10 @@ public class HardCurrencyBuythroughShown extends BattleUpdate{
         
         return buythroughShown;
     }
-    
-    private static TarantulaLogger log = JDKLogger.getLogger(HardCurrencyBuythroughShown.class);
 
     @Override
     protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session) {
-        HardCurrencyBuythroughShownTransaction transaction = new HardCurrencyBuythroughShownTransaction(session, currency, trigger);
-        pendingAnalytics.add(transaction);
-        log.info(transaction.toString());
+        pendingAnalytics.add(new HardCurrencyBuythroughShownTransaction(session, currency, trigger));
         return true;
     }
 }
