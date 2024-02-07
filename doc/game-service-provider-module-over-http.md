@@ -304,6 +304,16 @@ public class BattleTransaction extends RecoverableObject {
      redeemer.redeem(applicationPreSetup,resource);
 ```
 
+### 3.4 Remove stock (inventory item) from inventory
+```
+    long stockId = 1234;
+    Inventory inventory = applicationPreSetup.inventory(session.distributionId(),"Hero");
+    Inventory.Stock removed = inventory.stock(stockId);
+    if(removed!=null){
+        inventory.removeStock(removed);
+    }
+```
+
 ### 4. Tournament Operation
 
 ```
@@ -320,6 +330,7 @@ public class BattleTransaction extends RecoverableObject {
 ```
     gameContext.onMetrics("totalBattle",1);
 ```
+
 ### 6. Send Event Out Via External Webhook
 #### 6.1 Do not call webhook on callback thread. 
 ```
@@ -380,7 +391,10 @@ public class BattleTransaction extends RecoverableObject {
 
 ```
     public void startGame(Session session, byte[] payload) throws Exception{
-            
+        //parse payload if client HTTP POST 
+        //process payload
+        //send response back
+        //pocess after response           
     } 
 ```
 
@@ -389,7 +403,10 @@ public class BattleTransaction extends RecoverableObject {
 
 ```
     public void updateGame(Session session, byte[] payload) throws Exception{
-    
+        //parse payload if client HTTP POST 
+        //process payload
+        //send response back
+        //pocess after response
     } 
 ```
 
@@ -398,7 +415,10 @@ public class BattleTransaction extends RecoverableObject {
 
 ```
     public void endGame(Session session, byte[] payload) throws Exception{
-    
+        //parse payload if client HTTP POST 
+        //process payload
+        //send response back
+        //pocess after response
     } 
 ```
 
