@@ -20,7 +20,7 @@
 ### 8. Multiple Layer Access Control Policy
 ### 9. Distributed Application/Game Deployment
 ### 10. Stop-Less Module Deployment Support
-### 11. Pure JAVA Implmentation With High Concurrecy Throughput
+### 11. Pure JAVA Implementation With High Concurrency Throughput
 ### 12. Hot Runtime Deployment Support 
 
 # Document List
@@ -35,7 +35,7 @@
 [Setup](doc/setup.md)
 
 ## How to write a game module
-[Module](doc/module.md)
+[Game Service Provider Module Over HTTP](doc/game-service-provider-module-over-http.md)
 
 ## How to run as a cluster
 [Clustering](doc/cluster.md)
