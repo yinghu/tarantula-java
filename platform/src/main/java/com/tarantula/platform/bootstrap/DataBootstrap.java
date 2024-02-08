@@ -42,10 +42,10 @@ public class DataBootstrap {
         try(BufferedOutputStream toFile = new BufferedOutputStream(new FileOutputStream("./data.mdb"))){
             DataBatch dataBatch = doBackup(httpCaller,token);
             for(int i=0;i<dataBatch.batch;i++) {
-                byte[] data = doBatchDownload(httpCaller, host, token, dataBatch.fileName, i,BATCH_SIZE);
+                byte[] data = doBatchDownload(httpCaller, host, token, dataBatch.fileName, i*BATCH_SIZE,BATCH_SIZE);
                 toFile.write(data);
             }
-            byte[] data = doBatchDownload(httpCaller,host,token,dataBatch.fileName, dataBatch.batch,dataBatch.remaining);
+            byte[] data = doBatchDownload(httpCaller,host,token,dataBatch.fileName, dataBatch.batch*BATCH_SIZE,dataBatch.remaining);
             toFile.write(data);
         }
     }

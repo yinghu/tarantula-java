@@ -28,9 +28,11 @@ public class DataBootstrapOperation implements PendingOperation {
     @Override
     public void execute(OnExchange exchange) throws Exception{
         RandomAccessFile buffer = new RandomAccessFile(fileName,"r");
+        System.out.println("OFFSET : "+offset+" : "+size+" : "+buffer.length());
         byte[] payload = new byte[size];
         buffer.seek(offset);
         buffer.read(payload);
+        buffer.close();
         exchange.onStream(new ByteArrayInputStream(payload));
     }
 }
