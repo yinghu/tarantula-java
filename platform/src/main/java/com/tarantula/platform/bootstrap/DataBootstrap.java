@@ -20,7 +20,7 @@ public class DataBootstrap {
         run("dev/root","root","http://localhost:8090");
     }
 
-    private static final int BATCH_SIZE = 1_048_576; //1mb
+    private static final int BATCH_SIZE = 1_000_000; //1mb
     public static void run(String user,String password,String host) throws Exception{
 
         HttpCaller httpCaller = new HttpCaller(host);
