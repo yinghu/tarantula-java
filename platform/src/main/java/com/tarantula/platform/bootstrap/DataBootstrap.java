@@ -8,6 +8,8 @@ import com.icodesoftware.service.Batchable;
 import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URI;
@@ -75,7 +77,8 @@ public class DataBootstrap {
                 .headers(headers)
                 .GET()
                 .build();
-        FileOutputStream out = new FileOutputStream("./data."+offset+".mdb");
+        //BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream("./data."+offset+".mdb"));
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         int code = httpCaller.request(client->{
             HttpResponse<InputStream> _response = client.send(_request, HttpResponse.BodyHandlers.ofInputStream());
             InputStream input = _response.body();
@@ -88,5 +91,7 @@ public class DataBootstrap {
             return _response.statusCode();
         });
         if(code!=200) throw new RuntimeException("failed to load initial data from ["+host+"]");
+        System.out.println("Read ["+offset+" : "+size+"]");
+        
     }
 }
