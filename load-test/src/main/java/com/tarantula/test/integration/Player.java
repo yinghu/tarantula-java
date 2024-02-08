@@ -209,7 +209,7 @@ public class Player implements Runnable{
     }
 
     private void onJoin(String resp) throws Exception{
-        System.out.println(resp);
+        //System.out.println(resp);
         JsonObject joinPayload = JsonUtil.parse(resp);
         boolean suc = joinPayload.get("Successful").getAsBoolean();
         if(!suc){
