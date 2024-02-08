@@ -90,7 +90,7 @@ public class DataBootstrap {
             return _response.statusCode();
         });
         if(code!=200) throw new RuntimeException("failed to load initial data from ["+host+"]");
-        System.out.println("Read ["+offset+" : "+size+"]");
+        System.out.println("Batch data read offset : ["+ offset +"] size :  ["+size+"] from ["+host+"]");
         byte[] ret = out.toByteArray();
         out.close();
         return ret;
