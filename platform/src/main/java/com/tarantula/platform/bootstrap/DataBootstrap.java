@@ -35,11 +35,24 @@ public class DataBootstrap {
 
         if(!token.get("Successful").getAsBoolean()) throw new RuntimeException(token.toString());
 
-        headers = new String[]{
+
+        doBackup(httpCaller,token);
+        //doBatchDownload(httpCaller,host,token);
+
+    }
+    private static void doBackup(HttpCaller httpCaller,JsonObject token) throws Exception{
+        String[] headers = new String[]{
+                Session.TARANTULA_TOKEN,token.get("Token").getAsString(),
+                Session.TARANTULA_ACTION,"onDataBackup"
+        };
+        JsonObject json = JsonUtil.parse(httpCaller.get("development",headers));
+        System.out.println(json.toString());
+    }
+    private static void doBatchDownload(HttpCaller httpCaller,String host,JsonObject token) throws Exception{
+        String[] headers = new String[]{
                 Session.TARANTULA_TOKEN,token.get("Token").getAsString(),
                 Session.TARANTULA_ACTION,"onDataBootstrap"
         };
-
         HttpRequest _request = HttpRequest.newBuilder()
                 .uri(URI.create(host+"/development"))
                 .timeout(Duration.ofSeconds(HttpCaller.TIME_OUT*10))
@@ -59,6 +72,5 @@ public class DataBootstrap {
             return _response.statusCode();
         });
         if(code!=200) throw new RuntimeException("failed to load initial data from ["+host+"]");
-
     }
 }
