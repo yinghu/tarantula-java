@@ -39,12 +39,15 @@ public class DataBootstrap {
         JsonObject token = JsonUtil.parse(httpCaller.post("user/action",payload.toString().getBytes(),headers));
 
         if(!token.get("Successful").getAsBoolean()) throw new RuntimeException(token.toString());
-
-        DataBatch dataBatch = doBackup(httpCaller,token);
-        for(int i=0;i<dataBatch.batch;i++) {
-            doBatchDownload(httpCaller, host, token, dataBatch.fileName, i,BATCH_SIZE);
+        try(BufferedOutputStream toFile = new BufferedOutputStream(new FileOutputStream("./data.mdb"))){
+            DataBatch dataBatch = doBackup(httpCaller,token);
+            for(int i=0;i<dataBatch.batch;i++) {
+                byte[] data = doBatchDownload(httpCaller, host, token, dataBatch.fileName, i,BATCH_SIZE);
+                toFile.write(data);
+            }
+            byte[] data = doBatchDownload(httpCaller,host,token,dataBatch.fileName, dataBatch.batch,dataBatch.remaining);
+            toFile.write(data);
         }
-        doBatchDownload(httpCaller,host,token,dataBatch.fileName, dataBatch.batch,dataBatch.remaining);
     }
     private static DataBatch doBackup(HttpCaller httpCaller,JsonObject token) throws Exception{
         String[] headers = new String[]{
@@ -54,7 +57,6 @@ public class DataBootstrap {
         JsonObject json = JsonUtil.parse(httpCaller.get("development",headers));
         String file = json.get("file").getAsString();
         int size = json.get("size").getAsInt();
-        System.out.println("TOTAL : "+size);
         int offset = 1;
         do{
             size = size-BATCH_SIZE;
@@ -64,7 +66,7 @@ public class DataBootstrap {
         }while(size>BATCH_SIZE);
         return new DataBatch(file,offset,size);
     }
-    private static void doBatchDownload(HttpCaller httpCaller,String host,JsonObject token,String fileName,int offset,int size) throws Exception{
+    private static byte[] doBatchDownload(HttpCaller httpCaller,String host,JsonObject token,String fileName,int offset,int size) throws Exception{
         String[] headers = new String[]{
                 Session.TARANTULA_TOKEN,token.get("Token").getAsString(),
                 Session.TARANTULA_ACTION,"onDataBootstrap",
@@ -76,7 +78,6 @@ public class DataBootstrap {
                 .headers(headers)
                 .GET()
                 .build();
-        //BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream("./data."+offset+".mdb"));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         int code = httpCaller.request(client->{
             HttpResponse<InputStream> _response = client.send(_request, HttpResponse.BodyHandlers.ofInputStream());
@@ -86,13 +87,12 @@ public class DataBootstrap {
                 b = input.read();
                 if(b!=-1) out.write(b);
             }while (b!=-1);
-            out.close();
             return _response.statusCode();
         });
         if(code!=200) throw new RuntimeException("failed to load initial data from ["+host+"]");
         System.out.println("Read ["+offset+" : "+size+"]");
-        try(BufferedOutputStream toFile = new BufferedOutputStream(new FileOutputStream("./data."+offset+".mdb"))){
-            toFile.write(out.toByteArray());
-        }
+        byte[] ret = out.toByteArray();
+        out.close();
+        return ret;
     }
 }
