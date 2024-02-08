@@ -40,12 +40,11 @@ public class DataBootstrap {
 
         if(!token.get("Successful").getAsBoolean()) throw new RuntimeException(token.toString());
 
-
         DataBatch dataBatch = doBackup(httpCaller,token);
         for(int i=0;i<dataBatch.batch;i++) {
             doBatchDownload(httpCaller, host, token, dataBatch.fileName, i,BATCH_SIZE);
         }
-        doBatchDownload(httpCaller,host,token,dataBatch.fileName, dataBatch.batch+1,dataBatch.remaining);
+        doBatchDownload(httpCaller,host,token,dataBatch.fileName, dataBatch.batch,dataBatch.remaining);
     }
     private static DataBatch doBackup(HttpCaller httpCaller,JsonObject token) throws Exception{
         String[] headers = new String[]{
@@ -92,6 +91,8 @@ public class DataBootstrap {
         });
         if(code!=200) throw new RuntimeException("failed to load initial data from ["+host+"]");
         System.out.println("Read ["+offset+" : "+size+"]");
-        
+        try(BufferedOutputStream toFile = new BufferedOutputStream(new FileOutputStream("./data."+offset+".mdb"))){
+            toFile.write(out.toByteArray());
+        }
     }
 }
