@@ -30,14 +30,14 @@ public class DevelopmentEventHandler extends AbstractRequestHandler {
         super.onRequest(exchange);
         String token = exchange.header(Session.TARANTULA_TOKEN);
         String action = exchange.header(Session.TARANTULA_ACTION);
-        String name = exchange.header(Session.TARANTULA_NAME);
+        String query = exchange.header(Session.TARANTULA_NAME);
         OnSession onSession = tokenValidator.tokenValidator().validateToken(token);
         if(action.equals("onDataBackup")){
             uMap.put(exchange.id(),new DataBackupOperation(this.deploymentServiceProvider));
             checkPermission(onSession,exchange.id(),"role/sudo");
         }
         else if(action.equals("onDataBootstrap")) {
-            uMap.put(exchange.id(),new DataBootstrapOperation(this.deploymentServiceProvider));
+            uMap.put(exchange.id(),new DataBootstrapOperation(this.deploymentServiceProvider,query));
             checkPermission(onSession,exchange.id(),"role/sudo");
         }
         else if(action.equals("onDevelopment")){

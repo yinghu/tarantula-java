@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.Batchable;
 import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
 
@@ -38,11 +39,13 @@ public class DataBootstrap {
         if(!token.get("Successful").getAsBoolean()) throw new RuntimeException(token.toString());
 
 
-        doBackup(httpCaller,token);
-        //doBatchDownload(httpCaller,host,token);
-
+        DataBatch dataBatch = doBackup(httpCaller,token);
+        for(int i=0;i<dataBatch.batch;i++) {
+            doBatchDownload(httpCaller, host, token, dataBatch.fileName, i,BATCH_SIZE);
+        }
+        doBatchDownload(httpCaller,host,token,dataBatch.fileName, dataBatch.batch+1,dataBatch.remaining);
     }
-    private static void doBackup(HttpCaller httpCaller,JsonObject token) throws Exception{
+    private static DataBatch doBackup(HttpCaller httpCaller,JsonObject token) throws Exception{
         String[] headers = new String[]{
                 Session.TARANTULA_TOKEN,token.get("Token").getAsString(),
                 Session.TARANTULA_ACTION,"onDataBackup"
@@ -51,20 +54,20 @@ public class DataBootstrap {
         String file = json.get("file").getAsString();
         int size = json.get("size").getAsInt();
         System.out.println("TOTAL : "+size);
-        int offset = 0;
+        int offset = 1;
         do{
             size = size-BATCH_SIZE;
             if(size>BATCH_SIZE){
                 offset++;
             }
         }while(size>BATCH_SIZE);
-        System.out.println("OFFSET : "+offset+" Remaining : "+size);
-        System.out.println("ADDED :"+((offset*BATCH_SIZE)+size));
+        return new DataBatch(file,offset,size);
     }
-    private static void doBatchDownload(HttpCaller httpCaller,String host,JsonObject token) throws Exception{
+    private static void doBatchDownload(HttpCaller httpCaller,String host,JsonObject token,String fileName,int offset,int size) throws Exception{
         String[] headers = new String[]{
                 Session.TARANTULA_TOKEN,token.get("Token").getAsString(),
-                Session.TARANTULA_ACTION,"onDataBootstrap"
+                Session.TARANTULA_ACTION,"onDataBootstrap",
+                Session.TARANTULA_NAME,fileName+"#"+offset+"#"+size
         };
         HttpRequest _request = HttpRequest.newBuilder()
                 .uri(URI.create(host+"/development"))
@@ -72,7 +75,7 @@ public class DataBootstrap {
                 .headers(headers)
                 .GET()
                 .build();
-        FileOutputStream out = new FileOutputStream("./data.mdb");
+        FileOutputStream out = new FileOutputStream("./data."+offset+".mdb");
         int code = httpCaller.request(client->{
             HttpResponse<InputStream> _response = client.send(_request, HttpResponse.BodyHandlers.ofInputStream());
             InputStream input = _response.body();
