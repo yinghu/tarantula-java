@@ -57,10 +57,13 @@ public class DataBootstrap {
         JsonObject json = JsonUtil.parse(httpCaller.get("development",headers));
         String file = json.get("file").getAsString();
         int size = json.get("size").getAsInt();
-        int offset = 1;
+        if(size<=BATCH_SIZE){
+            return new DataBatch(file,0,size);
+        }
+        int offset = 0;
         do{
-            size = size-BATCH_SIZE;
             if(size>BATCH_SIZE){
+                size = size-BATCH_SIZE;
                 offset++;
             }
         }while(size>BATCH_SIZE);
