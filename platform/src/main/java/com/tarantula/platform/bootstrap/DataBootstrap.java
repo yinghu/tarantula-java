@@ -19,6 +19,8 @@ public class DataBootstrap {
     public static void main(String[] args) throws Exception{
         run("dev/root","root","http://localhost:8090");
     }
+
+    private static final int BATCH_SIZE = 1_048_576; //1mb
     public static void run(String user,String password,String host) throws Exception{
 
         HttpCaller httpCaller = new HttpCaller(host);
@@ -45,18 +47,19 @@ public class DataBootstrap {
                 Session.TARANTULA_TOKEN,token.get("Token").getAsString(),
                 Session.TARANTULA_ACTION,"onDataBackup"
         };
-        int batch = 1_048_576;//1m
         JsonObject json = JsonUtil.parse(httpCaller.get("development",headers));
         String file = json.get("file").getAsString();
         int size = json.get("size").getAsInt();
+        System.out.println("TOTAL : "+size);
         int offset = 0;
         do{
-            size = size-batch;
-            if(size>batch){
+            size = size-BATCH_SIZE;
+            if(size>BATCH_SIZE){
                 offset++;
             }
-        }while(size>batch);
-        System.out.println("OFFSET : "+offset);
+        }while(size>BATCH_SIZE);
+        System.out.println("OFFSET : "+offset+" Remaining : "+size);
+        System.out.println("ADDED :"+((offset*BATCH_SIZE)+size));
     }
     private static void doBatchDownload(HttpCaller httpCaller,String host,JsonObject token) throws Exception{
         String[] headers = new String[]{
