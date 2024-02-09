@@ -203,6 +203,10 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             if(existed){
               if(!dbi.put(txn,key.rewind(),value.flip())) throw new RuntimeException("lmdb failure to insert key/value");
               txn.commit();
+              key.rewind();
+              value.rewind();
+              lmdbDataStoreProvider.onUpdating(metadata,key,value,txn.getId());
+              lmdbDataStoreProvider.onCommit(metadata.scope(),txn.getId());
               if(!loading) return false;
               value.rewind();
               Recoverable.DataHeader h = value.readHeader();
