@@ -81,7 +81,6 @@ public class Player implements Runnable{
             String resp = httpCaller.post("user/action",jsonObject.toString().getBytes(),headers);
             LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
             LoadResult.totalHttpRequestCount.incrementAndGet();
-            System.out.println(resp);
             if(!onPresence(resp)) {
                 LoadResult.totalFailureRegister.incrementAndGet();
                 headers = new String[]{
@@ -95,7 +94,6 @@ public class Player implements Runnable{
                 LoadResult.totalHttpRequestCount.incrementAndGet();
                 if(!onPresence(resp)){
                     LoadResult.totalFailureLogin.incrementAndGet();
-                    System.out.println(jsonObject);
                     throw new RuntimeException("failed");
                 }
                 LoadResult.totalSuccessLogin.incrementAndGet();
