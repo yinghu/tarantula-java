@@ -196,6 +196,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             return true;
         });
         if(existed) return false;
+        key.rewind();
         existed = lmdbDataStoreProvider.onRecovering(metadata,key,value);
         Txn<ByteBuffer> txn = env.txnWrite(); //can be reading also
         try{

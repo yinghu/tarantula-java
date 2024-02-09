@@ -182,6 +182,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             return true;
         });
         if(existed) return false;
+        key.rewind();
         existed = lmdbDataStoreProvider.onRecovering(metadata,key,value);
         Txn<ByteBuffer> txn = env.txn(ptxn); //can be reading also
         try{
