@@ -18,11 +18,8 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
     @Override
     public void onCommit(int scope,long transactionId) {
         super.onCommit(scope,transactionId);
-        List<TransactionLog> logs = transactionLogManager.committed(scope,transactionId);
-        logger.warn("TT : "+transactionId+" : "+logs.size()+" : "+scope);
         ReplicationSynchronizerTimeout replicationEvent = new ReplicationSynchronizerTimeout(asyncInterval,()->{
-            //List<TransactionLog> logs = transactionLogManager.committed(scope,transactionId);
-            //logger.warn("TT : "+transactionId+" : "+logs.size()+" : "+scope);
+            List<TransactionLog> logs = transactionLogManager.committed(scope,transactionId);
             TransactionReplicationEvent transactionReplicationEvent = new TransactionReplicationEvent();
             transactionReplicationEvent.destination(MapStoreListener.INTEGRATION_MAP_STORE_NAME);
             transactionReplicationEvent.pendingLogs = new PortableTransactionLog[logs.size()];
