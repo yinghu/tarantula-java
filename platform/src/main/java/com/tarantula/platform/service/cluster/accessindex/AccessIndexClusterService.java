@@ -65,6 +65,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
 
 
     public AccessIndex set(String accessKey,int referenceId){
+        log.warn("Set access index ->"+accessKey);
         DataStore dataStore = this.dataStore();
         AccessIndex accessIndex = new AccessIndexTrack(accessKey,referenceId,tarantulaContext.distributionId());
         if(!dataStore.createIfAbsent(accessIndex,false)) return null;
