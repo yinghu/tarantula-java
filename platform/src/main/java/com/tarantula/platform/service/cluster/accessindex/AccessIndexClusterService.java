@@ -95,8 +95,8 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         TarantulaContext._integrationClusterStarted.await();
         this.deploymentServiceProvider = this.tarantulaContext.deploymentServiceProvider();
         this.tarantulaContext.clusterProvider().subscribe(MapStoreListener.INTEGRATION_MAP_STORE_NAME, event -> {
-            if(event.source().equals(nodeEngine.getLocalMember().getUuid())) return false;
-            log.warn("Replicated on : "+nodeEngine.getLocalMember().getUuid());
+            if(event.source().equals(tarantulaContext.node().nodeName())) return false;
+            log.warn("Replicated on : "+tarantulaContext.node().nodeName());
             if(event instanceof TransactionReplicationEvent){
                 tarantulaContext.onTransactionEvent(Distributable.INTEGRATION_SCOPE,(TransactionReplicationEvent)event);
             }

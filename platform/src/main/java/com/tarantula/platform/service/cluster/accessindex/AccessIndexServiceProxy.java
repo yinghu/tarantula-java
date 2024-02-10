@@ -191,7 +191,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
     //DistributionReplicator methods
     @Override
     public void replicate(TransactionReplicationEvent transactionReplicationEvent) {
-        transactionReplicationEvent.source(getNodeEngine().getLocalMember().getUuid());
+        transactionReplicationEvent.source(serviceContext.node().nodeName());
         serviceContext.clusterProvider().publisher().publish(transactionReplicationEvent);
     }
 
