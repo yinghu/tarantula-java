@@ -29,8 +29,11 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
             for (int i = 0; i < logs.size(); i++) {
                 transactionReplicationEvent.pendingLogs[i] = new PortableTransactionLog(logs.get(i));
             }
-            serviceContext.clusterProvider().publisher().publish(transactionReplicationEvent);
-            distributionReplicator.replicate(transactionReplicationEvent);
+            if(broadcasting) {
+                distributionReplicator.replicate(transactionReplicationEvent);
+                return;
+            }
+            distributionReplicator.replicate(transactionReplicationEvent,maxReplicationNodes);
         });
         if (!asyncDistributing) {
             replicationEvent.run();
