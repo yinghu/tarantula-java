@@ -223,7 +223,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
         DataReplicationOperation operation = new DataReplicationOperation(transactionReplicationEvent);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         for(Member m : mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(RecoverService.NAME,operation,m.getAddress());
             ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<Void> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);

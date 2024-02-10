@@ -80,14 +80,16 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         asyncDistributing = conf.get("asyncDistributing").getAsBoolean();
         if(asyncDistributing) asyncInterval = conf.get("asyncInterval").getAsLong();
         logger.warn("Using configuration replication setting ["+asyncDistributing+" : "+asyncInterval+"]");
+    }
+
+    @Override
+    public void waitForData() {
         if(scope== Distributable.INTEGRATION_SCOPE){
             distributionReplicator = (DistributionReplicator) serviceContext.clusterProvider().accessIndexService();
-            return;
         }
-        if(scope==Distributable.DATA_SCOPE){
+        else if(scope==Distributable.DATA_SCOPE){
             distributionReplicator = (DistributionReplicator)serviceContext.clusterProvider().recoverService();
         }
-
     }
 
     @Override
