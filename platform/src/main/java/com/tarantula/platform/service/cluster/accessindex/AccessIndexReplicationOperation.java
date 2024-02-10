@@ -37,6 +37,6 @@ public class AccessIndexReplicationOperation extends Operation {
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        this.transactionReplicationEvent = in.readObject(TransactionReplicationEvent.class);
+        this.transactionReplicationEvent = in.readObject();
     }
 }
