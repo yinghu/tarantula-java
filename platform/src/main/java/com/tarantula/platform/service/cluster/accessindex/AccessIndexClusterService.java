@@ -111,6 +111,10 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         return transactionLogManager.loadFromCommitted(metadata,key);
     }
 
+    public void replicate(TransactionReplicationEvent transactionReplicationEvent){
+        log.warn("TRS : "+transactionReplicationEvent.pendingLogs.length);
+    }
+
     private DataStore dataStore(){
         return this.tarantulaContext.deploymentDataStoreProvider.createAccessIndexDataStore(AccessIndexService.STORE_NAME);
     }

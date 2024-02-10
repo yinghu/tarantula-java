@@ -14,14 +14,16 @@ import com.icodesoftware.service.*;
 
 import com.tarantula.platform.TarantulaContext;
 
+import com.tarantula.platform.event.TransactionReplicationEvent;
 import com.tarantula.platform.service.cluster.ClusterDataView;
 import com.tarantula.platform.service.cluster.ClusterUtil;
+import com.tarantula.platform.service.cluster.DistributionReplicator;
 
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessIndexClusterService> implements AccessIndexService,DistributionAccessIndexViewer, DistributedObject {
+public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessIndexClusterService> implements AccessIndexService,DistributionAccessIndexViewer, DistributionReplicator, DistributedObject {
 
     private TarantulaLogger logger = JDKLogger.getLogger(AccessIndexServiceProxy.class);
     private final String objectName;//unique proxy name
@@ -182,6 +184,24 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
             },metricsListener);
             if(callResult.successful){
                 if(!view.onData(m,key,(byte[])callResult.result)) break;
+            }
+        }
+    }
+
+    //DistributionReplicator methods
+    @Override
+    public void replicate(TransactionReplicationEvent transactionReplicationEvent) {
+        NodeEngine nodeEngine = getNodeEngine();
+        AccessIndexReplicationOperation operation = new AccessIndexReplicationOperation(transactionReplicationEvent);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        for(Member m : mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
+            ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<byte[]> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            },metricsListener);
+            if(!callResult.successful){
+                //log replication error
             }
         }
     }

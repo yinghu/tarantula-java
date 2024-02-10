@@ -9,13 +9,16 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.event.TransactionReplicationEvent;
 import com.tarantula.platform.service.cluster.ClusterDataView;
 import com.tarantula.platform.service.cluster.ClusterUtil;
+import com.tarantula.platform.service.cluster.DistributionReplicator;
+
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecoverService> implements RecoverService,DistributionDataViewer {
+public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecoverService> implements RecoverService,DistributionDataViewer, DistributionReplicator {
 
     private TarantulaLogger logger = JDKLogger.getLogger(RecoverServiceProxy.class);
     private String objectName;
@@ -210,5 +213,11 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
                 if(!view.onData(m,key,(byte[])callResult.result)) break;
             }
         }
+    }
+
+    //DistributionReplicator methods
+    @Override
+    public void replicate(TransactionReplicationEvent transactionReplicationEvent) {
+
     }
 }

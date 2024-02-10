@@ -3,42 +3,40 @@ package com.tarantula.platform.service.cluster.accessindex;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
-import com.hazelcast.spi.PartitionAwareOperation;
+import com.tarantula.platform.event.TransactionReplicationEvent;
 
 import java.io.IOException;
 
-public class AccessIndexScanOperation extends Operation {
+public class AccessIndexReplicationOperation extends Operation {
 
+    private TransactionReplicationEvent transactionReplicationEvent;
+    public AccessIndexReplicationOperation(){
 
-    private byte[] key;
-    private byte[] value;
-    public AccessIndexScanOperation() {
     }
 
-
-    public AccessIndexScanOperation(byte[] key) {
-        this.key = key;
+    public AccessIndexReplicationOperation(TransactionReplicationEvent transactionReplicationEvent){
+        this.transactionReplicationEvent = transactionReplicationEvent;
     }
     @Override
     public void run() throws Exception {
         AccessIndexClusterService ais = this.getService();
-        value = ais.recover(key);
+        ais.replicate(transactionReplicationEvent);
     }
 
     @Override
     public Object getResponse() {
-        return this.value;
+        return null;
     }
 
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
-        out.writeByteArray(key);
+        out.writeObject(transactionReplicationEvent);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        this.key = in.readByteArray();
+        this.transactionReplicationEvent = in.readObject(TransactionReplicationEvent.class);
     }
 }

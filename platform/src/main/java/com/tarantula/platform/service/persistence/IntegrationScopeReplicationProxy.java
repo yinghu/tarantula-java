@@ -6,6 +6,7 @@ import com.icodesoftware.lmdb.TransactionLog;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.event.TransactionReplicationEvent;
+import com.tarantula.platform.service.cluster.DistributionReplicator;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
                 transactionReplicationEvent.pendingLogs[i]= new PortableTransactionLog(logs.get(i));
             }
             serviceContext.clusterProvider().publisher().publish(transactionReplicationEvent);
+            ((DistributionReplicator)serviceContext.clusterProvider().accessIndexService()).replicate(transactionReplicationEvent);
         });
         if (!asyncDistributing) {
             replicationEvent.run();
