@@ -3,16 +3,13 @@ package com.tarantula.platform.service.persistence;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
-import com.icodesoftware.Configuration;
+import com.icodesoftware.*;
 
-import com.icodesoftware.DataStore;
-
-import com.icodesoftware.Recoverable;
-import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.lmdb.TransactionLog;
 import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.event.TransactionReplicationEvent;
+import com.tarantula.platform.service.cluster.DistributionReplicator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,14 +23,17 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
     protected TarantulaLogger logger;
 
     private final String name;
+    private final int scope;
     protected boolean asyncDistributing = true;
 
     protected long asyncInterval = 100;
 
 
     protected TransactionLogManager transactionLogManager;
-    public ScopedReplicationProxy(String name){
+    protected DistributionReplicator distributionReplicator;
+    public ScopedReplicationProxy(String name,int scope){
         this.name = name;
+        this.scope = scope;
         transactionLogManager = new TransactionLogManager();
     }
 
@@ -80,6 +80,14 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         asyncDistributing = conf.get("asyncDistributing").getAsBoolean();
         if(asyncDistributing) asyncInterval = conf.get("asyncInterval").getAsLong();
         logger.warn("Using configuration replication setting ["+asyncDistributing+" : "+asyncInterval+"]");
+        if(scope== Distributable.INTEGRATION_SCOPE){
+            distributionReplicator = (DistributionReplicator) serviceContext.clusterProvider().accessIndexService();
+            return;
+        }
+        if(scope==Distributable.DATA_SCOPE){
+            distributionReplicator = (DistributionReplicator)serviceContext.clusterProvider().recoverService();
+        }
+
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.DataStore;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.TransactionLog;
 import com.icodesoftware.logging.JDKLogger;
@@ -13,7 +14,7 @@ import java.util.List;
 public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
 
     public IntegrationScopeReplicationProxy(){
-        super("integration");
+        super("integration", Distributable.INTEGRATION_SCOPE);
     }
 
     @Override
@@ -28,7 +29,7 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
                 transactionReplicationEvent.pendingLogs[i]= new PortableTransactionLog(logs.get(i));
             }
             serviceContext.clusterProvider().publisher().publish(transactionReplicationEvent);
-            ((DistributionReplicator)serviceContext.clusterProvider().accessIndexService()).replicate(transactionReplicationEvent);
+            distributionReplicator.replicate(transactionReplicationEvent);
         });
         if (!asyncDistributing) {
             replicationEvent.run();
