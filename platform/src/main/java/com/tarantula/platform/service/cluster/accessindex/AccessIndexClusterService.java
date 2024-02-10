@@ -90,12 +90,12 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         if(deploymentServiceProvider==null) return;
         this.deploymentServiceProvider.distributionCallback().onAccessIndexDisabled();
     }
-
-
+    
     public void setup() throws Exception{
         TarantulaContext._integrationClusterStarted.await();
         this.deploymentServiceProvider = this.tarantulaContext.deploymentServiceProvider();
         this.tarantulaContext.clusterProvider().subscribe(MapStoreListener.INTEGRATION_MAP_STORE_NAME, event -> {
+            if(event.source().equals(nodeEngine.getLocalMember().getUuid())) return false;
             if(event instanceof TransactionReplicationEvent){
                 tarantulaContext.onTransactionEvent(Distributable.INTEGRATION_SCOPE,(TransactionReplicationEvent)event);
             }

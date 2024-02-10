@@ -22,14 +22,18 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
         super.onCommit(scope,transactionId);
         ReplicationSynchronizerTimeout replicationEvent = new ReplicationSynchronizerTimeout(asyncInterval,()->{
             List<TransactionLog> logs = transactionLogManager.committed(scope,transactionId);
+            transactionLogManager.onTransaction(logs);//local index
             TransactionReplicationEvent transactionReplicationEvent = new TransactionReplicationEvent();
             transactionReplicationEvent.destination(MapStoreListener.INTEGRATION_MAP_STORE_NAME);
             transactionReplicationEvent.pendingLogs = new PortableTransactionLog[logs.size()];
             for(int i=0;i<logs.size();i++){
                 transactionReplicationEvent.pendingLogs[i]= new PortableTransactionLog(logs.get(i));
             }
-            serviceContext.clusterProvider().publisher().publish(transactionReplicationEvent);
-            distributionReplicator.replicate(transactionReplicationEvent);
+            if(broadcasting) {
+                distributionReplicator.replicate(transactionReplicationEvent);
+                return;
+            }
+            distributionReplicator.replicate(transactionReplicationEvent,maxReplicationNodes);
         });
         if (!asyncDistributing) {
             replicationEvent.run();

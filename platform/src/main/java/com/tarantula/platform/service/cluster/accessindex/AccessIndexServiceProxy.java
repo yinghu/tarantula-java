@@ -30,7 +30,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
 
     private MetricsListener metricsListener;
 
-
+    private ServiceContext serviceContext;
     public AccessIndexServiceProxy(String objectName, NodeEngine nodeEngine,AccessIndexClusterService accessIndexService){
         super(nodeEngine,accessIndexService);
         this.objectName = objectName;
@@ -75,7 +75,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
     }
     @Override
     public void setup(ServiceContext serviceContext){
-        //this.serviceContext = serviceContext;
+        this.serviceContext = serviceContext;
     }
     public void waitForData(){}
     @Override
@@ -191,6 +191,13 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
     //DistributionReplicator methods
     @Override
     public void replicate(TransactionReplicationEvent transactionReplicationEvent) {
+        transactionReplicationEvent.source(getNodeEngine().getLocalMember().getUuid());
+        serviceContext.clusterProvider().publisher().publish(transactionReplicationEvent);
+    }
+
+
+    @Override
+    public void replicate(TransactionReplicationEvent transactionReplicationEvent,int maxReplicationNode){
         NodeEngine nodeEngine = getNodeEngine();
         AccessIndexReplicationOperation operation = new AccessIndexReplicationOperation(transactionReplicationEvent);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();

@@ -25,9 +25,10 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
     private final String name;
     private final int scope;
     protected boolean asyncDistributing = true;
-
+    protected boolean broadcasting = true;
     protected long asyncInterval = 100;
 
+    protected int maxReplicationNodes = 3;
 
     protected TransactionLogManager transactionLogManager;
     protected DistributionReplicator distributionReplicator;
@@ -74,12 +75,14 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         Configuration configuration = serviceContext.configuration(CONFIG);
         JsonObject conf = ((JsonElement)configuration.property(name)).getAsJsonObject();
         if(conf==null) {
-            logger.warn("Using default replication setting ["+asyncDistributing+" : "+asyncInterval+"]");
+            logger.warn("Using default replication setting ["+asyncDistributing+" : "+asyncInterval+" : "+broadcasting+" : "+maxReplicationNodes+"]");
             return;
         }
         asyncDistributing = conf.get("asyncDistributing").getAsBoolean();
-        if(asyncDistributing) asyncInterval = conf.get("asyncInterval").getAsLong();
-        logger.warn("Using configuration replication setting ["+asyncDistributing+" : "+asyncInterval+"]");
+        broadcasting = conf.get("broadcasting").getAsBoolean();
+        asyncInterval = conf.get("asyncInterval").getAsLong();
+        maxReplicationNodes = conf.get("maxReplicationNodes").getAsInt();
+        logger.warn("Using replication setting ["+asyncDistributing+" : "+asyncInterval+" : "+broadcasting+" : "+maxReplicationNodes+"]");
     }
 
     @Override

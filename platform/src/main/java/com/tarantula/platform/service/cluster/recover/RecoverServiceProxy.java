@@ -219,6 +219,12 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     //DistributionReplicator methods
     @Override
     public void replicate(TransactionReplicationEvent transactionReplicationEvent) {
+        transactionReplicationEvent.source(getNodeEngine().getClusterService().getLocalMember().getUuid());
+        serviceContext.clusterProvider().publisher().publish(transactionReplicationEvent);
+    }
+
+    @Override
+    public void replicate(TransactionReplicationEvent transactionReplicationEvent,int maxReplicationNode){
         NodeEngine nodeEngine = getNodeEngine();
         DataReplicationOperation operation = new DataReplicationOperation(transactionReplicationEvent);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
