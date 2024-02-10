@@ -40,8 +40,8 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
 
     public void setup() throws Exception{
         this.tarantulaContext.clusterProvider().subscribe(MapStoreListener.DATA_MAP_STORE_NAME, event -> {
-            if(event.source().equals(tarantulaContext.node().nodeName())) return false;
-            log.warn("Replicated on : "+tarantulaContext.node().nodeName());
+            //if(event.source().equals(tarantulaContext.node().nodeName())) return false;
+            log.warn("Replicated on : "+tarantulaContext.node().nodeName()+" : "+event.source());
             if(event instanceof TransactionReplicationEvent){
                 tarantulaContext.onTransactionEvent(Distributable.DATA_SCOPE,(TransactionReplicationEvent)event);
             }
