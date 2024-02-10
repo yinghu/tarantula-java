@@ -197,7 +197,7 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         for(Member m : mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
             ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<byte[]> future = builder.invoke();
+                Future<Void> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
             },metricsListener);
             if(!callResult.successful){

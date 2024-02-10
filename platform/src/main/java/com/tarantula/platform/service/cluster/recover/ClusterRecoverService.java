@@ -119,5 +119,9 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
         return this.tarantulaContext._readContent(fileName);
     }
 
+    public void replicate(TransactionReplicationEvent transactionReplicationEvent){
+        log.warn("TRS : "+transactionReplicationEvent.pendingLogs.length);
+    }
+
 
 }

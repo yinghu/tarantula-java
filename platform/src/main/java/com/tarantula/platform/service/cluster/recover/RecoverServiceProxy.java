@@ -13,6 +13,7 @@ import com.tarantula.platform.event.TransactionReplicationEvent;
 import com.tarantula.platform.service.cluster.ClusterDataView;
 import com.tarantula.platform.service.cluster.ClusterUtil;
 import com.tarantula.platform.service.cluster.DistributionReplicator;
+import com.tarantula.platform.service.cluster.accessindex.AccessIndexReplicationOperation;
 
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -218,6 +219,18 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
     //DistributionReplicator methods
     @Override
     public void replicate(TransactionReplicationEvent transactionReplicationEvent) {
-
+        NodeEngine nodeEngine = getNodeEngine();
+        DataReplicationOperation operation = new DataReplicationOperation(transactionReplicationEvent);
+        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        for(Member m : mlist){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
+            ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<Void> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            },metricsListener);
+            if(!callResult.successful){
+                //log replication error
+            }
+        }
     }
 }
