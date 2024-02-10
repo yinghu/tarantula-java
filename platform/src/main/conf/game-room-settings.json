@@ -4,21 +4,25 @@
   "pve": {
     "maxRoomPoolSizePerZone": 5000,
     "minRoomPoolSizePerZone": 10,
-    "maxDedicatedServerConnections": 10
+    "maxDedicatedServerConnections": 10,
+    "pushChannelEnabled": false
   },
   "pvp": {
     "maxRoomPoolSizePerZone": 100,
     "minRoomPoolSizePerZone": 10,
-    "maxDedicatedServerConnections": 10
+    "maxDedicatedServerConnections": 10,
+    "pushChannelEnabled": false
   },
   "tve": {
     "maxRoomPoolSizePerZone": 2000,
     "minRoomPoolSizePerZone": 100,
-    "maxDedicatedServerConnections": 10
+    "maxDedicatedServerConnections": 10,
+    "pushChannelEnabled": false
   },
   "tvt": {
     "maxRoomPoolSizePerZone": 2000,
     "minRoomPoolSizePerZone": 100,
-    "maxDedicatedServerConnections": 10
+    "maxDedicatedServerConnections": 10,
+    "pushChannelEnabled": false
   }
 }

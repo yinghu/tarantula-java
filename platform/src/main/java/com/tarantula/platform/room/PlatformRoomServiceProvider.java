@@ -58,6 +58,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private int maxRoomPoolSizePerZone;
     private int minRoomPoolSizePerZone;
 
+    private boolean pushChannelEnabled = true;
     private boolean dedicated;
 
 
@@ -97,6 +98,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.maxDedicatedServerConnections = jsonObject.get("maxDedicatedServerConnections").getAsInt();
         this.maxRoomPoolSizePerZone = jsonObject.get("maxRoomPoolSizePerZone").getAsInt();
         this.minRoomPoolSizePerZone = jsonObject.get("minRoomPoolSizePerZone").getAsInt();
+        this.pushChannelEnabled = jsonObject.get("pushChannelEnabled").getAsBoolean();
         if(this.dedicated){
             this.connectionIndex = new ConcurrentHashMap<>();
             this.serverClusterStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,gameCluster.typeId()+"."+NAME);
@@ -116,6 +118,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public void start() throws Exception {
+        logger.warn("Room service provider started for ["+serviceType+"]["+typeLobby+"]["+this.playMode+"]["+dedicated+"]["+maxRoomPoolSizePerZone+"]["+pushChannelEnabled+"]");
         this.udpEndpoint = (UDPEndpoint) this.serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
         this.started = this.udpEndpoint != null;
         if(!dedicated) return;
@@ -128,7 +131,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             onConnectionRegistered(c);
             onConnectionStarted(c);
         });
-        logger.warn("Room service provider started for ["+serviceType+"]["+typeLobby+"]["+this.playMode+"]["+dedicated+"]["+maxRoomPoolSizePerZone+"]");
     }
 
     @Override
@@ -185,8 +187,10 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         gameServiceProvider.presenceServiceProvider().onLeave(stub);
         if(dedicated) return; //close from channel close
         GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
-        Channel channel = udpEndpoint.channel(stub.sessionId);
-        if(channel!=null) channel.close();
+        if(pushChannelEnabled){
+            Channel channel = udpEndpoint.channel(stub.sessionId);
+            if(channel!=null) channel.close();
+        }
         localLeave(stub.distributionId(),index,stub.roomId,(room,entry)->{
             if(room.totalJoined() != room.totalLeft()) return;
             resetGameRoom(index,room,true);
@@ -234,7 +238,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             }
             int roomPoolRemaining = index.maxRoomPoolSize.addAndGet((-1)*rooms[0]);
             logger.warn(gameZone+" Remaining Room Pool Size ["+roomPoolRemaining+"] Capacity ["+gameZone.capacity()+"]");
-            if(started) {
+            if(started && pushChannelEnabled) {
                 gameRoomIndex.forEach((rk, rv) -> {
                     rv.setup(udpEndpoint.createChannels(gameZone.capacity()));
                 });
@@ -408,24 +412,25 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public void onStart(EndPoint endPoint){
         if(endPoint.name().equals(EndPoint.UDP_ENDPOINT)){
             this.udpEndpoint = (UDPEndpoint)endPoint;
-            gameZoneIndex.forEach((k,v)->{
-                if(dedicated){
-                    for(int i=0;i<minRoomPoolSizePerZone;i++){
-                        UDPChannel[] channels = udpEndpoint.createChannels(v.gameZone.capacity());
-                        for(UDPChannel c : channels){
-                            v.pendingPushChannels.offer(c);
+            if(pushChannelEnabled){
+                gameZoneIndex.forEach((k,v)->{
+                    if(dedicated){
+                        for(int i=0;i<minRoomPoolSizePerZone;i++){
+                            UDPChannel[] channels = udpEndpoint.createChannels(v.gameZone.capacity());
+                            for(UDPChannel c : channels){
+                                v.pendingPushChannels.offer(c);
+                            }
                         }
                     }
-                }
-                else{
-                    gameRoomIndex.forEach((rk,rv)->{
-                        rv.setup(udpEndpoint.createChannels(v.gameZone.capacity()));
-                    });
-                    logger.warn("Total running/pending rooms ["+v.runningRooms.size()+"/"+v.pendingRooms.size()+"] on ["+typeLobby+"]["+v.gameZone.name()+"]");
-                }
+                    else{
+                        gameRoomIndex.forEach((rk,rv)->{
+                            rv.setup(udpEndpoint.createChannels(v.gameZone.capacity()));
+                        });
+                        logger.warn("Total running/pending rooms ["+v.runningRooms.size()+"/"+v.pendingRooms.size()+"] on ["+typeLobby+"]["+v.gameZone.name()+"]");
+                    }
 
-            });
-            //logger.warn("Initializing push channels ["+typeLobby+"]["+minRoomPoolSizePerZone+"]["+dedicated+"]");
+                });
+            }
         }
         started = true;
     }
@@ -480,7 +485,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private GameRoom loadGameRoom(GameZoneIndex zoneIndex,GameRoom gameRoom){
         gameRoom.dataStore(this.dataStore);
         gameRoom.load();
-        //GameModule gameModule = gameModule(zoneIndex.gameZone.gameModule(),gameRoom);
         gameRoom.setup(gameServiceProvider.gameServiceProvider(),zoneIndex.gameZone,dedicated);
         resetGameRoom(zoneIndex,gameRoom,true);
         gameRoomIndex.put(gameRoom.roomId(),gameRoom);
@@ -494,7 +498,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             if(!this.dataStore.load(gameRoom)) return null;
             gameRoom.dataStore(this.dataStore);
             gameRoom.load();
-            //GameModule gameModule = gameModule(zoneIndex.gameZone.gameModule(),gameRoom);
             gameRoom.setup(gameServiceProvider.gameServiceProvider(),zoneIndex.gameZone,dedicated);
             resetGameRoom(zoneIndex,gameRoom,true);
             return gameRoom;
@@ -512,7 +515,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         if(!this.dataStore.create(gameRoom)) return null;
         gameRoom.dataStore(this.dataStore);
         gameRoom.load();
-        //GameModule gameModule = gameModule(zoneIndex.gameZone.gameModule(),gameRoom);
         gameRoom.setup(gameServiceProvider.gameServiceProvider(),zoneIndex.gameZone,dedicated);
         gameRoomIndex.put(gameRoom.roomId(),gameRoom);
         resetGameRoom(zoneIndex,gameRoom,queued);
@@ -522,7 +524,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private void resetGameRoom(GameZoneIndex index,GameRoom room,boolean queued){
         room.reset();
         if(queued) index.pendingRooms.offer(room);
-        if(!started) return;
+        if(!started || !pushChannelEnabled) return;
         room.setup(udpEndpoint.createChannels(index.gameZone.capacity()));
     }
 
@@ -582,8 +584,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             logger.warn("Game lobby not available ["+room.owner()+"]");
             return;
         }
-        logger.warn("Release room->"+room.distributionKey()+" on->"+room.owner());
-        udpEndpoint.releaseChannel(room.channelId());
+        if(pushChannelEnabled) udpEndpoint.releaseChannel(room.channelId());
         index.runningRooms.remove(room);
         resetGameRoom(index,gameRoomIndex.get(room.distributionKey()),true);
         //forcefully reset room
@@ -612,6 +613,10 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         if(room.dedicated()) return;
         pendingReleaseRooms.remove(room.distributionKey());
         releaseRoom(room);
+    }
+
+    public boolean pushChannelEnabled(){
+        return pushChannelEnabled;
     }
 
     public void onClosed(Room room){

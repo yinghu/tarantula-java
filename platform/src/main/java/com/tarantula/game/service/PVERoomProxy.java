@@ -20,17 +20,16 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.roomId = stub.room.roomId();
         stub.zone = gameZone;
         stub.zoneId = gameZone.distributionKey();
-        /**
-        if(!room.dedicated()){
+        if(!room.dedicated() && gameServiceProvider.roomServiceProvider().pushChannelEnabled()){
             stub.pushChannel = this.gameServiceProvider.roomServiceProvider().registerChannel(stub,(s,d)->{
                 gameLobby.timeout(s,d);
             });
             room.setup(stub.pushChannel);
             stub.sessionId = stub.pushChannel.sessionId();
-        }**/
+            stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));
+        }
         stub.offline = true;
         stub.tag(application.tag());
-        stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));
         stub.update();
         return stub;
     }
