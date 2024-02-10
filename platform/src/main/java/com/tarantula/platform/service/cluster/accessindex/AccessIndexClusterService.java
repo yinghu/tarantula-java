@@ -96,7 +96,6 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         this.deploymentServiceProvider = this.tarantulaContext.deploymentServiceProvider();
         this.tarantulaContext.clusterProvider().subscribe(MapStoreListener.INTEGRATION_MAP_STORE_NAME, event -> {
             if(event.source().equals(tarantulaContext.node().nodeName())) return false;
-            log.warn("Replicated on : "+tarantulaContext.node().nodeName()+" : "+event.source()+" : "+event.getClass().getName());
             if(event instanceof TransactionReplicationEvent){
                 tarantulaContext.onTransactionEvent(Distributable.INTEGRATION_SCOPE,(TransactionReplicationEvent)event);
             }
@@ -113,7 +112,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     }
 
     public void replicate(TransactionReplicationEvent transactionReplicationEvent){
-        log.warn("TRS : "+transactionReplicationEvent.pendingLogs.length);
+        tarantulaContext.onTransactionEvent(Distributable.INTEGRATION_SCOPE,transactionReplicationEvent);
     }
 
     private DataStore dataStore(){

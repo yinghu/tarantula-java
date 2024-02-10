@@ -201,14 +201,17 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         NodeEngine nodeEngine = getNodeEngine();
         AccessIndexReplicationOperation operation = new AccessIndexReplicationOperation(transactionReplicationEvent);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
+        int replicated = 0;
         for(Member m : mlist){
+            if(m.localMember()) continue;
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,m.getAddress());
             ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<Void> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
             },metricsListener);
-            if(!callResult.successful){
-                //log replication error
+            if(callResult.successful){
+                replicated++;
+                if(replicated >= maxReplicationNode) break;
             }
         }
     }
