@@ -11,6 +11,7 @@ public class LocalTransaction implements Transaction, Transaction.DataStoreConte
     private final int scope;
 
     private Txn<ByteBuffer> txn;
+    private long transactionId;
     private DataStoreContext dataStoreContext;
     private Listener listener;
     public LocalTransaction(int scope,LMDBDataStoreProvider dataStoreProvider){
@@ -22,22 +23,23 @@ public class LocalTransaction implements Transaction, Transaction.DataStoreConte
     @Override
     public boolean execute(TransactionContext transactionContext) {
         txn = dataStoreProvider.txn(scope);
-        final long tid = txn.getId();
+        transactionId = txn.getId();
+        //final long tid = txn.getId();
         try{
             if(!transactionContext.update(this.dataStoreContext)){
                 txn.abort();
-                this.dataStoreProvider.onAbort(scope,tid);
-                listener.afterAbort(tid,null);
+                this.dataStoreProvider.onAbort(scope,transactionId);
+                listener.afterAbort(transactionId,null);
                 return false;
             }
             txn.commit();
-            this.dataStoreProvider.onCommit(scope,tid);
-            listener.afterCommit(tid);
+            this.dataStoreProvider.onCommit(scope,transactionId);
+            listener.afterCommit(transactionId);
             return true;
         }catch (Exception ex){
             txn.abort();
-            this.dataStoreProvider.onAbort(scope,tid);
-            listener.afterAbort(tid,ex);
+            this.dataStoreProvider.onAbort(scope,transactionId);
+            listener.afterAbort(transactionId,ex);
             return false;
         }
         finally {
@@ -54,7 +56,7 @@ public class LocalTransaction implements Transaction, Transaction.DataStoreConte
 
     @Override
     public DataStore onDataStore(String name) {
-       return dataStoreProvider.createDataStore(scope,name,txn);
+       return dataStoreProvider.createDataStore(scope,name,txn,transactionId);
     }
 
     public void register(DataStoreContext dataStoreContext,Listener listener){

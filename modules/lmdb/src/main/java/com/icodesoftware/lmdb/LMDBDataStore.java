@@ -7,7 +7,6 @@ import org.lmdbjava.*;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
@@ -25,8 +24,8 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     private final LMDBDataStoreProvider lmdbDataStoreProvider;
     private final Txn<ByteBuffer> ptxn;
-
-    public LMDBDataStore(int scope,String name, Dbi<ByteBuffer> dbi,Env<ByteBuffer> env,LMDBDataStoreProvider lmdbDataStoreProvider,Txn<ByteBuffer> ptxn){
+    private final long transactionId;
+    public LMDBDataStore(int scope,String name, Dbi<ByteBuffer> dbi,Env<ByteBuffer> env,LMDBDataStoreProvider lmdbDataStoreProvider,Txn<ByteBuffer> ptxn,long transactionId){
         this.metadata = new LocalMetadata(scope,name);
         this.scope = scope;
         this.name = name;
@@ -34,6 +33,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         this.env = env;
         this.lmdbDataStoreProvider = lmdbDataStoreProvider;
         this.ptxn = ptxn;
+        this.transactionId = transactionId;
     }
 
     @Override
@@ -87,7 +87,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             key.rewind();
             value.rewind();
             t.revision(Long.MIN_VALUE);
-            lmdbDataStoreProvider.onUpdating(metadata,key,value,ptxn.getId());
+            lmdbDataStoreProvider.onUpdating(metadata,key,value,transactionId);
             return true;
         }finally {
             txn.close();
@@ -120,7 +120,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
                     t.revision(header.revision());
                     key.rewind();
                     update.rewind();
-                    lmdbDataStoreProvider.onUpdating(metadata,key,update,ptxn.getId());
+                    lmdbDataStoreProvider.onUpdating(metadata,key,update,transactionId);
                     updated = true;
                 }
             }
@@ -152,7 +152,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             xtxn.commit();
             key.rewind();
             value.rewind();
-            lmdbDataStoreProvider.onUpdating(metadata,key,value,ptxn.getId());
+            lmdbDataStoreProvider.onUpdating(metadata,key,value,transactionId);
         }
         finally {
             xtxn.close();
@@ -204,7 +204,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             t.revision(Long.MIN_VALUE);
             key.rewind();
             value.rewind();
-            lmdbDataStoreProvider.onUpdating(metadata,key,value,ptxn.getId());
+            lmdbDataStoreProvider.onUpdating(metadata,key,value,transactionId);
             return true;
         }
         finally {
@@ -279,7 +279,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             if(!dbi.delete(txn, key.flip())) return false;
             txn.commit();
             key.rewind();
-            lmdbDataStoreProvider.onDeleting(metadata,key, cache.value(),txn.getId());
+            lmdbDataStoreProvider.onDeleting(metadata,key, cache.value(),transactionId);
             return true;
         }finally {
             txn.close();
@@ -537,7 +537,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             txn.commit();
             key.rewind();
             value.rewind();
-            lmdbDataStoreProvider.onUpdating(localEdgeDataStore.metadata,key,value,ptxn.getId());
+            lmdbDataStoreProvider.onUpdating(localEdgeDataStore.metadata,key,value,transactionId);
             return true;
         }finally {
             txn.close();
@@ -558,7 +558,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             txn.commit();
             key.rewind();
             value.rewind();
-            lmdbDataStoreProvider.onDeleting(localEdgeDataStore.metadata,key,value,ptxn.getId());
+            lmdbDataStoreProvider.onDeleting(localEdgeDataStore.metadata,key,value,transactionId);
             return true;
         }finally {
             txn.close();
@@ -576,7 +576,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             if(!localEdgeDataStore.dbi.delete(txn,key.flip())) return false;
             txn.commit();
             key.rewind();
-            this.lmdbDataStoreProvider.onDeleting(localEdgeDataStore.metadata,key,null,ptxn.getId());
+            this.lmdbDataStoreProvider.onDeleting(localEdgeDataStore.metadata,key,null,transactionId);
             return true;
         } finally {
             cache.reset();
