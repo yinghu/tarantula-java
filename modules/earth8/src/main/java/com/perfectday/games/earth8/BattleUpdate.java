@@ -26,6 +26,7 @@ public class BattleUpdate extends RecoverableObject {
         CampaignProgress,
         ManualAnalytics,
         CurrencyUpdate,
+        HardCurrencyBuythroughShown,
     }
 
     public UpdateId updateId;
@@ -109,6 +110,9 @@ public class BattleUpdate extends RecoverableObject {
                 break;
             case CurrencyUpdate:
                 update = CurrencyUpdate.fromJson(jsonObject);
+                break;
+            case HardCurrencyBuythroughShown:
+                update = HardCurrencyBuythroughShown.fromJson(jsonObject);
                 break;
             default:
                 throw new UnsupportedOperationException("operation not supported");
