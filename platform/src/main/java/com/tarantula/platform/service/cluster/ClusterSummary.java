@@ -4,9 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.util.RecoverableObject;
-import com.icodesoftware.util.TimeUtil;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +30,10 @@ public class ClusterSummary extends RecoverableObject implements ClusterProvider
 
     public List<ClusterProvider.Node> clusterNodes(){
         ArrayList<ClusterProvider.Node> _nodes = new ArrayList<>();
-        nodeList.forEach((k,n)-> _nodes.add(n));
+        HashMap<String, ClusterProvider.Node> added = new HashMap<>();
+        nodeList.forEach((k,n)-> {
+            if(added.putIfAbsent(n.memberId(),n)==null) _nodes.add(n);
+        });
         return _nodes;
     }
 
