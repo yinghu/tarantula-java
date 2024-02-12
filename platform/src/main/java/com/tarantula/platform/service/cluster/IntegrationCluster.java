@@ -390,7 +390,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         try{_serviceReady.await();}catch (Exception ex){}
         String setting = member.getStringAttribute("node");
         if(setting==null){
-            log.warn("NODE NOT READY : "+member.getUuid());
+            log.warn("Node not ready : "+member.getUuid()+" : "+member.getAddress().toString());
             return;
         }
         String[] node = setting.split("#");
@@ -401,7 +401,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         if(existingNode!=null){
             nList.forEach(nodeListener -> nodeListener.nodeAdded(existingNode));
             this.summary.register(existingNode);
-            log.warn("NODE ADDED : "+nodeName+" : "+memberId+" : "+nodeId);
+            log.warn("Node is ready : "+nodeName+" : "+memberId+" : "+nodeId);
         }
     }
 

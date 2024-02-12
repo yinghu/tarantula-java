@@ -117,11 +117,9 @@ public class TarantulaMain {
 			btx.dataBucketNode = override(overriding,"tarantula.data.bucket.node",_user,_config);
 			btx.dataStoreDir = override(overriding,"tarantula.data.store.dir",_user,_config);
 			btx.recoverBatchSize = Integer.parseInt(override(overriding,"tarantula.data.store.recover.batch.size",_user,_config));
-			//btx.dataReplicationThreadPoolSetting = override(overriding,"tarantula.data.replication.pool.setting",_user,_config);
             btx.eventThreadPoolSetting = override(overriding,"tarantula.event.pool.setting",_user,_config);
             btx.retries  = Integer.parseInt(override(overriding,"tarantula.event.max.retries",_user,_config));
             btx.retryInterval = Long.parseLong(override(overriding,"tarantula.event.retry.interval",_user,_config));
-
 		    btx.tarantulaServerValidator = override(overriding,"tarantula.service.authenticator.provider",_user,_config);
 		    btx.tarantulaDeploymentProvider = override(overriding,"tarantula.service.deployment.service.provider",_user,_config);
 		    btx.singleModuleApplication = override(overriding,"tarantula.service.deployment.module.singleton.application",_user,_config);
@@ -135,7 +133,6 @@ public class TarantulaMain {
 			btx.applicationSchedulingPoolSetting = override(overriding,"tarantula.scheduler.pool.setting",_user,_config);
 			btx.dataStoreDailyBackup = Boolean.parseBoolean(override(overriding,"tarantula.data.store.daily.backup",_user,_config));
 			btx.authContext = override(overriding,"tarantula.auth.context",_user,_config);
-			btx.tarantulaServiceEventLogPersistenceEnable = Boolean.parseBoolean(override(overriding,"tarantula.service.event.log.persistence.enable",_user,_config));
 			boolean udpEndpointEnabled = Boolean.parseBoolean(override(overriding,"tarantula.endpoint.udp.enable",_user,_config));
 			boolean endpointEnabled = Boolean.parseBoolean(override(overriding,"tarantula.endpoint.http.enable",_user,_config));
 			if(endpointEnabled){

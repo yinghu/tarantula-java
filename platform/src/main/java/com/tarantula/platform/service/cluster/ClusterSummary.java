@@ -62,6 +62,7 @@ public class ClusterSummary extends RecoverableObject implements ClusterProvider
             if(added.putIfAbsent(n.memberId(),n)==null) nodes.add(n.toJson());
         });
         jsonObject.add("nodeList",nodes);
+        added.clear();
         return jsonObject;
     }
 

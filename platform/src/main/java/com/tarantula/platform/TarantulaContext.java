@@ -164,10 +164,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     private HttpClientProvider httpClientProvider;
 
-    public boolean tarantulaServiceEventLogPersistenceEnable;
-
-
-    //public KeyIndexService keyIndexService;
 
     private DataStoreProvider.DistributionIdGenerator distributionIdGenerator;
  	private TarantulaContext(){
