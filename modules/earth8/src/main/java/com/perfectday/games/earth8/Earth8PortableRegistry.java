@@ -32,6 +32,8 @@ public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecov
 
     public static final int MANUAL_ANALYTICS_CID = 14;
     public static final int CURRENCY_UPDATE_CID = 15;
+    
+    public static final int CLIENT_HC_BUYTHROUGH_SHOWN = 16;
 
 
     public static Earth8PortableRegistry INS;
