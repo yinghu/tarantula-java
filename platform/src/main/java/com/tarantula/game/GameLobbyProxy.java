@@ -57,8 +57,6 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         if(!removed.joined()) return false;
         GameZone gameZone = this.gameServiceProvider.roomServiceProvider().gameZoneFromZoneId(removed.zoneId);
         gameZone.leave(removed);
-        context.log("timeout : "+systemId+" : "+stub,OnLog.WARN);
-        //gameServiceProvider.onUpdated(GameClusterMetrics.GAME_TIMEOUT_COUNT,1);
         return  true;
     }
 

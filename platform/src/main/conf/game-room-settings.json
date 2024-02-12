@@ -5,7 +5,7 @@
     "maxRoomPoolSizePerZone": 5000,
     "minRoomPoolSizePerZone": 500,
     "maxDedicatedServerConnections": 10,
-    "pushChannelEnabled": false
+    "pushChannelEnabled": true
   },
   "pvp": {
     "maxRoomPoolSizePerZone": 100,
