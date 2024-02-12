@@ -92,6 +92,8 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
     DistributionCallback distributionCallback();
 
+    NodeShutdownOperator nodeShutdownOperator(Access access);
+
     Transaction transaction(int scope);
     //local callbacks on distributed operations
     interface DistributionCallback{
@@ -128,6 +130,10 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     interface GameClusterEventListener{
         <T extends OnAccess> void onGameClusterEvent(T event);
         String typeId();
+    }
+
+    interface NodeShutdownOperator{
+        void shutdown(ClusterProvider.Node node);
     }
 
 }

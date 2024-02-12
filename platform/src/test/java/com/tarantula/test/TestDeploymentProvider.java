@@ -270,4 +270,8 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
     public void shutdown() throws Exception {
 
     }
+
+    public NodeShutdownOperator nodeShutdownOperator(Access access){
+        return null;
+    }
 }

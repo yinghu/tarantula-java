@@ -6,9 +6,7 @@ import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.DeployService;
-import com.icodesoftware.service.MetricsListener;
-import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.service.*;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.cluster.ClusterUtil;
 
@@ -16,7 +14,7 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployService> implements DeployService {
+public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployService> implements DeployService, DeploymentServiceProvider.NodeShutdownOperator {
 
     private final String objectName;
     private static TarantulaLogger logger = JDKLogger.getLogger(DeployServiceProxy.class);
@@ -400,4 +398,17 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         this.metricsListener = (k,v)->{};
     }
 
+    @Override
+    public void shutdown(ClusterProvider.Node removed) {
+        logger.warn("Shutdown node : "+removed.memberId());
+        NodeEngine nodeEngine = getNodeEngine();
+        Member pending = nodeEngine.getClusterService().getMember(removed.memberId());
+        NodeShutdownOperation operation = new NodeShutdownOperation();
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,pending.getAddress());
+        ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+            Future<Void> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+        },metricsListener);
+        if(!result.successful) throw new RuntimeException("failed to shutdown node : "+removed.memberId());
+    }
 }

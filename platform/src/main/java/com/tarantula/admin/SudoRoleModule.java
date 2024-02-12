@@ -12,6 +12,7 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.TarantulaMain;
 import com.tarantula.platform.presence.PermissionContext;
 
+import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -129,8 +130,12 @@ public class SudoRoleModule implements Module {
             session.write(summary.toJson().toString().getBytes());
         }
         else if(session.action().equals("onClusterShutdown")){
-            session.write(JsonUtil.toSimpleResponse(true,"shutdown").getBytes());
-            TarantulaMain.runtime.shutdown();
+            Access acc = userService.loadUser(session.distributionId());
+            session.write(JsonUtil.toSimpleResponse(true,"shutdown :"+session.name()).getBytes());
+            DeploymentServiceProvider.NodeShutdownOperator shutdownOperator = deploymentServiceProvider.nodeShutdownOperator(acc);
+            ClusterNode node = new ClusterNode();
+            node.memberId = session.name();
+            shutdownOperator.shutdown(node);
         }
         else{
            throw new UnsupportedOperationException("operation ["+session.action()+"] not supported");

@@ -918,6 +918,11 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return suc1&&suc2&&suc3;
     }
 
+    public NodeShutdownOperator nodeShutdownOperator(Access access){
+        if(!access.role().equals(AccessControl.root.name())) return null;
+        DeployService deployService = tarantulaContext.integrationCluster().deployService();
+        return (NodeShutdownOperator)deployService;
+    }
     class ModuleProxy implements Module{
 
         private Module module;
