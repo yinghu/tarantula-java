@@ -1,12 +1,14 @@
 {
   "integration" :{
      "asyncDistributing": false,
-     "maxPendingSize": 10,
-     "syncIntervalSeconds": 5
+     "broadcasting": false,
+     "asyncInterval": 100,
+     "maxReplicationNodes": 3
   },
   "data": {
      "asyncDistributing": false,
-     "maxPendingSize": 10,
-     "syncIntervalSeconds": 5
+     "broadcasting": false,
+     "asyncInterval": 100,
+     "maxReplicationNodes": 3
   }
 }

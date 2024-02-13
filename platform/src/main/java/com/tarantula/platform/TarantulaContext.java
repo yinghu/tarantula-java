@@ -16,6 +16,7 @@ import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
 import com.icodesoftware.*;
 import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
+import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.util.*;
@@ -47,11 +48,11 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 	public final static  CountDownLatch _storageInstanceStarted = new CountDownLatch(1);
     public final static  CountDownLatch _storageStarted = new CountDownLatch(1); //data store provider waitForData call finished;
  	public final static  CountDownLatch _integrationClusterStarted = new CountDownLatch(1);
-    public final static  CountDownLatch _keyIndexServiceStarted = new CountDownLatch(1);
+   
     public final static  CountDownLatch _accessIndexServiceStarted = new CountDownLatch(1);
     public final static  CountDownLatch _deployServiceStarted = new CountDownLatch(1);
     public final static  CountDownLatch _recoverServiceStarted = new CountDownLatch(1);
-    public final static CountDownLatch _cluster_service_ready = new CountDownLatch(4);
+    public final static CountDownLatch _cluster_service_ready = new CountDownLatch(3);
     public final static CountDownLatch _systemServiceStarted = new CountDownLatch(1);
  	public final static  CountDownLatch _tarantulaApplicationStarted = new CountDownLatch(1);
 
@@ -149,8 +150,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public String authContext = "localhost";
 
-    //public ConcurrentHashMap<String,CountDownLatch> _syncLatch = new ConcurrentHashMap<>();
-
     public boolean runAsMirror;
     public boolean backupEnabled;
     public String backupUrl;
@@ -165,10 +164,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     private HttpClientProvider httpClientProvider;
 
-    public boolean tarantulaServiceEventLogPersistenceEnable;
-
-
-    public KeyIndexService keyIndexService;
 
     private DataStoreProvider.DistributionIdGenerator distributionIdGenerator;
  	private TarantulaContext(){
@@ -222,7 +217,11 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         node_started = new AtomicBoolean(false);
         PortableProviderConfigurationParser pcs = new PortableProviderConfigurationParser("tarantula-platform-portable-provider.xml");
         pcs.parse().forEach((r)->{
+            if(fMap.contains(r.registryId())){
+                throw new RuntimeException("Duplicate portable registry ["+r.registryId()+"]");
+            }
             fMap.put(r.registryId(),r);
+            log.warn("Portable registry ["+r.registryId()+"] added");
         });
         this.dataScopeReplicationProxy = new DataScopeReplicationProxy();
         this.integrationScopeReplicationProxy = new IntegrationScopeReplicationProxy();
@@ -552,9 +551,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         return this.integrationCluster.accessIndexService();
     }
 
-    public KeyIndexService keyIndexService(){
-        return keyIndexService;
-    }
     @Override
     public DeploymentServiceProvider deploymentServiceProvider(){
  	    return this.deploymentServiceProvider;
@@ -586,14 +582,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
  	    this.serviceProviders.put(serviceProvider.name(),serviceProvider);
     }
     public void _setup() throws Exception{
-        //Waiting for all distribution service ready
-        //DistributionKeyIndexService distributionKeyIndexService = clusterProvider().serviceProvider(DistributionKeyIndexService.NAME);
-        //CountDownLatch countDownLatch = new CountDownLatch(1);
-        //distributionKeyIndexService.startSync(DistributionKeyIndexService.NAME);
-        //_syncLatch.put(DistributionKeyIndexService.NAME,countDownLatch);
-        //countDownLatch.await();
-        //_syncLatch.remove(DistributionKeyIndexService.NAME);
-        //log.warn("Key index data sync has finished");
         AccessIndex bid = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/"+node.bucketName,AccessIndex.SYSTEM_INDEX);
         node.bucketId = bid.distributionId();
         AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,AccessIndex.SYSTEM_INDEX);
@@ -1056,7 +1044,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
              GameCluster gc = new GameCluster();
              gc.distributionId(key);
              gc.dataStore(this.masterDataStore());
-             if(!this.masterDataStore().load(gc)) return null;
+             if(!this.masterDataStore().load(gc)){
+                 log.warn("Game cluster not existed ["+key+"]");
+                 return null;
+             }
              gc.gameLobby = this.lobby(gc.lobbyType());
              gc.serviceLobby = this.lobby(gc.serviceType());
              gc.dataLobby = this.lobby(gc.dataType());
@@ -1092,7 +1083,16 @@ public class TarantulaContext implements Serviceable, ServiceContext {
              return;
          }
          log.warn("Event on scope ["+scope+"] not supported");
+    }
 
+    public TransactionLogManager transactionLogManager(int scope){
+        if(scope==Distributable.DATA_SCOPE){
+            return dataScopeReplicationProxy.transactionLogManager();
+        }
+        if(scope==Distributable.INTEGRATION_SCOPE){
+            return integrationScopeReplicationProxy.transactionLogManager();
+        }
+        throw new RuntimeException("transaction manager on scope ["+scope+"] not supported");
     }
 
     public Recoverable.DataBufferPair dataBufferPair(){

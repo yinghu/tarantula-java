@@ -18,6 +18,7 @@ abstract public class AbstractRequestHandler implements RequestHandler {
 
     protected boolean onEvent;
     protected ConcurrentHashMap<Long, OnExchange> eMap;
+
     protected EventService eventService;
     protected TokenValidatorProvider tokenValidator;
     protected ServiceContext serviceContext;

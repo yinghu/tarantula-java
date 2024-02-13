@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.protocol.statistics.UserStatistics;
 import com.icodesoftware.service.ServiceContext;
 
 import com.icodesoftware.util.ScheduleRunner;
@@ -19,7 +20,6 @@ import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 
 import com.tarantula.platform.presence.saves.*;
 
-import com.tarantula.platform.statistics.UserStatistics;
 import com.tarantula.platform.util.RecoverableQuery;
 
 import java.time.LocalDateTime;
@@ -125,10 +125,6 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
             loaded[0].xp = 100;
             mDataStore.create(loaded[0]);
         }
-        //this.platformGameServiceProvider.savedGameServiceProvider().createIfAbsent(session,rating);
-        //if(rating.granted) return rating;
-        //rating.granted = this.platformGameServiceProvider.resourceServiceProvider().initializeInventory(session.systemId());
-        //rating.update();
         loaded[0].dataStore(mDataStore);
         return loaded[0];
     }

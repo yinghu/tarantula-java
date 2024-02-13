@@ -17,36 +17,10 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
     public TestDeploymentProvider(DataStoreProvider dataStoreProvider){
         this.dataStoreProvider = dataStoreProvider;
     }
-    @Override
-    public OnAccess registerConnection(Connection connection) {
-        return null;
-    }
 
-    @Override
-    public boolean registerChannel(Channel channel) {
-        return false;
-    }
 
-    @Override
-    public void updateRoom(String typeId, String lobby, byte[] payload) {
-
-    }
-
-    @Override
-    public void startConnection(Connection connection) {
-
-    }
-
-    @Override
-    public void stopConnection(Connection connection) {
-
-    }
     public Metrics metrics(String name){
         return null;
-    }
-    @Override
-    public void verifyConnection(String typeId, String serverId) {
-
     }
 
     public Transaction transaction(int scope){
@@ -185,6 +159,9 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
     public <T extends OnAccess> void onGameClusterEvent(T event){
 
     }
+    public GameServerListener gameServerListener(String typeId){
+        return null;///cListeners.get(typeId);
+    }
     public void registerGameClusterEventListener(GameClusterEventListener gameClusterEventListener){}
     public void unregisterGameClusterEventListener(GameClusterEventListener gameClusterEventListener){}
     @Override
@@ -292,5 +269,9 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
     @Override
     public void shutdown() throws Exception {
 
+    }
+
+    public NodeShutdownOperator nodeShutdownOperator(Access access){
+        return null;
     }
 }

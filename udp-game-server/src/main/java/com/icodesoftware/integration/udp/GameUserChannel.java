@@ -12,12 +12,15 @@ public class GameUserChannel extends UserChannel {
 
     private UDPEndpointServiceProvider.ActionListener actionListener;
 
-    public GameUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.CipherListener cipherListener,UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.ActionListener actionListener){
+    private UDPEndpointServiceProvider.RequestListener requestListener;
+
+    public GameUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.CipherListener cipherListener,UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.ActionListener actionListener,UDPEndpointServiceProvider.RequestListener requestListener){
         super(channelId,messenger);
         this.cipherListener = cipherListener;
         this.userSessionValidator = userSessionValidator;
         this.sessionListener = sessionListener;
         this.actionListener = actionListener;
+        this.requestListener = requestListener;
     }
 
     @Override
@@ -59,5 +62,8 @@ public class GameUserChannel extends UserChannel {
         });
     }
 
-
+    @Override
+    protected void onRequest(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
+        requestListener.onRequest(null,messageHeader,messageBuffer);
+    }
 }

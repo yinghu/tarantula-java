@@ -7,33 +7,15 @@ import com.icodesoftware.service.RecoverService;
 
 public class TestRecoverService implements RecoverService {
     @Override
-    public byte[] onRecover(String source, byte[] key,ClusterProvider.Node[] nodes) {
+    public byte[] onRecover(String source, byte[] key) {
         return null;
     }
 
     @Override
-    public Batchable onRecover(String source, String label, byte[] key, ClusterProvider.Node[] nodes) {
+    public Batchable onRecover(String source, String label, byte[] key) {
         return null;
     }
 
-
-    public int onReplicate(String nodeName,String source,String label, byte[] key, byte[] value, ClusterProvider.Node[] nodes){
-        return 0;
-    }
-    @Override
-    public void onReplicate(String nodeName,OnReplication[] batch, int size, ClusterProvider.Node node) {
-
-    }
-
-    @Override
-    public int onStartSync(String source, String syncKey) {
-        return 0;
-    }
-
-    @Override
-    public void onSync(int size, byte[][] keys, byte[][] values, String memberId, String source) {
-
-    }
 
     @Override
     public boolean onDelete(String source,byte[] key) {
@@ -47,10 +29,7 @@ public class TestRecoverService implements RecoverService {
         return false;
     }
 
-    @Override
-    public void onEndSync(String memberId, String syncKey) {
 
-    }
 
     @Override
     public String[] onListModules() {

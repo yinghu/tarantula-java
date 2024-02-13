@@ -1,8 +1,8 @@
 package com.tarantula.platform.service.cluster.recover;
 
-import com.icodesoftware.service.ClusterProvider;
+import com.tarantula.platform.service.cluster.ClusterDataView;
 
 public interface DistributionDataViewer {
 
-    byte[] load(String source, byte[] key, ClusterProvider.Node node);
+   void scan(String source, byte[] key, ClusterDataView view);
 }

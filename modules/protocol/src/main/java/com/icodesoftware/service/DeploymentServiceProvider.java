@@ -2,7 +2,6 @@ package com.icodesoftware.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.protocol.Channel;
 import com.icodesoftware.protocol.GameServerListener;
 
 import java.io.File;
@@ -17,16 +16,8 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
     String NAME = "DeploymentServiceProvider";
 
-    //GAME SERVER APIs
-    OnAccess registerConnection(Connection connection);
-    boolean registerChannel(Channel channel);
-
-    void updateRoom(String typeId,String lobby,byte[] payload);
-    void startConnection(Connection connection);
-    void stopConnection(Connection connection);
-    void verifyConnection(String typeId,String serverId);
     byte[] serverKey(String typeId);
-
+    GameServerListener gameServerListener(String typeId);
     String registerGameServerListener(GameServerListener gameServerListener);
     void unregisterGameServerListener(String registerKey);
     //END OF GAME SERVER/PUSH SERVER APIs
@@ -101,6 +92,8 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
     DistributionCallback distributionCallback();
 
+    NodeShutdownOperator nodeShutdownOperator(Access access);
+
     Transaction transaction(int scope);
     //local callbacks on distributed operations
     interface DistributionCallback{
@@ -109,7 +102,6 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
         void onGameClusterLaunched(long gameClusterId);
         void onGameClusterShutdown(long gameClusterId);
-        void onGameClusterCreated(long gameClusterId);
 
         void onModuleLaunched(String typeId);
         void onModuleShutdown(String typeId);
@@ -131,13 +123,17 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
         void onAccessIndexDisabled();
         void onAccessIndexEnabled();
 
-        void onConfigurableUpdated(String key);
+        //void onConfigurableUpdated(String key);
 
     }
 
     interface GameClusterEventListener{
         <T extends OnAccess> void onGameClusterEvent(T event);
         String typeId();
+    }
+
+    interface NodeShutdownOperator{
+        void shutdown(ClusterProvider.Node node);
     }
 
 }

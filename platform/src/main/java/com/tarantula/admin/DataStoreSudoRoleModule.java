@@ -117,6 +117,8 @@ public class DataStoreSudoRoleModule implements Module {
             if(sum!=null){
                 sum.load(query[1].getBytes(),(n,h,t)->{
                     JsonObject debug = new JsonObject();
+                    debug.addProperty("node",n.nodeName());
+                    debug.addProperty("address",n.address());
                     debug.addProperty("revision",Long.toString(h.revision()));
                     debug.add("content",t.toJson());
                     data.add(debug);

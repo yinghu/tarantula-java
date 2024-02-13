@@ -49,8 +49,8 @@ public class Stub extends PlayerGameObject {
         jo.addProperty("Tag",tag);
         jo.addProperty("TournamentEnabled",tournament!=null);
         jo.addProperty("PlayMode",zone!=null?zone.playMode():null);
-        jo.addProperty("Ticket",ticket);
-        jo.addProperty("DistributionId",distributionId);
+        if(ticket!=null) jo.addProperty("Ticket",ticket);
+        jo.addProperty("DistributionId",distributionKey());
         return jo;
     }
 

@@ -71,7 +71,7 @@ public class AccessIndexTrack extends RecoverableObject implements AccessIndex, 
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("login",owner);
-        jsonObject.addProperty("distributionId",distributionId);
+        jsonObject.addProperty("distributionId",Long.toString(distributionId));
         jsonObject.addProperty("referenceId",referenceId);
         return jsonObject;
     }

@@ -85,19 +85,20 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         value.writeHeader(new LocalHeader(Long.MIN_VALUE,t.getFactoryId(),t.getClassId()));
         if(!t.write(value)) return false;
         final Txn<ByteBuffer> txn = env.txnWrite(); //can read also
+        final long transactionId = txn.getId();
         try {
             if (!dbi.put(txn, key.rewind(), value.flip())) throw new RuntimeException("lmdb failure to insert key/value");
             if (t.onEdge()) onEdge(t.ownerKey(), t.label(), t.key(), txn);
             key.rewind();
             value.rewind();
             t.revision(Long.MIN_VALUE);
-            lmdbDataStoreProvider.onUpdating(metadata,key,value,txn.getId());
-            lmdbDataStoreProvider.onCommit(metadata.scope(),txn.getId());
+            lmdbDataStoreProvider.onUpdating(metadata,key,value,transactionId);
+            lmdbDataStoreProvider.onCommit(metadata.scope(),transactionId);
             txn.commit();
             return true;
         }catch(Exception ex){
             txn.abort();
-            lmdbDataStoreProvider.onAbort(metadata.scope(),txn.getId());
+            lmdbDataStoreProvider.onAbort(metadata.scope(),transactionId);
             logger.error("Error on create",ex);
             return false;
         }
@@ -117,6 +118,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             return false;
         }
         final Txn<ByteBuffer> txn = env.txnWrite(); //can read also
+        final long transactionId = txn.getId();
         boolean updated = false;
         try{
             if (dbi.get(txn, key.flip()) != null){
@@ -132,8 +134,8 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
                     t.revision(header.revision());
                     key.rewind();
                     update.rewind();
-                    lmdbDataStoreProvider.onUpdating(metadata,key,update,txn.getId());
-                    lmdbDataStoreProvider.onCommit(metadata.scope(),txn.getId());
+                    lmdbDataStoreProvider.onUpdating(metadata,key,update,transactionId);
+                    lmdbDataStoreProvider.onCommit(metadata.scope(),transactionId);
                     updated = true;
                 }
             }
@@ -152,6 +154,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             return false;
         }
         final Txn<ByteBuffer> xtxn = env.txnWrite();
+        final long xtransctionId = xtxn.getId();
         try{
             value.flip();
             Recoverable.DataHeader header = value.readHeader();
@@ -165,8 +168,8 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             xtxn.commit();
             key.rewind();
             value.rewind();
-            lmdbDataStoreProvider.onUpdating(metadata,key,value,xtxn.getId());
-            lmdbDataStoreProvider.onCommit(metadata.scope(),txn.getId());
+            lmdbDataStoreProvider.onUpdating(metadata,key,value,xtransctionId);
+            lmdbDataStoreProvider.onCommit(metadata.scope(),xtransctionId);
         }
         finally {
             xtxn.close();
@@ -196,12 +199,18 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             return true;
         });
         if(existed) return false;
+        key.rewind();
         existed = lmdbDataStoreProvider.onRecovering(metadata,key,value);
         Txn<ByteBuffer> txn = env.txnWrite(); //can be reading also
+        final long transactionId = txn.getId();
         try{
             if(existed){
               if(!dbi.put(txn,key.rewind(),value.flip())) throw new RuntimeException("lmdb failure to insert key/value");
               txn.commit();
+              key.rewind();
+              value.rewind();
+              lmdbDataStoreProvider.onUpdating(metadata,key,value,transactionId);
+              lmdbDataStoreProvider.onCommit(metadata.scope(),transactionId);
               if(!loading) return false;
               value.rewind();
               Recoverable.DataHeader h = value.readHeader();
@@ -217,8 +226,8 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             t.revision(Long.MIN_VALUE);
             key.rewind();
             value.rewind();
-            lmdbDataStoreProvider.onUpdating(metadata,key,value,txn.getId());
-            lmdbDataStoreProvider.onCommit(metadata.scope(),txn.getId());
+            lmdbDataStoreProvider.onUpdating(metadata,key,value,transactionId);
+            lmdbDataStoreProvider.onCommit(metadata.scope(),transactionId);
             return true;
         }
         finally {
@@ -274,10 +283,11 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         if(label==null) return false;
         lmdbDataStoreProvider.createEdgeDB(scope,name,label);
         Txn<ByteBuffer> txn = env.txnWrite();
+        final long transactionId = txn.getId();
         try{
             if(!onEdge(t.ownerKey(),label,t.key(),txn)) return false;
             txn.commit();
-            lmdbDataStoreProvider.onCommit(metadata.scope(),txn.getId());
+            lmdbDataStoreProvider.onCommit(metadata.scope(),transactionId);
             return true;
         }finally {
             txn.close();
@@ -314,12 +324,13 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         }
 
         final Txn<ByteBuffer> txn = env.txnWrite();
+        final long transactionId = txn.getId();
         try{
             if(!dbi.delete(txn, key.flip())) return false;
             txn.commit();
             key.rewind();
-            lmdbDataStoreProvider.onDeleting(metadata,key, cache.value(),txn.getId());
-            lmdbDataStoreProvider.onCommit(metadata.scope(),txn.getId());
+            lmdbDataStoreProvider.onDeleting(metadata,key, cache.value(),transactionId);
+            lmdbDataStoreProvider.onCommit(metadata.scope(),transactionId);
             return true;
         }finally {
             txn.close();

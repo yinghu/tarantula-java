@@ -24,7 +24,7 @@ public interface GameZone extends Configurable{
     long roundOvertime();
 
     boolean connected();
-    Stub join(Session session, Rating rating);
+    Stub join(Session session);
     boolean leave(Stub stub);
 
     List<GameArena> arenas();
@@ -35,7 +35,7 @@ public interface GameZone extends Configurable{
     void close();
 
     interface RoomProxy{
-        Stub join(Session session, Rating rating);
+        Stub join(Session session);
 
         boolean leave(Stub stub);
         void setup(ApplicationContext applicationContext,GameLobby gameLobby,GameZone gameZone);

@@ -18,7 +18,6 @@ public interface ServiceContext extends Context{
     HttpClientProvider httpClientProvider();
     BackupProvider backupProvider();
 
-    KeyIndexService keyIndexService();
     OnPartition[] partitions();
 
     ClusterProvider.Node node();

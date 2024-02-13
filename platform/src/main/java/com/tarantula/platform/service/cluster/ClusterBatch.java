@@ -9,13 +9,24 @@ import com.icodesoftware.service.Batchable;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ClusterBatch implements Batchable, Portable {
 
-    private List<byte[]> data = new ArrayList<>();
+
+    private int size;
+    private Portable[] batch;
+
     public ClusterBatch(){
+    }
+
+    public ClusterBatch(List<Batchable.BatchData> batchable){
+        this.size = batchable.size();
+        batch = new KeyValueSet[size];
+        for(int i=0;i< batchable.size();i++){
+            BatchData data = batchable.get(i);
+            batch[i]=new KeyValueSet(data.key(), data.value());
+        }
     }
 
     @Override
@@ -30,34 +41,27 @@ public class ClusterBatch implements Batchable, Portable {
 
     @Override
     public void writePortable(PortableWriter out) throws IOException {
-        int sz = data.size();
-        out.writeInt("size",sz);
-        for(int i=0;i<sz;i++){
-            out.writeByteArray("d"+i,data.get(i));
-        }
+        out.writeInt("size",size);
+        out.writePortableArray("batch",batch);
     }
 
     @Override
     public void readPortable(PortableReader in) throws IOException {
-        int sz = in.readInt("size");
-        for(int i=0;i<sz;i++){
-            data.add(in.readByteArray("d"+i));
-        }
+        size = in.readInt("size");
+        batch = in.readPortableArray("batch");
     }
 
     @Override
     public int size() {
-        return data.size();
+        return size;
     }
 
     @Override
-    public List<byte[]> data() {
-        return data;
+    public BatchData[] batch() {
+        BatchData[] batchData = new BatchData[size];
+        for(int i=0;i<size;i++){
+            batchData[i]= (BatchData)batch[i];
+        }
+        return batchData;
     }
-
-    public void batch(byte[] batch){
-        data.add(batch);
-    }
-
-
 }

@@ -1,11 +1,10 @@
 package com.tarantula.platform.service.metrics;
 
 import com.icodesoftware.*;
+import com.icodesoftware.protocol.statistics.StatisticsUtil;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.platform.statistics.StatisticsUtil;
-import com.tarantula.platform.statistics.StatsDelta;
 
 import java.time.LocalDateTime;
 import java.util.*;

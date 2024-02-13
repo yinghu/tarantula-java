@@ -4,7 +4,6 @@ import com.icodesoftware.*;
 import com.tarantula.game.*;
 import com.tarantula.platform.room.GameRoom;
 
-
 public class PVERoomProxy extends RoomProxyHeader {
 
     @Override
@@ -12,22 +11,25 @@ public class PVERoomProxy extends RoomProxyHeader {
         super.setup(applicationContext,gameLobby,gameZone);
     }
     @Override
-    public Stub join(Session session, Rating rating) {
+    public Stub join(Session session) {
         Stub stub = gameServiceProvider.presenceServiceProvider().stub(session,application);
-        GameRoom room = this.gameServiceProvider.roomServiceProvider().join(rating,gameZone);
+        GameRoom room = this.gameServiceProvider.roomServiceProvider().join(stub,gameZone);
         stub.joined(room!=null);
         if(!stub.joined()) return stub;
         stub.room = room;
         stub.roomId = stub.room.roomId();
         stub.zone = gameZone;
         stub.zoneId = gameZone.distributionKey();
-        stub.pushChannel = this.gameServiceProvider.roomServiceProvider().registerChannel(stub,(s,d)->{
-            gameLobby.timeout(s,d);
-        });
-        stub.sessionId = stub.pushChannel.sessionId();
+        if(!room.dedicated() && gameServiceProvider.roomServiceProvider().pushChannelEnabled()){
+            stub.pushChannel = this.gameServiceProvider.roomServiceProvider().registerChannel(stub,(s,d)->{
+                gameLobby.timeout(s,d);
+            });
+            room.setup(stub.pushChannel);
+            stub.sessionId = stub.pushChannel.sessionId();
+            stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));
+        }
         stub.offline = true;
         stub.tag(application.tag());
-        stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));
         stub.update();
         return stub;
     }

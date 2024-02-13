@@ -4,6 +4,7 @@ import com.icodesoftware.Closable;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.service.Batchable;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.BinaryKey;
@@ -73,7 +74,7 @@ public class TransactionLogManager implements Closable {
                 }
                 return true;
             });
-            if(!suc) return;
+            if(!suc || transactionId <0 ) return;
             TransactionLog log = TransactionLog.log(transactionId,false, metadata.scope(), metadata.source(),metadata.label(),ak,null,header.revision());
             ts.create(log);
             return;
@@ -89,7 +90,7 @@ public class TransactionLogManager implements Closable {
             }
             return true;
         });
-        if(!suc) return;
+        if(!suc || transactionId <0 ) return;
         TransactionLog log = TransactionLog.log(transactionId,false,metadata.scope(),metadata.source(),metadata.label(),ak,av,0);
         ts.create(log);
     }
@@ -104,8 +105,30 @@ public class TransactionLogManager implements Closable {
             }
             return true;
         });
-
     }
+
+    public byte[] loadFromCommitted(Metadata metadata,byte[] key){
+        DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
+        if(metadata.label()!=null) return null;
+        byte[][] loaded = new byte[1][];
+        if(dataStore.backup().get(BinaryKey.from(key),(k,v)->{
+            loaded[0] = v.array();
+            return true;
+        })) return loaded[0];
+        return null;
+    }
+
+    public List<Batchable.BatchData> loadEdgeValueFromCommitted(Metadata metadata, byte[] key){
+        DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
+        List<Batchable.BatchData> edgeValueSet = new ArrayList<>();
+        if(metadata.label()==null) return edgeValueSet;
+        dataStore.backup().forEachEdgeKeyValue(BinaryKey.from(key),metadata.label(),(e,v)->{
+            edgeValueSet.add(new EdgeValueSet(e.array(),v.array()));
+            return true;
+        });
+        return edgeValueSet;
+    }
+
 
     public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferStream bufferStream){
         DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
@@ -190,6 +213,10 @@ public class TransactionLogManager implements Closable {
         return serviceContext.dataStore(Distributable.LOG_SCOPE,TRANSACTION_LOG);
     }
 
+    public DataStore onTransaction(Metadata metadata){
+        return serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
+    }
+
     public void onTransaction(List<TransactionLog> transactionLogs) {
         for(TransactionLog log : transactionLogs){
             DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(log.scope)+log.source);
@@ -239,8 +266,8 @@ public class TransactionLogManager implements Closable {
             }
         }
     }
-
     public void close(){
         //clear resources if any
     }
+
 }

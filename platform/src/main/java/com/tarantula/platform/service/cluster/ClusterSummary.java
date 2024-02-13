@@ -4,10 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.util.RecoverableObject;
-import com.icodesoftware.util.TimeUtil;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,19 +30,22 @@ public class ClusterSummary extends RecoverableObject implements ClusterProvider
 
     public List<ClusterProvider.Node> clusterNodes(){
         ArrayList<ClusterProvider.Node> _nodes = new ArrayList<>();
-        nodeList.forEach((k,n)-> _nodes.add(n));
+        HashMap<String, ClusterProvider.Node> added = new HashMap<>();
+        nodeList.forEach((k,n)-> {
+            if(added.putIfAbsent(n.memberId(),n)==null) _nodes.add(n);
+        });
         return _nodes;
     }
 
     //operations
     public void register(ClusterProvider.Node node){
         nodeList.put(node.nodeName(),node);
-        //nodeList.put(node.memberId(),node);
+        nodeList.put(node.memberId(),node);
     }
     public void unregister(ClusterProvider.Node node){
         ClusterProvider.Node removed = nodeList.remove(node.nodeName());
-        //if(removed==null) return;
-        //nodeList.remove(removed.memberId());
+        if(removed==null) return;
+        nodeList.remove(removed.memberId());
     }
 
     public ClusterProvider.Node node(String nodeName){
@@ -56,10 +57,12 @@ public class ClusterSummary extends RecoverableObject implements ClusterProvider
         jsonObject.addProperty("clusterName",clusterName);
         jsonObject.addProperty("partitionNumber",partitionNumber);
         JsonArray nodes = new JsonArray();
+        HashMap<String, ClusterProvider.Node> added = new HashMap<>();
         nodeList.forEach((k,n)->{
-            nodes.add(n.toJson());
+            if(added.putIfAbsent(n.memberId(),n)==null) nodes.add(n.toJson());
         });
         jsonObject.add("nodeList",nodes);
+        added.clear();
         return jsonObject;
     }
 

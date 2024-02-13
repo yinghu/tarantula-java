@@ -47,10 +47,7 @@
             <name>AccessIndexService</name>
             <class-name>com.tarantula.platform.service.cluster.accessindex.AccessIndexClusterService</class-name>
         </service>
-        <service enabled="true">
-            <name>DistributionKeyIndexService</name>
-            <class-name>com.tarantula.platform.service.cluster.keyindex.KeyIndexClusterService</class-name>
-        </service>
+
         <service enabled="true">
             <name>DeployService</name>
             <class-name>com.tarantula.platform.service.cluster.deployment.ClusterDeployService</class-name>

@@ -173,7 +173,10 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
 
     public UDPChannel[] createChannels(int capacity) {
         PushUserChannel pushUserChannel = pendingUserChannels.poll();
-        if (pushUserChannel == null && channelPoolSize.decrementAndGet()<0) return new UDPChannel[0];
+        if (pushUserChannel == null && channelPoolSize.decrementAndGet()<0){
+            logger.warn("No more channels available ["+channelPoolSize.get()+"]");
+            return new UDPChannel[0];
+        }
 
         if(pushUserChannel == null) {
             pushUserChannel = new PushUserChannel(channelId.getAndIncrement(), udpEndpointServiceProvider,this.cipherListener, this, this, this,this);

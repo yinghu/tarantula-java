@@ -22,7 +22,7 @@
 	  </dependency>
 	  <dependency>
 		  <groupId>com.icodesoftware</groupId>
-		  <artifactId>gec-games</artifactId>
+		  <artifactId>gec-lmdb</artifactId>
 		  <version>1.0</version>
 	  </dependency>
   </dependencies>

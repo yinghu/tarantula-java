@@ -161,7 +161,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
 
     public EventService subscribe(String topic, EventListener callback){
-        //log.warn("Event subscription ["+topic+"] to integration cluster");
         this.eventSubscribers.computeIfAbsent(topic,(t)->{
             EventSubscriber eventSubscriber = new EventSubscriber();
             eventSubscriber.callback = callback;
@@ -230,7 +229,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
 
     public void onPartition(int pt,boolean opening){
-        //log.warn("Partition ["+pt+"] with opening ["+opening+"]");
         this.partitionStates[pt].opening = opening;
         bMap.forEach((k,v)->{
             if(v.partition()==pt&&opening){//open if closed
@@ -252,12 +250,10 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         return this.routingKey(magicKey,tag,routingNumber(magicKey));
     }
     public RoutingKey routingKey(Object magicKey,String tag,int routingNumber){
-        //int _ix = magicKey.indexOf(Recoverable.PATH_SEPARATOR);
         return new ServiceRoutingKey(this.bucket,tag,routingNumber);
     }
 
     private int routingNumber(Object magicKey){
-        //return -_cluster.getPartitionService().getPartition(magicKey).getPartitionId();
         return SystemUtil.partition(magicKey,this.tarantulaContext.platformRoutingNumber);
     }
     public void registerMetricsListener(MetricsListener metricsListener){
@@ -271,19 +267,19 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     @Override
     public void stateChanged(LifecycleEvent state) {
         LifecycleEvent.LifecycleState cs = state.getState();
-        log.warn("Integration cluster state changed->"+state);
+        log.warn("Integration cluster state changed : "+state);
         switch(cs){
             case STARTED:
                 _integrationInstanceStarted.countDown();
                 break;
             case MERGING:
-                log.warn("Integration cluster state merging->"+state);
+                log.warn("Integration cluster state merging : "+state);
                 break;
             case MERGED:
-                log.warn("Integration cluster state merged->"+state);
+                log.warn("Integration cluster state merged : "+state);
                 break;
             case MERGE_FAILED:
-                log.warn("Integration cluster state merged faied->"+state);
+                log.warn("Integration cluster state merged failed : "+state);
                 break;
             default:
         }
@@ -394,7 +390,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         try{_serviceReady.await();}catch (Exception ex){}
         String setting = member.getStringAttribute("node");
         if(setting==null){
-            log.warn("NODE NOT READY : "+member.getUuid());
+            log.warn("Node not ready : "+member.getUuid()+" : "+member.getAddress().toString());
             return;
         }
         String[] node = setting.split("#");
@@ -405,7 +401,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         if(existingNode!=null){
             nList.forEach(nodeListener -> nodeListener.nodeAdded(existingNode));
             this.summary.register(existingNode);
-            log.warn("NODE ADDED : "+nodeName+" : "+memberId+" : "+nodeId);
+            log.warn("Node is ready : "+nodeName+" : "+memberId+" : "+nodeId);
         }
     }
 

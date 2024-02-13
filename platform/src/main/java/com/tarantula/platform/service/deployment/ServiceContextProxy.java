@@ -127,10 +127,6 @@ public class ServiceContextProxy implements ServiceContext {
         this.tarantulaContext.log(message,error,level);
     }
 
-    public KeyIndexService keyIndexService(){
-        return this.tarantulaContext.keyIndexService();
-    }
-
     @Override
     public long distributionId() {
         return this.tarantulaContext.distributionId();

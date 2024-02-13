@@ -106,9 +106,9 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
     }
 
     @Override
-    public Stub join(Session session, Rating rating) {
+    public Stub join(Session session) {
 
-        return roomProxy.join(session,rating);
+        return roomProxy.join(session);
     }
 
     @Override

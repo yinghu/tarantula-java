@@ -7,7 +7,6 @@ import com.icodesoftware.service.Metrics;
 
 import com.tarantula.platform.service.metrics.*;
 
-import com.tarantula.platform.statistics.StatisticsPortableRegistry;
 import com.tarantula.platform.util.RecoverableQuery;
 import org.testng.Assert;
 import org.testng.annotations.Test;

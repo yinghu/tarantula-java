@@ -9,8 +9,8 @@ import com.tarantula.game.GameRating;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.service.KeyIndexTrack;
 import com.tarantula.platform.service.cluster.ClusterBatch;
+import com.tarantula.platform.service.cluster.KeyValueSet;
 import com.tarantula.platform.service.persistence.PortableTransactionLog;
 import com.tarantula.platform.tournament.*;
 
@@ -33,12 +33,14 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int SERVER_PUSH_EVENT_CID = 21;
 
-    public static final int KEY_INDEX_EVENT_CID = 22;
-
     public static final int TRANSACTION_LOG_CID = 24;
     public static final int TRANSACTION_REPLICATION_EVENT_CID = 25;
 
     public static final int TOURNAMENT_REGISTER_STATUS_CID = 26;
+
+    public static final int KEY_VALUE_SET_CID = 27;
+
+    public static final int CLUSTER_BATCH_CID = 28;
 
     //EVENT PORTABLE OBJECTS
     public static final int SINGLETON_FORWARD_CID = 100;
@@ -81,8 +83,7 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int CONNECTION_STUB_CID = 127;
 
-    public static final int KEY_INDEX_CID = 128;
-    public static final int CLUSTER_BATCH_CID = 129;
+
     public Portable create(int cid) {
         Portable _ins;
 		switch(cid){
@@ -115,9 +116,6 @@ public class PortableEventRegistry implements PortableFactory {
                 _ins = new ModuleResetEvent();
                 break;
 
-            case KEY_INDEX_EVENT_CID:
-                _ins = new KeyIndexEvent();
-                break;
             case TRANSACTION_LOG_CID:
                 _ins = new PortableTransactionLog();
                 break;
@@ -127,6 +125,14 @@ public class PortableEventRegistry implements PortableFactory {
             case TOURNAMENT_REGISTER_STATUS_CID:
                 _ins = new TournamentRegisterStatus();
                 break;
+            case KEY_VALUE_SET_CID:
+                _ins = new KeyValueSet();
+                break;
+            case CLUSTER_BATCH_CID:
+                _ins = new ClusterBatch();
+                break;
+
+
             case SINGLETON_FORWARD_CID:
                 _ins = new SessionForward();
                 break;
@@ -184,12 +190,6 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case CONNECTION_STUB_CID:
                 _ins = new ConnectionStub();
-                break;
-            case KEY_INDEX_CID:
-                _ins = new KeyIndexTrack();
-                break;
-            case CLUSTER_BATCH_CID:
-                _ins = new ClusterBatch();
                 break;
             default:
 				throw new IllegalArgumentException("Not supported event type");

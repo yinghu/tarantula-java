@@ -93,6 +93,8 @@ public class Player implements Runnable{
                 LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
                 LoadResult.totalHttpRequestCount.incrementAndGet();
                 if(!onPresence(resp)){
+                    System.out.println(resp);
+                    System.out.println(jsonObject);
                     LoadResult.totalFailureLogin.incrementAndGet();
                     throw new RuntimeException("failed");
                 }
@@ -212,13 +214,14 @@ public class Player implements Runnable{
         JsonObject joinPayload = JsonUtil.parse(resp);
         boolean suc = joinPayload.get("Successful").getAsBoolean();
         if(!suc){
+            System.out.println(resp);
             LoadResult.totalFailureJoin.incrementAndGet();
             throw new RuntimeException("failed");
         }
         LoadResult.totalSuccessJoin.incrementAndGet();
         joined = true;
         tag = joinPayload.get("Tag").getAsString();
-        ticket = joinPayload.get("Ticket").getAsString();
+        //ticket = joinPayload.get("Ticket").getAsString();
         if(!udpTested) return;
         JsonObject channel = joinPayload.get("_pushChannel").getAsJsonObject();
         byte[] serverKey = Base64.getDecoder().decode(channel.get("ServerKey").getAsString());

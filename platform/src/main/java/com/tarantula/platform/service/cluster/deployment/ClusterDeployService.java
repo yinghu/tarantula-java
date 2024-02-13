@@ -10,8 +10,10 @@ import com.icodesoftware.*;
 
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.logging.JDKLogger;
+import com.sun.jdi.Bootstrap;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
+import com.tarantula.platform.bootstrap.TarantulaMain;
 import com.tarantula.platform.util.ResponseSerializer;
 
 import java.util.*;
@@ -58,10 +60,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
 
     @Override
     public void destroyDistributedObject(String s) {
-    }
-
-    public void onCreateGameCluster(long gameClusterId){
-        this.deploymentServiceProvider.distributionCallback().onGameClusterCreated(gameClusterId);
     }
 
     public void onUpdateView(OnView onView){
@@ -143,10 +141,6 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         this.deploymentServiceProvider.distributionCallback().onModuleDeployed(contentUrl,resourceName);
     }
 
-    public void onUpdateConfigurable(String key){
-        this.deploymentServiceProvider.distributionCallback().onConfigurableUpdated(key);
-    }
-
     public void onStartConnection(String typeId,Connection connection){
         this.deploymentServiceProvider.distributionCallback().onConnectionStarted(typeId,connection);
     }
@@ -188,5 +182,15 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     @Override
     public void migrationFailed(MigrationEvent migrationEvent) {
 
+    }
+    public void onNodeShutdown(){
+        new Thread(()->{
+            try{
+                Thread.sleep(3000);
+                TarantulaMain.runtime.shutdown();
+            }catch (Exception ex){
+                log.warn("cannot shutdown node");
+            }
+        }).start();
     }
 }

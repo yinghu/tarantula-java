@@ -1,14 +1,14 @@
 package com.tarantula.platform.service.persistence;
 
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Distributable;
-import com.icodesoftware.Recoverable;
-import com.icodesoftware.RecoverableRegistry;
+import com.icodesoftware.*;
 
+import com.icodesoftware.lmdb.BufferProxy;
+import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.DataStoreSummary;
-import com.icodesoftware.service.KeyIndex;
 import com.icodesoftware.util.BinaryKey;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.service.cluster.accessindex.DistributionAccessIndexViewer;
+import com.tarantula.platform.service.cluster.recover.DistributionDataViewer;
 
 import java.util.Base64;
 import java.util.List;
@@ -111,18 +111,34 @@ public class DataStoreViewer implements DataStoreSummary {
 
     public void load(byte[] key, DataStoreSummary.View view){
         BinaryKey akey = new BinaryKey(Base64.getDecoder().decode(key));
-        if(dataStore.scope() != Distributable.INDEX_SCOPE){
-            KeyIndex keyIndex = tarantulaContext.keyIndexService.lookup(dataStore.name(),akey);
+        if(dataStore.scope()== Distributable.INTEGRATION_SCOPE){
+            DistributionAccessIndexViewer viewer = (DistributionAccessIndexViewer) tarantulaContext.clusterProvider().accessIndexService();
+            viewer.scan(akey.asBinary(),(m,k,v)->{
+                ClusterProvider.Node node = tarantulaContext.clusterProvider().summary().node(m.getUuid());
+                if(v==null) return true;
+                onView(node,k,v,view);
+                return true;
+            });
+            return;
         }
-        System.out.println("DB : "+dataStore.name()+" : "+dataStore.scope());
-        this.dataStore.backup().get(akey,(k,v)->{
-            Recoverable.DataHeader h = v.readHeader();
-            RecoverableRegistry registry = tarantulaContext.recoverableRegistry(h.factoryId());
-            Recoverable recoverable = registry.create(h.classId());
-            recoverable.read(v);
-            recoverable.readKey(k);
-            view.on(null,h,recoverable);
-            return true;
-        });
+        if(dataStore.scope()== Distributable.DATA_SCOPE){
+            DistributionDataViewer viewer = (DistributionDataViewer) tarantulaContext.clusterProvider().recoverService();
+            viewer.scan(dataStore.name(),akey.asBinary(),(m,k,v)->{
+                ClusterProvider.Node node = tarantulaContext.clusterProvider().summary().node(m.getUuid());
+                if(v==null) return true;
+                onView(node,k,v,view);
+                return true;
+            });
+        }
+    }
+
+    private void onView(ClusterProvider.Node node,byte[] key, byte[] value, DataStoreSummary.View view){
+        Recoverable.DataBuffer buffer = BufferProxy.wrap(value);
+        Recoverable.DataHeader header = buffer.readHeader();
+        RecoverableRegistry registry = tarantulaContext.recoverableRegistry(header.factoryId());
+        Recoverable r = registry.create(header.classId());
+        r.readKey(BufferProxy.wrap(key));
+        r.read(buffer);
+        view.on(node,header,r);
     }
 }

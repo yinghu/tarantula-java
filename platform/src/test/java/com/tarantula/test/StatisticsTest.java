@@ -4,8 +4,7 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Statistics;
 
 
-
-import com.tarantula.platform.statistics.UserStatistics;
+import com.icodesoftware.protocol.statistics.UserStatistics;
 import org.testng.Assert;
 
 import org.testng.annotations.Test;

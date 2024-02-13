@@ -70,7 +70,7 @@
         tx_close_current_page();       
     };
     document.querySelector('#tx-cluster-shutdown').onclick = ()=>{
-        TARA_API.onGet('role/sudo','onClusterShutdown','',(resp)=>{
+        TARA_API.onGet('role/sudo','onClusterShutdown',node.memberId,(resp)=>{
             console.log(resp);    
         });
     };

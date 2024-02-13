@@ -21,8 +21,6 @@ public interface Messenger {
     short ON_ACTION = 205;
 
 
-
-
     byte[] buffer();
     void buffer(byte[] buffer);
 

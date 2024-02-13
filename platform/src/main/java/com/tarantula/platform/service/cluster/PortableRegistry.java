@@ -1,6 +1,5 @@
 package com.tarantula.platform.service.cluster;
 
-import com.hazelcast.cache.impl.ICacheService;
 import com.icodesoftware.Recoverable;
 
 import com.icodesoftware.util.AbstractRecoverableListener;
@@ -10,7 +9,6 @@ import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.event.SessionForward;
 import com.tarantula.platform.room.*;
 import com.tarantula.platform.service.AccessKey;
-import com.tarantula.platform.service.KeyIndexTrack;
 import com.tarantula.platform.service.PresenceKey;
 import com.tarantula.platform.tournament.TournamentEntry;
 import com.tarantula.platform.tournament.TournamentInstance;
@@ -37,9 +35,6 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
     public static final int ON_SESSION_CID = 25;//DEPLOY OBJECT
 
     public static final int ON_VIEW_OID = 28;
-
-    public static final int PROPERTY_INDEX_SET_CID = 29;
-
 
     //START 100 working with EVENT PORTABLE on same OID
     public static final int SINGLETON_FORWARD_CID = PortableEventRegistry.SINGLETON_FORWARD_CID;
@@ -68,7 +63,6 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
     public static final int TVT_ROOM_CID = PortableEventRegistry.TVT_ROOM_CID;
     public static final int CLIENT_CONNECTION_CID = PortableEventRegistry.CLIENT_CONNECTION_CID;
 
-    public static final int KEY_INDEX_CID = PortableEventRegistry.KEY_INDEX_CID;
 
     public static PortableRegistry INS;
     public PortableRegistry(){
@@ -110,9 +104,7 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
             case ON_VIEW_OID:
                 _ins = new OnViewTrack();
                 break;
-            case PROPERTY_INDEX_SET_CID:
-                _ins = new PropertyIndexSet();
-                break;
+
             case SINGLETON_FORWARD_CID:
                 _ins = new SessionForward();
                 break;
@@ -162,9 +154,6 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
                 break;
             case TVT_ROOM_CID:
                 _ins = new TVTGameRoom();
-                break;
-            case KEY_INDEX_CID:
-                _ins = new KeyIndexTrack();
                 break;
             default:
                 throw new IllegalArgumentException("Not supported event type ["+cid+"]");

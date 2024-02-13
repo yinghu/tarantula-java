@@ -73,10 +73,7 @@ public class TestContext implements ServiceContext {
         return null;
     }
 
-    @Override
-    public KeyIndexService keyIndexService() {
-        return null;
-    }
+
 
     @Override
     public OnPartition[] partitions() {

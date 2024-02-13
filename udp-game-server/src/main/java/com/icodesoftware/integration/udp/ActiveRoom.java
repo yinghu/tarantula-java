@@ -19,7 +19,6 @@ public class ActiveRoom extends RecoverableObject implements Room {
     private AtomicInteger totalJoined;
     private AtomicInteger totalLeft;
 
-    //public GameModule gameModule;
     public GameUserChannel gameUserChannel;
 
     private long countdownTimer;
@@ -98,7 +97,6 @@ public class ActiveRoom extends RecoverableObject implements Room {
 
     public void onCountdown(long delta){
         countdownTimer -= delta;
-        //this.gameModule.countdown(countdownTimer);
     }
 
     public int join(){

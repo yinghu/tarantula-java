@@ -29,6 +29,7 @@ public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecov
     public static final int CAMPAIGN_PROGRESS_CID = 12;
 
     public static final int PLAYER_ACTION_CID = 13;
+
     public static final int MANUAL_ANALYTICS_CID = 14;
     public static final int CURRENCY_UPDATE_CID = 15;
     
@@ -80,6 +81,7 @@ public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecov
             case CAMPAIGN_PROGRESS_CID:
                 pt = new CampaignProgress();
                 break;
+
             case PLAYER_ACTION_CID:
                 pt = new PlayerAction();
                 break;
@@ -89,6 +91,7 @@ public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecov
             case CURRENCY_UPDATE_CID:
                 pt = new CurrencyUpdate();
                 break;
+
             default:
         }
         return (T)pt;

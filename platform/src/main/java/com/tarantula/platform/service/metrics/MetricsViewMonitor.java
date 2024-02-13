@@ -2,6 +2,7 @@ package com.tarantula.platform.service.metrics;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.ApplicationContext;
+import com.icodesoftware.OnLog;
 import com.icodesoftware.SchedulingTask;
 import com.icodesoftware.util.JsonUtil;
 
@@ -52,7 +53,7 @@ public class MetricsViewMonitor implements SchedulingTask {
                r.loaded();
            });
         }catch (Exception ex){
-            ex.printStackTrace();
+            applicationContext.log("error on monitor view",ex, OnLog.ERROR);
         }
         finally {
             this.applicationContext.schedule(this);

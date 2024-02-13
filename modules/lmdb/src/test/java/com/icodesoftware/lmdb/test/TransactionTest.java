@@ -8,7 +8,9 @@ import com.icodesoftware.Transaction;
 import com.icodesoftware.lmdb.LMDBDataStoreProvider;
 import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
 
+import com.icodesoftware.lmdb.LocalMetadata;
 import com.icodesoftware.lmdb.TransactionLog;
+import com.icodesoftware.util.NaturalKey;
 import com.icodesoftware.util.SnowflakeKey;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
@@ -174,7 +176,6 @@ public class TransactionTest {
             return true;
         });
         transaction.close();
-
     }
 
     @Test(groups = { "LMDB" })

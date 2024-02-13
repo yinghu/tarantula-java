@@ -3,12 +3,16 @@ package com.tarantula.admin;
 import com.google.gson.*;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
+import com.icodesoftware.util.NaturalKey;
+import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.TarantulaMain;
 import com.tarantula.platform.presence.PermissionContext;
 
+import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -126,8 +130,12 @@ public class SudoRoleModule implements Module {
             session.write(summary.toJson().toString().getBytes());
         }
         else if(session.action().equals("onClusterShutdown")){
-            session.write(JsonUtil.toSimpleResponse(true,"shutdown").getBytes());
-            TarantulaMain.runtime.shutdown();
+            Access acc = userService.loadUser(session.distributionId());
+            session.write(JsonUtil.toSimpleResponse(true,"shutdown :"+session.name()).getBytes());
+            DeploymentServiceProvider.NodeShutdownOperator shutdownOperator = deploymentServiceProvider.nodeShutdownOperator(acc);
+            ClusterNode node = new ClusterNode();
+            node.memberId = session.name();
+            shutdownOperator.shutdown(node);
         }
         else{
            throw new UnsupportedOperationException("operation ["+session.action()+"] not supported");

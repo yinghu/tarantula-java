@@ -1,23 +1,18 @@
 package com.tarantula.platform;
-import com.icodesoftware.Configurable;
-import com.icodesoftware.Configuration;
-import com.icodesoftware.Distributable;
-import com.icodesoftware.Property;
 
-import com.icodesoftware.service.*;
+import com.icodesoftware.Configuration;
+import com.icodesoftware.Property;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
+
 import com.icodesoftware.util.RecoverableObject;
 
 public class ApplicationConfiguration extends RecoverableObject implements Configuration {
 
     public static final String LABEL = "AFC";
-
-    private CopyOnWriteArrayList<Configurable.Listener> _listeners = new CopyOnWriteArrayList<>();
 
     private String type;
 
@@ -76,16 +71,4 @@ public class ApplicationConfiguration extends RecoverableObject implements Confi
         return PortableRegistry.APPLICATION_CONFIGURATION_CID;
     }
 
-    @Override
-    public void registerListener(Listener listener){
-        this._listeners.add(listener);
-    }
-    @Override
-    public void updated(ServiceContext serviceContext){
-        RecoverService rsp = serviceContext.clusterProvider().recoverService();
-        ClusterProvider.Node[] nodes = serviceContext.keyIndexService().recoveringNodeList(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.distributionKey());
-        byte[] _data = rsp.onRecover(DeploymentServiceProvider.DEPLOY_DATA_STORE,this.distributionKey().getBytes(),nodes);
-        this.fromBinary((_data));
-        this._listeners.forEach((a)->a.onUpdated(this));
-    }
 }

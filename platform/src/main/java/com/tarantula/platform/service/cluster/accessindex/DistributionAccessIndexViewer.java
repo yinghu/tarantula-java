@@ -1,7 +1,10 @@
 package com.tarantula.platform.service.cluster.accessindex;
 
-import com.icodesoftware.service.ClusterProvider;
+
+import com.tarantula.platform.service.cluster.ClusterDataView;
+
 
 public interface DistributionAccessIndexViewer {
-    byte[] load(String source, byte[] key, ClusterProvider.Node node);
+    void scan(byte[] key, ClusterDataView view);
+
 }
