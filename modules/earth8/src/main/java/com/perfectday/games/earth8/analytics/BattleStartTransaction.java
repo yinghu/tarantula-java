@@ -15,8 +15,10 @@ public class BattleStartTransaction extends AnalyticsTransaction {
         data.add("chapter_id", object.get("TEMP_ChapterName"));
         data.add("stage_id", object.get("TEMP_StageName"));
         data.add("party", object.get("TEMP_StringParty"));
-        data.add("difficulty", object.get("Difficulty"));
         data.add("autobattle", object.get("AutoBattle"));
-
+        data.add("difficulty", object.get("Difficulty"));
+        data.add("campaignName", object.get("MenuName"));
+        data.add("dungeonChapterName", object.get("DungeonChapterName"));
+        data.add("stageNumber", object.get("StageNumber"));
     }
 }
