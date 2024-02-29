@@ -221,7 +221,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         if(indexed[0]==null) return null;
         HashMap<Integer,BatchedMappingObject> batchData = new HashMap<>();
         dataStore.list(new OversizeDataQuery(SnowflakeKey.from(indexed[0].distributionId()),key),(batch)->{
-            batchData.put(batch.batch,batch);
+            if(batch.batch<indexed[0].batch) batchData.put(batch.batch,batch);
             return true;
         });
         return OversizeDataBatch.batch(batchData);
