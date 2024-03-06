@@ -8,6 +8,7 @@ import com.icodesoftware.Session;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -16,9 +17,14 @@ import com.tarantula.platform.item.PlatformItemServiceProvider;
 import com.tarantula.platform.presence.MappingObject;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.util.RecoverableQuery;
+import jnr.ffi.annotations.In;
 
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
+import java.util.ArrayDeque;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvider {
@@ -40,7 +46,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         super.setup(serviceContext);
         Configuration configuration = serviceContext.configuration("game-presence-settings");
         JsonObject saveGame = ((JsonElement)configuration.property("savedGame")).getAsJsonObject();
-        mappingObjectMaxSize = saveGame.get("mappingObjectMaxSize").getAsInt() - MappingObject.MAP_OBJECT_HEADER_SIZE;
+        mappingObjectMaxSize = saveGame.get("mappingObjectMaxSize").getAsInt();
         saveSize = saveGame.get("saveSize").getAsInt();
         saveTimeout = saveGame.get("saveTimeout").getAsInt()*saveTimeout;
         dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
@@ -48,11 +54,6 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         this.logger.warn("Saved game service provider started on ->"+gameServiceName+" : "+mappingObjectMaxSize);
     }
 
-
-
-    public int mappingObjectMaxSize(){
-        return mappingObjectMaxSize;
-    }
 
     public <T extends RecoverableObject> void save(Session session,T save){
         CurrentSaveIndex currentSaveIndex = currentSaveIndex(session);
@@ -166,5 +167,66 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         }
         return list;
     }
+
+    public void saveData(Session session,String key,byte[] data){
+        OversizeDataIndex[] indexed = {null};
+        dataStore.list(new OversizeDataIndexQuery(SnowflakeKey.from(session.distributionId())),(index)->{
+            if(!index.saveKey.equals(key)) return true;
+            indexed[0] = index;
+            return false;
+        });
+        HashMap<Integer,byte[]> chunks = OversizeDataBatch.toBatch(data,mappingObjectMaxSize-BatchedMappingObject.MAP_OBJECT_HEADER_SIZE);
+        if(indexed[0]==null){
+            indexed[0] = new OversizeDataIndex(key);
+            indexed[0].saveKey = key;
+            indexed[0].batch = chunks.size();
+            indexed[0].ownerKey(SnowflakeKey.from(session.distributionId()));
+            dataStore.create(indexed[0]);
+            for(int i=0;i<chunks.size();i++){
+                byte[] chunk = chunks.get(i);
+                BatchedMappingObject batchedMappingObject = new BatchedMappingObject(key);
+                batchedMappingObject.value(chunk);
+                batchedMappingObject.batch = i;
+                batchedMappingObject.ownerKey(SnowflakeKey.from(indexed[0].distributionId()));
+                dataStore.create(batchedMappingObject);
+            }
+            return;
+        }
+        indexed[0].batch = chunks.size();
+        dataStore.update(indexed[0]);
+        dataStore.list(new OversizeDataQuery(SnowflakeKey.from(indexed[0].distributionId()),key),(chunk)->{
+            byte[] pending = chunks.remove(chunk.batch);
+            if(pending!=null){
+                chunk.value(pending);
+                dataStore.update(chunk);
+            }
+            return true;
+        });
+        chunks.forEach((k,v)->{
+            BatchedMappingObject batchedMappingObject = new BatchedMappingObject(key);
+            batchedMappingObject.value(v);
+            batchedMappingObject.batch = k;
+            batchedMappingObject.ownerKey(SnowflakeKey.from(indexed[0].distributionId()));
+            dataStore.create(batchedMappingObject);
+        });
+    }
+
+    public byte[] loadData(Session session, String key){
+        OversizeDataIndex[] indexed = {null};
+        dataStore.list(new OversizeDataIndexQuery(SnowflakeKey.from(session.distributionId())),(index)->{
+            if(!index.saveKey.equals(key)) return true;
+            indexed[0] = index;
+            return false;
+        });
+        if(indexed[0]==null) return null;
+        HashMap<Integer,BatchedMappingObject> batchData = new HashMap<>();
+        dataStore.list(new OversizeDataQuery(SnowflakeKey.from(indexed[0].distributionId()),key),(batch)->{
+            if(batch.batch<indexed[0].batch) batchData.put(batch.batch,batch);
+            return true;
+        });
+        return OversizeDataBatch.fromBatch(batchData);
+    }
+
+
 
 }
