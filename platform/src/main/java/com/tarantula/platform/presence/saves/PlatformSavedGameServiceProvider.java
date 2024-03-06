@@ -175,7 +175,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
             indexed[0] = index;
             return false;
         });
-        HashMap<Integer,byte[]> chunks = OversizeDataBatch.batch(data,mappingObjectMaxSize-BatchedMappingObject.MAP_OBJECT_HEADER_SIZE);
+        HashMap<Integer,byte[]> chunks = OversizeDataBatch.toBatch(data,mappingObjectMaxSize-BatchedMappingObject.MAP_OBJECT_HEADER_SIZE);
         if(indexed[0]==null){
             indexed[0] = new OversizeDataIndex(key);
             indexed[0].saveKey = key;
@@ -224,7 +224,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
             if(batch.batch<indexed[0].batch) batchData.put(batch.batch,batch);
             return true;
         });
-        return OversizeDataBatch.batch(batchData);
+        return OversizeDataBatch.fromBatch(batchData);
     }
 
 

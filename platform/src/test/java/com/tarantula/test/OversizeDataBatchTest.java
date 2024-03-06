@@ -24,7 +24,7 @@ public class OversizeDataBatchTest extends DataStoreHook{
         Assert.assertNotNull(json);
         byte[] data = json.toString().getBytes();
         Assert.assertTrue(data.length>1600);
-        HashMap<Integer,byte[]> batch = OversizeDataBatch.batch(data,1600);
+        HashMap<Integer,byte[]> batch = OversizeDataBatch.toBatch(data,1600);
         StringBuffer buffer = new StringBuffer();
         HashMap<Integer, BatchedMappingObject> indexed = new HashMap<>();
 
@@ -40,7 +40,7 @@ public class OversizeDataBatchTest extends DataStoreHook{
         }
         JsonObject reverse = JsonUtil.parse(buffer.toString());
         Assert.assertEquals(json.toString(),reverse.toString());
-        byte[] stream = OversizeDataBatch.batch(indexed);
+        byte[] stream = OversizeDataBatch.fromBatch(indexed);
         JsonObject reverseFromIndex = JsonUtil.parse(stream);
         Assert.assertEquals(reverse.toString(),reverseFromIndex.toString());
     }
@@ -51,7 +51,7 @@ public class OversizeDataBatchTest extends DataStoreHook{
         Assert.assertNotNull(json);
         byte[] data = json.toString().getBytes();
         Assert.assertTrue(data.length<=1600);
-        HashMap<Integer,byte[]> batch = OversizeDataBatch.batch(data,1600);
+        HashMap<Integer,byte[]> batch = OversizeDataBatch.toBatch(data,1600);
         HashMap<Integer, BatchedMappingObject> indexed = new HashMap<>();
 
         StringBuffer buffer = new StringBuffer();
@@ -68,7 +68,7 @@ public class OversizeDataBatchTest extends DataStoreHook{
         }
         JsonObject reverse = JsonUtil.parse(buffer.toString());
         Assert.assertEquals(json.toString(),reverse.toString());
-        byte[] stream = OversizeDataBatch.batch(indexed);
+        byte[] stream = OversizeDataBatch.fromBatch(indexed);
         JsonObject reverseFromIndex = JsonUtil.parse(stream);
         Assert.assertEquals(reverse.toString(),reverseFromIndex.toString());
     }
