@@ -23,4 +23,6 @@ public interface GameContext extends Context {
     Achievement achievement(Session session);
 
     ApplicationResource.Redeemer redeemer(Session session);
+
+    Configurable lookup(long distributionId);
 }
