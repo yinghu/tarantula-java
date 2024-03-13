@@ -15,5 +15,5 @@ public interface GameServiceProvider extends UDPEndpointServiceProvider.RequestL
 
     void onLeft(Session session);
 
-    <T extends OnAccess> List<T> inbox(Session session);
+    List<OnInbox> inbox(Session session);
 }

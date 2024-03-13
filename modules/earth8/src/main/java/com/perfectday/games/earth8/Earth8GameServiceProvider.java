@@ -14,6 +14,7 @@ import com.perfectday.games.earth8.analytics.ServerConnectTransaction;
 import com.perfectday.games.earth8.analytics.ServerMetadataTransaction;
 import com.perfectday.games.earth8.inbox.PlayerAction;
 import com.perfectday.games.earth8.inbox.PlayerActionQuery;
+import com.perfectday.games.earth8.inbox.PlayerEventInbox;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -170,7 +171,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             var playerId = JsonUtil.getJsonLong(jsonData, "playerId", 0);
             if(playerId>0){
                 gameContext.applicationSchema().transaction().execute(ctx->{
-                    DataStore playerActionStore = ctx.onDataStore("player_action");
+                    DataStore playerActionStore = ctx.onDataStore("player_coin_form");
                     PlayerAction playerAction = new PlayerAction("ShippingFormCompleted",true);
                     playerAction.ownerKey(SnowflakeKey.from(playerId));
                     return playerActionStore.create(playerAction);
@@ -212,16 +213,18 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         this.gameContext.log("Inventory type ["+inventory.type()+"] not supported",OnLog.WARN);
     }
 
-    public <T extends OnAccess> List<T> inbox(Session session){
-        List<OnAccess> inbox = new ArrayList<>();
+    public List<OnInbox> inbox(Session session){
+        List<OnInbox> inbox = new ArrayList<>();
+        List<OnAccess> playerEvents = new ArrayList<>();
         gameContext.applicationSchema().transaction().execute(ctx->{
-            DataStore dataStore = ctx.onDataStore("player_action");
+            DataStore dataStore = ctx.onDataStore("player_coin_form");
             dataStore.list(new PlayerActionQuery(session.distributionId())).forEach(playerAction -> {
-                inbox.add(playerAction);
+                 playerEvents.add(playerAction);
             });
             return true;
         });
-        return (List<T>)inbox;
+        inbox.add(new PlayerEventInbox("coinForm","tournament",playerEvents));
+        return inbox;
     }
 
     @Override
