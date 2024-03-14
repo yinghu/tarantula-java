@@ -15,7 +15,8 @@ public class PlayerActionTest {
         Assert.assertEquals(playerAction.name(),"ShippingFormCompleted");
         Assert.assertEquals(playerAction.completed,true);
         JsonObject expected = new JsonObject();
-        expected.addProperty("ShippingFormCompleted",true);
+        expected.addProperty("Name","ShippingFormCompleted");
+        expected.addProperty("Completed",true);
         Assert.assertEquals(playerAction.toJson().toString(),expected.toString());
     }
 }

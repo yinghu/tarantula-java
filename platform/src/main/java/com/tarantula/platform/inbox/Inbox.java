@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Inventory;
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.protocol.OnInbox;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.achievement.AchievementItem;
 import com.tarantula.platform.presence.dailygiveaway.DailyGiveaway;
@@ -21,7 +22,7 @@ public class Inbox extends RecoverableObject {
 
     public List<DailyGiveaway> dailyGiveawayList;
 
-    public List<OnAccess> accessList;
+    public List<OnInbox> inboxList;
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
@@ -45,10 +46,18 @@ public class Inbox extends RecoverableObject {
 
         jsonObject.add("_shop",shop.toJson());
 
-        JsonArray accesses = new JsonArray();
-        accessList.forEach((v)->accesses.add(v.toJson()));
-        jsonObject.add("_accessList",accesses);
-
+        //OnInbox list
+        JsonArray dataList = new JsonArray();
+        inboxList.forEach(inbox->{
+            JsonObject data = new JsonObject();
+            data.addProperty("Name",inbox.name());
+            data.addProperty("Category",inbox.name());
+            JsonArray content = new JsonArray();
+            inbox.content().forEach((v)->content.add(v.toJson()));
+            data.add("_content",content);
+            dataList.add(data);
+        });
+        jsonObject.add("_onInbox",dataList);
         return jsonObject;
     }
 }
