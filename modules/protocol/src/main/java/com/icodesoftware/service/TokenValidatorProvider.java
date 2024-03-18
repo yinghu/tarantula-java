@@ -64,5 +64,7 @@ public interface TokenValidatorProvider extends ServiceProvider,Resettable {
 
         <T extends Recoverable> boolean upload(String context,T content);
 
+        default byte[] download(String name){return new byte[0];}
+
     }
 }

@@ -1,9 +1,6 @@
 package com.tarantula.platform.service;
 
-
-import com.icodesoftware.OnAccess;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.Statistics;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
@@ -67,6 +64,7 @@ public class AuthObject implements TokenValidatorProvider.AuthVendor {
     public boolean upload(String s, byte[] bytes) {
         return false;
     }
+
 
     public <T extends Recoverable> boolean upload(String context,T content){
         return false;

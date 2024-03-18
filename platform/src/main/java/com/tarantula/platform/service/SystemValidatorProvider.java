@@ -472,6 +472,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             jdbcPool.setup(serviceContext);
             aMap.put(OnAccess.JDBC_SQL,jdbcPool);
         }
+        AuthVendorRegistry download = TarantulaContext.getInstance().authVendor(OnAccess.DOWNLOAD_CENTER);
+        if(download!=null){
+            download.registerMetricsLister(serviceContext.metrics(Metrics.ACCESS));
+            download.setup(serviceContext);
+            aMap.put(OnAccess.DOWNLOAD_CENTER,download);
+        }
         Configuration configuration = serviceContext.configuration("account-role-user-settings");
         maxOnSessionCount = ((Number)configuration.property("maxOnSessionCount")).intValue();
         //map only store

@@ -1,0 +1,30 @@
+{
+  "type": "category",
+  "category": "system",
+  "version": "1.0",
+  "description": "category item template list",
+  "name": "application-type-settings",
+  "itemList":
+  [
+    {
+      "header": {
+        "scope": "application.data",
+        "type": "FileCredentialConfiguration",
+        "description": "access category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "File",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": true
+          }
+        ]
+      }
+    }
+  ]
+}
