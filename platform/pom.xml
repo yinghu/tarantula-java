@@ -45,7 +45,11 @@
 		  <artifactId>postgresql</artifactId>
 		  <version>42.7.1</version>
 	  </dependency>
-
+	  <dependency>
+		  <groupId>com.icodesoftware</groupId>
+		  <artifactId>gec-games</artifactId>
+		  <version>1.0</version>
+	  </dependency>
 	  <dependency>
 		  <groupId>com.perfectday.games</groupId>
 		  <artifactId>gec-earth8</artifactId>

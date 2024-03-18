@@ -45,7 +45,7 @@ public class Stub extends PlayerGameObject {
         jo.add("_arena",room!=null?room.arena().toJson():new JsonObject());
         jo.add("_room",room!=null?room.toJson():new JsonObject());
         if(tournament!=null) jo.add("_tournament",tournament.toJson());
-        if(pushChannel!=null) jo.add("_pushChannel",pushChannel.toJson());
+        //if(pushChannel!=null) jo.add("_pushChannel",pushChannel.toJson());
         jo.addProperty("Tag",tag);
         jo.addProperty("TournamentEnabled",tournament!=null);
         jo.addProperty("PlayMode",zone!=null?zone.playMode():null);

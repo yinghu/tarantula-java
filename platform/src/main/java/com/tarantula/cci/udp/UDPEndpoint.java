@@ -231,7 +231,8 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
             String ticket = messageBuffer.readUTF8();
             boolean suc = tokenValidator.validateTicket(systemId,stub,ticket);
             metricsListener.onUpdated(AccessMetrics.UDP_REQUEST_COUNT,1);
-            boolean joined = sessionId == messageHeader.sessionId && suc && pendingJoins.remove(sessionId)!=null;
+            boolean joined = sessionId == messageHeader.sessionId && suc ;
+            pendingJoins.remove(sessionId); //remove pending join
             if(joined) channels.get(sessionId).validated();
             return joined;
         }catch (Exception ex){
