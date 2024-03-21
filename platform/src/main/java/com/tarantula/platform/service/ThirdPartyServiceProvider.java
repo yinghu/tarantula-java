@@ -79,6 +79,14 @@ public class ThirdPartyServiceProvider implements AuthVendorRegistry {
         return vendor.upload(typeName[1],content);
     }
 
+    @Override
+    public byte[] download(String query){
+        String[] typeName = query.split("#");
+        TokenValidatorProvider.AuthVendor vendor = aMap.get(typeName[0]);
+        if(vendor == null) return new byte[0];
+        return vendor.download(typeName[1]);
+    }
+
 
     public void registerAuthVendor(TokenValidatorProvider.AuthVendor authVendor){
         authVendor.setup(serviceContext);
