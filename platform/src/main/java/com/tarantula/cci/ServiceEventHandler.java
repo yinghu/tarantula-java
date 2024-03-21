@@ -27,20 +27,13 @@ public class ServiceEventHandler extends AbstractRequestHandler {
         String token = exchange.header(Session.TARANTULA_TOKEN);//authenticated token
         String action = exchange.header(Session.TARANTULA_ACTION);
         String tag = exchange.header(Session.TARANTULA_TAG);
-        //String tournamentId = exchange.header(Session.TARANTULA_TOURNAMENT_ID);//instance Id
         String name = exchange.header(Session.TARANTULA_NAME);//key name
         String clientId = exchange.header(Session.TARANTULA_CLIENT_ID);
         String trackId = exchange.header(Session.TARANTULA_TRACK_ID);
         byte[]  _payload = exchange.payload();
         if(path.startsWith("/service/action") && token!=null && !token.equals("undefined")){
             OnSession id = auth.validateToken(token);
-            if(!id.successful()) {
-                log.warn("Invalid Token : "+token+" : "+tag+" : "+action);
-                if(_payload!=null && _payload.length>0){
-                    log.warn("Payload : "+new String(_payload));
-                }
-                throw new IllegalAccessException(id.message());
-            }
+            if(!id.successful()) throw new IllegalAccessException(id.message());
             RoutingKey  routingKey = eventService.routingKey(id.distributionId(),tag);
             ServiceActionEvent actionEvent = new ServiceActionEvent(this.serviceTopic,exchange.id(),_payload);
             actionEvent.distributionId(id.distributionId());
@@ -50,13 +43,11 @@ public class ServiceEventHandler extends AbstractRequestHandler {
             actionEvent.action(action!=null?action:path);
             actionEvent.routingNumber(routingKey.routingNumber());
             actionEvent.destination(routingKey.route());
-            //if(tournamentId!=null) actionEvent.tournamentId(Long.parseLong(tournamentId));
             actionEvent.name(name);
             actionEvent.clientId(clientId);
             this.eventService.publish(actionEvent);
         }
         else{
-            log.warn("Token : "+token+" : "+tag+" : "+action);
             throw new UnsupportedOperationException("HTTP ["+exchange.method()+"] request ["+path+"] not supported");
         }
      }

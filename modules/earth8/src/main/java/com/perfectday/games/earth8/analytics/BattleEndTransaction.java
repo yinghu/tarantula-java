@@ -1,5 +1,6 @@
 package com.perfectday.games.earth8.analytics;
 
+import com.google.gson.JsonNull;
 import com.icodesoftware.Session;
 import com.icodesoftware.util.JsonUtil;
 import com.perfectday.games.earth8.BattleUpdate;
@@ -17,5 +18,13 @@ public class BattleEndTransaction extends AnalyticsTransaction {
         data.addProperty("outcome", win ? "win" : "loss");
         var fastSpeed = JsonUtil.getJsonBool(object,"EndedWithFastSpeed", false);
         data.addProperty("battle_speed_x2", fastSpeed);
+        if(object.get("StarsEarned") != null)
+        {
+            data.addProperty("starsEarned", object.get("StarsEarned").getAsInt());
+        }
+        else
+        {
+            data.add("starsEarned", JsonNull.INSTANCE);
+        }
     }
 }

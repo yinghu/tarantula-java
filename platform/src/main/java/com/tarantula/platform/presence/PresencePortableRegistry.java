@@ -61,6 +61,10 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
 
     public static final int DEVICE_SAVE_INDEX_CID = 21;
     public static final int MAPPING_OBJECT_CID = 23;
+
+    public static final int OVERSIZE_DATA_INDEX_CID = 24;
+
+    public static final int BATCHED_MAPPING_OBJECT_CID = 25;
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
     public static PresencePortableRegistry INS;
@@ -137,6 +141,12 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
                 break;
             case MAPPING_OBJECT_CID:
                 pt = new MappingObject();
+                break;
+            case OVERSIZE_DATA_INDEX_CID:
+                pt = new OversizeDataIndex();
+                break;
+            case BATCHED_MAPPING_OBJECT_CID:
+                pt = new BatchedMappingObject();
                 break;
             default:
         }

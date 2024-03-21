@@ -2,9 +2,11 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
+import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ApplicationSchema;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
+import com.tarantula.platform.item.ConfigurableObject;
 
 import java.util.concurrent.ScheduledFuture;
 
@@ -92,5 +94,13 @@ public class PlatformGameContext implements GameContext {
 
     public ApplicationResource.Redeemer redeemer(Session session){
         return new ApplicationRedeemerProxy(session,platformGameServiceProvider.gameCluster());
+    }
+
+    public Configurable lookup(long distributionId){
+        ConfigurableObject configurableObject = new ConfigurableObject();
+        configurableObject.distributionId(distributionId);
+        ApplicationPreSetup applicationPreSetup = applicationSchema().applicationPreSetup();
+        Descriptor item = applicationSchema().application("item");
+        return  applicationPreSetup.load(item,distributionId);
     }
 }

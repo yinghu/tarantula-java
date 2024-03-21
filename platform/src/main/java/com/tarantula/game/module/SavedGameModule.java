@@ -29,22 +29,12 @@ public class SavedGameModule extends ModuleHeader {
             session.write(savedGame!=null?savedGame.toJson().toString().getBytes():JsonUtil.toSimpleResponse(false,"save in use").getBytes());
         }
         else if(session.action().equals("onSet")){
-            //this.context.log("SZ : "+bytes.length+" : "+session.name().length()+" : "+savedGameServiceProvider.mappingObjectMaxSize(),OnLog.WARN);
-            if((bytes.length+session.name().length()) > savedGameServiceProvider.mappingObjectMaxSize()){
-                session.write(JsonUtil.toSimpleResponse(false,"data size must be less than ["+savedGameServiceProvider.mappingObjectMaxSize()+"]").getBytes());
-            }else{
-                MappingObject mo = new MappingObject();
-                mo.label(session.name());
-                mo.value(bytes);
-                boolean suc = this.presenceServiceProvider.save(session,mo);
-                session.write(JsonUtil.toSimpleResponse(suc,mo.key().asString()).getBytes());
-            }
+            session.write(JsonUtil.toSimpleResponse(true,"data saved ["+session.name()+"]").getBytes());
+            this.savedGameServiceProvider.saveData(session,session.name(),bytes);
         }
         else if(session.action().equals("onGet")){
-            MappingObject mo = new MappingObject();
-            mo.label(session.name());
-            boolean suc = presenceServiceProvider.load(session,mo);
-            session.write(suc ? mo.value() : JsonUtil.toSimpleResponse(false,session.name()).getBytes());
+            byte[] data = this.savedGameServiceProvider.loadData(session,session.name());
+            session.write(data!=null? data : JsonUtil.toSimpleResponse(false,session.name()).getBytes());
         }
         else if(session.action().equals("onReset")){
             CurrentSaveIndex selected = this.savedGameServiceProvider.reset(session);

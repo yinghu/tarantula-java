@@ -10,11 +10,17 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div class="w3-panel">
-        <div id='tx-live-inbox-item-list' class="w3-container">
-            
+    <div class="w3-panel"><!-- send form -->
+        <div class="w3-container">
+            <label class="tx-text-12">File Configuration Name</label>
+            <input id ="tx-inbox-find-file-config-name" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='a name'/>
         </div>
     </div>
+    <div class="w3-panel">
+        <div class="w3-container  w3-border-bottom w3-border-red">
+            <span id="tx-inbox-download-config-file" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Download</span>     
+        </div>
+    </div>  
     <div class="w3-panel">
         <div class='w3-bar w3-white w3-border-bottom w3-border-red'>
             <span id='tx-inbox-live-service-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
@@ -37,10 +43,7 @@
 <script>
     let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-inbox"),{mode:'tree'},{});
     document.querySelector('#tx-live-inbox-item-list-title').innerHTML = TARA_HTML.caption(TARA_API.query().category);
-    let inboxList = document.querySelector('#tx-live-inbox-item-list');
-    inboxList.innerHTML = '';
-    //let actionList = document.querySelector('#tx-live-inbox-action-bar');
-    tx_live_inbox_setup();
+   
     document.querySelector('#tx-inbox-live-close').onclick=()=>{
         editor.destroy();
         tx_close_current_page();     
@@ -55,25 +58,12 @@
         editor.setMode('preview');
     };
     
-    function tx_live_inbox_setup(){
-        TARA_API.onGet(TARA_API.query().serviceTag,'onInbox',"Tami",(resp)=>{
-            editor.set(resp);
-            if(resp.Successful){
-                inboxList.innerHTML = '';
-                resp._rewardList.forEach(item => {
-                    inboxList.innerHTML += TARA_HTML.command(item.RewardKey,'Pending Reward',item.Name,'pending-reward-claim','Claim');
-                });    
-                document.querySelectorAll('.tx-live-pending-reward-claim').forEach(a=>{
-                      a.onclick = ()=>{
-                        tx_pending_reward_redeem(a.getAttribute('tx-item-id'));
-                        //console.log(a.getAttribute('tx-item-id'));       
-                    }
-                });
-            }
-        });   
-    }
-    function tx_pending_reward_redeem(itemId){
-        TARA_API.onGet(TARA_API.query().serviceTag,'onRedeem',itemId,(resp)=>{
+    document.querySelector('#tx-inbox-download-config-file').onclick=()=>{
+        tx_download_json_file();
+    };
+    function tx_download_json_file(){
+        let cname = document.querySelector('#tx-inbox-find-file-config-name').value;
+        TARA_API.onGet(TARA_API.query().serviceTag,'onFile',cname,(resp)=>{
             editor.set(resp);
         });
     }

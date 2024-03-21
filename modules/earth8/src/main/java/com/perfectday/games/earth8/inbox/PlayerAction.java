@@ -46,7 +46,8 @@ public class PlayerAction extends RecoverableObject implements OnAccess {
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty(name,completed);
+        jsonObject.addProperty("Name",name);
+        jsonObject.addProperty("Completed",completed);
         return jsonObject;
     }
     @Override

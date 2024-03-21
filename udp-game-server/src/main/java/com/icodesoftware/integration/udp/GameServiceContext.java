@@ -94,4 +94,8 @@ public class GameServiceContext implements GameContext {
     public ApplicationResource.Redeemer redeemer(Session session) {
         return null;
     }
+
+    public Configurable lookup(long distributionId){
+        return null;
+    }
 }

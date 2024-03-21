@@ -506,4 +506,14 @@ public class BattleTransaction extends RecoverableObject {
         this.gameContext.log(resource.name()+" released",OnLog.INFO);
     }
     
+```### 11. Configurable lookup 
+#### 11.1 PUID has a networkingId mapping a configurable object
+#### 11.2 Client should pass the Id to module included in the JSON payload
+#### 11.3 Configurable is a metadata container. Module is taking care of creating instances from the configurable and assign to players
+```
+    long configurableId = 1000L; //should be from networkingId of client PUID 
+    Configurable configurable = gameContext.lookup(configurableId);
+    if(configurable==null) return;
+    //use loaded configurable
+
 ```

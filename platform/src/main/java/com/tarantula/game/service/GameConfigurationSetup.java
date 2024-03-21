@@ -92,7 +92,7 @@ public class GameConfigurationSetup extends GamePreSetup implements ApplicationP
         ConfigurableObject ret = new ConfigurableObject();
         ret.distributionId(configurableId);
         if(!load(application,ret)) return null;
-        ret.configurableSetting(((GameCluster)gameCluster).configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
+        ret.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
         return ret.setup();
         //return ret;
     }
