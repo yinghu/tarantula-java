@@ -144,6 +144,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.sessionId = channel.sessionId();
         this.serverKey = channel.serverKey();
         this.timeout = channel.connection().timeout();
+        this.dedicated = true;
     }
 
     @Override
