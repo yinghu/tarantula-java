@@ -14,7 +14,7 @@ public interface Transaction extends Closable{
 
     }
     interface Listener{
-        void afterCommit(long transactionId);
-        void afterAbort(long transactionId,Exception exception);
+        default void afterCommit(long transactionId){}
+        default void afterAbort(long transactionId,Exception exception){}
     }
 }
