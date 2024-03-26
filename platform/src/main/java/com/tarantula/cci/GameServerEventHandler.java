@@ -128,19 +128,23 @@ public class GameServerEventHandler extends AbstractRequestHandler {
             }
             exchange.onEvent(new ResponsiveEvent("",0,resp.toString().getBytes(),true));
         }
-        else if(action.equals("onUpdate")){
+        else if(action.equals("onGameClusterEvent")){
+            //header name format playerId#event eg : 1000#formCompleted => player 1000 has completed shipping form input
+            //post payload
             GameServerListener gameServerListener = deploymentServiceProvider.gameServerListener(typeId);
             JsonObject resp = new JsonObject();
             if(gameServerListener!=null){
-                resp.addProperty("typeId",typeId);
+                resp.addProperty("action",name);
                 resp.addProperty("successful",true);
-                gameServerListener.onUpdate(name,_payload);
+                gameServerListener.onGameClusterEvent(name,_payload);
             }
             else{
                 resp.addProperty("successful",false);
+                resp.addProperty("message","no listener for ["+typeId+"]");
             }
             exchange.onEvent(new ResponsiveEvent("",0,resp.toString().getBytes(),true));
         }
+        //PENDING CODE REMOVAL
         else if(action.equals("onAction")) {
             String suggestedTypeId = exchange.header(Session.TARANTULA_TYPE_ID);
             JsonObject resp = new JsonObject();
@@ -156,6 +160,7 @@ public class GameServerEventHandler extends AbstractRequestHandler {
                 this.deploymentServiceProvider.onGameClusterEvent(event);
             }
         }
+        //END OF PENDING CODE REMOVAL
     }
 
     @Override

@@ -12,7 +12,7 @@ public interface GameServerListener extends EndPoint.Listener {
 
     void onDisConnection(Connection connection);
 
-    void onUpdate(String lobby,byte[] payload);
+    void onGameClusterEvent(String query,byte[] payload);
 
     boolean onChannel(Channel channel);
 
@@ -21,5 +21,7 @@ public interface GameServerListener extends EndPoint.Listener {
     void onConnectionStarted(Connection connection);
     void onConnectionRegistered(Connection connection);
     void onConnectionVerified(String serverId);
+
+    void onGameClusterEventUpdated(String query,byte[] payload);
 
 }
