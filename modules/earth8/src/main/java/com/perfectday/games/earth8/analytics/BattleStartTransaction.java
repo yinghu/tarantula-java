@@ -4,10 +4,12 @@ import com.icodesoftware.Session;
 import com.icodesoftware.util.JsonUtil;
 import com.perfectday.games.earth8.BattleUpdate;
 
+import java.util.UUID;
+
 public class BattleStartTransaction extends AnalyticsTransaction {
     private static final String MESSAGE_TYPE = "/earth8/player/0.0.1/battleStart";
 
-    public BattleStartTransaction(Session session, long battleId, byte[] clientData)
+    public BattleStartTransaction(Session session, long battleId, byte[] clientData, UUID analyticsBatchId)
     {
         super(MESSAGE_TYPE, session);
         var object = JsonUtil.parse(clientData);
@@ -20,5 +22,6 @@ public class BattleStartTransaction extends AnalyticsTransaction {
         data.add("campaignName", object.get("CampaignName"));
         data.add("dungeonChapterName", object.get("DungeonChapterName"));
         data.add("stageNumber", object.get("StageNumber"));
+        data.addProperty("analyticsBatchId", analyticsBatchId.toString());
     }
 }

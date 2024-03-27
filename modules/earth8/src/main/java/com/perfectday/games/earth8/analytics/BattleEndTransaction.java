@@ -5,10 +5,12 @@ import com.icodesoftware.Session;
 import com.icodesoftware.util.JsonUtil;
 import com.perfectday.games.earth8.BattleUpdate;
 
+import java.util.UUID;
+
 public class BattleEndTransaction extends AnalyticsTransaction {
     private static final String MESSAGE_TYPE = "/earth8/player/0.0.1/battleEnd";
 
-    public BattleEndTransaction(Session session, long battleId, byte[] clientData)
+    public BattleEndTransaction(Session session, long battleId, byte[] clientData, UUID analyticsBatchId)
     {
         super(MESSAGE_TYPE, session);
         var object = JsonUtil.parse(clientData);
@@ -26,5 +28,6 @@ public class BattleEndTransaction extends AnalyticsTransaction {
         {
             data.add("starsEarned", JsonNull.INSTANCE);
         }
+        data.addProperty("analyticsBatchId", analyticsBatchId.toString());
     }
 }
