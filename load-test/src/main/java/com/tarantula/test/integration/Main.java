@@ -22,21 +22,21 @@ public class Main {
 
     static boolean onFile = false;
 
-    public static void _main(String[] args) throws Exception{
-        HttpCaller httpCaller = new HttpCaller("http://10.0.0.18:8090");
+    public static void main(String[] args) throws Exception{
+        HttpCaller httpCaller = new HttpCaller("http://localhost:8090");
         httpCaller._init();
         String[] headers = new String[]{
                 Session.TARANTULA_ACCESS_KEY,
-                "535221202214457344-770A154A79E7F9DC65147205B1A5B7E2D060B9BB-111AD341F16C9772C5419B936120DA37",
+                "560375134943195136-6981C669F8A30C824A89D4CF0CE362A1C8AE91EB-1D6316B006ED0ADCDDE0DB8C6A591666",
                 Session.TARANTULA_ACTION,
-                "onAction",
-                Session.TARANTULA_TYPE_ID,
-                "earth8"};
+                "onGameClusterEvent",
+                Session.TARANTULA_NAME,
+                "1000#ShippingFormCompleted"};
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("playerId", 535221986201178113L);
         System.out.println(httpCaller.post("server",jsonObject.toString().getBytes(),headers));
     }
-    public static void main(String[] args) throws Exception{
+    public static void nmain(String[] args) throws Exception{
         Properties properties = new Properties();
         try(InputStream inputStream = new FileInputStream("load.properties")){
             properties.load(inputStream);

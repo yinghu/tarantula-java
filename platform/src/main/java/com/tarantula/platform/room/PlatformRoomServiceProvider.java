@@ -18,6 +18,7 @@ import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.OnAccessTrack;
 import com.icodesoftware.util.ScheduleRunner;
+import com.tarantula.platform.event.GameClusterSyncEvent;
 
 
 import java.time.LocalDateTime;
@@ -308,20 +309,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
 
-    public void onUpdate(String lobby,byte[] payload){
-        serviceContext.schedule(new ScheduleRunner(1000,()->{
-            GameZoneIndex index = gameZoneIndex(lobby);
-            //UpdateBatch updateBatch = UpdateBatch.fromBytes(payload);
-            //for(PlayerUpdate update : updateBatch.playerUpdates){
-                //UpdateBatch batch = new UpdateBatch(new PlayerUpdate[]{update});
-                //GameUpdateObject mappingObject = new GameUpdateObject();
-                //mappingObject.value(batch.toBytes());
-                //mappingObject.owner(update.systemId);
-                //mappingObject.distributionKey(index.gameZone.distributionKey());
-                //this.serviceContext.postOffice().onTag(gameServiceProvider.serviceProxy().tag()).send(update.systemId,mappingObject);
-            //}
-        }));
-    }
     @Override
     public boolean onChannel(Channel channel) {
         ChannelStub channelStub = (ChannelStub)channel;
@@ -622,11 +609,28 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public void onClosed(Room room){
 
     }
-    public void onGameUpdate(GameUpdateObject gameUpdateObject){
-        GameZoneIndex index = gameZoneIndex.get(gameUpdateObject.key().asString());
-        if(index==null){
-            logger.warn("Game lobby not available ["+gameUpdateObject.key().asString()+"]");
-        }
-        //index.gameModule.update(this.gameServiceProvider.gameContext(index.gameModule.getClass()).gameServiceProvider(),gameUpdateObject.value());
+
+
+    @Override
+    public void onGameClusterEvent(String query,byte[] payload){
+        serviceContext.schedule(new ScheduleRunner(100,()->{
+            //distribute the game cluster event to player target bucket node
+            String[] params = query.split("#");
+            GameClusterSyncEvent event = new GameClusterSyncEvent(typeId(),query,payload);
+            String targetApp = gameCluster.typeId()+"/lobby";
+            RoutingKey routingKey = serviceContext.eventService().routingKey(params[0],targetApp);
+            event.destination(routingKey.route());
+            serviceContext.eventService().publish(event);
+        }));
+    }
+    @Override
+    public void onGameClusterEventUpdated(String query,byte[] payload){
+        //callback on player target bucket node
+        String[] params = query.split("#");
+        OnAccessTrack onAccessTrack = new OnAccessTrack();
+        onAccessTrack.systemId(params[0]);
+        onAccessTrack.command(params[1]);
+        onAccessTrack.property(OnAccess.PAYLOAD,payload);
+        gameServiceProvider.gameServiceProvider().onGameEvent(onAccessTrack);
     }
 }

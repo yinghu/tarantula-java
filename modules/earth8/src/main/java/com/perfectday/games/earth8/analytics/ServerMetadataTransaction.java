@@ -2,6 +2,7 @@ package com.perfectday.games.earth8.analytics;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.util.JsonUtil;
 
 import java.time.LocalDateTime;
 
@@ -12,9 +13,9 @@ public class ServerMetadataTransaction {
 
     public ServerMetadataTransaction(OnAccess event)
     {
-        data = event.toJson();
+        data = JsonUtil.parse((byte[]) event.property(OnAccess.PAYLOAD));
         data.addProperty("message_type", MESSAGE_TYPE);
-        data.addProperty("player_id", 0);
+        data.addProperty("player_id", event.systemId());
         data.addProperty("timestamp", LocalDateTime.now().toString());
     }
 

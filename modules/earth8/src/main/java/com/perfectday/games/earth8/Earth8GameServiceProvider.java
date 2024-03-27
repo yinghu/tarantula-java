@@ -1,5 +1,6 @@
 package com.perfectday.games.earth8;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.ApplicationPreSetup;
@@ -163,6 +164,23 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
     //System level game event callbacks
     public <T extends OnAccess> void onGameEvent(T event){
+        if(event.command().equals("ShippingFormCompleted")){
+            if(gameContext.applicationSchema().transaction().execute(ctx->{
+                DataStore playerActionStore = ctx.onDataStore("player_coin_form");
+                PlayerAction playerAction = new PlayerAction("ShippingFormCompleted",true);
+                playerAction.ownerKey(SnowflakeKey.from(Long.parseLong(event.systemId())));
+                return playerActionStore.create(playerAction);
+            })){
+                TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+                gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
+                        webhook.upload(ANALYTICS_QUERY, new ServerMetadataTransaction(event).toBytes())
+                ));
+            }
+        }
+        else if(event.command().equals("something else")){
+
+        }
+        //PENDING REMOVE
         var eventType = (String)event.property(OnAccess.TYPE_ID);
         if(eventType != null && eventType.equals("onAction"))
         {
@@ -182,6 +200,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
                 webhook.upload(ANALYTICS_QUERY, new ServerMetadataTransaction(event).toBytes())
         ));
+        //END OF PENDING REMOVE
     }
 
     public void onInventory(ApplicationPreSetup applicationPreSetup,Inventory inventory, Inventory.Stock stock){
