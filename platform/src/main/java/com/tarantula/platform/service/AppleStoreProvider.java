@@ -4,18 +4,24 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.icodesoftware.Descriptor;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.Transaction;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.MetricsListener;
 
 import com.icodesoftware.util.HttpCaller;
 
 import com.tarantula.game.service.PlatformGameServiceProvider;
+import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.configuration.AppleCredentialConfiguration;
 import com.tarantula.platform.configuration.AppleStoreKey;
 import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
+import com.tarantula.platform.inventory.ApplicationRedeemer;
 import com.tarantula.platform.service.metrics.PaymentMetrics;
+import com.tarantula.platform.store.ShoppingItem;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -31,9 +37,11 @@ public class AppleStoreProvider extends AuthObject{
     private final static String  PRODUCTION_VERIFY_URI = "https://buy.itunes.apple.com/verifyReceipt";
 
     private PlatformConfigurationServiceProvider configurationServiceProvider;
+    private PlatformGameServiceProvider gameServiceProvider;
 
     public AppleStoreProvider(PlatformGameServiceProvider gameServiceProvider, MetricsListener metricsListener){
         super(gameServiceProvider.gameCluster().typeId(),"");
+        this.gameServiceProvider = gameServiceProvider;
         this.configurationServiceProvider = gameServiceProvider.configurationServiceProvider();
         this.applicationMetricsListener = metricsListener;
     }
@@ -53,14 +61,14 @@ public class AppleStoreProvider extends AuthObject{
         try{
             AppleStoreKey appleStoreKey = credentialConfiguration.appleStoreKey();
             String receipt = (String)params.get("receipt");
-            String serviceTypeId = (String)params.get(OnAccess.TYPE_ID);
+            //String serviceTypeId = (String)params.get(OnAccess.TYPE_ID);
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(appleStoreKey.isSandbox()?SANDBOX_VERIFY_URI:PRODUCTION_VERIFY_URI))
                     .version(HttpClient.Version.HTTP_2)
                     .timeout(Duration.ofSeconds(TIMEOUT))
                     .header(ACCEPT, ACCEPT_JSON)
                     .header(CONTENT_TYPE,ACCEPT_JSON)
-                    .POST(HttpRequest.BodyPublishers.ofByteArray(toRequestPayload(appleStoreKey,serviceTypeId,receipt).toString().getBytes()))
+                    .POST(HttpRequest.BodyPublishers.ofByteArray(toRequestPayload(appleStoreKey,receipt).toString().getBytes()))
                     .build();
             HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
             int code = serviceContext.httpClientProvider().request(client->{
@@ -68,18 +76,37 @@ public class AppleStoreProvider extends AuthObject{
                 responseData.dataAsString = response.body();
                 return response.statusCode();
             });
-            if(code!=200) return false;
+            if(code!=200) throw new RuntimeException("apple store gateway none 200 response");
             onMetrics(PaymentMetrics.PAYMENT_APPLE_STORE_AMOUNT);
-            return checkResponsePayload(responseData.dataAsString,params);
+            if(!checkResponsePayload(responseData.dataAsString,params)) return false;
+            String bundleId = (String)params.get(OnAccess.STORE_BUNDLE_ID);
+            String systemId = (String)params.get(OnAccess.SYSTEM_ID);
+            ShoppingItem shoppingItem = gameServiceProvider.storeServiceProvider().shoppingItem(bundleId);
+            if(shoppingItem==null){
+                logger.warn("Shopping Item not existed  : "+bundleId);
+                throw new RuntimeException("Shopping not existed ["+bundleId+"]");
+            }
+            GameCluster gameCluster = gameServiceProvider.gameCluster();
+            Transaction t = gameCluster.transaction();
+            boolean suc = t.execute(ctx->{
+                ApplicationPreSetup setup =(ApplicationPreSetup)ctx;
+                Descriptor app = gameCluster.application(shoppingItem.configurationTypeId());
+                ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,setup);
+                redeemer.distributionKey(bundleId);
+                if(!setup.load(app,redeemer)) return false;
+                redeemer.redeem();
+                return true;
+            });
+            if(suc) return true;
+            logger.warn("Item : "+bundleId+" cannot be redeemed");
+            throw new RuntimeException("Item : "+bundleId+" cannot be redeemed");
         }catch (Exception ex){
             logger.error("apple store error ["+typeId+"]",ex);
             return false;
         }
     }
     private boolean checkResponsePayload(String resp,Map<String,Object> params){
-        String systemId = (String) params.get(OnAccess.SYSTEM_ID);
         String pendingTransactionId = (String)params.get("transactionId");
-        //String serviceTypeId = (String)params.get(OnAccess.TYPE_ID);
         JsonObject receipt = JsonParser.parseString(resp).getAsJsonObject();
         int status = receipt.get("status").getAsInt();
         //in_app array
@@ -100,12 +127,17 @@ public class AppleStoreProvider extends AuthObject{
                 }
             }
         }
+        else{
+            logger.warn("failure apple store response ["+status+"]");
+            logger.warn(receipt.toString());
+            //to do send out a system message
+        }
         if(!validated){
             params.put(OnAccess.STORE_MESSAGE,"transaction cannot be validated");
         }
         return validated;
     }
-    private JsonObject toRequestPayload(AppleStoreKey appleStoreKey,String serviceTypeId,String receipt){
+    private JsonObject toRequestPayload(AppleStoreKey appleStoreKey,String receipt){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("receipt-data",receipt);
         jsonObject.addProperty("password",appleStoreKey.secureKey());
