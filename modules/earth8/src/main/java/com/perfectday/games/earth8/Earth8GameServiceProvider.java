@@ -1,5 +1,6 @@
 package com.perfectday.games.earth8;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.ApplicationPreSetup;
@@ -8,16 +9,14 @@ import com.icodesoftware.util.JsonUtil;
 
 import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.SnowflakeKey;
-import com.perfectday.games.earth8.analytics.BattleEndTransaction;
-import com.perfectday.games.earth8.analytics.BattleStartTransaction;
-import com.perfectday.games.earth8.analytics.ServerConnectTransaction;
-import com.perfectday.games.earth8.analytics.ServerMetadataTransaction;
+import com.perfectday.games.earth8.analytics.*;
 import com.perfectday.games.earth8.inbox.PlayerAction;
 import com.perfectday.games.earth8.inbox.PlayerActionQuery;
 import com.perfectday.games.earth8.inbox.PlayerEventInbox;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -55,6 +54,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     }
 
     public void startGame(Session session, byte[] payload) throws Exception{
+        UUID analyticsBatchId = AnalyticsBatchUtils.generateAnalyticsBatchId();
         BattleTransaction battleTransaction = BattleTransaction.fromJson(payload);
         if(!battleTransaction.validate()){
             session.write(JsonUtil.toSimpleResponse(false,"invalid battle settings").getBytes());
@@ -72,9 +72,15 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
         session.write(created ? battleTransaction.toJson().toString().getBytes() : JsonUtil.toSimpleResponse(false,"failed to create battle transaction").getBytes());
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
-        gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
-                webhook.upload(ANALYTICS_QUERY,new BattleStartTransaction(session, battleTransaction.distributionId(), payload).toString().getBytes()))
-        );
+        gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()-> {
+            webhook.upload(ANALYTICS_QUERY, new BattleStartTransaction(session, battleTransaction.distributionId(), payload, analyticsBatchId).toString().getBytes());
+            JsonObject jsonObject = JsonUtil.parse(payload);
+            if (jsonObject.has("analytics")) {
+                var analyticsData = AnalyticsBatchUtils.getAnalyticsData(jsonObject.getAsJsonArray("analytics"));
+                var transactions = AnalyticsBatchUtils.getTransactions(session, analyticsBatchId, analyticsData);
+                transactions.forEach(analytics -> webhook.upload(ANALYTICS_QUERY, analytics.toString().getBytes()));
+            }
+        }));
         gameContext.onMetrics("totalBattle",1);
     }
 
@@ -100,6 +106,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     }
 
     public void endGame(Session session,byte[] payload) throws Exception{
+        UUID analyticsBatchId = AnalyticsBatchUtils.generateAnalyticsBatchId();
         BattleTransaction battleTransaction = BattleTransaction.fromJson(payload);
         if(battleTransaction.distributionId()<=0){
             session.write(JsonUtil.toSimpleResponse(false,"invalid battleId").getBytes());
@@ -156,13 +163,36 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
         session.write(JsonUtil.toSimpleResponse(updated,"battle finished").getBytes());
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
-        gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
-                webhook.upload(ANALYTICS_QUERY,new BattleEndTransaction(session, battleTransaction.distributionId(), payload).toBytes()))
-        );
+        gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()-> {
+            webhook.upload(ANALYTICS_QUERY, new BattleEndTransaction(session, battleTransaction.distributionId(), payload, analyticsBatchId).toBytes());
+            JsonObject jsonObject = JsonUtil.parse(payload);
+            if (jsonObject.has("analytics")) {
+                var analyticsData = AnalyticsBatchUtils.getAnalyticsData(jsonObject.getAsJsonArray("analytics"));
+                var transactions = AnalyticsBatchUtils.getTransactions(session, analyticsBatchId, analyticsData);
+                transactions.forEach(analytics -> webhook.upload(ANALYTICS_QUERY, analytics.toString().getBytes()));
+            }
+        }));
     }
 
     //System level game event callbacks
     public <T extends OnAccess> void onGameEvent(T event){
+        if(event.command().equals("ShippingFormCompleted")){
+            if(gameContext.applicationSchema().transaction().execute(ctx->{
+                DataStore playerActionStore = ctx.onDataStore("player_coin_form");
+                PlayerAction playerAction = new PlayerAction("ShippingFormCompleted",true);
+                playerAction.ownerKey(SnowflakeKey.from(Long.parseLong(event.systemId())));
+                return playerActionStore.create(playerAction);
+            })){
+                TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+                gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
+                        webhook.upload(ANALYTICS_QUERY, new ServerMetadataTransaction(event).toBytes())
+                ));
+            }
+        }
+        else if(event.command().equals("something else")){
+
+        }
+        //PENDING REMOVE
         var eventType = (String)event.property(OnAccess.TYPE_ID);
         if(eventType != null && eventType.equals("onAction"))
         {
@@ -182,6 +212,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
                 webhook.upload(ANALYTICS_QUERY, new ServerMetadataTransaction(event).toBytes())
         ));
+        //END OF PENDING REMOVE
     }
 
     public void onInventory(ApplicationPreSetup applicationPreSetup,Inventory inventory, Inventory.Stock stock){

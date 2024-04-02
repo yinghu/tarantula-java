@@ -29,6 +29,8 @@ public class PortableEventRegistry implements PortableFactory {
     public static final int PERMISSION_CHECK_EVENT_CID = 10;
     public static final int MAP_STORE_SYNC_EVENT_CID =11;
 
+    public static final int GAME_CLUSTER_SYNC_EVENT_CID =12;
+
     public static final int MODULE_RESET_EVENT_CID = 15;
 
     public static final int SERVER_PUSH_EVENT_CID = 21;
@@ -106,6 +108,10 @@ public class PortableEventRegistry implements PortableFactory {
 
             case MAP_STORE_SYNC_EVENT_CID:
                 _ins = new MapStoreSyncEvent();
+                break;
+
+            case GAME_CLUSTER_SYNC_EVENT_CID:
+                _ins = new GameClusterSyncEvent();
                 break;
 
             case SERVER_PUSH_EVENT_CID:

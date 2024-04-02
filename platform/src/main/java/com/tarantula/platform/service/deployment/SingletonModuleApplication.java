@@ -2,9 +2,11 @@ package com.tarantula.platform.service.deployment;
 
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.tarantula.platform.TarantulaApplicationHeader;
 import com.tarantula.platform.event.FastPlayEvent;
+import com.tarantula.platform.event.GameClusterSyncEvent;
 
 public class SingletonModuleApplication extends TarantulaApplicationHeader{
 
@@ -29,8 +31,11 @@ public class SingletonModuleApplication extends TarantulaApplicationHeader{
             if(event instanceof FastPlayEvent){
                 this.module.onJoin(event);
             }
-            else{
-                context.log("event->"+event.toString(),OnLog.WARN);
+            else if(event instanceof GameClusterSyncEvent){
+                GameServerListener listener = this.serviceProvider.gameServerListener(event.typeId());
+                if(listener!=null){
+                    listener.onGameClusterEventUpdated(event.name(),event.payload());
+                }
             }
         }catch (Exception ex){
             //write error to client
