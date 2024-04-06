@@ -44,9 +44,14 @@ public class GameServerEventHandler extends AbstractRequestHandler {
         String typeId = gameCluster.gameLobbyName;
         if(action.equals("onTicket")){
             JsonObject resp = JsonUtil.parse(_payload);
-            boolean valid = tokenValidator.validateTicket(resp.get("systemId").getAsLong(),resp.get("stub").getAsLong(),resp.get("ticket").getAsString());
+            long systemId = resp.get("systemId").getAsLong();
+            long stub = resp.get("stub").getAsLong();
+            boolean valid = tokenValidator.validateTicket(systemId,stub,resp.get("ticket").getAsString());
             resp = new JsonObject();
             resp.addProperty("successful",valid);
+            if(valid){
+                resp.addProperty("token",tokenValidator.token(systemId,stub));
+            }
             exchange.onEvent(new ResponsiveEvent("",0,resp.toString().getBytes(),true));
         }
         else if(action.equals("onConnect")){//start game server

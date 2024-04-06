@@ -13,4 +13,6 @@ public interface Channel extends Configurable, Closable {
 
     Connection connection();
 
+    long systemId();
+
 }

@@ -27,13 +27,14 @@ public class Main {
         httpCaller._init();
         String[] headers = new String[]{
                 Session.TARANTULA_ACCESS_KEY,
-                "560375134943195136-6981C669F8A30C824A89D4CF0CE362A1C8AE91EB-1D6316B006ED0ADCDDE0DB8C6A591666",
+                "563971525414227968-019F582E7E6D4B83230C1F473832395611FC04C9-8C16E54DDCB76156E82FE37A501517FB",
                 Session.TARANTULA_ACTION,
                 "onGameClusterEvent",
                 Session.TARANTULA_NAME,
-                "1000#ShippingFormCompleted"};
+                "550956306786160640#onInventoryUpdated"};
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("playerId", 535221986201178113L);
+        jsonObject.addProperty("typeId","Chip");
+        jsonObject.addProperty("delta",-120);
         System.out.println(httpCaller.post("server",jsonObject.toString().getBytes(),headers));
     }
     public static void nmain(String[] args) throws Exception{

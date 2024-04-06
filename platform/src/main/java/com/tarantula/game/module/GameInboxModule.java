@@ -24,6 +24,11 @@ public class GameInboxModule extends ModuleHeader{
             boolean suc = this.gameServiceProvider.inboxServiceProvider().redeem(session,session.name());
             session.write(JsonUtil.toSimpleResponse(suc,session.name()).getBytes());
         }
+        else if(session.action().equals("onInventory")){
+            Inventory inventory = this.gameServiceProvider.inventoryServiceProvider().inventory(session);
+            if(inventory==null) session.write(JsonUtil.toSimpleResponse(false,"Inventory ["+session.name()+"] no existed").getBytes());
+            session.write(inventory.toJson().toString().getBytes());
+        }
         else{
             throw new UnsupportedOperationException(session.action()+" not support");
         }

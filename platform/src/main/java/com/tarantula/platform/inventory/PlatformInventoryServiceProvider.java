@@ -52,6 +52,9 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
         return this.applicationPreSetup.inventoryList(systemId);
     }
 
+    public Inventory inventory(Session session){
+        return applicationPreSetup.inventory(session.distributionId(),session.name());
+    }
     public UserInventory inventory(long systemId, String category, String typeId){
         int cindex = category.indexOf(".");
         String type = cindex<0?category:category.substring(0,cindex);

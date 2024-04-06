@@ -602,6 +602,14 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         aMap.get(provider).registerAuthVendor(authVendor);
     }
 
+    public String token(long systemId,long stub){
+        Access acc = new User();
+        acc.distributionId(systemId);
+        udataStore.load(acc);
+        OnSession onSession = new OnSessionTrack();
+        onSession.stub(stub);
+        return jwtToken(acc,onSession);
+    }
     public String jwtToken(Access access,OnSession session){
         return jwt.token((h,p)->{
             long expiry = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusHours(24));

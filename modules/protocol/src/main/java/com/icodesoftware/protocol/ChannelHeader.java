@@ -12,6 +12,7 @@ public class ChannelHeader extends RecoverableObject implements Channel {
 
     protected String configurationTypeId;
 
+    protected long systemId;
     protected int channelId;
     protected int sessionId;
     protected int timeout;
@@ -43,6 +44,9 @@ public class ChannelHeader extends RecoverableObject implements Channel {
         return sessionId;
     }
 
+    public long systemId(){
+        return systemId;
+    }
     @Override
     public int timeout() {
         return timeout;
