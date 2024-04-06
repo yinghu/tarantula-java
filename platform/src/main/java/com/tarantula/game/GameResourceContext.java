@@ -2,7 +2,7 @@ package com.tarantula.game;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.tarantula.platform.ResponseHeader;
+import com.icodesoftware.util.ResponseHeader;
 import com.tarantula.platform.resource.GameResource;
 
 import java.util.List;

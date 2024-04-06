@@ -2,6 +2,7 @@ package com.tarantula.platform;
 
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
+import com.icodesoftware.util.ResponseHeader;
 import com.tarantula.platform.util.*;
 
 public class TarantulaApplicationHeader implements TarantulaApplication {

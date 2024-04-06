@@ -7,7 +7,7 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.ResponseHeader;
+import com.icodesoftware.util.ResponseHeader;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;

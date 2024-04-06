@@ -6,6 +6,7 @@ import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.service.UserService;
 import com.icodesoftware.util.JsonUtil;
+import com.icodesoftware.util.ResponseHeader;
 import com.tarantula.platform.*;
 import com.tarantula.platform.util.*;
 

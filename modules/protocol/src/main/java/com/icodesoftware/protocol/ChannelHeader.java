@@ -44,8 +44,8 @@ public class ChannelHeader extends RecoverableObject implements Channel {
         return sessionId;
     }
 
-    public long systemId(){
-        return systemId;
+    public Session session(){
+        return stub;
     }
     @Override
     public int timeout() {

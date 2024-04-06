@@ -8,6 +8,7 @@ import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 
+import com.icodesoftware.util.ResponseHeader;
 import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.admin.GameClusterQuery;
 import com.tarantula.platform.*;

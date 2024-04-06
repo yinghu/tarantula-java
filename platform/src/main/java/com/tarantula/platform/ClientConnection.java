@@ -6,6 +6,7 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Connection;
 
+import com.icodesoftware.util.ResponseHeader;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;

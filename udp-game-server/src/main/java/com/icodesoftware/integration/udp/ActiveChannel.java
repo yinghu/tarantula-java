@@ -1,6 +1,5 @@
 package com.icodesoftware.integration.udp;
 
-import com.icodesoftware.Session;
 import com.icodesoftware.protocol.*;
 
 public class ActiveChannel extends ChannelHeader {
@@ -18,9 +17,6 @@ public class ActiveChannel extends ChannelHeader {
         this.cipherListener = cipherListener;
     }
 
-    Session session(){
-        return stub;
-    }
 
     void onRequest(MessageBuffer.MessageHeader header,byte[] payload){
         if(payload==null || payload.length==0) return;
