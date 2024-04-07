@@ -124,6 +124,7 @@ public class UserInventory extends RecoverableObject implements Inventory {
         jsonObject.addProperty("Rechargeable",rechargeable);
         jsonObject.addProperty("Constrained",constrained);
         jsonObject.addProperty("Count",count);
+        if(rechargeable) return jsonObject;
         JsonArray items = new JsonArray();
         itemList.forEach((item)->items.add(item.toJson()));
         jsonObject.add("_itemList",items);
