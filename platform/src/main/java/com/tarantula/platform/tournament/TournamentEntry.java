@@ -22,7 +22,24 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     private double score;
     private boolean finished;
     private int rank;
+    private String name;
+    private int icon;
 
+    public TournamentEntry(long systemId,double score, int rank, String name, int icon){
+        this();
+        this.systemId = systemId;
+        this.score = score;
+        this.rank = rank;
+        this.name = name;
+        this.icon = icon;
+    }
+
+    public TournamentEntry(long systemId,double score, int rank){
+        this();
+        this.systemId = systemId;
+        this.score = score;
+        this.rank = rank;
+    }
     public TournamentEntry(long systemId,double credits,double score){
         this();
         this.systemId = systemId;
@@ -75,6 +92,8 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         buffer.writeLong(timestamp);
         buffer.writeInt(rank);
         buffer.writeDouble(credits);
+        buffer.writeUTF8(name);
+        buffer.writeInt(icon);
         buffer.writeBoolean(finished);
         return true;
     }
@@ -86,6 +105,8 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         timestamp = buffer.readLong();
         rank = buffer.readInt();
         credits = buffer.readDouble();
+        name = buffer.readUTF8();
+        icon = buffer.readInt();
         finished = buffer.readBoolean();
         return true;
     }
@@ -107,7 +128,9 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         portableWriter.writeLong("3",timestamp);
         portableWriter.writeInt("4",rank);
         portableWriter.writeDouble("5",credits);
-        portableWriter.writeBoolean("6",finished);
+        portableWriter.writeUTF("6",name);
+        portableWriter.writeInt("7",icon);
+        portableWriter.writeBoolean("8",finished);
     }
 
     @Override
@@ -117,7 +140,9 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         this.timestamp = portableReader.readLong("3");
         this.rank = portableReader.readInt("4");
         this.credits = portableReader.readDouble("5");
-        this.finished = portableReader.readBoolean("6");
+        this.name = portableReader.readUTF("6");
+        this.icon = portableReader.readInt("7");
+        this.finished = portableReader.readBoolean("8");
     }
 
     @Override
@@ -127,6 +152,8 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         jsonObject.addProperty("Credits",credits);
         jsonObject.addProperty("Score",Double.valueOf(score).intValue());
         jsonObject.addProperty("Rank",rank);
+        jsonObject.addProperty("Name",name);
+        jsonObject.addProperty("Icon",icon);
         jsonObject.addProperty("LastUpdated",TimeUtil.fromUTCMilliseconds(timestamp).format(DateTimeFormatter.ISO_DATE_TIME));
         //jsonObject.addProperty("Finished",finished);
         return jsonObject;
