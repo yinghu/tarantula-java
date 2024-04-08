@@ -5,7 +5,7 @@ import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.util.MockUtils;
 import com.tarantula.platform.tournament.TournamentContext;
-import com.tarantula.platform.tournament.TournamentHistoryContext;
+import com.tarantula.platform.tournament.TournamentScore;
 
 
 public class TournamentModule extends ModuleHeader implements Configurable.Listener {
@@ -28,6 +28,13 @@ public class TournamentModule extends ModuleHeader implements Configurable.Liste
         }
         else if (session.action().equals("onLoadRankings")){
             session.write(MockUtils.GetMockTournamentRankings(Long.parseLong(session.systemId())).toString().getBytes());
+        }
+        else if (session.action().equals("onScore")){
+            TournamentScore tournamentScore = TournamentScore.fromJson(JsonUtil.parse(session.name()));
+            // TODO: Implement
+            String message = "Successfully added score " + tournamentScore.score() + " to tournament " + tournamentScore.tournamentId();
+            System.out.println(message);
+            session.write(new TournamentContext(true, message).toJson().toString().getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action()+" not supported");

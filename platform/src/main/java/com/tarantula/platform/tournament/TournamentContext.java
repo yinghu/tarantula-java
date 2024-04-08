@@ -6,6 +6,7 @@ import com.icodesoftware.Tournament;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.store.ShoppingItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TournamentContext extends ResponseHeader {
@@ -16,6 +17,10 @@ public class TournamentContext extends ResponseHeader {
         this.successful = successful;
         this.message = message;
         this.itemList = itemList;
+    }
+
+    public TournamentContext(boolean successful, String message){
+        this(successful, message, new ArrayList<>());
     }
 
     @Override
