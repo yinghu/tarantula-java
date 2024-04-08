@@ -168,6 +168,9 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
     }
 
     public Channel channel(int sessionId){
+        logger.warn("CHANNEL ["+sessionId+"]");
+        Channel channel = channels.get(sessionId);
+        //logger.warn(channel.session().distributionId()+" : "+channel.session().stub());
         return channels.get(sessionId);
     }
 
@@ -198,6 +201,7 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
         channel.sessionId(sessionId.getAndIncrement());
         channels.put(channel.sessionId(),channel);
         pendingJoins.put(channel.sessionId(),new PendingJoinChannel(channel,sessionJoinTimeout));
+        logger.warn("CHANNEL Added ["+channel.sessionId()+"]");
     }
 
     @Override

@@ -174,6 +174,10 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }
     }
 
+    public Channel channel(int sessionId){
+        return udpEndpoint.channel(sessionId);
+    }
+
     public GameZone gameZoneFromZoneId(String zoneId){
         return gameZoneIndex.get(zoneId).gameZone;
     }
@@ -628,7 +632,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         //callback on player target bucket node
         String[] params = query.split("#");
         OnAccessTrack onAccessTrack = new OnAccessTrack();
-        onAccessTrack.systemId(params[0]);
+        onAccessTrack.systemId(Long.parseLong(params[0]));
         onAccessTrack.command(params[1]);
         onAccessTrack.property(OnAccess.PAYLOAD,payload);
         gameServiceProvider.gameServiceProvider().onGameEvent(onAccessTrack);

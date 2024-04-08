@@ -78,13 +78,13 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
     }
 
     @Override
-    public String resetCode(String key) {
+    public String resetCode(long key) {
         return null;
     }
 
     @Override
-    public String checkCode(String resetCode) {
-        return null;
+    public long checkCode(String resetCode) {
+        return 0;
     }
 
     @Override

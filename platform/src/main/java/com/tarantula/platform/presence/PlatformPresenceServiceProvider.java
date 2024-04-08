@@ -78,32 +78,32 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         this.logger = JDKLogger.getLogger(PlatformPresenceServiceProvider.class);
         this.logger.warn("Presence service provider started on ->"+gameServiceName);
     }
-    public void onFriendList(String systemId,String friendSystemId){
+    public void onFriendList(long systemId,long friendSystemId){
         PlayList playList = new PlayList(friendListSize);
-        playList.distributionKey(systemId);
+        playList.distributionId(systemId);
         this.dataStore.createIfAbsent(playList,true);
         playList.playListIndex.push(friendSystemId);
         this.dataStore.update(playList);
     }
-    public void onPlay(String systemId){
+    public void onPlay(long systemId){
         this.recentlyPlayList.playListIndex.push(systemId);
         updates.incrementAndGet();
     }
-    public List<String> friendList(String systemId){
+    public List<Long> friendList(long systemId){
         PlayList playList = new PlayList(friendListSize);
-        playList.distributionKey(systemId);
+        playList.distributionId(systemId);
         this.dataStore.createIfAbsent(playList,true);
         return playList.playListIndex.list(new ArrayList<>());
     }
-    public List<String> recentlyPlayList(){
+    public List<Long> recentlyPlayList(){
         return this.recentlyPlayList.playListIndex.list(new ArrayList<>());
     }
 
-    public Profile profile(String systemId){
+    public Profile profile(long systemId){
         Profile profile = new Profile();
         profile.displayName ="player";
         profile.iconUrl = "resource/portrait.png";
-        profile.distributionKey(systemId);
+        profile.distributionId(systemId);
         this.dataStore.createIfAbsent(profile,true);
         profile.dataStore(this.dataStore);
         return profile;
@@ -208,9 +208,9 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         savedGame.expireSession(currentSaveIndex.routingNumber());
     }
 
-    public PersonalDataIndex loadPersonalDataIndex(String systemId){
+    public PersonalDataIndex loadPersonalDataIndex(long systemId){
         PersonalDataIndex playerSaveIndex = new PersonalDataIndex();
-        playerSaveIndex.distributionKey(systemId);
+        playerSaveIndex.distributionId(systemId);
         dataStore.createIfAbsent(playerSaveIndex,true);
         playerSaveIndex.dataStore(dataStore);
         return playerSaveIndex;

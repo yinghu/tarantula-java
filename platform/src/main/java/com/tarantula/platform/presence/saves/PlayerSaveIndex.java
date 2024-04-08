@@ -13,9 +13,9 @@ public class PlayerSaveIndex extends RecoverableObject {
         this.label = "playerSaveIndex";
     }
 
-    public PlayerSaveIndex(String indexId){
+    public PlayerSaveIndex(long indexId){
         this();
-        this.distributionKey(indexId);
+        this.distributionId(indexId);
     }
 
     @Override

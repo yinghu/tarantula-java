@@ -14,11 +14,11 @@ public class PlayList extends RecoverableObject {
 
     private final static String PLAY_LIST_INDEX ="playlist";
 
-    public FIFOBuffer<String> playListIndex;
+    public FIFOBuffer<Long> playListIndex;
 
     public PlayList(){}
     public PlayList(int size){
-        this.playListIndex = new FIFOBuffer<>(size,new String[size]);
+        this.playListIndex = new FIFOBuffer<>(size,new Long[size]);
     }
     @Override
     public int getFactoryId() {
@@ -32,13 +32,13 @@ public class PlayList extends RecoverableObject {
 
     @Override
     public Map<String,Object> toMap(){
-        List<String> list = this.playListIndex.list(new ArrayList<>());
-        list.forEach(a-> this.properties.put(a,"1"));
+        List<Long> list = this.playListIndex.list(new ArrayList<>());
+        ///list.forEach(a-> this.properties.put(a,"1"));
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
-        properties.forEach((k,v)->this.playListIndex.push(k));
+        //properties.forEach((k,v)->this.playListIndex.push(k));
     }
     @Override
     public Key key(){

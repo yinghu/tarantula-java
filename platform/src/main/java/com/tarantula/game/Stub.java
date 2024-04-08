@@ -63,7 +63,7 @@ public class Stub extends PlayerGameObject {
         this.tournamentId = buffer.readLong();
         this.trackId = buffer.readUTF8();
         this.timestamp = buffer.readLong();
-        this.systemId = Long.toString(buffer.readLong());
+        this.systemId = buffer.readLong();
         return true;
     }
     public boolean write(DataBuffer buffer) {
@@ -74,7 +74,7 @@ public class Stub extends PlayerGameObject {
         buffer.writeLong(tournamentId);
         buffer.writeUTF8(trackId);
         buffer.writeLong(timestamp);
-        buffer.writeLong(Long.parseLong(systemId));
+        buffer.writeLong(systemId);
         return true;
     }
 

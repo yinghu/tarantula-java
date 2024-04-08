@@ -72,7 +72,7 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
         inventories[0].list();
         return inventories[0];
     }
-    public boolean redeem(String systemId, Application item){
+    public boolean redeem(long systemId, Application item){
         Transaction t = gameCluster.transaction();
         boolean suc = t.execute(ctx->{
             ApplicationPreSetup setup = (ApplicationPreSetup)ctx;
@@ -85,7 +85,7 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
         });
         return suc;
     }
-    public boolean redeem(String systemId, Item item){
+    public boolean redeem(long systemId, Item item){
         Transaction t = gameCluster.transaction();
         boolean suc = t.execute(ctx->{
             ApplicationPreSetup setup = (ApplicationPreSetup)ctx;
@@ -99,7 +99,7 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
         return suc;
     }
 
-    public boolean redeem(String systemId, TournamentPrize item){
+    public boolean redeem(long systemId, TournamentPrize item){
         Transaction t = gameCluster.transaction();
         boolean suc = t.execute(ctx->{
             ApplicationPreSetup setup =(ApplicationPreSetup)ctx;

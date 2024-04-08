@@ -10,11 +10,11 @@ public class PlayListModule extends ModuleHeader{
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onRecentlyList")){
-            List<String> plist = gameServiceProvider.presenceServiceProvider().recentlyPlayList();
+            List<Long> plist = gameServiceProvider.presenceServiceProvider().recentlyPlayList();
             session.write(ListSerializer.toJson(plist).toString().getBytes());
         }
         else if(session.action().equals("onFriendList")){
-            List<String> plist = gameServiceProvider.presenceServiceProvider().friendList(session.systemId());
+            List<Long> plist = gameServiceProvider.presenceServiceProvider().friendList(session.systemId());
             session.write(ListSerializer.toJson(plist).toString().getBytes());
         }
         else{

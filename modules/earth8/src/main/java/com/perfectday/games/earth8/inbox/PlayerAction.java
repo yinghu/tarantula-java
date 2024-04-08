@@ -51,12 +51,12 @@ public class PlayerAction extends RecoverableObject implements OnAccess {
         return jsonObject;
     }
     @Override
-    public String systemId() {
-        return null;
+    public long systemId() {
+        return 0;
     }
 
     @Override
-    public void systemId(String systemId) {
+    public void systemId(long systemId) {
 
     }
 

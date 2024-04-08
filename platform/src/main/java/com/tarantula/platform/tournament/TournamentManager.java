@@ -374,7 +374,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             entry.update();
             TournamentPrize prize = prizes.get(rank);
             if(prize!=null) {
-                this.tournamentServiceProvider.inventoryServiceProvider.redeem(Long.toString(entry.systemId()),prize);
+                this.tournamentServiceProvider.inventoryServiceProvider.redeem(entry.systemId(),prize);
             }
             rank++;
         }
@@ -508,14 +508,14 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         }
         loaded[0].dataStore(dataStore);
         loaded[0].load();
-        return loaded[0].update(new SimpleStub("",systemId),entry -> {
+        return loaded[0].update(new SimpleStub(0,systemId),entry -> {
             entry.score(credits,score);
             return entry.finished();
         });
     }
     public boolean onScore(long systemId,long instanceId,double credits,double score){
         TournamentInstance instance = lookup(instanceId);
-        return instance.update(new SimpleStub("",systemId), entry -> {
+        return instance.update(new SimpleStub(0,systemId), entry -> {
             entry.score(credits,score);
             return true;
         });

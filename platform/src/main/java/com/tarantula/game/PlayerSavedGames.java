@@ -10,10 +10,10 @@ import java.util.List;
 public class PlayerSavedGames{
 
     public PlatformGameServiceProvider gameServiceProvider;
-    public String systemId;
+    public long systemId;
     public List<SavedGame> savedGames;
 
-    public PlayerSavedGames(String systemId,List<SavedGame> savedGames){
+    public PlayerSavedGames(long systemId,List<SavedGame> savedGames){
         this.systemId = systemId;
 
         this.savedGames = savedGames;

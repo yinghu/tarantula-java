@@ -8,6 +8,7 @@ import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 
+import com.icodesoftware.util.BufferUtil;
 import com.icodesoftware.util.ResponseHeader;
 import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.admin.GameClusterQuery;
@@ -752,14 +753,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
         return lobby;
     }
-    public String resetCode(String key){
+    public String resetCode(long key){
         String code = UUID.randomUUID().toString();
-        clusterStore.mapSet(code.getBytes(),key.getBytes());
+        clusterStore.mapSet(code.getBytes(), BufferUtil.fromLong(key));
         return code;
     }
-    public String checkCode(String resetCode){
+    public long checkCode(String resetCode){
         byte[] ret = clusterStore.mapRemove(resetCode.getBytes());
-        return (ret!=null?new String(ret):"");
+        return (ret!=null?BufferUtil.toLong(ret):0);
     }
 
     public byte[] serverKey(String typeId){

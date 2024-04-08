@@ -7,7 +7,7 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
 
     protected long tournamentId;
 
-    protected String systemId;
+    protected long systemId;
 
     protected String typeId;
 
@@ -17,12 +17,12 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
 
 
 
-    public String systemId() {
-        return systemId==null?Long.toString(this.distributionId):systemId;
+    public long systemId() {
+        return systemId;
     }
 
 
-    public void systemId(String systemId) {
+    public void systemId(long systemId) {
         this.systemId = systemId;
     }
 

@@ -3,12 +3,12 @@ package com.tarantula.game;
 
 public class SimpleStub extends PlayerGameObject{
 
-    public SimpleStub(String systemId,long stub){
+    public SimpleStub(long systemId,long stub){
         this.systemId = systemId;
         this.stub = stub;
     }
     @Override
-    public String systemId(){
+    public long systemId(){
         return systemId;
     }
 }

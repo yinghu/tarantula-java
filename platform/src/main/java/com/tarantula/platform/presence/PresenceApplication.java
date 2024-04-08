@@ -120,7 +120,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         else if(session.action().equals("onValidateEmail")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String code = (String) onAccess.property("validationCode");
-            if(this.deploymentServiceProvider.checkCode(code).equals(session.systemId())){
+            if(this.deploymentServiceProvider.checkCode(code)==(session.systemId())){
                 Access u = user(session.distributionId());
                 u.activated(true);
                 u.update();

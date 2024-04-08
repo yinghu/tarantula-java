@@ -57,10 +57,10 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         logger.warn("Platform inbox started->"+gameServiceName);
     }
 
-    public <T extends Application> void claim(String systemId,T item){
+    public <T extends Application> void claim(long systemId,T item){
         if(pendingReward){
             PendingRewardIndex pendingRewardIndex = new PendingRewardIndex();
-            pendingRewardIndex.distributionKey(systemId);
+            pendingRewardIndex.distributionId(systemId);
             this.dataStore.createIfAbsent(pendingRewardIndex,true);
             PendingReward pending = new PendingReward(item);
             this.dataStore.create(pending);
@@ -79,7 +79,7 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         reward.disabled(true);
         dataStore.update(reward);
         PendingRewardIndex pendingRewardIndex = new PendingRewardIndex();
-        pendingRewardIndex.distributionKey(session.systemId());
+        pendingRewardIndex.distributionId(session.systemId());
         this.dataStore.createIfAbsent(pendingRewardIndex,true);
         //pendingRewardIndex.removeKey(rewardKey);
         dataStore.update(pendingRewardIndex);

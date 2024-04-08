@@ -52,7 +52,7 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     }
 
     @Override
-    public boolean timeout(String systemId,long stub) {
+    public boolean timeout(long systemId,long stub) {
         Stub removed = this.gameServiceProvider.presenceServiceProvider().stub(new SimpleStub(systemId,stub),application);
         if(!removed.joined()) return false;
         GameZone gameZone = this.gameServiceProvider.roomServiceProvider().gameZoneFromZoneId(removed.zoneId);
