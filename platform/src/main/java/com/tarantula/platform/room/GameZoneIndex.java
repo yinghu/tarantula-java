@@ -20,4 +20,6 @@ public class GameZoneIndex {
     public ArrayBlockingQueue<GameRoom> pendingRooms;
     public LinkedBlockingDeque<GameRoom> runningRooms;
 
+    public ArrayBlockingQueue<RoomStub> pendingRoomStubs;
+
 }
