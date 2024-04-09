@@ -27,7 +27,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     private final static long EVENT_DISPATCH_DELAY = 100; //100ms
     private String ANALYTICS_QUERY;
 
-    private ConcurrentHashMap<Long,Tournament> tournamentIndex = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<Long,Tournament> tournamentIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,ApplicationResource> resourceIndex = new ConcurrentHashMap<>();
 
     public void setup(GameContext gameContext){

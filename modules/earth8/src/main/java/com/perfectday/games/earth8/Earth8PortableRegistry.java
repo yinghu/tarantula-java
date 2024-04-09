@@ -38,6 +38,8 @@ public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecov
 
     public static final int MANUAL_ANALYTICS_BATCH_CID = 18;
 
+    public static final int TOURNAMENT_SCORE_CID = 19;
+
     public static Earth8PortableRegistry INS;
 
     public Earth8PortableRegistry(){
@@ -93,7 +95,9 @@ public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecov
             case CURRENCY_UPDATE_CID:
                 pt = new CurrencyUpdate();
                 break;
-
+            case TOURNAMENT_SCORE_CID:
+                pt = new TournamentScore();
+                break;
             default:
         }
         return (T)pt;
