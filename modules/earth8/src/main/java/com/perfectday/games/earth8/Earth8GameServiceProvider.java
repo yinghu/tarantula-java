@@ -95,6 +95,16 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             return update.update(applicationPreSetup, session);
         });
 
+        if (update.score > 0 && update.tournamentId > 0) {
+            var tournament = tournamentIndex.getOrDefault(update.tournamentId, null);
+            if (tournament != null) {
+                tournament.register(session).update(session,(e)->{
+                    e.score(0, update.score);
+                    return true;
+                });
+            }
+        }
+
         if(updated)
         {
             TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
@@ -135,31 +145,6 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             **/
             return true;
         });
-        if(updated
-            && (battleTransaction.TEMP_BattleStage.equals("Chapter3_Stage7_HardConfig")
-                || battleTransaction.TEMP_BattleStage.endsWith("EpicConfig")
-            )
-            && battleTransaction.win
-        ) {
-            // hard coded 7 day tournament completion
-            tournamentIndex.forEach((key,entry)->{
-                if(entry.type().startsWith("SevenDayTournament")) {
-                    // register this user to the tournament the first time they finish the campaign
-                    entry.register(session).update(session,(e)->{
-                        this.gameContext.log("Test Register Player to tournament", OnLog.INFO);
-                        if(e.score() > 0)
-                        {
-                            this.gameContext.log("Player already registered", OnLog.INFO);
-                            return false;
-                        }
-
-                        this.gameContext.log("Player registering", OnLog.INFO);
-                        e.score(0,1);
-                        return true;
-                    });
-                }
-            });
-        }
 
         session.write(JsonUtil.toSimpleResponse(updated,"battle finished").getBytes());
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
