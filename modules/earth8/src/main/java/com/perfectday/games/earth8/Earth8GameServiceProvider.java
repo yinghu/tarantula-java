@@ -13,6 +13,8 @@ import com.perfectday.games.earth8.analytics.*;
 import com.perfectday.games.earth8.inbox.PlayerAction;
 import com.perfectday.games.earth8.inbox.PlayerActionQuery;
 import com.perfectday.games.earth8.inbox.PlayerEventInbox;
+import com.perfectday.games.earth8.tournament.PlayerTournamentTrack;
+import com.perfectday.games.earth8.tournament.PlayerTournamentTrackQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,19 +93,44 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             ApplicationPreSetup applicationPreSetup = (ApplicationPreSetup)ctx;
             DataStore dataStore = applicationPreSetup.onDataStore("battle");
             if(!dataStore.create(update)) return false;
+
+            if (update.score > 0 && update.playerLevel > 0) {
+                DataStore tournamentTrackDataStore = applicationPreSetup.onDataStore("player_tournament_track");
+                var tournamentTrackList = tournamentTrackDataStore.list(new PlayerTournamentTrackQuery(session.distributionId()));
+
+                PlayerTournamentTrack tournamentTrack = null;
+                if (tournamentTrackList.isEmpty()) {
+                    tournamentTrack = new PlayerTournamentTrack("player_tournament_track");
+                    tournamentTrack.ownerKey(SnowflakeKey.from(Long.parseLong(session.systemId()))); // Should this be the same as the query?
+                    tournamentTrackDataStore.create(tournamentTrack);
+                } else {
+                    tournamentTrack = tournamentTrackList.get(0);
+                }
+
+                boolean isUpdated = false;
+                for(var tournamentId : tournamentIndex.keySet()) {
+                    var tournament = tournamentIndex.get(tournamentId);
+                    if (!tournamentTrack.tournamentIDToLevel.containsKey(tournamentId)) {
+                        tournamentTrack.tournamentIDToLevel.put(tournamentId, update.playerLevel);
+                        isUpdated = true;
+                    }
+
+                    tournament.register(session, tournamentTrack.tournamentIDToLevel.get(tournamentId)).update(session,(e)->{
+                        e.score(0, update.score); // What will happen if the tournament is not active?
+                        return true;
+                    });
+                }
+
+                if (isUpdated) {
+                    tournamentTrackDataStore.update(tournamentTrack);
+                }
+            }
+
             //TO MORE TRANSACTION STUFF
             return update.update(applicationPreSetup, session);
         });
 
-        if (update.score > 0 && update.tournamentId > 0) {
-            var tournament = tournamentIndex.getOrDefault(update.tournamentId, null);
-            if (tournament != null) {
-                tournament.register(session).update(session,(e)->{
-                    e.score(0, update.score);
-                    return true;
-                });
-            }
-        }
+
 
         if(updated)
         {
