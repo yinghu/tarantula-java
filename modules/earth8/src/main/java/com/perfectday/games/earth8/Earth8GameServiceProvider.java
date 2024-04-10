@@ -97,7 +97,38 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             if (update.score > 0 && update.playerLevel > 0) {
                 DataStore tournamentTrackDataStore = applicationPreSetup.onDataStore("player_tournament_track");
                 var playerDataTracks = tournamentTrackDataStore.list(new PlayerDataTrackQuery(session.distributionId()));
-
+                //start
+                if(playerDataTracks.isEmpty()){
+                    Tournament tournament = tournamentIndex.get(update.playerLevel);
+                    if(tournament!=null){
+                        tournament.register(session).update(session,entry->{
+                            entry.score(0,update.score);
+                            return true;
+                        });
+                        //create playerDataTrack with the tournament Id
+                    }
+                }
+                else{
+                    PlayerDataTrack playerDataTrack = playerDataTracks.get(0);
+                    Tournament existing = tournamentIndex.get(playerDataTrack.tournamentId);
+                    if(existing!=null){
+                        existing.register(session).update(session,entry->{
+                            entry.score(0,update.score);
+                            return true;
+                        });
+                    }
+                    else{
+                        Tournament nextLevel = tournamentIndex.get(update.playerLevel);
+                        if(nextLevel!=null){
+                            nextLevel.register(session).update(session,entry->{
+                                entry.score(0,update.score);
+                                return true;
+                            });
+                            //create playerDataTrack with the tournament Id
+                        }
+                    }
+                }
+                //end
                 for(var tournamentId : tournamentIndex.keySet()) { // TODO: Get tournaments based on update.playerLevel
                     var tournament = tournamentIndex.get(tournamentId);
 
@@ -269,15 +300,18 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     public void tournamentStarted(Tournament tournament) {
         gameContext.log("Tournament started : "+tournament.distributionId()+" : "+tournament.name()+" : "+tournament.type()+" : "+tournament.global(),OnLog.WARN);
         tournamentIndex.put(tournament.distributionId(),tournament);
-        // Get start level and end level, add to hash map, for each level
-        // Add tournamentID for same tournaments with bands
-        // HashMap<level, tournament>
+        for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
+            tournamentIndex.put(start,tournament);
+        }
     }
 
     @Override
     public void tournamentClosed(Tournament tournament) {
         gameContext.log("Tournament closed : "+tournament.distributionId()+" : "+tournament.name()+" : "+tournament.type()+" : "+tournament.global(),OnLog.WARN);
         tournamentIndex.remove(tournament.distributionId());
+        for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
+            tournamentIndex.remove(start);
+        }
     }
 
     public void onApplicationResourceRegistered(ApplicationResource resource){

@@ -11,9 +11,14 @@ public class PlayerDataTrack extends RecoverableObject implements OnAccess {
 
     public long tournamentId;
 
-    public PlayerDataTrack(long tournamentId){
+
+    public PlayerDataTrack(){
         this.onEdge = true;
         this.label = LABEL;
+    }
+
+    public PlayerDataTrack(long tournamentId){
+        this();
         this.tournamentId = tournamentId;
     }
 
