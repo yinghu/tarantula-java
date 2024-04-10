@@ -32,7 +32,7 @@ public class BattleUpdate extends RecoverableObject {
     }
 
     public UpdateId updateId;
-    public int playerLevel;
+    public long playerLevel;
     public int score;
     public long unitId;
     public long equipmentId;
@@ -45,7 +45,7 @@ public class BattleUpdate extends RecoverableObject {
     @Override
     public boolean write(DataBuffer buffer) {
         buffer.writeInt(updateId.ordinal());
-        buffer.writeInt(playerLevel);
+        buffer.writeLong(playerLevel);
         buffer.writeInt(score);
         buffer.writeLong(unitId);
         buffer.writeLong(equipmentId);
@@ -61,7 +61,7 @@ public class BattleUpdate extends RecoverableObject {
     @Override
     public boolean read(DataBuffer buffer) {
         updateId = UpdateId.values()[buffer.readInt()];
-        playerLevel = buffer.readInt();
+        playerLevel = buffer.readLong();
         score = buffer.readInt();
         unitId = buffer.readLong();
         equipmentId = buffer.readLong();
@@ -136,7 +136,7 @@ public class BattleUpdate extends RecoverableObject {
 
     protected void parse(JsonObject json){
         updateId = UpdateId.values()[JsonUtil.getJsonInt(json, "UpdateId", 0)];
-        playerLevel = JsonUtil.getJsonInt(json, "PlayerLevel", 0);
+        playerLevel = JsonUtil.getJsonLong(json, "PlayerLevel", 0);
         score = JsonUtil.getJsonInt(json, "Score", 0);
         unitId = JsonUtil.getJsonLong(json, "UnitId", 0);
         equipmentId = JsonUtil.getJsonLong(json, "EquipmentId", 0);

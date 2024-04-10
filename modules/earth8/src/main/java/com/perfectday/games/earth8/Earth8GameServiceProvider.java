@@ -97,16 +97,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             if (update.score > 0 && update.playerLevel > 0) {
                 DataStore tournamentTrackDataStore = applicationPreSetup.onDataStore("player_tournament_track");
                 var playerDataTracks = tournamentTrackDataStore.list(new PlayerDataTrackQuery(session.distributionId()));
-                //start
+
                 if(playerDataTracks.isEmpty()){
-                    Tournament tournament = tournamentIndex.get(update.playerLevel);
-                    if(tournament!=null){
-                        tournament.register(session).update(session,entry->{
-                            entry.score(0,update.score);
-                            return true;
-                        });
-                        //create playerDataTrack with the tournament Id
-                    }
+                    scoreTournamentWithSameLevel(session, update, tournamentTrackDataStore);
                 }
                 else{
                     PlayerDataTrack playerDataTrack = playerDataTracks.get(0);
@@ -118,37 +111,12 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                         });
                     }
                     else{
-                        Tournament nextLevel = tournamentIndex.get(update.playerLevel);
-                        if(nextLevel!=null){
-                            nextLevel.register(session).update(session,entry->{
-                                entry.score(0,update.score);
-                                return true;
-                            });
-                            //create playerDataTrack with the tournament Id
+                        if (scoreTournamentWithSameLevel(session, update, tournamentTrackDataStore)){
+                            for (var track : playerDataTracks) {
+                                tournamentTrackDataStore.delete(track);
+                            }
                         }
                     }
-                }
-                //end
-                for(var tournamentId : tournamentIndex.keySet()) { // TODO: Get tournaments based on update.playerLevel
-                    var tournament = tournamentIndex.get(tournamentId);
-
-                    var isRegistered = false;
-                    for (var playerDataTrack : playerDataTracks) {
-                        if (playerDataTrack.tournamentId == 00000) { // TODO: Use tournamentId
-                            isRegistered = true;
-                            break;
-                        }
-                    }
-                    if (!isRegistered) {
-                        var tournamentTrack = new PlayerDataTrack(0000); // TODO: Use tournamentId
-                        tournamentTrack.ownerKey(SnowflakeKey.from(session.distributionId()));
-                        tournamentTrackDataStore.create(tournamentTrack);
-                    }
-
-                    tournament.register(session).update(session,(e)->{
-                        e.score(0, update.score); // What will happen if the tournament is not active?
-                        return true;
-                    });
                 }
             }
 
@@ -349,5 +317,20 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
         //UDP MESSAGE WITH RELAY CALL WITH SINGLE UDP MESSAGE
+    }
+
+    private boolean scoreTournamentWithSameLevel(Session session, BattleUpdate update, DataStore tournamentTrackDataStore) {
+        Tournament nextLevel = tournamentIndex.get(update.playerLevel);
+        if(nextLevel!=null){
+            nextLevel.register(session).update(session,entry->{
+                entry.score(0,update.score);
+                return true;
+            });
+            var tournamentTrack = new PlayerDataTrack(nextLevel.distributionId());
+            tournamentTrack.ownerKey(SnowflakeKey.from(session.distributionId()));
+            tournamentTrackDataStore.create(tournamentTrack);
+            return true;
+        }
+        return false;
     }
 }
