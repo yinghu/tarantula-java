@@ -141,6 +141,26 @@
       }
     },
     {
+      "header": {
+        "scope": "item",
+        "type": "Sku.Chip",
+        "description": "chip pack",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Chip",
+            "type": "category",
+            "reference": "category:SoftCurrency",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
         "header": {
           "scope": "item",
           "type": "Sku.Unit",

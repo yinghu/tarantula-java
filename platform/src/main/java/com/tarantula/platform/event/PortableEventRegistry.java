@@ -173,18 +173,6 @@ public class PortableEventRegistry implements PortableFactory {
                 _ins = new GameEntry();
                 break;
 
-            case PVE_ROOM_CID:
-                _ins = new PVEGameRoom();
-                break;
-            case PVP_ROOM_CID:
-                _ins = new PVPGameRoom();
-                break;
-            case TVE_ROOM_CID:
-                _ins = new TVEGameRoom();
-                break;
-            case TVT_ROOM_CID:
-                _ins = new TVTGameRoom();
-                break;
             case CLIENT_CONNECTION_CID:
                 _ins = new ClientConnection();
                 break;

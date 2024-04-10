@@ -18,10 +18,15 @@ public class ServiceActionEvent extends Data implements EventOnAction {
     }
 
 	@Override
+	public long systemId() {
+		return distributionId;
+	}
+
+	@Override
 	public void writePortable(PortableWriter out) throws IOException {
 		out.writeUTF("1",this.source);
 		out.writeLong("2",this.sessionId);
-        out.writeLong("3",this.systemId);
+        //out.writeLong("3",this.systemId);
         out.writeByteArray("6",this.payload);
 		out.writeUTF("7", this.clientId);
 		out.writeLong("8", this.stub);
@@ -38,7 +43,7 @@ public class ServiceActionEvent extends Data implements EventOnAction {
 	public void readPortable(PortableReader in) throws IOException {
 		this.source = in.readUTF("1");
 		this.sessionId = in.readLong("2");
-        this.systemId = in.readLong("3");
+        //this.systemId = in.readLong("3");
 		this.payload = in.readByteArray("6");
 		this.clientId = in.readUTF("7");
 		this.stub = in.readLong("8");

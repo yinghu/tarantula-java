@@ -64,8 +64,8 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
 
     @Override
-    public String roomId(){
-        return this.distributionKey();
+    public long roomId(){
+        return this.distributionId();
     }
 
     @Override
@@ -186,23 +186,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         }
         jsonObject.add("_players",plist);
         return jsonObject;
-    }
-
-    public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeInt("1",round);
-        portableWriter.writeLong("3",distributionId);
-        portableWriter.writeInt("4",capacity);
-        portableWriter.writePortableArray("5",entries);
-    }
-
-    public void readPortable(PortableReader portableReader) throws IOException {
-        this.round = portableReader.readInt("1");
-        this.distributionId = portableReader.readLong("3");
-        this.entries = new Entry[portableReader.readInt("4")];
-        for(Portable p : portableReader.readPortableArray("5")){
-            Entry gameEntry = (Entry)p;
-            entries[gameEntry.seat()] = gameEntry;
-        }
     }
 
     public GameRoom join(long systemId,Listener listener){

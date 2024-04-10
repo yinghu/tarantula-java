@@ -17,8 +17,6 @@ public class GameZoneIndex {
     public ArrayBlockingQueue<UDPChannel> pendingPushChannels;
     public GameRoom gameRoom;
 
-    public ArrayBlockingQueue<GameRoom> pendingRooms;
-    public LinkedBlockingDeque<GameRoom> runningRooms;
 
     public ArrayBlockingQueue<RoomStub> pendingRoomStubs;
 

@@ -10,6 +10,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 public class GameRoomTest extends DataStoreHook{
@@ -112,6 +113,20 @@ public class GameRoomTest extends DataStoreHook{
         Assert.assertEquals(3,q.size());
         Assert.assertTrue(q.remove(p2));
         Assert.assertEquals(2,q.size());
+    }
+
+    @Test(groups = { "GameRoom" })
+    public void removeRoomSubTest() {
+        ArrayBlockingQueue<RoomStub> stubs = new ArrayBlockingQueue<>(100);
+        long roomId = 1000;
+        for(int i=0;i<100;i++){
+            stubs.offer(new RoomStub(roomId,i));
+        }
+        Assert.assertEquals(stubs.size(),100);
+        for(int i=0;i<100;i++){
+            Assert.assertTrue(stubs.remove(new RoomStub(roomId,i)));
+        }
+        Assert.assertEquals(stubs.size(),0);
     }
 
 }

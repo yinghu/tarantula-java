@@ -19,7 +19,7 @@ public class PVERoomProxy extends RoomProxyHeader {
         stub.room = room;
         stub.roomId = stub.room.roomId();
         stub.zone = gameZone;
-        stub.zoneId = gameZone.distributionKey();
+        stub.zoneId = gameZone.distributionId();
         if(room.dedicated()){
             stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));
         }
