@@ -424,7 +424,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return TimeUtil.durationUTCMilliseconds(closeTime,endTime);
     }
 
-    public Instance register(Session session, int playerLevel){
+    public Instance register(Session session){
         TournamentJoin join = tournamentServiceProvider.tournamentJoin(session,scheduleId);
         if(this.global) {
             if(!join.closed && join.tournamentId == this.distributionId ) return new TournamentInstanceProxy(this,join);

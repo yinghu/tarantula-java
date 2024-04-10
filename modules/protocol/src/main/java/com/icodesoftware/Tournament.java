@@ -39,7 +39,7 @@ public interface Tournament extends Configurable {
 
     long scheduleId();
 
-    Instance register(Session session, int playerLevel);
+    Instance register(Session session);
 
     interface Entry extends Configurable {
         long systemId();

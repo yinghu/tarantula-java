@@ -13,8 +13,8 @@ import com.perfectday.games.earth8.analytics.*;
 import com.perfectday.games.earth8.inbox.PlayerAction;
 import com.perfectday.games.earth8.inbox.PlayerActionQuery;
 import com.perfectday.games.earth8.inbox.PlayerEventInbox;
-import com.perfectday.games.earth8.tournament.PlayerTournamentTrack;
-import com.perfectday.games.earth8.tournament.PlayerTournamentTrackQuery;
+import com.perfectday.games.earth8.data.PlayerDataTrack;
+import com.perfectday.games.earth8.data.PlayerDataTrackQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,33 +96,28 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
             if (update.score > 0 && update.playerLevel > 0) {
                 DataStore tournamentTrackDataStore = applicationPreSetup.onDataStore("player_tournament_track");
-                var tournamentTrackList = tournamentTrackDataStore.list(new PlayerTournamentTrackQuery(session.distributionId()));
+                var playerDataTracks = tournamentTrackDataStore.list(new PlayerDataTrackQuery(session.distributionId()));
 
-                PlayerTournamentTrack tournamentTrack = null;
-                if (tournamentTrackList.isEmpty()) {
-                    tournamentTrack = new PlayerTournamentTrack("player_tournament_track");
-                    tournamentTrack.ownerKey(SnowflakeKey.from(Long.parseLong(session.systemId()))); // Should this be the same as the query?
-                    tournamentTrackDataStore.create(tournamentTrack);
-                } else {
-                    tournamentTrack = tournamentTrackList.get(0);
-                }
-
-                boolean isUpdated = false;
-                for(var tournamentId : tournamentIndex.keySet()) {
+                for(var tournamentId : tournamentIndex.keySet()) { // TODO: Get tournaments based on update.playerLevel
                     var tournament = tournamentIndex.get(tournamentId);
-                    if (!tournamentTrack.tournamentIDToLevel.containsKey(tournamentId)) {
-                        tournamentTrack.tournamentIDToLevel.put(tournamentId, update.playerLevel);
-                        isUpdated = true;
+
+                    var isRegistered = false;
+                    for (var playerDataTrack : playerDataTracks) {
+                        if (playerDataTrack.tournamentId == 00000) { // TODO: Use tournamentId
+                            isRegistered = true;
+                            break;
+                        }
+                    }
+                    if (!isRegistered) {
+                        var tournamentTrack = new PlayerDataTrack(0000); // TODO: Use tournamentId
+                        tournamentTrack.ownerKey(SnowflakeKey.from(session.distributionId()));
+                        tournamentTrackDataStore.create(tournamentTrack);
                     }
 
-                    tournament.register(session, tournamentTrack.tournamentIDToLevel.get(tournamentId)).update(session,(e)->{
+                    tournament.register(session).update(session,(e)->{
                         e.score(0, update.score); // What will happen if the tournament is not active?
                         return true;
                     });
-                }
-
-                if (isUpdated) {
-                    tournamentTrackDataStore.update(tournamentTrack);
                 }
             }
 
@@ -274,6 +269,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     public void tournamentStarted(Tournament tournament) {
         gameContext.log("Tournament started : "+tournament.distributionId()+" : "+tournament.name()+" : "+tournament.type()+" : "+tournament.global(),OnLog.WARN);
         tournamentIndex.put(tournament.distributionId(),tournament);
+        // Get start level and end level, add to hash map, for each level
+        // Add tournamentID for same tournaments with bands
+        // HashMap<level, tournament>
     }
 
     @Override
