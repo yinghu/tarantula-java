@@ -97,12 +97,12 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             if (update.score > 0 && update.playerLevel > 0) {
                 DataStore tournamentTrackDataStore = applicationPreSetup.onDataStore("player_tournament_track");
                 var playerDataTracks = tournamentTrackDataStore.list(new PlayerDataTrackQuery(session.distributionId()));
+                PlayerDataTrack playerDataTrack = getActiveDataTrack(playerDataTracks);
 
-                if(playerDataTracks.isEmpty()){
+                if(playerDataTracks.isEmpty() || playerDataTrack == null){
                     scoreTournamentWithSameLevel(session, update, tournamentTrackDataStore);
                 }
                 else{
-                    PlayerDataTrack playerDataTrack = playerDataTracks.get(0);
                     Tournament existing = tournamentIndex.get(playerDataTrack.tournamentId);
                     if(existing!=null){
                         existing.register(session).update(session,entry->{
@@ -112,9 +112,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                     }
                     else{
                         if (scoreTournamentWithSameLevel(session, update, tournamentTrackDataStore)){
-                            for (var track : playerDataTracks) {
-                                tournamentTrackDataStore.delete(track);
-                            }
+                            playerDataTrack.tournamentId = 0;
+                            tournamentTrackDataStore.update(playerDataTrack);
                         }
                     }
                 }
@@ -332,5 +331,14 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             return true;
         }
         return false;
+    }
+
+    private PlayerDataTrack getActiveDataTrack(List<PlayerDataTrack> tracks) {
+        for (var track : tracks) {
+            if (track.tournamentId > 0) {
+                return track;
+            }
+        }
+        return null;
     }
 }
