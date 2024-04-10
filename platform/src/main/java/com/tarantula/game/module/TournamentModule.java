@@ -1,11 +1,16 @@
 package com.tarantula.game.module;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.util.MockUtils;
 import com.tarantula.platform.tournament.TournamentContext;
 import com.tarantula.platform.tournament.TournamentHistoryContext;
+import com.tarantula.platform.tournament.TournamentRanking;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class TournamentModule extends ModuleHeader implements Configurable.Listener {
@@ -27,7 +32,21 @@ public class TournamentModule extends ModuleHeader implements Configurable.Liste
             session.write(board.toString().getBytes());
         }
         else if (session.action().equals("onLoadRankings")){
-            session.write(MockUtils.GetMockTournamentRankings(Long.parseLong(session.systemId())).toString().getBytes());
+
+            List<TournamentRanking> allRankings = new ArrayList<>();
+            JsonObject jsonObject = JsonUtil.parse(session.name());
+            this.context.log(jsonObject.getAsString(), OnLog.DEBUG);
+            List<Long> tournamentIdList = new ArrayList<Long>();
+
+            long playerID = session.distributionId();
+
+            for(long tournamentID : tournamentIdList){
+                Tournament tournament = tournamentServiceProvider.tournament(tournamentID);
+                Tournament.RaceBoard board = tournament.register(session).raceBoard();
+                allRankings.add(new TournamentRanking(board, playerID));
+            }
+
+            session.write(allRankings.toString().getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action()+" not supported");
