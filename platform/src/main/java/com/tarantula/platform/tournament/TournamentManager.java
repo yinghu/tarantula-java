@@ -41,6 +41,9 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     private int maxEntriesPerInstance;
     private int durationMinutes;
 
+    private long startLevel;
+    private long endLevel;
+
     private int concurrentInstanceSize;
 
     private TournamentRegister[] pendingInstances;
@@ -87,8 +90,11 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.durationMinutes = schedule.durationMinutesPerInstance();
         this.enterCost = schedule.enterCost();
         this.credit = schedule.credit();
+        this.startLevel = schedule.startLevel();
+        this.endLevel = schedule.endLevel();
         this.scheduleId = schedule.distributionId();
     }
+
 
     public TournamentManager(){
         this.onEdge = true;
@@ -140,6 +146,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         buffer.writeDouble(enterCost);
         buffer.writeDouble(credit);
         buffer.writeLong(scheduleId);
+        buffer.writeLong(startLevel);
+        buffer.writeLong(endLevel);
         return true;
     }
 
@@ -160,6 +168,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         enterCost = buffer.readDouble();
         credit = buffer.readDouble();
         scheduleId = buffer.readLong();
+        startLevel = buffer.readLong();
+        endLevel = buffer.readLong();
         return true;
     }
 
@@ -177,6 +187,13 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
     public int durationMinutesPerInstance(){
         return durationMinutes;
+    }
+
+    public long startLevel(){
+        return startLevel;
+    }
+    public long endLevel(){
+        return endLevel;
     }
 
     public long scheduleId(){
@@ -346,6 +363,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         jsonObject.addProperty("EnterCost",enterCost);
         jsonObject.addProperty("Credit",credit);
         jsonObject.addProperty("ScheduleId",Long.toString(this.scheduleId));
+        jsonObject.addProperty("StartLevel",startLevel);
+        jsonObject.addProperty("EndLevel",endLevel);
         return jsonObject;
     }
 
