@@ -59,6 +59,13 @@ public class TournamentSchedule extends Application {
         return header.get("DurationMinutesPerInstance").getAsInt();
     }
 
+    public long startLevel(){
+        return header.get("StartLevel").getAsLong();
+    }
+    public long endLevel(){
+        return header.get("EndLevel").getAsLong();
+    }
+
     @Override
     public int getFactoryId() {
         return TournamentPortableRegistry.OID;

@@ -101,6 +101,20 @@
             "downloadable": false
           },
           {
+            "name": "StartLevel",
+            "type": "number",
+            "reference": "Long",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "EndLevel",
+            "type": "number",
+            "reference": "Long",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
             "name": "PrizeSet",
             "type": "set",
             "reference": "category:TournamentPrize",
