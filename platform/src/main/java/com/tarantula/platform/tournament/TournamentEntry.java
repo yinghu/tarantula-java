@@ -23,6 +23,12 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     private boolean finished;
     private int rank;
 
+    public TournamentEntry(long systemId,double score, int rank){
+        this();
+        this.systemId = systemId;
+        this.score = score;
+        this.rank = rank;
+    }
     public TournamentEntry(long systemId,double credits,double score){
         this();
         this.systemId = systemId;
@@ -107,7 +113,7 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         portableWriter.writeLong("3",timestamp);
         portableWriter.writeInt("4",rank);
         portableWriter.writeDouble("5",credits);
-        portableWriter.writeBoolean("6",finished);
+        portableWriter.writeBoolean("8",finished);
     }
 
     @Override
@@ -117,7 +123,7 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         this.timestamp = portableReader.readLong("3");
         this.rank = portableReader.readInt("4");
         this.credits = portableReader.readDouble("5");
-        this.finished = portableReader.readBoolean("6");
+        this.finished = portableReader.readBoolean("8");
     }
 
     @Override

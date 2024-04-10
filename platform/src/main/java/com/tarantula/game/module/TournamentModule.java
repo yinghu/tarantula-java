@@ -2,9 +2,8 @@ package com.tarantula.game.module;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.TournamentServiceProvider;
-import com.icodesoftware.util.JsonUtil;
+import com.tarantula.platform.tournament.TournamentMockUtils;
 import com.tarantula.platform.tournament.TournamentContext;
-import com.tarantula.platform.tournament.TournamentHistoryContext;
 
 
 public class TournamentModule extends ModuleHeader implements Configurable.Listener {
@@ -20,10 +19,13 @@ public class TournamentModule extends ModuleHeader implements Configurable.Liste
             Tournament.Instance ins = tournamentServiceProvider.tournament(Long.parseLong(session.name())).register(session);
             session.write(ins.toJson().toString().getBytes());
         }
-        else if(session.action().equals("onBoard")){
+        else if(session.action().equals("onBoard")){ // TODO: Clean this up once we have tournaments working
             Tournament tournament = tournamentServiceProvider.tournament(Long.parseLong(session.name()));
             Tournament.RaceBoard board = tournament.register(session).raceBoard();
             session.write(board.toString().getBytes());
+        }
+        else if (session.action().equals("onLoadRankings")){
+            session.write(TournamentMockUtils.GetMockTournamentRankings(Long.parseLong(session.systemId())).toString().getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action()+" not supported");
