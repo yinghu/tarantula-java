@@ -31,7 +31,7 @@ public class MockUtils {
         playerRankings.add(new TournamentEntry(playerId, 30, 55, "Player", 0));
         playerRankings.add(new TournamentEntry(56, 30, 56, "TestPlayerName", 0));
 
-        return new TournamentRanking(tournamentId, topTen, playerRankings);
+        return new TournamentRanking();
     }
 
     public static TournamentRanking GetMockUpperRankingTournament(long tournamentId, long playerId) {
@@ -45,6 +45,6 @@ public class MockUtils {
             playerRankings.add(new TournamentEntry(i == 3 ? playerId : i, 100 - i, i, i == 3 ? "Player" : "TestPlayerName", 0));
         }
 
-        return new TournamentRanking(tournamentId, topTen, playerRankings);
+        return new TournamentRanking();
     }
 }
