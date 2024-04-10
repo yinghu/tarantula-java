@@ -71,10 +71,6 @@ public interface Tournament extends Configurable {
         Entry myPosition();
     }
 
-    interface TournamentRanking extends Configurable{
-
-    }
-
     interface History extends Configurable{
         String tournamentId();
         int rank();

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class TournamentRanking extends RecoverableObject implements Tournament.TournamentRanking, Portable {
+public class TournamentRanking extends RecoverableObject implements Tournament.RaceBoard, Portable {
     private long tournamentId;
 
     private List<Tournament.Entry> topTenPlayers = new ArrayList<>();
@@ -50,5 +50,20 @@ public class TournamentRanking extends RecoverableObject implements Tournament.T
         jsonObject.add("_playerPersonalRankings", playerPersonalRankingsJson);
 
         return jsonObject;
+    }
+
+    @Override
+    public int size() {
+        return topTenPlayers.size();
+    }
+
+    @Override
+    public List<Tournament.Entry> list() {
+        return topTenPlayers;
+    }
+
+    @Override
+    public Tournament.Entry myPosition() {
+        return null;
     }
 }
