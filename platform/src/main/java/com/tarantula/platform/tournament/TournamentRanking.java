@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class TournamentRanking extends RecoverableObject implements Tournament.RaceBoard, Portable {
+public class TournamentRanking extends RecoverableObject implements Tournament.RaceBoard {
     private long tournamentId;
 
     private List<Tournament.Entry> topTenPlayers = new ArrayList<>();
@@ -26,15 +26,6 @@ public class TournamentRanking extends RecoverableObject implements Tournament.R
         this.playerPersonalRankings = playerPersonalRankings;
     }
 
-    @Override
-    public void writePortable(PortableWriter portableWriter) throws IOException {
-
-    }
-
-    @Override
-    public void readPortable(PortableReader portableReader) throws IOException {
-
-    }
 
     @Override
     public JsonObject toJson() {
