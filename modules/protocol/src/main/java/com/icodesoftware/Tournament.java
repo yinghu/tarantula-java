@@ -36,7 +36,8 @@ public interface Tournament extends Configurable {
     LocalDateTime endTime();
     int maxEntriesPerInstance();
     int durationMinutesPerInstance();
-
+    long startLevel();
+    long endLevel();
     long scheduleId();
 
     Instance register(Session session);
