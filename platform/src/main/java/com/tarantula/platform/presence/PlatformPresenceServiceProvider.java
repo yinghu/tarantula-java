@@ -8,6 +8,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.statistics.UserStatistics;
 import com.icodesoftware.service.ServiceContext;
 
+import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.GamePortableRegistry;
@@ -103,6 +104,24 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         Profile profile = new Profile();
         profile.displayName ="player";
         profile.distributionKey(systemId);
+        this.dataStore.createIfAbsent(profile,true);
+        profile.dataStore(this.dataStore);
+        return profile;
+    }
+
+    public Profile createProfile(String systemId, byte[] data){
+        Profile profile = new Profile();
+        profile.distributionKey(systemId);
+
+        JsonObject config = JsonUtil.parse(data);
+
+        if(config.has("DisplayName")){
+            profile.displayName = config.get("DisplayName").getAsString();
+        }
+        if(config.has("IconIndex")){
+            profile.iconIndex = config.get("IconIndex").getAsInt();
+        }
+
         this.dataStore.createIfAbsent(profile,true);
         profile.dataStore(this.dataStore);
         return profile;
