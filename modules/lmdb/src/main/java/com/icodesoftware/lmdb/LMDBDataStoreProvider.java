@@ -1,5 +1,6 @@
 package com.icodesoftware.lmdb;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
@@ -69,7 +70,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     MetricsListener metricsListener = (k,v)->{};
     private JsonObject jsonObject;
-
+    private JsonArray migrations;
     @Override
     public void configure(Map<String, Object> properties) {
         this.name = (String)properties.get("name");
@@ -86,6 +87,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         this.indexPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_indexPath;
         this.localPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_localPath;
         this.logPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_logPath;
+        this.migrations = (JsonArray)properties.get("migrationListeners");
     }
 
     @Override
@@ -297,6 +299,11 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         }
         FileInputStream in = new FileInputStream(backupLog);
         jsonObject = JsonUtil.parse(in);
+        if(migrations!=null){
+            migrations.forEach(m->{
+                runMigration(m.getAsString());
+            });
+        }
         logger.warn("LMDB Provider started with store size ["+storeSize+"] queue side ["+pendingQueue.size()+"] store no sync mode ["+envNoSyncFlag+"]");
     }
 
@@ -546,4 +553,12 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(metricsListener==null) return;
         this.metricsListener = metricsListener;
     }
+     private void runMigration(String migrationListener){
+        try{
+            MigrationListener migration = (MigrationListener)Class.forName(migrationListener).getConstructor().newInstance();
+            migration.migrate(this);
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+     }
 }

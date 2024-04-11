@@ -69,6 +69,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         properties.put("dir",this.dataDir);
         properties.put("dailyBackup",dataStoreDailyBackup);
         properties.put("node",this.node);
+        properties.put("migrationListeners",ds.get("migrationListeners").getAsJsonArray());
         DataStoreProvider dataStoreProvider = dataStoreProvider(provider.trim());
         JsonArray props = ds.get("properties").getAsJsonArray();
         props.forEach(e->{

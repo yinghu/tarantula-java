@@ -49,6 +49,8 @@ public interface DataStore extends Closable{
         void forEach(BufferStream buffer);
 
         void view(DataStoreSummary dataStoreSummary);
+
+        void drop();
     }
 
 

@@ -8,6 +8,9 @@
             {"indexPath":"tarantula/index"},
             {"localPath":"tarantula/local"},
             {"logPath":"tarantula/log"}
+        ],
+        "migrationListeners": [
+            "com.tarantula.platform.service.user.UserMigrationListener"
         ]
     }
 }
