@@ -13,6 +13,8 @@ import com.perfectday.games.earth8.analytics.*;
 import com.perfectday.games.earth8.inbox.PlayerAction;
 import com.perfectday.games.earth8.inbox.PlayerActionQuery;
 import com.perfectday.games.earth8.inbox.PlayerEventInbox;
+import com.perfectday.games.earth8.data.PlayerDataTrack;
+import com.perfectday.games.earth8.data.PlayerDataTrackQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,9 +93,37 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             ApplicationPreSetup applicationPreSetup = (ApplicationPreSetup)ctx;
             DataStore dataStore = applicationPreSetup.onDataStore("battle");
             if(!dataStore.create(update)) return false;
+
+            if (update.score > 0 && update.playerLevel > 0) {
+                DataStore tournamentTrackDataStore = applicationPreSetup.onDataStore("player_tournament_track");
+                var playerDataTracks = tournamentTrackDataStore.list(new PlayerDataTrackQuery(session.distributionId()));
+                PlayerDataTrack playerDataTrack = getActiveDataTrack(playerDataTracks);
+
+                if(playerDataTracks.isEmpty() || playerDataTrack == null){
+                    scoreTournamentWithSameLevel(session, update, tournamentTrackDataStore);
+                }
+                else{
+                    Tournament existing = tournamentIndex.get(playerDataTrack.tournamentId);
+                    if(existing!=null){
+                        existing.register(session).update(session,entry->{
+                            entry.score(0,update.score);
+                            return true;
+                        });
+                    }
+                    else{
+                        if (scoreTournamentWithSameLevel(session, update, tournamentTrackDataStore)){
+                            playerDataTrack.tournamentId = 0;
+                            tournamentTrackDataStore.update(playerDataTrack);
+                        }
+                    }
+                }
+            }
+
             //TO MORE TRANSACTION STUFF
             return update.update(applicationPreSetup, session);
         });
+
+
 
         if(updated)
         {
@@ -135,31 +165,6 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             **/
             return true;
         });
-        if(updated
-            && (battleTransaction.TEMP_BattleStage.equals("Chapter3_Stage7_HardConfig")
-                || battleTransaction.TEMP_BattleStage.endsWith("EpicConfig")
-            )
-            && battleTransaction.win
-        ) {
-            // hard coded 7 day tournament completion
-            tournamentIndex.forEach((key,entry)->{
-                if(entry.type().startsWith("SevenDayTournament")) {
-                    // register this user to the tournament the first time they finish the campaign
-                    entry.register(session).update(session,(e)->{
-                        this.gameContext.log("Test Register Player to tournament", OnLog.INFO);
-                        if(e.score() > 0)
-                        {
-                            this.gameContext.log("Player already registered", OnLog.INFO);
-                            return false;
-                        }
-
-                        this.gameContext.log("Player registering", OnLog.INFO);
-                        e.score(0,1);
-                        return true;
-                    });
-                }
-            });
-        }
 
         session.write(JsonUtil.toSimpleResponse(updated,"battle finished").getBytes());
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
@@ -262,12 +267,18 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     public void tournamentStarted(Tournament tournament) {
         gameContext.log("Tournament started : "+tournament.distributionId()+" : "+tournament.name()+" : "+tournament.type()+" : "+tournament.global(),OnLog.WARN);
         tournamentIndex.put(tournament.distributionId(),tournament);
+        for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
+            tournamentIndex.put(start,tournament);
+        }
     }
 
     @Override
     public void tournamentClosed(Tournament tournament) {
         gameContext.log("Tournament closed : "+tournament.distributionId()+" : "+tournament.name()+" : "+tournament.type()+" : "+tournament.global(),OnLog.WARN);
         tournamentIndex.remove(tournament.distributionId());
+        for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
+            tournamentIndex.remove(start);
+        }
     }
 
     public void onApplicationResourceRegistered(ApplicationResource resource){
@@ -305,5 +316,29 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
         //UDP MESSAGE WITH RELAY CALL WITH SINGLE UDP MESSAGE
+    }
+
+    private boolean scoreTournamentWithSameLevel(Session session, BattleUpdate update, DataStore tournamentTrackDataStore) {
+        Tournament nextLevel = tournamentIndex.get(update.playerLevel);
+        if(nextLevel!=null){
+            nextLevel.register(session).update(session,entry->{
+                entry.score(0,update.score);
+                return true;
+            });
+            var tournamentTrack = new PlayerDataTrack(nextLevel.distributionId());
+            tournamentTrack.ownerKey(SnowflakeKey.from(session.distributionId()));
+            tournamentTrackDataStore.create(tournamentTrack);
+            return true;
+        }
+        return false;
+    }
+
+    private PlayerDataTrack getActiveDataTrack(List<PlayerDataTrack> tracks) {
+        for (var track : tracks) {
+            if (track.tournamentId > 0) {
+                return track;
+            }
+        }
+        return null;
     }
 }

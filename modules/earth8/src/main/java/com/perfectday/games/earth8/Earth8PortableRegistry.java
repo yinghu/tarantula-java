@@ -38,6 +38,8 @@ public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecov
 
     public static final int MANUAL_ANALYTICS_BATCH_CID = 18;
 
+    public static final int PLAYER_TOURNAMENT_TRACK_CID = 19;
+
     public static Earth8PortableRegistry INS;
 
     public Earth8PortableRegistry(){
