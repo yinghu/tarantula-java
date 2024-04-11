@@ -1,0 +1,26 @@
+package com.tarantula.platform.presence;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.icodesoftware.OnAccess;
+
+import java.util.List;
+
+public class ProfilePayload {
+
+    private List<Profile> profileList;
+
+    public ProfilePayload(List<Profile> profileList){
+        this.profileList = profileList;
+    }
+
+    public JsonObject toJson(){
+        JsonObject jsonObject = new JsonObject();
+
+        JsonArray profiles = new JsonArray();
+        profileList.forEach((profile -> profiles.add(profile.toJson())));
+        jsonObject.add("_profileList",profiles);
+
+        return jsonObject;
+    }
+}

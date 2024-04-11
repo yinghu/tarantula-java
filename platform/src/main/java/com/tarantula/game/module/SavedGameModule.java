@@ -8,9 +8,14 @@ import com.tarantula.platform.presence.MappingObject;
 import com.tarantula.game.PlayerSavedGames;
 import com.tarantula.game.util.SavedGameDeserializer;
 import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
+import com.tarantula.platform.presence.Profile;
+import com.tarantula.platform.presence.ProfilePayload;
 import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 import com.tarantula.platform.presence.saves.PlatformSavedGameServiceProvider;
 import com.tarantula.platform.presence.saves.SavedGame;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SavedGameModule extends ModuleHeader {
 
@@ -45,6 +50,31 @@ public class SavedGameModule extends ModuleHeader {
             else{
                 session.write(JsonUtil.toSimpleResponse(true,"system saved game reset").getBytes());
             }
+        }
+        else if(session.action().equals("onFetchProfile")){
+            String[] playerIDs = session.name().split("#");
+            List<Profile> playerProfiles = new ArrayList<>();
+
+            for(String ID: playerIDs){
+                playerProfiles.add(gameServiceProvider.presenceServiceProvider().profile(ID));
+            }
+
+            ProfilePayload profilePayload = new ProfilePayload(playerProfiles);
+
+            session.write(profilePayload.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onUpdateProfile")){
+            Profile profile = gameServiceProvider.presenceServiceProvider().profile(Long.toString(session.distributionId()));
+
+            if(profile != null){
+                boolean successful = profile.configureAndValidate(session.payload());
+
+                session.write(JsonUtil.toSimpleResponse(successful,"update player profile").getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(true,"player profile does not exist").getBytes());
+            }
+
         }
         else{
             throw new UnsupportedOperationException(session.action());
