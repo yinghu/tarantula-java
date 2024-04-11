@@ -3,13 +3,10 @@ package com.tarantula.game.module;
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.platform.presence.MappingObject;
+import com.tarantula.platform.presence.*;
 
 import com.tarantula.game.PlayerSavedGames;
 import com.tarantula.game.util.SavedGameDeserializer;
-import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
-import com.tarantula.platform.presence.Profile;
-import com.tarantula.platform.presence.ProfilePayload;
 import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 import com.tarantula.platform.presence.saves.PlatformSavedGameServiceProvider;
 import com.tarantula.platform.presence.saves.SavedGame;
@@ -56,7 +53,8 @@ public class SavedGameModule extends ModuleHeader {
             List<Profile> playerProfiles = new ArrayList<>();
 
             for(String ID: playerIDs){
-                playerProfiles.add(gameServiceProvider.presenceServiceProvider().profile(ID));
+              //  playerProfiles.add(gameServiceProvider.presenceServiceProvider().profile(ID));
+                playerProfiles.add(ProfileMockUtils.getRandomProfile(ID));
             }
 
             ProfilePayload profilePayload = new ProfilePayload(playerProfiles);

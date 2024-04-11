@@ -102,7 +102,6 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     public Profile profile(String systemId){
         Profile profile = new Profile();
         profile.displayName ="player";
-        profile.iconUrl = "resource/portrait.png";
         profile.distributionKey(systemId);
         this.dataStore.createIfAbsent(profile,true);
         profile.dataStore(this.dataStore);

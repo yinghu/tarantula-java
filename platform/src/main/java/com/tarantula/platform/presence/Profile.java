@@ -11,7 +11,7 @@ import java.util.Map;
 public class Profile extends RecoverableObject implements Configurable {
 
     public String displayName;
-    public String iconUrl;
+    public int iconIndex;
     private JsonObject payload = new JsonObject();
 
     @Override
@@ -27,14 +27,14 @@ public class Profile extends RecoverableObject implements Configurable {
     @Override
     public Map<String,Object> toMap(){
         this.properties.put("1",displayName);
-        this.properties.put("2",iconUrl);
+        this.properties.put("2", iconIndex);
         this.properties.put("3",payload.toString());
         return this.properties;
     }
     @Override
     public void fromMap(Map<String,Object> properties){
         this.displayName = (String)properties.getOrDefault("1","");
-        this.iconUrl = (String)properties.getOrDefault("2","");
+        this.iconIndex = (int)properties.getOrDefault("2","");
         this.payload = JsonUtil.parse((String)properties.getOrDefault("3","{}"));
     }
 
@@ -46,11 +46,11 @@ public class Profile extends RecoverableObject implements Configurable {
     @Override
     public boolean configureAndValidate(byte[] data) {
         JsonObject config = JsonUtil.parse(data);
-        if(config.has("displayName")){
-            displayName = config.get("displayName").getAsString();
+        if(config.has("DisplayName")){
+            displayName = config.get("DisplayName").getAsString();
         }
-        if(config.has("iconUrl")){
-            iconUrl = config.get("iconUrl").getAsString();
+        if(config.has("IconIndex")){
+            iconIndex = config.get("IconIndex").getAsInt();
         }
         if(config.has("payload")){
             return configureAndValidate(config.getAsJsonObject("payload"));
@@ -68,7 +68,7 @@ public class Profile extends RecoverableObject implements Configurable {
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("DisplayName",displayName);
-        jsonObject.addProperty("IconUrl",iconUrl);
+        jsonObject.addProperty("IconIndex", iconIndex);
         return jsonObject;
     }
 
