@@ -5,7 +5,7 @@ import com.icodesoftware.OnAccess;
 import com.icodesoftware.util.RecoverableObject;
 import com.perfectday.games.earth8.Earth8PortableRegistry;
 
-public class PlayerDataTrack extends RecoverableObject implements OnAccess {
+public class PlayerDataTrack extends RecoverableObject {
 
     public static final String LABEL = "tournament";
 
@@ -51,93 +51,4 @@ public class PlayerDataTrack extends RecoverableObject implements OnAccess {
         return jsonObject;
     }
 
-    @Override
-    public String systemId() {
-        return null;
-    }
-
-    @Override
-    public void systemId(String systemId) {
-
-    }
-
-    @Override
-    public long stub() {
-        return 0;
-    }
-
-    @Override
-    public void stub(long stub) {
-
-    }
-
-    @Override
-    public long tournamentId() {
-        return 0;
-    }
-
-    @Override
-    public void tournamentId(long tournamentId) {
-
-    }
-
-    @Override
-    public String typeId() {
-        return null;
-    }
-
-    @Override
-    public void typeId(String typeId) {
-
-    }
-
-    @Override
-    public String ticket() {
-        return null;
-    }
-
-    @Override
-    public void ticket(String ticket) {
-
-    }
-
-    @Override
-    public String command() {
-        return null;
-    }
-
-    @Override
-    public void command(String command) {
-
-    }
-
-    @Override
-    public int code() {
-        return 0;
-    }
-
-    @Override
-    public void code(int code) {
-
-    }
-
-    @Override
-    public String message() {
-        return null;
-    }
-
-    @Override
-    public void message(String message) {
-
-    }
-
-    @Override
-    public boolean successful() {
-        return false;
-    }
-
-    @Override
-    public void successful(boolean successful) {
-
-    }
 }
