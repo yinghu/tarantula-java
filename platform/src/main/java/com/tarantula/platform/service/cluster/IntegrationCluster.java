@@ -69,6 +69,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private ConcurrentHashMap<String, ReloadListener> rMap = new ConcurrentHashMap<>();
     private CopyOnWriteArrayList<NodeListener> nList = new CopyOnWriteArrayList<>();
+    private ConcurrentHashMap<String,BucketListener> kMap = new ConcurrentHashMap<>();
 
 
     public IntegrationCluster(final Config config,final String bucket,final TarantulaContext tcx){
@@ -243,6 +244,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
                     this.unsubscribe(v.bucket());
                 }
             }
+        });
+        kMap.forEach((k,v)->{
+            v.onBucket(pt,opening?BucketListener.OPEN:BucketListener.CLOSE);
         });
     }
 
@@ -431,6 +435,18 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     public void registerNodeListener(NodeListener nodeListener){
         nList.add(nodeListener);
+    }
+
+    public String registerBucketListener(BucketListener bucketListener){
+        String regKey = UUID.randomUUID().toString();
+        kMap.put(regKey,bucketListener);
+        for(PartitionState partitionState : partitionStates){
+            bucketListener.onBucket(partitionState.partition,partitionState.opening?BucketListener.OPEN:BucketListener.CLOSE);
+        }
+        return regKey;
+    }
+    public void unregisterBucketListener(String regKey){
+        kMap.remove(regKey);
     }
 
 }

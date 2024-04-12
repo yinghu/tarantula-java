@@ -2,14 +2,10 @@ package com.tarantula.test;
 
 
 import com.icodesoftware.DataStore;
-import com.tarantula.platform.OnSessionQuery;
-import com.tarantula.platform.PresenceIndex;
-import com.tarantula.platform.SessionIndex;
 import com.tarantula.platform.tournament.TournamentRaceBoard;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.List;
 
 public class TournamentRaceBoardTest extends DataStoreHook{
 

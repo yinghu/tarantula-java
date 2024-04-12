@@ -20,15 +20,12 @@ import com.tarantula.platform.OnAccessTrack;
 import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.platform.event.GameClusterSyncEvent;
 
-
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class PlatformRoomServiceProvider implements ConfigurationServiceProvider, GameServerListener, ReloadListener,RoomListener {
+public class PlatformRoomServiceProvider implements ConfigurationServiceProvider, GameServerListener, BucketListener {
 
     private static final String CONFIG = "game-room-settings";
 
@@ -106,8 +103,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }
         String checkInterval = dedicated? "dedicatedCheckInterval" : "checkInterval";
         this.timer = ((Number)configuration.property(checkInterval)).intValue();
-        this.registerKey = this.serviceContext.deploymentServiceProvider().registerGameServerListener(this);
-        this.reloadKey = this.clusterProvider.registerReloadListener(this);
         this.schedulingTask = new ScheduleRunner(timer,()->{
             onSchedule();
             this.scheduledFuture = this.serviceContext.schedule(this.schedulingTask);
@@ -115,6 +110,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.scheduledFuture = this.serviceContext.schedule(schedulingTask);
         this.logger = JDKLogger.getLogger(PlatformRoomServiceProvider.class);
         this.pendingReleaseRooms = new ConcurrentHashMap<>(this.maxRoomPoolSizePerZone);
+        this.registerKey = this.serviceContext.deploymentServiceProvider().registerGameServerListener(this);
+        this.reloadKey = this.clusterProvider.registerBucketListener(this);
     }
 
     @Override
@@ -137,7 +134,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     @Override
     public void shutdown() throws Exception {
         if(scheduledFuture!=null && !scheduledFuture.isCancelled()) scheduledFuture.cancel(true);
-        this.clusterProvider.unregisterReloadListener(reloadKey);
+        this.clusterProvider.unregisterBucketListener(reloadKey);
         this.serviceContext.deploymentServiceProvider().unregisterGameServerListener(registerKey);
         gameRoomIndex.forEach((k,r)->r.close());
     }
@@ -227,7 +224,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }
         else{
             index.pendingRoomStubs = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone*gameZone.capacity());
-            GameRoomQuery query = new GameRoomQuery(serviceContext.node().nodeId(),gameZone.playMode(),gameZone.capacity());
+            GameRoomQuery query = new GameRoomQuery(index.gameZone.distributionId(),gameZone.playMode(),gameZone.capacity());
             int[] rooms = {0};
             this.dataStore.list(query).forEach(r->{
                 loadGameRoom(index,r);
@@ -396,8 +393,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
     @Override
-    public void reload(int partition, boolean localMember) {
-        gameRoomIndex.clear();
+    public void onBucket(int partition,int state) {
+        System.out.println("PARTITION : "+partition+" State : "+state);
     }
 
     public void onStart(EndPoint endPoint){
@@ -513,6 +510,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
     private void resetGameRoom(GameZoneIndex index,GameRoom room,boolean queued){
+        //logger.warn("PM : "+SystemUtil.partition(room.roomId(),serviceContext.node().partitionNumber()));
         room.reset();
         if(queued) {
             for(int i=0;i<index.gameZone.capacity();i++){
@@ -543,7 +541,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             logger.warn("No Stub Available Now");
             return null;
         }
-        GameRoom gameRoom = gameRoomIndex.get(roomStub.roomId);//index.runningRooms.poll();
+        GameRoom gameRoom = gameRoomIndex.get(roomStub.roomId);
         return joinGameRoom(index,gameRoom,stub);
     }
 
@@ -580,39 +578,13 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         //forcefully reset room
     }
 
-
     private ClusterProvider.ClusterStore channelStore(String serverId){
         return clusterProvider.clusterStore(ClusterProvider.ClusterStore.SMALL,serverId,false,false,true);
-    }
-
-
-    @Override
-    public void onStarted(Room room) {
-        //logger.warn("room started->"+room.channelId()+">>"+room.capacity());
-        pendingReleaseRooms.put(room.distributionKey(),new PendingReleaseRoom(room,LocalDateTime.now().plus(room.duration()+room.overtime(), ChronoUnit.MILLIS)));
-    }
-    @Override
-    public void onUpdated(Room room, byte[] payload) {
-        //logger.warn("room updated->"+room.channelId()+">>"+new String(payload));
-        GameRoom gameRoom = (GameRoom)room;
-       //gameRoom.onUpdated(gameUpdateContext.gameServiceProvider(),payload);
-    }
-
-    @Override
-    public void onEnded(Room room) {
-        if(room.dedicated()) return;
-        pendingReleaseRooms.remove(room.distributionKey());
-        releaseRoom(room);
     }
 
     public boolean pushChannelEnabled(){
         return pushChannelEnabled;
     }
-
-    public void onClosed(Room room){
-
-    }
-
 
     @Override
     public void onGameClusterEvent(String query,byte[] payload){
