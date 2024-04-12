@@ -5,12 +5,11 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.Channel;
-import com.icodesoftware.protocol.PendingReleaseRoom;
-import com.icodesoftware.protocol.GameServerListener;
-import com.icodesoftware.service.*;
 
+import com.icodesoftware.protocol.GameServerListener;
+import com.icodesoftware.protocol.Room;
+import com.icodesoftware.service.*;
 import com.icodesoftware.util.SnowflakeKey;
-import com.icodesoftware.util.TimeUtil;
 import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.cci.udp.UDPEndpoint;
 import com.tarantula.game.*;
@@ -68,7 +67,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private boolean started;
 
     private UDPEndpoint udpEndpoint;
-    private ConcurrentHashMap<String, PendingReleaseRoom> pendingReleaseRooms;
 
     public PlatformRoomServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameServiceProvider = gameServiceProvider;
@@ -109,7 +107,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         });
         this.scheduledFuture = this.serviceContext.schedule(schedulingTask);
         this.logger = JDKLogger.getLogger(PlatformRoomServiceProvider.class);
-        this.pendingReleaseRooms = new ConcurrentHashMap<>(this.maxRoomPoolSizePerZone);
         this.registerKey = this.serviceContext.deploymentServiceProvider().registerGameServerListener(this);
         this.reloadKey = this.clusterProvider.registerBucketListener(this);
     }
@@ -434,18 +431,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
     private void onSchedule() {
-        if(!dedicated) {
-            kickoff.clear();
-            pendingReleaseRooms.forEach((k,p)->{
-                p.room.onCountdown(timer);
-                if(TimeUtil.expired(p.pendingSchedule)) kickoff.add(k);
-            });
-            kickoff.forEach(k->{
-                PendingReleaseRoom pendingReleaseRoom = pendingReleaseRooms.remove(k);
-                if(pendingReleaseRoom!=null) udpEndpoint.releaseChannel(pendingReleaseRoom.room.channelId());
-            });
-            return;
-        }
+        if(!dedicated) return;
         kickoff.clear();
         connectionIndex.forEach((k,v)->{
             if(v.onTimeout(timer)) kickoff.add(k);

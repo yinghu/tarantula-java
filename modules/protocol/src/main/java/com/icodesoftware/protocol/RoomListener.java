@@ -1,4 +1,4 @@
-package com.icodesoftware;
+package com.icodesoftware.protocol;
 
 public interface RoomListener {
 

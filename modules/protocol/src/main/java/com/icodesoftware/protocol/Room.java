@@ -1,4 +1,7 @@
-package com.icodesoftware;
+package com.icodesoftware.protocol;
+
+import com.icodesoftware.Arena;
+import com.icodesoftware.Recoverable;
 
 public interface Room extends Recoverable {
 
