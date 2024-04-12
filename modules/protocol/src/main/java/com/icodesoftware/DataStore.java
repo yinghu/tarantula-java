@@ -50,7 +50,7 @@ public interface DataStore extends Closable{
 
         void view(DataStoreSummary dataStoreSummary);
 
-        void drop();
+        void drop(boolean delete);
     }
 
 

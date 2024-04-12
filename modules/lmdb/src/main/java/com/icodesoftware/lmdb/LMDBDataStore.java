@@ -474,7 +474,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         }
     }
 
-    public void drop(){
+    public void drop(boolean delete){
 
     }
     //help methods

@@ -2,7 +2,6 @@ package com.tarantula.platform.presence;
 
 
 import com.icodesoftware.Access;
-import com.icodesoftware.Account;
 import com.icodesoftware.util.RecoverableObject;
 
 public class User extends RecoverableObject implements Access {
@@ -16,6 +15,7 @@ public class User extends RecoverableObject implements Access {
     protected long primaryId;
     protected String validator;
     protected String role;
+
     public User(){
         this.label = Access.LABEL;
         this.onEdge = true;
