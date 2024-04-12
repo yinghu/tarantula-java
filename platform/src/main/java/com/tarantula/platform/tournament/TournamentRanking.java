@@ -14,14 +14,14 @@ import java.util.Collections;
 import java.util.List;
 
 public class TournamentRanking extends RecoverableObject implements Tournament.RaceBoard {
-    private long tournamentId;
+    private String tournamentType;
 
     private List<Tournament.Entry> topTenPlayers = new ArrayList<>();
 
     private List<Tournament.Entry> playerPersonalRankings = new ArrayList<>();
 
-    public TournamentRanking(long tournamentId, List<Tournament.Entry> topTenPlayers, List<Tournament.Entry> playerPersonalRankings) {
-        this.tournamentId = tournamentId;
+    public TournamentRanking(String tournamentType, List<Tournament.Entry> topTenPlayers, List<Tournament.Entry> playerPersonalRankings) {
+        this.tournamentType = tournamentType;
         this.topTenPlayers = topTenPlayers;
         this.playerPersonalRankings = playerPersonalRankings;
     }
@@ -30,7 +30,7 @@ public class TournamentRanking extends RecoverableObject implements Tournament.R
     @Override
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("TournamentId",tournamentId);
+        jsonObject.addProperty("TournamentType",tournamentType);
 
         JsonArray topTenPlayersJson = new JsonArray();
         topTenPlayers.forEach((v)->topTenPlayersJson.add(v.toJson()));
