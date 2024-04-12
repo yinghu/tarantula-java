@@ -10,6 +10,7 @@ import java.util.Map;
 
 public class Profile extends RecoverableObject implements Configurable {
 
+    public static final String LABEL = "profile";
     public String displayName;
     public int iconIndex;
     private JsonObject payload = new JsonObject();
@@ -44,19 +45,13 @@ public class Profile extends RecoverableObject implements Configurable {
     }
 
     @Override
-    public boolean configureAndValidate(byte[] data) {
+    public boolean configure(byte[] data) {
         JsonObject config = JsonUtil.parse(data);
         if(config.has("DisplayName")){
             displayName = config.get("DisplayName").getAsString();
         }
         if(config.has("IconIndex")){
             iconIndex = config.get("IconIndex").getAsInt();
-        }
-        if(config.has("payload")){
-            return configureAndValidate(config.getAsJsonObject("payload"));
-        }
-        else{
-            return configureAndValidate(config);
         }
     }
     @Override

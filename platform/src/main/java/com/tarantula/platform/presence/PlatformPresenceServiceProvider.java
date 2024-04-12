@@ -10,7 +10,10 @@ import com.icodesoftware.service.ServiceContext;
 
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.ScheduleRunner;
+import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
+import com.perfectday.games.earth8.data.PlayerDataTrack;
+import com.perfectday.games.earth8.data.PlayerDataTrackQuery;
 import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.game.GameRating;
 
@@ -109,23 +112,41 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         return profile;
     }
 
-    public Profile createProfile(String systemId, byte[] data){
-        Profile profile = new Profile();
-        profile.distributionKey(systemId);
+    public boolean createProfile(Session session){
 
-        JsonObject config = JsonUtil.parse(data);
+        DataStore profileDataStore = applicationPreSetup.onDataStore("profile");
+        var playerProfile = profileDataStore.list(new ProfileQuery(session.distributionId()));
 
-        if(config.has("DisplayName")){
-            profile.displayName = config.get("DisplayName").getAsString();
+        if(playerProfile.isEmpty()){
+            Profile profile = new Profile();
+
+            profile.distributionKey(Long.toString(session.distributionId()));
+            profile.configure(session.payload());
+            profile.ownerKey(SnowflakeKey.from(session.distributionId()));
+
+            return profileDataStore.create(profile);
         }
-        if(config.has("IconIndex")){
-            profile.iconIndex = config.get("IconIndex").getAsInt();
-        }
 
-        this.dataStore.createIfAbsent(profile,true);
-        profile.dataStore(this.dataStore);
-        return profile;
+        return false;
     }
+
+    public ProfilePayload getProfilePayload(String IDs){
+        String[] playerIDs = IDs.split("#");
+        List<Profile> playerProfiles = new ArrayList<>();
+        DataStore profileDataStore = applicationPreSetup.onDataStore("profile");
+
+        for(String ID: playerIDs){
+            var playerProfileList = profileDataStore.list(new ProfileQuery(Long.parseLong(ID)));
+
+            if(!playerProfileList.isEmpty()){
+                playerProfiles.add(playerProfileList.get(0));
+            }
+        }
+
+        return new ProfilePayload(playerProfiles);
+
+    }
+
     public GameRating rating(Session session){
         GameRating[] loaded  = {new GameRating()};
         CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);

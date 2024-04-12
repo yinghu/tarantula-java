@@ -49,27 +49,12 @@ public class SavedGameModule extends ModuleHeader {
             }
         }
         else if(session.action().equals("onFetchProfile")){
-            String[] playerIDs = session.name().split("#");
-            List<Profile> playerProfiles = new ArrayList<>();
-
-            for(String ID: playerIDs){
-              //  playerProfiles.add(gameServiceProvider.presenceServiceProvider().profile(ID));
-                playerProfiles.add(ProfileMockUtils.getRandomProfile(ID));
-            }
-
-            ProfilePayload profilePayload = new ProfilePayload(playerProfiles);
-
-            session.write(profilePayload.toJson().toString().getBytes());
+            session.write(presenceServiceProvider.getProfilePayload(session.name()).toJson().toString().getBytes());
         }
         else if(session.action().equals("onUpdateProfile")){
-            Profile profile = gameServiceProvider.presenceServiceProvider().createProfile(Long.toString(session.distributionId()), session.payload());
+            boolean sucessfull = gameServiceProvider.presenceServiceProvider().createProfile(session);
 
-            if(profile != null){
-                session.write(JsonUtil.toSimpleResponse(true,"create player profile").getBytes());
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,"create player profile").getBytes());
-            }
+            session.write(JsonUtil.toSimpleResponse(sucessfull,"create player profile").getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action());
