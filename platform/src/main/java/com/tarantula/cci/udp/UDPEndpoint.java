@@ -11,7 +11,6 @@ import com.tarantula.platform.service.metrics.AccessMetrics;
 
 import java.util.ArrayList;
 import java.util.UUID;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -21,8 +20,6 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
     private static final String CONFIG = "push-service-settings";
     private TarantulaLogger logger;
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
-
-    private ArrayBlockingQueue<PushUserChannel> pendingUserChannels;
 
     private TokenValidatorProvider tokenValidator;
     private AtomicInteger channelId;
@@ -47,7 +44,7 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
 
     private ServiceContext serviceContext;
     private boolean running = true;
-    private AtomicInteger channelPoolSize;
+
     private int frameRate = UDPEndpointServiceProvider.FRAME_RATE;
 
     private long sessionJoinTimeout;
@@ -83,9 +80,7 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
         this.udpEndpointServiceProvider.address(host);
         this.udpEndpointServiceProvider.port(connection.port());
         this.udpEndpointServiceProvider.inboundThreadPoolSetting(threadPoolSetting);
-        int _channelPoolSize = ((Number)cfg.property("channelPoolSize")).intValue();
-        this.channelPoolSize = new AtomicInteger(_channelPoolSize);
-        this.pendingUserChannels = new ArrayBlockingQueue<>(_channelPoolSize);
+
         this.key = serviceContext.deploymentServiceProvider().serverKey("pushChannel");
         connection.serverId(UUID.randomUUID().toString());
         connection.type(Connection.UDP);
@@ -122,7 +117,7 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
                 }
             }
         },"tarantula-udp-outbound-message-sender");
-        logger.warn("UDP Endpoint running as a daemon with channel pool size ["+channelPoolSize+"] on ["+serviceContext.node().servicePushAddress()+":"+connection.port()+"]");
+        logger.warn("UDP Endpoint running as a daemon on ["+serviceContext.node().servicePushAddress()+":"+connection.port()+"]");
     }
 
     @Override
@@ -169,16 +164,8 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
     }
 
     public UDPChannel[] createChannels(int capacity) {
-        PushUserChannel pushUserChannel = pendingUserChannels.poll();
-        if (pushUserChannel == null && channelPoolSize.decrementAndGet()<0){
-            logger.warn("No more channels available ["+channelPoolSize.get()+"]");
-            return new UDPChannel[0];
-        }
-
-        if(pushUserChannel == null) {
-            pushUserChannel = new PushUserChannel(this,channelId.getAndIncrement(), udpEndpointServiceProvider,this.cipherListener, this, this, this,this);
-            operationSummary.userChannelNumber.incrementAndGet();
-        }
+        PushUserChannel pushUserChannel = new PushUserChannel(this,channelId.getAndIncrement(), udpEndpointServiceProvider,this.cipherListener, this, this, this,this);
+        operationSummary.userChannelNumber.incrementAndGet();
         UDPChannel[] channels = new UDPChannel[capacity];
         for(int i=0;i<capacity;i++){
             UDPChannel channel = new UDPChannel(connection,pushUserChannel,key,udpEndpointServiceProvider.sessionTimeout(),this.cipherListener);
@@ -212,7 +199,6 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
         PushUserChannel released = udpEndpointServiceProvider.releaseUserChannel(channelId);
         if(released == null) return;
         released.kickoff();
-        pendingUserChannels.offer(released);
     }
 
     @Override
@@ -329,6 +315,5 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
         PushUserChannel pushUserChannel = udpEndpointServiceProvider.releaseUserChannel(channelId);
         if(pushUserChannel==null) return;
         pushUserChannel.kickoff();
-        pendingUserChannels.offer(pushUserChannel);
     }
 }

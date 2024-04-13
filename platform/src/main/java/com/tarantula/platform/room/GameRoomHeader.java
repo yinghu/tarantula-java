@@ -34,6 +34,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     protected int totalLeft;
     protected boolean dedicated;
     protected GameArena arena;
+    protected long zoneId;
 
     protected ConcurrentHashMap<Long,Entry> joinIndex;
     protected Entry[] entries;
@@ -64,6 +65,9 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         return this.distributionId();
     }
 
+    public long zoneId(){
+        return zoneId;
+    }
     @Override
     public long duration() {
         return duration;
@@ -269,7 +273,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.joinsOnStart = gameZone.joinsOnStart();
         this.dedicated = dedicated;
         this.gameModule = gameServiceProvider;
-        this.owner = gameZone.distributionKey();
+        this.zoneId = gameZone.distributionId();
         this.arena = gameZone.arena(1);
     }
 

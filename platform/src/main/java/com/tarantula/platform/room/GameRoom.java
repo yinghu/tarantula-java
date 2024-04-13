@@ -28,6 +28,7 @@ public interface GameRoom extends Room,Resettable,Closable,Configurable {
     void leave(long stubId,Listener listener);
     void load();
 
+    long zoneId();
 
     void setup(GameServiceProvider gameServiceProvider,GameZone gameZone,boolean dedicated);
 

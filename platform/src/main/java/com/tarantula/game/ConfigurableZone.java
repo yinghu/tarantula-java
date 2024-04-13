@@ -3,7 +3,6 @@ package com.tarantula.game;
 import com.google.gson.JsonObject;
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.DataStore;
-import com.icodesoftware.Rating;
 import com.icodesoftware.Session;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.lobby.LobbyItem;
@@ -157,13 +156,8 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
         return this.zoneItem.toJson();
     }
 
-    public String distributionKey(){
-        return this.zoneItem.distributionKey();
+    public long distributionId(){
+        return this.zoneItem.distributionId();
     }
-
-    //public String bucket(){
-        //return this.zoneItem.bucket();
-    //}
-
 
 }
