@@ -773,6 +773,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public String registerGameServerListener(GameServerListener gameChannelListener){
         String regKey = gameChannelListener.typeId();//UUID.randomUUID().toString();
         cListeners.put(regKey,gameChannelListener);
+        this.tarantulaContext.endpointService().onGameServerListener(gameChannelListener);
         return regKey;
     }
     public GameServerListener gameServerListener(String typeId){

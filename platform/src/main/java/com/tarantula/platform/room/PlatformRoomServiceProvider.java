@@ -427,8 +427,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                     }
                 });
             }
+            started = true;
         }
-        started = true;
     }
 
 

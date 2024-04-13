@@ -1,5 +1,6 @@
 package com.tarantula.platform.service;
 
+import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.service.RequestHandler;
 import com.tarantula.cci.*;
@@ -114,5 +115,11 @@ public class EndpointService implements Serviceable,EndPoint.Resource{
 
     public void atMidnight() {
         rMap.forEach((k,v)-> v.onCheck());
+    }
+    public void onGameServerListener(GameServerListener gameServerListener){
+        if(!tarantulaContext.node_started.get()) return;
+        for(EndPoint endpoint : endPointList){
+            gameServerListener.onStart(endpoint);
+        }
     }
 }
