@@ -2,10 +2,7 @@ package com.tarantula.platform.room;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.hazelcast.nio.serialization.Portable;
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
-import com.icodesoftware.Arena;
+import com.icodesoftware.protocol.Arena;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
@@ -15,7 +12,6 @@ import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.game.GameArena;
 import com.tarantula.game.GameZone;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -294,13 +290,5 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     public String toString(){
         return "ROOM ["+distributionKey()+"] Capacity ["+capacity+"][ Total Joined ["+totalJoined+"] Round ["+round+"] Channel ["+channelId+"]";
     }
-
-
-
-    @Override
-    public void onCountdown(long delta){
-
-    }
-
 
 }

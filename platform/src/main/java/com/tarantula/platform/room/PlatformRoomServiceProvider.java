@@ -259,16 +259,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 }
             }while (udpChannel!=null);
         }
-        //else{
-            //GameRoom gameRoom;
-            //do{
-                //gameRoom = index.pendingRooms.poll();
-                //if(gameRoom!=null){
-                    //gameRoom.close();
-                    //gameRoomIndex.remove(gameRoom.roomId());
-                //}
-            //}while (gameRoom!=null);
-        //}
     }
 
 

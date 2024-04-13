@@ -1,7 +1,7 @@
 package com.tarantula.game;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.Arena;
+import com.icodesoftware.protocol.Arena;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.lobby.ArenaItem;
 
