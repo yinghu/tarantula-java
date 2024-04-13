@@ -168,4 +168,8 @@ public class TestContext implements ServiceContext {
         return null;
     }
 
+    public OnPartition[] buckets(){
+        return new OnPartition[0];
+    }
+
 }

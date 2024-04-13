@@ -162,7 +162,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
 
     @Override
-    public void reload(int partition,boolean localMember) {
+    public void onPartition(int partition,boolean localMember) {
         tournamentIndex.forEach((k,v)->{
             int pid = distributionTournamentService.partitionId(k);
             if(pid==partition){

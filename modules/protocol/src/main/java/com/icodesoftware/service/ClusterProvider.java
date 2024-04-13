@@ -10,13 +10,6 @@ import java.util.concurrent.TimeUnit;
 public interface ClusterProvider extends ServiceProvider {
 
     String name();
-
-    int maxSize();
-
-    int maxReplicationNumber();
-    int scope();
-    String bucket();
-
     //EventListener Register
     EventService publisher();
     EventService subscribe(String topic, EventListener callback);
@@ -38,9 +31,6 @@ public interface ClusterProvider extends ServiceProvider {
     void registerMetricsListener(MetricsListener metricsListener);
     String registerReloadListener(ReloadListener reloadListener);
     void unregisterReloadListener(String registerKey);
-    String registerBucketListener(BucketListener bucketListener);
-    void unregisterBucketListener(String regKey);
-    void registerNodeListener(NodeListener nodeListener);
 
     int partition(byte[] key);
 
@@ -117,9 +107,5 @@ public interface ClusterProvider extends ServiceProvider {
 
     }
 
-    interface NodeListener{
-        void nodeAdded(Node node);
-        void nodeRemoved(Node node);
-    }
 
 }

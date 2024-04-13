@@ -13,20 +13,6 @@ public class TestClusterProvider extends TarantulaApplicationHeader implements C
         return null;
     }
 
-    @Override
-    public int scope() {
-        return 0;
-    }
-    public int maxSize(){
-        return 10;
-    }
-    public int maxReplicationNumber(){
-        return 10;
-    }
-    @Override
-    public String bucket() {
-        return null;
-    }
 
     @Override
     public EventService publisher() {
@@ -133,7 +119,6 @@ public class TestClusterProvider extends TarantulaApplicationHeader implements C
     public void unregisterReloadListener(String registerKey) {
 
     }
-    public void registerNodeListener(NodeListener nodeListener){}
 
     @Override
     public Summary summary() {
@@ -154,10 +139,4 @@ public class TestClusterProvider extends TarantulaApplicationHeader implements C
         return 0;//_cluster.getPartitionService().getPartition(key).getPartitionId();
     }
 
-    public String registerBucketListener(BucketListener bucketListener){
-        return null;
-    }
-    public void unregisterBucketListener(String regKey){
-
-    }
 }

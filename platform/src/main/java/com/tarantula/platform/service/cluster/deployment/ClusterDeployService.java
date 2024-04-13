@@ -80,8 +80,9 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         }
         log.warn("Bucket receiver updating on member added->["+pt+"/"+sz+"]"+lm.getUuid());
         for(int i=0;i<this.tarantulaContext.platformRoutingNumber;i++){
-            this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt);
+            this.tarantulaContext.integrationCluster().onBucket(i,i%sz==pt);
         }
+        this.tarantulaContext.integrationCluster().onReload();
     }
 
     @Override
@@ -98,8 +99,9 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         }
         log.warn("bucket receiver updating on member removed->["+pt+"/"+sz+"]"+lm.getUuid());
         for(int i=0;i<this.tarantulaContext.platformRoutingNumber;i++){
-            this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt);
+            this.tarantulaContext.integrationCluster().onBucket(i,i%sz==pt);
         }
+        this.tarantulaContext.integrationCluster().onReload();
     }
 
     @Override
@@ -176,7 +178,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
 
     @Override
     public void migrationCompleted(MigrationEvent migrationEvent) {
-        this.tarantulaContext.integrationCluster().onReload(migrationEvent.getPartitionId(),migrationEvent.getNewOwner().localMember());
+        this.tarantulaContext.integrationCluster().onPartition(migrationEvent.getPartitionId(),migrationEvent.getNewOwner().localMember());
     }
 
     @Override

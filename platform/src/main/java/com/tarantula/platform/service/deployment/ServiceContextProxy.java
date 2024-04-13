@@ -51,7 +51,9 @@ public class ServiceContextProxy implements ServiceContext {
         return tarantulaContext.transaction(scope);
     }
 
-
+    public OnPartition[] buckets(){
+        return this.tarantulaContext.buckets();
+    }
 
 
 

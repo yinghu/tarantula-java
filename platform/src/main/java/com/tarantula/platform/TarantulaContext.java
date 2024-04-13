@@ -332,7 +332,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         return _onLobby;
 	}
     public OnPartition[] partitions(){
- 	    return this.integrationCluster.partitionStates;
+ 	    return this.integrationCluster.partitionSet();
+    }
+    public OnPartition[] buckets(){
+        return this.integrationCluster.bucketSet();
     }
 
 	public List<Lobby> lobbyList(){

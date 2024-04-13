@@ -109,7 +109,9 @@ public class TestServiceContext implements ServiceContext {
         return new OnPartition[0];
     }
 
-
+    public OnPartition[] buckets(){
+        return new OnPartition[0];
+    }
 
 
     @Override

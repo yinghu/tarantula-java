@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class PlatformRoomServiceProvider implements ConfigurationServiceProvider, GameServerListener, BucketListener {
+public class PlatformRoomServiceProvider implements ConfigurationServiceProvider, GameServerListener,ReloadListener {
 
     private static final String CONFIG = "game-room-settings";
 
@@ -58,15 +58,13 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private boolean pushChannelEnabled = true;
     private boolean dedicated;
 
-
-    private ArrayList<String> kickoff = new ArrayList<>();
-
     private int timer;
     private SchedulingTask schedulingTask;
     private ScheduledFuture scheduledFuture;
     private boolean started;
 
     private UDPEndpoint udpEndpoint;
+
 
     public PlatformRoomServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameServiceProvider = gameServiceProvider;
@@ -108,14 +106,12 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         this.scheduledFuture = this.serviceContext.schedule(schedulingTask);
         this.logger = JDKLogger.getLogger(PlatformRoomServiceProvider.class);
         this.registerKey = this.serviceContext.deploymentServiceProvider().registerGameServerListener(this);
-        this.reloadKey = this.clusterProvider.registerBucketListener(this);
+        this.reloadKey = this.clusterProvider.registerReloadListener(this);
     }
 
     @Override
     public void start() throws Exception {
         logger.warn("Room service provider started for ["+serviceType+"]["+typeLobby+"]["+this.playMode+"]["+dedicated+"]["+maxRoomPoolSizePerZone+"]["+pushChannelEnabled+"]["+started+"]");
-        //this.udpEndpoint = (UDPEndpoint) this.serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
-        //this.started = this.udpEndpoint != null;
         if(!dedicated) return;
         Collection<byte[]> cb = serverClusterStore.indexGet(typeLobby);
         cb.forEach(b->{
@@ -131,7 +127,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     @Override
     public void shutdown() throws Exception {
         if(scheduledFuture!=null && !scheduledFuture.isCancelled()) scheduledFuture.cancel(true);
-        this.clusterProvider.unregisterBucketListener(reloadKey);
+        this.clusterProvider.unregisterReloadListener(reloadKey);
         this.serviceContext.deploymentServiceProvider().unregisterGameServerListener(registerKey);
         gameRoomIndex.forEach((k,r)->r.close());
     }
@@ -199,7 +195,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public <T extends Configurable> void register(T t) {
-        logger.warn("Game Zone Registered With ["+t.configurationTypeId()+"]["+minRoomPoolSizePerZone+"]["+t.distributionId()+"]["+dedicated+"]");
+        logger.warn("Game Zone Registered With ["+t.configurationTypeId()+"]["+minRoomPoolSizePerZone+"]["+t.distributionId()+"]["+dedicated+"]["+started+"]");
         GameZone gameZone = (GameZone)t;
         GameZoneIndex index = new GameZoneIndex();
         index.gameZone = gameZone;
@@ -259,7 +255,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 }
             }while (udpChannel!=null);
         }
-        logger.warn("Released : "+index.gameZone.distributionId()+" : "+gameRoomIndex.size());
         ArrayList<Long> pendingReleased = new ArrayList<>();
         gameRoomIndex.forEach((k,r)->{
             if(r.zoneId()==index.gameZone.distributionId()){
@@ -268,7 +263,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             }
         });
         pendingReleased.forEach(roomId->gameRoomIndex.remove(roomId));
-        logger.warn("RMF : "+gameRoomIndex.size());
     }
 
 
@@ -389,8 +383,23 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
     @Override
-    public void onBucket(int partition,int state) {
-
+    public void onReload() {
+        for(OnPartition p : this.serviceContext.partitions()){
+            //logger.warn("Partition : "+p.partition()+" : "+p.opening());
+        }
+        for(OnPartition p : this.serviceContext.buckets()){
+            //logger.warn("Bucket : "+p.partition()+" : "+p.opening());
+        }
+    }
+    @Override
+    public void onPartition(int partition,boolean localMember) {
+        logger.warn("Partition : "+partition+" : "+localMember);
+        //openBucket[partition]=state==BucketListener.OPEN;
+    }
+    @Override
+    public void onBucket(int bucket,boolean opening) {
+        logger.warn("Bucket : "+bucket+" : "+opening);
+        //openBucket[partition]=state==BucketListener.OPEN;
     }
 
     public void onStart(EndPoint endPoint){
@@ -434,6 +443,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     private void onSchedule() {
         if(!dedicated) return;
+        ArrayList<String> kickoff = new ArrayList<>();
         kickoff.clear();
         connectionIndex.forEach((k,v)->{
             if(v.onTimeout(timer)) kickoff.add(k);

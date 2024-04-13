@@ -19,10 +19,10 @@ public interface ServiceContext extends Context{
     BackupProvider backupProvider();
 
     OnPartition[] partitions();
-
+    OnPartition[] buckets();
     ClusterProvider.Node node();
     long distributionId();
-    //ServiceEventLogger serviceEventLogger();
+
     <T extends Recoverable> RecoverableRegistry<T> recoverableRegistry(int registryId);
     void recoverableRegistry(RecoverableListener recoverableListener);
 
