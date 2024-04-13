@@ -1,5 +1,6 @@
 package com.icodesoftware.lmdb;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
@@ -69,7 +70,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     MetricsListener metricsListener = (k,v)->{};
     private JsonObject jsonObject;
-
+    private LocalDataMigration migration;
     @Override
     public void configure(Map<String, Object> properties) {
         this.name = (String)properties.get("name");
@@ -86,6 +87,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         this.indexPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_indexPath;
         this.localPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_localPath;
         this.logPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_logPath;
+        this.migration = new LocalDataMigration((JsonObject)properties.get("migration"));
     }
 
     @Override
@@ -297,6 +299,10 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         }
         FileInputStream in = new FileInputStream(backupLog);
         jsonObject = JsonUtil.parse(in);
+        if(migration!=null && migration.migrating()){
+            migration.migrate(this);
+            System.exit(0);
+        }
         logger.warn("LMDB Provider started with store size ["+storeSize+"] queue side ["+pendingQueue.size()+"] store no sync mode ["+envNoSyncFlag+"]");
     }
 

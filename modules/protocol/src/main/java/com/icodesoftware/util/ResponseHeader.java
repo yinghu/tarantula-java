@@ -1,7 +1,6 @@
-package com.tarantula.platform;
+package com.icodesoftware.util;
 
 import com.icodesoftware.Response;
-import com.icodesoftware.util.RecoverableObject;
 
 public class ResponseHeader extends RecoverableObject implements Response {
 

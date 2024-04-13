@@ -2,10 +2,7 @@ package com.tarantula.platform.room;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.hazelcast.nio.serialization.Portable;
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
-import com.icodesoftware.Arena;
+import com.icodesoftware.protocol.Arena;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.Connection;
 import com.icodesoftware.Session;
@@ -15,7 +12,6 @@ import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.game.GameArena;
 import com.tarantula.game.GameZone;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -64,8 +60,8 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
 
     @Override
-    public String roomId(){
-        return this.distributionKey();
+    public long roomId(){
+        return this.distributionId();
     }
 
     @Override
@@ -144,6 +140,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.sessionId = channel.sessionId();
         this.serverKey = channel.serverKey();
         this.timeout = channel.connection().timeout();
+        this.dedicated = true;
     }
 
     @Override
@@ -185,23 +182,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         }
         jsonObject.add("_players",plist);
         return jsonObject;
-    }
-
-    public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeInt("1",round);
-        portableWriter.writeLong("3",distributionId);
-        portableWriter.writeInt("4",capacity);
-        portableWriter.writePortableArray("5",entries);
-    }
-
-    public void readPortable(PortableReader portableReader) throws IOException {
-        this.round = portableReader.readInt("1");
-        this.distributionId = portableReader.readLong("3");
-        this.entries = new Entry[portableReader.readInt("4")];
-        for(Portable p : portableReader.readPortableArray("5")){
-            Entry gameEntry = (Entry)p;
-            entries[gameEntry.seat()] = gameEntry;
-        }
     }
 
     public GameRoom join(long systemId,Listener listener){
@@ -310,13 +290,5 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     public String toString(){
         return "ROOM ["+distributionKey()+"] Capacity ["+capacity+"][ Total Joined ["+totalJoined+"] Round ["+round+"] Channel ["+channelId+"]";
     }
-
-
-
-    @Override
-    public void onCountdown(long delta){
-
-    }
-
 
 }

@@ -10,7 +10,7 @@ import com.icodesoftware.*;
 
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.logging.JDKLogger;
-import com.sun.jdi.Bootstrap;
+import com.icodesoftware.util.ResponseHeader;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.bootstrap.TarantulaMain;

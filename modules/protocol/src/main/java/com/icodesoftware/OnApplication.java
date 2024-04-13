@@ -3,8 +3,8 @@ package com.icodesoftware;
 public interface OnApplication extends Response {
 
 
-    String systemId();
-    void systemId(String systemId);
+    long systemId();
+    void systemId(long systemId);
 
     long stub();
     void stub(long stub);

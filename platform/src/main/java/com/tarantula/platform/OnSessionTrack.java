@@ -2,6 +2,7 @@ package com.tarantula.platform;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnSession;
+import com.icodesoftware.util.OnApplicationHeader;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 public class OnSessionTrack extends OnApplicationHeader implements OnSession {

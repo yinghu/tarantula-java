@@ -38,7 +38,8 @@ public interface ClusterProvider extends ServiceProvider {
     void registerMetricsListener(MetricsListener metricsListener);
     String registerReloadListener(ReloadListener reloadListener);
     void unregisterReloadListener(String registerKey);
-
+    String registerBucketListener(BucketListener bucketListener);
+    void unregisterBucketListener(String regKey);
     void registerNodeListener(NodeListener nodeListener);
 
     int partition(byte[] key);

@@ -18,7 +18,7 @@ public class PVPRoomProxy extends RoomProxyHeader{
         stub.joined(room!=null);
         if(!stub.joined()) return stub;
         stub.roomId = room.roomId();
-        stub.zoneId = gameZone.distributionKey();
+        stub.zoneId = gameZone.distributionId();
         stub.room = room;
         stub.zone = gameZone;
         stub.pushChannel = gameServiceProvider.roomServiceProvider().registerChannel(stub,(s,d)->{

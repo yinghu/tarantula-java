@@ -80,7 +80,7 @@ public class AppleStoreProvider extends AuthObject{
             onMetrics(PaymentMetrics.PAYMENT_APPLE_STORE_AMOUNT);
             if(!checkResponsePayload(responseData.dataAsString,params)) return false;
             String bundleId = (String)params.get(OnAccess.STORE_BUNDLE_ID);
-            String systemId = (String)params.get(OnAccess.SYSTEM_ID);
+            long systemId = (long)params.get(OnAccess.SYSTEM_ID);
             ShoppingItem shoppingItem = gameServiceProvider.storeServiceProvider().shoppingItem(bundleId);
             if(shoppingItem==null){
                 logger.warn("Shopping Item not existed  : "+bundleId);

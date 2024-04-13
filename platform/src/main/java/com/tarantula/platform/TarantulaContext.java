@@ -166,7 +166,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
 
     private DataStoreProvider.DistributionIdGenerator distributionIdGenerator;
- 	private TarantulaContext(){
+
+    private TarantulaContext(){
          this.endpointService = new EndpointService(this);
  	     this.metricsManager = new MetricsManager(this);
     }
@@ -485,7 +486,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             HashMap<String,Descriptor> _codeBase = new HashMap<>();
             Descriptor lab = null;
             for(Descriptor d : lb.entryList()){
-                if(d.type().equals(Descriptor.TYPE_APPLICATION)&&d.distributionKey().equals(applicationId)){
+                if(d.type().equals(Descriptor.TYPE_APPLICATION) && d.distributionId()==(applicationId)){
                     lb.removeEntry(applicationId);
                     ApplicationProvider app = this.availableApplicationManagers.remove(applicationId);
                     app.shutdown();
@@ -1099,4 +1100,5 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public Recoverable.DataBufferPair dataBufferPair(){
          return deploymentDataStoreProvider.dataBufferPair();
     }
+
 }

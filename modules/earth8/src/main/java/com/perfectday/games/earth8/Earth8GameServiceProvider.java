@@ -185,7 +185,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             if(gameContext.applicationSchema().transaction().execute(ctx->{
                 DataStore playerActionStore = ctx.onDataStore("player_coin_form");
                 PlayerAction playerAction = new PlayerAction("ShippingFormCompleted",true);
-                playerAction.ownerKey(SnowflakeKey.from(Long.parseLong(event.systemId())));
+                playerAction.ownerKey(SnowflakeKey.from(event.systemId()));
                 return playerActionStore.create(playerAction);
             })){
                 TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);

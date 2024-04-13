@@ -9,7 +9,7 @@ import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.MatchMakingComparator;
 import com.tarantula.game.GameRating;
 import com.tarantula.platform.AccessControl;
-import com.tarantula.platform.ResponseHeader;
+import com.icodesoftware.util.ResponseHeader;
 import com.tarantula.platform.lobby.LobbyItem;
 import com.tarantula.platform.util.ResponseSerializer;
 

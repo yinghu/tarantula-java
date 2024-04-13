@@ -35,8 +35,8 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
     Content resource(String name);
     void deleteResource(String name);
-    String resetCode(String key);
-    String checkCode(String resetCode);
+    String resetCode(long systemId);
+    long checkCode(String resetCode);
     //end
 
     //Module operation APIs

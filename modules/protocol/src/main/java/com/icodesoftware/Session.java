@@ -75,7 +75,7 @@ public interface Session extends OnApplication {
     void token(String token);
 
     interface TimeoutListener{
-        void timeout(String systemId,long stub);
+        void timeout(long systemId,long stub);
     }
 
     interface Header{

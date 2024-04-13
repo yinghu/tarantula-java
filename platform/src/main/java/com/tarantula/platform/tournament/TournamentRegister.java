@@ -1,10 +1,9 @@
 package com.tarantula.platform.tournament;
 
 import com.icodesoftware.Tournament;
-import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.platform.OnApplicationHeader;
+import com.icodesoftware.util.OnApplicationHeader;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.ScheduledFuture;

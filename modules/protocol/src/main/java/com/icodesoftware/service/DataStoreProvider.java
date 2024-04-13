@@ -43,6 +43,7 @@ public interface DataStoreProvider extends ServiceProvider {
     Transaction transaction(int scope);
 
     Recoverable.DataBufferPair dataBufferPair();
+
     interface OnStart{
         void on(DataStoreProvider dataStoreProvider);
     }
@@ -50,6 +51,10 @@ public interface DataStoreProvider extends ServiceProvider {
     interface DistributionIdGenerator{
         long id();
         void assign(Recoverable.DataBuffer dataBuffer);
+    }
+
+    interface MigrationListener{
+        void migrate(DataStoreProvider dataStoreProvider);
     }
 
 }

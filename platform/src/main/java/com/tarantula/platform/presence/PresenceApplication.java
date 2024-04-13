@@ -6,6 +6,7 @@ import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.service.UserService;
 import com.icodesoftware.util.JsonUtil;
+import com.icodesoftware.util.ResponseHeader;
 import com.tarantula.platform.*;
 import com.tarantula.platform.util.*;
 
@@ -119,7 +120,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         else if(session.action().equals("onValidateEmail")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             String code = (String) onAccess.property("validationCode");
-            if(this.deploymentServiceProvider.checkCode(code).equals(session.systemId())){
+            if(this.deploymentServiceProvider.checkCode(code)==(session.systemId())){
                 Access u = user(session.distributionId());
                 u.activated(true);
                 u.update();

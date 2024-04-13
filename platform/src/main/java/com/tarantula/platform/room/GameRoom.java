@@ -7,7 +7,7 @@ import com.tarantula.game.GameZone;
 
 import java.util.List;
 
-public interface GameRoom extends Room,Resettable,Closable,Configurable,Portable {
+public interface GameRoom extends Room,Resettable,Closable,Configurable {
 
     String LABEL = "gameRoom";
 
@@ -17,7 +17,7 @@ public interface GameRoom extends Room,Resettable,Closable,Configurable,Portable
     byte[] serverKey();
     Connection connection();
 
-    String roomId();
+    long roomId();
 
     List<Entry> entries();
     void setup(Channel channel);

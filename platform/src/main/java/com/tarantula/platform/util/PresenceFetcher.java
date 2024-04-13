@@ -58,7 +58,7 @@ public class PresenceFetcher{
             String resp = httpClientProvider.get(host,"service/action",headers);
             JsonObject jsonObject = JsonUtil.parse(resp).get("presence").getAsJsonObject();
             OnSession presence = new OnSessionTrack();
-            presence.systemId(jsonObject.get("systemId").getAsString());
+            presence.systemId(jsonObject.get("systemId").getAsLong());
             presence.stub(jsonObject.get("stub").getAsInt());
             //presence.balance(jsonObject.get("balance").getAsDouble());
             return presence;

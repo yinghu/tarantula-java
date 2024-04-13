@@ -23,7 +23,7 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
     private UDPEndpointServiceProvider udpEndpointServiceProvider;
 
     private ArrayBlockingQueue<PushUserChannel> pendingUserChannels;
-    private ConcurrentHashMap<Integer,ActivePushChannel> activePushChannelIndex;
+
     private TokenValidatorProvider tokenValidator;
     private AtomicInteger channelId;
     private AtomicInteger sessionId;
@@ -61,7 +61,6 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
 
     public UDPEndpoint(){
         channels = new ConcurrentHashMap<>();
-        activePushChannelIndex = new ConcurrentHashMap<>();
         pendingJoins = new ConcurrentHashMap<>();
         pendingJoinKickoff = new ArrayList<>();
         packetTracks = new ConcurrentHashMap<>();
@@ -133,9 +132,7 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
         receiverDaemon.start();
         outboundMessageDaemon.setPriority(UDPEndpointServiceProvider.SENDER_THREAD_PRIORITY);
         outboundMessageDaemon.start();
-        this.onTimer = new ScheduleRunner(this.frameRate,()->{
-            this.onTimer();
-        });
+        this.onTimer = new ScheduleRunner(this.frameRate,()-> this.onTimer());
         serviceContext.schedule(onTimer);
         this.serviceContext.deploymentServiceProvider().onStart(this);
     }
@@ -179,8 +176,7 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
         }
 
         if(pushUserChannel == null) {
-            pushUserChannel = new PushUserChannel(channelId.getAndIncrement(), udpEndpointServiceProvider,this.cipherListener, this, this, this,this);
-            this.activePushChannelIndex.put(pushUserChannel.channelId(),new ActivePushChannel());
+            pushUserChannel = new PushUserChannel(this,channelId.getAndIncrement(), udpEndpointServiceProvider,this.cipherListener, this, this, this,this);
             operationSummary.userChannelNumber.incrementAndGet();
         }
         UDPChannel[] channels = new UDPChannel[capacity];
@@ -190,7 +186,6 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
         }
         operationSummary.userSessionNumber.addAndGet(capacity);
         this.udpEndpointServiceProvider.registerUserChannel(pushUserChannel);
-        this.activePushChannelIndex.get(pushUserChannel.channelId()).reset(capacity);
         return channels;
     }
 
@@ -202,8 +197,6 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
 
     @Override
     public void onLeft(int channelId, int sessionId) {
-        ActivePushChannel activePushChannel = activePushChannelIndex.get(channelId);
-        if(activePushChannel.totalLeft.decrementAndGet()==0) releaseChannel(channelId);
         UDPChannel removed = channels.remove(sessionId);
         if(removed == null) return;
         removed.kickoff();
@@ -216,7 +209,7 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
     }
 
     public void releaseChannel(int channelId){
-        PushUserChannel released = (PushUserChannel) udpEndpointServiceProvider.releaseUserChannel(channelId);
+        PushUserChannel released = udpEndpointServiceProvider.releaseUserChannel(channelId);
         if(released == null) return;
         released.kickoff();
         pendingUserChannels.offer(released);
@@ -231,7 +224,8 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
             String ticket = messageBuffer.readUTF8();
             boolean suc = tokenValidator.validateTicket(systemId,stub,ticket);
             metricsListener.onUpdated(AccessMetrics.UDP_REQUEST_COUNT,1);
-            boolean joined = sessionId == messageHeader.sessionId && suc && pendingJoins.remove(sessionId)!=null;
+            boolean joined = sessionId == messageHeader.sessionId && suc ;
+            pendingJoins.remove(sessionId); //remove pending join
             if(joined) channels.get(sessionId).validated();
             return joined;
         }catch (Exception ex){
@@ -290,7 +284,6 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
             });
             if(expiredPackets.size()>0){
                 expiredPackets.forEach((h)->packetTracks.remove(h));
-                //logger.warn("Total packets removed ->"+expiredPackets.size());
             }
             packetRemoveTimer = packetRemoveInterval;
         }
@@ -304,7 +297,8 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
             });
             pendingJoinKickoff.forEach(c->{
                 if(pendingJoins.remove(c.sessionId())!=null){
-                    onLeft(c.channelId(),c.sessionId());
+                    PushUserChannel pushUserChannel = udpEndpointServiceProvider.lookup(c.channelId());
+                    pushUserChannel.onTimeout(c.channelId(),c.sessionId());
                 }
             });
         }
@@ -318,7 +312,6 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
 
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
-        //logger.warn("Action : Message header->"+messageHeader.toString()+">>"+messageHeader.commandId+">"+messageHeader.encrypted);
         UDPChannel channel = channels.get(messageHeader.sessionId);
         channel.onAction(messageHeader,messageBuffer,callback);
     }
@@ -329,5 +322,13 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
         }catch (Exception ex){
             throw new RuntimeException("udp provider ["+className+"] not existed");
         }
+    }
+
+    public void onChannelState(int channelId,int remainingSessions){
+        if(remainingSessions>0) return;
+        PushUserChannel pushUserChannel = udpEndpointServiceProvider.releaseUserChannel(channelId);
+        if(pushUserChannel==null) return;
+        pushUserChannel.kickoff();
+        pendingUserChannels.offer(pushUserChannel);
     }
 }

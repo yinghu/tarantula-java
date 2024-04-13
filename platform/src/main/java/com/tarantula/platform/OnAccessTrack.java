@@ -2,6 +2,7 @@ package com.tarantula.platform;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.util.OnApplicationHeader;
 import com.tarantula.platform.presence.UserPortableRegistry;
 import com.icodesoftware.util.JsonUtil;
 import java.util.Map;

@@ -136,7 +136,7 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
         return configurable;
     }
 
-    public boolean grant(String systemId,String itemId){
+    public boolean grant(long systemId,String itemId){
         Item item = itemIndex.get(itemId);
         if(item==null){
             logger.warn("Item not existed->"+itemId);

@@ -15,17 +15,17 @@ import java.util.List;
 public class TransactionLogManager implements Closable {
 
 
-    private static final String DATA_PREFIX = "log_d_";
-    private static final String ACCESS_PREFIX = "log_a_";
-    private static final String INDEX_PREFIX = "log_i_";
+    public static final String DATA_PREFIX = "log_d_";
+    public static final String ACCESS_PREFIX = "log_a_";
+    public static final String INDEX_PREFIX = "log_i_";
 
-    private static final String DATA_PREFIX_I = "index_d_";
-    private static final String ACCESS_PREFIX_I = "index_a_";
-    private static final String INDEX_PREFIX_I = "index_i_";
-    private static final String TRANSACTION_LOG = "log_tarantula_transaction";
+    public static final String DATA_PREFIX_I = "index_d_";
+    public static final String ACCESS_PREFIX_I = "index_a_";
+    public static final String INDEX_PREFIX_I = "index_i_";
+    public static final String TRANSACTION_LOG = "log_tarantula_transaction";
 
-    private static final String DATA_TRANSACTION_LOG = "log_tarantula_transaction_1";
-    private static final String INTEGRATION_TRANSACTION_LOG = "log_tarantula_transaction_2";
+    public static final String DATA_TRANSACTION_LOG = "log_tarantula_transaction_1";
+    public static final String INTEGRATION_TRANSACTION_LOG = "log_tarantula_transaction_2";
 
     private ServiceContext serviceContext;
 

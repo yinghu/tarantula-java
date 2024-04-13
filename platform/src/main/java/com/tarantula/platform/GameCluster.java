@@ -10,6 +10,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ApplicationSchema;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.OnApplicationHeader;
 import com.tarantula.game.service.GameConfigurationSetup;
 import com.tarantula.game.service.GameObjectSetup;
 import com.tarantula.platform.event.PortableEventRegistry;

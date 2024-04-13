@@ -524,6 +524,11 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             cache.reset();
         }
     }
+    public void drop(boolean delete){
+        Txn<ByteBuffer> txn = env.txnWrite();
+        dbi.drop(txn,delete);
+        txn.commit();
+    }
     //help methods
 
     private <T extends Recoverable> boolean list(ByteBuffer key,LocalEdgeDataStore localEdgeDataStore,RecoverableFactory<T> query, Stream<T> stream){

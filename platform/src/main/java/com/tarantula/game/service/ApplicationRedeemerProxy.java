@@ -9,10 +9,10 @@ import com.tarantula.platform.inventory.ApplicationRedeemer;
 
 public class ApplicationRedeemerProxy implements ApplicationResource.Redeemer {
 
-    private final String systemId;
+    private final long systemId;
     private final GameCluster gameCluster;
     public ApplicationRedeemerProxy(Session session,GameCluster gameCluster){
-        this.systemId = session.distributionKey();
+        this.systemId = session.distributionId();
         this.gameCluster = gameCluster;
     }
     @Override

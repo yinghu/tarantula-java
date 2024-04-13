@@ -1,4 +1,6 @@
-package com.icodesoftware;
+package com.icodesoftware.protocol;
+
+import com.icodesoftware.Recoverable;
 
 public interface Room extends Recoverable {
 
@@ -25,8 +27,6 @@ public interface Room extends Recoverable {
     int totalJoined();
 
     int totalLeft();
-
-    void onCountdown(long delta);
 
     Arena arena();
 }
