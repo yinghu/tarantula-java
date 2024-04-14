@@ -385,10 +385,10 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     @Override
     public void onReload() {
         for(OnPartition p : this.serviceContext.partitions()){
-            //logger.warn("Partition : "+p.partition()+" : "+p.opening());
+            logger.warn("xPartition : "+p.partition()+" : "+p.opening());
         }
         for(OnPartition p : this.serviceContext.buckets()){
-            //logger.warn("Bucket : "+p.partition()+" : "+p.opening());
+            logger.warn("xBucket : "+p.partition()+" : "+p.opening());
         }
     }
     @Override
