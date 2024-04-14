@@ -7,27 +7,25 @@ import com.tarantula.game.GameZone;
 
 import java.util.List;
 
-public interface GameRoom extends Room,Resettable,Closable,Configurable {
+public interface GameRoom extends Room,Resettable,DataStore.Updatable {
 
     String LABEL = "gameRoom";
 
     int channelId();
     int sessionId();
 
-    byte[] serverKey();
     Connection connection();
-
     long roomId();
 
     List<Entry> entries();
     void setup(Channel channel);
 
     //Distributed Methods
-    GameRoom join(long stubId,Listener listener);
+    GameRoom join(long stubId);
     GameRoom view();
-    void leave(long stubId,Listener listener);
+    void leave(long stubId);
     void load();
-
+    boolean dedicated();
     long zoneId();
 
     void setup(GameServiceProvider gameServiceProvider,GameZone gameZone,boolean dedicated);
@@ -50,10 +48,6 @@ public interface GameRoom extends Room,Resettable,Closable,Configurable {
         void stubId(long stubId);
         void team(int team);
         void occupied(boolean occupied);
-    }
-
-    interface Listener{
-        void onUpdated(GameRoom room,Entry entry);
     }
 
     static GameRoom newGameRoom(String type,int roomCapacity){

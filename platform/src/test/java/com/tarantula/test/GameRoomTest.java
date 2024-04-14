@@ -26,68 +26,18 @@ public class GameRoomTest extends DataStoreHook{
         Assert.assertTrue(dataStore.create(room));
         room.dataStore(dataStore);
         room.load();
-        room.join(1,(r,e)->{});
+        room.join(1);
         Assert.assertEquals(room.entries().size(),1);
         List<GameRoom> rooms = dataStore.list(new GameRoomQuery(zoneId,GameZone.PLAY_MODE_PVE,1));
         Assert.assertEquals(rooms.size(),1);
         rooms.get(0).dataStore(dataStore);
         rooms.get(0).load();
         Assert.assertEquals(rooms.get(0).entries().size(),1);
-        rooms.get(0).leave(1,(r,e)->{});
+        rooms.get(0).leave(1);
         Assert.assertEquals(rooms.get(0).entries().size(),0);
 
     }
 
-    @Test(groups = { "GameRoom" })
-    public void joinTest() {
-        DataStore dataStore = dataStoreProvider.createDataStore("test_room");
-        GameRoom room = GameRoom.newGameRoom(GameZone.PLAY_MODE_PVP,5);
-        dataStore.create(room);
-        room.dataStore(dataStore);
-        room.load();
-        room.join(1,(room1,entry) -> {
-            Assert.assertTrue(room1.available());
-            Assert.assertEquals(room.totalJoined(),1);
-        });
-        room.join(2,(room1,entry) -> {
-            Assert.assertTrue(room1.available());
-            Assert.assertEquals(room.totalJoined(),2);
-        });
-        room.join(3,(room1,entry) -> {
-            Assert.assertTrue(room1.available());
-            Assert.assertEquals(room.totalJoined(),3);
-        });
-        room.join(4,(room1,entry) -> {
-            Assert.assertTrue(room1.available());
-            Assert.assertEquals(room.totalJoined(),4);
-        });
-        room.join(5,(room1,entry) -> {
-            Assert.assertFalse(room1.available());
-            Assert.assertEquals(room.totalJoined(),5);
-            Assert.assertTrue(room.totalJoined()==room.capacity());
-        });
-        room.leave(1,(room1,entry) -> {
-            Assert.assertFalse(room1.available());
-            Assert.assertEquals(room.totalLeft(),1);
-        });
-        room.leave(2,(room1,entry) -> {
-            Assert.assertFalse(room1.available());
-            Assert.assertEquals(room.totalLeft(),2);
-        });
-        room.leave(3,(room1,entry) -> {
-            Assert.assertFalse(room1.available());
-            Assert.assertEquals(room.totalLeft(),3);
-        });
-        room.leave(4,(room1,entry) -> {
-            Assert.assertFalse(room1.available());
-            Assert.assertEquals(room.totalLeft(),4);
-        });
-        room.leave(5,(room1,entry) -> {
-            Assert.assertFalse(room1.available());
-            Assert.assertEquals(room.totalLeft(),5);
-            Assert.assertTrue(room.totalLeft()==room.capacity());
-        });
-    }
 
     @Test(groups = { "GameRoom" })
     public void removeTest() {

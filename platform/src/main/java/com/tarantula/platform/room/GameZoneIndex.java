@@ -1,6 +1,5 @@
 package com.tarantula.platform.room;
 
-import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.game.GameZone;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -12,12 +11,11 @@ public class GameZoneIndex {
     public GameZone gameZone;
     public AtomicInteger maxRoomPoolSize;
 
-    //dedicated settings
+    //dedicated room settings
     public LinkedBlockingDeque<ConnectionStub>  pendingConnections;
-    public ArrayBlockingQueue<UDPChannel> pendingPushChannels;
     public GameRoom gameRoom;
 
-
+    //local room settings
     public ArrayBlockingQueue<RoomStub> pendingRoomStubs;
 
 }

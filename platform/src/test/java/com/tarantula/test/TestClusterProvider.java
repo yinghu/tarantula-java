@@ -139,4 +139,8 @@ public class TestClusterProvider extends TarantulaApplicationHeader implements C
         return 0;//_cluster.getPartitionService().getPartition(key).getPartitionId();
     }
 
+    public int bucket(byte[] key){
+        return 0;//_cluster.getPartitionService().getPartition(key).getPartitionId();
+    }
+
 }

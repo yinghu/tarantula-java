@@ -33,7 +33,7 @@ public interface ClusterProvider extends ServiceProvider {
     void unregisterReloadListener(String registerKey);
 
     int partition(byte[] key);
-
+    int bucket(byte[] key);
     Summary summary();
 
     interface ClusterStore{

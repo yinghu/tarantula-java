@@ -33,7 +33,6 @@ public class TVEGameRoom extends GameRoomHeader{
         _room.entries = new GameEntry[joinIndex.size()];
         joinIndex.forEach((k,e)->_room.entries[e.seat()]=e);
         _room.capacity = _room.entries.length;
-        _room.round = this.round;
         return this;
     }
 }

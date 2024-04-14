@@ -299,9 +299,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         rMap.forEach((k,v)->v.onPartition(partition,localMember));
     }
     public void onReload(){
-        //_cluster.getPartitionService().getPartitions().forEach(partition -> {
-            //partitionStates[partition.getPartitionId()].opening = partition.getOwner().localMember();
-        //});
         rMap.forEach((k,v)->v.onReload());
     }
 
@@ -340,6 +337,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     public int partition(byte[] key){
         return _cluster.getPartitionService().getPartition(key).getPartitionId();
+    }
+    public int bucket(byte[] key){
+        return SystemUtil.partition(key,tarantulaContext.platformRoutingNumber);
     }
     public void registerNode(Node node){
         ClusterNode cnode = (ClusterNode) node;

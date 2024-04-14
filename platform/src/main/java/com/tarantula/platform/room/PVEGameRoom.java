@@ -20,7 +20,6 @@ public class PVEGameRoom extends GameRoomHeader{
     protected GameRoom duplicate() {
         PVEGameRoom _room = new PVEGameRoom();
         _room.capacity = this.capacity;
-        _room.round = this.round;
         _room.dedicated = this.dedicated;
         _room.duration = this.duration;
         _room.joinsOnStart = this.joinsOnStart;

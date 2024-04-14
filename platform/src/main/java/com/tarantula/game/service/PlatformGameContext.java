@@ -108,4 +108,8 @@ public class PlatformGameContext implements GameContext {
     public Channel channel(int sessionId){
         return platformGameServiceProvider.roomServiceProvider().channel(sessionId);
     }
+
+    public Room room(long roomId){
+        return platformGameServiceProvider.roomServiceProvider().room(roomId);
+    }
 }

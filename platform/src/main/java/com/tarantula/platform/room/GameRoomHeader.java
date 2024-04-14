@@ -26,7 +26,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
 
     protected int capacity;
     protected long duration;
-    protected int round;
+
     protected int joinsOnStart;
     protected long overtime;
 
@@ -50,9 +50,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         return sessionId;
     }
     public int timeout(){return timeout;}
-    public byte[] serverKey(){
-        return serverKey;
-    }
+
     public boolean dedicated(){
         return dedicated;
     }
@@ -78,10 +76,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         return capacity;
     }
 
-    @Override
-    public int round() {
-        return round;
-    }
 
     @Override
     public int joinsOnStart() {
@@ -98,6 +92,10 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         return arena;
     }
 
+    public Seat[] table(){
+        return new Seat[0];
+    }
+
     @Override
     public List<Entry> entries(){
         ArrayList<Entry> list = new ArrayList<>();
@@ -109,7 +107,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         this.onEdge = true;
         this.label = LABEL;
         this.capacity = capacity;
-        this.round = 1;
         this.joinIndex = new ConcurrentHashMap<>(capacity);
         this.entries = new Entry[capacity];
         this.placeHolder = createEntry();
@@ -137,8 +134,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
 
     @Override
     public void setup(Channel channel){
-        //this.arena = gameZone.arena(rating.arenaLevel);
-        //if(!dedicated) return;
         this.connection = channel.connection();
         this.channelId = channel.channelId();
         this.sessionId = channel.sessionId();
@@ -150,7 +145,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     @Override
     public boolean read(DataBuffer buffer){
         this.capacity = buffer.readInt();
-        this.round = buffer.readInt();
         this.totalJoined = buffer.readInt();
         this.totalLeft = buffer.readInt();
         return true;
@@ -158,7 +152,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     @Override
     public boolean write(DataBuffer buffer) {
         buffer.writeInt(capacity);
-        buffer.writeInt(round);
         buffer.writeInt(totalJoined);
         buffer.writeInt(totalLeft);
         return true;
@@ -169,7 +162,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         jsonObject.addProperty("RoomId",distributionKey());
         jsonObject.addProperty("Capacity",capacity);
         jsonObject.addProperty("Duration",duration);
-        jsonObject.addProperty("Round",round);
         jsonObject.addProperty("Dedicated",dedicated);
         if(connection!=null){
             jsonObject.addProperty("ChannelId",channelId);
@@ -188,7 +180,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         return jsonObject;
     }
 
-    public GameRoom join(long systemId,Listener listener){
+    public GameRoom join(long systemId){
         Entry entry = joinIndex.putIfAbsent(systemId,placeHolder);
         if(entry != null) return view();
         synchronized (entries){
@@ -203,13 +195,12 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
             }
         }
         joinIndex.replace(systemId,entry);
-        listener.onUpdated(this,entry);
         this.dataStore.update(entry);
         this.dataStore.update(this);
         return view();
     }
 
-    public void leave(long systemId,Listener listener){
+    public void leave(long systemId){
         Entry entry = joinIndex.remove(systemId);
         if(entry == null){
             return;
@@ -218,7 +209,6 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
             entries[entry.seat()].reset();
             totalLeft++;
         }
-        listener.onUpdated(this,entry);
         this.dataStore.update(entry);
         this.dataStore.update(this);
     }
@@ -234,13 +224,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     public boolean available(){
         return totalJoined < capacity;
     }
-    public int totalJoined(){
-        return totalJoined;
-    }
 
-    public int totalLeft(){
-        return totalLeft;
-    }
 
     public void reset(){
         if(pendingChannels!=null) pendingChannels.clear();
@@ -251,12 +235,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         }
         totalJoined = 0;
         totalLeft = 0;
-        round++;
         this.dataStore.update(this);
-    }
-
-    public void close(){
-
     }
 
     protected GameRoom duplicate(){
@@ -292,7 +271,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
     @Override
     public String toString(){
-        return "ROOM ["+distributionKey()+"] Capacity ["+capacity+"][ Total Joined ["+totalJoined+"] Round ["+round+"] Channel ["+channelId+"]";
+        return "ROOM ["+distributionKey()+"] Capacity ["+capacity+"][ Total Joined ["+totalJoined+"] Channel ["+channelId+"]";
     }
 
 }

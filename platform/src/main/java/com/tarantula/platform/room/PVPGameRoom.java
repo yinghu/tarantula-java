@@ -27,7 +27,6 @@ public class PVPGameRoom extends GameRoomHeader{
     protected GameRoom duplicate() {
         PVPGameRoom _room = new PVPGameRoom();
         _room.capacity = this.capacity;
-        _room.round = this.round;
         _room.dedicated = this.dedicated;
         _room.duration = this.duration;
         _room.joinsOnStart = this.joinsOnStart;

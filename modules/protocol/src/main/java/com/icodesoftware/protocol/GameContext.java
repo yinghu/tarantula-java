@@ -27,4 +27,6 @@ public interface GameContext extends Context {
     Configurable lookup(long distributionId);
 
     default Channel channel(int sessionId){return null;}
+
+    Room room(long roomId);
 }
