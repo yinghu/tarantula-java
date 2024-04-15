@@ -10,13 +10,14 @@ import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.game.GameArena;
+import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.game.GameZone;
 
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
-abstract public class GameRoomHeader extends RecoverableObject implements GameRoom {
+public class GameRoomHeader extends RecoverableObject implements GameRoom {
 
     protected int channelId;
     protected int sessionId;
@@ -30,19 +31,17 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     protected int joinsOnStart;
     protected long overtime;
 
-    protected int totalJoined;
-    protected int totalLeft;
     protected boolean dedicated;
     protected GameArena arena;
     protected long zoneId;
-
+    protected int bucket;
     protected ConcurrentHashMap<Long,Entry> joinIndex;
     protected Entry[] entries;
 
     private GameServiceProvider gameModule;
     private ArrayBlockingQueue<Channel> pendingChannels;
 
-    private Entry placeHolder;
+
     public int channelId(){
         return channelId;
     }
@@ -54,9 +53,7 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     public boolean dedicated(){
         return dedicated;
     }
-    public Connection connection(){
-        return connection;
-    }
+
 
     @Override
     public long roomId(){
@@ -65,6 +62,10 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
 
     public long zoneId(){
         return zoneId;
+    }
+
+    public int bucket(){
+        return bucket;
     }
     @Override
     public long duration() {
@@ -93,38 +94,33 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
 
     public Seat[] table(){
-        return new Seat[0];
+        return entries;
     }
-
-    @Override
-    public List<Entry> entries(){
-        ArrayList<Entry> list = new ArrayList<>();
-        joinIndex.forEach((k,e)->list.add(e));
-        return list;
+    public GameRoomHeader(){
+        this.onEdge = true;
+        this.label = LABEL;
     }
 
     public GameRoomHeader(int capacity){
-        this.onEdge = true;
-        this.label = LABEL;
+        this();
         this.capacity = capacity;
         this.joinIndex = new ConcurrentHashMap<>(capacity);
         this.entries = new Entry[capacity];
-        this.placeHolder = createEntry();
     }
 
     @Override
     public void load(){
         int[] created ={0};
+        if(entries==null) entries = new Entry[capacity];
         dataStore.list(new GameEntryQuery(this.distributionId()),(ge)->{
-            entries[ge.seat()]=ge;
-            if(ge.occupied()) joinIndex.put(ge.stubId(),ge);
+            entries[ge.number()]=ge;
             created[0]++;
             return true;
         });
         if(created[0]==capacity) return;
         for(int i=0;i<capacity;i++){
-            Entry entry = createEntry();
-            entry.seat(i);
+            Entry entry = new GameEntry();
+            entry.number(i);
             entry.occupied(false);
             entry.ownerKey(new SnowflakeKey(this.distributionId));
             if(!this.dataStore.create(entry)) throw new RuntimeException("cannot create room entry");
@@ -145,15 +141,11 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     @Override
     public boolean read(DataBuffer buffer){
         this.capacity = buffer.readInt();
-        this.totalJoined = buffer.readInt();
-        this.totalLeft = buffer.readInt();
         return true;
     }
     @Override
     public boolean write(DataBuffer buffer) {
         buffer.writeInt(capacity);
-        buffer.writeInt(totalJoined);
-        buffer.writeInt(totalLeft);
         return true;
     }
     @Override
@@ -180,50 +172,48 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
         return jsonObject;
     }
 
-    public GameRoom join(long systemId){
-        Entry entry = joinIndex.putIfAbsent(systemId,placeHolder);
-        if(entry != null) return view();
+    public GameRoom join(Session session){
+        Entry entry = null;
         synchronized (entries){
             for(int i=0;i<capacity;i++){
-                if(!entries[i].occupied()){
+                if(entries[i].occupied() && entries[i].systemId()==session.systemId() && entries[i].stub()==session.stub()){
                     entry = entries[i];
-                    entry.occupied(true);
-                    entry.stubId(systemId);
-                    totalJoined++;
+                    break;
+                }
+                if(!entries[i].occupied() && entry==null){
+                    entry = entries[i];
+                }
+            }
+            if(entry.systemId()==0) entry.occupied(true);
+        }
+        entry.systemId(session.systemId());
+        entry.stub(session.stub());
+        this.dataStore.update(entry);
+        return view();
+    }
+
+    public void leave(Session session){
+        Entry entry = null;
+        synchronized (entries){
+            for(int i=0;i<capacity;i++){
+                if(!entries[i].occupied()) continue;
+                if(entries[i].systemId()==session.systemId() && entries[i].stub()==session.stub()){
+                    entry = entries[i];
+                    entry.occupied(false);
+                    entry.systemId(0);
+                    entry.stub(0);
                     break;
                 }
             }
         }
-        joinIndex.replace(systemId,entry);
+        if(entry==null) return;
         this.dataStore.update(entry);
-        this.dataStore.update(this);
-        return view();
-    }
-
-    public void leave(long systemId){
-        Entry entry = joinIndex.remove(systemId);
-        if(entry == null){
-            return;
-        }
-        synchronized (entries){
-            entries[entry.seat()].reset();
-            totalLeft++;
-        }
-        this.dataStore.update(entry);
-        this.dataStore.update(this);
     }
 
     public GameRoom view(){
-        GameRoom room = duplicate();
-        if(room==null) return this;
-        room.distributionId(this.distributionId);
-        return room;
+        return this;
     }
 
-
-    public boolean available(){
-        return totalJoined < capacity;
-    }
 
 
     public void reset(){
@@ -233,17 +223,9 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
             entries[i].reset();
             this.dataStore.update(entries[i]);
         }
-        totalJoined = 0;
-        totalLeft = 0;
         this.dataStore.update(this);
     }
 
-    protected GameRoom duplicate(){
-        return null;
-    }
-    protected GameRoom.Entry createEntry(){
-        return new GameEntry();
-    }
 
     public void setup(GameServiceProvider gameServiceProvider,GameZone gameZone,boolean dedicated){
         this.capacity = gameZone.capacity();
@@ -271,7 +253,16 @@ abstract public class GameRoomHeader extends RecoverableObject implements GameRo
     }
     @Override
     public String toString(){
-        return "ROOM ["+distributionKey()+"] Capacity ["+capacity+"][ Total Joined ["+totalJoined+"] Channel ["+channelId+"]";
+        return "ROOM ["+distributionKey()+"] Capacity ["+capacity+"] Channel ["+channelId+"]";
+    }
+
+    @Override
+    public int getFactoryId() {
+        return GamePortableRegistry.OID;
+    }
+    @Override
+    public int getClassId() {
+        return GamePortableRegistry.PVE_ROOM_CID;
     }
 
 }

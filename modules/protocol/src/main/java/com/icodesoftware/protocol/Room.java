@@ -12,13 +12,15 @@ public interface Room extends Recoverable {
     long overtime();
 
     int joinsOnStart();
-    
+
     Seat[] table();
 
     Arena arena();
 
     interface Seat extends Recoverable{
+        int number();
         int team();
+        long systemId();
         long stub();
         boolean occupied();
     }

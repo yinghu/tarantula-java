@@ -13,13 +13,15 @@ public class GamePortableRegistry<T extends Recoverable>  extends AbstractRecove
 
     public static final int GAME_UPDATE_OBJECT_CID = 5;
 
+    public static final int GAME_ENTRY_CID = 6;
+
+
     public static final int RATING_CID = PortableEventRegistry.RATING_CID;//110
     public static final int PVE_ROOM_CID = PortableEventRegistry.PVE_ROOM_CID;
     public static final int PVP_ROOM_CID = PortableEventRegistry.PVP_ROOM_CID;
     public static final int TVE_ROOM_CID = PortableEventRegistry.TVE_ROOM_CID;
     public static final int TVT_ROOM_CID = PortableEventRegistry.TVT_ROOM_CID;
 
-    public static final int GAME_ENTRY_CID = PortableEventRegistry.GAME_ENTRY_CID;
 
     public static GamePortableRegistry INS;
 

@@ -1,17 +1,18 @@
 package com.tarantula.test;
 
+
 import com.icodesoftware.DataStore;
 
+import com.icodesoftware.protocol.Room;
 import com.icodesoftware.util.SnowflakeKey;
-import com.tarantula.game.GameZone;
+
+import com.tarantula.game.SimpleStub;
 import com.tarantula.platform.room.*;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
 
 public class GameRoomTest extends DataStoreHook{
 
@@ -21,62 +22,32 @@ public class GameRoomTest extends DataStoreHook{
     public void setupTest() {
         DataStore dataStore = dataStoreProvider.createDataStore("test_room");
         long zoneId = serviceContext.distributionId();
-        GameRoom room = GameRoom.newGameRoom(GameZone.PLAY_MODE_PVE,1);
+        GameRoomHeader room = new GameRoomHeader(2);
         room.ownerKey(new SnowflakeKey(zoneId));
         Assert.assertTrue(dataStore.create(room));
+        GameRoomHeader load = new GameRoomHeader();
+        load.distributionId(room.distributionId());
+        Assert.assertTrue(dataStore.load(load));
+        Assert.assertEquals(load.capacity(),room.capacity());
         room.dataStore(dataStore);
         room.load();
-        room.join(1);
-        Assert.assertEquals(room.entries().size(),1);
-        List<GameRoom> rooms = dataStore.list(new GameRoomQuery(zoneId,GameZone.PLAY_MODE_PVE,1));
+        Room.Seat[] table = room.table();
+        for(int i=0 ;i<table.length;i++){
+            Assert.assertEquals(table[i].number(),i);
+            Assert.assertEquals(table[i].occupied(),false);
+        }
+        SimpleStub stub = new SimpleStub(100,200);
+        room.join(stub);
+        Assert.assertEquals(room.table()[0].occupied(),true);
+        List<GameRoomHeader> rooms = dataStore.list(new GameRoomQuery(zoneId));
         Assert.assertEquals(rooms.size(),1);
         rooms.get(0).dataStore(dataStore);
         rooms.get(0).load();
-        Assert.assertEquals(rooms.get(0).entries().size(),1);
-        rooms.get(0).leave(1);
-        Assert.assertEquals(rooms.get(0).entries().size(),0);
+        Assert.assertEquals(rooms.get(0).table()[0].systemId(),100);
+        rooms.get(0).leave(stub);
+        Assert.assertEquals(rooms.get(0).table()[0].systemId(),0);
 
     }
 
-
-    @Test(groups = { "GameRoom" })
-    public void removeTest() {
-        LinkedBlockingDeque q = new LinkedBlockingDeque(3);
-
-        PVEGameRoom p1 = new PVEGameRoom();
-        p1.distributionId(1);
-
-        PVEGameRoom p2 = new PVEGameRoom();
-        p2.distributionId(2);
-
-        PVEGameRoom p3 = new PVEGameRoom();
-        p3.distributionId(3);
-
-        PVEGameRoom p4 = new PVEGameRoom();
-        p4.distributionId(4);
-
-        q.offer(p1);
-        q.offer(p2);
-        q.offer(p3);
-        q.offer(p4);
-
-        Assert.assertEquals(3,q.size());
-        Assert.assertTrue(q.remove(p2));
-        Assert.assertEquals(2,q.size());
-    }
-
-    @Test(groups = { "GameRoom" })
-    public void removeRoomSubTest() {
-        ArrayBlockingQueue<RoomStub> stubs = new ArrayBlockingQueue<>(100);
-        long roomId = 1000;
-        for(int i=0;i<100;i++){
-            stubs.offer(new RoomStub(roomId,i));
-        }
-        Assert.assertEquals(stubs.size(),100);
-        for(int i=0;i<100;i++){
-            Assert.assertTrue(stubs.remove(new RoomStub(roomId,i)));
-        }
-        Assert.assertEquals(stubs.size(),0);
-    }
 
 }

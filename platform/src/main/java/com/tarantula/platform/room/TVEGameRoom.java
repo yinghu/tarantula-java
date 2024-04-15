@@ -31,7 +31,7 @@ public class TVEGameRoom extends GameRoomHeader{
     protected TVEGameRoom duplicate(){
         TVEGameRoom _room = new TVEGameRoom();
         _room.entries = new GameEntry[joinIndex.size()];
-        joinIndex.forEach((k,e)->_room.entries[e.seat()]=e);
+        joinIndex.forEach((k,e)->_room.entries[e.number()]=e);
         _room.capacity = _room.entries.length;
         return this;
     }

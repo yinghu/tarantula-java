@@ -1,11 +1,9 @@
 package com.tarantula.platform.room;
 
-import com.hazelcast.nio.serialization.Portable;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
 import com.tarantula.game.GameZone;
 
-import java.util.List;
 
 public interface GameRoom extends Room,Resettable,DataStore.Updatable {
 
@@ -14,16 +12,16 @@ public interface GameRoom extends Room,Resettable,DataStore.Updatable {
     int channelId();
     int sessionId();
 
-    Connection connection();
     long roomId();
 
-    List<Entry> entries();
+    int bucket();
+
     void setup(Channel channel);
 
     //Distributed Methods
-    GameRoom join(long stubId);
+    GameRoom join(Session session);
     GameRoom view();
-    void leave(long stubId);
+    void leave(Session session);
     void load();
     boolean dedicated();
     long zoneId();
@@ -35,17 +33,13 @@ public interface GameRoom extends Room,Resettable,DataStore.Updatable {
 
     Channel registerChannel(Session session,Session.TimeoutListener timeoutListener);
 
-    interface Entry extends Resettable,Configurable, Portable {
+    interface Entry extends Room.Seat,Resettable {
 
         String LABEL = "roomEntry";
 
-        int seat();
-        long stubId();
-        int team();
-        boolean occupied();
-
-        void seat(int seat);
-        void stubId(long stubId);
+        void systemId(long systemId);
+        void number(int number);
+        void stub(long stubId);
         void team(int team);
         void occupied(boolean occupied);
     }

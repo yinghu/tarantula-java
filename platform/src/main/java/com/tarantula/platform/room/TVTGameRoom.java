@@ -31,7 +31,7 @@ public class TVTGameRoom extends GameRoomHeader{
     protected TVTGameRoom duplicate(){
         TVTGameRoom _room = new TVTGameRoom();
         _room.entries = new GameEntry[joinIndex.size()];
-        joinIndex.forEach((k,e)->_room.entries[e.seat()]=e);
+        joinIndex.forEach((k,e)->_room.entries[e.number()]=e);
         _room.capacity = _room.entries.length;
         return this;
     }

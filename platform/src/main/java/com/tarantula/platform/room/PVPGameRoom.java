@@ -33,7 +33,7 @@ public class PVPGameRoom extends GameRoomHeader{
         _room.overtime = this.overtime;
         if (!this.dedicated){
             _room.entries = new GameEntry[this.capacity];
-            joinIndex.forEach((k, e) -> _room.entries[e.seat()] = e);
+            joinIndex.forEach((k, e) -> _room.entries[e.number()] = e);
         }
         return _room;
     }
