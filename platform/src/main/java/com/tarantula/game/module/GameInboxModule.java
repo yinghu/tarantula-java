@@ -19,6 +19,7 @@ public class GameInboxModule extends ModuleHeader{
             TokenValidatorProvider.AuthVendor download = tokenValidatorProvider.authVendor(OnAccess.DOWNLOAD_CENTER);
             byte[] payload = download.download(gameServiceProvider.gameCluster().typeId()+"#"+session.name());
             session.write(payload);
+            this.gameServiceProvider.presenceServiceProvider().testSequence(session.name());
         }
         else if(session.action().equals("onRedeem")){
             boolean suc = this.gameServiceProvider.inboxServiceProvider().redeem(session,session.name());
