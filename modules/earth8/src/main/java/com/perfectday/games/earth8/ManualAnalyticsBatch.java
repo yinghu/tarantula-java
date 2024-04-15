@@ -6,11 +6,9 @@ import com.icodesoftware.service.ApplicationPreSetup;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class ManualAnalyticsBatch extends BattleUpdate {
 
-    private final UUID analyticsBatchId = AnalyticsBatchUtils.generateAnalyticsBatchId();
 
     private final List<AnalyticsBatchUtils.AnalyticsData> analytics = new ArrayList<>();
 
@@ -31,8 +29,9 @@ public class ManualAnalyticsBatch extends BattleUpdate {
     }
 
     @Override
-    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session) {
-        pendingAnalytics.addAll(AnalyticsBatchUtils.getTransactions(session, analyticsBatchId, analytics));
+    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session,long serverSessionId,long batchId) {
+
+        pendingAnalytics.addAll(AnalyticsBatchUtils.getTransactions(session,serverSessionId,batchId, analytics));
 
         return true;
     }

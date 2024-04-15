@@ -147,12 +147,12 @@ public class BattleUpdate extends RecoverableObject {
             currencies.put(entry.getKey(),entry.getValue().getAsInt());
         });
     }
-    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session){
+    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session,long serverSessionId,long batchId){
         return true;
     }
 
-    public boolean update(ApplicationPreSetup applicationPreSetup, Session session){
-        return runUpdate(applicationPreSetup, session);
+    public boolean update(ApplicationPreSetup applicationPreSetup, Session session,long serverSessionId,long batchId){
+        return runUpdate(applicationPreSetup, session,serverSessionId,batchId);
     }
 
     public void publishAnalytics(TokenValidatorProvider.AuthVendor webhook,String query){

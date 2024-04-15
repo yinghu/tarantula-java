@@ -144,23 +144,6 @@ public class GameServerEventHandler extends AbstractRequestHandler {
             }
             exchange.onEvent(new ResponsiveEvent("",0,resp.toString().getBytes(),true));
         }
-        //PENDING CODE REMOVAL
-        else if(action.equals("onAction")) {
-            String suggestedTypeId = exchange.header(Session.TARANTULA_TYPE_ID);
-            JsonObject resp = new JsonObject();
-            resp.addProperty("typeId", suggestedTypeId);
-            resp.addProperty("successful", true);
-
-            var event = new ResponsiveEvent("",0,resp.toString().getBytes(),true);
-            exchange.onEvent(event);
-            if(suggestedTypeId.equals(gameCluster.typeId())){
-                event.typeId(suggestedTypeId);
-                event.property(OnAccess.TYPE_ID, "onAction");
-                event.property(OnAccess.PAYLOAD, _payload);
-                this.deploymentServiceProvider.onGameClusterEvent(event);
-            }
-        }
-        //END OF PENDING CODE REMOVAL
     }
 
     @Override

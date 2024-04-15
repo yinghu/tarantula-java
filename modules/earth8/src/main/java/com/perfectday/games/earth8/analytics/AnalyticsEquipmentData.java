@@ -2,7 +2,7 @@ package com.perfectday.games.earth8.analytics;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.util.JsonUtil;
-import com.perfectday.games.earth8.BattleUpdate;
+
 
 public class AnalyticsEquipmentData {
     public String EquipmentName;

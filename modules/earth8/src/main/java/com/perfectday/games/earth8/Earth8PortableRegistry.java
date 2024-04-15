@@ -2,6 +2,8 @@ package com.perfectday.games.earth8;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.AbstractRecoverableListener;
+import com.perfectday.games.earth8.analytics.ServerConnectTransaction;
+import com.perfectday.games.earth8.data.PlayerDataTrack;
 import com.perfectday.games.earth8.inbox.PlayerAction;
 
 
@@ -38,7 +40,8 @@ public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecov
 
     public static final int MANUAL_ANALYTICS_BATCH_CID = 18;
 
-    public static final int PLAYER_TOURNAMENT_TRACK_CID = 19;
+    public static final int PLAYER_DATA_TRACK_CID = 19;
+
 
     public static Earth8PortableRegistry INS;
 
@@ -94,6 +97,10 @@ public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecov
                 break;
             case CURRENCY_UPDATE_CID:
                 pt = new CurrencyUpdate();
+                break;
+
+            case PLAYER_DATA_TRACK_CID:
+                pt = new PlayerDataTrack();
                 break;
 
             default:
