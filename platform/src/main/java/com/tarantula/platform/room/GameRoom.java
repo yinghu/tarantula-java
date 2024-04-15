@@ -43,23 +43,4 @@ public interface GameRoom extends Room,Resettable,DataStore.Updatable {
         void team(int team);
         void occupied(boolean occupied);
     }
-
-    static GameRoom newGameRoom(String type,int roomCapacity){
-        GameRoom gameRoom = null;
-        switch (type){
-            case GameZone.PLAY_MODE_PVE:
-                gameRoom = new PVEGameRoom();
-                break;
-            case GameZone.PLAY_MODE_PVP:
-                gameRoom = new PVPGameRoom(roomCapacity);
-                break;
-            case GameZone.PLAY_MODE_TVE:
-                gameRoom = new TVEGameRoom(roomCapacity);
-                break;
-            case GameZone.PLAY_MODE_TVT:
-                gameRoom = new TVTGameRoom(roomCapacity);
-                break;
-        }
-        return gameRoom;
-    }
 }

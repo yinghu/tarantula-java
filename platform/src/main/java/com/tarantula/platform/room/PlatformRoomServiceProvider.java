@@ -186,7 +186,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         index.maxRoomPoolSize = new AtomicInteger(maxRoomPoolSizePerNode);
         if(dedicated) {
             index.pendingConnections = new LinkedBlockingDeque<>(maxDedicatedServerConnections);
-            index.gameRoom = this.newGameRoom(gameZone.playMode(),gameZone.capacity());
+            index.gameRoom = new GameRoomHeader(gameZone.capacity());
             index.gameRoom.setup(gameServiceProvider.gameServiceProvider(),gameZone,dedicated);
             logger.warn("Initializing push channels ["+minRoomPoolSizePerNode+"]["+dedicated+"]");
         }
@@ -412,9 +412,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         });
     }
 
-    private GameRoom newGameRoom(String type,int roomCapacity){
-        return GameRoom.newGameRoom(type,roomCapacity);
-    }
+
 
     private GameZoneIndex gameZoneIndex(String configurationName){
         GameZoneIndex[] gameZone ={null};
@@ -437,7 +435,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     private GameRoom loadGameRoom(GameZoneIndex zoneIndex,long roomId){
         return gameRoomIndex.computeIfAbsent(roomId,(k)->{
-            GameRoom gameRoom = this.newGameRoom(zoneIndex.gameZone.playMode(),zoneIndex.gameZone.capacity());
+            GameRoom gameRoom = new GameRoomHeader(zoneIndex.gameZone.capacity());
             gameRoom.distributionId(roomId);
             if(!this.dataStore.load(gameRoom)) return null;
             gameRoom.dataStore(this.dataStore);
@@ -454,7 +452,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             return null;
         }
         GameZone gameZone = zoneIndex.gameZone;
-        GameRoom gameRoom = this.newGameRoom(gameZone.playMode(),gameZone.capacity());
+        GameRoom gameRoom = new GameRoomHeader(gameZone.capacity());
         gameRoom.ownerKey(SnowflakeKey.from(zoneIndex.gameZone.distributionId()));
         if(!this.dataStore.create(gameRoom)) return null;
         gameRoom.dataStore(this.dataStore);
