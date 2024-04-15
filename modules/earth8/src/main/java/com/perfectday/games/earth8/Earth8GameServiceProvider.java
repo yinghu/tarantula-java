@@ -103,7 +103,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             if (update.score > 0 && update.playerLevel > 0) {
                 DataStore tournamentTrackDataStore = applicationPreSetup.onDataStore("player_tournament_track");
                 var playerDataTracks = tournamentTrackDataStore.list(new PlayerDataTrackQuery(session.distributionId()));
-                PlayerDataTrack playerDataTrack = getActiveDataTrack(playerDataTracks);
+                PlayerDataTrack playerDataTrack = getActiveDataTrack(playerDataTracks, PlayerDataTrack.Type.Tournament);
 
                 if(playerDataTracks.isEmpty() || playerDataTrack == null){
                     scoreTournamentWithSameLevel(session, update, tournamentTrackDataStore);
@@ -311,9 +311,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         return false;
     }
 
-    private PlayerDataTrack getActiveDataTrack(List<PlayerDataTrack> tracks) {
+    private PlayerDataTrack getActiveDataTrack(List<PlayerDataTrack> tracks, PlayerDataTrack.Type trackType) {
         for (var track : tracks) {
-            if (track.trackId > 0) {
+            if (track.trackId > 0 && track.trackType == trackType) {
                 return track;
             }
         }
