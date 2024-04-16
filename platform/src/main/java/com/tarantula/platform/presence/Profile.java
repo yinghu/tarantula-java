@@ -15,6 +15,25 @@ public class Profile extends RecoverableObject implements Configurable {
     public int iconIndex;
     private JsonObject payload = new JsonObject();
 
+    public Profile(){
+        this.onEdge = true;
+        this.label = LABEL;
+    }
+
+    @Override
+    public boolean write(DataBuffer buffer) {
+        buffer.writeUTF8(displayName);
+        buffer.writeInt(iconIndex);
+        return true;
+    }
+
+    @Override
+    public boolean read(DataBuffer buffer) {
+        displayName = buffer.readUTF8();
+        iconIndex = buffer.readInt();
+        return true;
+    }
+
     @Override
     public int getFactoryId() {
         return PresencePortableRegistry.OID;
@@ -39,13 +58,10 @@ public class Profile extends RecoverableObject implements Configurable {
         this.payload = JsonUtil.parse((String)properties.getOrDefault("3","{}"));
     }
 
-    @Override
-    public Key key(){
-        return new AssociateKey(this.distributionId, "profile");
-    }
+
 
     @Override
-    public boolean configure(byte[] data) {
+    public boolean configureAndValidate(byte[] data) {
         JsonObject config = JsonUtil.parse(data);
         if(config.has("DisplayName")){
             displayName = config.get("DisplayName").getAsString();
@@ -53,13 +69,10 @@ public class Profile extends RecoverableObject implements Configurable {
         if(config.has("IconIndex")){
             iconIndex = config.get("IconIndex").getAsInt();
         }
-    }
-    @Override
-    public boolean configureAndValidate(JsonObject data) {
-        this.payload = data;
-        this.dataStore.update(this);
+
         return true;
     }
+
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("DisplayName",displayName);

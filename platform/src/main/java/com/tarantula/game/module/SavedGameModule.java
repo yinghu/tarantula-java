@@ -52,9 +52,9 @@ public class SavedGameModule extends ModuleHeader {
             session.write(presenceServiceProvider.getProfilePayload(session.name()).toJson().toString().getBytes());
         }
         else if(session.action().equals("onUpdateProfile")){
-            boolean sucessfull = gameServiceProvider.presenceServiceProvider().createProfile(session);
+            boolean successful = gameServiceProvider.presenceServiceProvider().createProfile(session);
 
-            session.write(JsonUtil.toSimpleResponse(sucessfull,"create player profile").getBytes());
+            session.write(JsonUtil.toSimpleResponse(successful,"create player profile").getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action());

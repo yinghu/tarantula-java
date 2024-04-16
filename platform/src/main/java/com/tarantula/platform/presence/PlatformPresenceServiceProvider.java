@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.protocol.GameContext;
 import com.icodesoftware.protocol.statistics.UserStatistics;
 import com.icodesoftware.service.ServiceContext;
 
@@ -28,6 +29,7 @@ import com.tarantula.platform.util.RecoverableQuery;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -120,8 +122,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         if(playerProfile.isEmpty()){
             Profile profile = new Profile();
 
-            profile.distributionKey(Long.toString(session.distributionId()));
-            profile.configure(session.payload());
+            profile.configureAndValidate(session.payload());
             profile.ownerKey(SnowflakeKey.from(session.distributionId()));
 
             return profileDataStore.create(profile);
@@ -132,6 +133,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
 
     public ProfilePayload getProfilePayload(String IDs){
         String[] playerIDs = IDs.split("#");
+
         List<Profile> playerProfiles = new ArrayList<>();
         DataStore profileDataStore = applicationPreSetup.onDataStore("profile");
 
