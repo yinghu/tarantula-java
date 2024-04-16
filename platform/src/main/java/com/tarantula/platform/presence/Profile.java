@@ -4,9 +4,6 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
-import com.tarantula.platform.AssociateKey;
-
-import java.util.Map;
 
 public class Profile extends RecoverableObject implements Configurable {
 

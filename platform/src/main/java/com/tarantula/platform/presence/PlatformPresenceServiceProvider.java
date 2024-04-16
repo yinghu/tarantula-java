@@ -5,16 +5,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.protocol.GameContext;
 import com.icodesoftware.protocol.statistics.UserStatistics;
 import com.icodesoftware.service.ServiceContext;
 
-import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.ScheduleRunner;
-import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
-import com.perfectday.games.earth8.data.PlayerDataTrack;
-import com.perfectday.games.earth8.data.PlayerDataTrackQuery;
 import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.game.GameRating;
 
@@ -29,7 +24,6 @@ import com.tarantula.platform.util.RecoverableQuery;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
