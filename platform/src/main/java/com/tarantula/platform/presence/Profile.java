@@ -13,10 +13,9 @@ public class Profile extends RecoverableObject implements Configurable {
     public static final String LABEL = "profile";
     public String displayName;
     public int iconIndex;
-    private JsonObject payload = new JsonObject();
 
     public Profile(){
-        this.onEdge = true;
+        this.onEdge = false;
         this.label = LABEL;
     }
 
@@ -43,22 +42,6 @@ public class Profile extends RecoverableObject implements Configurable {
     public int getClassId() {
         return PresencePortableRegistry.PROFILE_CID;
     }
-
-    @Override
-    public Map<String,Object> toMap(){
-        this.properties.put("1",displayName);
-        this.properties.put("2", iconIndex);
-        this.properties.put("3",payload.toString());
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        this.displayName = (String)properties.getOrDefault("1","");
-        this.iconIndex = (int)properties.getOrDefault("2","");
-        this.payload = JsonUtil.parse((String)properties.getOrDefault("3","{}"));
-    }
-
-
 
     @Override
     public boolean configureAndValidate(byte[] data) {

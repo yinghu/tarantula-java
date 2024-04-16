@@ -117,18 +117,13 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     public boolean createProfile(Session session){
 
         DataStore profileDataStore = applicationPreSetup.onDataStore("profile");
-        var playerProfile = profileDataStore.list(new ProfileQuery(session.distributionId()));
 
-        if(playerProfile.isEmpty()){
-            Profile profile = new Profile();
+        Profile profile = new Profile();
 
-            profile.configureAndValidate(session.payload());
-            profile.ownerKey(SnowflakeKey.from(session.distributionId()));
+        profile.configureAndValidate(session.payload());
+        profile.distributionId(session.distributionId());
 
-            return profileDataStore.create(profile);
-        }
-
-        return false;
+        return profileDataStore.createIfAbsent(profile, false); //TODO: Loading = false?
     }
 
     public ProfilePayload getProfilePayload(String IDs){
@@ -138,15 +133,14 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         DataStore profileDataStore = applicationPreSetup.onDataStore("profile");
 
         for(String ID: playerIDs){
-            var playerProfileList = profileDataStore.list(new ProfileQuery(Long.parseLong(ID)));
+            Profile profileLoaded = new Profile();
+            profileLoaded.distributionId(Long.parseLong(ID));
+            profileDataStore.load(profileLoaded);
 
-            if(!playerProfileList.isEmpty()){
-                playerProfiles.add(playerProfileList.get(0));
-            }
+            playerProfiles.add(profileLoaded);
         }
 
         return new ProfilePayload(playerProfiles);
-
     }
 
     public GameRating rating(Session session){
