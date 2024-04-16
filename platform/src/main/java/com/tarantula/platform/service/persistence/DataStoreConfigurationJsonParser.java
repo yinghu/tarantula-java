@@ -1,9 +1,7 @@
 package com.tarantula.platform.service.persistence;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.icodesoftware.Configuration;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.ServiceContext;
@@ -25,7 +23,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
     private String dataStoreProviderConfiguration;
     private String dataDir;
 
-    private int partitionNumber;
+    //private int partitionNumber;
 
     private int storeSizeMb;
 
@@ -47,7 +45,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         this.node = tx.node();
         this.dataBucketGroup = node.bucketName();
         this.dataBucketNode = node.nodeName();
-        this.partitionNumber = node.partitionNumber();//tx.platformRoutingNumber;
+        //this.partitionNumber = node.bucketNumber();//tx.platformRoutingNumber;
         this.dataDir = node.dataStoreDirectory();//tx.dataStoreDir;
         this.dataStoreDailyBackup = node.dailyBackupEnabled();//tx.dataStoreDailyBackup;
         this.serviceContext = tx;
@@ -63,7 +61,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         properties.put("name",name.trim());
         properties.put("bucket",this.dataBucketGroup);
         properties.put("node",this.dataBucketNode);
-        properties.put("partitionNumber",this.partitionNumber);
+        //properties.put("partitionNumber",this.partitionNumber);
         properties.put("storeSizeMb",this.storeSizeMb);
         properties.put("envNoSyncFlag",envNoSyncFlag);
         properties.put("dir",this.dataDir);

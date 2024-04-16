@@ -198,7 +198,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(this.applicationSchedulingPoolSetting);
         this.httpClientProvider = new HttpCaller();
         this.httpClientProvider.start();
-        this.node = new ClusterNode(this.dataBucketGroup,this.dataBucketNode,this.platformRoutingNumber);
+        this.node = new ClusterNode(this.dataBucketGroup,this.dataBucketNode,this.accessIndexRoutingNumber,this.platformRoutingNumber);
         this.node.clusterNameSuffix = this.clusterNameSuffix;
         this.node.deployDirectory = this.deployDir;
         this.node.servicePushAddress = this.servicePushAddress;

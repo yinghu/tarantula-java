@@ -100,10 +100,20 @@ public class GameRoomHeader extends RecoverableObject implements GameRoom {
         this.onEdge = true;
         this.label = LABEL;
     }
-
     public GameRoomHeader(int capacity){
         this();
         this.capacity = capacity;
+        this.entries = new Entry[capacity];
+    }
+    public GameRoomHeader(GameZone gameZone,boolean dedicated,int bucket){
+        this();
+        this.capacity = gameZone.capacity();
+        this.duration = gameZone.roundDuration();
+        this.overtime = gameZone.roundOvertime();
+        this.joinsOnStart = gameZone.joinsOnStart();
+        this.dedicated = dedicated;
+        this.bucket = bucket;
+        this.zoneId = gameZone.distributionId();
         this.entries = new Entry[capacity];
     }
 
@@ -140,11 +150,23 @@ public class GameRoomHeader extends RecoverableObject implements GameRoom {
     @Override
     public boolean read(DataBuffer buffer){
         this.capacity = buffer.readInt();
+        this.bucket = buffer.readInt();
+        this.joinsOnStart = buffer.readInt();
+        this.duration = buffer.readLong();
+        this.overtime = buffer.readLong();
+        this.dedicated = buffer.readBoolean();
+        this.zoneId = buffer.readLong();
         return true;
     }
     @Override
     public boolean write(DataBuffer buffer) {
         buffer.writeInt(capacity);
+        buffer.writeInt(bucket);
+        buffer.writeInt(joinsOnStart);
+        buffer.writeLong(duration);
+        buffer.writeLong(overtime);
+        buffer.writeBoolean(dedicated);
+        buffer.writeLong(zoneId);
         return true;
     }
     @Override

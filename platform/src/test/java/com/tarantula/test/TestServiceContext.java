@@ -24,7 +24,7 @@ public class TestServiceContext implements ServiceContext {
     DataStoreProvider.DistributionIdGenerator distributionIdGenerator;
     public TestServiceContext(DataStoreProvider.DistributionIdGenerator distributionIdGenerator){
         this.distributionIdGenerator = distributionIdGenerator;
-        this.node = new ClusterNode("BSD","T01",31);
+        this.node = new ClusterNode("BSD","T01",271,31);
         this.node.clusterNameSuffix = "test";
         this.node.nodeId = 100;
         this.node.bucketId = 200;

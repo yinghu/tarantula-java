@@ -24,7 +24,7 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     public long deploymentId;
     public String clusterNameSuffix;
     public int partitionNumber;
-
+    public int bucketNumber;
     public String deployDirectory;
     public String servicePushAddress;
 
@@ -34,16 +34,17 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     public String dataStoreDirectory;
 
 
-    public ClusterNode(String bucketName, String nodeName,int partitionNumber){
+    public ClusterNode(String bucketName, String nodeName,int partitionNumber,int bucketNumber){
         this.bucketName = bucketName;
         this.nodeName = nodeName;
         this.partitionNumber = partitionNumber;
+        this.bucketNumber = bucketNumber;
     }
     public ClusterNode(){
     }
 
     public String toString(){
-        return "Bucket ["+bucketName+"] On Node ["+nodeName+"]";
+        return "Bucket Name ["+bucketName+"] On Node ["+nodeName+"] partitions ["+partitionNumber+"] buckets ["+bucketNumber+"]";
     }
 
     @Override
@@ -88,7 +89,9 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     public int partitionNumber(){
         return partitionNumber;
     }
-
+    public int bucketNumber(){
+        return bucketNumber;
+    }
     public String clusterNameSuffix(){
         return this.clusterNameSuffix;
     }
@@ -127,6 +130,7 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         buffer.writeUTF8(clusterNameSuffix);
         buffer.writeLong(deploymentId);
         buffer.writeInt(partitionNumber);
+        buffer.writeInt(bucketNumber);
         return buffer.array();
     }
 
@@ -143,6 +147,7 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         this.clusterNameSuffix =buffer.readUTF8();
         this.deploymentId = buffer.readLong();
         this.partitionNumber = buffer.readInt();
+        this.bucketNumber = buffer.readInt();
     }
 
     private JsonObject _toJson(boolean toWeb){
@@ -155,6 +160,7 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         jsonObject.addProperty("address",address);
         jsonObject.addProperty("clusterNameSuffix",clusterNameSuffix);
         jsonObject.addProperty("partitionNumber",partitionNumber);
+        jsonObject.addProperty("bucketNumber",bucketNumber);
         jsonObject.addProperty("deploymentId","A_"+deploymentId);
         if(toWeb){
             jsonObject.addProperty("startTime",TimeUtil.fromUTCMilliseconds(startTime).format(DateTimeFormatter.ISO_DATE_TIME));

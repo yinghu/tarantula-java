@@ -93,7 +93,7 @@ public interface ClusterProvider extends ServiceProvider {
         long deploymentId();
 
         int partitionNumber();
-
+        int bucketNumber();
         String clusterNameSuffix();
 
         String deployDirectory();

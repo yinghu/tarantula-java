@@ -388,8 +388,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         String memberId = mEvent.getMember().getUuid();
         String[] node = mEvent.getMember().getStringAttribute("node").split("#");
         log.warn("Member ["+memberId+"] left from node ["+node[0]+":"+node[1]+"]");
-        ClusterNode removed = new ClusterNode("",node[0],tarantulaContext.platformRoutingNumber);
-        //nList.forEach(nodeListener -> nodeListener.nodeRemoved(removed));
+        ClusterNode removed = new ClusterNode("",node[0], tarantulaContext.accessIndexRoutingNumber,tarantulaContext.platformRoutingNumber);
         this.summary.unregister(removed);
         this.vMap.remove(BufferUtil.toArray(ByteBuffer.allocate(8).putLong(Long.parseLong(node[1])).flip()));//remove nodeId = > node
         this.vMap.remove(memberId.getBytes()); //remove member =>  nodeId

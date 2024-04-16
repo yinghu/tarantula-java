@@ -36,6 +36,10 @@ public class TestNode implements ClusterProvider.Node {
 
     }
 
+    public int bucketNumber(){
+        return 1;
+    }
+
     @Override
     public int scope() {
         return 0;
