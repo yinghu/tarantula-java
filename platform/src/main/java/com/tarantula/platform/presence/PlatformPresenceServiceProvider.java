@@ -102,12 +102,41 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     public Profile profile(String systemId){
         Profile profile = new Profile();
         profile.displayName ="player";
-        profile.iconUrl = "resource/portrait.png";
         profile.distributionKey(systemId);
         this.dataStore.createIfAbsent(profile,true);
         profile.dataStore(this.dataStore);
         return profile;
     }
+
+    public boolean createProfile(Session session){
+
+        DataStore profileDataStore = applicationPreSetup.onDataStore("profile");
+
+        Profile profile = new Profile();
+
+        if(!profile.configureAndValidate(session.payload())) return false;
+        profile.distributionId(session.distributionId());
+
+        return profileDataStore.createIfAbsent(profile, false);
+    }
+
+    public ProfilePayload getProfilePayload(String IDs){
+        String[] playerIDs = IDs.split("#");
+
+        List<Profile> playerProfiles = new ArrayList<>();
+        DataStore profileDataStore = applicationPreSetup.onDataStore("profile");
+
+        for(String ID: playerIDs){
+            Profile profileLoaded = new Profile();
+            profileLoaded.distributionId(Long.parseLong(ID));
+            if(!profileDataStore.load(profileLoaded)) continue;
+
+            playerProfiles.add(profileLoaded);
+        }
+
+        return new ProfilePayload(playerProfiles);
+    }
+
     public GameRating rating(Session session){
         GameRating[] loaded  = {new GameRating()};
         CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);

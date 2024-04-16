@@ -4,15 +4,31 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
-import com.tarantula.platform.AssociateKey;
-
-import java.util.Map;
 
 public class Profile extends RecoverableObject implements Configurable {
 
+    public static final String LABEL = "profile";
     public String displayName;
-    public String iconUrl;
-    private JsonObject payload = new JsonObject();
+    public int iconIndex;
+
+    public Profile(){
+        this.onEdge = false;
+        this.label = LABEL;
+    }
+
+    @Override
+    public boolean write(DataBuffer buffer) {
+        buffer.writeUTF8(displayName);
+        buffer.writeInt(iconIndex);
+        return true;
+    }
+
+    @Override
+    public boolean read(DataBuffer buffer) {
+        displayName = buffer.readUTF8();
+        iconIndex = buffer.readInt();
+        return true;
+    }
 
     @Override
     public int getFactoryId() {
@@ -25,50 +41,18 @@ public class Profile extends RecoverableObject implements Configurable {
     }
 
     @Override
-    public Map<String,Object> toMap(){
-        this.properties.put("1",displayName);
-        this.properties.put("2",iconUrl);
-        this.properties.put("3",payload.toString());
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        this.displayName = (String)properties.getOrDefault("1","");
-        this.iconUrl = (String)properties.getOrDefault("2","");
-        this.payload = JsonUtil.parse((String)properties.getOrDefault("3","{}"));
-    }
-
-    @Override
-    public Key key(){
-        return new AssociateKey(this.distributionId, "profile");
-    }
-
-    @Override
     public boolean configureAndValidate(byte[] data) {
         JsonObject config = JsonUtil.parse(data);
-        if(config.has("displayName")){
-            displayName = config.get("displayName").getAsString();
-        }
-        if(config.has("iconUrl")){
-            iconUrl = config.get("iconUrl").getAsString();
-        }
-        if(config.has("payload")){
-            return configureAndValidate(config.getAsJsonObject("payload"));
-        }
-        else{
-            return configureAndValidate(config);
-        }
-    }
-    @Override
-    public boolean configureAndValidate(JsonObject data) {
-        this.payload = data;
-        this.dataStore.update(this);
+        if(!config.has("DisplayName") || !config.has("IconIndex")) return false;
+        displayName = config.get("DisplayName").getAsString();
+        iconIndex = config.get("IconIndex").getAsInt();
         return true;
     }
+
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("DisplayName",displayName);
-        jsonObject.addProperty("IconUrl",iconUrl);
+        jsonObject.addProperty("IconIndex", iconIndex);
         return jsonObject;
     }
 
