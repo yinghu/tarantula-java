@@ -19,7 +19,7 @@ public interface GameRoom extends Room,Resettable,DataStore.Updatable {
     void setup(Channel channel);
 
     //Distributed Methods
-    GameRoom join(Session session);
+    GameRoom join(Session session,RoomStub roomStub);
     GameRoom view();
     void leave(Session session);
     void load();

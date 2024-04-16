@@ -158,10 +158,16 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         return gameZoneIndex.get(zoneId).gameZone;
     }
 
-    public GameRoom join(Stub rating, GameZone gameZone){
+    public GameRoom join(Stub stub, GameZone gameZone){
         GameZoneIndex index = gameZoneIndex.get(gameZone.distributionId());
-        GameRoom gameRoom = dedicated?remoteJoin(index):localJoin(rating,index);
-        return gameRoom;
+        if(dedicated) return remoteJoin(index);
+        RoomStub roomStub = index.pendingRoomStubs.poll();
+        if(roomStub==null){
+            logger.warn("No Stub Available Now");
+            return null;
+        }
+        GameRoom gameRoom = gameRoomIndex.get(roomStub.roomId);
+        return gameRoom.join(stub,roomStub);
     }
 
     public void leave(Stub stub){
@@ -174,7 +180,12 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 channel.close();
             }
         }
-        localLeave(stub,index,stub.roomId);
+        GameRoom gameRoom = loadGameRoom(index,stub.roomId);
+        if(gameRoom==null) {
+            logger.warn("Room Missed->"+index.gameZone.distributionKey()+">>"+stub.roomId);
+            return;
+        }
+        gameRoom.leave(stub);
     }
 
     @Override
@@ -476,28 +487,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         room.setup(udpEndpoint.createChannels(index.gameZone.capacity()));
     }
 
-    private void localLeave(Session session, GameZoneIndex index,long roomId){
-        GameRoom gameRoom = loadGameRoom(index,roomId);
-        if(gameRoom==null) {
-            logger.warn("Room Missed->"+index.gameZone.distributionKey()+">>"+roomId);
-            return;
-        }
-        gameRoom.leave(session);
-    }
-
-    private GameRoom joinGameRoom(GameZoneIndex index, GameRoom gameRoom, Stub stub){
-        GameRoom joined = gameRoom.join(stub);
-        return joined;
-    }
-    private GameRoom localJoin(Stub stub, GameZoneIndex index){
-        RoomStub roomStub = index.pendingRoomStubs.poll();
-        if(roomStub==null){
-            logger.warn("No Stub Available Now");
-            return null;
-        }
-        GameRoom gameRoom = gameRoomIndex.get(roomStub.roomId);
-        return joinGameRoom(index,gameRoom,stub);
-    }
 
     private GameRoom remoteJoin(GameZoneIndex gameZoneIndex){
         GameZone gameZone = gameZoneIndex.gameZone;

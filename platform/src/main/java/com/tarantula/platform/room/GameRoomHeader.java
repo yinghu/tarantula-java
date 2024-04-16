@@ -172,7 +172,7 @@ public class GameRoomHeader extends RecoverableObject implements GameRoom {
         return jsonObject;
     }
 
-    public GameRoom join(Session session){
+    public GameRoom join(Session session,RoomStub roomStub){
         Entry entry = null;
         synchronized (entries){
             for(int i=0;i<capacity;i++){
