@@ -1,5 +1,6 @@
 package com.tarantula.test;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.DataStore;
 import com.tarantula.platform.presence.Profile;
 import org.testng.Assert;
@@ -14,9 +15,16 @@ public class ProfileTest extends DataStoreHook{
         long presenceId = serviceContext.distributionId();
 
         Profile profile = new Profile();
+        JsonObject payload = new JsonObject();
+        //cover configureAndValidate
+        Assert.assertFalse(profile.configureAndValidate(payload.toString().getBytes()));
 
-        profile.displayName = "Erik-Test";
-        profile.iconIndex = 1;
+        payload.addProperty("DisplayName","Erik-Test");
+        Assert.assertFalse(profile.configureAndValidate(payload.toString().getBytes()));
+
+        payload.addProperty("IconIndex",1);
+        Assert.assertTrue(profile.configureAndValidate(payload.toString().getBytes()));
+
         profile.distributionId(presenceId);
 
         Assert.assertTrue(dataStore.createIfAbsent(profile, false));
@@ -28,5 +36,8 @@ public class ProfileTest extends DataStoreHook{
 
         Assert.assertEquals(profileLoaded.displayName, "Erik-Test");
         Assert.assertEquals(profileLoaded.iconIndex, 1);
+
+        //cover toJson
+        Assert.assertEquals(payload.toString(),profileLoaded.toJson().toString());
     }
 }

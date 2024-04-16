@@ -114,10 +114,10 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
 
         Profile profile = new Profile();
 
-        profile.configureAndValidate(session.payload());
+        if(!profile.configureAndValidate(session.payload())) return false;
         profile.distributionId(session.distributionId());
 
-        return profileDataStore.createIfAbsent(profile, false); //TODO: Loading = false?
+        return profileDataStore.createIfAbsent(profile, false);
     }
 
     public ProfilePayload getProfilePayload(String IDs){
@@ -129,7 +129,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         for(String ID: playerIDs){
             Profile profileLoaded = new Profile();
             profileLoaded.distributionId(Long.parseLong(ID));
-            profileDataStore.load(profileLoaded);
+            if(!profileDataStore.load(profileLoaded)) continue;
 
             playerProfiles.add(profileLoaded);
         }
