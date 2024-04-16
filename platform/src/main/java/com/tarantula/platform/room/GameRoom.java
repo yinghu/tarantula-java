@@ -3,6 +3,7 @@ package com.tarantula.platform.room;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
 import com.tarantula.game.GameZone;
+import com.tarantula.game.Stub;
 
 
 public interface GameRoom extends Room,Resettable,DataStore.Updatable {
@@ -21,7 +22,7 @@ public interface GameRoom extends Room,Resettable,DataStore.Updatable {
     //Distributed Methods
     GameRoom join(Session session,RoomStub roomStub);
     GameRoom view();
-    void leave(Session session);
+    void leave(Stub stub);
     void load();
     boolean dedicated();
     long zoneId();

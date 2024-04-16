@@ -11,7 +11,7 @@ public interface GameLobby extends Configurable, Serviceable {
 
 
     Stub join(Session session);
-    boolean leave(Session session);
+    void leave(Session session);
 
     void validate(Session session);
 

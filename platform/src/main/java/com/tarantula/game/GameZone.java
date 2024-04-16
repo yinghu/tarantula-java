@@ -36,9 +36,7 @@ public interface GameZone extends Configurable{
 
     interface RoomProxy{
         Stub join(Session session);
-
         boolean leave(Stub stub);
         void setup(ApplicationContext applicationContext,GameLobby gameLobby,GameZone gameZone);
-        void close();
     }
 }

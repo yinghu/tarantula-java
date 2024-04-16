@@ -24,9 +24,4 @@ abstract public class RoomProxyHeader implements GameZone.RoomProxy {
         this.dataStore = gameZone.dataStore();
     }
 
-    public void close(){
-
-    }
-
-
 }

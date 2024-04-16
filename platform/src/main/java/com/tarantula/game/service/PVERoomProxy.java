@@ -16,6 +16,7 @@ public class PVERoomProxy extends RoomProxyHeader {
         GameRoom room = this.gameServiceProvider.roomServiceProvider().join(stub,gameZone);
         stub.joined(room!=null);
         if(!stub.joined()) return stub;
+        
         stub.room = room;
         stub.roomId = stub.room.roomId();
         stub.zone = gameZone;

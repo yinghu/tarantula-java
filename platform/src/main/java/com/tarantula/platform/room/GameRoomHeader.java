@@ -12,10 +12,10 @@ import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.game.GameArena;
 import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.game.GameZone;
+import com.tarantula.game.Stub;
 
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class GameRoomHeader extends RecoverableObject implements GameRoom {
 
@@ -35,7 +35,7 @@ public class GameRoomHeader extends RecoverableObject implements GameRoom {
     protected GameArena arena;
     protected long zoneId;
     protected int bucket;
-    protected ConcurrentHashMap<Long,Entry> joinIndex;
+
     protected Entry[] entries;
 
     private GameServiceProvider gameModule;
@@ -104,7 +104,6 @@ public class GameRoomHeader extends RecoverableObject implements GameRoom {
     public GameRoomHeader(int capacity){
         this();
         this.capacity = capacity;
-        this.joinIndex = new ConcurrentHashMap<>(capacity);
         this.entries = new Entry[capacity];
     }
 
@@ -192,7 +191,7 @@ public class GameRoomHeader extends RecoverableObject implements GameRoom {
         return view();
     }
 
-    public void leave(Session session){
+    public void leave(Stub session){
         Entry entry = null;
         synchronized (entries){
             for(int i=0;i<capacity;i++){
@@ -218,7 +217,6 @@ public class GameRoomHeader extends RecoverableObject implements GameRoom {
 
     public void reset(){
         if(pendingChannels!=null) pendingChannels.clear();
-        joinIndex.clear();
         for(int i=0;i<capacity;i++){
             entries[i].reset();
             this.dataStore.update(entries[i]);
@@ -262,7 +260,7 @@ public class GameRoomHeader extends RecoverableObject implements GameRoom {
     }
     @Override
     public int getClassId() {
-        return GamePortableRegistry.PVE_ROOM_CID;
+        return GamePortableRegistry.GAME_ROOM_CID;
     }
 
 }

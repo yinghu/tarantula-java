@@ -7,6 +7,7 @@ import com.icodesoftware.protocol.Room;
 import com.icodesoftware.util.SnowflakeKey;
 
 import com.tarantula.game.SimpleStub;
+import com.tarantula.game.Stub;
 import com.tarantula.platform.room.*;
 
 import org.testng.Assert;
@@ -44,7 +45,10 @@ public class GameRoomTest extends DataStoreHook{
         rooms.get(0).dataStore(dataStore);
         rooms.get(0).load();
         Assert.assertEquals(rooms.get(0).table()[0].systemId(),100);
-        rooms.get(0).leave(stub);
+        Stub l = new Stub();
+        l.systemId(100);
+        l.stub(200);
+        rooms.get(0).leave(l);
         Assert.assertEquals(rooms.get(0).table()[0].systemId(),0);
 
     }

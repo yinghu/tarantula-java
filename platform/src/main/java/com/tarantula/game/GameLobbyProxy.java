@@ -31,13 +31,12 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     }
 
     @Override
-    public boolean leave(Session session) {
-        if(!started) return false;
+    public void leave(Session session) {
+        if(!started) return;
         Stub stub = gameServiceProvider.presenceServiceProvider().stub(session,application);
-        if(!stub.joined()) return false;
+        if(!stub.joined()) return;
         GameZone gameZone = this.gameServiceProvider.roomServiceProvider().gameZoneFromZoneId(stub.zoneId);
         gameZone.leave(stub);
-        return true;
     }
 
     public void validate(Session session){

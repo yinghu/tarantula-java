@@ -7,7 +7,6 @@ import com.tarantula.game.GameRating;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.event.SessionForward;
-import com.tarantula.platform.room.*;
 import com.tarantula.platform.service.AccessKey;
 import com.tarantula.platform.service.PresenceKey;
 import com.tarantula.platform.tournament.TournamentEntry;
@@ -56,10 +55,6 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
 
     public static final int TOURNAMENT_RACE_BOARD_CID = PortableEventRegistry.TOURNAMENT_RACE_BOARD_CID;
 
-    public static final int PVE_ROOM_CID = PortableEventRegistry.PVE_ROOM_CID;
-    public static final int PVP_ROOM_CID = PortableEventRegistry.PVP_ROOM_CID;
-    public static final int TVE_ROOM_CID = PortableEventRegistry.TVE_ROOM_CID;
-    public static final int TVT_ROOM_CID = PortableEventRegistry.TVT_ROOM_CID;
     public static final int CLIENT_CONNECTION_CID = PortableEventRegistry.CLIENT_CONNECTION_CID;
 
 
@@ -137,19 +132,6 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
                 break;
             case CLIENT_CONNECTION_CID:
                 _ins = new ClientConnection();
-                break;
-
-            case PVE_ROOM_CID:
-                _ins = new PVEGameRoom();
-                break;
-            case PVP_ROOM_CID:
-                _ins = new PVPGameRoom();
-                break;
-            case TVE_ROOM_CID:
-                _ins = new TVEGameRoom();
-                break;
-            case TVT_ROOM_CID:
-                _ins = new TVTGameRoom();
                 break;
             default:
                 throw new IllegalArgumentException("Not supported event type ["+cid+"]");
