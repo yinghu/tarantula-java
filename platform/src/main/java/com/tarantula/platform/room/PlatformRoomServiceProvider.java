@@ -367,7 +367,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 roomsClosed.add(v);
                 GameZoneIndex index = gameZoneIndex.get(v.zoneId());
                 if(index.rooms[v.bucket()].get()>0){
-                    logger.warn("CLOSE : "+v.bucket()+" : "+index.rooms[v.bucket()].get());
                     index.rooms[v.bucket()].set(0);
                 }
             }
@@ -378,12 +377,10 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         });
         logger.warn("Total room closed : "+roomsClosed.size());
         roomsClosed.clear();
-        logger.warn("Reload from opening buckets");
         HashMap<Integer,Boolean> bucketReload = new HashMap<>();
         gameZoneIndex.forEach((k,v)->{
             for(OnPartition onPartition : buckets){
                 if(onPartition.opening()&&v.rooms[onPartition.partition()].get()==0){
-                    logger.warn("REOPEN : "+onPartition.partition()+" : "+onPartition.opening());
                     bucketReload.put(onPartition.partition(),true);
                 }
                 else{
@@ -417,7 +414,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 serverClusterStore.mapUnlock(lockKey);
             }
             for(int i=0;i<serviceContext.node().bucketNumber();i++){
-                logger.warn("Rooms on bucket ["+v.rooms[i].get()+"] on ["+k+"]");
+                logger.warn("Rooms on bucket ["+v.rooms[i].get()+"] on ["+k+"]["+i+"]");
             }
         });
     }
