@@ -24,6 +24,7 @@ import com.tarantula.platform.event.GameClusterSyncEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -236,6 +237,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             GameRoom remove = gameRoomIndex.remove(roomId);
             closeGameRoom(remove);
         });
+
     }
 
 
@@ -369,9 +371,35 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             gameRoomIndex.remove(close.roomId());
             closeGameRoom(close);
         });
+        logger.warn("Total room closed : "+roomsClosed.size());
+        roomsClosed.clear();
+        logger.warn("Reload from opening buckets");
+        /**
         gameZoneIndex.forEach((k,v)->{
-
-        });
+            byte[] lockKey = BufferUtil.fromLong(v.gameZone.distributionId());
+            try{
+                serverClusterStore.mapLock(lockKey);
+                GameRoomQuery query = new GameRoomQuery(v.gameZone.distributionId());
+                this.dataStore.list(query).forEach(r->{
+                    if(buckets[r.bucket()].opening()){
+                        loadGameRoom(v,r);
+                        v.rooms[r.bucket()].incrementAndGet();
+                    }
+                });
+                for(int i=0; i<serviceContext.node().bucketNumber();i++){
+                    if(!buckets[i].opening()) continue;
+                    if(v.rooms[i].get() < minRoomPoolSizePerBucket){
+                        int remaining = minRoomPoolSizePerBucket - v.rooms[i].get();
+                        logger.warn("Creating game room on zone/bucket : "+v.gameZone.distributionId()+"/"+i+" : "+remaining);
+                        for(int j=0; j<remaining;j++){
+                            this.createGameRoom(v,i);
+                        }
+                    }
+                }
+            }finally {
+                serverClusterStore.mapUnlock(lockKey);
+            }
+        });**/
     }
 
 
@@ -466,7 +494,11 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         room.setup(udpEndpoint.createChannels(index.gameZone.capacity()));
     }
     private void closeGameRoom(GameRoom closed){
-        logger.warn("Room closed on bucket : "+closed.bucket());
+        GameZoneIndex index = gameZoneIndex.get(closed.zoneId());
+        for(int i=0;i<closed.capacity();i++){
+            RoomStub stub = new RoomStub(closed.distributionId(),i);
+            index.pendingRoomStubs.remove(stub);
+        }
         closed.close();
         udpEndpoint.releaseChannel(closed.channelId());
     }
