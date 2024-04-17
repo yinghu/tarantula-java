@@ -234,7 +234,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         });
         pendingReleased.forEach(roomId->{
             GameRoom remove = gameRoomIndex.remove(roomId);
-            remove.close();
+            closeGameRoom(remove);
         });
     }
 
@@ -357,20 +357,23 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public void onReload() {
-        for(OnPartition p : this.serviceContext.buckets()){
-            logger.warn("xBucket : "+p.partition()+" : "+p.opening());
-        }
+        if(!started) return;
+        OnPartition[] buckets = this.serviceContext.buckets();
+        ArrayList<GameRoom> roomsClosed = new ArrayList<>();
+        gameRoomIndex.forEach((k,v)->{
+            if(!buckets[v.bucket()].opening()){
+                roomsClosed.add(v);
+            }
+        });
+        roomsClosed.forEach(close->{
+            gameRoomIndex.remove(close.roomId());
+            closeGameRoom(close);
+        });
+        gameZoneIndex.forEach((k,v)->{
+
+        });
     }
-    @Override
-    public void onPartition(int partition,boolean localMember) {
-        logger.warn("Partition : "+partition+" : "+localMember);
-        //openBucket[partition]=state==BucketListener.OPEN;
-    }
-    @Override
-    public void onBucket(int bucket,boolean opening) {
-        logger.warn("Bucket : "+bucket+" : "+opening);
-        //openBucket[partition]=state==BucketListener.OPEN;
-    }
+
 
     public void onStart(EndPoint endPoint){
         if(endPoint.name().equals(EndPoint.UDP_ENDPOINT)){
@@ -461,6 +464,11 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         }
         if(!started || !pushChannelEnabled) return;
         room.setup(udpEndpoint.createChannels(index.gameZone.capacity()));
+    }
+    private void closeGameRoom(GameRoom closed){
+        logger.warn("Room closed on bucket : "+closed.bucket());
+        closed.close();
+        udpEndpoint.releaseChannel(closed.channelId());
     }
 
 
