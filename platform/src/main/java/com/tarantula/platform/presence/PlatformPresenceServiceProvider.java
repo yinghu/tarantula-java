@@ -115,15 +115,17 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         Profile profile = new Profile();
         profile.distributionId(session.distributionId());
 
-        var hasProfile = profileDataStore.load(profile);
-
         if(!profile.configureAndValidate(session.payload())) return false;
 
-        if (hasProfile) {
+        var isAbsent = profileDataStore.createIfAbsent(profile, false);
+
+        if (!isAbsent) {
+            if (!profileDataStore.load(profile)) return false;
+            if(!profile.configureAndValidate(session.payload())) return false;
             return profileDataStore.update(profile);
         }
 
-        return profileDataStore.createIfAbsent(profile, false);
+        return true;
     }
 
     public ProfilePayload getProfilePayload(String IDs){
