@@ -379,27 +379,32 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         logger.warn("Total room closed : "+roomsClosed.size());
         roomsClosed.clear();
         logger.warn("Reload from opening buckets");
+        HashMap<Integer,Boolean> bucketReload = new HashMap<>();
         gameZoneIndex.forEach((k,v)->{
             for(OnPartition onPartition : buckets){
                 if(onPartition.opening()&&v.rooms[onPartition.partition()].get()==0){
                     logger.warn("REOPEN : "+onPartition.partition()+" : "+onPartition.opening());
+                    bucketReload.put(onPartition.partition(),true);
+                }
+                else{
+                    bucketReload.put(onPartition.partition(),false);
                 }
             }
         });
-        /**
         gameZoneIndex.forEach((k,v)->{
             byte[] lockKey = BufferUtil.fromLong(v.gameZone.distributionId());
             try{
                 serverClusterStore.mapLock(lockKey);
                 GameRoomQuery query = new GameRoomQuery(v.gameZone.distributionId());
                 this.dataStore.list(query).forEach(r->{
-                    if(buckets[r.bucket()].opening()){
+                    if(buckets[r.bucket()].opening() && bucketReload.get(r.bucket)){
                         loadGameRoom(v,r);
                         v.rooms[r.bucket()].incrementAndGet();
                     }
                 });
+
                 for(int i=0; i<serviceContext.node().bucketNumber();i++){
-                    if(!buckets[i].opening()) continue;
+                    if(!bucketReload.get(i)) continue;
                     if(v.rooms[i].get() < minRoomPoolSizePerBucket){
                         int remaining = minRoomPoolSizePerBucket - v.rooms[i].get();
                         logger.warn("Creating game room on zone/bucket : "+v.gameZone.distributionId()+"/"+i+" : "+remaining);
@@ -411,7 +416,10 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             }finally {
                 serverClusterStore.mapUnlock(lockKey);
             }
-        });**/
+            for(int i=0;i<serviceContext.node().bucketNumber();i++){
+                logger.warn("Rooms on bucket ["+v.rooms[i].get()+"] on ["+k+"]");
+            }
+        });
     }
 
 
