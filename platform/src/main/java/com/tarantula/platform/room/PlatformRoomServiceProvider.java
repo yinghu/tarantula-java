@@ -365,6 +365,10 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         gameRoomIndex.forEach((k,v)->{
             if(!buckets[v.bucket()].opening()){
                 roomsClosed.add(v);
+                GameZoneIndex index = gameZoneIndex.get(v.zoneId());
+                if(index.rooms[v.bucket()].get()>0){
+                    index.rooms[v.bucket()].set(0);
+                }
             }
         });
         roomsClosed.forEach(close->{
@@ -374,6 +378,13 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         logger.warn("Total room closed : "+roomsClosed.size());
         roomsClosed.clear();
         logger.warn("Reload from opening buckets");
+        gameZoneIndex.forEach((k,v)->{
+            for(OnPartition onPartition : buckets){
+                if(onPartition.opening()&&v.rooms[onPartition.partition()].get()==0){
+                    logger.warn("REOPEN : "+onPartition.partition()+" : "+onPartition.opening());
+                }
+            }
+        });
         /**
         gameZoneIndex.forEach((k,v)->{
             byte[] lockKey = BufferUtil.fromLong(v.gameZone.distributionId());
