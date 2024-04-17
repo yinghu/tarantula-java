@@ -367,6 +367,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 roomsClosed.add(v);
                 GameZoneIndex index = gameZoneIndex.get(v.zoneId());
                 if(index.rooms[v.bucket()].get()>0){
+                    logger.warn("CLOSE : "+v.bucket()+" : "+index.rooms[v.bucket()].get());
                     index.rooms[v.bucket()].set(0);
                 }
             }
