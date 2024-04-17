@@ -2,11 +2,11 @@ package com.tarantula.platform.room;
 
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
-import com.tarantula.game.GameZone;
+import com.tarantula.game.GameArena;
 import com.tarantula.game.Stub;
 
 
-public interface GameRoom extends Room,Resettable,DataStore.Updatable {
+public interface GameRoom extends Room,DataStore.Updatable {
 
     String LABEL = "gameRoom";
 
@@ -19,6 +19,7 @@ public interface GameRoom extends Room,Resettable,DataStore.Updatable {
 
     void setup(Channel channel);
 
+    boolean empty();
     //Distributed Methods
     GameRoom join(Session session,RoomStub roomStub);
     GameRoom view();
@@ -27,12 +28,9 @@ public interface GameRoom extends Room,Resettable,DataStore.Updatable {
     boolean dedicated();
     long zoneId();
 
-    void setup(GameServiceProvider gameServiceProvider,GameZone gameZone,boolean dedicated);
-
     void setup(Channel[] channels);
-
-
-    Channel registerChannel(Session session,Session.TimeoutListener timeoutListener);
+    void arena(GameArena arena);
+    Channel registerChannel(Session session,Session.TimeoutListener timeoutListener,GameServiceProvider gameServiceProvider);
 
     interface Entry extends Room.Seat,Resettable {
 

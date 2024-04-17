@@ -6,10 +6,10 @@ import com.icodesoftware.util.SnowflakeKey;
 
 public class GameRoomQuery implements RecoverableFactory<GameRoomHeader> {
 
-    private long ownerId;
+    private long zoneId;
 
-    public GameRoomQuery(long ownerId){
-        this.ownerId = ownerId;
+    public GameRoomQuery(long zoneId){
+        this.zoneId = zoneId;
 
     }
 
@@ -24,6 +24,6 @@ public class GameRoomQuery implements RecoverableFactory<GameRoomHeader> {
 
     @Override
     public Recoverable.Key key() {
-        return new SnowflakeKey(ownerId);
+        return new SnowflakeKey(zoneId);
     }
 }

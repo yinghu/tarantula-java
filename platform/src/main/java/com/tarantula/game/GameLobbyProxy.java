@@ -27,7 +27,10 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         if(!started) return new Stub("lobby not started");
         Rating rating = gameServiceProvider.presenceServiceProvider().rating(session);
         GameZone _zone = gameZone(rating);
-        return _zone.join(session);
+        Stub stub = _zone.join(session);
+        if(!stub.joined()) return stub;
+        stub.room.arena(_zone.arena(rating.level()));
+        return stub;
     }
 
     @Override

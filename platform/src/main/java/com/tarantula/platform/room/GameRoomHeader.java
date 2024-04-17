@@ -38,9 +38,9 @@ public class GameRoomHeader extends RecoverableObject implements GameRoom {
 
     protected Entry[] entries;
 
-    private GameServiceProvider gameModule;
     private ArrayBlockingQueue<Channel> pendingChannels;
 
+    protected int joined;
 
     public int channelId(){
         return channelId;
@@ -54,6 +54,9 @@ public class GameRoomHeader extends RecoverableObject implements GameRoom {
         return dedicated;
     }
 
+    public boolean empty(){
+        return joined<=0;
+    }
 
     @Override
     public long roomId(){
@@ -92,7 +95,9 @@ public class GameRoomHeader extends RecoverableObject implements GameRoom {
     public Arena arena() {
         return arena;
     }
-
+    public void arena(GameArena arena){
+        this.arena = arena;
+    }
     public Seat[] table(){
         return entries;
     }
@@ -124,6 +129,7 @@ public class GameRoomHeader extends RecoverableObject implements GameRoom {
         dataStore.list(new GameEntryQuery(this.distributionId()),(ge)->{
             entries[ge.number()]=ge;
             created[0]++;
+            if(ge.occupied()) joined++;
             return true;
         });
         if(created[0]==capacity) return;
@@ -210,6 +216,7 @@ public class GameRoomHeader extends RecoverableObject implements GameRoom {
         entry.systemId(session.systemId());
         entry.stub(session.stub());
         this.dataStore.update(entry);
+        joined++;
         return view();
     }
 
@@ -228,6 +235,7 @@ public class GameRoomHeader extends RecoverableObject implements GameRoom {
             }
         }
         if(entry==null) return;
+        joined--;
         this.dataStore.update(entry);
     }
 
@@ -236,44 +244,23 @@ public class GameRoomHeader extends RecoverableObject implements GameRoom {
     }
 
 
-
-    public void reset(){
-        if(pendingChannels!=null) pendingChannels.clear();
-        for(int i=0;i<capacity;i++){
-            entries[i].reset();
-            this.dataStore.update(entries[i]);
-        }
-        this.dataStore.update(this);
-    }
-
-
-    public void setup(GameServiceProvider gameServiceProvider,GameZone gameZone,boolean dedicated){
-        this.capacity = gameZone.capacity();
-        this.duration = gameZone.roundDuration();
-        this.overtime = gameZone.roundOvertime();
-        this.joinsOnStart = gameZone.joinsOnStart();
-        this.dedicated = dedicated;
-        this.gameModule = gameServiceProvider;
-        this.zoneId = gameZone.distributionId();
-        this.arena = gameZone.arena(1);
-    }
-
     public void setup(Channel[] channels){
         if(pendingChannels==null) pendingChannels = new ArrayBlockingQueue<>(channels.length);
+        pendingChannels.clear();
         for(int i=0;i<channels.length;i++){
             pendingChannels.offer(channels[i]);
         }
         this.channelId = channels[0].channelId();
     }
 
-    public Channel registerChannel(Session session,Session.TimeoutListener timeoutListener){
+    public Channel registerChannel(Session session,Session.TimeoutListener timeoutListener,GameServiceProvider gameServiceProvider){
         Channel channel = pendingChannels.poll();
-        ((UDPChannel)channel).register(session,this.gameModule,this.gameModule,this.gameModule,timeoutListener);
+        ((UDPChannel)channel).register(session,gameServiceProvider,gameServiceProvider,gameServiceProvider,timeoutListener);
         return channel;
     }
     @Override
     public String toString(){
-        return "ROOM ["+distributionKey()+"] Capacity ["+capacity+"] Channel ["+channelId+"]";
+        return "Room ["+distributionId()+"] Capacity ["+capacity+"] Channel ["+channelId+"]["+joined+"]";
     }
 
     @Override
