@@ -64,7 +64,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private int timer;
     private SchedulingTask schedulingTask;
     private ScheduledFuture scheduledFuture;
-    private boolean started;
+    private volatile boolean started;
 
     private UDPEndpoint udpEndpoint;
 
@@ -232,7 +232,10 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                 if(pushChannelEnabled()) udpEndpoint.releaseChannel(r.channelId());
             }
         });
-        pendingReleased.forEach(roomId->gameRoomIndex.remove(roomId));
+        pendingReleased.forEach(roomId->{
+            GameRoom remove = gameRoomIndex.remove(roomId);
+            remove.close();
+        });
     }
 
 
@@ -243,7 +246,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public OnAccess onConnection(Connection connection) {
-        GameZoneIndex index = gameZoneIndex(connection.configurationName());
+        GameZoneIndex index = fromConfigurationName(connection.configurationName());
         if(index==null) {
             logger.warn("No game lobby available for ["+connection.configurationName()+"]");
             return new OnAccessTrack(false,"game lobby ["+connection.configurationName()+"] not available");
@@ -279,7 +282,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             logger.warn("no server connection ["+channelStub.serverId);
             return false;
         }
-        GameZoneIndex index = gameZoneIndex(connectionStub.configurationName());
+        GameZoneIndex index = fromConfigurationName(connectionStub.configurationName());
         if(index == null) throw new RuntimeException("no lobby available");
         for(int i=0;i<index.gameZone.capacity();i++){
             channelStub.sessionId(channelStub.sessionId()+i);
@@ -315,7 +318,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             return;
         }
         connectionStub.started.set(true);
-        GameZoneIndex index = gameZoneIndex(connectionStub.configurationName());
+        GameZoneIndex index = fromConfigurationName(connectionStub.configurationName());
         if(index==null){
             logger.warn("Game lobby is not available ["+connectionStub.configurationName()+"]");
             return;
@@ -347,7 +350,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             logger.warn("Connection is not available ["+connection.serverId()+"]");
             return;
         }
-        GameZoneIndex index = gameZoneIndex(connectionStub.configurationName());
+        GameZoneIndex index = fromConfigurationName(connectionStub.configurationName());
         boolean removed = index.pendingConnections.remove(connectionStub);
         logger.warn("Connection released on ["+connection.configurationName()+"]["+removed+"]");
     }
@@ -373,11 +376,12 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         if(endPoint.name().equals(EndPoint.UDP_ENDPOINT)){
             this.udpEndpoint = (UDPEndpoint)endPoint;
             if(pushChannelEnabled){
+                OnPartition[] buckets = serviceContext.buckets();
                 gameZoneIndex.forEach((k,v)->{
                     if(!dedicated){
                         int[] roomSize = {0};
                         gameRoomIndex.forEach((rk,rv)->{
-                            if(rv.zoneId()==k){
+                            if(rv.empty() && rv.zoneId()==k && buckets[rv.bucket()].opening()){
                                 rv.setup(udpEndpoint.createChannels(v.gameZone.capacity()));
                                 roomSize[0]++;
                             }
@@ -415,7 +419,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
 
 
-    private GameZoneIndex gameZoneIndex(String configurationName){
+    private GameZoneIndex fromConfigurationName(String configurationName){
         GameZoneIndex[] gameZone ={null};
         gameZoneIndex.forEach((k,v)->{
             if(configurationName.trim().equals(v.gameZone.configurationTypeId()+"/"+v.gameZone.configurationName())){
@@ -429,7 +433,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         gameRoom.dataStore(this.dataStore);
         gameRoom.load();
         gameRoomIndex.put(gameRoom.roomId(),gameRoom);
-        logger.warn(gameRoom.toString());
         if(!gameRoom.empty()) return;
         resetGameRoom(zoneIndex,gameRoom);
     }
@@ -451,7 +454,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
     private void resetGameRoom(GameZoneIndex index,GameRoom room){
-        logger.warn("reset room ["+room+"]");
         for(int i=0;i<index.gameZone.capacity();i++){
             RoomStub stub = new RoomStub(room.distributionId(),i);
             index.pendingRoomStubs.remove(stub);

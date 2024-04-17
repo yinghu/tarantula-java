@@ -142,6 +142,13 @@ public class GameRoomHeader extends RecoverableObject implements GameRoom {
             entries[i]=entry;
         }
     }
+    @Override
+    public void close(){
+        for(Entry e : entries){
+            e.occupied(false);
+            this.dataStore.update(e);
+        }
+    }
 
     @Override
     public void setup(Channel channel){

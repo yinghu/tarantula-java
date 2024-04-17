@@ -6,7 +6,7 @@ import com.tarantula.game.GameArena;
 import com.tarantula.game.Stub;
 
 
-public interface GameRoom extends Room,DataStore.Updatable {
+public interface GameRoom extends Room,DataStore.Updatable,Closable {
 
     String LABEL = "gameRoom";
 
