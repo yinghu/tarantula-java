@@ -22,11 +22,9 @@ import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.platform.event.GameClusterSyncEvent;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class PlatformRoomServiceProvider implements ConfigurationServiceProvider, GameServerListener,ReloadListener {
 
@@ -170,6 +168,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     public void leave(Stub stub){
         gameServiceProvider.presenceServiceProvider().onLeave(stub);
+        gameServiceProvider.gameServiceProvider().onLeft(stub);
         if(dedicated) return; //close from channel close
         GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
         if(pushChannelEnabled){

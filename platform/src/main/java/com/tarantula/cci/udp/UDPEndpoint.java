@@ -282,8 +282,9 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
                 }
             });
             pendingJoinKickoff.forEach(c->{
-                if(pendingJoins.remove(c.sessionId())!=null){
-                    PushUserChannel pushUserChannel = udpEndpointServiceProvider.lookup(c.channelId());
+                pendingJoins.remove(c.sessionId());
+                PushUserChannel pushUserChannel = udpEndpointServiceProvider.lookup(c.channelId());
+                if(pushUserChannel!=null) {
                     pushUserChannel.onTimeout(c.channelId(),c.sessionId());
                 }
             });

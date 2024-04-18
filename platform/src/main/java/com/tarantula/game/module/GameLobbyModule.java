@@ -35,7 +35,6 @@ public class GameLobbyModule extends ModuleHeader{
         else if(session.action().equals("onLeave")){
             gameLobby.leave(session);
             session.write(JsonUtil.toSimpleResponse(true,"left room").getBytes());
-            gameServiceProvider.gameServiceProvider().onLeft(session);
         }
         else if(session.action().equals("onValidate")){
             this.context.log("check game session",OnLog.WARN);

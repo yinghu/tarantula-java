@@ -25,9 +25,7 @@ public class PVERoomProxy extends RoomProxyHeader {
             stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));
         }
         else if(!room.dedicated() && gameServiceProvider.roomServiceProvider().pushChannelEnabled()){
-            stub.pushChannel = this.gameServiceProvider.roomServiceProvider().registerChannel(stub,(s,d)->{
-                gameLobby.timeout(s,d);
-            });
+            stub.pushChannel = this.gameServiceProvider.roomServiceProvider().registerChannel(stub,gameLobby);
             room.setup(stub.pushChannel);
             stub.sessionId = stub.pushChannel.sessionId();
             stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));
