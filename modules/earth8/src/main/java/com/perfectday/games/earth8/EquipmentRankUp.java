@@ -42,8 +42,8 @@ public class EquipmentRankUp extends BattleUpdate{
     }
 
     @Override
-    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session){
-        pendingAnalytics.add(new EquipmentRankUpTransaction(session, _equipmentData, equipmentId, rank));
+    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session,long serverSessionId,long batchId){
+        pendingAnalytics.add(new EquipmentRankUpTransaction(session,serverSessionId, _equipmentData, equipmentId, rank));
         return true;
     }
 

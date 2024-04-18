@@ -8,14 +8,14 @@ import com.perfectday.games.earth8.analytics.BatchedManualAnalyticsTransaction;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class AnalyticsBatchUtils {
-    public static List<BatchedManualAnalyticsTransaction> getTransactions(Session session, UUID analyticsBatchId, List<AnalyticsData> analytics) {
+    public static List<BatchedManualAnalyticsTransaction> getTransactions(Session session,long serverSessionId, long analyticsBatchId, List<AnalyticsData> analytics) {
         return analytics.stream()
                 .map(analyticsData -> new BatchedManualAnalyticsTransaction(
                         session,
+                        serverSessionId,
                         analyticsData.messageCategory,
                         analyticsData.messageType,
                         analyticsBatchId,
@@ -36,9 +36,6 @@ public class AnalyticsBatchUtils {
         return result;
     }
 
-    static UUID generateAnalyticsBatchId() {
-        return UUID.randomUUID();
-    }
 
     public static class AnalyticsData {
         public String messageCategory;

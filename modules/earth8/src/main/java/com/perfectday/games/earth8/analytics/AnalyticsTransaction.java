@@ -2,16 +2,19 @@ package com.perfectday.games.earth8.analytics;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
+import com.icodesoftware.util.RecoverableObject;
 
 import java.time.LocalDateTime;
 
-public class AnalyticsTransaction {
+public class AnalyticsTransaction extends RecoverableObject {
+
     protected JsonObject data;
 
-    public AnalyticsTransaction(String messageType, Session session)
+
+    public AnalyticsTransaction(String messageType, Session session,long serverSessionId)
     {
         data = new JsonObject();
-        data.addProperty("server_session_id", session.sessionId());
+        data.addProperty("server_session_id", serverSessionId);
         data.addProperty("message_type", messageType);
         data.addProperty("player_id", session.distributionId());
         data.addProperty("timestamp", LocalDateTime.now().toString());
@@ -25,4 +28,6 @@ public class AnalyticsTransaction {
     public byte[] toBytes() {
         return toString().getBytes();
     }
+
+    
 }

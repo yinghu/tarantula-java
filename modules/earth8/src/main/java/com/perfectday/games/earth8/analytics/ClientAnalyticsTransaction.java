@@ -6,8 +6,8 @@ import com.icodesoftware.util.JsonUtil;
 import com.perfectday.games.earth8.BattleUpdate;
 
 public class ClientAnalyticsTransaction extends AnalyticsTransaction {
-    public ClientAnalyticsTransaction(Session session, String messageType, JsonObject clientData) {
-        super(messageType, session);
+    public ClientAnalyticsTransaction(Session session, long serverSessionId,String messageType, JsonObject clientData) {
+        super(messageType, session,serverSessionId);
         for (String key : clientData.keySet()) {
             data.addProperty(key, clientData.get(key).getAsString());
         }

@@ -30,8 +30,8 @@ public class ManualAnalytics extends BattleUpdate{
     }
 
     @Override
-    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session) {
-        pendingAnalytics.add(new ClientAnalyticsTransaction(session, messageType, clientData));
+    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session,long serverSessionId,long batchId) {
+        pendingAnalytics.add(new ClientAnalyticsTransaction(session,serverSessionId,messageType, clientData));
         return true;
     }
 }

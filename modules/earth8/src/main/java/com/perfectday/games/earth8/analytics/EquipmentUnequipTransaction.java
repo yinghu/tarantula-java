@@ -6,9 +6,9 @@ import com.icodesoftware.util.JsonUtil;
 public class EquipmentUnequipTransaction extends AnalyticsTransaction {
     private static final String MESSAGE_TYPE = "/earth8/equipment/0.0.1/unequip";
 
-    public EquipmentUnequipTransaction(Session session, long equipmentId, long unitId)
+    public EquipmentUnequipTransaction(Session session, long serverSessionId,long equipmentId, long unitId)
     {
-        super(MESSAGE_TYPE, session);
+        super(MESSAGE_TYPE, session,serverSessionId);
         data.addProperty("equipment_id", equipmentId);
         data.addProperty("unit_id", unitId);
     }

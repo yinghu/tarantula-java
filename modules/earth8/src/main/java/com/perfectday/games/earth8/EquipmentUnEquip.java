@@ -19,8 +19,8 @@ public class EquipmentUnEquip extends BattleUpdate{
     }
 
     @Override
-    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session){
-        pendingAnalytics.add(new EquipmentUnequipTransaction(session, equipmentId, unitId));
+    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session,long serverSessionId,long batchId){
+        pendingAnalytics.add(new EquipmentUnequipTransaction(session,serverSessionId, equipmentId, unitId));
         return true;
     }
 }

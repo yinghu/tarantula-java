@@ -27,8 +27,8 @@ public class EquipmentEquip extends BattleUpdate{
     }
 
     @Override
-    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session){
-        pendingAnalytics.add(new EquipmentEquipTransaction(session, _equipmentData, equipmentId, unitId, _tempUnitName));
+    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session,long serverSessionId,long batchId){
+        pendingAnalytics.add(new EquipmentEquipTransaction(session,serverSessionId, _equipmentData, equipmentId, unitId, _tempUnitName));
         return true;
     }
 
