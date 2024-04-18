@@ -49,7 +49,6 @@ public class Profile extends RecoverableObject implements Configurable {
         if(!config.has("DisplayName") || !config.has("IconIndex")) return false;
         displayName = config.get("DisplayName").getAsString();
         iconIndex = config.get("IconIndex").getAsInt();
-        if (config.has("ProfileSequence")) profileSequence = config.get("ProfileSequence").getAsInt();
         return true;
     }
 
