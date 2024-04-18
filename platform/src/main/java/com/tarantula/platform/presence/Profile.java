@@ -43,12 +43,6 @@ public class Profile extends RecoverableObject implements Configurable {
         return PresencePortableRegistry.PROFILE_CID;
     }
 
-    public boolean configureAndValidate(byte[] data, int profileSequence) {
-        var result = configureAndValidate(data);
-        this.profileSequence = profileSequence;
-        return result;
-    }
-
     @Override
     public boolean configureAndValidate(byte[] data) {
         JsonObject config = JsonUtil.parse(data);
