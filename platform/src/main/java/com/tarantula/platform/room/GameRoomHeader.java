@@ -151,7 +151,7 @@ public class GameRoomHeader extends RecoverableObject implements GameRoom {
     }
 
     @Override
-    public void setup(Channel channel){
+    public void assign(Channel channel){
         this.connection = channel.connection();
         this.channelId = channel.channelId();
         this.sessionId = channel.sessionId();

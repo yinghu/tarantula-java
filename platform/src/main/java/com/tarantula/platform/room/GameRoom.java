@@ -17,7 +17,7 @@ public interface GameRoom extends Room,DataStore.Updatable,Closable {
 
     int bucket();
 
-    void setup(Channel channel);
+    void assign(Channel channel);
 
     boolean empty();
     //Distributed Methods

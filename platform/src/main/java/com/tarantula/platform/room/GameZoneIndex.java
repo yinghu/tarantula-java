@@ -18,9 +18,9 @@ public class GameZoneIndex {
     public AtomicInteger[] rooms;
     public ArrayBlockingQueue<RoomStub> pendingRoomStubs;
 
-    public void start(boolean dedicated,int bucketNumber,int maxRoomsPerBucket){
+    public void start(boolean dedicated,int bucketNumber,int maxRoomsPerBucket,int maxConnectionPerNode){
         if(dedicated){
-            pendingConnections = new LinkedBlockingDeque<>();
+            pendingConnections = new LinkedBlockingDeque<>(maxConnectionPerNode);
             gameRoom = new GameRoomHeader(gameZone,true,0);
             return;
         }

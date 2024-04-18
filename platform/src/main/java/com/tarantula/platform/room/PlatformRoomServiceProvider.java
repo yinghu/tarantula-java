@@ -148,7 +148,12 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         return udpEndpoint.channel(sessionId);
     }
     public Room room(long roomId){
-        return null;
+        GameRoom gameRoom = new GameRoomHeader();
+        gameRoom.distributionId(roomId);
+        dataStore.load(gameRoom);
+        gameRoom.dataStore(dataStore);
+        gameRoom.load();
+        return gameRoom;
     }
     public GameZone gameZoneFromZoneId(long zoneId){
         return gameZoneIndex.get(zoneId).gameZone;
@@ -160,6 +165,21 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         RoomStub roomStub = index.pendingRoomStubs.poll();
         if(roomStub==null){
             logger.warn("No Stub Available Now");
+            serviceContext.schedule(new ScheduleRunner(100,()->{
+                byte[] lockKey = BufferUtil.fromLong(index.gameZone.distributionId());
+                try{
+                    serverClusterStore.mapLock(lockKey);
+                    OnPartition[] buckets = serviceContext.buckets();
+                    for(int i=0; i<serviceContext.node().bucketNumber();i++){
+                        if(!buckets[i].opening()) continue;
+                        for (int j = 0;j<minRoomPoolSizePerBucket; j++){
+                            this.createGameRoom(index,i);
+                        }
+                    }
+                }finally {
+                    serverClusterStore.mapUnlock(lockKey);
+                }
+            }));
             return null;
         }
         GameRoom gameRoom = gameRoomIndex.get(roomStub.roomId);
@@ -188,10 +208,10 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         GameZone gameZone = (GameZone)t;
         GameZoneIndex index = new GameZoneIndex();
         index.gameZone = gameZone;
-        index.start(dedicated,serviceContext.node().bucketNumber(),maxRoomPoolSizePerBucket);
+        index.start(dedicated,serviceContext.node().bucketNumber(),maxRoomPoolSizePerBucket,maxDedicatedServerConnections);
         if(dedicated) {
             gameZoneIndex.put(gameZone.distributionId(),index);
-            logger.warn("Initializing push channels ["+minRoomPoolSizePerBucket+"]["+dedicated+"]");
+            logger.warn("Initializing max server connections per node ["+maxDedicatedServerConnections+"]["+dedicated+"]");
             return;
         }
         byte[] lockKey = BufferUtil.fromLong(index.gameZone.distributionId());
@@ -538,7 +558,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         channelStub.fromBinary(ret);
         Channel channel = channelStub.toChannel(connectionStub.clientConnection(),connectionStub.serverKey,connectionStub.timeout());
         GameRoom joined = gameZoneIndex.gameRoom.view();
-        joined.setup(channel);
+        joined.assign(channel);
         return joined;
     }
 
