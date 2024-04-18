@@ -65,6 +65,9 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
     public static final int OVERSIZE_DATA_INDEX_CID = 24;
 
     public static final int BATCHED_MAPPING_OBJECT_CID = 25;
+
+    public static final int PROFILE_NAME_SEQUENCE_CID = 26;
+
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
     public static PresencePortableRegistry INS;
@@ -147,6 +150,9 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
                 break;
             case BATCHED_MAPPING_OBJECT_CID:
                 pt = new BatchedMappingObject();
+                break;
+            case PROFILE_NAME_SEQUENCE_CID:
+                pt = new ProfileNameSequence();
                 break;
             default:
         }

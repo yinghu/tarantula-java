@@ -16,6 +16,7 @@ import com.tarantula.game.GameRating;
 import com.tarantula.game.Stub;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceSetup;
+
 import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 
 import com.tarantula.platform.presence.saves.*;
@@ -25,6 +26,7 @@ import com.tarantula.platform.util.RecoverableQuery;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
@@ -42,15 +44,25 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     private PlatformLeaderBoardProvider platformLeaderBoardProvider;
 
     private DataStore mDataStore;
+    private DataStore profileDataStore;
+
+    private DistributionPresenceService distributionPresenceService;
+    private ConcurrentHashMap<String,ProfileNameSequence> profileNameSequenceMapping;
 
     public PlatformPresenceServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
         updates = new AtomicInteger(0);
+        profileNameSequenceMapping = new ConcurrentHashMap<>();
     }
 
 
     @Override
     public void start() throws Exception {
+        this.profileDataStore.list(new ProfileNameSequenceQuery(gameCluster.distributionId()),(profileNameSequence -> {
+            profileNameSequence.dataStore(profileDataStore);
+            profileNameSequenceMapping.put(profileNameSequence.name(),profileNameSequence);
+            return true;
+        }));
         this.recentlyPlayList = new PlayList(recentlyPlayListSize);
         this.recentlyPlayList.distributionId(this.gameCluster.distributionId());
         this.dataStore.createIfAbsent(this.recentlyPlayList,true);
@@ -75,6 +87,8 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         this.syncIntervalSeconds = plist.get("syncIntervalSeconds").getAsLong();
         this.dataStore = this.applicationPreSetup.dataStore(gameCluster,NAME);
         this.mDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_mapping_object");
+        this.profileDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_profile");
+        this.distributionPresenceService = this.serviceContext.clusterProvider().serviceProvider(DistributionPresenceService.NAME);
         this.logger = JDKLogger.getLogger(PlatformPresenceServiceProvider.class);
         this.logger.warn("Presence service provider started on ->"+gameServiceName);
     }
@@ -280,6 +294,22 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
 
     public void onLobby(Descriptor onLobby){
         applicationPreSetup.dataStore(gameCluster,NAME+"_"+onLobby.tag().replaceAll(Recoverable.PATH_SEPARATOR,"_"));
+    }
+
+    public void testSequence(String name){
+        int seq = distributionPresenceService.profileSequence(gameCluster.serviceType(),name);
+        logger.warn(name+"#"+seq);
+    }
+
+    public int onProfileSequence(String name){
+        return profileNameSequenceMapping.compute(name,(k,v)->{
+            if(v==null){
+                v = ProfileNameSequence.lookup(profileDataStore,gameCluster.distributionId(),name);
+            }
+            v.sequence++;
+            v.update();
+            return v;
+        }).sequence;
     }
 
 }
