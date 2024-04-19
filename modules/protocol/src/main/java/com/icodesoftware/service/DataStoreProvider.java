@@ -55,6 +55,7 @@ public interface DataStoreProvider extends ServiceProvider {
 
     interface MigrationListener{
         void migrate(DataStoreProvider dataStoreProvider);
+        default boolean migrate(DataStore dataStore){ return false;}
     }
 
 }

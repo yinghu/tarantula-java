@@ -112,4 +112,9 @@ public class UserMigrationListener implements DataStoreProvider.MigrationListene
         User user;
     }
 
+
+    public boolean migrate(DataStore dataStore){
+        return false;
+    }
+
 }

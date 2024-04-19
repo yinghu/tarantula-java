@@ -300,7 +300,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         FileInputStream in = new FileInputStream(backupLog);
         jsonObject = JsonUtil.parse(in);
         if(migration!=null && migration.migrating()){
-            migration.migrate(this);
+            migration.migrate(this,storeMap);
             System.exit(0);
         }
         logger.warn("LMDB Provider started with store size ["+storeSize+"] queue side ["+pendingQueue.size()+"] store no sync mode ["+envNoSyncFlag+"]");
