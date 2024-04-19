@@ -206,43 +206,29 @@ public class GameRoomHeader extends RecoverableObject implements GameRoom {
         return jsonObject;
     }
 
-    public GameRoom join(Session session,RoomStub roomStub){
-        Entry entry = null;
+    public GameRoom join(Stub session,RoomStub roomStub){
+        Entry entry;
         synchronized (entries){
-            for(int i=0;i<capacity;i++){
-                if(entries[i].occupied() && entries[i].systemId()==session.systemId() && entries[i].stub()==session.stub()){
-                    entry = entries[i];
-                    break;
-                }
-                if(!entries[i].occupied() && entry==null){
-                    entry = entries[i];
-                }
-            }
-            if(entry.systemId()==0) entry.occupied(true);
+            entries[roomStub.sequence].occupied(true);
+            entry = entries[roomStub.sequence];
+            joined++;
         }
         entry.systemId(session.systemId());
         entry.stub(session.stub());
         this.dataStore.update(entry);
-        joined++;
+        session.seatIndex = roomStub.sequence;
         return view();
     }
 
     public void leave(Stub session){
-        Entry entry = null;
+        Entry entry;
         synchronized (entries){
-            for(int i=0;i<capacity;i++){
-                if(!entries[i].occupied()) continue;
-                if(entries[i].systemId()==session.systemId() && entries[i].stub()==session.stub()){
-                    entry = entries[i];
-                    entry.occupied(false);
-                    entry.systemId(0);
-                    entry.stub(0);
-                    break;
-                }
-            }
+            entry = entries[session.seatIndex];
+            entry.occupied(false);
+            entry.systemId(0);
+            entry.stub(0);
+            joined--;
         }
-        if(entry==null) return;
-        joined--;
         this.dataStore.update(entry);
     }
 

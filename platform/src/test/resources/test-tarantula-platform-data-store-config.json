@@ -11,7 +11,7 @@
         ],
         "migration": {
             "listeners": [
-                {"name":"com.tarantula.platform.service.user.UserMigrationListener","enabled": false}
+                {"name":"com.tarantula.platform.service.persistence.DataMigrationListener","enabled": false}
             ]
         }
     }

@@ -15,7 +15,7 @@ public class Stub extends PlayerGameObject {
     public boolean offline;
     public long zoneId;
     public long roomId;
-
+    public int seatIndex;
     public GameRoom room;
     public Tournament.Instance tournament;
     public GameZone zone;
@@ -62,6 +62,7 @@ public class Stub extends PlayerGameObject {
         this.tournamentId = buffer.readLong();
         this.timestamp = buffer.readLong();
         this.systemId = buffer.readLong();
+        this.seatIndex = buffer.readInt();
         return true;
     }
     public boolean write(DataBuffer buffer) {
@@ -72,6 +73,7 @@ public class Stub extends PlayerGameObject {
         buffer.writeLong(tournamentId);
         buffer.writeLong(timestamp);
         buffer.writeLong(systemId);
+        buffer.writeInt(seatIndex);
         return true;
     }
 

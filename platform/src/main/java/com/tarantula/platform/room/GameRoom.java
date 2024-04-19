@@ -21,7 +21,7 @@ public interface GameRoom extends Room,DataStore.Updatable,Closable {
 
     boolean empty();
     //Distributed Methods
-    GameRoom join(Session session,RoomStub roomStub);
+    GameRoom join(Stub session,RoomStub roomStub);
     GameRoom view();
     void leave(Stub stub);
     void load();

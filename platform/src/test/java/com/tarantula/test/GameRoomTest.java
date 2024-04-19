@@ -37,7 +37,9 @@ public class GameRoomTest extends DataStoreHook{
             Assert.assertEquals(table[i].number(),i);
             Assert.assertEquals(table[i].occupied(),false);
         }
-        SimpleStub stub = new SimpleStub(100,200);
+        Stub stub = new Stub();
+        stub.systemId(100);
+        stub.stub(200);
         room.join(stub,new RoomStub(100,0));
         Assert.assertEquals(room.table()[0].occupied(),true);
         List<GameRoomHeader> rooms = dataStore.list(new GameRoomQuery(zoneId));
