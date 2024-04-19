@@ -28,7 +28,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     private double enterCost;
     private double credit;
-
+    private int segmentsPerSchedule;
     private double targetScore;
 
     private boolean global;
@@ -65,6 +65,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.name = schedule.name();
         this.global = schedule.global();
         this.targetScore = schedule.targetScore();
+        this.segmentsPerSchedule = schedule.segmentsPerSchedule();
         this.notificationOnFinish = schedule.notificationOnFinish();
         if(schedule.schedule()== Schedule.DAILY_SCHEDULE){
             this.startTime = LocalDateTime.now();
@@ -148,6 +149,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         buffer.writeLong(scheduleId);
         buffer.writeLong(startLevel);
         buffer.writeLong(endLevel);
+        buffer.writeInt(segmentsPerSchedule);
         return true;
     }
 
@@ -170,6 +172,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         scheduleId = buffer.readLong();
         startLevel = buffer.readLong();
         endLevel = buffer.readLong();
+        segmentsPerSchedule = buffer.readInt();
         return true;
     }
 

@@ -251,9 +251,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             status.ownerKey(SnowflakeKey.from(this.serviceContext.node().bucketId()));
             dataStore.createIfAbsent(status,true);
             if(status.status != Tournament.Status.PENDING) throw new RuntimeException("schedule is running on tournament ["+status.tournamentId+"]");
-            if(schedule.maxEntriesPerInstance()<=0) throw new RuntimeException("max entries per instance must be more than 0");
-            if(TimeUtil.durationUTCInHours(schedule.startTime(),schedule.endTime()) < minDurationHoursPerSchedule) throw new RuntimeException("min hours per schedule less than ["+minDurationHoursPerSchedule+"]");
-            if(!schedule.global() && schedule.durationMinutesPerInstance() < minDurationMinutesPerInstance) throw new RuntimeException("min minutes per instance less than ["+minDurationMinutesPerInstance+"]");
+            validateSchedule(schedule);
             switch (schedule.schedule()){
                 case DAILY_SCHEDULE:
                 case WEEKLY_SCHEDULE:
@@ -468,5 +466,16 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         }));
     }
 
+    private void validateSchedule(TournamentSchedule schedule){
+        //common
+        if(TimeUtil.durationUTCInHours(schedule.startTime(),schedule.endTime()) < minDurationHoursPerSchedule) throw new RuntimeException("min hours per schedule less than ["+minDurationHoursPerSchedule+"]");
+
+        //global schedule
+        if(schedule.global() && schedule.segmentsPerSchedule()<=0) throw new RuntimeException("global segments per schedule must be at least 1 or more");
+
+        //none global schedule
+        if(!schedule.global() && schedule.maxEntriesPerInstance()<=0) throw new RuntimeException("max entries per instance  must be at least 1 or more");
+        if(!schedule.global() && schedule.durationMinutesPerInstance() < minDurationMinutesPerInstance) throw new RuntimeException("min minutes per instance less than ["+minDurationMinutesPerInstance+"]");
+    }
 
 }
