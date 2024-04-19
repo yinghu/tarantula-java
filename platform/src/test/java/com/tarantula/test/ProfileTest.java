@@ -38,6 +38,7 @@ public class ProfileTest extends DataStoreHook{
         Assert.assertEquals(profileLoaded.iconIndex, 1);
 
         payload.addProperty("ProfileSequence",0);
+        payload.addProperty("SystemId",profileLoaded.distributionId());
 
         //cover toJson
         Assert.assertEquals(profileLoaded.toJson().toString(), payload.toString());

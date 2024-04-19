@@ -57,6 +57,7 @@ public class Profile extends RecoverableObject implements Configurable {
         jsonObject.addProperty("DisplayName",displayName);
         jsonObject.addProperty("IconIndex", iconIndex);
         jsonObject.addProperty("ProfileSequence", profileSequence);
+        jsonObject.addProperty("SystemId", distributionId);
         return jsonObject;
     }
 
