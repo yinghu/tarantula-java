@@ -1,19 +1,17 @@
-package com.tarantula.platform.leaderboard;
+package com.tarantula.platform.presence.leaderboard;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.Statistics;
 
 import java.time.LocalDate;
-import java.util.concurrent.CopyOnWriteArraySet;
+
 
 public class LeaderBoardSync implements LeaderBoard {
 
-
+    private long gameClusterId;
     private String category;
     private int size;
-
-    private BoardSync[] boards = new BoardSync[5];
 
     private EntryComparator comparator = new EntryComparator();
     private Listener listener;
@@ -21,49 +19,55 @@ public class LeaderBoardSync implements LeaderBoard {
 
     private BoardView[] views = new BoardView[5];
 
-    private CopyOnWriteArraySet<Listener> listeners;
 
-    public LeaderBoardSync(String category, int size){
+    public LeaderBoardSync(String category, int size,long gameClusterId,Listener listener){
         this.category = category;
         this.size = size;
-        listeners = new CopyOnWriteArraySet<>();
+        this.gameClusterId = gameClusterId;
+        this.listener = listener;
+
     }
     public void load(){
         //daily
         BoardSync d = new BoardSync(DAILY,category,size,this.comparator);
+        d.distributionId(gameClusterId);
         d.dataStore(this.dataStore);
         BoardView dv = new BoardView(d,listener,this.comparator);
         views[0]=dv;
-        d.load(listener);
-        boards[0]=d;
+        dv.load();
+
         //weekly
         BoardSync w =new BoardSync(WEEKLY,category,size,this.comparator);
+        w.distributionId(gameClusterId);
         w.dataStore(this.dataStore);
         BoardView wv = new BoardView(w,listener,this.comparator);
         views[1]=wv;
-        w.load(listener);
-        boards[1]=w;
+        wv.load();
+
         //monthly
         BoardSync m =new BoardSync(MONTHLY,category,size,this.comparator);
+        m.distributionId(gameClusterId);
         m.dataStore(this.dataStore);
         BoardView mv = new BoardView(m,listener,this.comparator);
         views[2]=mv;
-        m.load(listener);
-        boards[2]=m;
+        mv.load();
+
         //yearly
         BoardSync y =new BoardSync(YEARLY,category,size,this.comparator);
+        y.distributionId(gameClusterId);
         y.dataStore(this.dataStore);
         BoardView yv = new BoardView(y,listener,this.comparator);
         views[3]=yv;
-        y.load(listener);
-        boards[3]=y;
+        yv.load();
+
         //total
         BoardSync t =new BoardSync(TOTAL,category,size,this.comparator);
+        t.distributionId(gameClusterId);
         t.dataStore(this.dataStore);
         BoardView tv = new BoardView(t,listener,this.comparator);
         views[4]=tv;
-        t.load(listener);
-        boards[4]=t;
+        tv.load();
+
     }
     @Override
     public int size() {
@@ -75,39 +79,13 @@ public class LeaderBoardSync implements LeaderBoard {
     }
     @Override
     public void onAllBoard(Statistics.Entry entry){
-        boards[0].onBoard(new LeaderBoardEntry(entry.distributionKey(),entry.daily(),System.currentTimeMillis()),this.listener);
-        boards[1].onBoard(new LeaderBoardEntry(entry.distributionKey(),entry.weekly(),System.currentTimeMillis()),this.listener);
-        boards[2].onBoard(new LeaderBoardEntry(entry.distributionKey(),entry.monthly(),System.currentTimeMillis()),this.listener);
-        boards[3].onBoard(new LeaderBoardEntry(entry.distributionKey(),entry.yearly(),System.currentTimeMillis()),this.listener);
-        boards[4].onBoard(new LeaderBoardEntry(entry.distributionKey(),entry.total(),System.currentTimeMillis()),this.listener);
+        views[0].onBoard(entry.systemId(),entry.daily());
+        views[1].onBoard(entry.systemId(),entry.weekly());
+        views[2].onBoard(entry.systemId(),entry.monthly());
+        views[3].onBoard(entry.systemId(),entry.yearly());
+        views[4].onBoard(entry.systemId(),entry.total());
     }
-    public void onView(Entry entry){//build global list
-        boolean _boarding = false;
-        if(entry.classifier().equals(DAILY)){
-            _boarding = views[0].onView(entry);
-        }
-        else if(entry.classifier().equals(WEEKLY)){
-            _boarding = views[1].onView(entry);
-        }
-        else if(entry.classifier().equals(MONTHLY)){
-            _boarding = views[2].onView(entry);
-        }
-        else if(entry.classifier().equals(YEARLY)){
-            _boarding = views[3].onView(entry);
-        }
-        else if(entry.classifier().equals(TOTAL)){
-            _boarding = views[4].onView(entry);
-        }
-        if(_boarding){
-            this.listeners.forEach((l)->l.onUpdated(entry));
-        }
-    }
-    public void masterListener(Listener listener){
-        this.listener = listener;
-    }
-    public void addListener(Listener listener){
-        this.listeners.add(listener);
-    }
+
     public Board daily(){
         return views[0];
     }

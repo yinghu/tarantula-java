@@ -5,12 +5,13 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Distributable;
 
 import com.icodesoftware.Statistics;
+import com.icodesoftware.util.OnApplicationHeader;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 
 import java.time.LocalDateTime;
 
-public class SystemStatisticsEntry extends RecoverableObject implements Statistics.Entry {
+public class SystemStatisticsEntry extends OnApplicationHeader implements Statistics.Entry {
 
     //private String name;
     private double total=0;

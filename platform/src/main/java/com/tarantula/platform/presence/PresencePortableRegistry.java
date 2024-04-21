@@ -8,6 +8,7 @@ import com.tarantula.platform.achievement.AchievementProgress;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.inbox.PendingReward;
+import com.tarantula.platform.presence.leaderboard.LeaderBoardEntry;
 import com.tarantula.platform.lobby.ArenaItem;
 import com.tarantula.platform.lobby.LobbyItem;
 import com.tarantula.platform.lobby.RoomItem;
@@ -65,6 +66,9 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
     public static final int OVERSIZE_DATA_INDEX_CID = 24;
 
     public static final int BATCHED_MAPPING_OBJECT_CID = 25;
+
+    public static final int LEADER_BOARD_ENTRY_CID = 26;
+
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
     public static PresencePortableRegistry INS;
@@ -147,6 +151,9 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
                 break;
             case BATCHED_MAPPING_OBJECT_CID:
                 pt = new BatchedMappingObject();
+                break;
+            case LEADER_BOARD_ENTRY_CID:
+                pt = new LeaderBoardEntry();
                 break;
             default:
         }

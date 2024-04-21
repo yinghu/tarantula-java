@@ -3,13 +3,13 @@ package com.icodesoftware.protocol.statistics;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.protocol.ProtocolPortableRegistry;
-import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.util.OnApplicationHeader;
 import com.icodesoftware.util.TimeUtil;
 
 import java.time.LocalDateTime;
 
 
-public class StatisticsEntry extends RecoverableObject implements Statistics.Entry {
+public class StatisticsEntry extends OnApplicationHeader implements Statistics.Entry {
 
     public static final String LABEL = "stats";
     //private String name;

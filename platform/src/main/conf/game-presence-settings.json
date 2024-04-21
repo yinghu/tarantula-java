@@ -21,8 +21,12 @@
   },
 
   "playList":{
-    "recentlyListSize" :10,
-    "friendListSize": 10,
-    "syncIntervalSeconds": 10
+      "recentlyListSize" :10,
+      "friendListSize": 10,
+      "syncIntervalSeconds": 10
+  },
+
+  "leaderBoard":{
+      "topListSize": 10
   }
 }

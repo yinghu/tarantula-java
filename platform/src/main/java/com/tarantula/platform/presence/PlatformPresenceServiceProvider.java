@@ -16,7 +16,7 @@ import com.tarantula.game.GameRating;
 import com.tarantula.game.Stub;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceSetup;
-import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
+import com.tarantula.platform.presence.leaderboard.PlatformLeaderBoardProvider;
 
 import com.tarantula.platform.presence.saves.*;
 

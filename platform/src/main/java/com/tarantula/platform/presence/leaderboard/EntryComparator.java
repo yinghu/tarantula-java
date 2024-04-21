@@ -1,4 +1,4 @@
-package com.tarantula.platform.leaderboard;
+package com.tarantula.platform.presence.leaderboard;
 
 import com.icodesoftware.LeaderBoard;
 

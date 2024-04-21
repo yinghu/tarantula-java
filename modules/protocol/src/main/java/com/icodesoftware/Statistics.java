@@ -3,7 +3,7 @@ package com.icodesoftware;
 import java.util.List;
 
 
-public interface Statistics extends Recoverable{
+public interface Statistics extends OnApplication{
 
 
     Entry entry(String key);
@@ -14,7 +14,7 @@ public interface Statistics extends Recoverable{
 
     default void registerListener(Listener listener){}
 
-    interface Entry extends Recoverable, DataStore.Updatable{
+    interface Entry extends OnApplication, DataStore.Updatable{
         String name();
         double total();
         double hourly();
