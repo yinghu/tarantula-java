@@ -137,4 +137,7 @@ public class LeaderBoardSync implements LeaderBoard {
             views[3].reset();
         }
     }
+    public void reload(){
+
+    }
 }

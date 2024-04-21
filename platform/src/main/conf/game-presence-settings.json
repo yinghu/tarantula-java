@@ -27,6 +27,7 @@
   },
 
   "leaderBoard":{
-      "topListSize": 10
+      "topListSize": 10,
+      "reloadIntervalMinutes":10
   }
 }
