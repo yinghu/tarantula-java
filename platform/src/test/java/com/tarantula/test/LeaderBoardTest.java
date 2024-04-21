@@ -57,6 +57,8 @@ public class LeaderBoardTest extends DataStoreHook{
         loaded.load((e)->{
             Assert.assertEquals(e.systemId(),100);
             Assert.assertEquals(e.value(),100);
+            Assert.assertNotNull(e.category());
+            Assert.assertNotNull(e.classifier());
         });
         for(int i=1;i<11;i++){
             long id = i;
@@ -88,19 +90,20 @@ public class LeaderBoardTest extends DataStoreHook{
         int[] updates = {0};
         BoardView view = new BoardView(boardSync,(e)->updates[0]++,new EntryComparator());
         view.load();
-        view.onBoard(100,100);
-        view.onBoard(200,90);
-        view.onBoard(300,120);
-        view.onBoard(400,93);
-        view.onBoard(500,1000);
-        view.onBoard(600,920);
-        view.onBoard(700,101);
-        view.onBoard(800,190);
-        view.onBoard(900,200);
-        view.onBoard(1000,190);
+        view.onBoard(new LeaderBoardEntry(100,100,System.currentTimeMillis()));
+        view.onBoard(new LeaderBoardEntry(200,90,System.currentTimeMillis()));
+        view.onBoard(new LeaderBoardEntry(300,120,System.currentTimeMillis()));
+        view.onBoard(new LeaderBoardEntry(400,93,System.currentTimeMillis()));
+        view.onBoard(new LeaderBoardEntry(500,1000,System.currentTimeMillis()));
+        view.onBoard(new LeaderBoardEntry(600,920,System.currentTimeMillis()));
+        view.onBoard(new LeaderBoardEntry(700,101,System.currentTimeMillis()));
+        view.onBoard(new LeaderBoardEntry(800,190,System.currentTimeMillis()));
+        view.onBoard(new LeaderBoardEntry(900,200,System.currentTimeMillis()));
+        view.onBoard(new LeaderBoardEntry(1000,190,System.currentTimeMillis()));
 
-        view.onBoard(1000,2290);
-        view.onBoard(2000,91);
+        view.onBoard(new LeaderBoardEntry(1000,2290,System.currentTimeMillis()));
+        view.onBoard(new LeaderBoardEntry(2000,91,System.currentTimeMillis()));
+
         List<LeaderBoard.Entry> board = new ArrayList<>();
         view.rank((e)->{
             board.add(e);
@@ -131,7 +134,9 @@ public class LeaderBoardTest extends DataStoreHook{
 
         LeaderBoardSync ldb = new LeaderBoardSync("jams",10,boardId, e->{
             updates[0]++;
-
+            Assert.assertNotNull(e.category());
+            Assert.assertTrue(e.category().equals("jams"));
+            Assert.assertNotNull(e.classifier());
         });
         ldb.dataStore(dataStore);
         ldb.load();
@@ -140,7 +145,7 @@ public class LeaderBoardTest extends DataStoreHook{
         Assert.assertNotNull(ldb.monthly());
         Assert.assertNotNull(ldb.yearly());
         Assert.assertNotNull(ldb.total());
-        StatisticsEntry entry = new StatisticsEntry();
+        StatisticsEntry entry = new StatisticsEntry(SnowflakeKey.from(1000),"jams");
         entry.systemId(1000);
         entry.update(100);
         ldb.onAllBoard(entry);

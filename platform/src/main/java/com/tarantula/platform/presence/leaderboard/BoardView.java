@@ -23,25 +23,24 @@ public class BoardView extends RecoverableObject implements LeaderBoard.Board,Le
         this.vList =  new ArrayList<>();
     }
     @Override
-    public synchronized void onBoard(long systemId, double value) {
-        LeaderBoard.Entry existing = vIndex.get(systemId);
+    public synchronized void onBoard(LeaderBoard.Entry update) {
+        LeaderBoard.Entry existing = vIndex.get(update.systemId());
         if(existing!=null){
-            existing.update(new LeaderBoardEntry(systemId,value,System.currentTimeMillis()));
+            existing.update(update);
             this.listener.onUpdated(existing);
             Collections.sort(vList,comparator);
             return;
         }
         if(vList.size()<sync.size()){
-            LeaderBoardEntry entry = new LeaderBoardEntry(systemId,value,System.currentTimeMillis());
-            vList.add(entry);
-            vIndex.put(systemId,entry);
-            this.listener.onUpdated(entry);
+            vList.add(update);
+            vIndex.put(update.systemId(),update);
+            this.listener.onUpdated(update);
             Collections.sort(vList,comparator);
             return;
         }
         LeaderBoard.Entry last = vList.get(sync.size()-1);
-        if(last.value() > value) return;
-        last.update(new LeaderBoardEntry(systemId,value,System.currentTimeMillis()));
+        if(last.value() > update.value()) return;
+        last.update(update);
         this.listener.onUpdated(last);
         Collections.sort(vList,comparator);
     }
@@ -51,7 +50,7 @@ public class BoardView extends RecoverableObject implements LeaderBoard.Board,Le
         Collections.sort(vList,comparator);
     }
 
-    public synchronized void onSync(LeaderBoard.Entry entry){
+    public void onSync(LeaderBoard.Entry entry, LeaderBoard.Listener listener){
         sync.onBoard(entry,listener);
     }
     public void rank(LeaderBoard.Listener ranking){

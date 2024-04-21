@@ -3,6 +3,7 @@ package com.tarantula.platform.presence.leaderboard;
 import com.google.gson.JsonObject;
 import com.icodesoftware.LeaderBoard;
 
+import com.icodesoftware.Statistics;
 import com.icodesoftware.util.OnApplicationHeader;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
@@ -33,6 +34,13 @@ public class LeaderBoardEntry extends OnApplicationHeader implements LeaderBoard
         this.systemId = systemId;
         this.value = value;
         this.timestamp = timestamp;
+    }
+    private LeaderBoardEntry(String classifier,String category,long systemId,double value){
+        this();
+        this.classifier = classifier;
+        this.category = category;
+        this.systemId = systemId;
+        this.value = value;
     }
 
     public LeaderBoard.Entry update(LeaderBoard.Entry entry){
@@ -115,5 +123,20 @@ public class LeaderBoardEntry extends OnApplicationHeader implements LeaderBoard
         jsonObject.addProperty("Value",value);
         jsonObject.addProperty("Timestamp",timestamp);
         return jsonObject;
+    }
+    public static LeaderBoard.Entry[] from(Statistics.Entry statisticsEntry){
+        LeaderBoard.Entry[] entries = new LeaderBoardEntry[5];
+        long stamp = System.currentTimeMillis();
+        entries[0] = from(LeaderBoard.DAILY,statisticsEntry.name(),statisticsEntry.systemId(),statisticsEntry.daily(),stamp);
+        entries[1] = from(LeaderBoard.WEEKLY,statisticsEntry.name(),statisticsEntry.systemId(),statisticsEntry.weekly(),stamp);
+        entries[2] = from(LeaderBoard.MONTHLY,statisticsEntry.name(),statisticsEntry.systemId(),statisticsEntry.monthly(),stamp);
+        entries[3] = from(LeaderBoard.YEARLY,statisticsEntry.name(),statisticsEntry.systemId(),statisticsEntry.yearly(),stamp);
+        entries[4] = from(LeaderBoard.TOTAL,statisticsEntry.name(),statisticsEntry.systemId(),statisticsEntry.total(),stamp);
+        return entries;
+    }
+    public static LeaderBoard.Entry from(String classifier,String category,long systemId,double value,long timestamp){
+        LeaderBoard.Entry entry = new LeaderBoardEntry(classifier,category,systemId,value);
+        entry.timestamp(timestamp);
+        return entry;
     }
 }

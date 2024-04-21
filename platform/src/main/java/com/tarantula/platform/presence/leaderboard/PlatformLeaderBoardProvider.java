@@ -5,12 +5,11 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.LeaderBoard;
-import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceSetup;
-import com.tarantula.platform.event.ServerPushEvent;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,12 +18,13 @@ public class PlatformLeaderBoardProvider extends PlatformGameServiceSetup implem
 
     public static final String NAME = "leaderboard";
 
-    private TarantulaLogger logger;
-    private String topic;
+
     private int leaderBoardSize = 10;
     private DataStore dataStore;
 
     private ConcurrentHashMap<String, LeaderBoardSync> tMap = new ConcurrentHashMap<>();
+
+    private DistributionLeaderBoardService distributionLeaderBoardService;
 
     public PlatformLeaderBoardProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
@@ -45,15 +45,7 @@ public class PlatformLeaderBoardProvider extends PlatformGameServiceSetup implem
         JsonObject plist = ((JsonElement)configuration.property("leaderBoard")).getAsJsonObject();
         this.leaderBoardSize = plist.get("topListSize").getAsInt();
         this.dataStore = gameCluster.applicationPreSetup().dataStore(gameCluster,NAME);//typeId_service
-
-        this.topic = this.platformGameServiceProvider.registerEventListener(NAME,(e)->{
-            if(e instanceof ServerPushEvent){
-                //LeaderBoard.Entry update = this.gsonBuilder.create().fromJson(new String(e.payload()),LeaderBoardEntry.class);
-                //LeaderBoardSync ldb = this.leaderBoard(update.category());
-                //ldb.onView(update);
-            }
-            return false;
-        });
+        this.distributionLeaderBoardService = serviceContext.clusterProvider().serviceProvider(DistributionLeaderBoardService.NAME);
         this.logger = JDKLogger.getLogger(PlatformLeaderBoardProvider.class);
     }
 
@@ -64,7 +56,7 @@ public class PlatformLeaderBoardProvider extends PlatformGameServiceSetup implem
 
     @Override
     public void start() throws Exception {
-        logger.warn("Leader board service provider started on ["+gameCluster.serviceType()+"] with topic ["+topic+"]["+leaderBoardSize+"]");
+        logger.warn("Leader board service provider started on ["+gameCluster.serviceType()+"] with board size ["+leaderBoardSize+"]");
     }
 
     @Override
@@ -74,8 +66,14 @@ public class PlatformLeaderBoardProvider extends PlatformGameServiceSetup implem
 
     @Override
     public void onUpdated(LeaderBoard.Entry entry) {
-        //byte[] payload = this.gsonBuilder.create().toJson(entry).getBytes();
-        //this.serviceContext.postOffice().onTopic(topic).send(NAME,payload);
+        distributionLeaderBoardService.onUpdateLeaderBoard(gameServiceName,entry);
+    }
+
+    public void leaderBoardUpdated(LeaderBoard.Entry entry){
+        LeaderBoardSync sync = leaderBoard(entry.category());
+        serviceContext.schedule(new ScheduleRunner(100,()->{
+            sync.sync(entry,(e)->{/* callback on updated*/});
+        }));
     }
     @Override
     public void atMidnight(){

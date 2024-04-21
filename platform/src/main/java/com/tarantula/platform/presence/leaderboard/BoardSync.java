@@ -49,14 +49,15 @@ public class BoardSync extends RecoverableObject{
     }
     public synchronized void onBoard(LeaderBoard.Entry entry,LeaderBoard.Listener listener){
         LeaderBoardEntry e = eIndex.get(entry.systemId());
-        if(e==null && (e = board[size-1]).value() < entry.value()){
+        if(e==null && (e=board[size-1]).value() <= entry.value()){
             eIndex.remove(e.systemId());
             e.update(entry).update();
             eIndex.put(e.systemId(),e);
             Arrays.sort(board,entryComparator);
             listener.onUpdated(e);
+            return;
         }
-        else if(e!=null && e.value() < entry.value()){
+        if(e!=null && e.value() <= entry.value()){
             e.update(entry).update();
             Arrays.sort(board,entryComparator);
             listener.onUpdated(e);

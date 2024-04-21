@@ -79,11 +79,10 @@ public class LeaderBoardSync implements LeaderBoard {
     }
     @Override
     public void onAllBoard(Statistics.Entry entry){
-        views[0].onBoard(entry.systemId(),entry.daily());
-        views[1].onBoard(entry.systemId(),entry.weekly());
-        views[2].onBoard(entry.systemId(),entry.monthly());
-        views[3].onBoard(entry.systemId(),entry.yearly());
-        views[4].onBoard(entry.systemId(),entry.total());
+        LeaderBoard.Entry[] entries = LeaderBoardEntry.from(entry);
+        for(int i=0;i<5;i++){
+            views[i].onBoard(entries[i]);
+        }
     }
 
     public Board daily(){
@@ -100,6 +99,27 @@ public class LeaderBoardSync implements LeaderBoard {
     }
     public Board total(){
         return views[4];
+    }
+    public void sync(LeaderBoard.Entry update,LeaderBoard.Listener listener){
+        if(update.classifier().equals(LeaderBoard.DAILY)){
+            views[0].onSync(update,listener);
+            return;
+        }
+        if(update.classifier().equals(LeaderBoard.WEEKLY)){
+            views[1].onSync(update,listener);
+            return;
+        }
+        if(update.classifier().equals(LeaderBoard.MONTHLY)){
+            views[2].onSync(update,listener);
+            return;
+        }
+        if(update.classifier().equals(LeaderBoard.YEARLY)){
+            views[3].onSync(update,listener);
+            return;
+        }
+        if(update.classifier().equals(LeaderBoard.TOTAL)){
+            views[4].onSync(update,listener);
+        }
     }
     public void dataStore(DataStore dataStore) {
         this.dataStore = dataStore;

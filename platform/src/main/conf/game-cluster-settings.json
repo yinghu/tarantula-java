@@ -14,7 +14,7 @@
     "com.tarantula.platform.presence.PlatformPresenceServiceProvider",
     "com.tarantula.platform.store.PlatformStoreServiceProvider",
     "com.tarantula.platform.tournament.PlatformTournamentServiceProvider",
-    "com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider",
+    "com.tarantula.platform.presence.leaderboard.PlatformLeaderBoardProvider",
     "com.tarantula.platform.resource.PlatformResourceServiceProvider"
   ]
 }

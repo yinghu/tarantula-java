@@ -85,9 +85,11 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         playList.playListIndex.push(friendSystemId);
         this.dataStore.update(playList);
     }
-    public void onPlay(long systemId){
-        this.recentlyPlayList.playListIndex.push(systemId);
+    public void onPlay(Session session){
+        this.recentlyPlayList.playListIndex.push(session.systemId());
         updates.incrementAndGet();
+        Statistics statistics = statistics(session);
+        statistics.entry("joins").update(1).update();
     }
     public List<Long> friendList(long systemId){
         PlayList playList = new PlayList(friendListSize);
@@ -144,6 +146,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         deltaStatistics.dataStore(applicationPreSetup.dataStore(gameCluster,NAME+"_statistics"));
         deltaStatistics.load();
         deltaStatistics.registerListener((entry -> {
+            entry.systemId(session.systemId());
             LeaderBoard leaderBoard = platformLeaderBoardProvider.leaderBoard(entry.name());
             leaderBoard.onAllBoard(entry);
         }));

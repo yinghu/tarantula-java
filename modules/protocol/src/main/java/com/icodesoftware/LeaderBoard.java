@@ -21,7 +21,7 @@ public interface LeaderBoard {
     void onAllBoard(Statistics.Entry entry);
 
     interface Board extends DataStore.Updatable{
-        void onBoard(long systemId,double value);
+        void onBoard(Entry update);
         default void rank(Listener ranking){}
     }
 
