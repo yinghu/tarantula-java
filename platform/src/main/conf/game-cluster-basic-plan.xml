@@ -66,15 +66,6 @@
                 <reset-enabled>true</reset-enabled>
                 <module-name>com.tarantula.game.module.MatchMakingModule</module-name>
             </application>
-            <application><!-- key/value set/get app-->
-                <type-id>game-data</type-id>
-                <name>PersonalDataStore</name>
-                <type>application</type>
-                <category>data</category>
-                <tag>game/data</tag>
-                <deploy-priority>20</deploy-priority>
-                <module-name>com.tarantula.game.module.PersonalDataStoreModule</module-name>
-            </application>
         </application-list>
     </lobby-context>
 </tarantula>
