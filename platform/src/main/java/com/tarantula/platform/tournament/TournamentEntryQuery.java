@@ -15,11 +15,8 @@ public class TournamentEntryQuery implements RecoverableFactory<TournamentEntry>
     }
 
     public TournamentEntry create() {
-        TournamentEntry ocx = new TournamentEntry();
-        return ocx;
+        return new TournamentEntry();
     }
-
-
 
     public String label(){
         return Tournament.ENTRY_LABEL;

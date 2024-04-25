@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Session;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
@@ -16,7 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -29,21 +30,33 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     private LocalDateTime close;
     private LocalDateTime end;
 
-    private int totalJoined;
+    private AtomicInteger totalJoined;
     private AtomicInteger totalFinished;
 
-    private ConcurrentHashMap<Long, TournamentEntry> entryIndex = new ConcurrentHashMap<>();
-    private TournamentRaceBoard tournamentRaceBoard;
+    private boolean global;
+    private double targetScore;
 
-    public TournamentInstance(int maxEntries,double scoreCredits){
+    private RaceBoardSync tournamentRaceBoard;
+
+    DataStore entryDataStore;
+    DataStore raceBoardDataStore;
+
+    private TournamentInstance(int maxEntries,double scoreCredits){
         this();
         this.maxEntries = maxEntries;
         this.scoreCredits = scoreCredits;
-        this.tournamentRaceBoard = new TournamentRaceBoard(maxEntries);
+    }
+
+    private TournamentInstance(double targetScore,int maxEntries){
+        this();
+        this.global = true;
+        this.maxEntries = maxEntries;
+        this.targetScore = targetScore;
     }
 
     public TournamentInstance(){
         totalFinished = new AtomicInteger(0);
+        totalJoined = new AtomicInteger(0);
         this.onEdge = true;
     }
 
@@ -52,32 +65,69 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         return status;
     }
 
-    public boolean enter(long systemId,double score) {
-        return entryIndex.computeIfAbsent(systemId,(k)->{
-            if(totalJoined==maxEntries) return null;
-            TournamentEntry entry = new TournamentEntry(systemId,scoreCredits,score);
-            entry.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-            entry.ownerKey(this.key());
-            this.dataStore.create(entry);
-            entry.dataStore(dataStore);
-            tournamentRaceBoard.addEntry(entry);
-            totalJoined++;
-            return entry;
-        })!=null;
+
+    public boolean scoreSegment(long entryId,long systemId,double credits,double score){
+        if(!global) return false;
+        TournamentEntry entry = new TournamentEntry();
+        entry.distributionId(entryId);
+        entry.dataStore(entryDataStore);
+        if(!entryDataStore.load(entry) || entry.systemId()!= systemId) return false;
+        entry.score(credits,score);
+        this.tournamentRaceBoard.onBoard(entry);
+        return true;
+    }
+
+    public long enterSegment(long systemId,double score){
+        if(!global) return 0;
+        if(targetScore>0){//limited winning players by first-in
+            if(totalJoined.incrementAndGet()<maxEntries){
+                TournamentEntry entry = new TournamentEntry(systemId,scoreCredits,score);
+                entry.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+                entry.ownerKey(this.key());
+                this.entryDataStore.create(entry);
+                entry.dataStore(entryDataStore);
+                this.dataStore.update(this);
+                tournamentRaceBoard.onBoard(entry);
+                return entry.distributionId();
+            }
+            return 0;
+        }
+        //no limited competing players by higher score finally
+        totalJoined.incrementAndGet();
+        TournamentEntry entry = new TournamentEntry(systemId,scoreCredits,score);
+        entry.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+        entry.ownerKey(this.key());
+        entry.dataStore(entryDataStore);
+        entryDataStore.create(entry);
+        this.dataStore.update(this);
+        this.tournamentRaceBoard.onBoard(entry);
+        return entry.distributionId();
     }
 
 
-    public int enter(long systemId){
-        enter(systemId,0);
-        return totalJoined;
+    public boolean enter(long systemId,double score) {
+        if(global) return false;
+        if(totalJoined.get()==maxEntries) return false;
+        TournamentEntry entry = new TournamentEntry(systemId,scoreCredits,score);
+        entry.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+        entry.ownerKey(this.key());
+        this.entryDataStore.create(entry);
+        entry.dataStore(entryDataStore);
+        totalJoined.incrementAndGet();
+        this.dataStore.update(this);
+        tournamentRaceBoard.onBoard(entry);
+        return true;
+
     }
 
     @Override
     public boolean update(Session session, Tournament.OnEntry onEntry) {
-        TournamentEntry entry = entryIndex.get(session.stub());
+        if(global) return false;
+        Tournament.Entry entry = tournamentRaceBoard.onBoard(session.distributionId());
         if(onEntry.on(entry)) totalFinished.incrementAndGet();
         int finished = totalFinished.get();
-        return status == (Tournament.Status.CLOSED)? (finished == totalJoined):(finished == totalJoined && totalJoined == maxEntries);
+        int joined = totalJoined.get();
+        return status == (Tournament.Status.CLOSED)? (finished == joined):(finished == joined && joined == maxEntries);
     }
     public int maxEntries(){
         return maxEntries;
@@ -101,6 +151,9 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         buffer.writeLong(end!=null?TimeUtil.toUTCMilliseconds(end):0);
         buffer.writeInt(status.ordinal());
         buffer.writeInt(routingNumber);
+        buffer.writeBoolean(global);
+        buffer.writeDouble(targetScore);
+        buffer.writeInt(totalJoined.get());
         return true;
     }
 
@@ -116,12 +169,14 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         if(_end>0) end = TimeUtil.fromUTCMilliseconds(_end);
         status = Tournament.Status.values()[buffer.readInt()];
         routingNumber = buffer.readInt();
+        global = buffer.readBoolean();
+        targetScore = buffer.readDouble();
+        totalJoined.set(buffer.readInt());
         return true;
     }
 
     public Tournament.RaceBoard raceBoard(){
-        tournamentRaceBoard.reset();
-        return tournamentRaceBoard;
+        return new TournamentRaceBoard(tournamentRaceBoard.snapshot());
     }
 
     @Override
@@ -149,16 +204,10 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     }
 
     public void load(){
-        if(tournamentRaceBoard==null){
-            tournamentRaceBoard = new TournamentRaceBoard(maxEntries);
-        }
-        dataStore.list(new TournamentEntryQuery(this.distributionId()),(e)->{
-            e.dataStore(dataStore);
-            entryIndex.put(e.systemId(),e);
-            tournamentRaceBoard.addEntry(e);
-            totalJoined++;
-            return true;
-        });
+        tournamentRaceBoard = new RaceBoardSync(maxEntries,new TournamentEntryComparator());
+        tournamentRaceBoard.dataStore(raceBoardDataStore);
+        tournamentRaceBoard.distributionId(this.distributionId);
+        tournamentRaceBoard.load();
     }
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
@@ -168,11 +217,14 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         jsonObject.addProperty("End",end!=null?end.format(DateTimeFormatter.ISO_DATE_TIME):"N/A");
         jsonObject.addProperty("Status",status.name());
         jsonObject.addProperty("TournamentId",this.distributionKey());
+        jsonObject.addProperty("Global",global);
+        jsonObject.addProperty("TotalJoined",totalJoined.get());
+        jsonObject.addProperty("TargetScore",targetScore);
         return jsonObject;
     }
     List<TournamentEntry> end(){
         ArrayList<TournamentEntry> rankedList = new ArrayList<>();
-        entryIndex.forEach((k,e)->rankedList.add(e));
+        //entryIndex.forEach((k,e)->rankedList.add(e));
         Collections.sort(rankedList,new TournamentEntryComparator());
         return rankedList;
     }
@@ -202,6 +254,13 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     long toEndingTime(){
         if(TimeUtil.expired(end)) return 10;
         return TimeUtil.durationUTCMilliseconds(close,end);
+    }
+
+    public static TournamentInstance global(double targetScore,int maxEntries){
+        return new TournamentInstance(targetScore,maxEntries);
+    }
+    public static TournamentInstance limit(int maxEntries,double credits){
+        return new TournamentInstance(maxEntries,credits);
     }
 
 }

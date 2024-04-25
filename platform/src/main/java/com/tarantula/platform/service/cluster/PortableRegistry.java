@@ -54,7 +54,7 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
 
     public static final int TOURNAMENT_ENTRY_CID = PortableEventRegistry.TOURNAMENT_ENTRY_CID;
 
-    public static final int TOURNAMENT_RACE_BOARD_CID = PortableEventRegistry.TOURNAMENT_RACE_BOARD_CID;
+
     public static final int GAME_ENTRY_CID = PortableEventRegistry.GAME_ENTRY_CID;
 
     public static final int PVE_ROOM_CID = PortableEventRegistry.PVE_ROOM_CID;
@@ -133,9 +133,7 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
             case TOURNAMENT_ENTRY_CID:
                 _ins = new TournamentEntry();
                 break;
-            case TOURNAMENT_RACE_BOARD_CID:
-                _ins = new TournamentRaceBoard();
-                break;
+
             case CLIENT_CONNECTION_CID:
                 _ins = new ClientConnection();
                 break;

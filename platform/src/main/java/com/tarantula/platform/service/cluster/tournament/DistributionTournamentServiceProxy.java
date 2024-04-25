@@ -78,10 +78,24 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
 
     }
 
-    public boolean onEnterTournament(String serviceName,long tournamentId,long systemId){
+    public long onEnterGlobalTournament(String serviceName,long tournamentId,long segmentInstanceId,long systemId){
         NodeEngine nodeEngine = getNodeEngine();
-        EnterTournamentOperation operation = new EnterTournamentOperation(serviceName,tournamentId,systemId);
-        int partitionId = nodeEngine.getPartitionService().getPartitionId(tournamentId);
+        TournamentSegmentJoinOperation operation = new TournamentSegmentJoinOperation(serviceName,tournamentId,segmentInstanceId,systemId);
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(segmentInstanceId);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
+        ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+            Future<Long> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+        },metricsListener);
+        if(!result.successful) throw new RuntimeException(result.exception);
+        return (long)result.result;
+
+    }
+
+    public boolean onScoreGlobalTournament(String serviceName,long tournamentId,long instanceId,long entryId,long systemId,double credit,double delta){
+        NodeEngine nodeEngine = getNodeEngine();
+        TournamentScoreSegmentOperation operation = new TournamentScoreSegmentOperation(serviceName,tournamentId,instanceId,entryId,systemId,credit,delta);
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(instanceId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
             Future<Boolean> future = builder.invoke();
@@ -120,46 +134,20 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
 
     }
 
-    public boolean onScoreTournament(String serviceName,long tournamentId,long systemId,double credit,double delta){
+
+    public byte[] onRaceBoard(String serviceName,long tournamentId,long instanceId){
         NodeEngine nodeEngine = getNodeEngine();
-        TournamentScoreOperation operation = new TournamentScoreOperation(serviceName,tournamentId,0,systemId,credit,delta);
-        int partitionId = nodeEngine.getPartitionService().getPartitionId(tournamentId);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
-        ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-            Future<Boolean> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        },metricsListener);
-        if(!result.successful) throw new RuntimeException(result.exception);
-        return (boolean)result.result;
-
-    }
-
-
-    public Tournament.RaceBoard onListTournament(String serviceName,long tournamentId,long instanceId){
-        NodeEngine nodeEngine = getNodeEngine();
-        TournamentListOperation operation = new TournamentListOperation(serviceName,tournamentId,instanceId);
+        TournamentRaceBoardOperation operation = new TournamentRaceBoardOperation(serviceName,tournamentId,instanceId);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(instanceId);
         InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
         ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-            Future<Tournament.RaceBoard> future = builder.invoke();
+            Future<byte[]> future = builder.invoke();
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
         },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
-        return (Tournament.RaceBoard)result.result;
+        return (byte[])result.result;
     }
 
-    public Tournament.RaceBoard onListTournament(String serviceName,long tournamentId){
-        NodeEngine nodeEngine = getNodeEngine();
-        TournamentListOperation operation = new TournamentListOperation(serviceName,tournamentId,0);
-        int partitionId = nodeEngine.getPartitionService().getPartitionId(tournamentId);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,partitionId);
-        ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-            Future<Tournament.RaceBoard> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        },metricsListener);
-        if(!result.successful) throw new RuntimeException(result.exception);
-        return (Tournament.RaceBoard)result.result;
-    }
 
     public void onFinishTournament(String serviceName,String tournamentId,String instanceId,String systemId){
         NodeEngine nodeEngine = getNodeEngine();
