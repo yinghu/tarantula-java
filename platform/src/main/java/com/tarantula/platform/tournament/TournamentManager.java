@@ -298,17 +298,16 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             }
             TournamentInstanceQuery query = new TournamentInstanceQuery(this.distributionId,Tournament.GLOBAL_INSTANCE_LABEL);
             int[] index = {0};
-            DataStore.Stream<TournamentInstance> stream = ins->{
+            this.dataStore.list(query).forEach((ins->{
                 TournamentSegment segment = new TournamentSegment();
                 segment.tournamentInstance = ins;
                 ins.dataStore(dataStore);
                 ins.entryDataStore = tournamentServiceProvider.tournamentEntry;
                 ins.raceBoardDataStore = tournamentServiceProvider.tournamentRaceBoard;
+                ins.load();
                 tournamentSegmentIndex.put(ins.distributionId(),ins);
                 tournamentSegments[index[0]++] = segment;
-                return true;
-            };
-            this.dataStore.list(query,stream);
+            }));
             if(index[0]!=segmentsPerSchedule) throw new RuntimeException("segment not matched with ["+segmentsPerSchedule+"]");
             return;
         }

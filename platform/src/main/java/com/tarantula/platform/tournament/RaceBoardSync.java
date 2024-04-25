@@ -29,12 +29,11 @@ public class RaceBoardSync extends RecoverableObject {
         //LOAD
         TournamentEntryQuery query = new TournamentEntryQuery(this.distributionId);
         int[] index = {0};
-        DataStore.Stream<TournamentEntry> stream = entry->{
+        dataStore.list(query,entry->{
             board[index[0]++]=entry;
             if(entry.systemId()>0) entryIndex.put(entry.systemId(),entry);
             return true;
-        };
-        dataStore.list(query,stream);
+        });
         //CREATE IF NO ITEMS LOADED
         if(index[0]==0){
             for(int i=0;i<size;i++){
