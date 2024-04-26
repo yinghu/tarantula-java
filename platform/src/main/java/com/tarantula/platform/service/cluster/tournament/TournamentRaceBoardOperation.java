@@ -4,46 +4,46 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.PartitionAwareOperation;
-import com.icodesoftware.Tournament;
+
 
 import java.io.IOException;
 
 
-public class EnterTournamentOperation extends Operation implements PartitionAwareOperation {
+public class TournamentRaceBoardOperation extends Operation implements PartitionAwareOperation {
 
     private String serviceName;
+
     private long tournamentId;
+    private long instanceId;
 
-    private long systemId;
+    private byte[] raceBoard;
 
-    private boolean entered;
-
-    public EnterTournamentOperation() {
+    public TournamentRaceBoardOperation() {
     }
 
 
-    public EnterTournamentOperation(String serviceName, long tournamentId,long systemId) {
+    public TournamentRaceBoardOperation(String serviceName, long tournamentId, long instanceId) {
         this.serviceName = serviceName;
         this.tournamentId = tournamentId;
-        this.systemId = systemId;
+        this.instanceId = instanceId;
     }
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        entered = ais.enter(serviceName,tournamentId,systemId);
+        raceBoard = ais.raceBoard(serviceName,tournamentId,instanceId);
     }
 
     @Override
     public Object getResponse() {
-        return this.entered;
+        return this.raceBoard;
     }
 
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(this.serviceName);
-        out.writeLong(tournamentId);
-        out.writeLong(this.systemId);
+        out.writeLong(this.tournamentId);
+        out.writeLong(this.instanceId);
     }
 
     @Override
@@ -51,6 +51,6 @@ public class EnterTournamentOperation extends Operation implements PartitionAwar
         super.readInternal(in);
         serviceName = in.readUTF();
         tournamentId = in.readLong();
-        systemId = in.readLong();
+        instanceId = in.readLong();
     }
 }

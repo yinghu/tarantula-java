@@ -4,46 +4,47 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.PartitionAwareOperation;
-import com.icodesoftware.Tournament;
 
 import java.io.IOException;
 
 
-public class TournamentListOperation extends Operation implements PartitionAwareOperation {
+public class TournamentSegmentJoinOperation extends Operation implements PartitionAwareOperation {
 
     private String serviceName;
-
     private long tournamentId;
-    private long instanceId;
+    private long segmentInstanceId;
+    private long systemId;
 
-    private Tournament.RaceBoard raceBoard;
+    private long entered;
 
-    public TournamentListOperation() {
+    public TournamentSegmentJoinOperation() {
     }
 
 
-    public TournamentListOperation(String serviceName,long tournamentId, long instanceId) {
+    public TournamentSegmentJoinOperation(String serviceName, long tournamentId, long segmentInstanceId, long systemId) {
         this.serviceName = serviceName;
         this.tournamentId = tournamentId;
-        this.instanceId = instanceId;
+        this.segmentInstanceId = segmentInstanceId;
+        this.systemId = systemId;
     }
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        raceBoard = instanceId!=0?ais.list(serviceName,tournamentId,instanceId):ais.list(serviceName,tournamentId);
+        entered = ais.joinOnSegment(serviceName,tournamentId,segmentInstanceId,systemId);
     }
 
     @Override
     public Object getResponse() {
-        return this.raceBoard;
+        return this.entered;
     }
 
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(this.serviceName);
-        out.writeLong(this.tournamentId);
-        out.writeLong(this.instanceId);
+        out.writeLong(tournamentId);
+        out.writeLong(segmentInstanceId);
+        out.writeLong(this.systemId);
     }
 
     @Override
@@ -51,6 +52,7 @@ public class TournamentListOperation extends Operation implements PartitionAware
         super.readInternal(in);
         serviceName = in.readUTF();
         tournamentId = in.readLong();
-        instanceId = in.readLong();
+        segmentInstanceId = in.readLong();
+        systemId = in.readLong();
     }
 }

@@ -39,6 +39,14 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         this.onEdge = true;
         this.label = Tournament.ENTRY_LABEL;
     }
+
+    private TournamentEntry(long systemId,double score,long timestamp, int rank){
+        this();
+        this.systemId = systemId;
+        this.score = score;
+        this.timestamp = timestamp;
+        this.rank = rank;
+    }
     @Override
     public long systemId() {
         return systemId;
@@ -53,6 +61,7 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         finished = credits <= 0;
         this.update();
     }
+
     public double score(){
         return score;
     }
@@ -69,7 +78,7 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     public int rank(){
         return rank;
     }
-    void rank(int rank){
+    public void rank(int rank){
         this.rank = rank;
     }
 
@@ -136,5 +145,18 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         jsonObject.addProperty("LastUpdated",TimeUtil.fromUTCMilliseconds(timestamp).format(DateTimeFormatter.ISO_DATE_TIME));
         //jsonObject.addProperty("Finished",finished);
         return jsonObject;
+    }
+
+    public void update(TournamentEntry pendingEntry){
+        this.systemId = pendingEntry.systemId();
+        this.score = pendingEntry.score();
+        this.timestamp = pendingEntry.timestamp;
+    }
+
+    public TournamentEntry duplicate(int rank){
+        return new TournamentEntry(systemId,score,timestamp,rank);
+    }
+    public static TournamentEntry from(long systemId,double score,long timestamp,int rank){
+        return new TournamentEntry(systemId,score,timestamp,rank);
     }
 }

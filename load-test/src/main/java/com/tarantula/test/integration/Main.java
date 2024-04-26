@@ -22,7 +22,7 @@ public class Main {
 
     static boolean onFile = false;
 
-    public static void cmain(String[] args) throws Exception{
+    public static void vmain(String[] args) throws Exception{
         HttpCaller httpCaller = new HttpCaller("http://localhost:8090");
         httpCaller._init();
         String[] headers = new String[]{

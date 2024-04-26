@@ -6,12 +6,11 @@ import com.icodesoftware.Tournament;
 import com.icodesoftware.util.BufferUtil;
 import com.icodesoftware.util.SnowflakeKey;
 
-import com.tarantula.platform.tournament.TournamentJoin;
-import com.tarantula.platform.tournament.TournamentJoinQuery;
-import com.tarantula.platform.tournament.TournamentScheduleStatus;
-import com.tarantula.platform.tournament.TournamentScheduleStatusQuery;
+import com.tarantula.platform.tournament.*;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class TournamentTest extends DataStoreHook{
@@ -66,6 +65,18 @@ public class TournamentTest extends DataStoreHook{
         dataStore.deleteEdge(SnowflakeKey.from(tournamentId),TournamentJoin.TOURNAMENT_JOIN_LABEL);
         Assert.assertEquals(0,dataStore.list(new TournamentJoinQuery(SnowflakeKey.from(tournamentId),TournamentJoin.TOURNAMENT_JOIN_LABEL)).size());
 
+    }
+
+    @Test(groups = { "Tournament" })
+    public void tournamentSlotSelectionTest() {
+        AtomicInteger slot = new AtomicInteger(0);
+        for(int i=0;i<20;i++){
+            int x = slot.getAndAccumulate(10,(value,limit)->{
+                value++;
+                return value==limit? 0:value;
+            });
+            Assert.assertTrue(x>=0 && x<10);
+        }
     }
 
 

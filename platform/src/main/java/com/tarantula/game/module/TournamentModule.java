@@ -15,14 +15,11 @@ public class TournamentModule extends ModuleHeader implements Configurable.Liste
         if(session.action().equals("onList")){
             session.write(new TournamentContext(true,"tournament list",this.tournamentServiceProvider.list()).toJson().toString().getBytes());
         }
-        else if(session.action().equals("onJoin")){
-            Tournament.Instance ins = tournamentServiceProvider.tournament(Long.parseLong(session.name())).register(session);
-            session.write(ins.toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onBoard")){ // TODO: Clean this up once we have tournaments working
+
+        else if(session.action().equals("onBoard")){
             Tournament tournament = tournamentServiceProvider.tournament(Long.parseLong(session.name()));
             Tournament.RaceBoard board = tournament.register(session).raceBoard();
-            session.write(board.toString().getBytes());
+            session.write(board.toJson().toString().getBytes());
         }
         else if (session.action().equals("onLoadRankings")){
             session.write(TournamentMockUtils.GetMockTournamentRankings(Long.parseLong(session.systemId())).toString().getBytes());

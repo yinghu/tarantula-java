@@ -38,7 +38,7 @@ public class TournamentHistoryRecord extends RecoverableObject implements Tourna
             entry.ownerKey(key());
             this.dataStore.create(entry);
             entry.dataStore(dataStore);
-            tournamentRaceBoard.addEntry(entry);
+            //tournamentRaceBoard.addEntry(entry);
             return entry;
         });
         return entryIndex.size();
@@ -87,7 +87,7 @@ public class TournamentHistoryRecord extends RecoverableObject implements Tourna
         this.end = TimeUtil.fromUTCMilliseconds(((Number)properties.get("4")).longValue());
     }
     public Tournament.RaceBoard raceBoard(){
-        tournamentRaceBoard.reset();
+        //tournamentRaceBoard.reset();
         return tournamentRaceBoard;
     }
 
@@ -106,7 +106,7 @@ public class TournamentHistoryRecord extends RecoverableObject implements Tourna
         dataStore.list(new TournamentEntryQuery(this.distributionId()),(e)->{
             e.dataStore(dataStore);
             entryIndex.put(e.systemId(),e);
-            tournamentRaceBoard.addEntry(e);
+            //tournamentRaceBoard.addEntry(e);
             return true;
         });
         return true;

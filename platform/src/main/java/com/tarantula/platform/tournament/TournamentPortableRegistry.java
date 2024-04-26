@@ -12,7 +12,8 @@ public class TournamentPortableRegistry<T extends Recoverable> extends AbstractR
     public static final int TOURNAMENT_CID = PortableEventRegistry.TOURNAMENT_CID;
     public static final int TOURNAMENT_INSTANCE_CID = PortableEventRegistry.TOURNAMENT_INSTANCE_CID;
     public static final int TOURNAMENT_ENTRY_CID = PortableEventRegistry.TOURNAMENT_ENTRY_CID;
-    public static final int TOURNAMENT_RACE_BOARD_CID = PortableEventRegistry.TOURNAMENT_RACE_BOARD_CID;
+
+    public static final int TOURNAMENT_RACE_BOARD_CID = 11;
 
     public static final int TOURNAMENT_SCHEDULE_CID = 12;
 
