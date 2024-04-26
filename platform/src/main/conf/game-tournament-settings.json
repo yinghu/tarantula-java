@@ -6,5 +6,7 @@
   "smallConcurrentInstanceSize": 1,
   "mediumConcurrentInstanceSize": 3,
   "largeConcurrentInstanceSize": 8,
-  "clusterLockTimeoutSeconds": 5
+  "clusterLockTimeoutSeconds": 5,
+  "topRaceBoardSize": 10,
+  "myRaceBoardSize": 7
 }

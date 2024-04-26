@@ -24,6 +24,12 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     private static final String CONFIG = "game-tournament-settings";
 
+    static final String TOURNAMENT_DATA_STORE = "tournament";
+    static final String TOURNAMENT_JOIN_DATA_STORE = "tournament_join";
+    static final String TOURNAMENT_ENTRY_DATA_STORE = "tournament_entry";
+    static final String TOURNAMENT_RACE_BOARD_DATA_STORE = "tournament_race_board";
+
+
     public static final String NAME = "tournament";
 
     final static long SCHEDULE_RUNNER_DELAY = 500;
@@ -36,9 +42,15 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     private DistributionItemService distributionItemService;
     final String gameServiceName;
-    private DataStore dataStore;
 
-    private DataStore tournamentJoin;
+    DataStore dataStore;
+
+    DataStore tournamentJoin;
+
+    DataStore tournamentEntry;
+
+    DataStore tournamentRaceBoard;
+
     private CopyOnWriteArrayList<Tournament.Listener> listeners = new CopyOnWriteArrayList<>();
 
     private ConcurrentHashMap<Long,TournamentManager> tournamentIndex = new ConcurrentHashMap<>();
@@ -56,6 +68,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     int clusterLockTimeoutSeconds = 5;
 
     int maxPlayerHistoryRecords = 10;
+
+    int topRaceBoardSize;
+    int myRaceBoardSize;
 
     private String reloadKey;
     private final GameCluster gameCluster;
@@ -118,8 +133,12 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.endBufferTimeMinutes = ((Number)configuration.property("endBufferTimeMinutes")).intValue();
         this.maxPlayerHistoryRecords = ((Number)configuration.property("maxPlayerHistoryRecords")).intValue();
         this.clusterLockTimeoutSeconds = ((Number)configuration.property("clusterLockTimeoutSeconds")).intValue();
-        this.dataStore = applicationPreSetup.dataStore(gameCluster,name());
-        this.tournamentJoin = serviceContext.dataStore(gameCluster,Distributable.DATA_SCOPE,"tournament_join");
+        this.topRaceBoardSize = ((Number)configuration.property("topRaceBoardSize")).intValue();
+        this.myRaceBoardSize = ((Number)configuration.property("myRaceBoardSize")).intValue();
+        this.dataStore = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_DATA_STORE);
+        this.tournamentJoin = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_JOIN_DATA_STORE);
+        this.tournamentEntry = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_ENTRY_DATA_STORE);
+        this.tournamentRaceBoard = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_RACE_BOARD_DATA_STORE);
         this.logger = JDKLogger.getLogger(PlatformTournamentServiceProvider.class);
         this.reloadKey = this.serviceContext.clusterProvider().registerReloadListener(this);
         this.distributionTournamentService = this.serviceContext.clusterProvider().serviceProvider(DistributionTournamentService.NAME);
@@ -130,7 +149,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     @Override
     public void start() throws Exception {
-        dataStore.list(new TournamentScheduleStatusQuery(this.serviceContext.node().bucketId())).forEach(status->{
+        dataStore.list(new TournamentScheduleStatusQuery(this.gameCluster.distributionId())).forEach(status->{
             logger.warn("Tournament Status : "+status.tournamentId+" : "+status.status);
             if(status.status != Tournament.Status.PENDING){
                 TournamentManager tournament = new TournamentManager();
@@ -189,7 +208,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     private void scheduleTournament(){
         LocalDateTime _current = LocalDateTime.now();
-        TournamentScheduleStatusQuery query = new TournamentScheduleStatusQuery(this.serviceContext.node().bucketId());
+        TournamentScheduleStatusQuery query = new TournamentScheduleStatusQuery(this.gameCluster.distributionId());
         dataStore.list(query).forEach(ts->{
             TournamentSchedule schedule = this.tournamentSchedule(ts.distributionId());
             if(schedule!=null){
@@ -248,7 +267,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             scheduleStore.mapLock(lockKey);
             TournamentSchedule schedule = new TournamentSchedule((ConfigurableObject) t);
             TournamentScheduleStatus status = schedule.status();
-            status.ownerKey(SnowflakeKey.from(this.serviceContext.node().bucketId()));
+            status.ownerKey(SnowflakeKey.from(this.gameCluster.distributionId()));
             dataStore.createIfAbsent(status,true);
             if(status.status != Tournament.Status.PENDING) throw new RuntimeException("schedule is running on tournament ["+status.tournamentId+"]");
             validateSchedule(schedule);
@@ -324,7 +343,12 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         tournament.ownerKey(SnowflakeKey.from(schedule.distributionId()));
         tournament.dataStore(dataStore);
         if(!dataStore.create(tournament)){
-            throw new RuntimeException("Failed to create tournament instance");
+            throw new RuntimeException("Failed to create tournament manager");
+        }
+        if(schedule.global()){
+            for(int i=0;i<schedule.segmentsPerSchedule();i++){
+                tournament.createGlobalInstance();
+            }
         }
         status.tournamentId = tournament.distributionId();
         status.update(Tournament.Status.STARTING);
@@ -370,22 +394,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         return serviceContext.distributionId();
     }
 
-    TournamentJoin tournamentJoin(Session session,long scheduleId){
-        TournamentJoin[] joined = new TournamentJoin[]{null};
-        tournamentJoin.list(new TournamentJoinQuery(SnowflakeKey.from(session.distributionId()),TournamentJoin.PLAYER_JOIN_LABEL),join->{
-            if(join.scheduleId == scheduleId){
-                join.dataStore(tournamentJoin);
-                joined[0]=join;
-                return false;
-            }
-            return true;
-        });
-        if(joined[0]!=null) return joined[0];
-        TournamentJoin joining = TournamentJoin.init(session,scheduleId);
-        joining.dataStore(tournamentJoin);
-        tournamentJoin.create(joining);
-        return joining;
-    }
 
     ScheduledFuture<?> schedule(SchedulingTask task){
         return serviceContext.schedule(task);
@@ -406,10 +414,13 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         return tournamentManager.onRegister(slot);
     }
-    public boolean onTournamentEntered(long tournamentId,long systemId){
+    public long onTournamentSegmentEntered(long tournamentId,long segmentInstanceId,long systemId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
-        boolean joined = tournamentManager.onEnter(systemId);
-        return joined;
+        return tournamentManager.onEnterSegment(systemId,segmentInstanceId);
+    }
+    public boolean onTournamentSegmentScored(long tournamentId,long instanceId,long entryId, long systemId, double credit,double delta){
+        TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
+        return tournamentManager.onScoreSegment(systemId,instanceId,entryId,credit,delta);
     }
     public Tournament.Instance onTournamentEntered(long tournamentId,long instanceId,long systemId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
@@ -419,20 +430,12 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         return tournamentManager.onScore(systemId,instanceId,credit,delta);
     }
-    public boolean onTournamentScored(long tournamentId,long systemId, double credit,double delta){
+
+    public byte[] onTournamentListed(long tournamentId,long instanceId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
-        return tournamentManager.onScore(systemId,credit,delta);
-    }
-    public Tournament.RaceBoard onTournamentListed(long tournamentId,long instanceId){
-        TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
-        return tournamentManager.onRaceBoard(instanceId);
+        return tournamentManager.onRaceBoard(instanceId).toBinary();
     }
 
-    public Tournament.RaceBoard onTournamentListed(long tournamentId){
-        TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
-        if(tournamentManager == null) return new TournamentRaceBoard();
-        return tournamentManager.onRaceBoard();
-    }
     public void onTournamentFinished(String tournamentId,String instanceId,String systemId){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         //Tournament.Instance _ins = tournamentManager.lookup(instanceId);
@@ -472,10 +475,13 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
         //global schedule
         if(schedule.global() && schedule.segmentsPerSchedule()<=0) throw new RuntimeException("global segments per schedule must be at least 1 or more");
-
+        if(schedule.global() && schedule.maxEntriesPerInstance()<=0){
+            schedule.maxEntriesPerInstance(topRaceBoardSize);
+        }
         //none global schedule
         if(!schedule.global() && schedule.maxEntriesPerInstance()<=0) throw new RuntimeException("max entries per instance  must be at least 1 or more");
         if(!schedule.global() && schedule.durationMinutesPerInstance() < minDurationMinutesPerInstance) throw new RuntimeException("min minutes per instance less than ["+minDurationMinutesPerInstance+"]");
+
     }
 
 }

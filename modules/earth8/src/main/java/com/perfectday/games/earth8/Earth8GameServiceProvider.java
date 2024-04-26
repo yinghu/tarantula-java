@@ -14,11 +14,9 @@ import com.perfectday.games.earth8.inbox.PlayerAction;
 import com.perfectday.games.earth8.inbox.PlayerActionQuery;
 import com.perfectday.games.earth8.inbox.PlayerEventInbox;
 import com.perfectday.games.earth8.data.PlayerDataTrack;
-import com.perfectday.games.earth8.data.PlayerDataTrackQuery;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -94,52 +92,34 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
     public void updateGame(Session session,byte[] payload) throws Exception{
         BattleUpdate update = BattleUpdate.fromJson(payload);
-        Transaction transaction = gameContext.applicationSchema().transaction();
-        boolean updated = transaction.execute(ctx->{
-            ApplicationPreSetup applicationPreSetup = (ApplicationPreSetup)ctx;
-            DataStore dataStore = applicationPreSetup.onDataStore("battle");
-            if(!dataStore.create(update)) return false;
 
-            if (update.score > 0 && update.playerLevel > 0) {
-                DataStore tournamentTrackDataStore = applicationPreSetup.onDataStore("player_tournament_track");
-                var playerDataTracks = tournamentTrackDataStore.list(new PlayerDataTrackQuery(session.distributionId()));
-                PlayerDataTrack playerDataTrack = getActiveDataTrack(playerDataTracks, PlayerDataTrack.Type.Tournament);
+        if (update.score > 0 && update.playerLevel > 0) {
 
-                if(playerDataTracks.isEmpty() || playerDataTrack == null){
-                    scoreTournamentWithSameLevel(session, update, tournamentTrackDataStore);
-                }
-                else{
-                    Tournament existing = tournamentIndex.get(playerDataTrack.trackId);
-                    if(existing!=null){
-                        existing.register(session).update(session,entry->{
-                            entry.score(0,update.score);
-                            return true;
-                        });
-                    }
-                    else{
-                        if (scoreTournamentWithSameLevel(session, update, tournamentTrackDataStore)){
-                            playerDataTrack.trackId = 0;
-                            tournamentTrackDataStore.update(playerDataTrack);
-                        }
-                    }
-                }
+            var playerDataTrack = PlayerDataTrack.lookup(gameContext,session.distributionId(),PlayerDataTrack.Type.Tournament);
+
+            Tournament existing = tournamentIndex.get(playerDataTrack.trackId);
+            if(existing!=null){
+                existing.register(session).update(session,entry->{
+                    entry.score(0,update.score);
+                    return true;
+                });
+            }
+            else{
+                scoreTournamentWithSameLevel(session, update, playerDataTrack);
             }
 
-            //TO MORE TRANSACTION STUFF
-            PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext,session.distributionId(), PlayerDataTrack.Type.Analytics);
-            return update.update(applicationPreSetup, session,serverSession.trackId,gameContext.applicationSchema().applicationPreSetup().distributionId());
-        });
+        }
 
+        PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext,session.distributionId(), PlayerDataTrack.Type.Analytics);
 
-
-        if(updated)
+        if(update.update(gameContext.applicationSchema().applicationPreSetup(), session,serverSession.trackId,gameContext.applicationSchema().applicationPreSetup().distributionId()))
         {
             TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
             gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
                     update.publishAnalytics(webhook,ANALYTICS_QUERY))
             );
         }
-        session.write(JsonUtil.toSimpleResponse(updated,updated?"battle updated":"failed to update").getBytes());
+        session.write(JsonUtil.toSimpleResponse(true,"battle updated").getBytes());
     }
 
     public void endGame(Session session,byte[] payload) throws Exception{
@@ -297,27 +277,14 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         //UDP MESSAGE WITH RELAY CALL WITH SINGLE UDP MESSAGE
     }
 
-    private boolean scoreTournamentWithSameLevel(Session session, BattleUpdate update, DataStore tournamentTrackDataStore) {
+    private void scoreTournamentWithSameLevel(Session session, BattleUpdate update, PlayerDataTrack playerDataTrack) {
         Tournament nextLevel = tournamentIndex.get(update.playerLevel);
-        if(nextLevel!=null){
-            nextLevel.register(session).update(session,entry->{
-                entry.score(0,update.score);
-                return true;
-            });
-            var tournamentTrack = new PlayerDataTrack(nextLevel.distributionId());
-            tournamentTrack.ownerKey(SnowflakeKey.from(session.distributionId()));
-            tournamentTrackDataStore.create(tournamentTrack);
+        if(nextLevel==null) return;
+        nextLevel.register(session).update(session,entry->{
+            entry.score(0,update.score);
             return true;
-        }
-        return false;
-    }
-
-    private PlayerDataTrack getActiveDataTrack(List<PlayerDataTrack> tracks, PlayerDataTrack.Type trackType) {
-        for (var track : tracks) {
-            if (track.trackId > 0 && track.trackType == trackType) {
-                return track;
-            }
-        }
-        return null;
+        });
+        playerDataTrack.trackId = nextLevel.distributionId();
+        playerDataTrack.update();
     }
 }

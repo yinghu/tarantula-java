@@ -2,74 +2,49 @@ package com.tarantula.platform.tournament;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.hazelcast.nio.serialization.Portable;
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
-import com.icodesoftware.Tournament;
-import com.icodesoftware.util.RecoverableObject;
-import com.tarantula.platform.event.PortableEventRegistry;
 
-import java.io.IOException;
+import com.icodesoftware.Tournament;
+
+import com.icodesoftware.util.RecoverableObject;
+
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-public class TournamentRaceBoard extends RecoverableObject implements Tournament.RaceBoard, Portable {
+public class TournamentRaceBoard extends RecoverableObject implements Tournament.RaceBoard {
 
-    private List<Tournament.Entry> onBoard = new ArrayList<>();
-    private Portable[] pending;
-    private int size;
+    private static final int ENTRY_DATA_SIZE = 28;
+
+    private final List<Tournament.Entry> snapshot;
+
+    public TournamentRaceBoard(List<Tournament.Entry> snapshot){
+        this.snapshot = snapshot;
+    }
 
     public TournamentRaceBoard(){
-
-    }
-    public TournamentRaceBoard(int size){
-        this.size = size;
-    }
-    @Override
-    public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writePortableArray("1",pending);
+        this.snapshot = new ArrayList<>();
     }
 
-    @Override
-    public void readPortable(PortableReader portableReader) throws IOException {
-        for(Portable p : portableReader.readPortableArray("1")){
-            onBoard.add((Tournament.Entry)p);
-        }
-    }
     @Override
     public int getFactoryId() {
-        return PortableEventRegistry.OID;
+        return TournamentPortableRegistry.OID;
     }
 
     @Override
     public int getClassId() {
-        return PortableEventRegistry.TOURNAMENT_RACE_BOARD_CID;
+        return TournamentPortableRegistry.TOURNAMENT_RACE_BOARD_CID;
     }
     @Override
     public int size() {
-        return size;
+        return snapshot.size();
     }
 
     @Override
     public List<Tournament.Entry> list() {
-        return onBoard;
+        return snapshot;
     }
 
-    public void addEntry(Tournament.Entry entry){
-        synchronized (onBoard){
-            onBoard.add(entry);
-            size++;
-        }
-    }
-    public void reset(){
-        synchronized (onBoard){
-            pending = new Portable[onBoard.size()];
-            for(int i=0;i<onBoard.size();i++){
-                pending[i]=(Portable)onBoard.get(i);
-            }
-        }
-    }
+
 
     public Tournament.Entry myPosition(){
         return null;
@@ -79,14 +54,40 @@ public class TournamentRaceBoard extends RecoverableObject implements Tournament
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("Successful",true);
-        Collections.sort(onBoard,new TournamentEntryComparator());
         JsonArray plist = new JsonArray();
         int[] rank = {1};
-        onBoard.forEach((v)->{
+        snapshot.forEach((v)->{
             ((TournamentEntry)v).rank(rank[0]++);
             plist.add(v.toJson());
         });
         jsonObject.add("_board",plist);
         return jsonObject;
+    }
+
+
+    @Override
+    public byte[] toBinary() {
+        ByteBuffer buffer = ByteBuffer.allocate(snapshot.size()*ENTRY_DATA_SIZE);
+        snapshot.forEach(entry -> {
+            buffer.putLong(entry.systemId());
+            buffer.putDouble(entry.score());
+            buffer.putLong(entry.timestamp());
+            buffer.putInt(entry.rank());
+        });
+        return buffer.array();
+    }
+
+    @Override
+    public void fromBinary(byte[] payload) {
+        ByteBuffer buffer = ByteBuffer.wrap(payload);
+        while (buffer.hasRemaining()){
+            snapshot.add(TournamentEntry.from(buffer.getLong(),buffer.getDouble(),buffer.getLong(),buffer.getInt()));
+        }
+    }
+
+    public static TournamentRaceBoard from(byte[] payload){
+        TournamentRaceBoard tournamentRaceBoard = new TournamentRaceBoard();
+        tournamentRaceBoard.fromBinary(payload);
+        return tournamentRaceBoard;
     }
 }

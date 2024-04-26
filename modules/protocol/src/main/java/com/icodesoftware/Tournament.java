@@ -10,7 +10,10 @@ public interface Tournament extends Configurable {
     String MANAGER_LABEL = "tournament_manager";
     String REGISTER_LABEL = "tournament_register";
     String INSTANCE_LABEL = "tournament_instance";
+
     String GLOBAL_INSTANCE_LABEL = "tournament_global";
+    String GLOBAL_RACE_BOARD_LABEL = "tournament_race_board";
+
     String ENTRY_LABEL = "tournament_entry";
 
     String HISTORY_LABEL = "tournament_history";
