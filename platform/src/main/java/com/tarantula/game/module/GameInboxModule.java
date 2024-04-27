@@ -32,6 +32,14 @@ public class GameInboxModule extends ModuleHeader{
                 session.write(inventory.toJson().toString().getBytes());
             }
         }
+        else if(session.action().equals("onStatistics")){
+            Statistics statistics = this.gameServiceProvider.presenceServiceProvider().statistics(session);
+            session.write(statistics.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("OnRating")){
+            Rating rating = this.gameServiceProvider.presenceServiceProvider().rating(session);
+            session.write(rating.toJson().toString().getBytes());
+        }
         else{
             throw new UnsupportedOperationException(session.action()+" not support");
         }
