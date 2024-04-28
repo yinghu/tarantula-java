@@ -145,7 +145,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         deltaStatistics.distributionId(currentSaveIndex.saveId);
         deltaStatistics.dataStore(applicationPreSetup.dataStore(gameCluster,NAME+"_statistics"));
         deltaStatistics.load();
-        deltaStatistics.registerListener((entry -> {
+        deltaStatistics.registerListener(((entry,delta) -> {
             entry.systemId(session.systemId());
             LeaderBoard leaderBoard = platformLeaderBoardProvider.leaderBoard(entry.name());
             leaderBoard.onAllBoard(entry);

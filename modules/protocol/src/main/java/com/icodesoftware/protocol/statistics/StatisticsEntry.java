@@ -100,7 +100,7 @@ public class StatisticsEntry extends OnApplicationHeader implements Statistics.E
         }
         total += delta;
         if(listener==null) return this;
-        listener.entryUpdated(this);
+        listener.entryUpdated(this,delta);
         return this;
     }
     @Override

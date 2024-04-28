@@ -29,7 +29,7 @@ public interface Statistics extends OnApplication{
         void onEntry(Entry entry);
     }
     interface Listener{
-        void entryUpdated(Entry entry);
+        void entryUpdated(Entry entry,double delta);
     }
 
 }
