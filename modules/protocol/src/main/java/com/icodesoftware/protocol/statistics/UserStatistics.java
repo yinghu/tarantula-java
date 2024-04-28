@@ -31,18 +31,17 @@ public class UserStatistics extends OnApplicationHeader implements Statistics {
             //new entry
             StatisticsEntry se = new StatisticsEntry(this.key(),ename);
             this.dataStore.create(se);
-            this.dataStore.update(this);
             se.dataStore(this.dataStore);
             return se;
         });
         entry.listener(this.listener);
         return entry;
+
     }
     //memory copy list
     public List<Entry> summary(){
         ArrayList<Entry> elist = new ArrayList<>();
         mappings.forEach((k,v)->{
-            //v.load();
             elist.add(v.duplicate());
         });
         return elist;
@@ -50,7 +49,6 @@ public class UserStatistics extends OnApplicationHeader implements Statistics {
     //original streaming
     public void summary(Stream query){
         mappings.forEach((k,v)->{
-            //v.load();
             query.onEntry(v);
         });
     }

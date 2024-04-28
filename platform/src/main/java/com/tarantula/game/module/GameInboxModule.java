@@ -36,7 +36,7 @@ public class GameInboxModule extends ModuleHeader{
             Statistics statistics = this.gameServiceProvider.presenceServiceProvider().statistics(session);
             session.write(statistics.toJson().toString().getBytes());
         }
-        else if(session.action().equals("OnRating")){
+        else if(session.action().equals("onRating")){
             Rating rating = this.gameServiceProvider.presenceServiceProvider().rating(session);
             session.write(rating.toJson().toString().getBytes());
         }
