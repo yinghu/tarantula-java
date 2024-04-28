@@ -38,10 +38,10 @@ public class UserRating extends RecoverableObject implements Rating {
     public Rating update(double xpDelta,Listener listener) {
         levelUpXp += xpDelta;
         xp += xpDelta;
-        if(!listener.levelUp(levelUpXp)) return this;
+        if(!listener.levelUp(this,levelUpXp)) return this;
         level++;
         levelUpXp = 0;
-        if(!listener.rankUp(level)) return this;
+        if(!listener.rankUp(this,level)) return this;
         rank++;
         return this;
     }

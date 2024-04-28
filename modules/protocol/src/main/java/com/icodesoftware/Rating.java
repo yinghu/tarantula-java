@@ -11,7 +11,7 @@ public interface Rating extends Recoverable, DataStore.Updatable {
 
 
     interface Listener{
-        boolean levelUp(double xp);
-        boolean rankUp(int level);
+        boolean levelUp(Rating rating,double xp);
+        boolean rankUp(Rating rating,int level);
     }
 }
