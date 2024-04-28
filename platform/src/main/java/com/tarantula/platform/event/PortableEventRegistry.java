@@ -5,7 +5,6 @@ import com.hazelcast.nio.serialization.PortableFactory;
 import com.tarantula.cci.udp.GameChannel;
 import com.tarantula.platform.ClientConnection;
 import com.tarantula.platform.room.*;
-import com.tarantula.game.GameRating;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.GameCluster;
@@ -57,8 +56,6 @@ public class PortableEventRegistry implements PortableFactory {
     public static final int ACCESS_INDEX_CID = 107;
 
     public static final int EXPOSED_GAME_SERVICE_CID = 108;
-
-    public static final int RATING_CID = 110;
 
     public static final int TOURNAMENT_CID = 113;
 
@@ -143,9 +140,6 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case ACCESS_INDEX_CID:
                 _ins = new AccessIndexTrack();
-                break;
-            case RATING_CID:
-                _ins = new GameRating();
                 break;
             case TOURNAMENT_CID:
                 _ins = new TournamentManager();

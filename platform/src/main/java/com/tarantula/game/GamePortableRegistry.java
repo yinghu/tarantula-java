@@ -17,9 +17,6 @@ public class GamePortableRegistry<T extends Recoverable>  extends AbstractRecove
 
     public static final int GAME_ROOM_CID = 7;
 
-    public static final int RATING_CID = PortableEventRegistry.RATING_CID;//110
-
-
     public static GamePortableRegistry INS;
 
     public GamePortableRegistry(){
@@ -36,9 +33,6 @@ public class GamePortableRegistry<T extends Recoverable>  extends AbstractRecove
         switch (i){
             case GAME_UPDATE_OBJECT_CID:
                 pt = new GameUpdateObject();
-                break;
-            case RATING_CID:
-                pt = new GameRating();
                 break;
             case STUB_CID:
                 pt = new Stub();

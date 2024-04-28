@@ -5,13 +5,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.protocol.ProtocolPortableRegistry;
+import com.icodesoftware.protocol.statistics.UserRating;
 import com.icodesoftware.protocol.statistics.UserStatistics;
 import com.icodesoftware.service.ServiceContext;
 
 import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.GamePortableRegistry;
-import com.tarantula.game.GameRating;
 
 import com.tarantula.game.Stub;
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -110,10 +111,10 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         profile.dataStore(this.dataStore);
         return profile;
     }
-    public GameRating rating(Session session){
-        GameRating[] loaded  = {new GameRating()};
+    public Rating rating(Session session){
+        UserRating[] loaded  = {new UserRating()};
         CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);
-        RecoverableQuery<GameRating> query = RecoverableQuery.query(currentSaveIndex.saveId,loaded[0], GamePortableRegistry.INS);
+        RecoverableQuery<UserRating> query = RecoverableQuery.query(currentSaveIndex.saveId,loaded[0], ProtocolPortableRegistry.INS);
         mDataStore.list(query,(m)->{
             if(m.label().equals(loaded[0].label())){
                 loaded[0]=m;

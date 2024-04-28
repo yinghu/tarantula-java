@@ -34,6 +34,18 @@ public class UserRating extends RecoverableObject implements Rating {
         return this;
     }
 
+    @Override
+    public Rating update(double xpDelta,Listener listener) {
+        levelUpXp += xpDelta;
+        xp += xpDelta;
+        if(!listener.levelUp(levelUpXp)) return this;
+        level++;
+        levelUpXp = 0;
+        if(!listener.rankUp(level)) return this;
+        rank++;
+        return this;
+    }
+
     public boolean read(DataBuffer buffer){
         this.rank = buffer.readInt();
         this.level = buffer.readInt();

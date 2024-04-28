@@ -1,7 +1,7 @@
 package com.tarantula.test;
 
 import com.icodesoftware.Rating;
-import com.tarantula.game.GameRating;
+import com.icodesoftware.protocol.statistics.UserRating;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -10,7 +10,7 @@ public class RatingTest {
 
     @Test(groups = { "Rating" })
     public void levelUp1000Test() {
-        GameRating rating = new GameRating();
+        UserRating rating = new UserRating();
         double levelUpLimit = 1000;
         Rating r = rating.update(10,levelUpLimit);
         Assert.assertEquals(r.rank(), 1);
@@ -30,7 +30,7 @@ public class RatingTest {
 
     @Test(groups = { "Rating" })
     public void levelUp500Test() {
-        GameRating rating = new GameRating();
+        UserRating rating = new UserRating();
         double levelUpLimit = 500;
         Rating r = rating.update(10,levelUpLimit);
         Assert.assertEquals(r.rank(), 1);
@@ -51,7 +51,7 @@ public class RatingTest {
 
     @Test(groups = { "Rating" })
     public void levelUp200Test() {
-        GameRating rating = new GameRating();
+        UserRating rating = new UserRating();
         double levelUpLimit = 200;
         Rating r = rating.update(10,levelUpLimit);
         Assert.assertEquals(r.rank(), 1);

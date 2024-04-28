@@ -132,7 +132,9 @@ public class MiscTest {
             exception = ex;
         }
         finally {
-            System.out.println("final block");
+            //System.out.println("final block");
+            Assert.assertTrue(sampleCloseable.closed);
+            Assert.assertTrue(sampleCloseable1.closed);
         }
         Assert.assertNotNull(exception);
     }

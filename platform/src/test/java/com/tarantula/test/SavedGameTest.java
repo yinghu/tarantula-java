@@ -2,10 +2,10 @@ package com.tarantula.test;
 
 
 import com.icodesoftware.DataStore;
+import com.icodesoftware.protocol.ProtocolPortableRegistry;
+import com.icodesoftware.protocol.statistics.UserRating;
 import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.game.GamePortableRegistry;
-import com.tarantula.game.GameRating;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 import com.tarantula.platform.presence.saves.SavedGame;
@@ -51,11 +51,11 @@ public class SavedGameTest extends DataStoreHook{
         load.distributionId(save.distributionId());
         Assert.assertTrue(dataStore.load(load));
         Assert.assertEquals(load.stub,save.stub);
-        GameRating rating = new GameRating();
+        UserRating rating = new UserRating();
         rating.ownerKey(load.key());
         Assert.assertTrue(dataStoreForRanking.create(rating));
-        GamePortableRegistry registry = new GamePortableRegistry();
-        List<GameRating> rlist = dataStoreForRanking.list(new RecoverableQuery<>(save.key(),rating.label(),GamePortableRegistry.RATING_CID,registry));
+        ProtocolPortableRegistry registry = new ProtocolPortableRegistry();
+        List<UserRating> rlist = dataStoreForRanking.list(new RecoverableQuery<>(save.key(),rating.label(), ProtocolPortableRegistry.USER_RATION_CID,registry));
         Assert.assertEquals(rlist.size(),1);
     }
 }

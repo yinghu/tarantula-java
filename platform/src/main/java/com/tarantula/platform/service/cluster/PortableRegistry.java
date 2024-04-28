@@ -3,7 +3,6 @@ package com.tarantula.platform.service.cluster;
 import com.icodesoftware.Recoverable;
 
 import com.icodesoftware.util.AbstractRecoverableListener;
-import com.tarantula.game.GameRating;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.event.SessionForward;
@@ -46,7 +45,6 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
     public static final int ACCESS_INDEX_CID = PortableEventRegistry.ACCESS_INDEX_CID;
 
-    public static final int RATING_CID = PortableEventRegistry.RATING_CID;
     public static final int TOURNAMENT_CID = PortableEventRegistry.TOURNAMENT_CID;
 
     public static final int TOURNAMENT_INSTANCE_CID = PortableEventRegistry.TOURNAMENT_INSTANCE_CID;
@@ -114,9 +112,6 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
                 break;
             case ACCESS_INDEX_CID:
                 _ins = new AccessIndexTrack();
-                break;
-            case RATING_CID:
-                _ins = new GameRating();
                 break;
             case TOURNAMENT_CID:
                 _ins = new TournamentManager();
