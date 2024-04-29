@@ -28,6 +28,33 @@ public class LoadResult {
     static AtomicInteger totalSuccessStatistics = new AtomicInteger(0);
     static AtomicInteger totalFailureStatistics = new AtomicInteger(0);
 
+    static AtomicInteger totalSuccessCreateProfile = new AtomicInteger(0);
+    static AtomicInteger totalFailureCreateProfile = new AtomicInteger(0);
+
+    static AtomicInteger totalSuccessStartGame = new AtomicInteger(0);
+    static AtomicInteger totalFailureStartGame = new AtomicInteger(0);
+
+    static AtomicInteger totalSuccessScoreTournament = new AtomicInteger(0);
+    static AtomicInteger totalFailureScoreTournament = new AtomicInteger(0);
+
+    static AtomicInteger totalSuccessEndGame = new AtomicInteger(0);
+    static AtomicInteger totalFailureEndGame = new AtomicInteger(0);
+
+    static AtomicInteger totalSuccessFetchProfile = new AtomicInteger(0);
+    static AtomicInteger totalFailureFetchProfile = new AtomicInteger(0);
+
+    static AtomicInteger totalSuccessSaveOnSet = new AtomicInteger(0);
+    static AtomicInteger totalFailureSaveOnSet = new AtomicInteger(0);
+
+    static AtomicInteger totalSuccessSaveOnGet = new AtomicInteger(0);
+    static AtomicInteger totalFailureSaveOnGet = new AtomicInteger(0);
+
+    static AtomicInteger totalSuccessLoadShop = new AtomicInteger(0);
+    static AtomicInteger totalFailureLoadShop = new AtomicInteger(0);
+
+    static AtomicInteger totalSuccessCoinForm = new AtomicInteger(0);
+    static AtomicInteger totalFailureCoinForm = new AtomicInteger(0);
+
 
     static AtomicInteger totalFailureOther = new AtomicInteger(0);
 
@@ -89,6 +116,24 @@ public class LoadResult {
                 bw.write("Total Failure Join Count ["+totalFailureJoin.get()+"]\n");
                 bw.write("Total Success Statistics Count ["+totalSuccessStatistics.get()+"]\n");
                 bw.write("Total Failure Statistics Count ["+totalFailureStatistics.get()+"]\n");
+                bw.write("Total Success CreateProfile Count ["+totalSuccessCreateProfile.get()+"]\n");
+                bw.write("Total Failure CreateProfile Count ["+totalFailureCreateProfile.get()+"]\n");
+                bw.write("Total Success FetchProfile Count ["+totalSuccessFetchProfile.get()+"]\n");
+                bw.write("Total Failure FetchProfile Count ["+totalFailureFetchProfile.get()+"]\n");
+                bw.write("Total Success SaveOnSet Count ["+totalSuccessSaveOnSet.get()+"]\n");
+                bw.write("Total Failure SaveOnSet Count ["+totalFailureSaveOnSet.get()+"]\n");
+                bw.write("Total Success SaveOnGet Count ["+totalSuccessSaveOnGet.get()+"]\n");
+                bw.write("Total Failure SaveOnGet Count ["+totalFailureSaveOnGet.get()+"]\n");
+                bw.write("Total Success LoadShop Count ["+totalSuccessLoadShop.get()+"]\n");
+                bw.write("Total Failure LoadShop Count ["+totalFailureLoadShop.get()+"]\n");
+                bw.write("Total Success StartGame Count ["+totalSuccessStartGame.get()+"]\n");
+                bw.write("Total Failure StartGame Count ["+totalFailureStartGame.get()+"]\n");
+                bw.write("Total Success ScoreTournament Count ["+totalSuccessScoreTournament.get()+"]\n");
+                bw.write("Total Failure ScoreTournament Count ["+totalFailureScoreTournament.get()+"]\n");
+                bw.write("Total Success EndGame Count ["+totalSuccessEndGame.get()+"]\n");
+                bw.write("Total Failure EndGame Count ["+totalFailureEndGame.get()+"]\n");
+                bw.write("Total Success CoinForm Count ["+totalSuccessCoinForm.get()+"]\n");
+                bw.write("Total Failure CoinForm Count ["+totalFailureCoinForm.get()+"]\n");
 
                 bw.write("Total Success Leave Count ["+totalSuccessLeave.get()+"]\n");
                 bw.write("Total Failure Leave Count ["+totalFailureLeave.get()+"]\n");

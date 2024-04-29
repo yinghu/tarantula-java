@@ -27,7 +27,7 @@ public class Main {
         httpCaller._init();
         String[] headers = new String[]{
                 Session.TARANTULA_ACCESS_KEY,
-                "560375134943195136-6981C669F8A30C824A89D4CF0CE362A1C8AE91EB-1D6316B006ED0ADCDDE0DB8C6A591666",
+                "570342964778242048-6879508E047E7B7BF8A50EF2951A3A198EE81957-FA80A8B8A29B7C4C4D636032D4BFA571",
                 Session.TARANTULA_ACTION,
                 "onGameClusterEvent",
                 Session.TARANTULA_NAME,
