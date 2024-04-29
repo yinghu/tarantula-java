@@ -6,11 +6,11 @@ import com.icodesoftware.Rating;
 import com.icodesoftware.protocol.ProtocolPortableRegistry;
 import com.icodesoftware.util.RecoverableObject;
 
-public class UserRating extends RecoverableObject implements Rating {
+public class UserRating extends RecoverableObject implements Rating,Rating.Listener {
 
 
     public static int RANK_UP_LEVEL_BASE = 100;
-
+    public static double LEVEL_UP_XP = 100;
     public int rank = 1; //rank of lobby
     public int level = 1; //total level
     public double xp =0; //total xp
@@ -22,15 +22,15 @@ public class UserRating extends RecoverableObject implements Rating {
         this.label = "rating";
     }
 
-    public Rating update(double xpDelta, double levelUpLimit){
+    public Rating update(double xpDelta){
         levelUpXp += xpDelta;
         xp += xpDelta;
-        if(levelUpXp < levelUpLimit) return this;
+        if(!levelUp(this,xpDelta)) return this;
         //level up
         level++;
         levelUpXp = 0;
-        int _tryRank = 1+((level-1)/RANK_UP_LEVEL_BASE);
-        if(_tryRank > rank) rank = _tryRank;
+        if(!rankUp(this,level)) return this;
+        rank++;
         return this;
     }
 
@@ -95,5 +95,16 @@ public class UserRating extends RecoverableObject implements Rating {
     @Override
     public double xp() {
         return xp;
+    }
+
+    @Override
+    public boolean levelUp(Rating rating, double xp) {
+        return xp >= LEVEL_UP_XP;
+    }
+
+    @Override
+    public boolean rankUp(Rating rating, int level) {
+        int _tryRank = 1+((level-1)/RANK_UP_LEVEL_BASE);
+        return _tryRank > rating.rank();
     }
 }

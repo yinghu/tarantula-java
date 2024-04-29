@@ -6,7 +6,7 @@ public interface Rating extends Recoverable, DataStore.Updatable {
     int level();
     double xp();
 
-    Rating update(double delta,double levelUpLimit);
+    Rating update(double delta);
     Rating update(double delta,Listener listener);
 
 

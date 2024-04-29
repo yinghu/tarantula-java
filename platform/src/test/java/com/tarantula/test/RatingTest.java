@@ -1,6 +1,5 @@
 package com.tarantula.test;
 
-import com.beust.ah.A;
 import com.icodesoftware.Rating;
 import com.icodesoftware.protocol.statistics.UserRating;
 import org.testng.Assert;
@@ -10,64 +9,16 @@ public class RatingTest implements Rating.Listener {
 
 
     @Test(groups = { "Rating" })
-    public void levelUp1000Test() {
+    public void levelUpTest() {
         UserRating rating = new UserRating();
-        double levelUpLimit = 1000;
-        Rating r = rating.update(10,levelUpLimit);
+        Rating r = rating.update(100);
         Assert.assertEquals(r.rank(), 1);
-        Assert.assertEquals(r.xp(),10d);
-        Assert.assertEquals(r.level(),1);
-        for(int i=1;i<=99;i++) {
-            r.update(levelUpLimit,levelUpLimit);
-            Assert.assertEquals(r.rank(), 1);
-            Assert.assertEquals(r.xp(), i*levelUpLimit+10d);
-            Assert.assertEquals(r.level(),i+1);
+        Assert.assertEquals(r.xp(),100);
+        Assert.assertEquals(r.level(),2);
+        for(int i=0;i<100;i++) {
+            r.update(100);
         }
-        r.update(levelUpLimit,levelUpLimit);
         Assert.assertEquals(r.rank(), 2);
-        Assert.assertEquals(r.xp(), 100*levelUpLimit+10d);
-        Assert.assertEquals(r.level(),101);
-    }
-
-    @Test(groups = { "Rating" })
-    public void levelUp500Test() {
-        UserRating rating = new UserRating();
-        double levelUpLimit = 500;
-        Rating r = rating.update(10,levelUpLimit);
-        Assert.assertEquals(r.rank(), 1);
-        Assert.assertEquals(r.xp(),10d);
-        Assert.assertEquals(r.level(),1);
-        for(int i=1;i<=99;i++) {
-            r.update(levelUpLimit,levelUpLimit);
-            Assert.assertEquals(r.rank(), 1);
-            Assert.assertEquals(r.xp(), i*levelUpLimit+10d);
-            Assert.assertEquals(r.level(),i+1);
-        }
-        r.update(levelUpLimit,levelUpLimit);
-        Assert.assertEquals(r.rank(), 2);
-        Assert.assertEquals(r.xp(), 100*levelUpLimit+10d);
-        Assert.assertEquals(r.level(),101);
-
-    }
-
-    @Test(groups = { "Rating" })
-    public void levelUp200Test() {
-        UserRating rating = new UserRating();
-        double levelUpLimit = 200;
-        Rating r = rating.update(10,levelUpLimit);
-        Assert.assertEquals(r.rank(), 1);
-        Assert.assertEquals(r.xp(),10d);
-        Assert.assertEquals(r.level(),1);
-        for(int i=1;i<=99;i++) {
-            r.update(levelUpLimit,levelUpLimit);
-            Assert.assertEquals(r.rank(), 1);
-            Assert.assertEquals(r.xp(), i*levelUpLimit+10d);
-            Assert.assertEquals(r.level(),i+1);
-        }
-        r.update(levelUpLimit,levelUpLimit);
-        Assert.assertEquals(r.rank(), 2);
-        Assert.assertEquals(r.xp(), 100*levelUpLimit+10d);
-        Assert.assertEquals(r.level(),101);
     }
 
     @Test(groups = { "Rating" })
