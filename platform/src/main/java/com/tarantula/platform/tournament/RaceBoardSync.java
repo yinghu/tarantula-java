@@ -1,6 +1,5 @@
 package com.tarantula.platform.tournament;
 
-import com.icodesoftware.DataStore;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.SnowflakeKey;
@@ -32,6 +31,7 @@ public class RaceBoardSync extends RecoverableObject {
         dataStore.list(query,entry->{
             board[index[0]++]=entry;
             if(entry.systemId()>0) entryIndex.put(entry.systemId(),entry);
+            entry.dataStore(dataStore);
             return true;
         });
         //CREATE IF NO ITEMS LOADED
@@ -40,9 +40,11 @@ public class RaceBoardSync extends RecoverableObject {
                 TournamentEntry entry = new TournamentEntry();
                 entry.ownerKey(SnowflakeKey.from(distributionId));
                 dataStore.create(entry);
+                entry.dataStore(dataStore);
                 board[i]=entry;
             }
         }
+        Arrays.sort(board,entryComparator);
     }
 
     public synchronized void onBoard(TournamentEntry pendingEntry){
@@ -50,12 +52,14 @@ public class RaceBoardSync extends RecoverableObject {
         if(entry == null && (entry = board[size-1]).score() < pendingEntry.score()){
             entryIndex.remove(entry.systemId());
             entry.update(pendingEntry);
+            entry.update();
             entryIndex.put(pendingEntry.systemId(),entry);
             Arrays.sort(board,entryComparator);
             return;
         }
         if(entry != null && entry.score() < pendingEntry.score()){
             entry.update(pendingEntry);
+            entry.update();
             Arrays.sort(board,entryComparator);
         }
     }

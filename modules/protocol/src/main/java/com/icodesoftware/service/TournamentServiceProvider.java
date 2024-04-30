@@ -10,6 +10,8 @@ public interface TournamentServiceProvider extends ConfigurationServiceProvider{
 
     Tournament tournament(long tournamentId);
     List<Tournament> list();
+    List<Tournament> list(String type);
+
     boolean available(long tournamentId);
 
     //List<Tournament.History> playerHistory(String systemId);

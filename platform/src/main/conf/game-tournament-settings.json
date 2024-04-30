@@ -7,6 +7,7 @@
   "mediumConcurrentInstanceSize": 3,
   "largeConcurrentInstanceSize": 8,
   "clusterLockTimeoutSeconds": 5,
+  "recentlyTournamentListSize": 4,
   "topRaceBoardSize": 10,
   "myRaceBoardSize": 7
 }

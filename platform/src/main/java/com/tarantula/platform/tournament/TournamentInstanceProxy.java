@@ -9,12 +9,12 @@ import java.time.LocalDateTime;
 public class TournamentInstanceProxy extends RecoverableObject implements Tournament.Instance {
 
     private TournamentManager tournamentManager;
-    private TournamentJoin instance;
+    private TournamentJoin tournamentJoin;
 
 
-    public TournamentInstanceProxy(TournamentManager tournamentManager,TournamentJoin instance){
+    public TournamentInstanceProxy(TournamentManager tournamentManager,TournamentJoin tournamentJoin){
         this.tournamentManager = tournamentManager;
-        this.instance = instance;
+        this.tournamentJoin = tournamentJoin;
     }
     @Override
     public Tournament.Status status() {
@@ -49,22 +49,26 @@ public class TournamentInstanceProxy extends RecoverableObject implements Tourna
             TournamentEntryProxy tournamentEntryProxy = new TournamentEntryProxy();
             onEntry.on(tournamentEntryProxy);
             if(tournamentManager.targetScore()>0){
-                if(tournamentEntryProxy.score() != tournamentManager.targetScore()) return false;
-                boolean finished = tournamentManager.enter(session);
-                instance.finished();
-                return finished;
+                if(tournamentJoin.finished || tournamentEntryProxy.score() != tournamentManager.targetScore()) return false;
+                tournamentManager.enter(session);
+                tournamentJoin.finished();
+                return true;
             }
             boolean finished = tournamentManager.score(session,tournamentEntryProxy);
-            if(finished) instance.finished();
+            if(finished) tournamentJoin.finished();
             return finished;
         }
         TournamentEntryProxy tournamentEntryProxy = new TournamentEntryProxy();
         onEntry.on(tournamentEntryProxy);
-        return tournamentManager.score(session,instance.instanceId,tournamentEntryProxy);
+        return tournamentManager.score(session,tournamentJoin.instanceId,tournamentEntryProxy);
     }
 
     @Override
     public Tournament.RaceBoard raceBoard() {
-        return this.tournamentManager.raceBoard(instance);
+        return this.tournamentManager.raceBoard(tournamentJoin);
+    }
+
+    public Tournament.RaceBoard myRaceBoard(){
+        return this.tournamentManager.myRaceBoard(tournamentJoin);
     }
 }

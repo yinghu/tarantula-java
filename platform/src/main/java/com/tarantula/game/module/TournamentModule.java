@@ -13,17 +13,20 @@ public class TournamentModule extends ModuleHeader implements Configurable.Liste
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")){
-            session.write(new TournamentContext(true,"tournament list",this.tournamentServiceProvider.list()).toJson().toString().getBytes());
+            session.write(new TournamentContext(true,"tournament list",this.tournamentServiceProvider.list(session.name())).toJson().toString().getBytes());
         }
-
         else if(session.action().equals("onBoard")){
             Tournament tournament = tournamentServiceProvider.tournament(Long.parseLong(session.name()));
-            Tournament.RaceBoard board = tournament.register(session).raceBoard();
-            session.write(board.toJson().toString().getBytes());
+            Tournament.Instance instance = tournament.register(session);
+            Tournament.RaceBoard board = instance.raceBoard();
+            Tournament.RaceBoard myBoard = instance.myRaceBoard();
+            session.write(new TournamentContext(board,myBoard).toJson().toString().getBytes());
         }
+        //pending removal
         else if (session.action().equals("onLoadRankings")){
             session.write(TournamentMockUtils.GetMockTournamentRankings(Long.parseLong(session.systemId())).toString().getBytes());
         }
+        //end of removal
         else{
             throw new UnsupportedOperationException(session.action()+" not supported");
         }
@@ -37,6 +40,5 @@ public class TournamentModule extends ModuleHeader implements Configurable.Liste
         this.tournamentServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
         this.context.log("Tournament module started", OnLog.WARN);
     }
-
 
 }

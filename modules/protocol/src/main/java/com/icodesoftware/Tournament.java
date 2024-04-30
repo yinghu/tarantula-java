@@ -12,7 +12,6 @@ public interface Tournament extends Configurable {
     String INSTANCE_LABEL = "tournament_instance";
 
     String GLOBAL_INSTANCE_LABEL = "tournament_global";
-    String GLOBAL_RACE_BOARD_LABEL = "tournament_race_board";
 
     String ENTRY_LABEL = "tournament_entry";
 
@@ -64,21 +63,25 @@ public interface Tournament extends Configurable {
 
         boolean update(Session session,OnEntry onEntry);
         RaceBoard raceBoard();
+        RaceBoard myRaceBoard();
     }
     interface Prize extends Configurable{
         int rank();
     }
     interface RaceBoard extends Configurable{
+
         int size();
+
         List<Entry> list();
 
-        Entry myPosition();
+        Entry myPosition(long systemId);
     }
 
     interface History extends Configurable{
-        String tournamentId();
-        int rank();
-        double score();
+        long tournamentId();
+        long instanceId();
+        long entryId();
+        long prizeId();
         LocalDateTime dateTime();
     }
 
