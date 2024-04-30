@@ -54,7 +54,7 @@ public class TournamentRanking extends RecoverableObject implements Tournament.R
     }
 
     @Override
-    public Tournament.Entry myPosition() {
+    public Tournament.Entry myPosition(long systemId) {
         return null;
     }
 }

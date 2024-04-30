@@ -3,12 +3,12 @@ package com.tarantula.platform.tournament;
 import com.icodesoftware.SchedulingTask;
 
 
-public class TournamentCloseMonitor implements SchedulingTask {
+public class TournamentStartMonitor implements SchedulingTask {
 
     private final TournamentManager tournamentManager;
     private final PlatformTournamentServiceProvider tournamentServiceProvider;
 
-    public TournamentCloseMonitor(TournamentManager tournamentManager, PlatformTournamentServiceProvider tournamentServiceProvider){
+    public TournamentStartMonitor(TournamentManager tournamentManager, PlatformTournamentServiceProvider tournamentServiceProvider){
         this.tournamentManager = tournamentManager;
         this.tournamentServiceProvider = tournamentServiceProvider;
     }
@@ -24,11 +24,11 @@ public class TournamentCloseMonitor implements SchedulingTask {
 
     @Override
     public long delay() {
-       return tournamentManager.toClosingTime();
+       return tournamentManager.toStartTime();
     }
 
     @Override
     public void run() {
-        this.tournamentServiceProvider.closeTournament(tournamentManager);
+        this.tournamentServiceProvider.startTournament(tournamentManager);
     }
 }

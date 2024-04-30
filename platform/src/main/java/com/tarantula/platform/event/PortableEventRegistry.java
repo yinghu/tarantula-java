@@ -64,8 +64,6 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int TOURNAMENT_INSTANCE_CID = 114;
 
-    public static final int TOURNAMENT_ENTRY_CID = 115;
-
 
     public static final int GAME_ENTRY_CID = 118;
 
@@ -160,10 +158,6 @@ public class PortableEventRegistry implements PortableFactory {
             case TOURNAMENT_INSTANCE_CID:
                 _ins = new TournamentInstance();
                 break;
-            case TOURNAMENT_ENTRY_CID:
-                _ins = new TournamentEntry();
-                break;
-
 
             case GAME_ENTRY_CID:
                 _ins = new GameEntry();

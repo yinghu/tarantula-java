@@ -24,14 +24,9 @@ public interface DistributionTournamentService extends ServiceProvider {
 
     //shared
     byte[] onRaceBoard(String serviceName,long tournamentId,long instanceId);
-
+    byte[] onMyRaceBoard(String serviceName,long tournamentId,long instanceId,long entryId,long systemId);
 
     //management
-
-    void onFinishTournament(String serviceName,String tournamentId,String instanceId,String systemId);
-
-    void onSyncTournament(String serviceName,String tournamentId,String instanceId);
-    void onCloseTournament(String serviceName,String tournamentId);
     void onEndTournament(String serviceName,long tournamentId);
 
 }

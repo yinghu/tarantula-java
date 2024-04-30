@@ -81,7 +81,7 @@ public class TournamentJoin extends OnApplicationHeader {
         return jsonObject;
     }
 
-    void onTournament(long tournamentId,long segmentInstanceId,long entryId){
+    public void onTournament(long tournamentId,long segmentInstanceId,long entryId){
         ownerKey = SnowflakeKey.from(tournamentId);
         this.dataStore.createEdge(this,TOURNAMENT_JOIN_LABEL);
         this.tournamentId = tournamentId;
@@ -91,7 +91,7 @@ public class TournamentJoin extends OnApplicationHeader {
         this.entryId = entryId;
         this.dataStore.update(this);
     }
-    void onTournament(long tournamentId,int slot,long instanceId){
+    public void onTournament(long tournamentId,int slot,long instanceId){
         ownerKey = SnowflakeKey.from(tournamentId);
         this.dataStore.createEdge(this,TOURNAMENT_JOIN_LABEL);
         this.tournamentId = tournamentId;
@@ -101,7 +101,7 @@ public class TournamentJoin extends OnApplicationHeader {
         this.instanceId = instanceId;
         this.dataStore.update(this);
     }
-    void finished(){
+    public void finished(){
         finished = true;
         this.dataStore.update(this);
     }
@@ -117,7 +117,7 @@ public class TournamentJoin extends OnApplicationHeader {
             return true;
         });
         if(joined[0]!=null) return joined[0];
-        TournamentJoin tournamentJoin = new TournamentJoin(session.stub(),scheduleId);
+        TournamentJoin tournamentJoin = new TournamentJoin(session.distributionId(),scheduleId);
         tournamentJoin.closed = true;
         tournamentJoin.ownerKey(SnowflakeKey.from(session.distributionId()));
         tournamentJoin.dataStore(dataStore);

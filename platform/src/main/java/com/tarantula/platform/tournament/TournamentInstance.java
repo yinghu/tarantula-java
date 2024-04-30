@@ -38,8 +38,10 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
 
     private RaceBoardSync tournamentRaceBoard;
 
-    DataStore entryDataStore;
-    DataStore raceBoardDataStore;
+    public DataStore entryDataStore;
+    public DataStore raceBoardDataStore;
+
+    private TournamentEntryComparator entryComparator;
 
     private TournamentInstance(int maxEntries,double scoreCredits){
         this();
@@ -178,6 +180,31 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     public Tournament.RaceBoard raceBoard(){
         return new TournamentRaceBoard(tournamentRaceBoard.snapshot());
     }
+    public Tournament.RaceBoard myRaceBoard(){
+        return null;
+    }
+    public Tournament.RaceBoard myRaceBoard(long entryId,long systemId,int size){
+        ArrayList<Tournament.Entry> sorted = new ArrayList<>();
+        TournamentEntry me = new TournamentEntry();
+        me.distributionId(entryId);
+        if(!entryDataStore.load(me) || me.systemId() != systemId) return new TournamentRaceBoard(sorted);
+        sorted.add(me);
+        int[] ahead = {size-2};
+        int[] after = {1};
+        entryDataStore.list(new TournamentEntryQuery(this.distributionId),(e)->{
+            if(e.systemId()==systemId) return true;
+            if(e.score()>me.score() && ahead[0]>0){
+                sorted.add(e);
+                ahead[0]--;
+            }
+            else if(e.score()<me.score() && after[0]>0){
+                after[0]--;
+            }
+            return ahead[0]==0 && after[0]==0;
+        });
+        Collections.sort(sorted,entryComparator);
+        return new TournamentRaceBoard(sorted);
+    }
 
     @Override
     public int getFactoryId() {
@@ -204,7 +231,8 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     }
 
     public void load(){
-        tournamentRaceBoard = new RaceBoardSync(maxEntries,new TournamentEntryComparator());
+        entryComparator = new TournamentEntryComparator();
+        tournamentRaceBoard = new RaceBoardSync(maxEntries,entryComparator);
         tournamentRaceBoard.dataStore(raceBoardDataStore);
         tournamentRaceBoard.distributionId(this.distributionId);
         tournamentRaceBoard.load();
@@ -222,10 +250,9 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         jsonObject.addProperty("TargetScore",targetScore);
         return jsonObject;
     }
-    List<TournamentEntry> end(){
-        ArrayList<TournamentEntry> rankedList = new ArrayList<>();
-        //entryIndex.forEach((k,e)->rankedList.add(e));
-        Collections.sort(rankedList,new TournamentEntryComparator());
+    List<TournamentEntry> sorted(){
+        List<TournamentEntry> rankedList = entryDataStore.list(new TournamentEntryQuery(this.distributionId));
+        Collections.sort(rankedList,entryComparator);
         return rankedList;
     }
 

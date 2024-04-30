@@ -46,18 +46,18 @@ public class TournamentRaceBoard extends RecoverableObject implements Tournament
 
 
 
-    public Tournament.Entry myPosition(){
-        return null;
+    public Tournament.Entry myPosition(long systemId){
+        var optional = snapshot.stream().filter(e-> e.systemId()==systemId).findFirst();
+        return optional.isPresent()? optional.get() : null;
     }
 
     @Override
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("Successful",true);
+        jsonObject.addProperty("InstanceId",Long.toString(distributionId));
         JsonArray plist = new JsonArray();
-        int[] rank = {1};
         snapshot.forEach((v)->{
-            ((TournamentEntry)v).rank(rank[0]++);
             plist.add(v.toJson());
         });
         jsonObject.add("_board",plist);

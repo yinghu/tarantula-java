@@ -10,10 +10,9 @@ import com.tarantula.platform.event.SessionForward;
 import com.tarantula.platform.room.*;
 import com.tarantula.platform.service.AccessKey;
 import com.tarantula.platform.service.PresenceKey;
-import com.tarantula.platform.tournament.TournamentEntry;
+
 import com.tarantula.platform.tournament.TournamentInstance;
 import com.tarantula.platform.tournament.TournamentManager;
-import com.tarantula.platform.tournament.TournamentRaceBoard;
 
 
 public class PortableRegistry<T extends Recoverable> extends AbstractRecoverableListener {
@@ -52,7 +51,6 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
 
     public static final int TOURNAMENT_INSTANCE_CID = PortableEventRegistry.TOURNAMENT_INSTANCE_CID;
 
-    public static final int TOURNAMENT_ENTRY_CID = PortableEventRegistry.TOURNAMENT_ENTRY_CID;
 
 
     public static final int GAME_ENTRY_CID = PortableEventRegistry.GAME_ENTRY_CID;
@@ -130,9 +128,7 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
             case TOURNAMENT_INSTANCE_CID:
                 _ins = new TournamentInstance();
                 break;
-            case TOURNAMENT_ENTRY_CID:
-                _ins = new TournamentEntry();
-                break;
+
 
             case CLIENT_CONNECTION_CID:
                 _ins = new ClientConnection();
