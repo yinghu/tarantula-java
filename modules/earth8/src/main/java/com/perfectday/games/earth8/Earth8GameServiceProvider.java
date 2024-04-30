@@ -92,6 +92,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
     public void updateGame(Session session,byte[] payload) throws Exception{
         BattleUpdate update = BattleUpdate.fromJson(payload);
+        PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext,session.distributionId(), PlayerDataTrack.Type.Analytics);
 
         if (update.score > 0 && update.playerLevel > 0) {
 
@@ -101,16 +102,14 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             if(existing!=null){
                 existing.register(session).update(session,entry->{
                     entry.score(0,update.score);
+                    update.pendingAnalytics.add(new RLCPointsEarnedTransaction(session, serverSession.trackId, existing.distributionId(), update.objectiveType, update.score, entry.score()));
                     return true;
                 });
             }
             else{
-                scoreTournamentWithSameLevel(session, update, playerDataTrack);
+                scoreTournamentWithSameLevel(session, update, playerDataTrack, serverSession);
             }
-
         }
-
-        PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext,session.distributionId(), PlayerDataTrack.Type.Analytics);
 
         if(update.update(gameContext.applicationSchema().applicationPreSetup(), session,serverSession.trackId,gameContext.applicationSchema().applicationPreSetup().distributionId()))
         {
@@ -229,6 +228,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
             tournamentIndex.put(start,tournament);
         }
+        gameContext.authorVendor(OnAccess.WEB_HOOK).upload(ANALYTICS_QUERY, new RLCTournamentStartTransaction(tournament.distributionId()));
     }
 
     @Override
@@ -238,6 +238,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
             tournamentIndex.remove(start);
         }
+        gameContext.authorVendor(OnAccess.WEB_HOOK).upload(ANALYTICS_QUERY, new RLCTournamentEndTransaction(tournament.distributionId()));
     }
 
     public void onApplicationResourceRegistered(ApplicationResource resource){
@@ -277,11 +278,13 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         //UDP MESSAGE WITH RELAY CALL WITH SINGLE UDP MESSAGE
     }
 
-    private void scoreTournamentWithSameLevel(Session session, BattleUpdate update, PlayerDataTrack playerDataTrack) {
+    private void scoreTournamentWithSameLevel(Session session, BattleUpdate update, PlayerDataTrack playerDataTrack, PlayerDataTrack serverSession) {
         Tournament nextLevel = tournamentIndex.get(update.playerLevel);
         if(nextLevel==null) return;
+        update.pendingAnalytics.add(new RLCLeaderboardAssignedTransaction(session, serverSession.trackId, nextLevel.distributionId()));
         nextLevel.register(session).update(session,entry->{
             entry.score(0,update.score);
+            update.pendingAnalytics.add(new RLCPointsEarnedTransaction(session, serverSession.trackId, nextLevel.distributionId(), update.objectiveType, update.score, entry.score()));
             return true;
         });
         playerDataTrack.trackId = nextLevel.distributionId();
