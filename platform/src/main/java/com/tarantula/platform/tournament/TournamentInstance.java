@@ -188,21 +188,26 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         TournamentEntry me = new TournamentEntry();
         me.distributionId(entryId);
         if(!entryDataStore.load(me) || me.systemId() != systemId) return new TournamentRaceBoard(sorted);
-        sorted.add(me);
+
+        sorted.add(me.duplicate(0));
         int[] ahead = {size-2};
         int[] after = {1};
         entryDataStore.list(new TournamentEntryQuery(this.distributionId),(e)->{
             if(e.systemId()==systemId) return true;
-            if(e.score()>me.score() && ahead[0]>0){
-                sorted.add(e);
+            if(e.score() > me.score() && ahead[0]>0){
+                sorted.add(e.duplicate(0));
                 ahead[0]--;
             }
             else if(e.score()<me.score() && after[0]>0){
+                sorted.add(e.duplicate(0));
                 after[0]--;
             }
-            return ahead[0]==0 && after[0]==0;
+            return !(ahead[0]==0 && after[0]==0);
         });
         Collections.sort(sorted,entryComparator);
+        for(int i=0; i<sorted.size();i++){
+            sorted.get(i).rank(i+1);
+        }
         return new TournamentRaceBoard(sorted);
     }
 
