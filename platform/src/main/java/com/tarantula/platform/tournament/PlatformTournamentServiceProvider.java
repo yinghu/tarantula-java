@@ -109,7 +109,12 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
 
     public Tournament tournament(long tournamentId){
-        return tournamentIndex.get(tournamentId);
+        TournamentManager indexed = tournamentIndex.get(tournamentId);
+        if(indexed!=null) return indexed;
+        indexed = new TournamentManager(this);
+        indexed.distributionId(tournamentId);
+        if(!dataStore.load(indexed)) throw new RuntimeException("Tournament ["+tournamentId+"] not existed");
+        return indexed;
     }
     @Override
     public boolean available(long tournamentId) {
@@ -279,6 +284,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
                 this.distributionItemService.onReleaseItem(gameServiceName, name(), "TournamentSchedule", tournament.distributionKey());
             }
             tournament.end();
+            tournamentIndex.remove(tournament.distributionId());
         }
         catch (Exception ex){
             logger.error("Error on end tournament : "+tournament.distributionId()+" : ",ex);
@@ -464,11 +470,11 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
 
     public byte[] onTournamentRaceBoardListed(long tournamentId,long instanceId){
-        TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
+        TournamentManager tournamentManager = (TournamentManager)this.tournament(tournamentId);
         return tournamentManager.onRaceBoard(instanceId).toBinary();
     }
     public byte[] onTournamentMyRaceBoardListed(long tournamentId,long instanceId,long entryId,long systemId){
-        TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
+        TournamentManager tournamentManager = (TournamentManager)this.tournament(tournamentId);
         return tournamentManager.onMyRaceBoard(instanceId,entryId,systemId).toBinary();
     }
 
@@ -482,7 +488,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         tournament.pendingSchedule.cancel(true);
         this.listeners.forEach(l->l.tournamentClosed(tournament));
         this.serviceContext.schedule(new ScheduleRunner(SCHEDULE_RUNNER_DELAY,()->{
-
             endTournament(tournament);
         }));
     }
