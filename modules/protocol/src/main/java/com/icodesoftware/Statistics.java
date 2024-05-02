@@ -3,7 +3,7 @@ package com.icodesoftware;
 import java.util.List;
 
 
-public interface Statistics extends OnApplication{
+public interface Statistics extends OnApplication, DataStore.Loadable {
 
 
     Entry entry(String key);

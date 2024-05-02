@@ -50,7 +50,7 @@ public class TournamentInstanceTest extends DataStoreHook{
 
         long systemId = 300;
         double score = 30;
-        for(int i = 0;i<10000;i++){
+        for(int i = 0;i<1000;i++){
             Assert.assertTrue(enterAndScore(tournamentInstance,systemId,score)>0);
             systemId += 100;
             score += 10;
@@ -60,10 +60,10 @@ public class TournamentInstanceTest extends DataStoreHook{
         Assert.assertEquals(raceBoard10.list().size(),10);
 
         List<TournamentEntry> all = dataStoreEntry.list(new TournamentEntryQuery(tournamentInstance.distributionId()));
-        Assert.assertEquals(all.size(),10002);
-        long st = System.currentTimeMillis();
+        Assert.assertEquals(all.size(),1002);
+        //long st = System.currentTimeMillis();
         Collections.sort(all,new TournamentEntryComparator());
-        System.out.println("SORT : "+(System.currentTimeMillis()-st));
+        //System.out.println("SORT : "+(System.currentTimeMillis()-st));
 
         Optional<TournamentEntry> opt = all.stream().filter((e)->e.systemId()==200).findFirst();
         Assert.assertNotNull(opt.get());

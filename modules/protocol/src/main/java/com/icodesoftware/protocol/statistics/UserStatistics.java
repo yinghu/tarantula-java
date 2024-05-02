@@ -75,15 +75,6 @@ public class UserStatistics extends OnApplicationHeader implements Statistics {
         return jo;
     }
 
-    public boolean read(DataBuffer buffer){
-        //this.count = buffer.readInt();
-        return true;
-    }
-    public boolean write(DataBuffer buffer) {
-        //buffer.writeInt(count);
-        return true;
-    }
-
     public void load(){
         dataStore.list(new StatisticsEntryQuery(this.distributionId),e->{
             e.dataStore(dataStore);

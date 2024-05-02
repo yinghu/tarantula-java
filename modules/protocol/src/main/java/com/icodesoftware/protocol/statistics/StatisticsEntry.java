@@ -30,7 +30,7 @@ public class StatisticsEntry extends OnApplicationHeader implements Statistics.E
         this.ownerKey = ownerKey;
         this.name = name;
     }
-    public StatisticsEntry(Statistics.Entry entry){
+    private StatisticsEntry(Statistics.Entry entry){
         this.name = entry.name();
         this.daily = entry.daily();
         this.weekly = entry.weekly();
@@ -80,6 +80,7 @@ public class StatisticsEntry extends OnApplicationHeader implements Statistics.E
     public synchronized Statistics.Entry update(double delta) {
         LocalDateTime lastUpdated = TimeUtil.fromUTCMilliseconds(timestamp);
         LocalDateTime _now = LocalDateTime.now();
+        timestamp = TimeUtil.toUTCMilliseconds(_now);
         if(StatisticsUtil.validateDaily(lastUpdated,_now)){
             daily += delta;
             weekly += delta;
@@ -137,6 +138,7 @@ public class StatisticsEntry extends OnApplicationHeader implements Statistics.E
         this.monthly = buffer.readDouble();
         this.yearly = buffer.readDouble();
         this.total = buffer.readDouble();
+        this.timestamp = buffer.readLong();
         return true;
     }
     public boolean write(DataBuffer buffer) {
@@ -146,6 +148,7 @@ public class StatisticsEntry extends OnApplicationHeader implements Statistics.E
         buffer.writeDouble(monthly);
         buffer.writeDouble(yearly);
         buffer.writeDouble(total);
+        buffer.writeLong(timestamp);
         return true;
     }
 }

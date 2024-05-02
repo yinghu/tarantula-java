@@ -66,5 +66,8 @@ public interface DataStore extends Closable{
         void dataStore(DataStore dataStore);
         void update();
     }
+    interface Loadable extends Updatable{
+        void load();
+    }
 
 }
