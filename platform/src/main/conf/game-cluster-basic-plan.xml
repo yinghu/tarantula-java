@@ -66,6 +66,15 @@
                 <reset-enabled>true</reset-enabled>
                 <module-name>com.tarantula.game.module.MatchMakingModule</module-name>
             </application>
+            <application><!-- cloud data module-->
+                <type-id>game-data</type-id>
+                <name>Cloud</name>
+                <type>application</type>
+                <category>data</category>
+                <tag>game/data</tag>
+                <deploy-priority>20</deploy-priority>
+                <module-name>com.tarantula.game.module.CloudDataModule</module-name>
+            </application>
         </application-list>
     </lobby-context>
 </tarantula>

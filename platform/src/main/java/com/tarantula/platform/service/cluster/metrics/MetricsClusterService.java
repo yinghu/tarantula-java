@@ -5,22 +5,20 @@ import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
 import com.icodesoftware.LeaderBoard;
-import com.icodesoftware.Property;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceProvider;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.TarantulaContext;
-import com.tarantula.platform.service.metrics.MetricsSnapshotRequest;
+
 import com.tarantula.platform.service.metrics.MetricsSnapshotResponse;
 import com.tarantula.platform.service.metrics.ServiceViewRequest;
-
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
-import java.util.Random;
+
 
 public class MetricsClusterService implements ManagedService, RemoteService {
 
