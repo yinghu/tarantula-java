@@ -3,6 +3,7 @@ package com.tarantula.platform.service.cluster.presence;
 import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
+import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.service.MetricsListener;
 
 import com.tarantula.platform.TarantulaContext;
@@ -50,6 +51,19 @@ public class DistributionPresenceServiceProxy extends AbstractDistributedObject<
         if(!result.successful) throw new RuntimeException(result.exception);
         return (int)result.result;
     }
+
+    public void onUpdateLeaderBoard(String serviceName, LeaderBoard.Entry leaderBoardEntry){
+        NodeEngine nodeEngine = getNodeEngine();
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(leaderBoardEntry.category());
+        LeaderBoardUpdateOperation leaderBoardUpdateOperation = new LeaderBoardUpdateOperation(serviceName,leaderBoardEntry);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionPresenceService.NAME, leaderBoardUpdateOperation,partitionId);
+        ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+            Future<Void> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+        },metricsListener);
+        if(!result.successful) throw new RuntimeException(result.exception);
+    }
+
 
     public void registerMetricsListener(MetricsListener metricsListener){
         this.metricsListener = metricsListener;

@@ -10,6 +10,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceSetup;
+import com.tarantula.platform.presence.DistributionPresenceService;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,7 +26,7 @@ public class PlatformLeaderBoardProvider extends PlatformGameServiceSetup implem
 
     private ConcurrentHashMap<String, LeaderBoardSync> tMap = new ConcurrentHashMap<>();
 
-    private DistributionLeaderBoardService distributionLeaderBoardService;
+    private DistributionPresenceService distributionPresenceService;
 
     public PlatformLeaderBoardProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
@@ -47,7 +48,7 @@ public class PlatformLeaderBoardProvider extends PlatformGameServiceSetup implem
         this.leaderBoardSize = plist.get("topListSize").getAsInt();
         this.reloadInterval = plist.get("reloadIntervalMinutes").getAsInt()*60*1000;
         this.dataStore = gameCluster.applicationPreSetup().dataStore(gameCluster,NAME);//typeId_service
-        this.distributionLeaderBoardService = serviceContext.clusterProvider().serviceProvider(DistributionLeaderBoardService.NAME);
+        this.distributionPresenceService = serviceContext.clusterProvider().serviceProvider(DistributionPresenceService.NAME);
         this.logger = JDKLogger.getLogger(PlatformLeaderBoardProvider.class);
     }
 
@@ -68,7 +69,7 @@ public class PlatformLeaderBoardProvider extends PlatformGameServiceSetup implem
 
     @Override
     public void onUpdated(LeaderBoard.Entry entry) {
-        distributionLeaderBoardService.onUpdateLeaderBoard(gameServiceName,entry);
+        distributionPresenceService.onUpdateLeaderBoard(gameServiceName,entry);
     }
 
     public void leaderBoardUpdated(LeaderBoard.Entry entry){

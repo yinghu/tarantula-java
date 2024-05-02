@@ -1,4 +1,4 @@
-package com.tarantula.platform.service.cluster.leaderboard;
+package com.tarantula.platform.service.cluster.presence;
 
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
@@ -21,7 +21,7 @@ public class LeaderBoardUpdateOperation extends Operation implements PartitionAw
 
     @Override
     public void run() throws Exception {
-        LeaderBoardClusterService ais = this.getService();
+        PresenceClusterService ais = this.getService();
         ais.onUpdateLeaderBoard(serviceName,entry);
     }
 

@@ -62,15 +62,6 @@ public class PortableEventRegistry implements PortableFactory {
     public static final int TOURNAMENT_INSTANCE_CID = 114;
 
 
-    public static final int GAME_ENTRY_CID = 118;
-
-
-    public static final int PVE_ROOM_CID = 120;
-    public static final int PVP_ROOM_CID = 121;
-    public static final int TVE_ROOM_CID = 122;
-    public static final int TVT_ROOM_CID = 123;
-
-
     public static final int CLIENT_CONNECTION_CID = 124;
 
     public static final int GAME_CHANNEL_CID = 125;

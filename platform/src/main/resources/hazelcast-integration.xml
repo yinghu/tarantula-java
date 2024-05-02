@@ -71,10 +71,6 @@
             <class-name>com.tarantula.platform.service.cluster.item.ItemClusterService</class-name>
         </service>
         <service enabled="true">
-            <name>DistributionLeaderBoardService</name>
-            <class-name>com.tarantula.platform.service.cluster.leaderboard.LeaderBoardClusterService</class-name>
-        </service>
-        <service enabled="true">
             <name>DistributionMetricsService</name>
             <class-name>com.tarantula.platform.service.cluster.metrics.MetricsClusterService</class-name>
         </service>

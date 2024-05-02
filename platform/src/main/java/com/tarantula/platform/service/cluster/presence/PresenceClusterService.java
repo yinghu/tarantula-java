@@ -4,6 +4,7 @@ import com.hazelcast.core.DistributedObject;
 import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
+import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -50,6 +51,11 @@ public class PresenceClusterService implements ManagedService, RemoteService {
     public int onProfileSequence(String gameServiceName,String profileName){
         PlatformGameServiceProvider gameServiceProvider = (PlatformGameServiceProvider) this.tarantulaContext.serviceProvider(gameServiceName);
         return gameServiceProvider.presenceServiceProvider().onProfileSequence(profileName);
+    }
+
+    public void onUpdateLeaderBoard(String serviceName, LeaderBoard.Entry leaderBoardEntry){
+        PlatformGameServiceProvider gameServiceProvider = (PlatformGameServiceProvider)this.tarantulaContext.serviceProvider(serviceName);
+        gameServiceProvider.leaderBoardProvider().leaderBoardUpdated(leaderBoardEntry);
     }
 
 }
