@@ -31,8 +31,8 @@ public class HardCurrencyBuythrough extends BattleUpdate{
     }
 
     @Override
-    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session) {
-        pendingAnalytics.add(new HardCurrencyBuythroughTransaction(session, currencyPurchased, hCPrice, currencyTotal, trigger, transactionId));
+    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session,long serverSessionId,long batchId) {
+        pendingAnalytics.add(new HardCurrencyBuythroughTransaction(session,serverSessionId, currencyPurchased, hCPrice, currencyTotal, trigger, transactionId));
         return true;
     }
 }

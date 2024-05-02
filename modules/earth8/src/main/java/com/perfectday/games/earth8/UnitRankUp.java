@@ -41,8 +41,8 @@ public class UnitRankUp extends BattleUpdate{
     }
 
     @Override
-    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session){
-        pendingAnalytics.add(new UnitRankUpTransaction(session, unitId, rank, _unitName));
+    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session,long serverSessionId,long batchId){
+        pendingAnalytics.add(new UnitRankUpTransaction(session,serverSessionId, unitId, rank, _unitName));
         return true;
     }
 }

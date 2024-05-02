@@ -11,8 +11,8 @@ public class TournamentPortableRegistry<T extends Recoverable> extends AbstractR
 
     public static final int TOURNAMENT_CID = PortableEventRegistry.TOURNAMENT_CID;
     public static final int TOURNAMENT_INSTANCE_CID = PortableEventRegistry.TOURNAMENT_INSTANCE_CID;
-    public static final int TOURNAMENT_ENTRY_CID = PortableEventRegistry.TOURNAMENT_ENTRY_CID;
-    public static final int TOURNAMENT_RACE_BOARD_CID = PortableEventRegistry.TOURNAMENT_RACE_BOARD_CID;
+
+    public static final int TOURNAMENT_RACE_BOARD_CID = 11;
 
     public static final int TOURNAMENT_SCHEDULE_CID = 12;
 
@@ -24,6 +24,10 @@ public class TournamentPortableRegistry<T extends Recoverable> extends AbstractR
     public static final int TOURNAMENT_REGISTER_CID = 18;
 
     public static final int TOURNAMENT_JOIN_CID = 19;
+
+    public static final int TOURNAMENT_ENTRY_CID = 20;
+
+    public static final int RECENTLY_TOURNAMENT_LIST_CID = 21;
 
 
     public static TournamentPortableRegistry INS;
@@ -64,6 +68,9 @@ public class TournamentPortableRegistry<T extends Recoverable> extends AbstractR
                 break;
             case TOURNAMENT_JOIN_CID:
                 pt = new TournamentJoin();
+                break;
+            case RECENTLY_TOURNAMENT_LIST_CID:
+                pt = new RecentlyTournamentList();
                 break;
             default:
         }

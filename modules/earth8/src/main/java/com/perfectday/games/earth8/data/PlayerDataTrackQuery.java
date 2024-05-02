@@ -5,6 +5,7 @@ import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.SnowflakeKey;
 
 public class PlayerDataTrackQuery implements RecoverableFactory<PlayerDataTrack> {
+
     private long systemId;
     public PlayerDataTrackQuery(long systemId){
         this.systemId = systemId;

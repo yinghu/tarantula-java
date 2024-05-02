@@ -44,6 +44,9 @@
     let editor = new JSONEditor(document.querySelector("#jsoneditor-live-service-inbox"),{mode:'tree'},{});
     document.querySelector('#tx-live-inbox-item-list-title').innerHTML = TARA_HTML.caption(TARA_API.query().category);
    
+    TARA_API.onGet(TARA_API.query().serviceTag,'onInbox','',(resp)=>{
+            editor.set(resp);
+    });
     document.querySelector('#tx-inbox-live-close').onclick=()=>{
         editor.destroy();
         tx_close_current_page();     

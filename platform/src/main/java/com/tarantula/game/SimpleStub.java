@@ -7,6 +7,9 @@ public class SimpleStub extends PlayerGameObject{
         this.systemId = systemId;
         this.stub = stub;
     }
+    public SimpleStub(){
+
+    }
     @Override
     public long systemId(){
         return systemId;

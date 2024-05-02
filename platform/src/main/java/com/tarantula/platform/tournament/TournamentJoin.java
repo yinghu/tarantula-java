@@ -1,23 +1,26 @@
 package com.tarantula.platform.tournament;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Session;
-import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.SnowflakeKey;
+import com.icodesoftware.util.OnApplicationHeader;
 
-public class TournamentJoin extends RecoverableObject{
+public class TournamentJoin extends OnApplicationHeader {
 
     public static final String TOURNAMENT_JOIN_LABEL = "tournament_join";
     public static final String PLAYER_JOIN_LABEL = "player_tournament_join";
 
-    public long systemId;
-    public long stub;
+    //public long systemId;
+    //public long stub;
     public long scheduleId;
     public long tournamentId;
     public int slot;
     public long instanceId;
+    public long entryId;
     public boolean closed;
     public boolean finished;
+
     public TournamentJoin(long stub,long scheduleId){
         this();
         this.stub = stub;
@@ -34,6 +37,7 @@ public class TournamentJoin extends RecoverableObject{
         buffer.writeLong(tournamentId);
         buffer.writeInt(slot);
         buffer.writeLong(instanceId);
+        buffer.writeLong(entryId);
         buffer.writeLong(stub);
         buffer.writeBoolean(closed);
         buffer.writeBoolean(finished);
@@ -46,6 +50,7 @@ public class TournamentJoin extends RecoverableObject{
         tournamentId = buffer.readLong();
         slot = buffer.readInt();
         instanceId = buffer.readLong();
+        entryId = buffer.readLong();
         stub = buffer.readLong();
         closed = buffer.readBoolean();
         finished = buffer.readBoolean();
@@ -69,21 +74,24 @@ public class TournamentJoin extends RecoverableObject{
         jsonObject.addProperty("tournamentId",Long.toString(tournamentId));
         jsonObject.addProperty("slot",slot);
         jsonObject.addProperty("instanceId",Long.toString(instanceId));
+        jsonObject.addProperty("entryId",Long.toString(entryId));
         jsonObject.addProperty("stub",Long.toString(stub));
         jsonObject.addProperty("closed",closed);
         jsonObject.addProperty("finished",finished);
         return jsonObject;
     }
 
-    void onTournament(long tournamentId){
+    public void onTournament(long tournamentId,long segmentInstanceId,long entryId){
         ownerKey = SnowflakeKey.from(tournamentId);
         this.dataStore.createEdge(this,TOURNAMENT_JOIN_LABEL);
         this.tournamentId = tournamentId;
         this.closed = false;
         this.finished = false;
+        this.instanceId = segmentInstanceId;
+        this.entryId = entryId;
         this.dataStore.update(this);
     }
-    void onTournament(long tournamentId,int slot,long instanceId){
+    public void onTournament(long tournamentId,int slot,long instanceId){
         ownerKey = SnowflakeKey.from(tournamentId);
         this.dataStore.createEdge(this,TOURNAMENT_JOIN_LABEL);
         this.tournamentId = tournamentId;
@@ -93,15 +101,27 @@ public class TournamentJoin extends RecoverableObject{
         this.instanceId = instanceId;
         this.dataStore.update(this);
     }
-    void finished(){
+    public void finished(){
         finished = true;
         this.dataStore.update(this);
     }
 
-    public static TournamentJoin init(Session session,long scheduleId){
-        TournamentJoin tournamentJoin = new TournamentJoin(session.stub(),scheduleId);
+    public static TournamentJoin lookup(DataStore dataStore,Session session,long scheduleId){
+        TournamentJoin[] joined = new TournamentJoin[]{null};
+        dataStore.list(new TournamentJoinQuery(SnowflakeKey.from(session.distributionId()),TournamentJoin.PLAYER_JOIN_LABEL),join->{
+            if(join.scheduleId == scheduleId){
+                join.dataStore(dataStore);
+                joined[0]=join;
+                return false;
+            }
+            return true;
+        });
+        if(joined[0]!=null) return joined[0];
+        TournamentJoin tournamentJoin = new TournamentJoin(session.distributionId(),scheduleId);
         tournamentJoin.closed = true;
         tournamentJoin.ownerKey(SnowflakeKey.from(session.distributionId()));
+        tournamentJoin.dataStore(dataStore);
+        dataStore.create(tournamentJoin);
         return tournamentJoin;
     }
 }

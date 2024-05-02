@@ -4,7 +4,6 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.PartitionAwareOperation;
-import com.icodesoftware.Tournament;
 
 import java.io.IOException;
 
@@ -32,7 +31,7 @@ public class TournamentScoreOperation extends Operation implements PartitionAwar
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        this.scored = instanceId!=0?ais.score(serviceName,tournamentId,instanceId,systemId,credit,delta):ais.score(serviceName,tournamentId,systemId,credit,delta);
+        this.scored = ais.score(serviceName,tournamentId,instanceId,systemId,credit,delta);
     }
 
     @Override

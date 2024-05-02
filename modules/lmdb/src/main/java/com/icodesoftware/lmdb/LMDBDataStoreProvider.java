@@ -47,7 +47,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private Env<ByteBuffer> index;
     private Env<ByteBuffer> local;
     private Env<ByteBuffer> log;
-    private long storeSize = 1_048_576L; // 1MB = 1,048,576 (1024*1024)
+    private long storeSize = 10_048_576L; // 1MB = 1,048,576 (1024*1024)
     private int maxDatabaseNumber = 1024;
     private int maxReaders = 100;
 

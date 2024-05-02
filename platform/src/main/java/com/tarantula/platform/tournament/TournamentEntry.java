@@ -1,21 +1,18 @@
 package com.tarantula.platform.tournament;
 
 import com.google.gson.JsonObject;
-import com.hazelcast.nio.serialization.Portable;
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
+
 import com.icodesoftware.Tournament;
 
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.event.PortableEventRegistry;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 
-public class TournamentEntry extends RecoverableObject implements Tournament.Entry, Portable {
+public class TournamentEntry extends RecoverableObject implements Tournament.Entry{
 
     private long systemId;
     private double credits;
@@ -39,6 +36,14 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         this.onEdge = true;
         this.label = Tournament.ENTRY_LABEL;
     }
+
+    private TournamentEntry(long systemId,double score,long timestamp, int rank){
+        this();
+        this.systemId = systemId;
+        this.score = score;
+        this.timestamp = timestamp;
+        this.rank = rank;
+    }
     @Override
     public long systemId() {
         return systemId;
@@ -53,6 +58,7 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         finished = credits <= 0;
         this.update();
     }
+
     public double score(){
         return score;
     }
@@ -69,7 +75,7 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
     public int rank(){
         return rank;
     }
-    void rank(int rank){
+    public void rank(int rank){
         this.rank = rank;
     }
 
@@ -98,33 +104,15 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
 
     @Override
     public int getFactoryId() {
-        return PortableEventRegistry.OID;
+        return TournamentPortableRegistry.OID;
     }
 
     @Override
     public int getClassId() {
-        return PortableEventRegistry.TOURNAMENT_ENTRY_CID;
+        return TournamentPortableRegistry.TOURNAMENT_ENTRY_CID;
     }
 
-    @Override
-    public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeLong("1",systemId);
-        portableWriter.writeDouble("2",score);
-        portableWriter.writeLong("3",timestamp);
-        portableWriter.writeInt("4",rank);
-        portableWriter.writeDouble("5",credits);
-        portableWriter.writeBoolean("8",finished);
-    }
 
-    @Override
-    public void readPortable(PortableReader portableReader) throws IOException {
-        this.systemId = portableReader.readLong("1");
-        this.score = portableReader.readDouble("2");
-        this.timestamp = portableReader.readLong("3");
-        this.rank = portableReader.readInt("4");
-        this.credits = portableReader.readDouble("5");
-        this.finished = portableReader.readBoolean("8");
-    }
 
     @Override
     public JsonObject toJson(){
@@ -136,5 +124,18 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         jsonObject.addProperty("LastUpdated",TimeUtil.fromUTCMilliseconds(timestamp).format(DateTimeFormatter.ISO_DATE_TIME));
         //jsonObject.addProperty("Finished",finished);
         return jsonObject;
+    }
+
+    public void update(TournamentEntry pendingEntry){
+        this.systemId = pendingEntry.systemId();
+        this.score = pendingEntry.score();
+        this.timestamp = pendingEntry.timestamp;
+    }
+
+    public TournamentEntry duplicate(int rank){
+        return new TournamentEntry(systemId,score,timestamp,rank);
+    }
+    public static TournamentEntry from(long systemId,double score,long timestamp,int rank){
+        return new TournamentEntry(systemId,score,timestamp,rank);
     }
 }

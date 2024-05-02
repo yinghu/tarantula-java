@@ -1,47 +1,53 @@
 package com.tarantula.platform.tournament;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
+
 
 public class TournamentHistory extends RecoverableObject implements Tournament.History {
 
-    public String tournamentId;
-    public int rank;
-    public double score;
+    public long tournamentId;
+    public long instanceId;
+    public long entryId;
+    public long prizeId;
     public LocalDateTime dateTime;
+
     public TournamentHistory(){
         this.onEdge = true;
         this.label = Tournament.HISTORY_LABEL;
     }
-    public TournamentHistory(String tournamentId,int rank,double score,LocalDateTime dateTime){
+    public TournamentHistory(long tournamentId,long instanceId,long entryId,long prizeId,LocalDateTime dateTime){
         this();
         this.tournamentId = tournamentId;
-        this.rank = rank;
-        this.score = score;
+        this.instanceId = instanceId;
+        this.entryId = entryId;
+        this.prizeId = prizeId;
         this.dateTime = dateTime;
     }
 
 
     @Override
     public boolean write(DataBuffer buffer) {
-        buffer.writeUTF8(tournamentId);
-        buffer.writeInt(rank);
-        buffer.writeDouble(score);
+        buffer.writeLong(tournamentId);
+        buffer.writeLong(instanceId);
+        buffer.writeLong(entryId);
+        buffer.writeLong(prizeId);
         buffer.writeLong(TimeUtil.toUTCMilliseconds(dateTime));
         return true;
     }
 
     @Override
     public boolean read(DataBuffer buffer) {
-        tournamentId = buffer.readUTF8();
-        rank = buffer.readInt();
-        score = buffer.readDouble();
+        tournamentId = buffer.readLong();
+        instanceId = buffer.readLong();
+        entryId = buffer.readLong();
+        prizeId = buffer.readLong();
         dateTime = TimeUtil.fromUTCMilliseconds(buffer.readLong());
         return true;
     }
@@ -55,30 +61,37 @@ public class TournamentHistory extends RecoverableObject implements Tournament.H
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("tournamentId",tournamentId);
-        jsonObject.addProperty("rank",rank);
-        jsonObject.addProperty("score",score);
-        jsonObject.addProperty("dataTime",dateTime.format(DateTimeFormatter.ISO_DATE_TIME));
+        jsonObject.addProperty("TournamentId",Long.toString(tournamentId));
+        jsonObject.addProperty("InstanceId",Long.toString(instanceId));
+        jsonObject.addProperty("EntryId",Long.toString(entryId));
+        jsonObject.addProperty("DataTime",dateTime.format(DateTimeFormatter.ISO_DATE_TIME));
         return jsonObject;
     }
 
     @Override
-    public String tournamentId() {
+    public long tournamentId() {
         return tournamentId;
     }
 
     @Override
-    public int rank() {
-        return rank;
+    public long instanceId() {
+        return instanceId;
     }
 
     @Override
-    public double score() {
-        return score;
+    public long entryId() {
+        return entryId;
     }
 
+    public long prizeId(){
+        return prizeId;
+    }
     @Override
     public LocalDateTime dateTime() {
         return dateTime;
+    }
+
+    public static void list(long systemId, DataStore.Stream<TournamentHistory> stream,DataStore dataStore){
+        dataStore.list(new TournamentHistoryQuery(systemId),(tournamentHistory -> stream.on(tournamentHistory)));
     }
 }

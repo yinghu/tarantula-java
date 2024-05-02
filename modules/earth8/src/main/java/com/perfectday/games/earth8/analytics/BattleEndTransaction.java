@@ -10,9 +10,9 @@ import java.util.UUID;
 public class BattleEndTransaction extends AnalyticsTransaction {
     private static final String MESSAGE_TYPE = "/earth8/player/0.0.1/battleEnd";
 
-    public BattleEndTransaction(Session session, long battleId, byte[] clientData, UUID analyticsBatchId)
+    public BattleEndTransaction(Session session,long serverSessionId, long battleId, byte[] clientData, long analyticsBatchId)
     {
-        super(MESSAGE_TYPE, session);
+        super(MESSAGE_TYPE, session,serverSessionId);
         var object = JsonUtil.parse(clientData);
         data.addProperty("battle_id", battleId);
 
@@ -28,6 +28,6 @@ public class BattleEndTransaction extends AnalyticsTransaction {
         {
             data.add("starsEarned", JsonNull.INSTANCE);
         }
-        data.addProperty("analyticsBatchId", analyticsBatchId.toString());
+        data.addProperty("analyticsBatchId", analyticsBatchId);
     }
 }

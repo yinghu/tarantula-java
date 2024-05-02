@@ -12,6 +12,7 @@ import com.tarantula.game.service.PlatformGameServiceSetup;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.Application;
+import com.tarantula.platform.tournament.TournamentPrize;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,6 +70,10 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
             return;
         }
         this.inventoryServiceProvider.redeem(systemId,item);
+    }
+
+    public void pendingTournamentPrize(long systemId,TournamentPrize tournamentPrize){
+
     }
 
     public boolean redeem(Session session,String rewardKey){
