@@ -3,8 +3,8 @@ package com.tarantula.game.module;
 import com.icodesoftware.*;
 import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.platform.tournament.TournamentMockUtils;
 import com.tarantula.platform.tournament.TournamentContext;
-import com.tarantula.platform.tournament.TournamentHistoryContext;
 
 
 public class TournamentModule extends ModuleHeader implements Configurable.Listener {
@@ -14,17 +14,25 @@ public class TournamentModule extends ModuleHeader implements Configurable.Liste
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")){
-            session.write(new TournamentContext(true,"tournament list",this.tournamentServiceProvider.list()).toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onJoin")){
-            Tournament.Instance ins = tournamentServiceProvider.tournament(Long.parseLong(session.name())).register(session);
-            session.write(ins.toJson().toString().getBytes());
+            session.write(new TournamentContext(true,"tournament list",this.tournamentServiceProvider.list(session.name())).toJson().toString().getBytes());
         }
         else if(session.action().equals("onBoard")){
             Tournament tournament = tournamentServiceProvider.tournament(Long.parseLong(session.name()));
-            Tournament.RaceBoard board = tournament.register(session).raceBoard();
-            session.write(board.toString().getBytes());
+            if(tournament.status() == Tournament.Status.STARTING || tournament.status() == Tournament.Status.PENDING){
+                session.write(JsonUtil.toSimpleResponse(false,"tournament not started").getBytes());
+            }
+            else{
+                Tournament.Instance instance = tournament.register(session);
+                Tournament.RaceBoard board = instance.raceBoard();
+                Tournament.RaceBoard myBoard = instance.myRaceBoard();
+                session.write(new TournamentContext(board,myBoard).toJson().toString().getBytes());
+            }
         }
+        //pending removal
+        else if (session.action().equals("onLoadRankings")){
+            session.write(TournamentMockUtils.GetMockTournamentRankings(session.systemId()).toString().getBytes());
+        }
+        //end of removal
         else{
             throw new UnsupportedOperationException(session.action()+" not supported");
         }
@@ -38,6 +46,5 @@ public class TournamentModule extends ModuleHeader implements Configurable.Liste
         this.tournamentServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
         this.context.log("Tournament module started", OnLog.WARN);
     }
-
 
 }

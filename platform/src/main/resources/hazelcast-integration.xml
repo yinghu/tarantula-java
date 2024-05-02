@@ -78,6 +78,10 @@
             <name>DistributionMetricsService</name>
             <class-name>com.tarantula.platform.service.cluster.metrics.MetricsClusterService</class-name>
         </service>
+        <service enabled="true">
+            <name>DistributionPresenceService</name>
+            <class-name>com.tarantula.platform.service.cluster.presence.PresenceClusterService</class-name>
+        </service>
     </services>
     <partition-group enabled="true" group-type="HOST_AWARE" />
     <map name="tarantula.map.small.*">

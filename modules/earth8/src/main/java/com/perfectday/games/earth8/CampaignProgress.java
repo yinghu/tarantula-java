@@ -26,8 +26,8 @@ public class CampaignProgress extends BattleUpdate{
     }
 
     @Override
-    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session) {
-        pendingAnalytics.add(new CampaignProgressTransaction(session, battleId, stageId, stars));
+    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session,long serverSessionId,long batchId) {
+        pendingAnalytics.add(new CampaignProgressTransaction(session,serverSessionId, battleId, stageId, stars));
         return true;
     }
 }

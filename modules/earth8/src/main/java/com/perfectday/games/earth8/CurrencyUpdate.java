@@ -30,8 +30,8 @@ public class CurrencyUpdate extends BattleUpdate{
     }
 
     @Override
-    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session) {
-        pendingAnalytics.add(new CurrencyUpdateTransaction(session, context, currencyId, currencyDelta, currencyTotal, fakeTransactionId));
+    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session,long serverSessionId,long batchId) {
+        pendingAnalytics.add(new CurrencyUpdateTransaction(session,serverSessionId, context, currencyId, currencyDelta, currencyTotal, fakeTransactionId));
         return true;
     }
 }

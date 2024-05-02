@@ -8,49 +8,49 @@ import com.hazelcast.spi.PartitionAwareOperation;
 
 import java.io.IOException;
 
-public class TournamentFinishOperation extends Operation implements PartitionAwareOperation {
+
+public class TournamentRaceBoardOperation extends Operation implements PartitionAwareOperation {
 
     private String serviceName;
-    private String systemId;
-    private String tournamentId;
-    private String instanceId;
 
-    public TournamentFinishOperation() {
+    private long tournamentId;
+    private long instanceId;
+
+    private byte[] raceBoard;
+
+    public TournamentRaceBoardOperation() {
     }
 
 
-    public TournamentFinishOperation(String serviceName, String tournamentId,String instanceId, String systemId) {
+    public TournamentRaceBoardOperation(String serviceName, long tournamentId, long instanceId) {
         this.serviceName = serviceName;
         this.tournamentId = tournamentId;
         this.instanceId = instanceId;
-        this.systemId = systemId;
     }
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        ais.finish(serviceName,tournamentId,instanceId,systemId);
+        raceBoard = ais.raceBoard(serviceName,tournamentId,instanceId);
     }
 
     @Override
     public Object getResponse() {
-        return null;
+        return this.raceBoard;
     }
 
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeUTF(this.serviceName);
-        out.writeUTF(this.tournamentId);
-        out.writeUTF(this.instanceId);
-        out.writeUTF(this.systemId);
+        out.writeLong(this.tournamentId);
+        out.writeLong(this.instanceId);
     }
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        this.serviceName = in.readUTF();
-        this.tournamentId = in.readUTF();
-        this.instanceId = in.readUTF();
-        this.systemId = in.readUTF();
+        serviceName = in.readUTF();
+        tournamentId = in.readLong();
+        instanceId = in.readLong();
     }
 }

@@ -49,11 +49,11 @@ public class EquipmentXpUp extends BattleUpdate{
     }
 
     @Override
-    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session){
-        pendingAnalytics.add(new EquipmentXpUpTransaction(session, _equipmentData, equipmentId, xpGain));
+    protected boolean runUpdate(ApplicationPreSetup applicationPreSetup, Session session,long serverSessionId,long batchId){
+        pendingAnalytics.add(new EquipmentXpUpTransaction(session,serverSessionId, _equipmentData, equipmentId, xpGain));
         if(toLevel > fromLevel)
         {
-            pendingAnalytics.add(new EquipmentLevelUpTransaction(session, _equipmentData, equipmentId, fromLevel, toLevel));
+            pendingAnalytics.add(new EquipmentLevelUpTransaction(session,serverSessionId, _equipmentData, equipmentId, fromLevel, toLevel));
         }
         return true;
     }

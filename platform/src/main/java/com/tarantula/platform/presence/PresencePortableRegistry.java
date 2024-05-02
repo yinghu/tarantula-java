@@ -69,6 +69,9 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
 
     public static final int LEADER_BOARD_ENTRY_CID = 26;
 
+    public static final int PROFILE_NAME_SEQUENCE_CID = 27;
+
+
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
     public static PresencePortableRegistry INS;
@@ -154,6 +157,10 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
                 break;
             case LEADER_BOARD_ENTRY_CID:
                 pt = new LeaderBoardEntry();
+                break;
+            case PROFILE_NAME_SEQUENCE_CID:
+                pt = new ProfileNameSequence();
+
                 break;
             default:
         }

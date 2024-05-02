@@ -13,10 +13,10 @@ import com.perfectday.games.earth8.analytics.*;
 import com.perfectday.games.earth8.inbox.PlayerAction;
 import com.perfectday.games.earth8.inbox.PlayerActionQuery;
 import com.perfectday.games.earth8.inbox.PlayerEventInbox;
+import com.perfectday.games.earth8.data.PlayerDataTrack;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -41,10 +41,14 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     //callbacks from HTTP
     @Override
     public void onJoined(Session session,Room room) {
-        //use room.distributionId/key as game session id
+
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+        PlayerDataTrack analyticsSession = PlayerDataTrack.lookup(gameContext,session.distributionId(), PlayerDataTrack.Type.Analytics);
+        analyticsSession.trackId = gameContext.applicationSchema().applicationPreSetup().distributionId();
+        analyticsSession.update();
+        ServerConnectTransaction serverConnectTransaction = new ServerConnectTransaction(session,analyticsSession.trackId);
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
-                webhook.upload(ANALYTICS_QUERY,new ServerConnectTransaction(session).toString().getBytes()))
+                webhook.upload(ANALYTICS_QUERY,serverConnectTransaction.toString().getBytes()))
         );
     }
 
@@ -54,7 +58,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     }
 
     public void startGame(Session session, byte[] payload) throws Exception{
-        UUID analyticsBatchId = AnalyticsBatchUtils.generateAnalyticsBatchId();
+        long analyticsBatchId = gameContext.applicationSchema().applicationPreSetup().distributionId();
         BattleTransaction battleTransaction = BattleTransaction.fromJson(payload);
         if(!battleTransaction.validate()){
             session.write(JsonUtil.toSimpleResponse(false,"invalid battle settings").getBytes());
@@ -73,11 +77,13 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         session.write(created ? battleTransaction.toJson().toString().getBytes() : JsonUtil.toSimpleResponse(false,"failed to create battle transaction").getBytes());
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()-> {
-            webhook.upload(ANALYTICS_QUERY, new BattleStartTransaction(session, battleTransaction.distributionId(), payload, analyticsBatchId).toString().getBytes());
+            PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext,session.distributionId(), PlayerDataTrack.Type.Analytics);
+            webhook.upload(ANALYTICS_QUERY, new BattleStartTransaction(session,serverSession.trackId, battleTransaction.distributionId(), payload, analyticsBatchId).toString().getBytes());
             JsonObject jsonObject = JsonUtil.parse(payload);
             if (jsonObject.has("analytics")) {
                 var analyticsData = AnalyticsBatchUtils.getAnalyticsData(jsonObject.getAsJsonArray("analytics"));
-                var transactions = AnalyticsBatchUtils.getTransactions(session, analyticsBatchId, analyticsData);
+                PlayerDataTrack serverSessionTrack = PlayerDataTrack.lookup(gameContext,session.distributionId(), PlayerDataTrack.Type.Analytics);
+                var transactions = AnalyticsBatchUtils.getTransactions(session,serverSessionTrack.trackId, analyticsBatchId, analyticsData);
                 transactions.forEach(analytics -> webhook.upload(ANALYTICS_QUERY, analytics.toString().getBytes()));
             }
         }));
@@ -86,27 +92,38 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
     public void updateGame(Session session,byte[] payload) throws Exception{
         BattleUpdate update = BattleUpdate.fromJson(payload);
-        Transaction transaction = gameContext.applicationSchema().transaction();
-        boolean updated = transaction.execute(ctx->{
-            ApplicationPreSetup applicationPreSetup = (ApplicationPreSetup)ctx;
-            DataStore dataStore = applicationPreSetup.onDataStore("battle");
-            if(!dataStore.create(update)) return false;
-            //TO MORE TRANSACTION STUFF
-            return update.update(applicationPreSetup, session);
-        });
 
-        if(updated)
+        if (update.score > 0 && update.playerLevel > 0) {
+
+            var playerDataTrack = PlayerDataTrack.lookup(gameContext,session.distributionId(),PlayerDataTrack.Type.Tournament);
+
+            Tournament existing = tournamentIndex.get(playerDataTrack.trackId);
+            if(existing!=null){
+                existing.register(session).update(session,entry->{
+                    entry.score(0,update.score);
+                    return true;
+                });
+            }
+            else{
+                scoreTournamentWithSameLevel(session, update, playerDataTrack);
+            }
+
+        }
+
+        PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext,session.distributionId(), PlayerDataTrack.Type.Analytics);
+
+        if(update.update(gameContext.applicationSchema().applicationPreSetup(), session,serverSession.trackId,gameContext.applicationSchema().applicationPreSetup().distributionId()))
         {
             TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
             gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
                     update.publishAnalytics(webhook,ANALYTICS_QUERY))
             );
         }
-        session.write(JsonUtil.toSimpleResponse(updated,updated?"battle updated":"failed to update").getBytes());
+        session.write(JsonUtil.toSimpleResponse(true,"battle updated").getBytes());
     }
 
     public void endGame(Session session,byte[] payload) throws Exception{
-        UUID analyticsBatchId = AnalyticsBatchUtils.generateAnalyticsBatchId();
+        long analyticsBatchId = gameContext.applicationSchema().applicationPreSetup().distributionId();
         BattleTransaction battleTransaction = BattleTransaction.fromJson(payload);
         if(battleTransaction.distributionId()<=0){
             session.write(JsonUtil.toSimpleResponse(false,"invalid battleId").getBytes());
@@ -125,50 +142,19 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                 ApplicationResource.Redeemer redeemer = gameContext.redeemer(session);
                 redeemer.redeem(applicationPreSetup,resource);
             });
-            /** Inventory item remove from the Inventory
-             * Rechargeable item  cannot be removed
-            Inventory inventory = applicationPreSetup.inventory(session.distributionId(),"Hero");
-            Inventory.Stock removed = inventory.stock(1234);
-            if(removed!=null){
-                inventory.removeStock(removed);
-            }
-            **/
             return true;
         });
-        if(updated
-            && (battleTransaction.TEMP_BattleStage.equals("Chapter3_Stage7_HardConfig")
-                || battleTransaction.TEMP_BattleStage.endsWith("EpicConfig")
-            )
-            && battleTransaction.win
-        ) {
-            // hard coded 7 day tournament completion
-            tournamentIndex.forEach((key,entry)->{
-                if(entry.type().startsWith("SevenDayTournament")) {
-                    // register this user to the tournament the first time they finish the campaign
-                    entry.register(session).update(session,(e)->{
-                        this.gameContext.log("Test Register Player to tournament", OnLog.INFO);
-                        if(e.score() > 0)
-                        {
-                            this.gameContext.log("Player already registered", OnLog.INFO);
-                            return false;
-                        }
-
-                        this.gameContext.log("Player registering", OnLog.INFO);
-                        e.score(0,1);
-                        return true;
-                    });
-                }
-            });
-        }
 
         session.write(JsonUtil.toSimpleResponse(updated,"battle finished").getBytes());
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()-> {
-            webhook.upload(ANALYTICS_QUERY, new BattleEndTransaction(session, battleTransaction.distributionId(), payload, analyticsBatchId).toBytes());
+            PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext,session.distributionId(), PlayerDataTrack.Type.Analytics);
+            webhook.upload(ANALYTICS_QUERY, new BattleEndTransaction(session,serverSession.trackId, battleTransaction.distributionId(), payload, analyticsBatchId).toBytes());
             JsonObject jsonObject = JsonUtil.parse(payload);
             if (jsonObject.has("analytics")) {
                 var analyticsData = AnalyticsBatchUtils.getAnalyticsData(jsonObject.getAsJsonArray("analytics"));
-                var transactions = AnalyticsBatchUtils.getTransactions(session, analyticsBatchId, analyticsData);
+                PlayerDataTrack serverSessionTrack = PlayerDataTrack.lookup(gameContext,session.distributionId(), PlayerDataTrack.Type.Analytics);
+                var transactions = AnalyticsBatchUtils.getTransactions(session,serverSessionTrack.trackId, analyticsBatchId, analyticsData);
                 transactions.forEach(analytics -> webhook.upload(ANALYTICS_QUERY, analytics.toString().getBytes()));
             }
         }));
@@ -178,8 +164,10 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     public <T extends OnAccess> void onGameEvent(T event){
         if(event.command().equals("ShippingFormCompleted")){
             if(gameContext.applicationSchema().transaction().execute(ctx->{
+                var tournamentType = JsonUtil.parse((byte[])event.property(OnAccess.PAYLOAD)).get("tournament_type").getAsString();
                 DataStore playerActionStore = ctx.onDataStore("player_coin_form");
-                PlayerAction playerAction = new PlayerAction("ShippingFormCompleted",true);
+
+                PlayerAction playerAction = new PlayerAction("ShippingFormCompleted-" + tournamentType,true);
                 playerAction.ownerKey(SnowflakeKey.from(event.systemId()));
                 return playerActionStore.create(playerAction);
             })){
@@ -189,30 +177,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                 ));
             }
         }
-        else if(event.command().equals("something else")){
 
-        }
-        //PENDING REMOVE
-        var eventType = (String)event.property(OnAccess.TYPE_ID);
-        if(eventType != null && eventType.equals("onAction"))
-        {
-            var data = (byte[])event.property(OnAccess.PAYLOAD);
-            var jsonData = JsonUtil.parse(data);
-            var playerId = JsonUtil.getJsonLong(jsonData, "playerId", 0);
-            if(playerId>0){
-                gameContext.applicationSchema().transaction().execute(ctx->{
-                    DataStore playerActionStore = ctx.onDataStore("player_coin_form");
-                    PlayerAction playerAction = new PlayerAction("ShippingFormCompleted",true);
-                    playerAction.ownerKey(SnowflakeKey.from(playerId));
-                    return playerActionStore.create(playerAction);
-                });
-            }
-        }
-        TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
-        gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
-                webhook.upload(ANALYTICS_QUERY, new ServerMetadataTransaction(event).toBytes())
-        ));
-        //END OF PENDING REMOVE
     }
 
     public void onInventory(ApplicationPreSetup applicationPreSetup,Inventory inventory, Inventory.Stock stock){
@@ -262,12 +227,18 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     public void tournamentStarted(Tournament tournament) {
         gameContext.log("Tournament started : "+tournament.distributionId()+" : "+tournament.name()+" : "+tournament.type()+" : "+tournament.global(),OnLog.WARN);
         tournamentIndex.put(tournament.distributionId(),tournament);
+        for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
+            tournamentIndex.put(start,tournament);
+        }
     }
 
     @Override
     public void tournamentClosed(Tournament tournament) {
         gameContext.log("Tournament closed : "+tournament.distributionId()+" : "+tournament.name()+" : "+tournament.type()+" : "+tournament.global(),OnLog.WARN);
         tournamentIndex.remove(tournament.distributionId());
+        for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
+            tournamentIndex.remove(start);
+        }
     }
 
     public void onApplicationResourceRegistered(ApplicationResource resource){
@@ -305,5 +276,16 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
         //UDP MESSAGE WITH RELAY CALL WITH SINGLE UDP MESSAGE
+    }
+
+    private void scoreTournamentWithSameLevel(Session session, BattleUpdate update, PlayerDataTrack playerDataTrack) {
+        Tournament nextLevel = tournamentIndex.get(update.playerLevel);
+        if(nextLevel==null) return;
+        nextLevel.register(session).update(session,entry->{
+            entry.score(0,update.score);
+            return true;
+        });
+        playerDataTrack.trackId = nextLevel.distributionId();
+        playerDataTrack.update();
     }
 }

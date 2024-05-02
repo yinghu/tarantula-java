@@ -23,11 +23,12 @@ public class Main {
     static boolean onFile = false;
 
     public static void xmain(String[] args) throws Exception{
+
         HttpCaller httpCaller = new HttpCaller("http://localhost:8090");
         httpCaller._init();
         String[] headers = new String[]{
                 Session.TARANTULA_ACCESS_KEY,
-                "563971525414227968-019F582E7E6D4B83230C1F473832395611FC04C9-8C16E54DDCB76156E82FE37A501517FB",
+                "570342964778242048-6879508E047E7B7BF8A50EF2951A3A198EE81957-FA80A8B8A29B7C4C4D636032D4BFA571",
                 Session.TARANTULA_ACTION,
                 "onGameClusterEvent",
                 Session.TARANTULA_NAME,

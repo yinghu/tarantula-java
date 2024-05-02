@@ -61,9 +61,15 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int TOURNAMENT_INSTANCE_CID = 114;
 
-    public static final int TOURNAMENT_ENTRY_CID = 115;
 
-    public static final int TOURNAMENT_RACE_BOARD_CID = 116;
+    public static final int GAME_ENTRY_CID = 118;
+
+
+    public static final int PVE_ROOM_CID = 120;
+    public static final int PVP_ROOM_CID = 121;
+    public static final int TVE_ROOM_CID = 122;
+    public static final int TVT_ROOM_CID = 123;
+
 
     public static final int CLIENT_CONNECTION_CID = 124;
 
@@ -146,12 +152,6 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case TOURNAMENT_INSTANCE_CID:
                 _ins = new TournamentInstance();
-                break;
-            case TOURNAMENT_ENTRY_CID:
-                _ins = new TournamentEntry();
-                break;
-            case TOURNAMENT_RACE_BOARD_CID:
-                _ins = new TournamentRaceBoard();
                 break;
 
             case CLIENT_CONNECTION_CID:

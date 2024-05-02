@@ -3,12 +3,12 @@ package com.tarantula.platform.service.cluster.tournament;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
-import com.hazelcast.spi.PartitionAwareOperation;
+
 
 import java.io.IOException;
 
 
-public class EndTournamentOperation extends Operation implements PartitionAwareOperation {
+public class EndTournamentOperation extends Operation {
 
     private String serviceName;
     private long tournamentId;

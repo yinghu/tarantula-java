@@ -25,7 +25,9 @@ public class TournamentSchedule extends Application {
     public boolean global(){
         return header.get("Global").getAsBoolean();
     }
-
+    public int segmentsPerSchedule(){
+        return header.get("SegmentsPerSchedule").getAsInt();
+    }
     public boolean notificationOnFinish(){
         return header.get("NotificationOnFinish").getAsBoolean();
     }
@@ -55,8 +57,19 @@ public class TournamentSchedule extends Application {
         return header.get("MaxEntriesPerInstance").getAsInt();
     }
 
+    public void maxEntriesPerInstance(int maxEntriesPerInstance){
+        header.addProperty("MaxEntriesPerInstance",maxEntriesPerInstance);
+    }
+
     public int durationMinutesPerInstance() {
         return header.get("DurationMinutesPerInstance").getAsInt();
+    }
+
+    public long startLevel(){
+        return header.get("StartLevel").getAsLong();
+    }
+    public long endLevel(){
+        return header.get("EndLevel").getAsLong();
     }
 
     @Override

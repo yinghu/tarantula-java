@@ -3,14 +3,16 @@ package com.tarantula.game.module;
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.platform.presence.MappingObject;
+import com.tarantula.platform.presence.*;
 
 import com.tarantula.game.PlayerSavedGames;
 import com.tarantula.game.util.SavedGameDeserializer;
-import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
 import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 import com.tarantula.platform.presence.saves.PlatformSavedGameServiceProvider;
 import com.tarantula.platform.presence.saves.SavedGame;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SavedGameModule extends ModuleHeader {
 
@@ -45,6 +47,14 @@ public class SavedGameModule extends ModuleHeader {
             else{
                 session.write(JsonUtil.toSimpleResponse(true,"system saved game reset").getBytes());
             }
+        }
+        else if(session.action().equals("onFetchProfile")){
+            session.write(presenceServiceProvider.getProfilePayload(session.name()).toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onUpdateProfile")){
+            boolean successful = gameServiceProvider.presenceServiceProvider().createProfile(session);
+
+            session.write(JsonUtil.toSimpleResponse(successful,"create player profile").getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action());
