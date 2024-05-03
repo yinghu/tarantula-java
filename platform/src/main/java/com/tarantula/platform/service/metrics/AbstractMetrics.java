@@ -425,6 +425,9 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
     }
     @Override
     public void updateSummary(Summary summary){
+        categories.forEach(c->{
+            summary.update(c,statistics.entry(c).total());
+        });
     }
 
 }

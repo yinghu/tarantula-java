@@ -4,6 +4,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 
 public class TimeUtil {
+
     public static long toUTCMilliseconds(LocalDateTime dateTime){
         return dateTime.toInstant(ZoneOffset.UTC).toEpochMilli();
     }

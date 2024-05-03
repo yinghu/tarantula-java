@@ -32,6 +32,7 @@ import com.tarantula.platform.service.cluster.*;
 
 import com.tarantula.platform.service.deployment.*;
 
+import com.tarantula.platform.service.metrics.DataStoreMonitor;
 import com.tarantula.platform.service.metrics.JVMMonitor;
 import com.tarantula.platform.service.metrics.MetricsManager;
 import com.tarantula.platform.service.persistence.*;
@@ -612,9 +613,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         this.serviceProviders.put(AccessIndexService.NAME,accessIndexService());
         this.serviceProviders.put(mirrorBackupProvider.name(),mirrorBackupProvider);
         this.serviceProviders.put(JVMMonitor.NAME,new JVMMonitor());
+        this.serviceProviders.put(DataStoreMonitor.NAME,new DataStoreMonitor(this));
         ServiceProviderConfigurationParser spc = new ServiceProviderConfigurationParser("tarantula-platform-service-provider-config.xml",serviceProviders);
         spc.start(this);
-        serviceViewList.add(this.deploymentDataStoreProvider.name());
+        serviceViewList.add(DataStoreMonitor.NAME);
         serviceViewList.add(JVMMonitor.NAME);
         serviceViewList.add(UDPEndpoint.UDP_ENDPOINT);
         serviceViewList.add(this.integrationCluster.name());

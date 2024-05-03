@@ -1,6 +1,6 @@
 package com.tarantula.admin;
 
-import com.google.gson.GsonBuilder;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -11,7 +11,6 @@ import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.service.metrics.MetricsSnapshotRequest;
 import com.tarantula.platform.service.metrics.MetricsViewMonitor;
-import com.tarantula.platform.util.OnAccessDeserializer;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,7 +21,7 @@ public class MetricsViewSudoRoleModule implements Module {
     private DeploymentServiceProvider deploymentServiceProvider;
 
     private UserService userService;
-    private GsonBuilder builder;
+
     private MetricsViewMonitor metricsViewMonitor;
     private Configuration chartConfiguration;
 
@@ -98,8 +97,6 @@ public class MetricsViewSudoRoleModule implements Module {
         this.context = context;
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.userService = this.context.serviceProvider(UserService.NAME);
-        this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.chartConfiguration = this.deploymentServiceProvider.configuration("metrics-view-settings");
         long timerInterval = ((Number)this.chartConfiguration.property("timerInterval")).longValue();
         this.metricsViewMonitor = new MetricsViewMonitor(this.context,timerInterval);
