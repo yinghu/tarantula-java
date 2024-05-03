@@ -10,7 +10,7 @@ public class ServiceViewOperation extends Operation {
 
     private String serviceName;
 
-    private String ret;
+    private byte[] ret;
 
     public ServiceViewOperation() {
     }

@@ -5,8 +5,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configuration;
 import com.icodesoftware.service.ServiceProvider;
+import com.icodesoftware.util.FIFOBuffer;
 import com.icodesoftware.util.RecoverableObject;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
@@ -22,13 +24,17 @@ public class ServiceViewSummary extends RecoverableObject implements ServiceProv
     private final HashSet<String> categorySet;
 
     private final ConcurrentHashMap<String, ServiceView> viewMap = new ConcurrentHashMap<>();
-
+    private FIFOBuffer<LocalDateTime> lastViewed = new FIFOBuffer<>(2,new LocalDateTime[2]);
     public ServiceViewSummary(String name, Configuration configuration, Runnable stop){
         this.name = name;
         this.metricsSize = ((Number)configuration.property("metricsSize")).intValue();
         this.chartSize = ((Number)configuration.property("chartSize")).intValue();
         this.stop = stop;
         this.categorySet = new HashSet<>();
+        LocalDateTime init = LocalDateTime.now();
+        for(int i=0;i<2;i++){
+            lastViewed.push(init);
+        }
     }
 
     @Override
@@ -46,6 +52,7 @@ public class ServiceViewSummary extends RecoverableObject implements ServiceProv
         JsonArray list = new JsonArray();
         categorySet.forEach(c-> list.add(c));
         resp.add("list",list);
+        lastViewed.push(LocalDateTime.now());
         return resp;
     }
     public JsonObject toMetricsJson(JsonArray nodes,JsonArray categories){
@@ -65,13 +72,14 @@ public class ServiceViewSummary extends RecoverableObject implements ServiceProv
         m.addProperty("name",name);
         m.addProperty("successful",true);
         m.add("list",list);
+        lastViewed.push(LocalDateTime.now());
         return m;
     }
     public void stop(){
         stop.run();
     }
 
-    public void update(JsonObject payload){
+    public LocalDateTime update(JsonObject payload){
         String memberId = payload.get("memberId").getAsString();
         String timed = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME_FORMAT));
         viewMap.compute(memberId,(k,v)->{
@@ -85,5 +93,6 @@ public class ServiceViewSummary extends RecoverableObject implements ServiceProv
             }
             return v;
         });
+        return lastViewed.pop();
     }
 }

@@ -3,10 +3,17 @@ package com.tarantula.platform.service.metrics;
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.OnLog;
 import com.icodesoftware.SchedulingTask;
+import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceProvider;
 import com.icodesoftware.util.JsonUtil;
+import com.icodesoftware.util.TimeUtil;
+
+import java.time.LocalDateTime;
 
 public class ServiceViewMonitor implements SchedulingTask {
+
+    private TarantulaLogger logger = JDKLogger.getLogger(ServiceViewMonitor.class);
 
     private final ApplicationContext applicationContext;
     private final ServiceProvider serviceProvider;
@@ -44,9 +51,16 @@ public class ServiceViewMonitor implements SchedulingTask {
     @Override
     public void run() {
         try{
-            String[] ret = distributionMetricsService.onMonitor(serviceProvider.name());
-            for(String f  : ret){
-                serviceView.update(JsonUtil.parse(f));
+            byte[][] ret = distributionMetricsService.onMonitor(serviceProvider.name());
+            for(byte[] f  : ret){
+                ServiceViewRequest response = ServiceViewRequest.response(f);
+                LocalDateTime lastViewed = serviceView.update(response.toJson());
+                long seconds = TimeUtil.durationUTCInSeconds(lastViewed,LocalDateTime.now());
+                if(seconds>30){
+                    logger.warn("Monitor is stopping with last view passed in seconds ["+seconds+"] ");
+                    timerCountDown = 0;
+                    break;
+                }
             }
             timerCountDown--;
             if(timerCountDown <= 0){

@@ -35,19 +35,19 @@ public class DistributionMetricsServiceProxy extends AbstractDistributedObject<M
     }
 
     @Override
-    public String[] onMonitor(String serviceName) {
+    public byte[][] onMonitor(String serviceName) {
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        String[] ret = new String[mlist.size()];
+        byte[][] ret = new byte[mlist.size()][];
         int i = 0;
         for(Member m : mlist){
             ServiceViewOperation serviceViewOperation = new ServiceViewOperation(serviceName);
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionMetricsService.NAME, serviceViewOperation,m.getAddress());
             ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<String> future = builder.invoke();
+                Future<byte[]> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
             },metricsListener);
-            ret[i++]= result.successful? (String) result.result : "{}";
+            ret[i++]= result.successful? (byte[]) result.result : new byte[0];
         }
         return ret;
     }

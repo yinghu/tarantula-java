@@ -40,4 +40,14 @@ public class MetricsSnapshotResponse extends RecoverableObject{
         jsonObject.add("data",metrics);
         return jsonObject;
     }
+
+    @Override
+    public byte[] toBinary() {
+        return super.toBinary();
+    }
+
+    @Override
+    public void fromBinary(byte[] payload) {
+        super.fromBinary(payload);
+    }
 }

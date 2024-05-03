@@ -116,7 +116,10 @@ public class MetricsViewAdminRoleModule implements Module {
             ServiceProvider serviceProvider = context.serviceProvider(session.name());
             if(serviceProvider != null){
                 viewMap.computeIfAbsent(session.name(),k->{
-                    ServiceViewSummary view = new ServiceViewSummary(session.name(),chartConfiguration,()->viewMap.remove(session.name()));
+                        ServiceViewSummary view = new ServiceViewSummary(session.name(),chartConfiguration,()->{
+                        ServiceViewSummary removed = viewMap.remove(session.name());
+                        this.context.log("Monitor view removed : "+removed.name(),OnLog.WARN);
+                    });
                     ServiceViewMonitor monitor = new ServiceViewMonitor(context,serviceProvider,timerInterval,timerLoopCount,view);
                     context.schedule(monitor);
                     return view;
@@ -133,7 +136,7 @@ public class MetricsViewAdminRoleModule implements Module {
             JsonArray nodes = query.get("nodes").getAsJsonArray();
             JsonArray categories = query.get("categories").getAsJsonArray();
             ServiceViewSummary view = viewMap.get(session.name());
-            if(view!=null&&categories.size()>0){
+            if(view!=null && categories.size()>0){
                 session.write(view.toMetricsJson(nodes,categories).toString().getBytes());
             }
             else{

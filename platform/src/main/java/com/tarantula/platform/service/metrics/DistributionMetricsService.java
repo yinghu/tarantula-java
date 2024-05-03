@@ -8,7 +8,7 @@ public interface DistributionMetricsService extends ServiceProvider {
 
     String NAME = "DistributionMetricsService";
 
-    String[] onMonitor(String serviceName);
+    byte[][] onMonitor(String serviceName);
 
     String[] onMetrics(String name,String category,String classifier);
 
