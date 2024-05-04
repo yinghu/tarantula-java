@@ -5,6 +5,10 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
+import com.icodesoftware.util.TimeUtil;
+
+import java.time.LocalDateTime;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DataStoreMonitor implements ServiceProvider {
 
@@ -13,6 +17,9 @@ public class DataStoreMonitor implements ServiceProvider {
     public static final String NAME = "DataStoreMonitor";
 
     private ServiceContext serviceContext;
+
+    private ConcurrentHashMap<String,Double> delta = new ConcurrentHashMap<>();
+    private LocalDateTime lastUpdated;
     @Override
     public String name() {
         return NAME;
@@ -35,11 +42,20 @@ public class DataStoreMonitor implements ServiceProvider {
     @Override
     public void registerSummary(Summary summary){
         Metrics metrics = serviceContext.metrics(DataStoreMetrics.DATA_STORE);
+        metrics.categories().forEach(cat->{
+            delta.put(cat,metrics.statistics().entry(cat).total());
+        });
         metrics.registerSummary(summary);
+        lastUpdated = LocalDateTime.now();
     }
     @Override
     public void updateSummary(Summary summary){
         Metrics metrics = serviceContext.metrics(DataStoreMetrics.DATA_STORE);
-        metrics.updateSummary(summary);
+        metrics.categories().forEach(cat->{
+            double current = metrics.statistics().entry(cat).total();
+            double gain = current-delta.get(cat);
+            summary.update(cat,gain);
+            delta.replace(cat,current);
+        });
     }
 }

@@ -61,7 +61,7 @@ public class MetricsViewAdminRoleModule implements Module {
                         ServiceViewSummary removed = viewMap.remove(session.name());
                         this.context.log("Monitor view removed : "+removed.name(),OnLog.WARN);
                     });
-                    ServiceViewMonitor monitor = new ServiceViewMonitor(context,serviceProvider,timerInterval,timerLoopCount,view);
+                    ServiceViewScheduler monitor = new ServiceViewScheduler(context,serviceProvider,timerInterval,timerLoopCount,view);
                     context.schedule(monitor);
                     return view;
                 });

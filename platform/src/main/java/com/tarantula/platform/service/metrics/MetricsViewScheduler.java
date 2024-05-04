@@ -9,7 +9,7 @@ import com.icodesoftware.util.JsonUtil;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class MetricsViewMonitor implements SchedulingTask {
+public class MetricsViewScheduler implements SchedulingTask {
 
     private final ApplicationContext applicationContext;
 
@@ -19,7 +19,7 @@ public class MetricsViewMonitor implements SchedulingTask {
 
     private final ConcurrentHashMap<String,MetricsSnapshotRequest> listeners;
 
-    public MetricsViewMonitor(ApplicationContext context,long timerInternal){
+    public MetricsViewScheduler(ApplicationContext context, long timerInternal){
         this.timerInternal = timerInternal;
         this.applicationContext = context;
         this.listeners = new ConcurrentHashMap<>();

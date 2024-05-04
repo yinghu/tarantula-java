@@ -6,14 +6,13 @@ import com.icodesoftware.SchedulingTask;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceProvider;
-import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TimeUtil;
 
 import java.time.LocalDateTime;
 
-public class ServiceViewMonitor implements SchedulingTask {
+public class ServiceViewScheduler implements SchedulingTask {
 
-    private TarantulaLogger logger = JDKLogger.getLogger(ServiceViewMonitor.class);
+    private TarantulaLogger logger = JDKLogger.getLogger(ServiceViewScheduler.class);
 
     private final ApplicationContext applicationContext;
     private final ServiceProvider serviceProvider;
@@ -24,7 +23,7 @@ public class ServiceViewMonitor implements SchedulingTask {
 
     private final DistributionMetricsService distributionMetricsService;
 
-    public ServiceViewMonitor(ApplicationContext context,ServiceProvider serviceProvider,long timerInternal,int timerCountDown,ServiceViewSummary serviceView){
+    public ServiceViewScheduler(ApplicationContext context, ServiceProvider serviceProvider, long timerInternal, int timerCountDown, ServiceViewSummary serviceView){
         this.applicationContext = context;
         this.distributionMetricsService = this.applicationContext.clusterProvider().serviceProvider(DistributionMetricsService.NAME);
         this.serviceProvider = serviceProvider;

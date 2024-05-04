@@ -10,7 +10,7 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.service.metrics.MetricsSnapshotRequest;
-import com.tarantula.platform.service.metrics.MetricsViewMonitor;
+import com.tarantula.platform.service.metrics.MetricsViewScheduler;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,7 +22,7 @@ public class MetricsViewSudoRoleModule implements Module {
 
     private UserService userService;
 
-    private MetricsViewMonitor metricsViewMonitor;
+    private MetricsViewScheduler metricsViewMonitor;
     private Configuration chartConfiguration;
 
     @Override
@@ -99,7 +99,7 @@ public class MetricsViewSudoRoleModule implements Module {
         this.userService = this.context.serviceProvider(UserService.NAME);
         this.chartConfiguration = this.deploymentServiceProvider.configuration("metrics-view-settings");
         long timerInterval = ((Number)this.chartConfiguration.property("timerInterval")).longValue();
-        this.metricsViewMonitor = new MetricsViewMonitor(this.context,timerInterval);
+        this.metricsViewMonitor = new MetricsViewScheduler(this.context,timerInterval);
         this.context.schedule(this.metricsViewMonitor);
         this.context.log("Metrics view sudo role module started", OnLog.INFO);
     }

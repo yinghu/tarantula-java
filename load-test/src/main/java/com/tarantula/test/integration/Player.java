@@ -74,10 +74,8 @@ public class Player implements Runnable{
         try{
             String[] headers = new String[]{
                     Session.TARANTULA_TAG,"index/user",
-                    Session.TARANTULA_ACTION,"onDeveloper",
+                    Session.TARANTULA_ACTION,"onDevice",
                     Session.TARANTULA_MAGIC_KEY,userName,
-                    Session.TARANTULA_ACCESS_KEY,
-                    "570342964778242048-6879508E047E7B7BF8A50EF2951A3A198EE81957-FA80A8B8A29B7C4C4D636032D4BFA571",
             };
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("DeviceId",userName);
@@ -105,12 +103,12 @@ public class Player implements Runnable{
             LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
             LoadResult.totalHttpRequestCount.incrementAndGet();
             onJoin(resp);
-            createProfile();
+            //createProfile();
             //saveOnSet();
-            coinForm();
-            loadShop();
-            onStartGame();
-            onUpdateGameScoreTournament();
+            //coinForm();
+            //loadShop();
+            //onStartGame();
+            //onUpdateGameScoreTournament();
         }catch (Exception ex){
             ex.printStackTrace();
             String error = ex.getMessage();

@@ -51,9 +51,10 @@ public class SystemStatisticsEntry extends OnApplicationHeader implements Statis
         return name;
     }
     @Override
-    public double total() {
+    public synchronized double total() {
         return this.total;
     }
+
     void total(double total,LocalDateTime update){
         this.total = total;
         this.timestamp = TimeUtil.toUTCMilliseconds(update);
@@ -67,7 +68,7 @@ public class SystemStatisticsEntry extends OnApplicationHeader implements Statis
         this.timestamp = TimeUtil.toUTCMilliseconds(update);
     }
     @Override
-    public double daily() {
+    public synchronized double daily() {
         return daily;
     }
 
@@ -76,7 +77,7 @@ public class SystemStatisticsEntry extends OnApplicationHeader implements Statis
         this.timestamp = TimeUtil.toUTCMilliseconds(update);
     }
     @Override
-    public double weekly() {
+    public synchronized double weekly() {
         return weekly;
     }
 
@@ -85,7 +86,7 @@ public class SystemStatisticsEntry extends OnApplicationHeader implements Statis
         this.timestamp = TimeUtil.toUTCMilliseconds(update);
     }
     @Override
-    public double monthly() {
+    public synchronized double monthly() {
         return monthly;
     }
 
@@ -94,7 +95,7 @@ public class SystemStatisticsEntry extends OnApplicationHeader implements Statis
         this.timestamp = TimeUtil.toUTCMilliseconds(update);
     }
     @Override
-    public double yearly() {
+    public synchronized double yearly() {
         return yearly;
     }
 
