@@ -5,7 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.protocol.ProtocolPortableRegistry;
 import com.icodesoftware.protocol.statistics.UserRating;
 import com.icodesoftware.protocol.statistics.UserStatistics;
 import com.icodesoftware.service.ServiceContext;
@@ -156,24 +155,12 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     }
 
     public Rating rating(Session session){
-        UserRating[] loaded  = {new UserRating()};
+        UserRating rating  = new UserRating();
         CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);
-        RecoverableQuery<UserRating> query = RecoverableQuery.query(currentSaveIndex.saveId,loaded[0], ProtocolPortableRegistry.INS);
-        mDataStore.list(query,(m)->{
-            if(m.label().equals(loaded[0].label())){
-                loaded[0]=m;
-                return false;
-            }
-            return true;
-        });
-        if(loaded[0].distributionId()==0){
-            loaded[0].ownerKey(query.key());
-            loaded[0].rank = 1;
-            loaded[0].xp = 100;
-            mDataStore.create(loaded[0]);
-        }
-        loaded[0].dataStore(mDataStore);
-        return loaded[0];
+        rating.distributionId(currentSaveIndex.saveId);
+        rating.dataStore(applicationPreSetup.dataStore(gameCluster,NAME+"_rating"));
+        rating.load();
+        return rating;
     }
     public Stub stub(Session session,Descriptor lobby){
         DataStore ds = applicationPreSetup.dataStore(gameCluster,NAME+"_"+lobby.tag().replaceAll(Recoverable.PATH_SEPARATOR,"_"));

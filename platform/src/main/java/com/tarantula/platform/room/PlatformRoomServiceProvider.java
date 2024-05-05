@@ -139,7 +139,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     public Channel registerChannel(Stub stub, Session.TimeoutListener timeoutListener){
         //local join only
         GameRoom room = gameRoomIndex.get(stub.roomId);
-        Channel channel = room.registerChannel(stub,timeoutListener,this.gameServiceProvider.gameServiceProvider());
+        Channel channel = room.registerChannel(stub.session(),timeoutListener,this.gameServiceProvider.gameServiceProvider());
         udpEndpoint.registerChannel((UDPChannel)channel);
         return channel;
     }

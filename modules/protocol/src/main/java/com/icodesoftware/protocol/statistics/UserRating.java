@@ -2,11 +2,12 @@ package com.icodesoftware.protocol.statistics;
 
 import com.google.gson.JsonObject;
 
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Rating;
 import com.icodesoftware.protocol.ProtocolPortableRegistry;
 import com.icodesoftware.util.RecoverableObject;
 
-public class UserRating extends RecoverableObject implements Rating,Rating.Listener {
+public class UserRating extends RecoverableObject implements Rating,Rating.Listener, DataStore.Loadable {
 
 
     public static int RANK_UP_LEVEL_BASE = 100;
@@ -18,8 +19,8 @@ public class UserRating extends RecoverableObject implements Rating,Rating.Liste
     private double levelUpXp =0;  //xp of arena level
 
     public UserRating(){
-        this.onEdge = true;
-        this.label = "rating";
+        //this.onEdge = true;
+        //this.label = "rating";
     }
 
     public Rating update(double xpDelta){
@@ -76,6 +77,7 @@ public class UserRating extends RecoverableObject implements Rating,Rating.Liste
 
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("Successful",true);
         jsonObject.addProperty("Rank",rank);
         jsonObject.addProperty("Level",level);
         jsonObject.addProperty("Xp",xp);
@@ -106,5 +108,9 @@ public class UserRating extends RecoverableObject implements Rating,Rating.Liste
     public boolean rankUp(Rating rating, int level) {
         int _tryRank = 1+((level-1)/RANK_UP_LEVEL_BASE);
         return _tryRank > rating.rank();
+    }
+
+    public void load(){
+        dataStore.createIfAbsent(this,true);
     }
 }

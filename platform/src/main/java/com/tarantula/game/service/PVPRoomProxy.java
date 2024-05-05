@@ -24,7 +24,7 @@ public class PVPRoomProxy extends RoomProxyHeader{
         stub.pushChannel = gameServiceProvider.roomServiceProvider().registerChannel(stub,(s,d)->{
             gameLobby.timeout(s,d);
         });
-        stub.tag(application.tag());
+        stub.tag = (application.tag());
         stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));
         this.dataStore.update(stub);
         return stub;

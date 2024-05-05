@@ -18,11 +18,6 @@ public class ServiceActionEvent extends Data implements EventOnAction {
     }
 
 	@Override
-	public long systemId() {
-		return distributionId;
-	}
-
-	@Override
 	public void writePortable(PortableWriter out) throws IOException {
 		out.writeUTF("1",this.source);
 		out.writeLong("2",this.sessionId);

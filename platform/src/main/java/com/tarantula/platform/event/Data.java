@@ -39,6 +39,10 @@ abstract public class Data extends OnApplicationHeader implements Portable{
         this.destination  = destination;
     }
 
+    @Override
+    public long systemId() {
+        return distributionId;
+    }
     public int retries() {
         return this.retries;
     }

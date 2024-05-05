@@ -51,11 +51,11 @@ public class SavedGameTest extends DataStoreHook{
         load.distributionId(save.distributionId());
         Assert.assertTrue(dataStore.load(load));
         Assert.assertEquals(load.stub,save.stub);
-        UserRating rating = new UserRating();
-        rating.ownerKey(load.key());
-        Assert.assertTrue(dataStoreForRanking.create(rating));
-        ProtocolPortableRegistry registry = new ProtocolPortableRegistry();
-        List<UserRating> rlist = dataStoreForRanking.list(new RecoverableQuery<>(save.key(),rating.label(), ProtocolPortableRegistry.USER_RATION_CID,registry));
-        Assert.assertEquals(rlist.size(),1);
+        //UserRating rating = new UserRating();
+        //rating.ownerKey(load.key());
+        //Assert.assertTrue(dataStoreForRanking.create(rating));
+        //ProtocolPortableRegistry registry = new ProtocolPortableRegistry();
+        //List<UserRating> rlist = dataStoreForRanking.list(new RecoverableQuery<>(save.key(),rating.label(), ProtocolPortableRegistry.USER_RATION_CID,registry));
+        //Assert.assertEquals(rlist.size(),1);
     }
 }

@@ -6,7 +6,7 @@ import com.icodesoftware.Session;
 import com.icodesoftware.util.JsonUtil;
 
 
-public class CloudDataModule extends ModuleHeader{
+public class PersonalDataStoreModule extends ModuleHeader{
 
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
@@ -17,7 +17,7 @@ public class CloudDataModule extends ModuleHeader{
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         super.setup(applicationContext);
-        this.context.log("Game cloud module started", OnLog.WARN);
+        this.context.log("Game personal data module started", OnLog.WARN);
     }
 
 }

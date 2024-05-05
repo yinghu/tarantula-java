@@ -63,11 +63,10 @@
     {
       "header": {
         "scope": "commodity",
-        "type": "SoftCurrency.HeroCoin",
-        "description": "virtual currency",
+        "type": "GameItem",
+        "description": "common game item",
         "version": "1.0",
-        "rechargeable": true,
-        "constrained": true
+        "rechargeable": false
       },
       "application": {
         "properties": [
@@ -79,75 +78,7 @@
             "downloadable": false
           },
           {
-            "name": "Amount",
-            "type": "number",
-            "reference": "Double",
-            "nullable": false,
-            "downloadable": false
-          }
-        ]
-      }
-    },
-    {
-      "header": {
-        "scope": "commodity",
-        "type": "GameItem",
-        "description": "common game item",
-        "version": "1.0",
-        "rechargeable": false
-      },
-      "application": {
-        "properties": [
-          {
-            "name": "ConfigId",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "Level",
-            "type": "number",
-            "reference": "Integer",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "Xp",
-            "type": "number",
-            "reference": "Integer",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "Rank",
-            "type": "number",
-            "reference": "Integer",
-            "nullable": false,
-            "downloadable": false
-          }
-        ]
-      }
-    },
-    {
-      "header": {
-        "scope": "commodity",
-        "type": "GameItem.Equipment",
-        "description": "equipment game item",
-        "version": "1.0",
-        "rechargeable": false
-      },
-      "application": {
-        "properties": [
-          {
             "name": "Type",
-            "type": "enum",
-            "reference": "EquipmentType",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "ConfigId",
             "type": "string",
             "reference": "String",
             "nullable": false,
@@ -173,92 +104,9 @@
             "reference": "Integer",
             "nullable": false,
             "downloadable": false
-          },
-          {
-            "name": "Rarity",
-            "type": "number",
-            "reference": "Integer",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "PrimaryStatType",
-            "type": "string",
-            "reference": "String",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "PrimaryStat",
-            "type": "number",
-            "reference": "Integer",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "SubStats",
-            "type": "list",
-            "reference": "category:StatEntry",
-            "nullable": false,
-            "downloadable": false
           }
         ]
       }
-    },
-    {
-        "header": {
-          "scope": "commodity",
-          "type": "GameItem.Unit",
-          "description": "unit",
-          "version": "1.0",
-          "rechargeable": false
-        },
-        "application": {
-          "properties": [
-            {
-              "name": "MaxEquipmentNumber",
-              "type": "number",
-              "reference": "Integer",
-              "nullable": false,
-              "downloadable": false
-            },
-            {
-              "name": "CurrencyConstraint",
-              "type": "list",
-              "reference": "string:String",
-              "nullable": false,
-              "downloadable": false
-            },
-            {
-              "name": "Level",
-              "type": "number",
-              "reference": "Integer",
-              "nullable": false,
-              "downloadable": false
-            },
-            {
-              "name": "ConfigId",
-              "type": "string",
-              "reference": "String",
-              "nullable": false,
-              "downloadable": false
-            },
-            {
-              "name": "Xp",
-              "type": "number",
-              "reference": "Integer",
-              "nullable": false,
-              "downloadable": false
-            },
-            {
-              "name": "Rank",
-              "type": "number",
-              "reference": "Integer",
-              "nullable": false,
-              "downloadable": false
-            }
-          ]
-        }
-      }
+    }
   ]
 }

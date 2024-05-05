@@ -79,12 +79,12 @@
             </application>
             <application><!-- cloud data module-->
                 <type-id>game-data</type-id>
-                <name>Cloud</name>
+                <name>PersonalDataStore</name>
                 <type>application</type>
                 <category>data</category>
                 <tag>game/data</tag>
                 <deploy-priority>20</deploy-priority>
-                <module-name>com.tarantula.game.module.CloudDataModule</module-name>
+                <module-name>com.tarantula.game.module.PersonalDataStoreModule</module-name>
             </application>
         </application-list>
     </lobby-context>

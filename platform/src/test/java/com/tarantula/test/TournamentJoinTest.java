@@ -19,9 +19,7 @@ public class TournamentJoinTest extends DataStoreHook{
     @Test(groups = { "TournamentJoin" })
     public void tournamentJoinTest() {
         DataStore dataStore = dataStoreProvider.createDataStore("test_tournament_join");
-        SimpleStub stub = new SimpleStub();
-        stub.distributionId(100);
-        stub.stub(200);
+        SimpleStub stub = new SimpleStub(100,200);
         long scheduleId = 1000;
         long tournamentId = 2000;
         long instanceId = 3000;

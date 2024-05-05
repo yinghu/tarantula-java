@@ -3,12 +3,13 @@ package com.tarantula.game;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.Channel;
+import com.icodesoftware.util.OnApplicationHeader;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.room.GameRoom;
 
 import java.time.LocalDateTime;
 
-public class Stub extends PlayerGameObject {
+public class Stub extends OnApplicationHeader{
 
     public final static String LABEL = "stub";
 
@@ -20,6 +21,7 @@ public class Stub extends PlayerGameObject {
     public Tournament.Instance tournament;
     public GameZone zone;
 
+    public String tag;
 
     public Channel pushChannel;
     public int sessionId;
@@ -91,5 +93,13 @@ public class Stub extends PlayerGameObject {
     public void write(Session.Header messageHeader,byte[] payload){
         if(pushChannel == null) return;
         pushChannel.write(messageHeader,payload);
+    }
+
+    public long stub(){
+        return this.distributionId;
+    }
+
+    public Session session(){
+        return new SimpleStub(systemId,distributionId);
     }
 }
