@@ -1,6 +1,6 @@
 package com.icodesoftware;
 
-public interface OnAccess extends OnApplication, DataStore.Updatable {
+public interface OnAccess extends Session, DataStore.Updatable {
 
     String ACCESS_KEY = "accessKey";
     String ACCESS_ID = "accessId";

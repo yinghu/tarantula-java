@@ -12,7 +12,6 @@ import com.icodesoftware.service.ServiceContext;
 
 import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.game.GamePortableRegistry;
 
 import com.tarantula.game.Stub;
 import com.tarantula.game.service.PlatformGameServiceProvider;
