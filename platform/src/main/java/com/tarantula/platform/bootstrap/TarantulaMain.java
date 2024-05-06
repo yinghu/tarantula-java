@@ -110,6 +110,8 @@ public class TarantulaMain {
 			btx.platformRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.routing.number",_user,_config));
 			btx.accessIndexRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.access.index.routing.number",_user,_config));
 			btx.maxReplicationNumber = Integer.parseInt(override(overriding,"tarantula.data.store.replication.max.number",_user,_config));
+			btx.kubernetesDiscoveryEnabled = Boolean.parseBoolean(override(overriding,"tarantula.member.discovery.kubernetes.enabled",_user,_config));
+			btx.kubernetesServiceDns = override(overriding,"tarantula.member.discovery.kubernetes.service.dns",_user,_config);
 			btx.clusterInitialSize = Integer.parseInt(override(overriding,"tarantula.platform.cluster.initial.size",_user,_config));
 			btx.clusterMaxSize = Integer.parseInt(override(overriding,"tarantula.platform.cluster.max.size",_user,_config));
 			btx.clusterNameSuffix = override(overriding,"tarantula.cluster.name.suffix",_user,_config);

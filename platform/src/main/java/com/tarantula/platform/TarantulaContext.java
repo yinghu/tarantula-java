@@ -14,6 +14,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
+import com.hazelcast.config.DiscoveryStrategyConfig;
 import com.icodesoftware.*;
 import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
 import com.icodesoftware.lmdb.TransactionLogManager;
@@ -135,7 +136,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public int maxIdlesOnInstance;
     public long timeoutOnInstance;
 
-
+    public boolean kubernetesDiscoveryEnabled;
+    public String kubernetesServiceDns;
     public String clusterNameSuffix;
     public int clusterInitialSize;
     public int clusterMaxSize;
@@ -248,6 +250,19 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         gcfg.getProperties().setProperty("hazelcast.partition.count",""+accessIndexRoutingNumber);
         gcfg.getProperties().setProperty("hazelcast.initial.min.cluster.size",""+clusterInitialSize);
         gcfg.getGroupConfig().setName("tarantula-integration-"+this.clusterNameSuffix);
+        if(kubernetesDiscoveryEnabled && kubernetesServiceDns != null){
+            gcfg.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
+            gcfg.getNetworkConfig().getJoin().getKubernetesConfig().setEnabled(true);
+            gcfg.getNetworkConfig().getJoin().getKubernetesConfig().setProperty("service-dns",kubernetesServiceDns);
+            gcfg.getNetworkConfig().getJoin().getKubernetesConfig().setProperty("service-port","5702");
+
+        }
+        else{
+            DiscoveryStrategyConfig discoveryStrategyConfig = new DiscoveryStrategyConfig("com.tarantula.platform.service.cluster.TarantulaDiscoveryStrategy");
+            discoveryStrategyConfig.addProperty("tarantula-port",5702);
+            discoveryStrategyConfig.addProperty("tarantula-scope",2);
+            gcfg.getNetworkConfig().getJoin().getDiscoveryConfig().addDiscoveryStrategyConfig(discoveryStrategyConfig);
+        }
         this.integrationCluster = new IntegrationCluster(gcfg,this.dataBucketGroup,this);
         new ServiceBootstrap(_storageInstanceStarted,_integrationClusterStarted,this.integrationCluster,"integration-cluster",true).start(); //integration cluster start
         new ServiceBootstrap(_systemServiceStarted, _tarantulaApplicationStarted, new TarantulaApplicationDeployer(this),"application-deployer",true).start();
