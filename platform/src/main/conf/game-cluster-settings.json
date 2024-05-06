@@ -8,7 +8,7 @@
   ],
   "gameServiceProviders": [
     "com.tarantula.platform.presence.dailygiveaway.PlatformDailyGiveawayServiceProvider",
-    "com.tarantula.platform.achievement.PlatformAchievementServiceProvider",
+    "com.tarantula.platform.presence.achievement.PlatformAchievementServiceProvider",
     "com.tarantula.platform.presence.saves.PlatformSavedGameServiceProvider",
     "com.tarantula.platform.inbox.PlatformInboxServiceProvider",
     "com.tarantula.platform.presence.PlatformPresenceServiceProvider",

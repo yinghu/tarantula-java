@@ -9,8 +9,8 @@ import com.icodesoftware.Session;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
-import com.tarantula.platform.inbox.PlatformInboxServiceProvider;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
+import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
     private ConcurrentHashMap<String,DailyGiveaway> dailyGiveaways;
     public PlatformDailyGiveawayServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
-       this.dailyGiveaways = new ConcurrentHashMap<>();
+        this.dailyGiveaways = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -37,19 +37,21 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
         dailyLoginPendingHours = dailyReward.get("waitingTimeHours").getAsInt();
         maxConsecutiveDays = dailyReward.get("maxConsecutiveDays").getAsInt();
         maxRewardTier = dailyReward.get("maxRewardTiers").getAsInt();
+        this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
         this.logger = JDKLogger.getLogger(PlatformDailyGiveawayServiceProvider.class);
         this.logger.warn("Daily giveaway service provider started on ->"+gameServiceName);
     }
 
     public DailyLoginTrack claim(Session session){
-        DailyLoginTrack dailyLoginTrack = new DailyLoginTrack();
-        platformGameServiceProvider.savedGameServiceProvider().createIfAbsent(session,dailyLoginTrack);
+        CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);
+        DailyLoginTrack dailyLoginTrack = DailyLoginTrack.lookup(currentSaveIndex.saveId,dataStore);
         if(dailyLoginTrack.rewardPending) return dailyLoginTrack;
         boolean rewarded = dailyLoginTrack.checkDailyLogin(dailyLoginPendingHours,maxConsecutiveDays,maxRewardTier);
         if(!rewarded) return null;
         DailyGiveaway dailyGiveaway = dailyGiveaways.get(dailyLoginTrack.rewardKey());
         if(dailyGiveaway==null) return null;
-        platformGameServiceProvider.inboxServiceProvider().claim(session.systemId(),dailyGiveaway);
+        platformGameServiceProvider.inventoryServiceProvider().redeem(session.systemId(),dailyGiveaway);
+        //platformGameServiceProvider.inboxServiceProvider().claim(session.systemId(),dailyGiveaway);
         dailyLoginTrack.rewardPending = false;
         dailyLoginTrack.update();
         return dailyLoginTrack;

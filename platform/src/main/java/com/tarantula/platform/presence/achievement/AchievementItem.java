@@ -1,4 +1,4 @@
-package com.tarantula.platform.achievement;
+package com.tarantula.platform.presence.achievement;
 
 import com.tarantula.platform.item.*;
 import com.tarantula.platform.presence.PresencePortableRegistry;

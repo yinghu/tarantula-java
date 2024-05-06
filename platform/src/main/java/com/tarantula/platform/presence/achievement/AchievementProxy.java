@@ -1,4 +1,4 @@
-package com.tarantula.platform.achievement;
+package com.tarantula.platform.presence.achievement;
 
 import com.icodesoftware.Achievement;
 
@@ -31,7 +31,8 @@ public class AchievementProxy implements Achievement {
     }
 
     @Override
-    public void onProgress(double delta) {
+    public Achievement onProgress(double delta) {
         progress.progress(delta);
+        return null;
     }
 }

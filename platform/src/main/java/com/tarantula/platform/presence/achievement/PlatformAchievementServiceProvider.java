@@ -1,4 +1,4 @@
-package com.tarantula.platform.achievement;
+package com.tarantula.platform.presence.achievement;
 
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
@@ -58,11 +58,7 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
                     return true;
                 }
                 logger.warn("Achieved : "+achievement.configurationTypeId());
-                Descriptor app = gameCluster.application(achievement.configurationTypeId());
-                ApplicationRedeemer redeemer = new ApplicationRedeemer(session.systemId(),preSetup);
-                redeemer.distributionKey(achievement.distributionKey());
-                if(!preSetup.load(app,redeemer)) return false;
-                redeemer.redeem();
+                platformGameServiceProvider.inventoryServiceProvider().redeem(session.systemId(),achievement);
                 logger.warn("Redeemed : "+achievement.configurationTypeId());
                 if(!tryNextAchievement(achievementProgress)){
                     achievementProgress.disabled(true);

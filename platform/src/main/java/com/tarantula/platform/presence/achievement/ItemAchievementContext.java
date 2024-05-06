@@ -1,16 +1,15 @@
-package com.tarantula.platform.presence.dailygiveaway;
+package com.tarantula.platform.presence.achievement;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.util.ResponseHeader;
-
 import java.util.List;
 
-public class ItemDailyGiveawayContext extends ResponseHeader {
+public class ItemAchievementContext extends ResponseHeader {
 
-    private List<DailyGiveaway> itemList;
+    private List<AchievementItem> itemList;
 
-    public ItemDailyGiveawayContext(boolean successful, String message, List<DailyGiveaway> itemList){
+    public ItemAchievementContext(boolean successful, String message, List<AchievementItem> itemList){
         this.successful = successful;
         this.message = message;
         this.itemList = itemList;

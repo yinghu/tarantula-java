@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.inbox.Inbox;
+import com.tarantula.platform.presence.dailygiveaway.DailyLoginTrack;
 
 
 public class GameInboxModule extends ModuleHeader{
@@ -40,6 +41,19 @@ public class GameInboxModule extends ModuleHeader{
         else if(session.action().equals("onRating")){
             Rating rating = this.gameServiceProvider.presenceServiceProvider().rating(session);
             session.write(rating.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onDailyReward")){
+            DailyLoginTrack dailyLoginTrack = this.gameServiceProvider.dailyGiveawayServiceProvider().claim(session);
+            if(dailyLoginTrack!=null){
+                session.write(dailyLoginTrack.toJson().toString().getBytes());
+            }else{
+                session.write(JsonUtil.toSimpleResponse(false,"no daily login reward").getBytes());
+            }
+        }
+        else if(session.action().equals("onAchievement")){
+            Achievement achievement = this.gameServiceProvider.achievementServiceProvider().achievement(session);
+            achievement.onProgress(100);
+            session.write(JsonUtil.toSimpleResponse(true,"achievement commited").getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action()+" not support");

@@ -62,16 +62,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         //.presenceServiceProvider().updateSavedGame(currentSaveIndex);
     }
 
-    public <T extends RecoverableObject> void createIfAbsent(Session session, T save){
-        CurrentSaveIndex currentSaveIndex = currentSaveIndex(session);
-        long saveId = currentSaveIndex.saveId==0?session.systemId():currentSaveIndex.saveId;
-        save.distributionId(saveId);
-        save.dataStore(dataStore);
-        if(!this.dataStore.createIfAbsent(save,true)) return;
-        PlayerSaveIndex saveIndex = playerSaveIndex(saveId);
-        //if(saveIndex.addKey(save.key().asString())) saveIndex.update();
-        //platformGameServiceProvider.presenceServiceProvider().updateSavedGame(currentSaveIndex);
-    }
+
 
     public <T extends RecoverableObject> boolean load(Session session, T save){
         CurrentSaveIndex currentSaveIndex = currentSaveIndex(session);

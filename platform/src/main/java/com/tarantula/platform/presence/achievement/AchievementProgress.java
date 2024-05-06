@@ -1,4 +1,4 @@
-package com.tarantula.platform.achievement;
+package com.tarantula.platform.presence.achievement;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.util.RecoverableObject;

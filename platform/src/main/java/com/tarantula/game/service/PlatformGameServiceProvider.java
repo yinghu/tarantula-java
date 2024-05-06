@@ -9,7 +9,7 @@ import com.icodesoftware.protocol.GameServiceProvider;
 import com.icodesoftware.service.*;
 import com.tarantula.game.module.ErrorModule;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.achievement.PlatformAchievementServiceProvider;
+import com.tarantula.platform.presence.achievement.PlatformAchievementServiceProvider;
 import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
 import com.tarantula.platform.inbox.PlatformInboxServiceProvider;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;

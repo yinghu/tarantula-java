@@ -7,5 +7,5 @@ public interface Achievement{
 
     double objective();
 
-    void onProgress(double delta);
+    Achievement onProgress(double delta);
 }
