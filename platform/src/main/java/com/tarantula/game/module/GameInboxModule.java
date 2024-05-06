@@ -52,8 +52,8 @@ public class GameInboxModule extends ModuleHeader{
         }
         else if(session.action().equals("onAchievement")){
             Achievement achievement = this.gameServiceProvider.achievementServiceProvider().achievement(session);
-            achievement.onProgress(100);
-            session.write(JsonUtil.toSimpleResponse(true,"achievement commited").getBytes());
+            achievement.onProgress(Double.parseDouble(session.name()));
+            session.write(achievement.toJson().toString().getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action()+" not support");

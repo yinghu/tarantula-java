@@ -6,7 +6,7 @@ import java.util.Map;
 
 public interface JsonSerializable {
 
-    Map<String,Object> toMap();
-    void fromMap(Map<String,Object> properties);
+    default Map<String,Object> toMap(){ return null;}
+    default void fromMap(Map<String,Object> properties){}
     JsonObject toJson();
 }

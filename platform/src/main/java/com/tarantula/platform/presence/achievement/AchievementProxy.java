@@ -1,5 +1,6 @@
 package com.tarantula.platform.presence.achievement;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.Achievement;
 
 public class AchievementProxy implements Achievement {
@@ -31,8 +32,12 @@ public class AchievementProxy implements Achievement {
     }
 
     @Override
-    public Achievement onProgress(double delta) {
+    public void onProgress(double delta) {
         progress.progress(delta);
-        return null;
+    }
+
+    @Override
+    public JsonObject toJson() {
+        return this.achievementProgress.toJson();
     }
 }

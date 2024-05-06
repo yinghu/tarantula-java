@@ -1,11 +1,11 @@
 package com.icodesoftware;
 
-public interface Achievement{
+public interface Achievement extends JsonSerializable{
     String name();
     int tier();
     int target();
 
     double objective();
 
-    Achievement onProgress(double delta);
+    void onProgress(double delta);
 }
