@@ -2,6 +2,7 @@ package com.tarantula.game.module;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.TournamentServiceProvider;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.tournament.TournamentMockUtils;
 import com.tarantula.platform.tournament.TournamentContext;
 
@@ -17,10 +18,15 @@ public class TournamentModule extends ModuleHeader implements Configurable.Liste
         }
         else if(session.action().equals("onBoard")){
             Tournament tournament = tournamentServiceProvider.tournament(Long.parseLong(session.name()));
-            Tournament.Instance instance = tournament.register(session);
-            Tournament.RaceBoard board = instance.raceBoard();
-            Tournament.RaceBoard myBoard = instance.myRaceBoard();
-            session.write(new TournamentContext(board,myBoard).toJson().toString().getBytes());
+            if(tournament.status() == Tournament.Status.STARTING || tournament.status() == Tournament.Status.PENDING){
+                session.write(JsonUtil.toSimpleResponse(false,"tournament not started").getBytes());
+            }
+            else{
+                Tournament.Instance instance = tournament.register(session);
+                Tournament.RaceBoard board = instance.raceBoard();
+                Tournament.RaceBoard myBoard = instance.myRaceBoard();
+                session.write(new TournamentContext(board,myBoard).toJson().toString().getBytes());
+            }
         }
         //pending removal
         else if (session.action().equals("onLoadRankings")){

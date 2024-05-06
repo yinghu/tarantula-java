@@ -52,6 +52,7 @@ public interface Tournament extends Configurable {
         void finish();
         boolean finished();
         int rank();
+        void rank(int rank);
     }
     interface Instance extends Configurable {
 

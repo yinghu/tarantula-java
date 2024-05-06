@@ -42,4 +42,8 @@ public class TournamentEntryProxy extends RecoverableObject implements Tournamen
     public int rank() {
         return 0;
     }
+
+    public void rank(int rank){
+
+    }
 }

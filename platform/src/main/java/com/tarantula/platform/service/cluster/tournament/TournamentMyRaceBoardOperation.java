@@ -26,6 +26,8 @@ public class TournamentMyRaceBoardOperation extends Operation implements Partiti
         this.serviceName = serviceName;
         this.tournamentId = tournamentId;
         this.instanceId = instanceId;
+        this.entryId = entryId;
+        this.systemId = systemId;
     }
     @Override
     public void run() throws Exception {
