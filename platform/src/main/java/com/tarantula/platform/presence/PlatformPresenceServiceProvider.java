@@ -10,7 +10,7 @@ import com.icodesoftware.protocol.statistics.UserStatistics;
 import com.icodesoftware.service.ServiceContext;
 
 import com.icodesoftware.util.ScheduleRunner;
-import com.icodesoftware.util.TimeUtil;
+
 
 import com.tarantula.game.Stub;
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -23,7 +23,6 @@ import com.tarantula.platform.presence.saves.*;
 
 import com.tarantula.platform.util.RecoverableQuery;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -115,15 +114,6 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         return this.recentlyPlayList.playListIndex.list(new ArrayList<>());
     }
 
-    public Profile profile(long systemId){
-        Profile profile = new Profile();
-        profile.displayName ="player";
-
-        profile.distributionId(systemId);
-        this.dataStore.createIfAbsent(profile,true);
-        profile.dataStore(this.dataStore);
-        return profile;
-    }
 
     public boolean createProfile(Session session){
 
@@ -219,58 +209,11 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         });
         return loaded[0];
     }
-    public SavedGame resetSavedGame(CurrentSaveIndex currentSaveIndex){
-        if(currentSaveIndex.index()==null) return null;
-        SavedGame savedGame = savedGame(currentSaveIndex.index());
-        savedGame.stub = 0;
-        savedGame.version = 0;
-        savedGame.name("New Save");
-        savedGame.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-        this.dataStore.update(savedGame);
-        return  savedGame;
+    public void  onResetSavedGame(SavedGame resetSave){
+        logger.warn("Reset save : "+resetSave.distributionId());
     }
 
-    public void updateSavedGame(CurrentSaveIndex currentSaveIndex){
-        if(currentSaveIndex.index()==null) return;
-        SavedGame savedGame = savedGame(currentSaveIndex.index());
-        savedGame.version = savedGame.version+1;
-        savedGame.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-        savedGame.update();
-    }
-    public void expireSavedGame(CurrentSaveIndex currentSaveIndex){
-        if(currentSaveIndex.index()==null) return;
-        SavedGame savedGame = savedGame(currentSaveIndex.index());
-        savedGame.expireSession(currentSaveIndex.routingNumber());
-    }
 
-    public PersonalDataIndex loadPersonalDataIndex(long systemId){
-        PersonalDataIndex playerSaveIndex = new PersonalDataIndex();
-        playerSaveIndex.distributionId(systemId);
-        dataStore.createIfAbsent(playerSaveIndex,true);
-        playerSaveIndex.dataStore(dataStore);
-        return playerSaveIndex;
-    }
-
-    private SavedGameIndex savedGameIndex(String systemId){
-        SavedGameIndex savedGameIndex = new SavedGameIndex();
-        savedGameIndex.distributionKey(systemId);
-        savedGameIndex.dataStore(this.dataStore);
-        this.dataStore.createIfAbsent(savedGameIndex,true);
-        return savedGameIndex;
-    }
-    private SavedGame savedGame(String saveId){
-        SavedGame savedGame = new SavedGame();
-        savedGame.distributionKey(saveId);
-        if(!dataStore.load(savedGame)) return null;
-        savedGame.dataStore(dataStore);
-        return savedGame;
-    }
-    private void deviceIndex(String systemId,String deviceId){
-        //AccessIndex accessIndex = serviceContext.clusterProvider().accessIndexService().setIfAbsent(deviceId,AccessIndex.DEVICE_INDEX);
-        //DeviceSaveIndex deviceSaveIndex = new DeviceSaveIndex(accessIndex.distributionKey());
-        //this.dataStore.createIfAbsent(deviceSaveIndex,true);
-        //if(deviceSaveIndex.addKey(systemId)) this.dataStore.update(deviceSaveIndex);
-    }
 
     private void syncPlayList(){
         if(updates.getAndSet(0)>0) recentlyPlayList.update();
@@ -278,7 +221,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     }
 
     public void onLeave(Session session){
-        platformGameServiceProvider.savedGameServiceProvider().checkSavedGame(session.distributionKey());
+        ///platformGameServiceProvider.savedGameServiceProvider().checkSavedGame(session.distributionKey());
     }
 
     public void onLobby(Descriptor onLobby){

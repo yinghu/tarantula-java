@@ -4,24 +4,23 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.Session;
 
-
-public class SavedGameQuery implements RecoverableFactory<SavedGame> {
+public class CurrentSaveIndexQuery implements RecoverableFactory<CurrentSaveIndex> {
 
     private Session session;
 
-    public SavedGameQuery(Session session){
+    public CurrentSaveIndexQuery(Session session){
         this.session = session;
     }
 
     @Override
-    public SavedGame create() {
-        return new SavedGame();
+    public CurrentSaveIndex create() {
+        return new CurrentSaveIndex();
     }
 
 
     @Override
     public String label() {
-        return SavedGame.USER_SAVE;
+        return CurrentSaveIndex.LABEL;
     }
 
     @Override

@@ -38,7 +38,6 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
     public static final int SAVED_GAME_CID = 8;
 
     public static final int CURRENT_SAVE_INDEX_CID = 9;
-    public static final int SAVE_GAME_INDEX_CID = 10;
 
     public static final int PENDING_REWARD_CID = 11;
 
@@ -60,7 +59,6 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
 
     public static final int PERSONAL_DATA_OBJECT_CID = 20;
 
-    public static final int DEVICE_SAVE_INDEX_CID = 21;
     public static final int MAPPING_OBJECT_CID = 23;
 
     public static final int OVERSIZE_DATA_INDEX_CID = 24;
@@ -110,9 +108,7 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
             case CURRENT_SAVE_INDEX_CID:
                 pt = new CurrentSaveIndex();
                 break;
-            case SAVE_GAME_INDEX_CID:
-                pt = new SavedGameIndex();
-                break;
+
             case PENDING_REWARD_CID:
                 pt = new PendingReward();
                 break;
@@ -142,9 +138,6 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
                 break;
             case PERSONAL_DATA_OBJECT_CID:
                 pt = new PersonalDataObject();
-                break;
-            case DEVICE_SAVE_INDEX_CID:
-                pt = new DeviceSaveIndex();
                 break;
             case MAPPING_OBJECT_CID:
                 pt = new MappingObject();

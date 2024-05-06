@@ -11,8 +11,6 @@ import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 import com.tarantula.platform.presence.saves.PlatformSavedGameServiceProvider;
 import com.tarantula.platform.presence.saves.SavedGame;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class SavedGameModule extends ModuleHeader {
 
@@ -39,14 +37,8 @@ public class SavedGameModule extends ModuleHeader {
             session.write(data!=null? data : JsonUtil.toSimpleResponse(false,session.name()).getBytes());
         }
         else if(session.action().equals("onReset")){
-            CurrentSaveIndex selected = this.savedGameServiceProvider.reset(session);
-            if(selected.index()!=null){
-                SavedGame savedGame = presenceServiceProvider.resetSavedGame(selected);
-                session.write(savedGame.toJson().toString().getBytes());
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(true,"system saved game reset").getBytes());
-            }
+            boolean reset = this.savedGameServiceProvider.reset(session);
+            session.write(JsonUtil.toSimpleResponse(reset,reset?"system saved game reset":"cannot reset save").getBytes());
         }
         else if(session.action().equals("onFetchProfile")){
             session.write(presenceServiceProvider.getProfilePayload(session.name()).toJson().toString().getBytes());
