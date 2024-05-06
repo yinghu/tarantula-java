@@ -46,7 +46,7 @@ public interface Tournament extends Configurable {
 
     interface Entry extends Configurable {
         long systemId();
-        void score(double credit,double delta);
+        double score(double credit,double delta);
         double score();
         double credit();
         void finish();
@@ -62,7 +62,7 @@ public interface Tournament extends Configurable {
         LocalDateTime closeTime();
         LocalDateTime endTime();
 
-        boolean update(Session session,OnEntry onEntry);
+        double update(Session session,OnEntry onEntry);
         RaceBoard raceBoard();
         RaceBoard myRaceBoard();
     }

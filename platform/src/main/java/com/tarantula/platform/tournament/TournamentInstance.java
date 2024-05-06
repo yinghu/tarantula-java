@@ -68,15 +68,15 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     }
 
 
-    public boolean scoreSegment(long entryId,long systemId,double credits,double score){
-        if(!global) return false;
+    public double scoreSegment(long entryId,long systemId,double credits,double score){
+        if(!global) return 0;
         TournamentEntry entry = new TournamentEntry();
         entry.distributionId(entryId);
         entry.dataStore(entryDataStore);
-        if(!entryDataStore.load(entry) || entry.systemId()!= systemId) return false;
-        entry.score(credits,score);
+        if(!entryDataStore.load(entry) || entry.systemId()!= systemId) return 0;
+        var totalScore = entry.score(credits,score);
         this.tournamentRaceBoard.onBoard(entry);
-        return true;
+        return totalScore;
     }
 
     public long enterSegment(long systemId,double score){
@@ -123,13 +123,15 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     }
 
     @Override
-    public boolean update(Session session, Tournament.OnEntry onEntry) {
-        if(global) return false;
+    public double update(Session session, Tournament.OnEntry onEntry) {
+        if(global) return 0;
         Tournament.Entry entry = tournamentRaceBoard.onBoard(session.distributionId());
         if(onEntry.on(entry)) totalFinished.incrementAndGet();
         int finished = totalFinished.get();
         int joined = totalJoined.get();
-        return status == (Tournament.Status.CLOSED)? (finished == joined):(finished == joined && joined == maxEntries);
+        var isValidStatus = status == (Tournament.Status.CLOSED)? (finished == joined):(finished == joined && joined == maxEntries);
+        return isValidStatus ? entry.score() : 0;
+
     }
     public int maxEntries(){
         return maxEntries;

@@ -537,13 +537,13 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return true;
     }
 
-    public boolean score(Session session,Entry entry){
+    public double score(Session session,Entry entry){
         TournamentJoin join = TournamentJoin.lookup(tournamentServiceProvider.tournamentJoin,session,scheduleId);
-        if(join.closed || join.tournamentId != this.distributionId ) return false;
+        if(join.closed || join.tournamentId != this.distributionId ) return 0;
         return distributionTournamentService.onScoreGlobalTournament(tournamentServiceProvider.gameServiceName,this.distributionId,join.instanceId,join.entryId,session.distributionId(),entry.credit(),entry.score());
     }
 
-    public boolean score(Session session,long instanceId,Entry entry){
+    public double score(Session session,long instanceId,Entry entry){
         return distributionTournamentService.onScoreTournament(tournamentServiceProvider.gameServiceName,this.distributionId,instanceId,session.distributionId(),entry.credit(),entry.score());
     }
     public RaceBoard raceBoard(TournamentJoin session){
@@ -569,8 +569,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return segmentInstance.enterSegment(systemId,targetScore);
     }
 
-    public boolean onScoreSegment(long systemId,long instanceId,long entryId,double credits,double score){
-        if(!global) return false;
+    public double onScoreSegment(long systemId,long instanceId,long entryId,double credits,double score){
+        if(!global) return 0;
         TournamentInstance instance = lookupSegmentInstance(instanceId);
         //logger.warn(distributionId+" : "+instanceId+" : "+systemId+" : scored");
         return instance.scoreSegment(entryId,systemId,credits,score);
@@ -588,8 +588,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return instance;
     }
 
-    public boolean onScore(long systemId,long instanceId,double credits,double score){
-        if(global) return false;
+    public double onScore(long systemId,long instanceId,double credits,double score){
+        if(global) return 0;
         TournamentInstance instance = lookup(instanceId);
         return instance.update(new SimpleStub("",systemId), entry -> {
             entry.score(credits,score);
