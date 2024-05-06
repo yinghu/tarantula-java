@@ -57,9 +57,7 @@ public class TournamentInstanceProxy extends RecoverableObject implements Tourna
                 tournamentJoin.finished();
                 return tournamentManager.targetScore();
             }
-            double totalScore = tournamentManager.score(session,tournamentEntryProxy);
-            if(totalScore > 0) tournamentJoin.finished();
-            return totalScore;
+            return tournamentManager.score(session,tournamentEntryProxy);
         }
         TournamentEntryProxy tournamentEntryProxy = new TournamentEntryProxy();
         onEntry.on(tournamentEntryProxy);
