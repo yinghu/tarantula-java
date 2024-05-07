@@ -21,7 +21,6 @@ public class PlatformLeaderBoardProvider extends PlatformGameServiceSetup implem
 
 
     private int leaderBoardSize = 10;
-    private long reloadInterval;
     private DataStore dataStore;
 
     private ConcurrentHashMap<String, LeaderBoardSync> tMap = new ConcurrentHashMap<>();
@@ -46,7 +45,6 @@ public class PlatformLeaderBoardProvider extends PlatformGameServiceSetup implem
         Configuration configuration = serviceContext.configuration("game-presence-settings");
         JsonObject plist = ((JsonElement)configuration.property("leaderBoard")).getAsJsonObject();
         this.leaderBoardSize = plist.get("topListSize").getAsInt();
-        this.reloadInterval = plist.get("reloadIntervalMinutes").getAsInt()*60*1000;
         this.dataStore = gameCluster.applicationPreSetup().dataStore(gameCluster,NAME);//typeId_service
         this.distributionPresenceService = serviceContext.clusterProvider().serviceProvider(DistributionPresenceService.NAME);
         this.logger = JDKLogger.getLogger(PlatformLeaderBoardProvider.class);
@@ -72,12 +70,14 @@ public class PlatformLeaderBoardProvider extends PlatformGameServiceSetup implem
         distributionPresenceService.onUpdateLeaderBoard(gameServiceName,entry);
     }
 
-    public void leaderBoardUpdated(LeaderBoard.Entry entry){
+    //distribution call
+    public void onLeaderBoardUpdated(LeaderBoard.Entry entry){
         LeaderBoardSync sync = leaderBoard(entry.category());
         serviceContext.schedule(new ScheduleRunner(100,()->{
             sync.sync(entry,(e)->{/* callback on updated*/});
         }));
     }
+
 
     @Override
     public void atMidnight(){

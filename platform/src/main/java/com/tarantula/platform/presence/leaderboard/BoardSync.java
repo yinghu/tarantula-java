@@ -72,6 +72,7 @@ public class BoardSync extends RecoverableObject{
     public boolean onBoard(long systemId){
         return eIndex.containsKey(systemId);
     }
+
     public int size(){
         return size;
     }

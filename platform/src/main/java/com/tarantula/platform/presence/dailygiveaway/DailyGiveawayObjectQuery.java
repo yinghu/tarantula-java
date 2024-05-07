@@ -2,17 +2,15 @@ package com.tarantula.platform.presence.dailygiveaway;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
-import com.tarantula.platform.presence.PresencePortableRegistry;
 
-public class DailygGiveawayObjectQuery implements RecoverableFactory<DailyGiveaway> {
+public class DailyGiveawayObjectQuery implements RecoverableFactory<DailyGiveaway> {
 
-    public String label;
+    public static final String label = "DailyGiveaway";
     private Recoverable.Key key;
 
 
-    public DailygGiveawayObjectQuery(Recoverable.Key key,String query){
+    public DailyGiveawayObjectQuery(Recoverable.Key key){
         this.key = key;
-        this.label = query;
     }
 
     @Override

@@ -5,12 +5,11 @@ import com.icodesoftware.RecoverableFactory;
 
 public class AchievementObjectQuery implements RecoverableFactory<AchievementItem> {
 
-    public String label;
+    public static final String label = "Achievement";
     Recoverable.Key key;
 
-    public AchievementObjectQuery(Recoverable.Key key,String query){
+    public AchievementObjectQuery(Recoverable.Key key){
         this.key = key;
-        this.label = query;
     }
 
     @Override

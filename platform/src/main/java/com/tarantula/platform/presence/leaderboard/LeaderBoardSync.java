@@ -3,11 +3,12 @@ package com.tarantula.platform.presence.leaderboard;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.Statistics;
+import com.icodesoftware.util.RecoverableObject;
 
 import java.time.LocalDate;
 
 
-public class LeaderBoardSync implements LeaderBoard {
+public class LeaderBoardSync extends RecoverableObject implements LeaderBoard {
 
     private long gameClusterId;
     private String category;
@@ -137,7 +138,6 @@ public class LeaderBoardSync implements LeaderBoard {
             views[3].reset();
         }
     }
-    public void reload(){
 
-    }
+
 }

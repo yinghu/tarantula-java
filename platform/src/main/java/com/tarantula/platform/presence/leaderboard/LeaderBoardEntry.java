@@ -7,6 +7,9 @@ import com.icodesoftware.Statistics;
 import com.icodesoftware.util.OnApplicationHeader;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class LeaderBoardEntry extends OnApplicationHeader implements LeaderBoard.Entry {
 
@@ -86,6 +89,11 @@ public class LeaderBoardEntry extends OnApplicationHeader implements LeaderBoard
         return classifier+"/"+category+"/"+this.systemId+"/"+value+"/"+timestamp;
     }
 
+    public List<LeaderBoardEntry> board(){
+        ArrayList<LeaderBoardEntry> board = new ArrayList<>();
+
+        return board;
+    }
 
     @Override
     public boolean write(DataBuffer buffer) {
@@ -138,5 +146,11 @@ public class LeaderBoardEntry extends OnApplicationHeader implements LeaderBoard
         LeaderBoard.Entry entry = new LeaderBoardEntry(classifier,category,systemId,value);
         entry.timestamp(timestamp);
         return entry;
+    }
+
+    public LeaderBoard.Entry duplicate(int rank){
+        LeaderBoard.Entry copy = LeaderBoardEntry.from(classifier,category,systemId,value,timestamp);
+        copy.rank(rank);
+        return copy;
     }
 }

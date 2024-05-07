@@ -7,10 +7,6 @@ public class AchievementItem extends Application{
 
     public AchievementItem(){}
 
-    //public AchievementItem(ConfigurableObject configurableObject){
-        //super(configurableObject);
-    //}
-
     public int getFactoryId() {
         return PresencePortableRegistry.OID;
     }

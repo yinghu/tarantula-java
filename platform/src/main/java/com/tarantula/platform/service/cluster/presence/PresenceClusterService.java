@@ -55,7 +55,7 @@ public class PresenceClusterService implements ManagedService, RemoteService {
 
     public void onUpdateLeaderBoard(String serviceName, LeaderBoard.Entry leaderBoardEntry){
         PlatformGameServiceProvider gameServiceProvider = (PlatformGameServiceProvider)this.tarantulaContext.serviceProvider(serviceName);
-        gameServiceProvider.leaderBoardProvider().leaderBoardUpdated(leaderBoardEntry);
+        gameServiceProvider.leaderBoardProvider().onLeaderBoardUpdated(leaderBoardEntry);
     }
 
 }

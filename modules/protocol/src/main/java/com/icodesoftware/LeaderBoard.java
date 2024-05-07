@@ -1,6 +1,6 @@
 package com.icodesoftware;
 
-public interface LeaderBoard {
+public interface LeaderBoard extends JsonSerializable {
 
     String HOURLY = "hourly";
     String DAILY = "daily";
@@ -20,7 +20,7 @@ public interface LeaderBoard {
 
     void onAllBoard(Statistics.Entry entry);
 
-    interface Board extends DataStore.Updatable{
+    interface Board extends DataStore.Updatable,JsonSerializable{
         void onBoard(Entry update);
         default void rank(Listener ranking){}
     }
