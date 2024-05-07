@@ -11,8 +11,6 @@ import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 import com.tarantula.platform.presence.saves.PlatformSavedGameServiceProvider;
 import com.tarantula.platform.presence.saves.SavedGame;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class SavedGameModule extends ModuleHeader {
 

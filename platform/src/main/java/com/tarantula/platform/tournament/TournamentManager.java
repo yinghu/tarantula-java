@@ -508,8 +508,9 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     public Instance register(Session session){
         TournamentJoin join = TournamentJoin.lookup(tournamentServiceProvider.tournamentJoin,session,scheduleId);
+        if(status == Status.ENDED) return new TournamentInstanceProxy(this,join);
         if(this.global) {
-            if(!join.closed && join.tournamentId == this.distributionId ) return new TournamentInstanceProxy(this,join);
+            if(join.tournamentId == this.distributionId ) return new TournamentInstanceProxy(this,join);
             if(targetScore == 0) {
                 TournamentInstance pending = tournamentSegments[segmentSlot()].tournamentInstance;
                 long entryId = this.distributionTournamentService.onEnterGlobalTournament(tournamentServiceProvider.gameServiceName,this.distributionId,pending.distributionId(),session.distributionId());
@@ -519,7 +520,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             return new TournamentInstanceProxy(this,join);
         }
         //not used for e8 game
-        if(!join.closed && join.tournamentId == this.distributionId) return new TournamentInstanceProxy(this,join);
+        if(join.tournamentId == this.distributionId) return new TournamentInstanceProxy(this,join);
         TournamentRegisterStatus pending = distributionTournamentService.onRegisterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,join.slot);
         Tournament.Instance ins = this.distributionTournamentService.onEnterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,pending.instanceId,session.distributionId());
         ins.distributionId(pending.instanceId);
@@ -547,6 +548,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return distributionTournamentService.onScoreTournament(tournamentServiceProvider.gameServiceName,this.distributionId,instanceId,session.distributionId(),entry.credit(),entry.score());
     }
     public RaceBoard raceBoard(TournamentJoin session){
+        if(session.instanceId==0) return new TournamentRaceBoard();
         byte[] payload = this.distributionTournamentService.onRaceBoard(tournamentServiceProvider.gameServiceName,distributionId,session.instanceId);
         TournamentRaceBoard raceBoard = TournamentRaceBoard.from(payload);
         raceBoard.distributionId(session.instanceId);
@@ -554,6 +556,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
 
     public RaceBoard myRaceBoard(TournamentJoin session){
+        if(session.instanceId==0) return new TournamentRaceBoard();
         byte[] payload = this.distributionTournamentService.onMyRaceBoard(tournamentServiceProvider.gameServiceName,distributionId,session.instanceId,session.entryId,session.stub());
         TournamentRaceBoard raceBoard = TournamentRaceBoard.from(payload);
         raceBoard.distributionId(session.instanceId);
