@@ -92,7 +92,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
 
     }
 
-    public boolean onScoreGlobalTournament(String serviceName,long tournamentId,long instanceId,long entryId,long systemId,double credit,double delta){
+    public double onScoreGlobalTournament(String serviceName,long tournamentId,long instanceId,long entryId,long systemId,double credit,double delta){
         NodeEngine nodeEngine = getNodeEngine();
         TournamentScoreSegmentOperation operation = new TournamentScoreSegmentOperation(serviceName,tournamentId,instanceId,entryId,systemId,credit,delta);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(instanceId);
@@ -102,7 +102,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
         },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
-        return (boolean)result.result;
+        return (double)result.result;
 
     }
 
@@ -120,7 +120,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
 
     }
 
-    public boolean onScoreTournament(String serviceName,long tournamentId,long instanceId,long systemId,double credit,double delta){
+    public double onScoreTournament(String serviceName,long tournamentId,long instanceId,long systemId,double credit,double delta){
         NodeEngine nodeEngine = getNodeEngine();
         TournamentScoreOperation operation = new TournamentScoreOperation(serviceName,tournamentId,instanceId,systemId,credit,delta);
         int partitionId = nodeEngine.getPartitionService().getPartitionId(instanceId);
@@ -130,7 +130,7 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
         },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
-        return (boolean)result.result;
+        return (double)result.result;
 
     }
 

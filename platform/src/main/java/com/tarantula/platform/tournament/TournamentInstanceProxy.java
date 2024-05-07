@@ -41,22 +41,23 @@ public class TournamentInstanceProxy extends RecoverableObject implements Tourna
         return tournamentManager.endTime();
     }
 
-
+    @Override
+    public long distributionId() {
+        return tournamentJoin.instanceId;
+    }
 
     @Override
-    public boolean update(Session session, Tournament.OnEntry onEntry) {
+    public double update(Session session, Tournament.OnEntry onEntry) {
         if(tournamentManager.global()){
             TournamentEntryProxy tournamentEntryProxy = new TournamentEntryProxy();
             onEntry.on(tournamentEntryProxy);
             if(tournamentManager.targetScore()>0){
-                if(tournamentJoin.finished || tournamentEntryProxy.score() != tournamentManager.targetScore()) return false;
+                if(tournamentJoin.finished || tournamentEntryProxy.score() != tournamentManager.targetScore()) return 0;
                 tournamentManager.enter(session);
                 tournamentJoin.finished();
-                return true;
+                return tournamentManager.targetScore();
             }
-            boolean finished = tournamentManager.score(session,tournamentEntryProxy);
-            if(finished) tournamentJoin.finished();
-            return finished;
+            return tournamentManager.score(session,tournamentEntryProxy);
         }
         TournamentEntryProxy tournamentEntryProxy = new TournamentEntryProxy();
         onEntry.on(tournamentEntryProxy);

@@ -456,7 +456,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         return tournamentManager.onEnterSegment(systemId,segmentInstanceId);
     }
-    public boolean onTournamentSegmentScored(long tournamentId,long instanceId,long entryId, long systemId, double credit,double delta){
+    public double onTournamentSegmentScored(long tournamentId,long instanceId,long entryId, long systemId, double credit,double delta){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         return tournamentManager.onScoreSegment(systemId,instanceId,entryId,credit,delta);
     }
@@ -464,7 +464,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         return tournamentManager.onEnter(systemId,instanceId);
     }
-    public boolean onTournamentScored(long tournamentId,long instanceId, long systemId, double credit,double delta){
+    public double onTournamentScored(long tournamentId,long instanceId, long systemId, double credit,double delta){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         return tournamentManager.onScore(systemId,instanceId,credit,delta);
     }

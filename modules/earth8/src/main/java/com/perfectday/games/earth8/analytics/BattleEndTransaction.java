@@ -3,11 +3,8 @@ package com.perfectday.games.earth8.analytics;
 import com.google.gson.JsonNull;
 import com.icodesoftware.Session;
 import com.icodesoftware.util.JsonUtil;
-import com.perfectday.games.earth8.BattleUpdate;
 
-import java.util.UUID;
-
-public class BattleEndTransaction extends AnalyticsTransaction {
+public class BattleEndTransaction extends UserAnalyticsTransaction {
     private static final String MESSAGE_TYPE = "/earth8/player/0.0.1/battleEnd";
 
     public BattleEndTransaction(Session session,long serverSessionId, long battleId, byte[] clientData, long analyticsBatchId)
