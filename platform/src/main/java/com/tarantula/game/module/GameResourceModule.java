@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.GameResourceContext;
 import com.tarantula.platform.item.ConfigurableObject;
+import com.tarantula.platform.presence.achievement.AchievementItem;
 import com.tarantula.platform.resource.GameResource;
 import com.tarantula.platform.resource.PlatformResourceServiceProvider;
 
@@ -26,6 +27,9 @@ public class GameResourceModule extends ModuleHeader implements Configurable.Lis
         }
         else if(session.action().equals("onGrant")){
             session.write(JsonUtil.toSimpleResponse(platformResourceServiceProvider.grant(session.systemId(),session.name()), session.name()).getBytes());
+        }
+        else if(session.action().equals("onAchievementList")){
+            session.write(gameServiceProvider.achievementServiceProvider().listAsJson().toString().getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action()+" not support");

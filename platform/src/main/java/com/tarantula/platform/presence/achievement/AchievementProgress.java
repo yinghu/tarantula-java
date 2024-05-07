@@ -1,6 +1,7 @@
 package com.tarantula.platform.presence.achievement;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.DataStore;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
@@ -91,5 +92,13 @@ public class AchievementProgress extends RecoverableObject {
     }
     public void reset(){
         reset(1,0,0);
+    }
+
+    public static AchievementProgress lookup(long saveId, DataStore dataStore){
+        AchievementProgress achievementProgress = new AchievementProgress();
+        achievementProgress.distributionId(saveId);
+        dataStore.createIfAbsent(achievementProgress,true);
+        achievementProgress.dataStore(dataStore);
+        return achievementProgress;
     }
 }

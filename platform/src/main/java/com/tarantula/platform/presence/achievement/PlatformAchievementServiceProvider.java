@@ -2,13 +2,12 @@ package com.tarantula.platform.presence.achievement;
 
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.inventory.ApplicationRedeemer;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
 import com.tarantula.platform.presence.saves.CurrentSaveIndex;
+import com.tarantula.platform.util.JsonSerializableContext;
 
 
 import java.util.ArrayList;
@@ -23,39 +22,33 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
 
     public PlatformAchievementServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
-         this.achievements = new ConcurrentHashMap<>();
+        this.achievements = new ConcurrentHashMap<>();
     }
 
     @Override
     public void setup(ServiceContext serviceContext) {
         super.setup(serviceContext);
+        this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
         this.logger = JDKLogger.getLogger(PlatformAchievementServiceProvider.class);
         this.logger.warn("Achievement service provider started on ->"+gameServiceName);
     }
 
     public Achievement achievement(Session session){
         CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);
-        AchievementProgress achievementProgress = new AchievementProgress();
-        achievementProgress.distributionId(currentSaveIndex.saveId);
+        AchievementProgress achievementProgress = AchievementProgress.lookup(currentSaveIndex.saveId,dataStore);
         return new AchievementProxy(achievementProgress,delta ->onProgress(session,achievementProgress,delta));
     }
 
     private void onProgress(Session session,AchievementProgress achievementProgress,double delta){
-        Transaction transaction = gameCluster.transaction();
-        transaction.execute(ctx->{
-            ApplicationPreSetup preSetup = (ApplicationPreSetup)ctx;
-            DataStore ds = preSetup.onDataStore(NAME);
-            ds.createIfAbsent(achievementProgress,true);
-            achievementProgress.dataStore(ds);
             logger.warn("STATUS : "+achievementProgress.disabled()+" : "+delta+" : "+achievementProgress.progress());
             if(achievementProgress.disabled()) tryNextAchievement(achievementProgress);
-            if(achievementProgress.disabled()) return true;
+            if(achievementProgress.disabled()) return;
             if(achievementProgress.onProgress(delta)){
                 AchievementItem achievement = achievements.get(achievementProgress.name());
                 if(achievement==null) {
                     achievementProgress.disabled(true);
                     achievementProgress.update();
-                    return true;
+                    return;
                 }
                 logger.warn("Achieved : "+achievement.configurationTypeId());
                 platformGameServiceProvider.inventoryServiceProvider().redeem(session.systemId(),achievement);
@@ -65,14 +58,17 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
                     achievementProgress.update();
                 }
             }
-            return true;
-        });
     }
     public List<AchievementItem> list(){
         ArrayList<AchievementItem> _item = new ArrayList<>();
         achievements.forEach((k,v)->_item.add(v));
         return _item;
     }
+
+    public JsonSerializable listAsJson(){
+        return new JsonSerializableContext<>(list());
+    }
+
     @Override
     public <T extends Configurable> void register(T t) {
         t.registered();
