@@ -30,6 +30,8 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int GAME_CLUSTER_SYNC_EVENT_CID =12;
 
+    public static final int LEADER_BOARD_SYNC_EVENT_CID = 13;
+
     public static final int MODULE_RESET_EVENT_CID = 15;
 
     public static final int SERVER_PUSH_EVENT_CID = 21;
@@ -42,6 +44,7 @@ public class PortableEventRegistry implements PortableFactory {
     public static final int KEY_VALUE_SET_CID = 27;
 
     public static final int CLUSTER_BATCH_CID = 28;
+
 
     //EVENT PORTABLE OBJECTS
     public static final int SINGLETON_FORWARD_CID = 100;
@@ -97,6 +100,10 @@ public class PortableEventRegistry implements PortableFactory {
 
             case GAME_CLUSTER_SYNC_EVENT_CID:
                 _ins = new GameClusterSyncEvent();
+                break;
+
+            case LEADER_BOARD_SYNC_EVENT_CID:
+                _ins = new LeaderBoardSyncEvent();
                 break;
 
             case SERVER_PUSH_EVENT_CID:

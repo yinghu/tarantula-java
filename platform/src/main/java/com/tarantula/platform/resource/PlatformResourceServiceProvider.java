@@ -1,11 +1,8 @@
 package com.tarantula.platform.resource;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.icodesoftware.Configurable;
-import com.icodesoftware.Configuration;
-import com.icodesoftware.Descriptor;
 
+import com.icodesoftware.Configurable;
+import com.icodesoftware.Descriptor;
 import com.icodesoftware.logging.JDKLogger;
 
 import com.icodesoftware.service.ServiceContext;
@@ -27,10 +24,6 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
     private ConcurrentHashMap<String, GameResource> gameResourceIndex;
     private ConcurrentHashMap<String,Item> itemIndex;
 
-    private ArrayList<String> startingInventory;
-
-    private String startingResourceName;
-    private String grantingPolicy;
 
 
 
@@ -39,16 +32,11 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
         this.gameResourceIndex = new ConcurrentHashMap<>();
         this.itemIndex = new ConcurrentHashMap<>();
-        this.startingInventory = new ArrayList<>();
     }
 
     @Override
     public void setup(ServiceContext serviceContext) {
         super.setup(serviceContext);
-        Configuration configuration = serviceContext.configuration("game-presence-settings");
-        JsonObject startingInventory = ((JsonElement)configuration.property("startingInventory")).getAsJsonObject();
-        startingResourceName = startingInventory.get("resourceName").getAsString();
-        grantingPolicy = startingInventory.get("grantPolicy").getAsString();
         this.logger = JDKLogger.getLogger(PlatformResourceServiceProvider.class);
         this.logger.warn("Resource service provider started on ->"+gameServiceName);
     }
@@ -148,24 +136,12 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
 
     private void setup(GameResource gameResource){
         List<Item> items = gameResource.list();
-        items.forEach(c->{
-            if(gameResource.configurationName().equals(startingResourceName)){
-                synchronized (startingInventory){
-                    startingInventory.add(c.distributionKey());
-                }
-            }
-            itemIndex.put(c.distributionKey(),c);
-        });
+        items.forEach(c-> itemIndex.put(c.distributionKey(),c));
     }
 
     private void clear(GameResource gameResource){
         List<Item> items = gameResource.list();
         items.forEach(c->{
-            if(gameResource.configurationName().equals(startingResourceName)){
-                synchronized (startingInventory){
-                    startingInventory.clear();
-                }
-            }
             itemIndex.remove(c.distributionKey());
             logger.warn("Item removed->"+gameResource.configurationName());
         });

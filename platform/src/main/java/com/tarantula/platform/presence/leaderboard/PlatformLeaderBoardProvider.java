@@ -6,10 +6,12 @@ import com.icodesoftware.Configuration;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.EventService;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceSetup;
+import com.tarantula.platform.event.LeaderBoardSyncEvent;
 import com.tarantula.platform.presence.DistributionPresenceService;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,9 +28,11 @@ public class PlatformLeaderBoardProvider extends PlatformGameServiceSetup implem
     private ConcurrentHashMap<String, LeaderBoardSync> tMap = new ConcurrentHashMap<>();
 
     private DistributionPresenceService distributionPresenceService;
-
+    private String leaderBoardTopic;
+    private EventService publisher;
     public PlatformLeaderBoardProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
+        leaderBoardTopic = gameCluster.typeId()+"_"+NAME;
     }
     public LeaderBoardSync leaderBoard(String category){
         return tMap.computeIfAbsent(category,(s)->{
@@ -57,12 +61,19 @@ public class PlatformLeaderBoardProvider extends PlatformGameServiceSetup implem
 
     @Override
     public void start() throws Exception {
-        logger.warn("Leader board service provider started on ["+gameCluster.serviceType()+"] with board size ["+leaderBoardSize+"]");
+        this.publisher = this.serviceContext.clusterProvider().subscribe(leaderBoardTopic,event -> {
+            if(event instanceof LeaderBoardSyncEvent){
+                LeaderBoard.Entry e = ((LeaderBoardSyncEvent)event).entry;
+                logger.warn(e.category()+" : "+e.classifier()+" : "+e.systemId()+" : "+e.value()+" :"+e.timestamp());
+            }
+            return false;
+        });
+        logger.warn("Leader board service provider started on ["+gameCluster.serviceType()+"] with board size ["+leaderBoardSize+"]["+leaderBoardTopic+"]");
     }
 
     @Override
     public void shutdown() throws Exception {
-
+        this.serviceContext.clusterProvider().unsubscribe(leaderBoardTopic);
     }
 
     @Override
@@ -74,7 +85,10 @@ public class PlatformLeaderBoardProvider extends PlatformGameServiceSetup implem
     public void onLeaderBoardUpdated(LeaderBoard.Entry entry){
         LeaderBoardSync sync = leaderBoard(entry.category());
         serviceContext.schedule(new ScheduleRunner(100,()->{
-            sync.sync(entry,(e)->{/* callback on updated*/});
+            sync.sync(entry,(e)->{
+                /* callback on updated*/
+                publisher.publish(new LeaderBoardSyncEvent(leaderBoardTopic,e));
+            });
         }));
     }
 
