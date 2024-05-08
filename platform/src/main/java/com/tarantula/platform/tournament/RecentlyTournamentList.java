@@ -70,7 +70,7 @@ public class RecentlyTournamentList extends RecoverableObject {
     public static RecentlyTournamentList lookup(DataStore dataStore,long gameClusterId, String type,int size){
         RecentlyTournamentList[] ret = new RecentlyTournamentList[]{null};
         dataStore.list(new RecentlyTournamentListQuery(gameClusterId),list->{
-            if(list.name.equals(type)){
+            if(list.name !=null && list.name.equals(type)){
                 ret[0]=list;
                 ret[0].dataStore = dataStore;
                 return false;

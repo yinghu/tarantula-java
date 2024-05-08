@@ -187,7 +187,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     @Override
     public void start() throws Exception {
         dataStore.list(new RecentlyTournamentListQuery(gameCluster.distributionId()),list->{
-            typedTournamentIndex.put(list.name(),list);
+            if(list.name()!=null) typedTournamentIndex.put(list.name(),list);
             return true;
         });
         dataStore.list(new TournamentScheduleStatusQuery(this.gameCluster.distributionId())).forEach(status->{
