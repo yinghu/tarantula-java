@@ -48,6 +48,7 @@ public class TournamentInstanceProxy extends RecoverableObject implements Tourna
 
     @Override
     public double update(Session session, Tournament.OnEntry onEntry) {
+        if(tournamentManager.status()== Tournament.Status.ENDED) return 0;
         if(tournamentManager.global()){
             TournamentEntryProxy tournamentEntryProxy = new TournamentEntryProxy();
             onEntry.on(tournamentEntryProxy);

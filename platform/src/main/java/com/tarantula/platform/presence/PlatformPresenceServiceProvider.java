@@ -130,8 +130,9 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         profile.distributionId(session.distributionId());
 
         if(!profile.configureAndValidate(session.payload())) return false;
+        if(!profileDataStore.createIfAbsent(profile, false)) return false;
         profile.profileSequence = distributionPresenceService.profileSequence(gameCluster.serviceType(),profile.displayName);
-        return profileDataStore.createIfAbsent(profile, false);
+        return profileDataStore.update(profile);
     }
 
     public ProfilePayload getProfilePayload(String IDs){
@@ -293,10 +294,6 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         applicationPreSetup.dataStore(gameCluster,NAME+"_"+onLobby.tag().replaceAll(Recoverable.PATH_SEPARATOR,"_"));
     }
 
-    public void testSequence(String name){
-        int seq = distributionPresenceService.profileSequence(gameCluster.serviceType(),name);
-        logger.warn(name+"#"+seq);
-    }
 
     public int onProfileSequence(String name){
         return profileNameSequenceMapping.compute(name,(k,v)->{
