@@ -64,7 +64,7 @@ public class PlatformLeaderBoardProvider extends PlatformGameServiceSetup implem
         this.publisher = this.serviceContext.clusterProvider().subscribe(leaderBoardTopic,event -> {
             if(event instanceof LeaderBoardSyncEvent){
                 LeaderBoard.Entry e = ((LeaderBoardSyncEvent)event).entry;
-                logger.warn(e.category()+" : "+e.classifier()+" : "+e.systemId()+" : "+e.value()+" :"+e.timestamp());
+                //logger.warn(e.category()+" : "+e.classifier()+" : "+e.systemId()+" : "+e.value()+" :"+e.timestamp());
                 LeaderBoardSync leaderBoardSync = leaderBoard(e.category());
                 switch (e.classifier()){
                     case LeaderBoard.DAILY:
