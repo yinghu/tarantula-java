@@ -31,7 +31,7 @@ public class BoardSync extends RecoverableObject{
             e.dataStore(dataStore);
             if(e.systemId()>0) {
                 eIndex.put(e.systemId(),e);
-                listener.onUpdated(e);
+                listener.onUpdated(e.duplicate(0));
             }
             return true;
         });
