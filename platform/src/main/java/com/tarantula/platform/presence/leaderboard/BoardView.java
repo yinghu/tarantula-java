@@ -31,7 +31,7 @@ public class BoardView extends RecoverableObject implements LeaderBoard.Board,Le
             Collections.sort(vList,comparator);
             return;
         }
-        if(vList.size()<sync.size()){
+        if(vList.size() < sync.size()){
             vList.add(update);
             vIndex.put(update.systemId(),update);
             this.listener.onUpdated(update);

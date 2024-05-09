@@ -78,11 +78,13 @@ public class PlatformLeaderBoardProvider extends PlatformGameServiceSetup implem
 
     @Override
     public void onUpdated(LeaderBoard.Entry entry) {
+        logger.warn("request sync on cluster ");
         distributionPresenceService.onUpdateLeaderBoard(gameServiceName,entry);
     }
 
     //distribution call
     public void onLeaderBoardUpdated(LeaderBoard.Entry entry){
+        logger.warn("sync on cluster");
         LeaderBoardSync sync = leaderBoard(entry.category());
         serviceContext.schedule(new ScheduleRunner(100,()->{
             sync.sync(entry,(e)->{
