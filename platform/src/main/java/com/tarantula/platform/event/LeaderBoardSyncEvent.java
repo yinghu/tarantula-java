@@ -32,7 +32,7 @@ public class LeaderBoardSyncEvent extends Data implements Event {
     @Override
     public void readPortable(PortableReader in) throws IOException {
         this.destination = in.readUTF("1");
-        LeaderBoardEntry.from(in.readUTF("2"),in.readUTF("3"),in.readLong("4"),in.readDouble("5"),in.readLong("6"));
+        this.entry = LeaderBoardEntry.from(in.readUTF("2"),in.readUTF("3"),in.readLong("4"),in.readDouble("5"),in.readLong("6"));
     }
     @Override
     public int getClassId() {
