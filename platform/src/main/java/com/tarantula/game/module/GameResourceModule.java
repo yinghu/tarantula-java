@@ -4,7 +4,6 @@ import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.GameResourceContext;
 import com.tarantula.platform.item.ConfigurableObject;
-import com.tarantula.platform.presence.achievement.AchievementItem;
 import com.tarantula.platform.resource.GameResource;
 import com.tarantula.platform.resource.PlatformResourceServiceProvider;
 

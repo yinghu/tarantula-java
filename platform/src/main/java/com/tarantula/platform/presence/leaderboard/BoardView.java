@@ -1,5 +1,6 @@
 package com.tarantula.platform.presence.leaderboard;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.util.RecoverableObject;
 
@@ -70,5 +71,11 @@ public class BoardView extends RecoverableObject implements LeaderBoard.Board,Le
     public void onUpdated(LeaderBoard.Entry entry) {
         vList.add(entry);
         vIndex.put(entry.systemId(),entry);
+    }
+
+    @Override
+    public JsonObject toJson(){
+        JsonObject jsonObject = new JsonObject();
+        return jsonObject;
     }
 }

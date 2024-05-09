@@ -124,8 +124,6 @@ public class LeaderBoardEntry extends OnApplicationHeader implements LeaderBoard
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("Category",category);
-        jsonObject.addProperty("Classifier",classifier);
         jsonObject.addProperty("Rank",rank);
         jsonObject.addProperty("SystemId",systemId);
         jsonObject.addProperty("Value",value);
