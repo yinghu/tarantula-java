@@ -70,8 +70,10 @@ public class GoogleStorePurchaseValidator extends AuthObject {
             String token = (String)params.get(OnAccess.STORE_RECEIPT);//purchase token
             String orderId = (String)params.get(OnAccess.STORE_TRANSACTION_ID);
             //{packageName}/purchases/products/{productId}/tokens/{token}",
+
             String query = new StringBuffer(VALIDATION_URI).append(googleCredentialConfiguration.packageName()).append("/purchases/products/").append(sku)
                     .append("/tokens/").append(token).toString();
+
             HttpRequest _request = HttpRequest.newBuilder()
                     .uri(URI.create(query))
                     .timeout(Duration.ofSeconds(TIMEOUT))
@@ -80,23 +82,30 @@ public class GoogleStorePurchaseValidator extends AuthObject {
                     .GET()
                     .build();
             HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
+
             int code = this.serviceContext.httpClientProvider().request(client->{
                 HttpResponse<String> _response = client.send(_request, HttpResponse.BodyHandlers.ofString());
                 responseData.dataAsString = _response.body();
                 return _response.statusCode();
             });
+
             if(code!=200) throw new RuntimeException("Google store gateway none 200 response");
             onMetrics(PaymentMetrics.PAYMENT_GOOGLE_STORE_AMOUNT);
+
             if(!checkResponsePayload(responseData.dataAsString,params)) return false;
+
             String bundleId = (String)params.get(OnAccess.STORE_BUNDLE_ID);
             String systemId = (String)params.get(OnAccess.SYSTEM_ID);
             ShoppingItem shoppingItem = gameServiceProvider.storeServiceProvider().shoppingItem(bundleId);
+
             if(shoppingItem==null){
                 logger.warn("Shopping Item not existed  : "+bundleId);
                 throw new RuntimeException("Shopping not existed ["+bundleId+"]");
             }
+
             GameCluster gameCluster = gameServiceProvider.gameCluster();
             Transaction t = gameCluster.transaction();
+
             boolean suc = t.execute(ctx->{
                 ApplicationPreSetup setup =(ApplicationPreSetup)ctx;
                 Descriptor app = gameCluster.application(shoppingItem.configurationTypeId());
@@ -106,12 +115,19 @@ public class GoogleStorePurchaseValidator extends AuthObject {
                 redeemer.redeem();
                 return true;
             });
-            if(suc) return true;
+
+            if(suc){
+                consumePurchase(query);
+
+                return true;
+            }
+
             logger.warn("Item : "+bundleId+" cannot be redeemed");
+
             throw new RuntimeException("Item : "+bundleId+" cannot be redeemed");
         }catch (Exception ex){
             logger.error("Error on google pay",ex);
-            return false;//false;
+            return false;
         }
     }
 
@@ -119,8 +135,9 @@ public class GoogleStorePurchaseValidator extends AuthObject {
         String pendingTransactionId = (String)params.get("order_id"); //TODO:transactionId
         JsonObject receipt = JsonParser.parseString(resp).getAsJsonObject();
         int status = receipt.get("purchaseState").getAsInt();
+        int consumptionState = receipt.get("consumptionState").getAsInt();
         boolean validated = false;
-        if(status==0){
+        if(status == 0 & consumptionState == 0){
             String transactionId = receipt.get("order_id").getAsString();
             if(transactionId.equals(pendingTransactionId)){
                 String sku = receipt.get("product_id").getAsString();
@@ -142,4 +159,27 @@ public class GoogleStorePurchaseValidator extends AuthObject {
         return validated;
     }
 
+    private boolean consumePurchase(String query) throws Exception{
+        String consumeQuery = query + ":consume";
+
+        HttpRequest _request = HttpRequest.newBuilder()
+                .uri(URI.create(consumeQuery))
+                .timeout(Duration.ofSeconds(TIMEOUT))
+                .header(ACCEPT, ACCEPT_JSON)
+                .header(CONTENT_TYPE, CONTENT_FORM)
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
+
+        int code = serviceContext.httpClientProvider().request(client->{
+            HttpResponse<String> _response = client.send(_request, HttpResponse.BodyHandlers.ofString());
+            responseData.dataAsString = _response.body();
+            return _response.statusCode();
+        });
+
+        if(code!=200) throw new RuntimeException(responseData.dataAsString);
+
+        return true;
+    }
 }
