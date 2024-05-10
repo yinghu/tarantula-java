@@ -133,7 +133,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
     }
 
     private boolean checkResponsePayload(String resp,Map<String,Object> params){
-        String pendingTransactionId = (String)params.get("order_id"); //TODO:transactionId
+        String pendingTransactionId = (String)params.get("transactionId");
         JsonObject receipt = JsonParser.parseString(resp).getAsJsonObject();
         int status = receipt.get("purchaseState").getAsInt();
         int consumptionState = receipt.get("consumptionState").getAsInt();
@@ -180,6 +180,8 @@ public class GoogleStorePurchaseValidator extends AuthObject {
         });
 
         if(code!=200) throw new RuntimeException(responseData.dataAsString);
+
+        logger.warn("Item consumed!");
 
         return true;
     }
