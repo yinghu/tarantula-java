@@ -1,9 +1,8 @@
 package com.perfectday.games.earth8.analytics;
 
 import com.icodesoftware.Session;
-import com.perfectday.games.earth8.CurrencyUpdate;
 
-public class CurrencyUpdateTransaction extends AnalyticsTransaction {
+public class CurrencyUpdateTransaction extends UserAnalyticsTransaction {
     private static final String MESSAGE_TYPE = "/earth8/inventory/0.0.1/currencyUpdate";
 
     public CurrencyUpdateTransaction(Session session,long serverSessionId, String context, String currencyId, int currencyDelta, int currencyTotal, String fakeTransactionId)

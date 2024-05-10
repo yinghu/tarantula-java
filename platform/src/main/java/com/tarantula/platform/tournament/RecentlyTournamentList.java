@@ -66,14 +66,11 @@ public class RecentlyTournamentList extends RecoverableObject {
         tournamentIndex.push(tournamentManager.distributionId());
     }
 
-    public static RecentlyTournamentList lookup(PlatformTournamentServiceProvider provider,String type){
-        return lookup(provider.dataStore,provider.gameCluster.distributionId(),type,provider.recentlyTournamentListSize);
-    }
 
     public static RecentlyTournamentList lookup(DataStore dataStore,long gameClusterId, String type,int size){
         RecentlyTournamentList[] ret = new RecentlyTournamentList[]{null};
         dataStore.list(new RecentlyTournamentListQuery(gameClusterId),list->{
-            if(list.name.equals(type)){
+            if(list.name !=null && list.name.equals(type)){
                 ret[0]=list;
                 ret[0].dataStore = dataStore;
                 return false;

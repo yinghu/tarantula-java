@@ -59,6 +59,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     private ConcurrentHashMap<Long,TournamentManager> tournamentIndex = new ConcurrentHashMap<>();
 
+    private ConcurrentHashMap<String,RecentlyTournamentList> typedTournamentIndex = new ConcurrentHashMap<>();
+
+
 
     int smallConcurrentInstanceSize = 3;
     int mediumConcurrentInstanceSize = 20;
@@ -131,12 +134,18 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
 
     public List<Tournament> list(String type){
+        if(type==null || type.trim().length() < 4) throw new RuntimeException("query type cannot be null or less than 4 chars");
         ArrayList<Tournament> _tms = new ArrayList<>();
-        RecentlyTournamentList list = RecentlyTournamentList.lookup(this,type);
+        RecentlyTournamentList list = lookupRecentlyTournamentList(type);
         Long[] tournaments = list.pop();
         for(Long id : tournaments){
             if(id==null || id==0) continue;
-            TournamentManager tournamentManager = new TournamentManager();
+            TournamentManager tournamentManager = tournamentIndex.get(id);
+            if(tournamentManager!=null) {
+                _tms.add(tournamentManager);
+                continue;
+            }
+            tournamentManager = new TournamentManager();
             tournamentManager.distributionId(id);
             if(!dataStore.load(tournamentManager)) continue;
             _tms.add(tournamentManager);
@@ -177,6 +186,13 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     @Override
     public void start() throws Exception {
+        dataStore.list(new RecentlyTournamentListQuery(gameCluster.distributionId()),list->{
+            if(list.name()!=null) {
+                list.dataStore(dataStore);
+                typedTournamentIndex.put(list.name(),list);
+            }
+            return true;
+        });
         dataStore.list(new TournamentScheduleStatusQuery(this.gameCluster.distributionId())).forEach(status->{
             logger.warn("Tournament Status : "+status.tournamentId+" : "+status.status);
             if(status.status != Tournament.Status.PENDING){
@@ -381,7 +397,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         if(!dataStore.create(tournament)){
             throw new RuntimeException("Failed to create tournament manager");
         }
-        RecentlyTournamentList list = RecentlyTournamentList.lookup(this,schedule.type());
+        RecentlyTournamentList list = lookupRecentlyTournamentList(schedule.type());
         list.push(tournament);
         list.update();
         if(schedule.global()){
@@ -456,7 +472,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         return tournamentManager.onEnterSegment(systemId,segmentInstanceId);
     }
-    public boolean onTournamentSegmentScored(long tournamentId,long instanceId,long entryId, long systemId, double credit,double delta){
+    public double onTournamentSegmentScored(long tournamentId,long instanceId,long entryId, long systemId, double credit,double delta){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         return tournamentManager.onScoreSegment(systemId,instanceId,entryId,credit,delta);
     }
@@ -464,7 +480,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         return tournamentManager.onEnter(systemId,instanceId);
     }
-    public boolean onTournamentScored(long tournamentId,long instanceId, long systemId, double credit,double delta){
+    public double onTournamentScored(long tournamentId,long instanceId, long systemId, double credit,double delta){
         TournamentManager tournamentManager = this.tournamentIndex.get(tournamentId);
         return tournamentManager.onScore(systemId,instanceId,credit,delta);
     }
@@ -496,6 +512,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private void validateSchedule(TournamentSchedule schedule){
         //common
         if(TimeUtil.durationUTCInHours(schedule.startTime(),schedule.endTime()) < minDurationHoursPerSchedule) throw new RuntimeException("min hours per schedule less than ["+minDurationHoursPerSchedule+"]");
+        if(schedule.name()==null || schedule.name().trim().length() < 4) throw new RuntimeException("Name cannot be null or less 4 chars");
+        if(schedule.type()==null || schedule.type().trim().length() < 4) throw new RuntimeException("Type cannot be null or less 4 chars");
 
         //global schedule
         if(schedule.global() && schedule.segmentsPerSchedule()<=0) throw new RuntimeException("global segments per schedule must be at least 1 or more");
@@ -507,6 +525,13 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         if(!schedule.global() && schedule.maxEntriesPerInstance()<=0) throw new RuntimeException("max entries per instance  must be at least 1 or more");
         if(!schedule.global() && schedule.durationMinutesPerInstance() < minDurationMinutesPerInstance) throw new RuntimeException("min minutes per instance less than ["+minDurationMinutesPerInstance+"]");
 
+    }
+
+    private RecentlyTournamentList lookupRecentlyTournamentList(String type){
+        return typedTournamentIndex.computeIfAbsent(type,key->{
+            RecentlyTournamentList loaded = RecentlyTournamentList.lookup(this.dataStore,this.gameCluster.distributionId(),type,this.recentlyTournamentListSize);
+            return loaded;
+        });
     }
 
 }

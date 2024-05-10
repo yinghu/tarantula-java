@@ -6,7 +6,7 @@ import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
-import com.perfectday.games.earth8.analytics.AnalyticsTransaction;
+import com.perfectday.games.earth8.analytics.UserAnalyticsTransaction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,12 +34,13 @@ public class BattleUpdate extends RecoverableObject {
     public UpdateId updateId;
     public long playerLevel;
     public int score;
+    public String objectiveType;
     public long unitId;
     public long equipmentId;
 
     public HashMap<String,Integer> currencies = new HashMap<>();
 
-    protected List<AnalyticsTransaction> pendingAnalytics = new ArrayList<>();
+    public List<UserAnalyticsTransaction> pendingAnalytics = new ArrayList<>();
 
     //Data store write contract
     @Override
@@ -47,6 +48,7 @@ public class BattleUpdate extends RecoverableObject {
         buffer.writeInt(updateId.ordinal());
         buffer.writeLong(playerLevel);
         buffer.writeInt(score);
+        buffer.writeUTF8(objectiveType);
         buffer.writeLong(unitId);
         buffer.writeLong(equipmentId);
         buffer.writeInt(currencies.size());
@@ -63,6 +65,7 @@ public class BattleUpdate extends RecoverableObject {
         updateId = UpdateId.values()[buffer.readInt()];
         playerLevel = buffer.readLong();
         score = buffer.readInt();
+        objectiveType = buffer.readUTF8();
         unitId = buffer.readLong();
         equipmentId = buffer.readLong();
         int csize = buffer.readInt();
@@ -138,6 +141,7 @@ public class BattleUpdate extends RecoverableObject {
         updateId = UpdateId.values()[JsonUtil.getJsonInt(json, "UpdateId", 0)];
         playerLevel = JsonUtil.getJsonLong(json, "PlayerLevel", 0);
         score = JsonUtil.getJsonInt(json, "Score", 0);
+        objectiveType = JsonUtil.getJsonString(json, "ObjectiveType", "");
         unitId = JsonUtil.getJsonLong(json, "UnitId", 0);
         equipmentId = JsonUtil.getJsonLong(json, "EquipmentId", 0);
 
