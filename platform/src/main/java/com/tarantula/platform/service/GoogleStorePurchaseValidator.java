@@ -165,7 +165,6 @@ public class GoogleStorePurchaseValidator extends AuthObject {
                 .uri(URI.create(consumeQuery))
                 .timeout(Duration.ofSeconds(TIMEOUT))
                 .header(AUTHORIZATION,"Bearer "+_tk)
-                .header(ACCEPT, ACCEPT_JSON)
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .build();
 
