@@ -139,13 +139,12 @@ public class GoogleStorePurchaseValidator extends AuthObject {
         int consumptionState = receipt.get("consumptionState").getAsInt();
         boolean validated = false;
         if(status == 0 & consumptionState == 0){
-            String transactionId = receipt.get("order_id").getAsString();
+            String transactionId = receipt.get("orderId").getAsString();
             if(transactionId.equals(pendingTransactionId)){
-                String sku = receipt.get("product_id").getAsString();
-                int quantity  = receipt.get("quantity").getAsInt();
+                String sku = (String)params.get("storeProductId");
                 params.put(OnAccess.STORE_TRANSACTION_ID,transactionId);
                 params.put(OnAccess.STORE_PRODUCT_ID,sku);
-                params.put(OnAccess.STORE_QUANTITY,quantity);
+                params.put(OnAccess.STORE_QUANTITY,1);
                 validated = true;
             }
         }
