@@ -1,5 +1,6 @@
 package com.tarantula.platform.presence.leaderboard;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.LeaderBoard;
 import com.icodesoftware.Statistics;
@@ -137,6 +138,18 @@ public class LeaderBoardSync extends RecoverableObject implements LeaderBoard {
         if(localDate.getDayOfYear()==1){
             views[3].reset();
         }
+    }
+
+    public JsonObject toJson(){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("Successful",true);
+        jsonObject.addProperty("Category",category);
+        jsonObject.add(LeaderBoard.DAILY,views[0].toJson());
+        jsonObject.add(LeaderBoard.WEEKLY,views[1].toJson());
+        jsonObject.add(LeaderBoard.MONTHLY,views[2].toJson());
+        jsonObject.add(LeaderBoard.YEARLY,views[3].toJson());
+        jsonObject.add(LeaderBoard.TOTAL,views[4].toJson());
+        return jsonObject;
     }
 
 

@@ -9,8 +9,8 @@ import com.icodesoftware.util.SnowflakeKey;
 
 public class BoardSync extends RecoverableObject{
 
-    private String classifier;
-    private String category;
+    public String classifier;
+    public String category;
     private int size;
     private LeaderBoardEntry[] board;
     private HashMap<Long, LeaderBoardEntry> eIndex;

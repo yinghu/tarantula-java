@@ -55,6 +55,10 @@ public class GameInboxModule extends ModuleHeader{
             achievement.onProgress(Double.parseDouble(session.name()));
             session.write(achievement.toJson().toString().getBytes());
         }
+        else if(session.action().equals("onLeaderBoard")){
+            LeaderBoard leaderBoard = this.gameServiceProvider.leaderBoardProvider().leaderBoard(session.name());
+            session.write(leaderBoard.toJson().toString().getBytes());
+        }
         else{
             throw new UnsupportedOperationException(session.action()+" not support");
         }
