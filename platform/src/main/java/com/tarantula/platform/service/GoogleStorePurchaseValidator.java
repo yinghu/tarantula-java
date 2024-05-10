@@ -58,7 +58,6 @@ public class GoogleStorePurchaseValidator extends AuthObject {
 
     public boolean validate(Map<String,Object> params){
         try{
-            logger.warn("Client Params: " + params.toString());
             //Session session = (Session)params.get(OnAccess.SESSION);
             GoogleCredentialConfiguration googleCredentialConfiguration = configurationServiceProvider.credentialConfiguration(OnAccess.GOOGLE);
             if(googleCredentialConfiguration==null){
@@ -172,11 +171,10 @@ public class GoogleStorePurchaseValidator extends AuthObject {
 
         int code = serviceContext.httpClientProvider().request(client->{
             HttpResponse<String> _response = client.send(_request, HttpResponse.BodyHandlers.ofString());
-            responseData.dataAsString = _response.body();
             return _response.statusCode();
         });
 
-        if(code!=200) throw new RuntimeException(responseData.dataAsString);
+        if(code!=200) throw new RuntimeException("Not 200 status code :" + code);
 
         logger.warn("Item consumed!");
 
