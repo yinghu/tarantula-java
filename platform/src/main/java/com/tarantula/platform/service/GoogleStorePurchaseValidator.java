@@ -79,6 +79,9 @@ public class GoogleStorePurchaseValidator extends AuthObject {
                     .header(ACCEPT, ACCEPT_JSON)
                     .GET()
                     .build();
+            logger.info(_tk);
+            logger.info(token);
+            logger.info(query);
             HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
             int code = this.serviceContext.httpClientProvider().request(client->{
                 HttpResponse<String> _response = client.send(_request, HttpResponse.BodyHandlers.ofString());
