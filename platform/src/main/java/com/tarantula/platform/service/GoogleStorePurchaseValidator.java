@@ -118,7 +118,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
             });
 
             if(suc){
-                consumePurchase(query);
+                consumePurchase(query, _tk);
 
                 return true;
             }
@@ -159,12 +159,13 @@ public class GoogleStorePurchaseValidator extends AuthObject {
         return validated;
     }
 
-    private boolean consumePurchase(String query) throws Exception{
+    private boolean consumePurchase(String query, String _tk) throws Exception{
         String consumeQuery = query + ":consume";
 
         HttpRequest _request = HttpRequest.newBuilder()
                 .uri(URI.create(consumeQuery))
                 .timeout(Duration.ofSeconds(TIMEOUT))
+                .header(AUTHORIZATION,"Bearer "+_tk)
                 .header(ACCEPT, ACCEPT_JSON)
                 .header(CONTENT_TYPE, CONTENT_FORM)
                 .POST(HttpRequest.BodyPublishers.noBody())
