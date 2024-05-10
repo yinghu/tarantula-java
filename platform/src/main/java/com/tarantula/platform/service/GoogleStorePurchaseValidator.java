@@ -85,6 +85,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
                 responseData.dataAsString = _response.body();
                 return _response.statusCode();
             });
+            logger.warn(responseData.dataAsString);
             if(code!=200) throw new RuntimeException("Google store gateway none 200 response");
             onMetrics(PaymentMetrics.PAYMENT_GOOGLE_STORE_AMOUNT);
             if(!checkResponsePayload(responseData.dataAsString,params)) return false;
