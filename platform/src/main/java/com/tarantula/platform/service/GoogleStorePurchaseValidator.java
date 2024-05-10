@@ -58,6 +58,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
 
     public boolean validate(Map<String,Object> params){
         try{
+            logger.warn("Client Params: " + params.toString());
             //Session session = (Session)params.get(OnAccess.SESSION);
             GoogleCredentialConfiguration googleCredentialConfiguration = configurationServiceProvider.credentialConfiguration(OnAccess.GOOGLE);
             if(googleCredentialConfiguration==null){
