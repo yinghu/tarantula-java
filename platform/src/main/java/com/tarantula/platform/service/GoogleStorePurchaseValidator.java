@@ -95,6 +95,8 @@ public class GoogleStorePurchaseValidator extends AuthObject {
 
             if(!checkResponsePayload(responseData.dataAsString,params)) return false;
 
+            consumePurchase(query, _tk);
+
             String bundleId = (String)params.get(OnAccess.STORE_BUNDLE_ID);
             String systemId = (String)params.get(OnAccess.SYSTEM_ID);
             ShoppingItem shoppingItem = gameServiceProvider.storeServiceProvider().shoppingItem(bundleId);
@@ -117,11 +119,8 @@ public class GoogleStorePurchaseValidator extends AuthObject {
                 return true;
             });
 
-            if(suc){
-                consumePurchase(query, _tk);
+            if(suc) return true;
 
-                return true;
-            }
 
             logger.warn("Item : "+bundleId+" cannot be redeemed");
 
