@@ -11,10 +11,19 @@ public class MetricsSnapshotScheduler implements SchedulingTask {
 
     private int timerCountDown;
     private long timerInternal;
-    private LocalDateTime lastViewed;
+
     private MetricsSnapshotRequest metricsSnapshotRequest;
     private ApplicationContext applicationContext;
     private DistributionMetricsService distributionMetricsService;
+
+
+    public MetricsSnapshotScheduler(ApplicationContext applicationContext,long timerInternal, int timerCountDown,MetricsSnapshotRequest request){
+        this.timerInternal = timerInternal;
+        this.timerCountDown = timerCountDown;
+        this.applicationContext = applicationContext;
+        this.metricsSnapshotRequest = request;
+        distributionMetricsService = this.applicationContext.clusterProvider().serviceProvider(DistributionMetricsService.NAME);
+    }
 
     @Override
     public boolean oneTime() {
@@ -34,10 +43,11 @@ public class MetricsSnapshotScheduler implements SchedulingTask {
     @Override
     public void run() {
         try{
+            metricsSnapshotRequest.reset();
             byte[][] ret = metricsSnapshotRequest.archived? distributionMetricsService.onMetricsArchive(metricsSnapshotRequest.name,metricsSnapshotRequest.category,metricsSnapshotRequest.classifier,metricsSnapshotRequest.endTime) : distributionMetricsService.onMetrics(metricsSnapshotRequest.name,metricsSnapshotRequest.category,metricsSnapshotRequest.classifier);
             for(byte[] f  : ret){
                 metricsSnapshotRequest.fromBinary(f);
-                //LocalDateTime lastViewed = serviceView.update(response.toJson());
+                LocalDateTime lastViewed = metricsSnapshotRequest.lastViewed.pop();
                 long seconds = TimeUtil.durationUTCInSeconds(lastViewed,LocalDateTime.now());
                 if(seconds>30){
                     applicationContext.log("Monitor is stopping with last view passed in seconds ["+seconds+"] ",OnLog.WARN);
@@ -45,6 +55,7 @@ public class MetricsSnapshotScheduler implements SchedulingTask {
                     break;
                 }
             }
+            metricsSnapshotRequest.loaded();
             timerCountDown--;
             if(timerCountDown <= 0){
                 metricsSnapshotRequest.stop();
