@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.OnLog;
 import com.icodesoftware.SchedulingTask;
-import com.icodesoftware.util.JsonUtil;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -45,10 +44,9 @@ public class MetricsViewScheduler implements SchedulingTask {
         try{
            listeners.forEach((k,r)->{
                r.reset();
-               String[] ret = r.archived?distributionMetricsService.onMetricsArchive(r.name,r.category,r.classifier,r.endTime):distributionMetricsService.onMetrics(r.name,r.category,r.classifier);
-               for(String f  : ret) {
-                   JsonObject m = JsonUtil.parse(f);
-                   r.snapshot(m);
+               byte[][] ret = r.archived?distributionMetricsService.onMetricsArchive(r.name,r.category,r.classifier,r.endTime):distributionMetricsService.onMetrics(r.name,r.category,r.classifier);
+               for(byte[] f  : ret) {
+                   r.fromBinary(f);
                }
                r.loaded();
            });

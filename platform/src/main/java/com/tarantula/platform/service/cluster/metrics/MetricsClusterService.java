@@ -60,14 +60,14 @@ public class MetricsClusterService implements ManagedService, RemoteService {
         serviceProvider.updateSummary(request);
         return request.toBinary();
     }
-    public String metricsSnapshot(String name,String category,String classifier){
+    public byte[] metricsSnapshot(String name,String category,String classifier){
         Metrics m = this.tarantulaContext.metrics(name);
         Metrics.Spot[] dat = m.snapshot(category,classifier);
         MetricsSnapshotResponse response = new MetricsSnapshotResponse(nodeEngine.getLocalMember().getUuid());
         response.snapshot(dat);
-        return response.toJson().toString();
+        return response.toBinary();
     }
-    public String metricsArchive(String name, String category, String classifier, LocalDateTime end){
+    public byte[] metricsArchive(String name, String category, String classifier, LocalDateTime end){
         Metrics m = this.tarantulaContext.metrics(name);
         MetricsSnapshotResponse response = new MetricsSnapshotResponse(nodeEngine.getLocalMember().getUuid());
         switch (classifier){
@@ -108,7 +108,7 @@ public class MetricsClusterService implements ManagedService, RemoteService {
                 Metrics.History history = m.archive(category,end);
                 response.snapshot(history.hourlyGain());
         }
-        return response.toJson().toString();
+        return response.toBinary();
     }
 
 }

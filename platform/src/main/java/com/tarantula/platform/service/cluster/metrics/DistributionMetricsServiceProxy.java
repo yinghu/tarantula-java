@@ -51,35 +51,35 @@ public class DistributionMetricsServiceProxy extends AbstractDistributedObject<M
         }
         return ret;
     }
-    public String[] onMetrics(String name,String category,String classifier){
+    public byte[][] onMetrics(String name,String category,String classifier){
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        String[] ret = new String[mlist.size()];
+        byte[][] ret = new byte[mlist.size()][];
         int i = 0;
         for(Member m : mlist){
             MetricsViewOperation serviceViewOperation = new MetricsViewOperation(name,category,classifier);
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionMetricsService.NAME, serviceViewOperation,m.getAddress());
             ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<String> future = builder.invoke();
+                Future<byte[]> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
             },metricsListener);
-            ret[i++]= result.successful? (String) result.result : "{}";
+            ret[i++]= result.successful? (byte[]) result.result : new byte[0];
         }
         return ret;
     }
-    public String[] onMetricsArchive(String name, String category, String classifier, LocalDateTime end){
+    public byte[][] onMetricsArchive(String name, String category, String classifier, LocalDateTime end){
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        String[] ret = new String[mlist.size()];
+        byte[][] ret = new byte[mlist.size()][];
         int i = 0;
         for(Member m : mlist){
             MetricsArchiveViewOperation serviceViewOperation = new MetricsArchiveViewOperation(name,category,classifier,end);
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionMetricsService.NAME, serviceViewOperation,m.getAddress());
             ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<String> future = builder.invoke();
+                Future<byte[]> future = builder.invoke();
                 return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
             },metricsListener);
-            ret[i++]= result.successful? (String) result.result : "{}";
+            ret[i++]= result.successful? (byte[]) result.result : new byte[0];
         }
         return ret;
     }

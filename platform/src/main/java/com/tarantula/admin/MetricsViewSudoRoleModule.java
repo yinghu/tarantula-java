@@ -24,7 +24,8 @@ public class MetricsViewSudoRoleModule implements Module {
 
     private MetricsViewScheduler metricsViewMonitor;
     private Configuration chartConfiguration;
-
+    private long timerInterval;
+    private int timerLoopCount;
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onCheckPermission")){
@@ -98,7 +99,8 @@ public class MetricsViewSudoRoleModule implements Module {
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.userService = this.context.serviceProvider(UserService.NAME);
         this.chartConfiguration = this.deploymentServiceProvider.configuration("metrics-view-settings");
-        long timerInterval = ((Number)this.chartConfiguration.property("timerInterval")).longValue();
+        this.timerInterval = ((Number)this.chartConfiguration.property("timerInterval")).longValue();
+        this.timerLoopCount = ((Number)this.chartConfiguration.property("timerLoopCount")).intValue();
         this.metricsViewMonitor = new MetricsViewScheduler(this.context,timerInterval);
         this.context.schedule(this.metricsViewMonitor);
         this.context.log("Metrics view sudo role module started", OnLog.INFO);

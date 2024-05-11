@@ -10,7 +10,7 @@ public interface DistributionMetricsService extends ServiceProvider {
 
     byte[][] onMonitor(String serviceName);
 
-    String[] onMetrics(String name,String category,String classifier);
+    byte[][] onMetrics(String name,String category,String classifier);
 
-    String[] onMetricsArchive(String name, String category, String classifier, LocalDateTime end);
+    byte[][] onMetricsArchive(String name, String category, String classifier, LocalDateTime end);
 }

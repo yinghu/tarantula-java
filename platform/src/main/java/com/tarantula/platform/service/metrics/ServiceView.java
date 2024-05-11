@@ -23,15 +23,6 @@ public class ServiceView extends RecoverableObject{
         this.chartSize = chartSize;
     }
 
-
-    public JsonObject toMetricsJson(String category){
-        JsonObject resp = new JsonObject();
-        resp.addProperty("memberId",name);
-        FIFOBuffer<Property> metrics = metricsMap.get(category);
-        List<Property> snapshot = metrics.list(new ArrayList<>());
-        resp.add("chart",_chart(snapshot,category));
-        return resp;
-    }
     public JsonObject toMetricsJson(JsonArray categories){
         JsonArray list = new JsonArray();
         int[] ix = {0};

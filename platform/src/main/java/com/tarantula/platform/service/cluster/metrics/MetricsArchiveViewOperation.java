@@ -15,7 +15,7 @@ public class MetricsArchiveViewOperation extends Operation {
     private String classifier;
     private LocalDateTime endTime;
 
-    private String ret;
+    private byte[] ret;
 
     public MetricsArchiveViewOperation() {
     }
