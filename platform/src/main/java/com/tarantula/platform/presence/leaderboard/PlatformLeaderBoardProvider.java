@@ -107,7 +107,6 @@ public class PlatformLeaderBoardProvider extends PlatformGameServiceSetup implem
         serviceContext.schedule(new ScheduleRunner(100,()->{
             sync.sync(entry,(e)->{
                 /* callback on updated*/
-                //logger.warn("Publish : "+e.category()+" : "+e.classifier()+" : "+e.systemId());
                 publisher.publish(new LeaderBoardSyncEvent(leaderBoardTopic,e));
             });
         }));

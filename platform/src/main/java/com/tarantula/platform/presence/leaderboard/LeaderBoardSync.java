@@ -36,15 +36,12 @@ public class LeaderBoardSync extends RecoverableObject implements LeaderBoard {
         d.dataStore(this.dataStore);
         BoardView dv = new BoardView(d,listener,this.comparator);
         views[0]=dv;
-        //dv.load();
-
         //weekly
         BoardSync w =new BoardSync(WEEKLY,category,size,this.comparator);
         w.distributionId(gameClusterId);
         w.dataStore(this.dataStore);
         BoardView wv = new BoardView(w,listener,this.comparator);
         views[1]=wv;
-        //wv.load();
 
         //monthly
         BoardSync m =new BoardSync(MONTHLY,category,size,this.comparator);
@@ -52,7 +49,6 @@ public class LeaderBoardSync extends RecoverableObject implements LeaderBoard {
         m.dataStore(this.dataStore);
         BoardView mv = new BoardView(m,listener,this.comparator);
         views[2]=mv;
-        //mv.load();
 
         //yearly
         BoardSync y =new BoardSync(YEARLY,category,size,this.comparator);
@@ -60,7 +56,6 @@ public class LeaderBoardSync extends RecoverableObject implements LeaderBoard {
         y.dataStore(this.dataStore);
         BoardView yv = new BoardView(y,listener,this.comparator);
         views[3]=yv;
-        //yv.load();
 
         //total
         BoardSync t =new BoardSync(TOTAL,category,size,this.comparator);
@@ -68,7 +63,6 @@ public class LeaderBoardSync extends RecoverableObject implements LeaderBoard {
         t.dataStore(this.dataStore);
         BoardView tv = new BoardView(t,listener,this.comparator);
         views[4]=tv;
-        //tv.load();
 
     }
     @Override
