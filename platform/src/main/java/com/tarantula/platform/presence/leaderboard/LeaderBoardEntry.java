@@ -143,9 +143,9 @@ public class LeaderBoardEntry extends OnApplicationHeader implements LeaderBoard
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("Rank",rank);
-        jsonObject.addProperty("SystemId",systemId);
+        jsonObject.addProperty("SystemId",Long.toString(systemId));
         jsonObject.addProperty("Value",value);
-        jsonObject.addProperty("Timestamp",timestamp);
+        jsonObject.addProperty("Timestamp",Long.toString(timestamp));
         return jsonObject;
     }
     public static LeaderBoard.Entry[] from(Statistics.Entry statisticsEntry){

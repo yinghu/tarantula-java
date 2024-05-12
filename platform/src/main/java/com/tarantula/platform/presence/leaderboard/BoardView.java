@@ -47,12 +47,9 @@ public class BoardView extends RecoverableObject implements LeaderBoard.Board,Le
         Collections.sort(vList,comparator);
     }
 
-    public void load(){
-        this.sync.load(this);
-        Collections.sort(vList,comparator);
-    }
 
     public void onSync(LeaderBoard.Entry entry, LeaderBoard.Listener listener){
+        sync.load(listener);
         sync.onBoard(entry,listener);
     }
     public void rank(LeaderBoard.Listener ranking){
@@ -65,7 +62,6 @@ public class BoardView extends RecoverableObject implements LeaderBoard.Board,Le
     public void reset(){
         vIndex.clear();
         vList.clear();
-        sync.load(this);
     }
 
     @Override

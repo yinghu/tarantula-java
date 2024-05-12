@@ -4,6 +4,8 @@ import com.icodesoftware.LeaderBoard;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.SnowflakeKey;
 
@@ -15,7 +17,7 @@ public class BoardSync extends RecoverableObject{
     private LeaderBoardEntry[] board;
     private HashMap<Long, LeaderBoardEntry> eIndex;
     private EntryComparator entryComparator;
-
+    private final AtomicBoolean load = new AtomicBoolean(false);
     public BoardSync(String classifier, String category, int size, EntryComparator entryComparator){
         this.classifier = classifier;
         this.category = category;
@@ -23,6 +25,7 @@ public class BoardSync extends RecoverableObject{
         this.entryComparator = entryComparator;
     }
     public synchronized void load(LeaderBoard.Listener listener){
+        if(load.getAndSet(true)) return;
         board = new LeaderBoardEntry[size];
         eIndex = new HashMap<>();
         int[] ix = {0};
@@ -31,7 +34,7 @@ public class BoardSync extends RecoverableObject{
             e.dataStore(dataStore);
             if(e.systemId()>0) {
                 eIndex.put(e.systemId(),e);
-                listener.onUpdated(e.duplicate(0));
+                listener.onUpdated(e);
             }
             return true;
         });

@@ -23,8 +23,8 @@ public class LeaderBoardSyncEvent extends Data implements Event {
     @Override
     public void writePortable(PortableWriter out) throws IOException {
         out.writeUTF("1",this.destination);
-        out.writeUTF("2",entry.category());
-        out.writeUTF("3",entry.classifier());
+        out.writeUTF("2",entry.classifier());
+        out.writeUTF("3",entry.category());
         out.writeLong("4",entry.systemId());
         out.writeDouble("5",entry.value());
         out.writeLong("6",entry.timestamp());
