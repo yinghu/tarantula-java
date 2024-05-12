@@ -10,5 +10,5 @@ public interface DistributionPresenceService extends ServiceProvider {
     int profileSequence(String serviceName,String name);
 
     void onUpdateLeaderBoard(String serviceName, LeaderBoard.Entry leaderBoardEntry);
-
+    byte[] onLeaderBoard(String serviceName,String category,String classifier);
 }

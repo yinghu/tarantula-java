@@ -99,6 +99,8 @@ public class PlatformLeaderBoardProvider extends PlatformGameServiceSetup implem
         distributionPresenceService.onUpdateLeaderBoard(gameServiceName,entry);
     }
 
+
+
     //distribution call
     public void onLeaderBoardUpdated(LeaderBoard.Entry entry){
         LeaderBoardSync sync = leaderBoard(entry.category());
@@ -109,7 +111,10 @@ public class PlatformLeaderBoardProvider extends PlatformGameServiceSetup implem
             });
         }));
     }
-
+    public byte[] onLeaderBoardLoaded(String category,String classifier){
+        
+        return null;
+    }
 
     @Override
     public void atMidnight(){

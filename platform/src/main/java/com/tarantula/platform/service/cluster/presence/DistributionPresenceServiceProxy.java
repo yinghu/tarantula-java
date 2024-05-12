@@ -64,6 +64,19 @@ public class DistributionPresenceServiceProxy extends AbstractDistributedObject<
         if(!result.successful) throw new RuntimeException(result.exception);
     }
 
+    public byte[] onLeaderBoard(String serviceName,String category,String classifier){
+        NodeEngine nodeEngine = getNodeEngine();
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(category);
+        LeaderBoardLoadOperation leaderBoardUpdateOperation = new LeaderBoardLoadOperation(serviceName,category,classifier);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionPresenceService.NAME, leaderBoardUpdateOperation,partitionId);
+        ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+            Future<byte[]> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+        },metricsListener);
+        if(!result.successful) throw new RuntimeException(result.exception);
+        return (byte[]) result.result;
+    }
+
 
     public void registerMetricsListener(MetricsListener metricsListener){
         this.metricsListener = metricsListener;

@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.LeaderBoard;
 
 import com.icodesoftware.Statistics;
+import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.util.OnApplicationHeader;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
@@ -109,6 +110,23 @@ public class LeaderBoardEntry extends OnApplicationHeader implements LeaderBoard
         value = buffer.readDouble();
         timestamp = buffer.readLong();
         return true;
+    }
+
+    @Override
+    public void fromBinary(byte[] payload) {
+        DataBuffer buffer = BufferProxy.wrap(payload);
+        systemId = buffer.readLong();
+        value = buffer.readDouble();
+        timestamp = buffer.readLong();
+    }
+
+    @Override
+    public byte[] toBinary() {
+        DataBuffer buffer = BufferProxy.buffer(24,false);
+        buffer.writeLong(systemId);
+        buffer.writeDouble(value);
+        buffer.writeLong(timestamp);
+        return buffer.array();
     }
 
     @Override
