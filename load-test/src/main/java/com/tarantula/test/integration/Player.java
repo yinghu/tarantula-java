@@ -14,17 +14,14 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Base64;
-import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
 public class Player implements Runnable{
 
     private CountDownLatch counter;
-
     private String game;
     private String userName;
-    private String deviceName;
-    private String clientId;
+
     private String token;
     private String systemId;
     private String ticket;
@@ -42,19 +39,19 @@ public class Player implements Runnable{
 
     private boolean joined;
 
+    private long battleId;
+
     private boolean udpTested;
 
     static short STATISTICS_QUERY = 1;
     static short STATISTICS_COMMIT = 2;
 
     private HttpCaller httpCaller;
-    public Player(HttpCaller httpCaller, CountDownLatch counter, String game,String userName,int sequence,boolean udpTested,int udpReceiveTimeout,int udpRounds){
+    public Player(HttpCaller httpCaller, CountDownLatch counter, String game,String userName,boolean udpTested,int udpReceiveTimeout,int udpRounds){
         this.httpCaller = httpCaller;
         this.counter = counter;
         this.game = game;
         this.userName = userName;
-        this.deviceName = "test-"+sequence;
-        this.clientId = UUID.randomUUID().toString();
         this.udpTested = udpTested;
         this.udpReceiveTimeout = udpReceiveTimeout;
         this.udpRounds = udpRounds;
@@ -74,10 +71,8 @@ public class Player implements Runnable{
         try{
             String[] headers = new String[]{
                     Session.TARANTULA_TAG,"index/user",
-                    Session.TARANTULA_ACTION,"onDeveloper",
+                    Session.TARANTULA_ACTION,"onDevice",
                     Session.TARANTULA_MAGIC_KEY,userName,
-                    Session.TARANTULA_ACCESS_KEY,
-                    "570342964778242048-6879508E047E7B7BF8A50EF2951A3A198EE81957-FA80A8B8A29B7C4C4D636032D4BFA571",
             };
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("DeviceId",userName);
@@ -87,30 +82,43 @@ public class Player implements Runnable{
             LoadResult.totalHttpRequestCount.incrementAndGet();
             if(!onPresence(resp)) {
                 LoadResult.totalFailureRegister.incrementAndGet();
+                throw new RuntimeException(resp);
             }else{
                 LoadResult.totalSuccessRegister.incrementAndGet();
             }
+            saveOnSet(Main.inventoryKey);
+            Thread.sleep(Main.httpRequestInterval);
+            saveOnGet(Main.inventoryKey);
+            Thread.sleep(Main.httpRequestInterval);
+            createProfile();
+            Thread.sleep(Main.httpRequestInterval);
+            fetchProfile();
+            Thread.sleep(Main.httpRequestInterval);
+            loadShop();
+            Thread.sleep(Main.httpRequestInterval);
+            onUpdateGame();
+            Thread.sleep(Main.httpRequestInterval);
             headers = new String[]{
                     Session.TARANTULA_TAG,game+"/lobby",
                     Session.TARANTULA_ACTION,"onPlay",
                     Session.TARANTULA_TOKEN,token,
-                    Session.TARANTULA_NAME,deviceName,
-                    Session.TARANTULA_CLIENT_ID, deviceName,
-                    Session.TARANTULA_TOURNAMENT_ID, "n/a",
-                    Session.TARANTULA_ACCESS_KEY,
-                    "570342964778242048-6879508E047E7B7BF8A50EF2951A3A198EE81957-FA80A8B8A29B7C4C4D636032D4BFA571",
             };
             requestStart = System.currentTimeMillis();
             resp = httpCaller.get("service/action",headers);
             LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
             LoadResult.totalHttpRequestCount.incrementAndGet();
             onJoin(resp);
-            createProfile();
-            //saveOnSet();
-            coinForm();
-            loadShop();
+            Thread.sleep(Main.httpRequestInterval);
             onStartGame();
-            onUpdateGameScoreTournament();
+            Thread.sleep(Main.httpRequestInterval);
+            for(int i=0;i<Main.playerUpdateRound;i++){
+                onUpdateGameScoreTournament();
+                Thread.sleep(Main.httpRequestInterval);
+                saveOnSet(Main.campaignKey);
+                Thread.sleep(Main.httpRequestInterval);
+                saveOnGet(Main.campaignKey);
+            }
+            onEndGame();
         }catch (Exception ex){
             ex.printStackTrace();
             String error = ex.getMessage();
@@ -211,9 +219,8 @@ public class Player implements Runnable{
         JsonObject joinPayload = JsonUtil.parse(resp);
         boolean suc = joinPayload.get("Successful").getAsBoolean();
         if(!suc){
-            System.out.println(resp);
             LoadResult.totalFailureJoin.incrementAndGet();
-            throw new RuntimeException("failed");
+            throw new RuntimeException(resp);
         }
         LoadResult.totalSuccessJoin.incrementAndGet();
         joined = true;
@@ -277,50 +284,37 @@ public class Player implements Runnable{
         throw new RuntimeException("failed");
     }
 
-    private void createProfile() {
-        try{
-            String[] headers = new String[]{
-                    Session.TARANTULA_TAG,game+"/save",
-                    Session.TARANTULA_ACTION,"onUpdateProfile",
-                    Session.TARANTULA_TOKEN,token,
-                    Session.TARANTULA_NAME,deviceName,
-                    Session.TARANTULA_CLIENT_ID,clientId
-            };
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("DisplayName",userName);
-            jsonObject.addProperty("IconIndex",0);
-            long requestStart = System.currentTimeMillis();
-            String resp = httpCaller.post("service/action",jsonObject.toString().getBytes(),headers);
-            LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
-            LoadResult.totalHttpRequestCount.incrementAndGet();
-            JsonObject json = JsonUtil.parse(resp);
-            boolean suc = json.get("Successful").getAsBoolean();
-            if(!suc) {
-                LoadResult.totalFailureCreateProfile.incrementAndGet();
-            }else{
-                LoadResult.totalSuccessCreateProfile.incrementAndGet();
-                fetchProfile();
-            }
-        }catch (Exception ex){
-            ex.printStackTrace();
-            String error = ex.getMessage();
-            if(error==null || !error.equals("failed")){
-                LoadResult.totalFailureOther.incrementAndGet();
-            }
-            udpRounds = 0;
-            counter.countDown();
-            joined = false;
+    private void createProfile() throws Exception{
+        String[] headers = new String[]{
+                Session.TARANTULA_TAG,game+"/save",
+                Session.TARANTULA_ACTION,"onUpdateProfile",
+                Session.TARANTULA_TOKEN,token,
+        };
+        JsonObject jsonObject = new JsonObject();
+        int iconIndex = Main.index();
+        jsonObject.addProperty("DisplayName",Main.displayNames[iconIndex]);
+        jsonObject.addProperty("IconIndex",iconIndex);
+        long requestStart = System.currentTimeMillis();
+        String resp = httpCaller.post("service/action",jsonObject.toString().getBytes(),headers);
+        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        LoadResult.totalHttpRequestCount.incrementAndGet();
+        JsonObject json = JsonUtil.parse(resp);
+        boolean suc = json.get("Successful").getAsBoolean();
+        if(!suc) {
+            LoadResult.totalFailureCreateProfile.incrementAndGet();
+            throw new RuntimeException(resp);
+        }else{
+            LoadResult.totalSuccessCreateProfile.incrementAndGet();
         }
     }
 
-    private void fetchProfile() {
-        try{
+    private void fetchProfile() throws Exception{
+
             String[] headers = new String[]{
                     Session.TARANTULA_TAG,game+"/save",
                     Session.TARANTULA_ACTION,"onFetchProfile",
                     Session.TARANTULA_TOKEN,token,
                     Session.TARANTULA_NAME,systemId,
-                    Session.TARANTULA_CLIENT_ID,clientId
             };
             long requestStart = System.currentTimeMillis();
             String resp = httpCaller.get("service/action",headers);
@@ -328,267 +322,169 @@ public class Player implements Runnable{
             LoadResult.totalHttpRequestCount.incrementAndGet();
             if(!isValidProfile(resp)) {
                 LoadResult.totalFailureFetchProfile.incrementAndGet();
+                throw new RuntimeException(resp);
             }else{
                 LoadResult.totalSuccessFetchProfile.incrementAndGet();
             }
-        }catch (Exception ex){
-            ex.printStackTrace();
-            String error = ex.getMessage();
-            if(error==null || !error.equals("failed")){
-                LoadResult.totalFailureOther.incrementAndGet();
-            }
-            udpRounds = 0;
-            counter.countDown();
-            joined = false;
-        }
     }
 
     private boolean isValidProfile(String resp) {
         JsonObject json = JsonUtil.parse(resp);
         var jsonArray = json.getAsJsonArray("_profileList");
-        if (!jsonArray.isEmpty()) {
-            var profile = jsonArray.get(0);
-            return userName.equals(profile.getAsJsonObject().get("DisplayName").getAsString());
-        }
-        return false;
+        return !jsonArray.isEmpty();
     }
 
-    private void loadShop() {
-        try{
-            String[] headers = new String[]{
-                    Session.TARANTULA_TAG,game+"/store",
-                    Session.TARANTULA_ACTION,"onList",
-                    Session.TARANTULA_TOKEN,token,
-                    Session.TARANTULA_NAME,"tami",
-                    Session.TARANTULA_CLIENT_ID,clientId
-            };
-            long requestStart = System.currentTimeMillis();
-            String resp = httpCaller.get("service/action",headers);
-            LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
-            LoadResult.totalHttpRequestCount.incrementAndGet();
-            JsonObject json = JsonUtil.parse(resp);
-            boolean suc = json.get("Successful").getAsBoolean();
-            if(!suc) {
-                LoadResult.totalFailureLoadShop.incrementAndGet();
-            }else{
-                LoadResult.totalSuccessLoadShop.incrementAndGet();
-            }
-        }catch (Exception ex){
-            ex.printStackTrace();
-            String error = ex.getMessage();
-            if(error==null || !error.equals("failed")){
-                LoadResult.totalFailureOther.incrementAndGet();
-            }
-            udpRounds = 0;
-            counter.countDown();
-            joined = false;
+    private void loadShop() throws Exception{
+        String[] headers = new String[]{
+                Session.TARANTULA_TAG,game+"/store",
+                Session.TARANTULA_ACTION,"onList",
+                Session.TARANTULA_TOKEN,token,
+                Session.TARANTULA_NAME,"Tami",
+        };
+        long requestStart = System.currentTimeMillis();
+        String resp = httpCaller.get("service/action",headers);
+        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        LoadResult.totalHttpRequestCount.incrementAndGet();
+        JsonObject json = JsonUtil.parse(resp);
+        boolean suc = json.get("Successful").getAsBoolean() && !json.get("_shoppingItemList").getAsJsonArray().isEmpty();
+        if(!suc) {
+            LoadResult.totalFailureLoadShop.incrementAndGet();
+            throw new RuntimeException(resp);
+        }else{
+            LoadResult.totalSuccessLoadShop.incrementAndGet();
         }
     }
 
-    private void saveOnSet() {
-        try{
-            String[] headers = new String[]{
-                    Session.TARANTULA_TAG,game+"/save",
-                    Session.TARANTULA_ACTION,"onSet",
-                    Session.TARANTULA_TOKEN,token,
-                    Session.TARANTULA_NAME,userName,
-                    Session.TARANTULA_CLIENT_ID,clientId
-            };
-            long requestStart = System.currentTimeMillis();
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("name",userName);
-            String resp = httpCaller.post("service/action",jsonObject.toString().getBytes(),headers);
-            LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
-            LoadResult.totalHttpRequestCount.incrementAndGet();
-            JsonObject json = JsonUtil.parse(resp);
-            boolean suc = json.get("Successful").getAsBoolean();
-            if(!suc) {
-                LoadResult.totalFailureSaveOnSet.incrementAndGet();
-            }else{
-                LoadResult.totalSuccessSaveOnSet.incrementAndGet();
-                saveOnGet();
-            }
-        }catch (Exception ex){
-            ex.printStackTrace();
-            String error = ex.getMessage();
-            if(error==null || !error.equals("failed")){
-                LoadResult.totalFailureOther.incrementAndGet();
-            }
-            udpRounds = 0;
-            counter.countDown();
-            joined = false;
+    private void saveOnSet(String key) throws Exception{
+
+        String[] headers = new String[]{
+                Session.TARANTULA_TAG,game+"/save",
+                Session.TARANTULA_ACTION,"onSet",
+                Session.TARANTULA_TOKEN,token,
+                Session.TARANTULA_NAME,key
+        };
+        long requestStart = System.currentTimeMillis();
+        JsonObject jsonObject = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(key+".json"));
+        String resp = httpCaller.post("service/action",jsonObject.toString().getBytes(),headers);
+        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        LoadResult.totalHttpRequestCount.incrementAndGet();
+        JsonObject json = JsonUtil.parse(resp);
+        boolean suc = json.get("Successful").getAsBoolean();
+        if(!suc) {
+            LoadResult.totalFailureSaveOnSet.incrementAndGet();
+            throw new RuntimeException(resp);
+        }else{
+            LoadResult.totalSuccessSaveOnSet.incrementAndGet();
         }
     }
 
-    private void saveOnGet() {
-        try{
-            String[] headers = new String[]{
-                    Session.TARANTULA_TAG,game+"/save",
-                    Session.TARANTULA_ACTION,"onGet",
-                    Session.TARANTULA_TOKEN,token,
-                    Session.TARANTULA_NAME,userName,
-                    Session.TARANTULA_CLIENT_ID,clientId
-            };
-            long requestStart = System.currentTimeMillis();
-            String resp = httpCaller.get("service/action",headers);
-            LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
-            LoadResult.totalHttpRequestCount.incrementAndGet();
-            System.out.println("resp is " + resp);
-            JsonObject json = JsonUtil.parse(resp);
-            boolean suc = userName.equals(json.get("name").getAsString());
-            if(!suc) {
-                LoadResult.totalFailureSaveOnSet.incrementAndGet();
-            }else{
-                LoadResult.totalSuccessSaveOnSet.incrementAndGet();
-            }
-        }catch (Exception ex){
-            ex.printStackTrace();
-            String error = ex.getMessage();
-            if(error==null || !error.equals("failed")){
-                LoadResult.totalFailureOther.incrementAndGet();
-            }
-            udpRounds = 0;
-            counter.countDown();
-            joined = false;
+    private void saveOnGet(String key) throws Exception{
+        String[] headers = new String[]{
+                Session.TARANTULA_TAG,game+"/save",
+                Session.TARANTULA_ACTION,"onGet",
+                Session.TARANTULA_TOKEN,token,
+                Session.TARANTULA_NAME,key
+        };
+        long requestStart = System.currentTimeMillis();
+        String resp = httpCaller.get("service/action",headers);
+        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        LoadResult.totalHttpRequestCount.incrementAndGet();
+        JsonObject json = JsonUtil.parse(resp);
+        boolean suc = json.toString().length()>2000;
+        if(!suc) {
+            LoadResult.totalFailureSaveOnGet.incrementAndGet();
+            throw new RuntimeException(resp);
+        }else{
+            LoadResult.totalSuccessSaveOnGet.incrementAndGet();
         }
     }
 
-    private void onStartGame() {
-        try{
-            String[] headers = new String[]{
-                    Session.TARANTULA_ACTION,"onStartGame",
-                    Session.TARANTULA_TOKEN,token,
-                    Session.TARANTULA_NAME,deviceName,
-                    Session.TARANTULA_CLIENT_ID,clientId,
-                    Session.TARANTULA_TAG,game+"/lobby1",
-            };
-            var payload = "{\"ChapterId\":0,\"StageId\":0,\"Party\":[0,0,0,0,0],\"AutoBattle\":false,\"Difficulty\":\"Normal\",\"CampaignName\":\"Campaign\",\"DungeonChapterName\":\"ChapterOne\",\"StageNumber\":1,\"analytics\":[{\"currencyDelta\":-6,\"currencyId\":\"Energy\",\"currencyTotal\":214,\"context\":\"CampaignBattleStart\",\"messageType\":\"currencyUpdate\",\"messageCategory\":\"inventory\"}],\"TEMP_ChapterName\":\"ChapterOneConfig\",\"TEMP_StageName\":\"Chapter1_Stage1Config\",\"TEMP_StringParty\":[\"FelixUnitConfig\",\"GusUnitConfig\",\"MaxineUnitConfig\",\"MarkIVUnitConfig\",\"TerrenceUnitConfig\"]}";
-            long requestStart = System.currentTimeMillis();
-            String resp = httpCaller.post("service/action",payload.getBytes(),headers);
-            LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
-            LoadResult.totalHttpRequestCount.incrementAndGet();
-            JsonObject json = JsonUtil.parse(resp);
-            boolean suc = json.get("Successful").getAsBoolean();
-            if(!suc) {
-                LoadResult.totalFailureStartGame.incrementAndGet();
-            }else{
-                LoadResult.totalSuccessStartGame.incrementAndGet();
-                onEndGame(json.get("BattleId").getAsString());
-            }
-        }catch (Exception ex){
-            ex.printStackTrace();
-            String error = ex.getMessage();
-            if(error==null || !error.equals("failed")){
-                LoadResult.totalFailureOther.incrementAndGet();
-            }
-            udpRounds = 0;
-            counter.countDown();
-            joined = false;
+
+    private void onUpdateGame() throws Exception{
+        String[] headers = new String[]{
+                Session.TARANTULA_ACTION,"onUpdateGame",
+                Session.TARANTULA_TOKEN,token,
+                Session.TARANTULA_TAG,game+"/lobby",
+        };
+        JsonObject jsonObject = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("updateGame.json"));
+        long requestStart = System.currentTimeMillis();
+        String resp = httpCaller.post("service/action",jsonObject.toString().getBytes(),headers);
+        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        LoadResult.totalHttpRequestCount.incrementAndGet();
+        JsonObject json = JsonUtil.parse(resp);
+        boolean suc = json.get("Successful").getAsBoolean();
+        if(!suc) {
+            LoadResult.totalFailureUpdateGame.incrementAndGet();
+            throw new RuntimeException(resp);
+        }else{
+            LoadResult.totalSuccessUpdateGame.incrementAndGet();
         }
     }
 
-    private void onUpdateGameScoreTournament() {
-        try{
-            String[] headers = new String[]{
-                    Session.TARANTULA_ACTION,"onUpdateGame",
-                    Session.TARANTULA_TOKEN,token,
-                    Session.TARANTULA_NAME,deviceName,
-                    Session.TARANTULA_CLIENT_ID,clientId,
-                    Session.TARANTULA_TAG,game+"/lobby1",
-            };
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("PlayerLevel",10);
-            jsonObject.addProperty("Score",10);
-            jsonObject.addProperty("UnitId",0);
-            jsonObject.addProperty("UpdateId",0);
-            jsonObject.addProperty("EquipmentId",0);
-            long requestStart = System.currentTimeMillis();
-            String resp = httpCaller.post("service/action",jsonObject.toString().getBytes(),headers);
-            LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
-            LoadResult.totalHttpRequestCount.incrementAndGet();
-            JsonObject json = JsonUtil.parse(resp);
-            boolean suc = json.get("Successful").getAsBoolean();
-            if(!suc) {
-                LoadResult.totalFailureScoreTournament.incrementAndGet();
-            }else{
-                LoadResult.totalSuccessScoreTournament.incrementAndGet();
-            }
-        }catch (Exception ex){
-            ex.printStackTrace();
-            String error = ex.getMessage();
-            if(error==null || !error.equals("failed")){
-                LoadResult.totalFailureOther.incrementAndGet();
-            }
-            udpRounds = 0;
-            counter.countDown();
-            joined = false;
+    private void onStartGame() throws Exception{
+
+        String[] headers = new String[]{
+                Session.TARANTULA_ACTION,"onStartGame",
+                Session.TARANTULA_TOKEN,token,
+                Session.TARANTULA_TAG,game+"/lobby1",
+        };
+        JsonObject payload = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("updateGame.json"));
+        long requestStart = System.currentTimeMillis();
+        String resp = httpCaller.post("service/action",payload.toString().getBytes(),headers);
+        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        LoadResult.totalHttpRequestCount.incrementAndGet();
+        JsonObject json = JsonUtil.parse(resp);
+        boolean suc = json.get("Successful").getAsBoolean() && json.get("BattleId").getAsLong()>0;
+        if(!suc) {
+            LoadResult.totalFailureStartGame.incrementAndGet();
+            throw new RuntimeException(resp);
+        }else{
+            battleId = json.get("BattleId").getAsLong();
+            LoadResult.totalSuccessStartGame.incrementAndGet();
         }
     }
 
-    private void onEndGame(String battleId) {
-        try{
-            String[] headers = new String[]{
-                    Session.TARANTULA_ACTION,"onEndGame",
-                    Session.TARANTULA_TOKEN,token,
-                    Session.TARANTULA_NAME,deviceName,
-                    Session.TARANTULA_CLIENT_ID,clientId,
-                    Session.TARANTULA_TAG,game+"/lobby1",
-            };
-            var payload = "{\"BattleId\":" + battleId + ",\"Win\":true,\"EndedWithFastSpeed\":false,\"StarsEarned\":3,\"analytics\":[{\"currencyDelta\":540,\"currencyId\":\"SoftCurrency\",\"currencyTotal\":145540,\"context\":\"CampaignBattleEnd\",\"messageType\":\"currencyUpdate\",\"messageCategory\":\"inventory\"},{\"currencyDelta\":1,\"currencyId\":\"FelixCoin\",\"currencyTotal\":1,\"context\":\"CampaignBattleEnd\",\"messageType\":\"currencyUpdate\",\"messageCategory\":\"inventory\"},{\"currencyDelta\":2,\"currencyId\":\"EarthPotion\",\"currencyTotal\":2,\"context\":\"CampaignBattleEnd\",\"messageType\":\"currencyUpdate\",\"messageCategory\":\"inventory\"},{\"level\":1,\"totalXp\":18,\"xpGain\":18,\"messageType\":\"playerXpUp\",\"messageCategory\":\"player\"}]}";
-            long requestStart = System.currentTimeMillis();
-            String resp = httpCaller.post("service/action",payload.getBytes(),headers);
-            LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
-            LoadResult.totalHttpRequestCount.incrementAndGet();
-            JsonObject json = JsonUtil.parse(resp);
-            boolean suc = json.get("Successful").getAsBoolean();
-            if(!suc) {
-                LoadResult.totalFailureEndGame.incrementAndGet();
-            }else{
-                LoadResult.totalSuccessEndGame.incrementAndGet();
-            }
-        }catch (Exception ex){
-            ex.printStackTrace();
-            String error = ex.getMessage();
-            if(error==null || !error.equals("failed")){
-                LoadResult.totalFailureOther.incrementAndGet();
-            }
-            udpRounds = 0;
-            counter.countDown();
-            joined = false;
+    private void onUpdateGameScoreTournament() throws Exception{
+        String[] headers = new String[]{
+                Session.TARANTULA_ACTION,"onUpdateGame",
+                Session.TARANTULA_TOKEN,token,
+                Session.TARANTULA_TAG,game+"/lobby1",
+        };
+        JsonObject jsonObject = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("updateGame.json"));
+        long requestStart = System.currentTimeMillis();
+        String resp = httpCaller.post("service/action",jsonObject.toString().getBytes(),headers);
+        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        LoadResult.totalHttpRequestCount.incrementAndGet();
+        JsonObject json = JsonUtil.parse(resp);
+        boolean suc = json.get("Successful").getAsBoolean();
+        if(!suc) {
+            LoadResult.totalFailureScoreTournament.incrementAndGet();
+            throw new RuntimeException(resp);
+        }else{
+            LoadResult.totalSuccessScoreTournament.incrementAndGet();
         }
     }
 
-    private void coinForm() {
-        try{
-            String[] headers = new String[]{
-                    Session.TARANTULA_ACTION,"onGameClusterEvent",
-                    Session.TARANTULA_MAGIC_KEY,userName,
-                    Session.TARANTULA_NAME, clientId + "#ShippingFormCompleted",
-                    Session.TARANTULA_ACCESS_KEY,
-                    "570342964778242048-6879508E047E7B7BF8A50EF2951A3A198EE81957-FA80A8B8A29B7C4C4D636032D4BFA571",
-            };
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("tournament_type",UUID.randomUUID().toString());
-            long requestStart = System.currentTimeMillis();
-            String resp = httpCaller.post("server",jsonObject.toString().getBytes(),headers);
-            LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
-            LoadResult.totalHttpRequestCount.incrementAndGet();
-            JsonObject json = JsonUtil.parse(resp);
-            boolean suc = json.get("successful").getAsBoolean();
-            if(!suc) {
-                LoadResult.totalFailureCoinForm.incrementAndGet();
-            }else{
-                LoadResult.totalSuccessCoinForm.incrementAndGet();
-            }
-        }catch (Exception ex){
-            ex.printStackTrace();
-            String error = ex.getMessage();
-            if(error==null || !error.equals("failed")){
-                LoadResult.totalFailureOther.incrementAndGet();
-            }
-            udpRounds = 0;
-            counter.countDown();
-            joined = false;
+    private void onEndGame() throws Exception {
+        String[] headers = new String[]{
+                Session.TARANTULA_ACTION,"onEndGame",
+                Session.TARANTULA_TOKEN,token,
+                Session.TARANTULA_TAG,game+"/lobby1",
+        };
+        JsonObject payload = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("endGame.json"));
+        payload.addProperty("BattleId",battleId);
+        long requestStart = System.currentTimeMillis();
+        String resp = httpCaller.post("service/action",payload.toString().getBytes(),headers);
+        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        LoadResult.totalHttpRequestCount.incrementAndGet();
+        JsonObject json = JsonUtil.parse(resp);
+        boolean suc = json.get("Successful").getAsBoolean();
+        if(!suc) {
+            LoadResult.totalFailureEndGame.incrementAndGet();
+            throw new RuntimeException(resp);
+        }else{
+            LoadResult.totalSuccessEndGame.incrementAndGet();
         }
     }
+
 }
