@@ -230,7 +230,10 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
             tournamentIndex.put(start,tournament);
         }
-        gameContext.authorVendor(OnAccess.WEB_HOOK).upload(ANALYTICS_QUERY, new RLCTournamentStartTransaction(tournament.distributionId(), tournament.name()));
+        TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+        gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
+                webhook.upload(ANALYTICS_QUERY, new RLCTournamentStartTransaction(tournament.distributionId(), tournament.name()).toBytes())
+        ));
     }
 
     @Override
@@ -240,7 +243,10 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
             tournamentIndex.remove(start);
         }
-        gameContext.authorVendor(OnAccess.WEB_HOOK).upload(ANALYTICS_QUERY, new RLCTournamentEndTransaction(tournament.distributionId()));
+        TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+        gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
+                webhook.upload(ANALYTICS_QUERY, new RLCTournamentEndTransaction(tournament.distributionId()).toBytes())
+        ));
     }
 
     public void onApplicationResourceRegistered(ApplicationResource resource){
