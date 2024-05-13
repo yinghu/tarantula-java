@@ -123,6 +123,9 @@ public class Player implements Runnable{
                 Thread.sleep(Main.httpRequestInterval);
                 saveOnGet(Main.campaignKey);
             }
+            Thread.sleep(Main.httpRequestInterval);
+            onGameEvent();
+            Thread.sleep(Main.httpRequestInterval);
             onEndGame();
         }catch (Exception ex){
             ex.printStackTrace();
@@ -541,6 +544,31 @@ public class Player implements Runnable{
             //throw new RuntimeException(resp);
         }else{
             LoadResult.totalSuccessEndGame.incrementAndGet();
+        }
+    }
+
+    private void onGameEvent() throws Exception{
+        String[] headers = new String[]{
+                Session.TARANTULA_ACCESS_KEY,
+                Main.accessKey,
+                Session.TARANTULA_ACTION,
+                "onGameClusterEvent",
+                Session.TARANTULA_NAME,
+                systemId+"#ShippingFormCompleted"
+        };
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("tournament_type","Hero");
+        long requestStart = System.currentTimeMillis();
+        String resp = httpCaller.post("server",jsonObject.toString().getBytes(),headers);
+        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        LoadResult.totalHttpRequestCount.incrementAndGet();
+        JsonObject json = JsonUtil.parse(resp);
+        boolean suc = json.get("successful").getAsBoolean();
+        if(!suc) {
+            LoadResult.totalFailureOnGameEvent.incrementAndGet();
+            //throw new RuntimeException(resp);
+        }else{
+            LoadResult.totalSuccessOnGameEvent.incrementAndGet();
         }
     }
 

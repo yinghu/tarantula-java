@@ -61,6 +61,9 @@ public class LoadResult {
     static AtomicInteger totalSuccessLoadTournamentRaceBoard = new AtomicInteger(0);
     static AtomicInteger totalFailureLoadTournamentRaceBoard = new AtomicInteger(0);
 
+    static AtomicInteger totalSuccessOnGameEvent = new AtomicInteger(0);
+    static AtomicInteger totalFailureOnGameEvent = new AtomicInteger(0);
+
     static AtomicInteger totalFailureOther = new AtomicInteger(0);
 
     static AtomicLong totalUDPBytesSent = new AtomicLong(0);
@@ -143,7 +146,8 @@ public class LoadResult {
                 bw.write("Total Failure EndGame Count ["+totalFailureEndGame.get()+"]\n");
                 bw.write("Total Success UpdateGame Count ["+totalSuccessUpdateGame.get()+"]\n");
                 bw.write("Total Failure UpdateGame Count ["+totalFailureUpdateGame.get()+"]\n");
-
+                bw.write("Total Success OnGameEvent Count ["+totalSuccessOnGameEvent.get()+"]\n");
+                bw.write("Total Failure OnGameEvent Count ["+totalFailureOnGameEvent.get()+"]\n");
                 bw.write("Total Success Leave Count ["+totalSuccessLeave.get()+"]\n");
                 bw.write("Total Failure Leave Count ["+totalFailureLeave.get()+"]\n");
                 bw.write("Total Http Request Count ["+totalHttpRequestCount.get()+"]\n");

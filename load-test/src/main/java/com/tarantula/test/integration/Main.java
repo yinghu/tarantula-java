@@ -28,7 +28,7 @@ public class Main {
     static int index(){
         return rng.onNext(10);
     }
-
+    static String accessKey;
     static long httpRequestInterval;
     static int playerUpdateRound = 10;
 
@@ -67,7 +67,7 @@ public class Main {
         int poolSize = Integer.parseInt(properties.getProperty("pool.size"));
         boolean scheduledPlay = Boolean.parseBoolean(properties.getProperty("scheduled.play"));
         httpRequestInterval = Long.parseLong(properties.getProperty("http.request.interval.ms"));
-
+        accessKey = properties.getProperty("access.key");
         boolean usePlayerPrefix = Boolean.parseBoolean(properties.getProperty("use.player.prefix"));
         String playerPrefix = properties.getProperty("player.prefix");
         boolean udpTested = Boolean.parseBoolean(properties.getProperty("test.udp"));
