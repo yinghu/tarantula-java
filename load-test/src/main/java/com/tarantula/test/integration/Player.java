@@ -40,6 +40,7 @@ public class Player implements Runnable{
     private boolean joined;
 
     private long battleId;
+    private long tournamentId;
 
     private boolean udpTested;
 
@@ -96,6 +97,8 @@ public class Player implements Runnable{
             Thread.sleep(Main.httpRequestInterval);
             loadShop();
             Thread.sleep(Main.httpRequestInterval);
+            loadTournament();
+            Thread.sleep(Main.httpRequestInterval);
             onUpdateGame();
             Thread.sleep(Main.httpRequestInterval);
             headers = new String[]{
@@ -113,6 +116,8 @@ public class Player implements Runnable{
             Thread.sleep(Main.httpRequestInterval);
             for(int i=0;i<Main.playerUpdateRound;i++){
                 onUpdateGameScoreTournament();
+                Thread.sleep(Main.httpRequestInterval);
+                loadRaceBoard();
                 Thread.sleep(Main.httpRequestInterval);
                 saveOnSet(Main.campaignKey);
                 Thread.sleep(Main.httpRequestInterval);
@@ -302,7 +307,7 @@ public class Player implements Runnable{
         boolean suc = json.get("Successful").getAsBoolean();
         if(!suc) {
             LoadResult.totalFailureCreateProfile.incrementAndGet();
-            throw new RuntimeException(resp);
+            //throw new RuntimeException(resp);
         }else{
             LoadResult.totalSuccessCreateProfile.incrementAndGet();
         }
@@ -322,7 +327,7 @@ public class Player implements Runnable{
             LoadResult.totalHttpRequestCount.incrementAndGet();
             if(!isValidProfile(resp)) {
                 LoadResult.totalFailureFetchProfile.incrementAndGet();
-                throw new RuntimeException(resp);
+                //throw new RuntimeException(resp);
             }else{
                 LoadResult.totalSuccessFetchProfile.incrementAndGet();
             }
@@ -349,9 +354,57 @@ public class Player implements Runnable{
         boolean suc = json.get("Successful").getAsBoolean() && !json.get("_shoppingItemList").getAsJsonArray().isEmpty();
         if(!suc) {
             LoadResult.totalFailureLoadShop.incrementAndGet();
-            throw new RuntimeException(resp);
+            //throw new RuntimeException(resp);
         }else{
             LoadResult.totalSuccessLoadShop.incrementAndGet();
+        }
+    }
+
+    private void loadTournament() throws Exception{
+        String[] headers = new String[]{
+                Session.TARANTULA_TAG,game+"/tournament",
+                Session.TARANTULA_ACTION,"onList",
+                Session.TARANTULA_TOKEN,token,
+                Session.TARANTULA_NAME,"Hero",
+        };
+        long requestStart = System.currentTimeMillis();
+        String resp = httpCaller.get("service/action",headers);
+        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        LoadResult.totalHttpRequestCount.incrementAndGet();
+        JsonObject json = JsonUtil.parse(resp);
+        boolean suc = json.get("Successful").getAsBoolean() && !json.get("_tournamentList").getAsJsonArray().isEmpty();
+        if(!suc) {
+            LoadResult.totalFailureLoadTournament.incrementAndGet();
+            //throw new RuntimeException(resp);
+        }else{
+            JsonObject tournament = json.get("_tournamentList").getAsJsonArray().get(0).getAsJsonObject();
+            tournamentId = tournament.get("TournamentId").getAsLong();
+            LoadResult.totalSuccessLoadTournament.incrementAndGet();
+        }
+    }
+
+    private void loadRaceBoard() throws Exception{
+        if(tournamentId==0){
+            LoadResult.totalFailureLoadTournamentRaceBoard.incrementAndGet();
+            return;
+        }
+        String[] headers = new String[]{
+                Session.TARANTULA_TAG,game+"/tournament",
+                Session.TARANTULA_ACTION,"onBoard",
+                Session.TARANTULA_TOKEN,token,
+                Session.TARANTULA_NAME,""+tournamentId,
+        };
+        long requestStart = System.currentTimeMillis();
+        String resp = httpCaller.get("service/action",headers);
+        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        LoadResult.totalHttpRequestCount.incrementAndGet();
+        JsonObject json = JsonUtil.parse(resp);
+        boolean suc = json.get("Successful").getAsBoolean() && json.get("_raceBoard")!=null && json.get("_myRaceBoard")!=null;
+        if(!suc) {
+            LoadResult.totalFailureLoadTournamentRaceBoard.incrementAndGet();
+            //throw new RuntimeException(resp);
+        }else{
+            LoadResult.totalSuccessLoadTournamentRaceBoard.incrementAndGet();
         }
     }
 
@@ -372,7 +425,7 @@ public class Player implements Runnable{
         boolean suc = json.get("Successful").getAsBoolean();
         if(!suc) {
             LoadResult.totalFailureSaveOnSet.incrementAndGet();
-            throw new RuntimeException(resp);
+            //throw new RuntimeException(resp);
         }else{
             LoadResult.totalSuccessSaveOnSet.incrementAndGet();
         }
@@ -393,7 +446,7 @@ public class Player implements Runnable{
         boolean suc = json.toString().length()>2000;
         if(!suc) {
             LoadResult.totalFailureSaveOnGet.incrementAndGet();
-            throw new RuntimeException(resp);
+            //throw new RuntimeException(resp);
         }else{
             LoadResult.totalSuccessSaveOnGet.incrementAndGet();
         }
@@ -415,7 +468,7 @@ public class Player implements Runnable{
         boolean suc = json.get("Successful").getAsBoolean();
         if(!suc) {
             LoadResult.totalFailureUpdateGame.incrementAndGet();
-            throw new RuntimeException(resp);
+            //throw new RuntimeException(resp);
         }else{
             LoadResult.totalSuccessUpdateGame.incrementAndGet();
         }
@@ -437,7 +490,7 @@ public class Player implements Runnable{
         boolean suc = json.get("Successful").getAsBoolean() && json.get("BattleId").getAsLong()>0;
         if(!suc) {
             LoadResult.totalFailureStartGame.incrementAndGet();
-            throw new RuntimeException(resp);
+            //throw new RuntimeException(resp);
         }else{
             battleId = json.get("BattleId").getAsLong();
             LoadResult.totalSuccessStartGame.incrementAndGet();
@@ -459,13 +512,17 @@ public class Player implements Runnable{
         boolean suc = json.get("Successful").getAsBoolean();
         if(!suc) {
             LoadResult.totalFailureScoreTournament.incrementAndGet();
-            throw new RuntimeException(resp);
+            //throw new RuntimeException(resp);
         }else{
             LoadResult.totalSuccessScoreTournament.incrementAndGet();
         }
     }
 
     private void onEndGame() throws Exception {
+        if(battleId==0){
+            LoadResult.totalFailureEndGame.incrementAndGet();
+            return;
+        }
         String[] headers = new String[]{
                 Session.TARANTULA_ACTION,"onEndGame",
                 Session.TARANTULA_TOKEN,token,
@@ -481,7 +538,7 @@ public class Player implements Runnable{
         boolean suc = json.get("Successful").getAsBoolean();
         if(!suc) {
             LoadResult.totalFailureEndGame.incrementAndGet();
-            throw new RuntimeException(resp);
+            //throw new RuntimeException(resp);
         }else{
             LoadResult.totalSuccessEndGame.incrementAndGet();
         }

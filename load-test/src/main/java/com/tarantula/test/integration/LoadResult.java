@@ -55,6 +55,12 @@ public class LoadResult {
     static AtomicInteger totalSuccessLoadShop = new AtomicInteger(0);
     static AtomicInteger totalFailureLoadShop = new AtomicInteger(0);
 
+    static AtomicInteger totalSuccessLoadTournament = new AtomicInteger(0);
+    static AtomicInteger totalFailureLoadTournament = new AtomicInteger(0);
+
+    static AtomicInteger totalSuccessLoadTournamentRaceBoard = new AtomicInteger(0);
+    static AtomicInteger totalFailureLoadTournamentRaceBoard = new AtomicInteger(0);
+
     static AtomicInteger totalFailureOther = new AtomicInteger(0);
 
     static AtomicLong totalUDPBytesSent = new AtomicLong(0);
@@ -125,6 +131,10 @@ public class LoadResult {
                 bw.write("Total Failure SaveOnGet Count ["+totalFailureSaveOnGet.get()+"]\n");
                 bw.write("Total Success LoadShop Count ["+totalSuccessLoadShop.get()+"]\n");
                 bw.write("Total Failure LoadShop Count ["+totalFailureLoadShop.get()+"]\n");
+                bw.write("Total Success LoadTournament Count ["+totalSuccessLoadTournament.get()+"]\n");
+                bw.write("Total Failure LoadTournament Count ["+totalFailureLoadTournament.get()+"]\n");
+                bw.write("Total Success LoadTournamentRaceBoard Count ["+totalSuccessLoadTournamentRaceBoard.get()+"]\n");
+                bw.write("Total Failure LoadTournamentRaceBoard Count ["+totalFailureLoadTournamentRaceBoard.get()+"]\n");
                 bw.write("Total Success StartGame Count ["+totalSuccessStartGame.get()+"]\n");
                 bw.write("Total Failure StartGame Count ["+totalFailureStartGame.get()+"]\n");
                 bw.write("Total Success ScoreTournament Count ["+totalSuccessScoreTournament.get()+"]\n");
