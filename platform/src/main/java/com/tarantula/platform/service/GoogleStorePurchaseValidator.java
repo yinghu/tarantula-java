@@ -30,6 +30,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Map;
+import java.util.logging.Logger;
 
 
 public class GoogleStorePurchaseValidator extends AuthObject {
@@ -93,6 +94,8 @@ public class GoogleStorePurchaseValidator extends AuthObject {
 
             if (!checkResponsePayload(responseData.dataAsString, params)) return false;
 
+            consumePurchase(query, _tk);
+
             String bundleId = (String) params.get(OnAccess.STORE_BUNDLE_ID);
             String systemId = (String) params.get(OnAccess.SYSTEM_ID);
             ShoppingItem shoppingItem = gameServiceProvider.storeServiceProvider().shoppingItem(bundleId);
@@ -149,5 +152,29 @@ public class GoogleStorePurchaseValidator extends AuthObject {
             params.put(OnAccess.STORE_MESSAGE, "transaction cannot be validated");
         }
         return validated;
+    }
+
+    private boolean consumePurchase(String query, String _tk) throws Exception{
+        String consumeQuery = query + ":consume";
+
+        HttpRequest _request = HttpRequest.newBuilder()
+                .uri(URI.create(consumeQuery))
+                .timeout(Duration.ofSeconds(TIMEOUT))
+                .header(AUTHORIZATION,"Bearer "+_tk)
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
+
+        int code = serviceContext.httpClientProvider().request(client->{
+            HttpResponse<String> _response = client.send(_request, HttpResponse.BodyHandlers.ofString());
+            return _response.statusCode();
+        });
+
+        if(code!=200) logger.warn("Status of Google consume not 200: " + code);
+
+        logger.warn("Item consumed!");
+
+        return true;
     }
 }
