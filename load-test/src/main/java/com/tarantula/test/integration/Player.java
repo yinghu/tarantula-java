@@ -445,8 +445,8 @@ public class Player implements Runnable{
         String resp = httpCaller.get("service/action",headers);
         LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
         LoadResult.totalHttpRequestCount.incrementAndGet();
-        JsonObject json = JsonUtil.parse(resp);
-        boolean suc = json.toString().length()>2000;
+        //JsonObject json = JsonUtil.parse(resp);
+        boolean suc = resp.length()>2000;
         if(!suc) {
             LoadResult.totalFailureSaveOnGet.incrementAndGet();
             //throw new RuntimeException(resp);
