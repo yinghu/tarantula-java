@@ -1,7 +1,0 @@
-Premain-Class: com.icodesoftware.agent.TarantulaAgent
-Agent-Class: com.icodesoftware.agent.TarantulaAgent
-Can-Redefine-Classes: true
-Can-Retransform-Classes: true
-Can-Set-Native-Method-Prefix: false
-Main-Class: com.icodesoftware.agent.TarantulaAgent
-

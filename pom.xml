@@ -17,7 +17,6 @@
         <module>modules/protocol</module>
         <module>modules/lmdb</module>
         <module>platform</module>
-        <module>modules/agent</module>
         <module>modules/earth8</module>
         <module>load-test</module>
     </modules>

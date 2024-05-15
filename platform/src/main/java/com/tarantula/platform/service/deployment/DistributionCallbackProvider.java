@@ -58,10 +58,7 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
         this.tarantulaContext.unloadGameCluster(gameClusterId);
     }
 
-
-
-    //@Override
-    public void onModuleShutdown(String typeId) {
+    private void onModuleShutdown(String typeId) {
 
         platformDeploymentServiceProvider.oListeners.forEach((k,ol)->{
             if(platformDeploymentServiceProvider.vMap.containsKey(typeId)){//skip system level modules
