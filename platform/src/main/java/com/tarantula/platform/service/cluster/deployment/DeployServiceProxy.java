@@ -142,21 +142,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
-    public boolean onDeployModule(String contentUrl,String resourceName){
-        NodeEngine nodeEngine = getNodeEngine();
-        DeployModuleOperation operation = new DeployModuleOperation(contentUrl,resourceName);
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        int expected = mlist.size();
-        for(Member m :mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<Void> future = builder.invoke();
-                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            },metricsListener);
-            if(result.successful) expected--;
-        }
-        return expected==0;
-    }
+
     public boolean onShutdownApplication(String typeId,long applicationId){
         NodeEngine nodeEngine = getNodeEngine();
         ShutdownApplicationOperation operation = new ShutdownApplicationOperation(typeId,applicationId);
@@ -187,51 +173,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
-    public boolean onLaunchModule(String typeId){
-        NodeEngine nodeEngine = getNodeEngine();
-        LaunchModuleOperation operation = new LaunchModuleOperation(typeId);
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        int expected = mlist.size();
-        for(Member m :mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<Void> future = builder.invoke();
-                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            },metricsListener);
-            if(result.successful) expected--;
-        }
-        return expected==0;
-    }
-    public boolean onShutdownModule(String typeId){
-        NodeEngine nodeEngine = getNodeEngine();
-        ShutdownModuleOperation operation = new ShutdownModuleOperation(typeId);
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        int expected = mlist.size();
-        for(Member m :mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<Void> future = builder.invoke();
-                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            },metricsListener);
-            if(result.successful) expected--;
-        }
-        return expected==0;
-    }
-    public boolean onUpdateModule(Descriptor descriptor){
-        NodeEngine nodeEngine = getNodeEngine();
-        UpdateModuleOperation operation = new UpdateModuleOperation(descriptor);
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        int expected = mlist.size();
-        for(Member m :mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<Void> future = builder.invoke();
-                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            },metricsListener);
-            if(result.successful) expected--;
-        }
-        return expected==0;
-    }
+
 
     public boolean onUpload(String fileName,byte[] content){
         NodeEngine nodeEngine = getNodeEngine();

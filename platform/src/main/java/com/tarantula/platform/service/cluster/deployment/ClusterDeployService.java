@@ -127,20 +127,9 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void onShutdownApplication(String typeId,long applicationId){
         this.deploymentServiceProvider.distributionCallback().onApplicationShutdown(typeId,applicationId);
     }
-    public void onLaunchModule(String typeId){
-        this.deploymentServiceProvider.distributionCallback().onModuleLaunched(typeId);
-    }
-    public void onShutdownModule(String typeId){
-        this.deploymentServiceProvider.distributionCallback().onModuleShutdown(typeId);
-    }
-    public void onUpdateModule(Descriptor descriptor){
-        this.deploymentServiceProvider.distributionCallback().onModuleUpdated(descriptor);
-    }
+
     public void onUpdateResource(String contentUrl,String resourceName){
         this.deploymentServiceProvider.distributionCallback().onResourceUpdated(contentUrl,resourceName);
-    }
-    public void onDeployModule(String contentUrl,String resourceName){
-        this.deploymentServiceProvider.distributionCallback().onModuleDeployed(contentUrl,resourceName);
     }
 
     public void onStartConnection(String typeId,Connection connection){

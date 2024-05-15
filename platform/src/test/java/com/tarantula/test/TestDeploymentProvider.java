@@ -97,40 +97,6 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
 
     }
 
-    @Override
-    public Response deployModule(String contextUrl, String resourceName) {
-        return null;
-    }
-
-    @Override
-    public Response createModule(Descriptor descriptor) {
-        return null;
-    }
-
-    @Override
-    public Response exportModule(Descriptor descriptor) {
-        return null;
-    }
-
-    @Override
-    public boolean launchModule(String typeId) {
-        return false;
-    }
-
-    @Override
-    public boolean resetModule(Descriptor descriptor) {
-        return false;
-    }
-
-    @Override
-    public boolean shutdownModule(String typeId) {
-        return false;
-    }
-
-    @Override
-    public ClassLoader classLoader(String moduleId) {
-        return null;
-    }
 
     @Override
     public boolean createApplication(Descriptor descriptor, String configName, boolean launching) {

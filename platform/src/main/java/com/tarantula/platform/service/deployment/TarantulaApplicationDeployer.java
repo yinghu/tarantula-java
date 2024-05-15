@@ -53,16 +53,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		List<GameCluster> glist =datastore.list(new GameClusterQuery(deploymentId));
 		glist.forEach((gc)-> deployGameCluster(gc));
 	}
-	private void deployModule(long publishingId){
-		try {
-			List<LobbyDescriptor> blist = this.context.masterDataStore().list(new LobbyQuery(publishingId));
-			blist.forEach((lb)->{
-				this.context.setOnLobby(lb,this);
-			});
-		}catch (Exception ex){
-			throw new RuntimeException(ex);
-		}
-	}
+
 	private void deployGameCluster(GameCluster gameCluster){
 		try {
 			if(gameCluster==null || gameCluster.disabled()){

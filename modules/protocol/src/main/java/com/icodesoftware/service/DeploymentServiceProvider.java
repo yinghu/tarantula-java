@@ -42,14 +42,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     //Module operation APIs
     Module module(Descriptor descriptor);
     void resource(Descriptor descriptor, String name, Module.OnResource onResource);
-    Response deployModule(String contextUrl,String resourceName);
-    Response createModule(Descriptor descriptor);
-    Response exportModule(Descriptor descriptor);
-    boolean launchModule(String typeId);
-    boolean resetModule(Descriptor descriptor);
-    boolean shutdownModule(String typeId);
-    ClassLoader classLoader(String moduleId);
-    //end
+
 
     //game cluster operation APIs
     boolean createApplication(Descriptor descriptor,String configName,boolean launching);
@@ -103,10 +96,6 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
         void onGameClusterLaunched(long gameClusterId);
         void onGameClusterShutdown(long gameClusterId);
 
-        void onModuleLaunched(String typeId);
-        void onModuleShutdown(String typeId);
-        void onModuleUpdated(Descriptor descriptor);
-        void onModuleDeployed(String contentUrl,String resourceName);
 
         void onApplicationLaunched(String typeId,long applicationId);
         void onApplicationShutdown(String typeId,long applicationId);

@@ -825,7 +825,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         }
     }
     public ModuleClassLoader moduleClassLoader(String moduleId){
- 	    return (ModuleClassLoader)this.deploymentService().classLoader(moduleId);
+ 	    return null;
+        //return (ModuleClassLoader)this.deploymentService().classLoader(moduleId);
     }
 
     public Configuration configuration(String config){

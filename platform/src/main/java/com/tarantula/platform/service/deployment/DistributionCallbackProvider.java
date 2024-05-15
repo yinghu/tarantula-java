@@ -58,13 +58,9 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
         this.tarantulaContext.unloadGameCluster(gameClusterId);
     }
 
-    @Override
-    public void onModuleLaunched(String typeId) {
-        AccessIndex accessIndex = this.tarantulaContext.clusterProvider().accessIndexService().get(typeId);
-        this.tarantulaContext.setOnLobby(typeId,accessIndex.distributionId(),new OnLobbyListener(platformDeploymentServiceProvider));
-    }
 
-    @Override
+
+    //@Override
     public void onModuleShutdown(String typeId) {
 
         platformDeploymentServiceProvider.oListeners.forEach((k,ol)->{
@@ -118,31 +114,7 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
         });
     }
 
-    @Override
-    public void onModuleUpdated(Descriptor descriptor) {
 
-        DynamicModuleClassLoader mc = platformDeploymentServiceProvider.cMap.computeIfPresent(descriptor.moduleId(),(k,c)->{
-            DynamicModuleClassLoader nmc = new DynamicModuleClassLoader(descriptor);
-            nmc.proxies.addAll(c.proxies);
-            c._clear();
-            nmc._load();
-            return nmc;
-        });
-        mc.proxies.forEach((mp)->{
-            mp.reset();
-        });
-
-        platformDeploymentServiceProvider.cMap.computeIfPresent(descriptor.moduleId(),(k,c)->{
-            c.reset(descriptor.resetEnabled());
-            return c;
-        });
-        try{//agent operation into the platform vm
-            Runtime rt  =Runtime.getRuntime();
-            rt.exec("java -jar gec-agent-1.0.jar "+ProcessHandle.current().pid()+" "+descriptor.moduleId());
-        }catch (Exception ex){
-            log.error("error from agent",ex);
-        }
-    }
 
     @Override
     public void onViewUpdated(OnView onView) {
@@ -157,29 +129,7 @@ public class DistributionCallbackProvider implements DeploymentServiceProvider.D
 
     }
 
-    @Override
-    public void onModuleDeployed(String contentUrl,String resourceName) {
-        try{
-            //content dir deployDir/module
-            Path _path = Paths.get(this.tarantulaContext.deployDir+"/module/"+contentUrl);
-            if(!Files.exists(_path)){
-                Files.createDirectories(_path);
-            }
-            File f = new File(this.tarantulaContext.deployDir+"/"+resourceName);
-            File fe = new File(this.tarantulaContext.deployDir+"/module/"+contentUrl+"/"+resourceName);
-            if(!fe.exists()||fe.lastModified()<f.lastModified()){
-                BufferedInputStream fin = new BufferedInputStream(new FileInputStream(f));
-                BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(fe));
-                fos.write(fin.readAllBytes());
-                fin.close();
-                fos.flush();
-                fos.close();
-                platformDeploymentServiceProvider.rMap.remove(contentUrl+"/"+resourceName);//clear cache
-            }
-        }catch (Exception ex){
-            log.error(contentUrl+"/"+resourceName,ex);
-        }
-    }
+
 
     @Override
     public void onResourceUpdated(String contentUrl,String resourceName) {

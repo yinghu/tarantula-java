@@ -1,7 +1,5 @@
 package com.tarantula.platform.service.deployment;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.protocol.GameServerListener;
@@ -176,53 +174,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         dyn.loadResource(name,onResource);
     }
 
-    public boolean resetModule(Descriptor descriptor){
-        //update app desc via typeId
-        boolean[] suc ={false};
-        DataStore dataStore = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.tarantulaContext.node().deploymentId(),descriptor.typeId());
-        if(!dataStore.load(lobbyTypeIdIndex)){
-            if(descriptor.index()!=null){
-                //IndexSet indexSet = new IndexSet();
-                //indexSet.distributionKey(descriptor.index());
-                //indexSet.label(ExposedGameService.INDEX_LABEL);
-                //if(dataStore.load(indexSet)){
-                    //indexSet.keySet().forEach((k)->{
-                        //DeploymentDescriptor app = new DeploymentDescriptor();
-                        //app.distributionKey(k);
-                        //if(dataStore.load(app)){
-                            //app.codebase(descriptor.codebase());
-                            //app.moduleArtifact(descriptor.moduleArtifact());
-                            //app.moduleVersion(descriptor.moduleVersion());
-                            //dataStore.update(app);
-                            //suc[0]=true;
-                        //}
-                    //});
-                //}
-            }
-            return suc[0];
-        }
-        /***
-        dataStore.list(new ApplicationQuery(lobbyTypeIdIndex.index()),(a)->{
-            a.codebase(descriptor.codebase());
-            a.moduleArtifact(descriptor.moduleArtifact());
-            a.moduleVersion(descriptor.moduleVersion());
-            dataStore.update(a);
-            suc[0]=true;
-            return true;
-        });**/
-        //return suc[0];
 
-        //DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
-        //boolean suc = deployService.resetModule(descriptor);
-        if(suc[0]){
-            this.integrationCluster.deployService().onUpdateModule(descriptor);
-        }
-        return suc[0];
-    }
-    public ClassLoader classLoader(String moduleId){
-        return cMap.get(moduleId);
-    }
     private Module _internalModule(String mname){
         try{
             return (Module)Class.forName(mname).getConstructor().newInstance();
@@ -231,38 +183,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             throw new RuntimeException(ex);
         }
     }
-    public Response exportModule(Descriptor descriptor){
-        DynamicModuleClassLoader mc = new DynamicModuleClassLoader(descriptor);
-        Response response = new ResponseHeader();
-        mc.loadResource("export.json",(in)->{
-            try{
-                JsonParser parser = new JsonParser();
-                JsonObject jo = parser.parse(new InputStreamReader(in)).getAsJsonObject();
-                String _moduleId = jo.get(ExposedGameService.MODULE_ID).getAsString();
-                response.message(_moduleId);
-                AccessIndex accessIndex = this.tarantulaContext.clusterProvider().accessIndexService().setIfAbsent(_moduleId,AccessIndex.SYSTEM_INDEX);
-                jo.getAsJsonArray("exposedServiceList").forEach((es)->{
-                    JsonObject je = es.getAsJsonObject();
-                    ExposedGameService egs = new ExposedGameService();
-                    egs.property(ExposedGameService.MODULE_ID,_moduleId);
-                    egs.property(ExposedGameService.MODULE_INDEX,accessIndex.distributionKey());
-                    egs.name(je.get(ExposedGameService.NAME).getAsString());
-                    egs.property(ExposedGameService.DESCRIPTION,je.get(ExposedGameService.DESCRIPTION).getAsString());
-                    egs.property(ExposedGameService.MODULE_CODE_BASE,descriptor.codebase());
-                    egs.property(ExposedGameService.MODULE_ARTIFACT,descriptor.moduleArtifact());
-                    egs.property(ExposedGameService.MODULE_VERSION,descriptor.moduleVersion());
-                    egs.property(ExposedGameService.MODULE_NAME,je.get(ExposedGameService.MODULE_NAME).getAsString());
-                    egs.property(ExposedGameService.DEPLOY_PRIORITY,je.get(ExposedGameService.DEPLOY_PRIORITY).getAsInt());
-                    egs.property(ExposedGameService.ACCESS_CONTROL,je.get(ExposedGameService.ACCESS_CONTROL).getAsInt());
-                    eMap.put(egs.name(),egs);
-                });
-            }catch (Exception ex){
-                log.warn("failed to parse export.json",ex);
-                response.message(ex.getMessage());
-            }
-        });
-        return response;
-    }
+
 
     public <T extends OnAccess> void onGameClusterEvent(T event){
         if(event.typeId()==null) return;
@@ -280,72 +201,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public List<Descriptor> gameServiceList(){
         return this.tarantulaContext.availableServices();
     }
-    public Response deployModule(String contextUrl,String resourceName){
-        Response checked =  this.tarantulaContext.checkModule(contextUrl,resourceName);
-        if(!checked.successful()){
-            return checked;
-        }
-        boolean suc = this.tarantulaContext.integrationCluster().deployService().onDeployModule(contextUrl,resourceName);
-        checked.successful(suc);
-        checked.message(suc?"deployed->"+resourceName:"failed->"+resourceName);
-        return checked;
-    }
 
-    public Response createModule(Descriptor descriptor){
-        DynamicModuleClassLoader mc = new DynamicModuleClassLoader(descriptor);
-        XMLParser xmlParser = new XMLParser();
-        Response response = new ResponseHeader();
-        response.successful(false);
-        mc.loadResource("descriptor.xml",(in)->{
-            try{
-                xmlParser.parse(in);
-                response.successful(true);
-            }catch (Exception ex){
-                log.warn("failed to parse descriptor.xml",ex);
-                response.message(ex.getMessage());
-            }
-        });
-        if(!response.successful()){
-            return response;
-        }
-        LobbyConfiguration a = xmlParser.configurations.get(0);
-        AccessIndex publishId = this.tarantulaContext.clusterProvider().accessIndexService().set(a.descriptor.typeId(),AccessIndex.SYSTEM_INDEX);
-        if(publishId==null){
-            response.successful(false);
-            response.message("module already existed");
-            return response;
-        }
-        DataStore ds = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(tarantulaContext.node().deploymentId(),descriptor.typeId());
-        if(!ds.createIfAbsent(lobbyTypeIdIndex,false)){
-            response.successful(false);
-            response.message("module already existed");
-            return response;
-        }
-        ModuleIndex moduleIndex = new ModuleIndex();
-        moduleIndex.distributionKey(publishId.distributionKey());
-        moduleIndex.index(descriptor.typeId());
-        ds.create(moduleIndex);
-        descriptor.owner(publishId.distributionKey());
-        descriptor.label(LobbyDescriptor.LABEL);
-        descriptor.onEdge(true);
-        descriptor.resetEnabled(true);
-        descriptor.disabled(true);
-        ds.create(descriptor);
-        lobbyTypeIdIndex.index(descriptor.distributionKey());
-        lobbyTypeIdIndex.owner(publishId.distributionKey());
-        ds.update(lobbyTypeIdIndex);
-        a.applications.forEach((b)->{
-            b.codebase(descriptor.codebase());
-            b.moduleArtifact(descriptor.moduleArtifact());
-            b.moduleVersion(descriptor.moduleVersion());
-            b.applicationClassName(this.tarantulaContext.singleModuleApplication);
-            this.createApplication(b,null,false);
-        });
-        response.successful(true);
-        response.message("module created");
-        return response;
-    }
 
     public boolean createApplication(Descriptor descriptor,String configName,boolean launching){
         DataStore ds = this.tarantulaContext.masterDataStore();
@@ -403,17 +259,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         ds.update(app);
         DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         return deployService.onShutdownApplication(app.typeId(),applicationId);
-    }
-
-    public boolean launchModule(String typeId){
-        if(!enableLobby(typeId)) return false;
-        this.integrationCluster.deployService().onLaunchModule(typeId);
-        return true;
-    }
-    public boolean shutdownModule(String typeId){
-        if(!disableLobby(typeId)) return false;
-        this.integrationCluster.deployService().onShutdownModule(typeId);
-        return true;
     }
 
     @Override
