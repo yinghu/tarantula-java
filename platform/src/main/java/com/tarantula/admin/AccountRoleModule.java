@@ -13,11 +13,7 @@ import com.tarantula.platform.AccessControl;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.util.OnAccessDeserializer;
-import com.tarantula.platform.util.SystemUtil;
-import jnr.x86asm.SEGMENT;
 
-import java.util.ArrayList;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -89,27 +85,6 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
                 session.write(this.toMessage("add user service not available",false).getBytes());
             }
         }
-        else if(session.action().equals("onSubscription")){
-            AccessContext accessContext = new AccessContext();
-            accessContext.subscriptionList = new ArrayList<>();
-            _items.forEach((k,v)->accessContext.subscriptionList.add(v));
-            session.write(accessContext.toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onCommit")){
-            OnAccess acc = builder.create().fromJson(new String(session.payload()).trim(),OnAccess.class);
-            Map<String,Object> chargeParams = acc.toMap();
-            SubscriptionItem item = _items.get(acc.property("checkoutId"));
-            chargeParams.put("amount",Double.valueOf(item.price*100).intValue());//pass penney number as integer
-            chargeParams.put("currency", "usd");
-            chargeParams.put("description",item.description);
-            if(this.context.validator().validateToken(chargeParams)){
-                Subscription subscription = userService.subscribe(null,12);
-                session.write(toMessage( "on commit",true).getBytes());
-            }
-            else {
-                session.write(toMessage("on commit",false).getBytes());
-            }
-        }
         else{
             throw new UnsupportedOperationException(session.action());
         }
@@ -129,14 +104,6 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
         this.subscribedMaxUserCount = ((Number)this.context.configuration("user").property("subscribedMaxUserCount")).intValue();
         DeploymentServiceProvider deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         deploymentServiceProvider.registerAccessIndexListener(this);
-        SubscriptionItem item1 = new SubscriptionItem(SystemUtil.oid(),"Monthly","one month subscription",1.99,true);
-        SubscriptionItem item2 = new SubscriptionItem(SystemUtil.oid(),"Yearly","one year subscription",19.99,true);
-        SubscriptionItem item3 = new SubscriptionItem(SystemUtil.oid(),"2-Month","two month subscription",2.99,true);
-        SubscriptionItem item4 = new SubscriptionItem(SystemUtil.oid(),"2-Year","two year subscription",29.99,true);
-        //_items.put(item1.oid(),item1);
-        //_items.put(item2.oid(),item2);
-        //_items.put(item3.oid(),item3);
-        //_items.put(item4.oid(),item4);
         this.context.log("Account role module started with max user count ["+trialMaxUserCount+","+subscribedMaxUserCount+"]", OnLog.INFO);
     }
 

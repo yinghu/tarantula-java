@@ -213,18 +213,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         descriptor.label(ApplicationProvider.LABEL);
         descriptor.onEdge(true);
         if(!ds.create(descriptor)) return false;
-        if(!descriptor.typeId().equals(descriptor.moduleId())){
-            //create index for moduleId
-            //IndexSet indexSet = new IndexSet();
-            //indexSet.distributionKey(descriptor.index());
-            //indexSet.label(ExposedGameService.INDEX_LABEL);
-            //indexSet.addKey(descriptor.distributionKey());
-            //if(!ds.createIfAbsent(indexSet,true)){
-                //indexSet.addKey(descriptor.distributionKey());
-                //ds.update(indexSet);
-            //}
-            //log.warn("create index->"+descriptor.moduleId()+"<><><>"+descriptor.index());
-        }
         this.integrationCluster.deployService().onLaunchApplication(descriptor.typeId(),descriptor.distributionId());
         return true;
     }
@@ -308,15 +296,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     @Override
     public void waitForData() {
-        /**
-        this.publisher = this.tarantulaContext.integrationCluster().subscribe(NAME,(e)->{
-            String tp = e.trackId();
-            RecoverableListener listener = tMap.get(tp);
-            if(listener!=null){
-                listener.onUpdated(e.stub(),e.trackId(),e.index(),e.payload());
-            }
-            return false;
-        });**/
         this.clusterStore = this.tarantulaContext.integrationCluster().clusterStore(ClusterProvider.ClusterStore.SMALL,DeploymentServiceProvider.NAME,true,false,false);
         log.info("Platform deployment service started on ["+this.tarantulaContext.dataBucketNode+"/"+this.tarantulaContext.dataBucketGroup+"]");
     }
@@ -465,7 +444,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return (T)gameCluster;
     }
     public <T extends OnAccess> List<T> gameClusterList(Access access){
-        GameClusterQuery gameClusterQuery = new GameClusterQuery(access.primary()?access.distributionId():access.distributionId());
+        GameClusterQuery gameClusterQuery = new GameClusterQuery(access.primary()?access.distributionId():access.primaryId());
         return (List<T>)this.tarantulaContext.masterDataStore().list(gameClusterQuery);
     }
     public  <T extends OnAccess> T createGameCluster(Account account,String name,OnAccess properties){

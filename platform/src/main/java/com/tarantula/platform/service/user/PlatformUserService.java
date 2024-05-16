@@ -22,7 +22,6 @@ public class PlatformUserService implements UserService {
     private DataStore sessionDataStore;
     private DataStore accountDataStore;
     private DataStore membershipDataStore;
-    //private DataStore accountIndexDataStore;
 
     private DataStore loginProviderDataStore;
     private TokenValidatorProvider tokenValidatorProvider;

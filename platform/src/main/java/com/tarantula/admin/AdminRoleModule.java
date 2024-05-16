@@ -222,6 +222,6 @@ public class AdminRoleModule implements Module{
         return jsonObject.toString().getBytes();
     }
     private boolean checkGameClusterName(String name){
-        return name!=null&&name.length()>3&&name.chars().allMatch(Character::isLetterOrDigit);
+        return name!=null && name.length()>3 && name.chars().allMatch(Character::isLetterOrDigit);
     }
 }
