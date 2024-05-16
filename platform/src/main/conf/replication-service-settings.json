@@ -1,13 +1,13 @@
 {
   "integration" :{
-     "asyncDistributing": false,
-     "broadcasting": false,
+     "asyncDistributing": true,
+     "broadcasting": true,
      "asyncInterval": 100,
      "maxReplicationNodes": 3
   },
   "data": {
-     "asyncDistributing": false,
-     "broadcasting": false,
+     "asyncDistributing": true,
+     "broadcasting": true,
      "asyncInterval": 100,
      "maxReplicationNodes": 3
   }
