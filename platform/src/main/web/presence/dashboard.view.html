@@ -26,8 +26,8 @@
                         <span view-id='add.user' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Add User</span>
                         <span view-id='user.list' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>User Access</span>
                         <span view-id='change.password' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Change Password</span>
-                        <span view-id='add.email' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Update Email</span>
-                        <span view-id='subscribe.membership' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Subscribe</span>
+                        <!--<span view-id='add.email' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Update Email</span>
+                        <span view-id='subscribe.membership' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Subscribe</span>-->
                     </div>            
                 </div>
                 <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Presence</span></div>
@@ -72,6 +72,7 @@
                         </div>
                     </div>
                 </div>
+                <!--
                 <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Subscription</span></div>
                 <div id='tx-user-subscription-view-bar' class='w3-bar w3-white'>
                     <div class="w3-display-container tx-content-64">
@@ -85,7 +86,7 @@
                             <span id='tx-subscription-end-time' class="tx-text-12">end time</span>            
                         </div>
                     </div>
-                </div>
+                </div>-->
             </div>
             <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
                 <div class="w3-display-topleft w3-padding">
@@ -98,8 +99,8 @@
         </div> 
         
         <div id="tx-Developer" class="w3-container tx-pane" style="display:none;">
+            <div id='tx-developer-open'>
             <div class='w3-panel w3-border-bottom w3-border-red'>
-                <div id='tx-game-cluster-warning' class="w3-container w3-center"><p class="tx-text-12 w3-text-red">You need to upgrade your role to admin role.</p></div>
                 <div class="w3-container w3-padding w3-border-bottom w3-border-red">
                     <span class="w3-left tx-margin-right-8 w3-text-green"><i class="fa fa-group" style="font-size:16px"></i></span>
                     <span id='tx-game-cluster-role' class='w3-left tx-text-14'>Role name</span>
@@ -166,8 +167,9 @@
                     </div>  
                 </div>    
                  
-            </div>
-             
+            </div></div>
+            <div class="w3-display-container w3-white tx-content-16"></div>
+            <div id='tx-game-cluster-warning' class="w3-container w3-center" style="display: none;"><p class="tx-text-12 w3-text-red">Only admin role can access developer resource.</p></div>
             <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
                 <div class="w3-display-topleft w3-padding">
                     <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -213,6 +215,7 @@
             </div>
         </div>
         <div id="tx-Monitor" class="w3-container tx-pane" style="display:none;">
+            <div id='tx-monitor-open'>
             <div class="w3-panel">
                 <fieldset class="w3-border-blue tx-text-12">
                     <legend>Metrics View Selection</legend>
@@ -268,7 +271,9 @@
                     <canvas id="tx-service-chart-7"></canvas>
                 </div>
             </div>
+            </div>
             <div class="w3-display-container w3-white tx-content-16"></div>
+            <div id='tx-monitor-warning' class="w3-container w3-center" style="display:none;"><p class="tx-text-12 w3-text-red">Only admin user can access metrics resources.</p></div>
             <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-top-margin-8 tx-content-36">
                 <div class="w3-display-topleft w3-padding">
                     <span><i class="fa fa-cubes" style="font-size:18px"></i></span>            
@@ -292,19 +297,7 @@
                         <span view-id='reset.cluster.key' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Reset Cluster Key</span>
                     </div>            
                 </div>
-                <!--
-                <div class="w3-panel w3-border-bottom w3-border-red">
-                    <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Module Operations</span></div>
-                    <div class='w3-bar w3-white'>
-                        <span view-id='export.module' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Export Module</span>      
-                        <span view-id='add.module' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Add Module</span>
-                        <span view-id='launch.module' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Launch Module</span>
-                        <span view-id='reset.module' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Reset Module</span>
-                        <span view-id='shutdown.module' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Shutdown Module</span>
-                        <span view-id='upload.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upload Module</span>
-                        <span view-id='deploy.module' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Deploy Module</span>
-                    </div>            
-                </div>-->
+                
                 <div class="w3-panel w3-border-bottom w3-border-red">
                     <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">System Operations</span></div>
                     <div class='w3-bar w3-white'>
@@ -333,6 +326,7 @@
                     </div>            
                 </div>
             </div>
+            <div class="w3-display-container w3-white tx-content-16"></div>
             <div id='tx-extension-warning' class="w3-container w3-center"><p class="tx-text-12 w3-text-red">Only super user can access sudo permission resources.</p></div>
             <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
                 <div class="w3-display-topleft w3-padding">
@@ -498,8 +492,8 @@
                 document.querySelector('#tx-access-role').innerHTML = 'Role Name : '+resp.access.role;
                 document.querySelector('#tx-account-game-cluster-count').innerHTML = 'Game Cluster Count : '+resp.account.gameClusterCount;
                 document.querySelector('#tx-account-user-count').innerHTML = 'User Count : '+resp.account.userCount;
-                document.querySelector('#tx-subscription-start-time').innerHTML = 'Start Time : '+resp.subscription.startTime;
-                document.querySelector('#tx-subscription-end-time').innerHTML = 'End Time : '+resp.subscription.endTime;
+                //document.querySelector('#tx-subscription-start-time').innerHTML = 'Start Time : '+resp.subscription.startTime;
+                //document.querySelector('#tx-subscription-end-time').innerHTML = 'End Time : '+resp.subscription.endTime;
             }    
         });
     }
@@ -516,6 +510,7 @@
             }
             else{
                 document.querySelector('#tx-game-cluster-create').style.display='none';
+                document.querySelector('#tx-developer-open').style.display='none';
                 document.querySelector('#tx-game-cluster-warning').style.display='block'; 
             }        
         });
@@ -606,47 +601,52 @@
     }
     function _tx_metrics(){
         TARA_API.onGet('role/admin/metrics','onServiceViewList','',(resp)=>{
-            //console.log(resp);
-            if(!resp.successful) return;
-            let tem1 =[];
-            metricsClusterSelectBar.innerHTML = '';
-            _tx_empty_arr(metricsSelected.nodes);
-            metricsCategoryCheckBar.innerHTML='';
-            metricsStart.style.display = 'none';
-            resp.cluster.forEach(a=>{
-                //console.log(a);
-                tem1.push('<label class=\'w3-tag w3-round-large tx-text-10 tx-margin-left-4 tx-margin-right-4\' style=\'background-color: '+a.chart.backgroundColor+ '\'>'+a.nodeName+'</label>');
-                tem1.push('<input tx-node-member-id=\''+a.memberId+'\'');
-                tem1.push(' class=\'w3-check tx-text-10 tx-metrics-node-picker\' checked type=\'checkbox\'>');   
-                metricsSelected[a.memberId]=a.chart;
-                metricsSelected.nodes.push(a.memberId);
-                //tem1.push('<span class=\'w3-tag w3-blue tx-text-10 tx-margin-left-4 tx-margin-right-4\'>'+a.nodeName+'</span>');         
-            });
-            metricsClusterSelectBar.innerHTML = tem1.join('');  
-            metricsSelectBar.innerHTML = '';
-            let tem = ['<option value=\'\' disabled selected>Choose a service</option>'];
-            resp.list.forEach(a=>{
-                tem.push('<option value=\'');
-                tem.push(a);
-                tem.push('\'>');
-                tem.push(a);
-                tem.push('</option>');
-            });
-            metricsSelectBar.innerHTML = tem.join('');
-            document.querySelectorAll('.tx-metrics-node-picker').forEach(a=>{
-                a.onchange = ()=>{
-                    let memberId = a.getAttribute('tx-node-member-id');
-                    if(a.checked){
-                        metricsSelected.nodes.push(memberId);
-                    }
-                    else{
-                       let ix = metricsSelected.nodes.indexOf(memberId);
-                       if(ix != -1){
-                           metricsSelected.nodes.splice(ix,1);   
-                       }     
-                    }
-                };
-            });
+            console.log(resp);
+            if(resp.successful){
+                let tem1 =[];
+                metricsClusterSelectBar.innerHTML = '';
+                _tx_empty_arr(metricsSelected.nodes);
+                metricsCategoryCheckBar.innerHTML='';
+                metricsStart.style.display = 'none';
+                resp.cluster.forEach(a=>{
+                    //console.log(a);
+                    tem1.push('<label class=\'w3-tag w3-round-large tx-text-10 tx-margin-left-4 tx-margin-right-4\' style=\'background-color: '+a.chart.backgroundColor+ '\'>'+a.nodeName+'</label>');
+                    tem1.push('<input tx-node-member-id=\''+a.memberId+'\'');
+                    tem1.push(' class=\'w3-check tx-text-10 tx-metrics-node-picker\' checked type=\'checkbox\'>');   
+                    metricsSelected[a.memberId]=a.chart;
+                    metricsSelected.nodes.push(a.memberId);
+                    //tem1.push('<span class=\'w3-tag w3-blue tx-text-10 tx-margin-left-4 tx-margin-right-4\'>'+a.nodeName+'</span>');         
+                });
+                metricsClusterSelectBar.innerHTML = tem1.join('');  
+                metricsSelectBar.innerHTML = '';
+                let tem = ['<option value=\'\' disabled selected>Choose a service</option>'];
+                resp.list.forEach(a=>{
+                    tem.push('<option value=\'');
+                    tem.push(a);
+                    tem.push('\'>');
+                    tem.push(a);
+                    tem.push('</option>');
+                });
+                metricsSelectBar.innerHTML = tem.join('');
+                document.querySelectorAll('.tx-metrics-node-picker').forEach(a=>{
+                    a.onchange = ()=>{
+                        let memberId = a.getAttribute('tx-node-member-id');
+                        if(a.checked){
+                            metricsSelected.nodes.push(memberId);
+                        }
+                        else{
+                        let ix = metricsSelected.nodes.indexOf(memberId);
+                        if(ix != -1){
+                            metricsSelected.nodes.splice(ix,1);   
+                        }     
+                        }
+                    };
+                });
+            }else{
+                document.querySelector('#tx-monitor-open').style.display = 'none';
+                document.querySelector('#tx-monitor-warning').style.display = 'block';
+                console.log("no permision"); 
+            }
         });
     }
     function _tx_metrics_pull(){
