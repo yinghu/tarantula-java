@@ -106,6 +106,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
     }
 
     public void onTransactionReplicationEvent(TransactionReplicationEvent event){
+        logger.warn("REPL : ");
         List<TransactionLog> logs = new ArrayList<>();
         for(Portable portableTransactionLog : event.pendingLogs){
             logs.add(((PortableTransactionLog)portableTransactionLog).transactionLog);
