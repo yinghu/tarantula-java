@@ -146,8 +146,8 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         Profile profile = new Profile();
         profile.distributionId(session.distributionId());
 
+        profileDataStore.createIfAbsent(profile, true);
         if(!profile.configureAndValidate(session.payload())) return false;
-        if(!profileDataStore.createIfAbsent(profile, false)) return false;
         profile.profileSequence = distributionPresenceService.profileSequence(gameCluster.serviceType(),profile.displayName);
         return profileDataStore.update(profile);
     }
