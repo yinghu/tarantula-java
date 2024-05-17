@@ -34,7 +34,10 @@ public class SavedGameModule extends ModuleHeader {
         }
         else if(session.action().equals("onGet")){
             byte[] data = this.savedGameServiceProvider.loadData(session,session.name());
-            session.write(data!=null? data : JsonUtil.toSimpleResponse(false,session.name()).getBytes());
+            session.write(JsonUtil.toSimpleResponse(
+                    data != null,
+                    data == null ? session.name() : new String(data)
+            ).getBytes());
         }
         else if(session.action().equals("onReset")){
             CurrentSaveIndex selected = this.savedGameServiceProvider.reset(session);
