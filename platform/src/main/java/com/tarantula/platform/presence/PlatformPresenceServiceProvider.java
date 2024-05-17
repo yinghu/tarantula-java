@@ -89,12 +89,12 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     public void setup(ServiceContext serviceContext) {
         super.setup(serviceContext);
         Configuration configuration = serviceContext.configuration("game-presence-settings");
-        JsonArray objsPreloaded = ((JsonElement)configuration.property("profile")).getAsJsonObject().get("objectives").getAsJsonArray();
+        JsonArray objsPreloaded = ((JsonElement)configuration.property("profile")).getAsJsonObject().get("adjectives").getAsJsonArray();
         JsonArray namesPreloaded = ((JsonElement)configuration.property("profile")).getAsJsonObject().get("nouns").getAsJsonArray();
         objsPreloaded.forEach(obj->{
-            String objective = obj.getAsString();
+            String adjective = obj.getAsString();
             namesPreloaded.forEach(pn->{
-                String pname = objective+pn.getAsString();
+                String pname = adjective+pn.getAsString();
                 profileNameSequenceMapping.put(pname,new ProfileNameSequence(pname));
             });
         });
