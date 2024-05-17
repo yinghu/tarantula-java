@@ -169,7 +169,9 @@ public class GameObjectSetup extends GamePreSetup implements ApplicationPreSetup
         //dataStore.deleteEdge(configurableObject.key(),VersionedConfigurableObject.LABEL);
     }
 
-
+    public Inventory createInventory(String category, String typeId){
+        return gameCluster.createInventory(this,category,typeId);
+    }
     public List<Inventory> inventoryList(long systemId){
         DataStore ids = serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,Inventory.DataStore));
         InventoryQuery query = new InventoryQuery(systemId);

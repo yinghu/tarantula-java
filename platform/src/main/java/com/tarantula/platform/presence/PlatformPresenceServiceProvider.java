@@ -1,6 +1,7 @@
 package com.tarantula.platform.presence;
 
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
@@ -9,6 +10,7 @@ import com.icodesoftware.protocol.statistics.UserStatistics;
 import com.icodesoftware.service.ServiceContext;
 
 import com.icodesoftware.util.ScheduleRunner;
+import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.game.GameRating;
@@ -63,6 +65,12 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
             profileNameSequenceMapping.put(profileNameSequence.name(),profileNameSequence);
             return true;
         }));
+        profileNameSequenceMapping.forEach((n,p)->{
+            if(p.distributionId()==0){
+                p.ownerKey(SnowflakeKey.from(gameCluster.distributionId()));
+                if(this.profileDataStore.create(p)) p.dataStore(profileDataStore);
+            }
+        });
         this.recentlyPlayList = new PlayList(recentlyPlayListSize);
         this.recentlyPlayList.distributionId(this.gameCluster.distributionId());
         this.dataStore.createIfAbsent(this.recentlyPlayList,true);
@@ -81,6 +89,15 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     public void setup(ServiceContext serviceContext) {
         super.setup(serviceContext);
         Configuration configuration = serviceContext.configuration("game-presence-settings");
+        JsonArray objsPreloaded = ((JsonElement)configuration.property("profile")).getAsJsonObject().get("objectives").getAsJsonArray();
+        JsonArray namesPreloaded = ((JsonElement)configuration.property("profile")).getAsJsonObject().get("nouns").getAsJsonArray();
+        objsPreloaded.forEach(obj->{
+            String objective = obj.getAsString();
+            namesPreloaded.forEach(pn->{
+                String pname = objective+pn.getAsString();
+                profileNameSequenceMapping.put(pname,new ProfileNameSequence(pname));
+            });
+        });
         JsonObject plist = ((JsonElement)configuration.property("playList")).getAsJsonObject();
         this.recentlyPlayListSize = plist.get("recentlyListSize").getAsInt();
         this.friendListSize = plist.get("friendListSize").getAsInt();
@@ -301,7 +318,10 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
                 v = ProfileNameSequence.lookup(profileDataStore,gameCluster.distributionId(),name);
             }
             v.sequence++;
-            v.update();
+            final ProfileNameSequence vx = v;
+            serviceContext.schedule(new ScheduleRunner(100,()->{
+                vx.update();
+            }));
             return v;
         }).sequence;
     }

@@ -27,9 +27,7 @@ public class GamePreSetup{
     public void registerListener(ApplicationPreSetup.Listener listener){
         this.listener = listener;
     }
-    public Inventory createInventory(String category, String typeId){
-        return gameCluster.createInventory(category,typeId);
-    }
+
     public long distributionId(){
         return serviceContext.distributionId();
     }
