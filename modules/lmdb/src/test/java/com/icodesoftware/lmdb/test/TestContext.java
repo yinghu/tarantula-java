@@ -68,11 +68,6 @@ public class TestContext implements ServiceContext {
         return null;
     }
 
-    @Override
-    public BackupProvider backupProvider() {
-        return null;
-    }
-
 
 
     @Override
@@ -122,16 +117,6 @@ public class TestContext implements ServiceContext {
 
     @Override
     public void unregisterAuthVendor(TokenValidatorProvider.AuthVendor authVendor) {
-
-    }
-
-    @Override
-    public void registerBackupProvider(BackupProvider backupProvider) {
-
-    }
-
-    @Override
-    public void unregisterBackupProvider(BackupProvider backupProvider) {
 
     }
 

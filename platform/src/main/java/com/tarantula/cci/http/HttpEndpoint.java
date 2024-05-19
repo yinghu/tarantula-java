@@ -89,9 +89,6 @@ public class HttpEndpoint implements EndPoint {
 		httpGameServerHandler.resource(this.resource);
 		this.hserver.createContext(httpGameServerHandler.path(),httpGameServerHandler);
 
-		HttpBackupHandler httpBackupHandler = new HttpBackupHandler(metricsListener);
-		httpBackupHandler.resource(this.resource);
-		this.hserver.createContext(httpBackupHandler.path(),httpBackupHandler);
 
 		HttpDevelopmentHandler httpDevelopmentHandler = new HttpDevelopmentHandler(metricsListener);
 		httpDevelopmentHandler.resource(this.resource);

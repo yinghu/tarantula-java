@@ -103,10 +103,6 @@ public class TarantulaMain {
 			btx.storeNoSync = Boolean.parseBoolean(override(overriding,"tarantula.data.store.no.sync",_user,_config));
 			String[] epochStart = override(overriding,"tarantula.snowflake.epoch.start",_user,_config).split(",");
 			btx.snowflakeEpochStart = new int[]{Integer.parseInt(epochStart[0]),Integer.parseInt(epochStart[1]),Integer.parseInt(epochStart[2])};
-			btx.runAsMirror = Boolean.parseBoolean(override(overriding,"tarantula.platform.cluster.run.as.mirror",_user,_config));
-			btx.backupEnabled = Boolean.parseBoolean(override(overriding,"tarantula.platform.cluster.backup.enabled",_user,_config));
-			btx.backupUrl = override(overriding,"tarantula.platform.cluster.backup.url",_user,_config);
-			btx.backupAccessKey = override(overriding,"tarantula.platform.cluster.backup.access.key",_user,_config);
 			btx.platformRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.routing.number",_user,_config));
 			btx.accessIndexRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.access.index.routing.number",_user,_config));
 			btx.maxReplicationNumber = Integer.parseInt(override(overriding,"tarantula.data.store.replication.max.number",_user,_config));

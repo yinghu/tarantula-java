@@ -151,13 +151,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public String authContext = "localhost";
 
-    public boolean runAsMirror;
-    public boolean backupEnabled;
-    public String backupUrl;
-    private static String deploymentIdPath = "backup/deployment";
-    public String backupAccessKey;
-
-    private MirrorClusterBackupProvider mirrorBackupProvider;
 
     public List<String> serviceViewList = new ArrayList<>();
     private PostOfficeSession postOfficeSession;
@@ -203,19 +196,12 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         this.node.clusterNameSuffix = this.clusterNameSuffix;
         this.node.deployDirectory = this.deployDir;
         this.node.servicePushAddress = this.servicePushAddress;
-        this.node.runAsMirror = this.runAsMirror;
-        this.node.backupEnabled = this.backupEnabled;
+
         this.node.dailyBackupEnabled = this.dataStoreDailyBackup;
         this.node.dataStoreDirectory = this.dataStoreDir;
         long epochStart = TimeUtil.epochMillisecondsFromMidnight(snowflakeEpochStart[0],snowflakeEpochStart[1],snowflakeEpochStart[2]);
         this.distributionIdGenerator = new LocalDistributionIdGenerator(snowflakeNodeNumber,epochStart);
-        if(backupEnabled){//using backup deployment id
-            String resp = this.httpClientProvider.get(this.backupUrl,deploymentIdPath,new String[]{Session.TARANTULA_ACCESS_KEY,this.backupAccessKey});
-            JsonObject json = JsonUtil.parse(resp);
-            if(!json.get("successful").getAsBoolean()) throw new RuntimeException("failed to fetch remote deployment id");
-            node.deploymentId = json.get("message").getAsLong();
-            log.warn("Using backup deployment id ["+node.deploymentId+"]");
-        }
+
         node_started = new AtomicBoolean(false);
         PortableProviderConfigurationParser pcs = new PortableProviderConfigurationParser("tarantula-platform-portable-provider.xml");
         pcs.parse().forEach((r)->{
@@ -234,12 +220,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             try{
                 this.deploymentDataStoreProvider = dataStoreProvider;
                 this.deploymentDataStoreProvider.registerDistributionIdGenerator(this.distributionIdGenerator);
-                //this.deploymentDataStoreProvider.registerMapStoreListener(Distributable.INDEX_SCOPE,new IndexScopeReplicationProxy());
                 this.deploymentDataStoreProvider.registerMapStoreListener(Distributable.INTEGRATION_SCOPE,integrationScopeReplicationProxy);
                 this.deploymentDataStoreProvider.registerMapStoreListener(Distributable.DATA_SCOPE,dataScopeReplicationProxy);
                 this.deploymentDataStoreProvider.start();
                 this.deploymentDataStoreProvider.setup(this);
-                this._initMirrorClusterBackup();
                 log.warn("Tarantula data store provider started");
             }catch (Exception ex){
                 throw new RuntimeException(ex);
@@ -280,17 +264,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         }else{
             return this.scheduledExecutorService.scheduleAtFixedRate(task,task.initialDelay(),task.delay(),TimeUnit.MILLISECONDS);
         }
-    }
-
-
-    public void _initMirrorClusterBackup(){
- 	    this.mirrorBackupProvider = new MirrorClusterBackupProvider(this.deploymentDataStoreProvider);
- 	    Configuration config = this.configuration("mirror-backup-provider-settings");
- 	    Map<String,Object> map = new HashMap<>();
- 	    config.properties().forEach(p-> map.put(p.name(),p.value()));
- 	    this.mirrorBackupProvider.configure(map);
- 	    this.mirrorBackupProvider.enabled(runAsMirror);
- 	    this.mirrorBackupProvider.setup(this);
     }
 
     private void setApplicationManager(DeploymentDescriptor c,Lobby lb) throws Exception{
@@ -592,16 +565,13 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,AccessIndex.SYSTEM_INDEX);
         node.nodeId = nid.distributionId();
         AccessIndex did = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/deploymentId",AccessIndex.SYSTEM_INDEX);
-        if(!backupEnabled){//using local deployment id
-            node.deploymentId = did.distributionId();
-            log.warn("Using local deployment id ["+node.deploymentId+"]");
-        }
+        node.deploymentId = did.distributionId();
+        log.warn("Using local deployment id ["+node.deploymentId+"]");
         if(bid==null || nid==null || did==null) throw new RuntimeException("Need to restart the server again");
         log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
         log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
         log.info("Backup Development id ["+node.deploymentId+"] is registered on node ["+node.nodeName+"]");
         integrationCluster.registerNode(this.node);//may throw node already registered runtime exception
-        //
 
         initMetricsProvider();
  	    this.serviceProviders.forEach((k,v)->{ //synchronize data and setup
@@ -611,7 +581,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
  	    this.serviceProviders.put(this.integrationCluster.name(),integrationCluster);
  	    this.serviceProviders.put(this.deploymentDataStoreProvider.name(),this.deploymentDataStoreProvider);
         this.serviceProviders.put(AccessIndexService.NAME,accessIndexService());
-        this.serviceProviders.put(mirrorBackupProvider.name(),mirrorBackupProvider);
+
         this.serviceProviders.put(JVMMonitor.NAME,new JVMMonitor());
         this.serviceProviders.put(DataStoreMonitor.NAME,new DataStoreMonitor(this));
         ServiceProviderConfigurationParser spc = new ServiceProviderConfigurationParser("tarantula-platform-service-provider-config.xml",serviceProviders);
@@ -955,15 +925,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         thirdPartyServiceProvider.releaseAuthVendor(authVendor);
     }
 
-    public void registerBackupProvider(BackupProvider backupProvider){
- 	    this.mirrorBackupProvider.addBackupProvider(backupProvider);
- 	}
-    public void unregisterBackupProvider(BackupProvider backupProvider){
- 	    this.mirrorBackupProvider.removeBackupProvider(backupProvider);
-    }
-    public BackupProvider backupProvider(){
- 	    return this.mirrorBackupProvider;
-    }
 
     public Metrics metrics(String name){
          return metricsManager.metrics(name);

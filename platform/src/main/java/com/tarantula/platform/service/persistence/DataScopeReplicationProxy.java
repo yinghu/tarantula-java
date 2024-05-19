@@ -30,15 +30,12 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
                 transactionReplicationEvent.pendingLogs[i] = new PortableTransactionLog(logs.get(i));
             }
             if(broadcasting) {
-                logger.warn("Event ::");
                 distributionReplicator.replicate(transactionReplicationEvent);
                 return;
             }
-            logger.warn("BLOCK ::");
             distributionReplicator.replicate(transactionReplicationEvent,maxReplicationNodes);
         });
         if (!asyncDistributing) {
-            logger.warn("NO SCHEDULE");
             replicationEvent.run();
             return;
         }

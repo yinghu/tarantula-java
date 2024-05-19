@@ -16,7 +16,6 @@ public interface ServiceContext extends Context{
     ServiceProvider serviceProvider(String name);
     DeploymentServiceProvider deploymentServiceProvider();
     HttpClientProvider httpClientProvider();
-    BackupProvider backupProvider();
 
     OnPartition[] partitions();
     OnPartition[] buckets();
@@ -31,9 +30,6 @@ public interface ServiceContext extends Context{
 
     void registerAuthVendor(TokenValidatorProvider.AuthVendor authVendor);
     void unregisterAuthVendor(TokenValidatorProvider.AuthVendor authVendor);
-
-    void registerBackupProvider(BackupProvider backupProvider);
-    void unregisterBackupProvider(BackupProvider backupProvider);
 
     Metrics metrics(String name);
     List<String> metricsList();

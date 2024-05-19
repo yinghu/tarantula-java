@@ -100,8 +100,6 @@ public interface ClusterProvider extends ServiceProvider {
 
         String servicePushAddress();
 
-        boolean runAsMirror();
-        boolean backupEnabled();
         boolean dailyBackupEnabled();
         String dataStoreDirectory();
 

@@ -28,8 +28,6 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     public String deployDirectory;
     public String servicePushAddress;
 
-    public boolean runAsMirror;
-    public boolean backupEnabled;
     public boolean dailyBackupEnabled;
     public String dataStoreDirectory;
 
@@ -104,8 +102,6 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         return servicePushAddress;
     }
 
-    public boolean runAsMirror(){return runAsMirror;}
-    public boolean backupEnabled(){return backupEnabled;}
     public boolean dailyBackupEnabled(){ return this.dailyBackupEnabled;}
     public String dataStoreDirectory(){
         return this.dataStoreDirectory;

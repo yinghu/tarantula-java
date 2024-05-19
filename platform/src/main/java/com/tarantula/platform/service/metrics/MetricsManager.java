@@ -64,6 +64,8 @@ public class MetricsManager implements SchedulingTask, Serviceable {
         return list;
     }
 
+
+
     @Override
     public void start() throws Exception {
         this.nextHour = LocalDateTime.now().getHour();

@@ -227,15 +227,6 @@ public class TestNode implements ClusterProvider.Node {
         return null;
     }
 
-    @Override
-    public boolean runAsMirror() {
-        return false;
-    }
-
-    @Override
-    public boolean backupEnabled() {
-        return false;
-    }
 
     @Override
     public boolean dailyBackupEnabled() {
