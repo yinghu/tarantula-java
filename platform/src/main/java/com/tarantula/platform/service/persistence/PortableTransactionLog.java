@@ -4,12 +4,13 @@ import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.lmdb.TransactionLog;
+import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 
 import java.io.IOException;
 
-public class PortableTransactionLog implements Portable {
+public class PortableTransactionLog extends RecoverableObject implements Portable {
 
     public TransactionLog transactionLog;
 
@@ -53,5 +54,15 @@ public class PortableTransactionLog implements Portable {
         transactionLog.key = portableReader.readByteArray("6");
         transactionLog.value = portableReader.readByteArray("7");
         transactionLog.edgeKey = portableReader.readByteArray("8");
+    }
+
+    @Override
+    public byte[] toBinary() {
+        return new byte[0];
+    }
+
+    @Override
+    public void fromBinary(byte[] payload) {
+
     }
 }
