@@ -18,6 +18,10 @@
             <include>load.sh</include>
 			<include>lmdb_load.sh</include>
 			<include>load.properties</include>
+			<include>campaign.json</include>
+			<include>inventory.json</include>
+			<include>updateGame.json</include>
+			<include>endGame.json</include>
       	</includes>
       	<fileMode>0777</fileMode>
      </fileSet>

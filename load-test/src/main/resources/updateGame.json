@@ -1,0 +1,22 @@
+{
+  "UpdateId": 0,
+  "ChapterId": 10,
+  "StageId": 20,
+  "UnitId": 1,
+  "EquipmentId": 2,
+  "SkillId": 5,
+  "TEMP_StageName": "Chapter3_Stage7_HardConfig",
+  "Party": [
+    100,
+    200,
+    300
+  ],
+  "Score": 10,
+  "PlayerLevel": 2,
+  "Currencies": {
+    "Gem": 100,
+    "XpPortionA": 5,
+    "XpPortionB": 6
+  },
+  "XpGain": 100
+}
