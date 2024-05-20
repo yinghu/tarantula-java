@@ -79,13 +79,17 @@ public class Player implements Runnable{
             jsonObject.addProperty("DeviceId",userName);
             long requestStart = System.currentTimeMillis();
             String resp = httpCaller.post("user/action",jsonObject.toString().getBytes(),headers);
-            LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+            long delta = System.currentTimeMillis()-requestStart;
+            LoadResult.totalHttpRequestTime.addAndGet(delta);
             LoadResult.totalHttpRequestCount.incrementAndGet();
+            RequestResult result = LoadResult.requestResult("onDevice");
             if(!onPresence(resp)) {
-                LoadResult.totalFailureRegister.incrementAndGet();
+                result.totalFailure.incrementAndGet();
+                result.totalTimed.addAndGet(delta);
                 throw new RuntimeException(resp);
             }else{
-                LoadResult.totalSuccessRegister.incrementAndGet();
+                result.totalSuccess.incrementAndGet();
+                result.totalTimed.addAndGet(delta);
             }
             saveOnSet(Main.inventoryKey);
             Thread.sleep(Main.httpRequestInterval);
@@ -108,9 +112,12 @@ public class Player implements Runnable{
             };
             requestStart = System.currentTimeMillis();
             resp = httpCaller.get("service/action",headers);
-            LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+            result = LoadResult.requestResult("onPlay");
+            delta = System.currentTimeMillis()-requestStart;
+            LoadResult.totalHttpRequestTime.addAndGet(delta);
             LoadResult.totalHttpRequestCount.incrementAndGet();
-            onJoin(resp);
+            result.totalTimed.addAndGet(delta);
+            onJoin(resp,result);
             Thread.sleep(Main.httpRequestInterval);
             onStartGame();
             Thread.sleep(Main.httpRequestInterval);
@@ -148,15 +155,18 @@ public class Player implements Runnable{
         };
         long requestStart = System.currentTimeMillis();
         String resp = httpCaller.get("service/action",headers);
-        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        long delta = System.currentTimeMillis() - requestStart;
+        LoadResult.totalHttpRequestTime.addAndGet(delta);
         LoadResult.totalHttpRequestCount.incrementAndGet();
+        RequestResult result = LoadResult.requestResult("onLeave");
+        result.totalTimed.addAndGet(delta);
         JsonObject json = JsonUtil.parse(resp);
         boolean suc = json.get("Successful").getAsBoolean();
         if(suc){
-            LoadResult.totalSuccessLeave.incrementAndGet();
+            result.totalSuccess.incrementAndGet();
         }
         else {
-            LoadResult.totalFailureLeave.incrementAndGet();
+            result.totalFailure.incrementAndGet();
         }
     }
 
@@ -223,14 +233,14 @@ public class Player implements Runnable{
         }
     }
 
-    private void onJoin(String resp) throws Exception{
+    private void onJoin(String resp,RequestResult result) throws Exception{
         JsonObject joinPayload = JsonUtil.parse(resp);
         boolean suc = joinPayload.get("Successful").getAsBoolean();
         if(!suc){
-            LoadResult.totalFailureJoin.incrementAndGet();
+            result.totalFailure.incrementAndGet();
             throw new RuntimeException(resp);
         }
-        LoadResult.totalSuccessJoin.incrementAndGet();
+        result.totalSuccess.incrementAndGet();
         joined = true;
         tag = joinPayload.get("Tag").getAsString();
         //ticket = joinPayload.get("Ticket").getAsString();
@@ -304,14 +314,19 @@ public class Player implements Runnable{
         jsonObject.addProperty("IconIndex",iconIndex);
         long requestStart = System.currentTimeMillis();
         String resp = httpCaller.post("service/action",jsonObject.toString().getBytes(),headers);
-        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        long delta = System.currentTimeMillis()-requestStart;
+        RequestResult result = LoadResult.requestResult("onUpdateProfile");
+        LoadResult.totalHttpRequestTime.addAndGet(delta);
         LoadResult.totalHttpRequestCount.incrementAndGet();
         JsonObject json = JsonUtil.parse(resp);
         boolean suc = json.get("Successful").getAsBoolean();
         if(!suc) {
+            result.totalFailure.incrementAndGet();
+            result.totalTimed.addAndGet(delta);
             LoadResult.totalFailureCreateProfile.incrementAndGet();
-            //throw new RuntimeException(resp);
         }else{
+            result.totalSuccess.incrementAndGet();
+            result.totalTimed.addAndGet(delta);
             LoadResult.totalSuccessCreateProfile.incrementAndGet();
         }
     }
@@ -326,13 +341,16 @@ public class Player implements Runnable{
             };
             long requestStart = System.currentTimeMillis();
             String resp = httpCaller.get("service/action",headers);
-            LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+            long delta = System.currentTimeMillis()-requestStart;
+            LoadResult.totalHttpRequestTime.addAndGet(delta);
             LoadResult.totalHttpRequestCount.incrementAndGet();
+            RequestResult result = LoadResult.requestResult("onFetchProfile");
+            result.totalTimed.addAndGet(delta);
             if(!isValidProfile(resp)) {
-                LoadResult.totalFailureFetchProfile.incrementAndGet();
+                result.totalFailure.incrementAndGet();
                 //throw new RuntimeException(resp);
             }else{
-                LoadResult.totalSuccessFetchProfile.incrementAndGet();
+                result.totalSuccess.incrementAndGet();
             }
     }
 
@@ -351,15 +369,18 @@ public class Player implements Runnable{
         };
         long requestStart = System.currentTimeMillis();
         String resp = httpCaller.get("service/action",headers);
-        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        long delta = System.currentTimeMillis()-requestStart;
+        LoadResult.totalHttpRequestTime.addAndGet(delta);
         LoadResult.totalHttpRequestCount.incrementAndGet();
+        RequestResult result = LoadResult.requestResult("onLoadShop");
+        result.totalTimed.addAndGet(delta);
         JsonObject json = JsonUtil.parse(resp);
         boolean suc = json.get("Successful").getAsBoolean() && !json.get("_shoppingItemList").getAsJsonArray().isEmpty();
         if(!suc) {
-            LoadResult.totalFailureLoadShop.incrementAndGet();
+            result.totalFailure.incrementAndGet();
             //throw new RuntimeException(resp);
         }else{
-            LoadResult.totalSuccessLoadShop.incrementAndGet();
+            result.totalSuccess.incrementAndGet();
         }
     }
 
@@ -372,17 +393,20 @@ public class Player implements Runnable{
         };
         long requestStart = System.currentTimeMillis();
         String resp = httpCaller.get("service/action",headers);
-        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        long delta = System.currentTimeMillis()-requestStart;
+        LoadResult.totalHttpRequestTime.addAndGet(delta);
         LoadResult.totalHttpRequestCount.incrementAndGet();
+        RequestResult result = LoadResult.requestResult("onLoadTournament");
+        result.totalTimed.addAndGet(delta);
         JsonObject json = JsonUtil.parse(resp);
         boolean suc = json.get("Successful").getAsBoolean() && !json.get("_tournamentList").getAsJsonArray().isEmpty();
         if(!suc) {
-            LoadResult.totalFailureLoadTournament.incrementAndGet();
+            result.totalFailure.incrementAndGet();
             //throw new RuntimeException(resp);
         }else{
             JsonObject tournament = json.get("_tournamentList").getAsJsonArray().get(0).getAsJsonObject();
             tournamentId = tournament.get("TournamentId").getAsLong();
-            LoadResult.totalSuccessLoadTournament.incrementAndGet();
+            result.totalSuccess.incrementAndGet();
         }
     }
 
@@ -399,15 +423,18 @@ public class Player implements Runnable{
         };
         long requestStart = System.currentTimeMillis();
         String resp = httpCaller.get("service/action",headers);
-        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        long delta = System.currentTimeMillis()-requestStart;
+        LoadResult.totalHttpRequestTime.addAndGet(delta);
         LoadResult.totalHttpRequestCount.incrementAndGet();
+        RequestResult result = LoadResult.requestResult("onLoadTournamentRaceBoard");
+        result.totalTimed.addAndGet(delta);
         JsonObject json = JsonUtil.parse(resp);
         boolean suc = json.get("Successful").getAsBoolean() && json.get("_raceBoard")!=null && json.get("_myRaceBoard")!=null;
         if(!suc) {
-            LoadResult.totalFailureLoadTournamentRaceBoard.incrementAndGet();
+            result.totalFailure.incrementAndGet();
             //throw new RuntimeException(resp);
         }else{
-            LoadResult.totalSuccessLoadTournamentRaceBoard.incrementAndGet();
+            result.totalSuccess.incrementAndGet();
         }
     }
 
@@ -422,15 +449,19 @@ public class Player implements Runnable{
         long requestStart = System.currentTimeMillis();
         JsonObject jsonObject = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(key+".json"));
         String resp = httpCaller.post("service/action",jsonObject.toString().getBytes(),headers);
-        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        long delta = System.currentTimeMillis()-requestStart;
+        RequestResult result = LoadResult.requestResult("onSet");
+        LoadResult.totalHttpRequestTime.addAndGet(delta);
         LoadResult.totalHttpRequestCount.incrementAndGet();
         JsonObject json = JsonUtil.parse(resp);
         boolean suc = json.get("Successful").getAsBoolean();
         if(!suc) {
-            LoadResult.totalFailureSaveOnSet.incrementAndGet();
+            result.totalFailure.incrementAndGet();
+            result.totalTimed.addAndGet(delta);
             //throw new RuntimeException(resp);
         }else{
-            LoadResult.totalSuccessSaveOnSet.incrementAndGet();
+            result.totalSuccess.incrementAndGet();
+            result.totalTimed.addAndGet(delta);
         }
     }
 
@@ -443,15 +474,19 @@ public class Player implements Runnable{
         };
         long requestStart = System.currentTimeMillis();
         String resp = httpCaller.get("service/action",headers);
-        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        long delta = System.currentTimeMillis()-requestStart;
+        LoadResult.totalHttpRequestTime.addAndGet(delta);
         LoadResult.totalHttpRequestCount.incrementAndGet();
+        RequestResult result = LoadResult.requestResult("onGet");
         //JsonObject json = JsonUtil.parse(resp);
         boolean suc = resp.length()>2000;
         if(!suc) {
-            LoadResult.totalFailureSaveOnGet.incrementAndGet();
+            result.totalFailure.incrementAndGet();
+            result.totalTimed.addAndGet(delta);
             //throw new RuntimeException(resp);
         }else{
-            LoadResult.totalSuccessSaveOnGet.incrementAndGet();
+            result.totalSuccess.incrementAndGet();
+            result.totalTimed.addAndGet(delta);
         }
     }
 
@@ -465,15 +500,18 @@ public class Player implements Runnable{
         JsonObject jsonObject = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("updateGame.json"));
         long requestStart = System.currentTimeMillis();
         String resp = httpCaller.post("service/action",jsonObject.toString().getBytes(),headers);
-        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        long delta = System.currentTimeMillis()-requestStart;
+        LoadResult.totalHttpRequestTime.addAndGet(delta);
         LoadResult.totalHttpRequestCount.incrementAndGet();
+        RequestResult result = LoadResult.requestResult("onUpdateGame");
+        result.totalTimed.addAndGet(delta);
         JsonObject json = JsonUtil.parse(resp);
         boolean suc = json.get("Successful").getAsBoolean();
         if(!suc) {
-            LoadResult.totalFailureUpdateGame.incrementAndGet();
+            result.totalFailure.incrementAndGet();
             //throw new RuntimeException(resp);
         }else{
-            LoadResult.totalSuccessUpdateGame.incrementAndGet();
+            result.totalSuccess.incrementAndGet();
         }
     }
 
@@ -487,16 +525,19 @@ public class Player implements Runnable{
         JsonObject payload = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("updateGame.json"));
         long requestStart = System.currentTimeMillis();
         String resp = httpCaller.post("service/action",payload.toString().getBytes(),headers);
-        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        long delta = System.currentTimeMillis() - requestStart;
+        LoadResult.totalHttpRequestTime.addAndGet(delta);
         LoadResult.totalHttpRequestCount.incrementAndGet();
+        RequestResult result = LoadResult.requestResult("onStartGame");
+        result.totalTimed.addAndGet(delta);
         JsonObject json = JsonUtil.parse(resp);
         boolean suc = json.get("Successful").getAsBoolean() && json.get("BattleId").getAsLong()>0;
         if(!suc) {
-            LoadResult.totalFailureStartGame.incrementAndGet();
+            result.totalFailure.incrementAndGet();
             //throw new RuntimeException(resp);
         }else{
             battleId = json.get("BattleId").getAsLong();
-            LoadResult.totalSuccessStartGame.incrementAndGet();
+            result.totalSuccess.incrementAndGet();
         }
     }
 
@@ -535,15 +576,18 @@ public class Player implements Runnable{
         payload.addProperty("BattleId",battleId);
         long requestStart = System.currentTimeMillis();
         String resp = httpCaller.post("service/action",payload.toString().getBytes(),headers);
-        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        long delta = System.currentTimeMillis() - requestStart;
+        LoadResult.totalHttpRequestTime.addAndGet(delta);
         LoadResult.totalHttpRequestCount.incrementAndGet();
+        RequestResult result = LoadResult.requestResult("onEndGame");
+        result.totalTimed.addAndGet(delta);
         JsonObject json = JsonUtil.parse(resp);
         boolean suc = json.get("Successful").getAsBoolean();
         if(!suc) {
-            LoadResult.totalFailureEndGame.incrementAndGet();
+            result.totalFailure.incrementAndGet();
             //throw new RuntimeException(resp);
         }else{
-            LoadResult.totalSuccessEndGame.incrementAndGet();
+            result.totalSuccess.incrementAndGet();
         }
     }
 
@@ -560,15 +604,18 @@ public class Player implements Runnable{
         jsonObject.addProperty("tournament_type","Hero");
         long requestStart = System.currentTimeMillis();
         String resp = httpCaller.post("server",jsonObject.toString().getBytes(),headers);
-        LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);
+        long delta = System.currentTimeMillis() - requestStart;
+        LoadResult.totalHttpRequestTime.addAndGet(delta);
         LoadResult.totalHttpRequestCount.incrementAndGet();
+        RequestResult result = LoadResult.requestResult("onGameClusterEvent");
+        result.totalTimed.addAndGet(delta);
         JsonObject json = JsonUtil.parse(resp);
         boolean suc = json.get("successful").getAsBoolean();
         if(!suc) {
-            LoadResult.totalFailureOnGameEvent.incrementAndGet();
+            result.totalFailure.incrementAndGet();
             //throw new RuntimeException(resp);
         }else{
-            LoadResult.totalSuccessOnGameEvent.incrementAndGet();
+            result.totalSuccess.incrementAndGet();
         }
     }
 

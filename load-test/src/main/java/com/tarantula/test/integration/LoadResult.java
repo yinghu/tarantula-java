@@ -3,12 +3,14 @@ package com.tarantula.test.integration;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 
 public class LoadResult {
 
+    static ConcurrentHashMap<String,RequestResult> results = new ConcurrentHashMap<>();
 
     static AtomicInteger totalSuccessRegister = new AtomicInteger(0);
     static AtomicInteger totalFailureRegister = new AtomicInteger(0);
@@ -95,6 +97,9 @@ public class LoadResult {
     static String playerPrefix;
     static LocalDateTime startTime;
 
+    static RequestResult requestResult(String name){
+        return results.computeIfAbsent(name,(k)-> new RequestResult(name));
+    }
 
     public static void print(boolean onFile){
 
@@ -107,15 +112,19 @@ public class LoadResult {
                 bw.write("Batch Size ["+batch+"]\n");
                 bw.write("Pool Size ["+poolSize+"]\n");
                 bw.write("Player Prefix ["+playerPrefix+"]\n");
-                bw.write("Test UDP Enabled ["+udpTested+"]\n");
-                bw.write("Test UDP Receive Timeout ["+udpReceiveTimeout+"]\n");
-                bw.write("Test UDP Rounds ["+udpTestRounds+"]\n");
+                //bw.write("Test UDP Enabled ["+udpTested+"]\n");
+                //bw.write("Test UDP Receive Timeout ["+udpReceiveTimeout+"]\n");
+                //bw.write("Test UDP Rounds ["+udpTestRounds+"]\n");
                 bw.write("Start time ["+startTime.format(DateTimeFormatter.ISO_DATE_TIME)+"]\n");
                 bw.write("End time ["+localDateTime.format(DateTimeFormatter.ISO_DATE_TIME)+"]\n\n");
 
                 bw.write("###### HTTP Operation Summary ######\n");
                 bw.write("Total Rounds ["+totalRounds.get()+"]\n");
                 bw.write("Total Failure Other ["+totalFailureOther.get()+"]\n");
+                results.forEach((k,v)->{
+                    try{bw.write(v.toString());}catch (Exception ex){}
+                });
+                /**
                 bw.write("Total Success Register Count ["+totalSuccessRegister.get()+"]\n");
                 bw.write("Total Failure Register Count ["+totalFailureRegister.get()+"]\n");
                 bw.write("Total Success Login Count ["+totalSuccessLogin.get()+"]\n");
@@ -149,10 +158,9 @@ public class LoadResult {
                 bw.write("Total Success OnGameEvent Count ["+totalSuccessOnGameEvent.get()+"]\n");
                 bw.write("Total Failure OnGameEvent Count ["+totalFailureOnGameEvent.get()+"]\n");
                 bw.write("Total Success Leave Count ["+totalSuccessLeave.get()+"]\n");
-                bw.write("Total Failure Leave Count ["+totalFailureLeave.get()+"]\n");
+                bw.write("Total Failure Leave Count ["+totalFailureLeave.get()+"]\n");**/
                 bw.write("Total Http Request Count ["+totalHttpRequestCount.get()+"]\n");
                 bw.write("Average HTTP Request Duration (ms) ["+(totalHttpRequestTime.get()/totalHttpRequestCount.get())+"]\n\n");
-
                 //bw.write("###### UDP Operation Summary ######\n");
                 //bw.write("Total Success Play Count ["+totalSuccessPlay.get()+"]\n");
                 //bw.write("Total Failure Play Count ["+totalFailurePlay.get()+"]\n");
