@@ -76,7 +76,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         CurrentSaveIndex currentSaveIndex = currentSaveIndex(session);
         SavedGame savedGame = SavedGame.lookup(currentSaveIndex.saveId,dataStore);
         if(savedGame==null || savedGame.stub != currentSaveIndex.stub) return false;
-        platformGameServiceProvider.presenceServiceProvider().onResetSavedGame(savedGame);
+        //platformGameServiceProvider.presenceServiceProvider().onResetSavedGame(savedGame);
         savedGame.version = 1;
         savedGame.name("New Save");
         savedGame.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));

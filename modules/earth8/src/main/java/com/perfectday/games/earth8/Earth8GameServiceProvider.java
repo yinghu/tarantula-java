@@ -1,6 +1,8 @@
 package com.perfectday.games.earth8;
 
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.ApplicationPreSetup;
@@ -92,6 +94,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
     public void updateGame(Session session,byte[] payload) throws Exception{
         BattleUpdate update = BattleUpdate.fromJson(payload);
+        PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext,session.distributionId(), PlayerDataTrack.Type.Analytics);
 
         if (update.score > 0 && update.playerLevel > 0) {
 
@@ -99,18 +102,16 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
             Tournament existing = tournamentIndex.get(playerDataTrack.trackId);
             if(existing!=null){
-                existing.register(session).update(session,entry->{
+                var totalScore = existing.register(session).update(session,entry->{
                     entry.score(0,update.score);
                     return true;
                 });
+                update.pendingAnalytics.add(new RLCPointsEarnedTransaction(session, serverSession.trackId, existing.distributionId(), update.objectiveType, update.score, totalScore));
             }
             else{
-                scoreTournamentWithSameLevel(session, update, playerDataTrack);
+                scoreTournamentWithSameLevel(session, update, playerDataTrack, serverSession);
             }
-
         }
-
-        PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext,session.distributionId(), PlayerDataTrack.Type.Analytics);
 
         if(update.update(gameContext.applicationSchema().applicationPreSetup(), session,serverSession.trackId,gameContext.applicationSchema().applicationPreSetup().distributionId()))
         {
@@ -230,6 +231,10 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
             tournamentIndex.put(start,tournament);
         }
+        TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+        gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
+                webhook.upload(ANALYTICS_QUERY, new RLCTournamentStartTransaction(tournament.distributionId(), tournament.name()).toBytes())
+        ));
     }
 
     @Override
@@ -239,6 +244,10 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
             tournamentIndex.remove(start);
         }
+        TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+        gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
+                webhook.upload(ANALYTICS_QUERY, new RLCTournamentEndTransaction(tournament.distributionId()).toBytes())
+        ));
     }
 
     public void onApplicationResourceRegistered(ApplicationResource resource){
@@ -278,13 +287,16 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         //UDP MESSAGE WITH RELAY CALL WITH SINGLE UDP MESSAGE
     }
 
-    private void scoreTournamentWithSameLevel(Session session, BattleUpdate update, PlayerDataTrack playerDataTrack) {
+    private void scoreTournamentWithSameLevel(Session session, BattleUpdate update, PlayerDataTrack playerDataTrack, PlayerDataTrack serverSession) {
         Tournament nextLevel = tournamentIndex.get(update.playerLevel);
         if(nextLevel==null) return;
-        nextLevel.register(session).update(session,entry->{
+        var tournamentInstance = nextLevel.register(session);
+        update.pendingAnalytics.add(new RLCLeaderboardAssignedTransaction(session, serverSession.trackId, nextLevel.distributionId(), tournamentInstance.distributionId()));
+        var totalScore = tournamentInstance.update(session,entry->{
             entry.score(0,update.score);
             return true;
         });
+        update.pendingAnalytics.add(new RLCPointsEarnedTransaction(session, serverSession.trackId, nextLevel.distributionId(), update.objectiveType, update.score, totalScore));
         playerDataTrack.trackId = nextLevel.distributionId();
         playerDataTrack.update();
     }

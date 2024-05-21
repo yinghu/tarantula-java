@@ -57,7 +57,7 @@ public class TournamentClusterService implements ManagedService, RemoteService {
         return tsp.tournamentServiceProvider().onTournamentSegmentEntered(tournamentId,segmentInstanceId,systemId);
     }
 
-    public boolean scoreOnSegment(String serviceName, long tournamentId,long instanceId, long entryId,long systemId,double credit,double delta){
+    public double scoreOnSegment(String serviceName, long tournamentId,long instanceId, long entryId,long systemId,double credit,double delta){
         PlatformGameServiceProvider tsp = (PlatformGameServiceProvider) tarantulaContext.serviceProvider(serviceName);
         return tsp.tournamentServiceProvider().onTournamentSegmentScored(tournamentId,instanceId,entryId,systemId,credit,delta);
     }
@@ -68,7 +68,7 @@ public class TournamentClusterService implements ManagedService, RemoteService {
         return _ins;
     }
 
-    public boolean score(String serviceName, long tournamentId,long instanceId, long systemId,double credit,double delta){
+    public double score(String serviceName, long tournamentId,long instanceId, long systemId,double credit,double delta){
         PlatformGameServiceProvider tsp = (PlatformGameServiceProvider) tarantulaContext.serviceProvider(serviceName);
         return tsp.tournamentServiceProvider().onTournamentScored(tournamentId,instanceId,systemId,credit,delta);
     }

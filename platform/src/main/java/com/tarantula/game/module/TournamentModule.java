@@ -3,7 +3,6 @@ package com.tarantula.game.module;
 import com.icodesoftware.*;
 import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.platform.tournament.TournamentMockUtils;
 import com.tarantula.platform.tournament.TournamentContext;
 
 
@@ -28,11 +27,6 @@ public class TournamentModule extends ModuleHeader implements Configurable.Liste
                 session.write(new TournamentContext(board,myBoard).toJson().toString().getBytes());
             }
         }
-        //pending removal
-        else if (session.action().equals("onLoadRankings")){
-            session.write(TournamentMockUtils.GetMockTournamentRankings(session.systemId()).toString().getBytes());
-        }
-        //end of removal
         else{
             throw new UnsupportedOperationException(session.action()+" not supported");
         }

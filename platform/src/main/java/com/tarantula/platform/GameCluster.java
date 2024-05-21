@@ -386,6 +386,10 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
 
     public ConfigurableCategories configurableCategories(String type){
         ApplicationPreSetup preSetup = applicationPreSetup();
+        return configurableCategories(preSetup,type);
+    }
+
+    public ConfigurableCategories configurableCategories(ApplicationPreSetup preSetup,String type){
         ConfigurableCategories categories = new ConfigurableCategories();
         categories.name(type);
         ConfigurableCategoryQuery query = ConfigurableCategoryQuery.query(type,"category");
@@ -457,8 +461,8 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
         if(exception!=null) exception.printStackTrace();
     }
 
-    public Inventory createInventory(String category,String typeId){
-        ConfigurableCategories categories = this.configurableCategories(Configurable.COMMODITY_CONFIG_TYPE);
+    public Inventory createInventory(ApplicationPreSetup applicationPreSetup,String category,String typeId){
+        ConfigurableCategories categories = this.configurableCategories(applicationPreSetup,Configurable.COMMODITY_CONFIG_TYPE);
         ConfigurableCategory conf = categories.configurableSetting(category);
         conf.parse();
         Inventory inventory = new UserInventory(conf.name(),typeId,conf.rechargeable,conf.constrained,this);

@@ -1,9 +1,8 @@
 package com.perfectday.games.earth8.analytics;
 
 import com.icodesoftware.Session;
-import com.icodesoftware.util.JsonUtil;
 
-public class CampaignProgressTransaction extends AnalyticsTransaction {
+public class CampaignProgressTransaction extends UserAnalyticsTransaction {
     private static final String MESSAGE_TYPE = "/earth8/player/0.0.1/campaignProgress";
 
     public CampaignProgressTransaction(Session session,long serverSessionId, long battleId, String stageId, int stars)

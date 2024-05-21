@@ -16,7 +16,7 @@ public class TournamentScoreSegmentOperation extends Operation implements Partit
     private long entryId;
     private double credit;
     private double delta;
-    private boolean scored;
+    private double score;
     public TournamentScoreSegmentOperation() {
     }
 
@@ -33,12 +33,12 @@ public class TournamentScoreSegmentOperation extends Operation implements Partit
     @Override
     public void run() throws Exception {
         TournamentClusterService ais = this.getService();
-        this.scored = ais.scoreOnSegment(serviceName,tournamentId,instanceId,entryId,systemId,credit,delta);
+        this.score = ais.scoreOnSegment(serviceName,tournamentId,instanceId,entryId,systemId,credit,delta);
     }
 
     @Override
     public Object getResponse() {
-        return this.scored;
+        return this.score;
     }
 
     @Override

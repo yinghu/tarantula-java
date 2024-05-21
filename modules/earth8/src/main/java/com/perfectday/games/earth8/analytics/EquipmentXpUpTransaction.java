@@ -2,7 +2,7 @@ package com.perfectday.games.earth8.analytics;
 
 import com.icodesoftware.Session;
 
-public class EquipmentXpUpTransaction extends AnalyticsTransaction {
+public class EquipmentXpUpTransaction extends UserAnalyticsTransaction {
     private static final String MESSAGE_TYPE = "/earth8/equipment/0.0.1/xpUp";
 
     public EquipmentXpUpTransaction(Session session, long serverSessionId,AnalyticsEquipmentData equipmentData, long equipmentId, int xpGain)

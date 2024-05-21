@@ -1,6 +1,7 @@
 package com.tarantula.platform.presence;
 
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
@@ -10,6 +11,8 @@ import com.icodesoftware.protocol.statistics.UserStatistics;
 import com.icodesoftware.service.ServiceContext;
 
 import com.icodesoftware.util.ScheduleRunner;
+import com.icodesoftware.util.SnowflakeKey;
+import com.icodesoftware.util.TimeUtil;
 
 
 import com.tarantula.game.Stub;
@@ -18,11 +21,11 @@ import com.tarantula.game.service.PlatformGameServiceSetup;
 
 import com.tarantula.platform.presence.leaderboard.PlatformLeaderBoardProvider;
 
-
 import com.tarantula.platform.presence.saves.*;
 
 import com.tarantula.platform.util.RecoverableQuery;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -62,6 +65,12 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
             profileNameSequenceMapping.put(profileNameSequence.name(),profileNameSequence);
             return true;
         }));
+        profileNameSequenceMapping.forEach((n,p)->{
+            if(p.distributionId()==0){
+                p.ownerKey(SnowflakeKey.from(gameCluster.distributionId()));
+                if(this.profileDataStore.create(p)) p.dataStore(profileDataStore);
+            }
+        });
         this.recentlyPlayList = new PlayList(recentlyPlayListSize);
         this.recentlyPlayList.distributionId(this.gameCluster.distributionId());
         this.dataStore.createIfAbsent(this.recentlyPlayList,true);
@@ -80,6 +89,15 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     public void setup(ServiceContext serviceContext) {
         super.setup(serviceContext);
         Configuration configuration = serviceContext.configuration("game-presence-settings");
+        JsonArray objsPreloaded = ((JsonElement)configuration.property("profile")).getAsJsonObject().get("adjectives").getAsJsonArray();
+        JsonArray namesPreloaded = ((JsonElement)configuration.property("profile")).getAsJsonObject().get("nouns").getAsJsonArray();
+        objsPreloaded.forEach(obj->{
+            String adjective = obj.getAsString();
+            namesPreloaded.forEach(pn->{
+                String pname = adjective+pn.getAsString();
+                profileNameSequenceMapping.put(pname,new ProfileNameSequence(pname));
+            });
+        });
         JsonObject plist = ((JsonElement)configuration.property("playList")).getAsJsonObject();
         this.recentlyPlayListSize = plist.get("recentlyListSize").getAsInt();
         this.friendListSize = plist.get("friendListSize").getAsInt();
@@ -91,29 +109,21 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         this.logger = JDKLogger.getLogger(PlatformPresenceServiceProvider.class);
         this.logger.warn("Presence service provider started on ->"+gameServiceName);
     }
-    public void onFriendList(long systemId,long friendSystemId){
-        PlayList playList = new PlayList(friendListSize);
-        playList.distributionId(systemId);
-        this.dataStore.createIfAbsent(playList,true);
-        playList.playListIndex.push(friendSystemId);
-        this.dataStore.update(playList);
-    }
+
     public void onPlay(Session session){
-        this.recentlyPlayList.playListIndex.push(session.systemId());
+        this.recentlyPlayList.playListIndex.push(session.distributionId());
         updates.incrementAndGet();
-        Statistics statistics = statistics(session);
-        statistics.entry("joins").update(1).update();
-    }
-    public List<Long> friendList(long systemId){
-        PlayList playList = new PlayList(friendListSize);
-        playList.distributionId(systemId);
-        this.dataStore.createIfAbsent(playList,true);
-        return playList.playListIndex.list(new ArrayList<>());
-    }
-    public List<Long> recentlyPlayList(){
-        return this.recentlyPlayList.playListIndex.list(new ArrayList<>());
     }
 
+
+    public Profile profile(String systemId){
+        Profile profile = new Profile();
+        profile.displayName ="player";
+        profile.distributionKey(systemId);
+        this.dataStore.createIfAbsent(profile,true);
+        profile.dataStore(this.dataStore);
+        return profile;
+    }
 
     public boolean createProfile(Session session){
 
@@ -122,9 +132,10 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         Profile profile = new Profile();
         profile.distributionId(session.distributionId());
 
+        profileDataStore.createIfAbsent(profile, true);
         if(!profile.configureAndValidate(session.payload())) return false;
         profile.profileSequence = distributionPresenceService.profileSequence(gameCluster.serviceType(),profile.displayName);
-        return profileDataStore.createIfAbsent(profile, false);
+        return profileDataStore.update(profile);
     }
 
     public ProfilePayload getProfilePayload(String IDs){
@@ -168,7 +179,6 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         deltaStatistics.dataStore(applicationPreSetup.dataStore(gameCluster,NAME+"_statistics"));
         deltaStatistics.load();
         deltaStatistics.registerListener(((entry,delta) -> {
-            entry.systemId(session.systemId());
             LeaderBoard leaderBoard = platformLeaderBoardProvider.leaderBoard(entry.name());
             leaderBoard.onAllBoard(entry);
         }));
@@ -209,11 +219,48 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         });
         return loaded[0];
     }
-    public void  onResetSavedGame(SavedGame resetSave){
-        logger.warn("Reset save : "+resetSave.distributionId());
+    public SavedGame resetSavedGame(CurrentSaveIndex currentSaveIndex){
+        if(currentSaveIndex.index()==null) return null;
+        SavedGame savedGame = savedGame(currentSaveIndex.index());
+        savedGame.stub = 0;
+        savedGame.version = 0;
+        savedGame.name("New Save");
+        savedGame.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+        this.dataStore.update(savedGame);
+        return  savedGame;
+    }
+
+    public void updateSavedGame(CurrentSaveIndex currentSaveIndex){
+        if(currentSaveIndex.index()==null) return;
+        SavedGame savedGame = savedGame(currentSaveIndex.index());
+        savedGame.version = savedGame.version+1;
+        savedGame.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+        savedGame.update();
     }
 
 
+    public PersonalDataIndex loadPersonalDataIndex(String systemId){
+        PersonalDataIndex playerSaveIndex = new PersonalDataIndex();
+        playerSaveIndex.distributionKey(systemId);
+        dataStore.createIfAbsent(playerSaveIndex,true);
+        playerSaveIndex.dataStore(dataStore);
+        return playerSaveIndex;
+    }
+
+
+    private SavedGame savedGame(String saveId){
+        SavedGame savedGame = new SavedGame();
+        savedGame.distributionKey(saveId);
+        if(!dataStore.load(savedGame)) return null;
+        savedGame.dataStore(dataStore);
+        return savedGame;
+    }
+    private void deviceIndex(String systemId,String deviceId){
+        //AccessIndex accessIndex = serviceContext.clusterProvider().accessIndexService().setIfAbsent(deviceId,AccessIndex.DEVICE_INDEX);
+        //DeviceSaveIndex deviceSaveIndex = new DeviceSaveIndex(accessIndex.distributionKey());
+        //this.dataStore.createIfAbsent(deviceSaveIndex,true);
+        //if(deviceSaveIndex.addKey(systemId)) this.dataStore.update(deviceSaveIndex);
+    }
 
     private void syncPlayList(){
         if(updates.getAndSet(0)>0) recentlyPlayList.update();
@@ -221,17 +268,13 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     }
 
     public void onLeave(Session session){
-        ///platformGameServiceProvider.savedGameServiceProvider().checkSavedGame(session.distributionKey());
+        //platformGameServiceProvider.savedGameServiceProvider().checkSavedGame(session.distributionKey());
     }
 
     public void onLobby(Descriptor onLobby){
         applicationPreSetup.dataStore(gameCluster,NAME+"_"+onLobby.tag().replaceAll(Recoverable.PATH_SEPARATOR,"_"));
     }
 
-    public void testSequence(String name){
-        int seq = distributionPresenceService.profileSequence(gameCluster.serviceType(),name);
-        logger.warn(name+"#"+seq);
-    }
 
     public int onProfileSequence(String name){
         return profileNameSequenceMapping.compute(name,(k,v)->{
@@ -239,7 +282,10 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
                 v = ProfileNameSequence.lookup(profileDataStore,gameCluster.distributionId(),name);
             }
             v.sequence++;
-            v.update();
+            final ProfileNameSequence vx = v;
+            serviceContext.schedule(new ScheduleRunner(100,()->{
+                vx.update();
+            }));
             return v;
         }).sequence;
     }

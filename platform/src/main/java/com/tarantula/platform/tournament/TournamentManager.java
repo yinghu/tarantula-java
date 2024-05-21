@@ -508,8 +508,9 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     public Instance register(Session session){
         TournamentJoin join = TournamentJoin.lookup(tournamentServiceProvider.tournamentJoin,session,scheduleId);
+        if(status == Status.ENDED) return new TournamentInstanceProxy(this,join);
         if(this.global) {
-            if(!join.closed && join.tournamentId == this.distributionId ) return new TournamentInstanceProxy(this,join);
+            if(join.tournamentId == this.distributionId ) return new TournamentInstanceProxy(this,join);
             if(targetScore == 0) {
                 TournamentInstance pending = tournamentSegments[segmentSlot()].tournamentInstance;
                 long entryId = this.distributionTournamentService.onEnterGlobalTournament(tournamentServiceProvider.gameServiceName,this.distributionId,pending.distributionId(),session.distributionId());
@@ -519,7 +520,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             return new TournamentInstanceProxy(this,join);
         }
         //not used for e8 game
-        if(!join.closed && join.tournamentId == this.distributionId) return new TournamentInstanceProxy(this,join);
+        if(join.tournamentId == this.distributionId) return new TournamentInstanceProxy(this,join);
         TournamentRegisterStatus pending = distributionTournamentService.onRegisterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,join.slot);
         Tournament.Instance ins = this.distributionTournamentService.onEnterTournament(tournamentServiceProvider.gameServiceName,this.distributionId,pending.instanceId,session.distributionId());
         ins.distributionId(pending.instanceId);
@@ -537,16 +538,17 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return true;
     }
 
-    public boolean score(Session session,Entry entry){
+    public double score(Session session,Entry entry){
         TournamentJoin join = TournamentJoin.lookup(tournamentServiceProvider.tournamentJoin,session,scheduleId);
-        if(join.closed || join.tournamentId != this.distributionId ) return false;
+        if(join.closed || join.tournamentId != this.distributionId ) return 0;
         return distributionTournamentService.onScoreGlobalTournament(tournamentServiceProvider.gameServiceName,this.distributionId,join.instanceId,join.entryId,session.distributionId(),entry.credit(),entry.score());
     }
 
-    public boolean score(Session session,long instanceId,Entry entry){
+    public double score(Session session,long instanceId,Entry entry){
         return distributionTournamentService.onScoreTournament(tournamentServiceProvider.gameServiceName,this.distributionId,instanceId,session.distributionId(),entry.credit(),entry.score());
     }
     public RaceBoard raceBoard(TournamentJoin session){
+        if(session.instanceId==0) return new TournamentRaceBoard();
         byte[] payload = this.distributionTournamentService.onRaceBoard(tournamentServiceProvider.gameServiceName,distributionId,session.instanceId);
         TournamentRaceBoard raceBoard = TournamentRaceBoard.from(payload);
         raceBoard.distributionId(session.instanceId);
@@ -554,6 +556,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
 
     public RaceBoard myRaceBoard(TournamentJoin session){
+        if(session.instanceId==0) return new TournamentRaceBoard();
         byte[] payload = this.distributionTournamentService.onMyRaceBoard(tournamentServiceProvider.gameServiceName,distributionId,session.instanceId,session.entryId,session.stub());
         TournamentRaceBoard raceBoard = TournamentRaceBoard.from(payload);
         raceBoard.distributionId(session.instanceId);
@@ -569,8 +572,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return segmentInstance.enterSegment(systemId,targetScore);
     }
 
-    public boolean onScoreSegment(long systemId,long instanceId,long entryId,double credits,double score){
-        if(!global) return false;
+    public double onScoreSegment(long systemId,long instanceId,long entryId,double credits,double score){
+        if(!global) return 0;
         TournamentInstance instance = lookupSegmentInstance(instanceId);
         //logger.warn(distributionId+" : "+instanceId+" : "+systemId+" : scored");
         return instance.scoreSegment(entryId,systemId,credits,score);
@@ -588,8 +591,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return instance;
     }
 
-    public boolean onScore(long systemId,long instanceId,double credits,double score){
-        if(global) return false;
+    public double onScore(long systemId,long instanceId,double credits,double score){
+        if(global) return 0;
         TournamentInstance instance = lookup(instanceId);
         return instance.update(new SimpleStub(0,systemId), entry -> {
             entry.score(credits,score);
