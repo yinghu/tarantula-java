@@ -18,10 +18,11 @@ public class HttpEndpointService implements EndPoint {
 
     private ExecutorService tpool;
     private Serviceable retryPool;
-    private HttpServer hserver;
+    protected HttpServer hserver;
 
-    private boolean started;
-    private Resource resource;
+    protected boolean started;
+    protected Resource resource;
+
     private MetricsListener metricsListener =(k,v)->{};;
     @Override
     public void address(String address) {
@@ -56,7 +57,7 @@ public class HttpEndpointService implements EndPoint {
         InetSocketAddress ip = this.address==null?new InetSocketAddress(this.port):new InetSocketAddress(this.address,this.port);
         hserver = HttpServer.create(ip,this.backlog);
         hserver.setExecutor(this.tpool);
-        started = true;
+
     }
 
     @Override
