@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class PlatformTournamentServiceProvider implements TournamentServiceProvider, ReloadListener, ConfigurationServiceProvider, ItemDistributionCallback {
 
@@ -78,7 +79,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     int recentlyTournamentListSize;
     int topRaceBoardSize;
     int myRaceBoardSize;
-
+    AtomicLong sortingTimerInterval = new AtomicLong(0);
     private String reloadKey;
     final GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
@@ -171,6 +172,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.recentlyTournamentListSize = ((Number)configuration.property("recentlyTournamentListSize")).intValue();
         this.topRaceBoardSize = ((Number)configuration.property("topRaceBoardSize")).intValue();
         this.myRaceBoardSize = ((Number)configuration.property("myRaceBoardSize")).intValue();
+        long sortingInterval = ((Number)configuration.property("sortingIntervalMinutes")).intValue()*60*1000;
+        this.sortingTimerInterval.set(sortingInterval);
         this.dataStore = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_DATA_STORE);
         this.tournamentJoin = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_JOIN_DATA_STORE);
         this.tournamentEntry = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_ENTRY_DATA_STORE);
