@@ -551,7 +551,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         this.serviceProviders.put(AccessIndexService.NAME,accessIndexService());
         this.serviceProviders.put(DeployService.NAME,integrationCluster.deployService());
         this.serviceProviders.put(JVMMonitor.NAME,new JVMMonitor());
-        this.serviceProviders.put(DataStoreMonitor.NAME,new DataStoreMonitor(this));
+        DataStoreMonitor dataStoreMonitor = new DataStoreMonitor(this);
+        dataStoreMonitor.start();
+        this.serviceProviders.put(DataStoreMonitor.NAME,dataStoreMonitor);
         ServiceProviderConfigurationParser spc = new ServiceProviderConfigurationParser("tarantula-platform-service-provider-config.xml",serviceProviders);
         spc.start(this);
         serviceViewList.add(DataStoreMonitor.NAME);
