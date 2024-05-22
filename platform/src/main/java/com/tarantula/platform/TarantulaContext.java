@@ -373,40 +373,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             log.error("error on _setOnLobby",ex);
         }
     }
-    public synchronized void setOnLobby(LobbyDescriptor lobbyDescriptor,OnLobby.Listener listener){
- 	    if(this._lobbyMapping.containsKey(lobbyDescriptor.typeId())){
- 	        return;
-        }
- 	    this.setLobby(lobbyDescriptor);
-        LobbyConfiguration lc = new LobbyConfiguration();
-        lc.descriptor = lobbyDescriptor;
-        lc.applications = this.masterDataStore().list(new ApplicationQuery(lobbyDescriptor.distributionId()));
-        //this.configureViews(lc);
-        try{
-            OnLobby ob = this.configure(lc);
-            listener.onUpdated(ob);
-        }catch (Exception ex){
-            log.error("Error on setLobby",ex);
-        }
-    }
-    public synchronized void setOnLobby(String typeId,long publishingId,Configurable.Listener listener){
-        if(this._lobbyMapping.containsKey(typeId)){
-            return;
-        }
-        List<LobbyDescriptor> bList = masterDataStore().list(new LobbyQuery(publishingId));
-        bList.forEach((d)->{
-            this.setLobby(d);//
-            LobbyConfiguration lc = new LobbyConfiguration();
-            lc.descriptor = d;
-            lc.applications = masterDataStore().list(new ApplicationQuery(d.distributionId()));
-            try{
-                OnLobby ob = this.configure(lc);
-                listener.onUpdated(ob);
-            }catch (Exception ex){
-                log.error("Error on setLobby",ex);
-            }
-        });
-    }
+
+
     public synchronized void unsetLobby(String typeId,Lobby.Listener listener){
         try{
             Lobby lb = this._lobbyMapping.remove(typeId);
@@ -581,7 +549,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
  	    this.serviceProviders.put(this.integrationCluster.name(),integrationCluster);
  	    this.serviceProviders.put(this.deploymentDataStoreProvider.name(),this.deploymentDataStoreProvider);
         this.serviceProviders.put(AccessIndexService.NAME,accessIndexService());
-
+        this.serviceProviders.put(DeployService.NAME,integrationCluster.deployService());
         this.serviceProviders.put(JVMMonitor.NAME,new JVMMonitor());
         this.serviceProviders.put(DataStoreMonitor.NAME,new DataStoreMonitor(this));
         ServiceProviderConfigurationParser spc = new ServiceProviderConfigurationParser("tarantula-platform-service-provider-config.xml",serviceProviders);
@@ -772,29 +740,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             return response;
         }
     }
-    public Response checkModule(String context,String moduleFile){
-        Response response = new ResponseHeader();
-        try{
-            File checkFile = new File(deployDir+"/"+moduleFile);
-            if(!checkFile.exists()){
-                log.warn("File not existed->"+checkFile);
-                response.message("file not existed->"+checkFile);
-                return response;
-            }
-            File ft = new File(deployDir+"/module/"+context+"/"+moduleFile);
-            if(ft.exists()&&ft.lastModified()>=checkFile.lastModified()){
-                response.message("File already has latest version");
-                return response;
-            }
-            response.successful(true);
-            response.message("module validated->"+moduleFile);
-            return response;
-        }catch (Exception ex){
- 	        response.message(ex.getMessage());
- 	        return response;
-        }
-    }
-
 
     public Configuration configuration(String config){
  	    try{
