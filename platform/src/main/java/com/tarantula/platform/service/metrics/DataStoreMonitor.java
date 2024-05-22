@@ -5,7 +5,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.ServiceProvider;
-import com.icodesoftware.util.TimeUtil;
+
 
 import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,7 +27,7 @@ public class DataStoreMonitor implements ServiceProvider {
 
     public DataStoreMonitor(ServiceContext serviceContext){
         this.serviceContext = serviceContext;
-        logger.warn("starting data store monitor");
+        logger.warn("Starting data store monitor");
     }
     @Override
     public void start() throws Exception {
@@ -43,6 +43,7 @@ public class DataStoreMonitor implements ServiceProvider {
     public void registerSummary(Summary summary){
         Metrics metrics = serviceContext.metrics(DataStoreMetrics.DATA_STORE);
         metrics.categories().forEach(cat->{
+            logger.warn("Register : "+cat);
             delta.put(cat,metrics.statistics().entry(cat).total());
         });
         metrics.registerSummary(summary);
@@ -52,6 +53,7 @@ public class DataStoreMonitor implements ServiceProvider {
     public void updateSummary(Summary summary){
         Metrics metrics = serviceContext.metrics(DataStoreMetrics.DATA_STORE);
         metrics.categories().forEach(cat->{
+            logger.warn("Query : "+cat);
             double current = metrics.statistics().entry(cat).total();
             double gain = current-delta.get(cat);
             summary.update(cat,gain);
