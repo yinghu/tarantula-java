@@ -176,10 +176,15 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
 
     }
 
+    @Override
+    public File dataStoreBackup(int scope) {
+        return null;
+    }
+
 
     @Override
-    public File issueDataStoreBackup(int scope) {
-        return null;
+    public void issueDataStoreBackup(int scope) {
+
     }
 
     @Override

@@ -18,7 +18,7 @@ public class DataStoreSudoRoleModule implements Module {
     private DeploymentServiceProvider deploymentServiceProvider;
 
     private AccessIndexService accessIndexService;
-
+    private DeployService deployService;
     private UserService userService;
     private GsonBuilder builder;
 
@@ -131,23 +131,22 @@ public class DataStoreSudoRoleModule implements Module {
 
         else if(session.action().equals("onBackupDataStore")){
             String[] query = session.name().split("#");
-            StringBuffer buffer = new StringBuffer();
             if(Boolean.parseBoolean(query[0])){
-                buffer.append(this.deploymentServiceProvider.issueDataStoreBackup(Distributable.LOCAL_SCOPE));
+                this.deployService.onIssueDataStoreBackup(Distributable.LOCAL_SCOPE);
             }
             if(Boolean.parseBoolean(query[1])){
-                buffer.append(this.deploymentServiceProvider.issueDataStoreBackup(Distributable.DATA_SCOPE));
+                this.deployService.onIssueDataStoreBackup(Distributable.DATA_SCOPE);
             }
             if(Boolean.parseBoolean(query[2])){
-                buffer.append(this.deploymentServiceProvider.issueDataStoreBackup(Distributable.INTEGRATION_SCOPE));
+                this.deployService.onIssueDataStoreBackup(Distributable.INTEGRATION_SCOPE);
             }
             if(Boolean.parseBoolean(query[3])){
-                buffer.append(this.deploymentServiceProvider.issueDataStoreBackup(Distributable.INDEX_SCOPE));
+                this.deployService.onIssueDataStoreBackup(Distributable.INDEX_SCOPE);
             }
             if(Boolean.parseBoolean(query[4])){
-                buffer.append(this.deploymentServiceProvider.issueDataStoreBackup(Distributable.LOG_SCOPE));
+                this.deployService.onIssueDataStoreBackup(Distributable.LOG_SCOPE);
             }
-            session.write(toMessage("backup command issued ["+buffer+"]",true).toString().getBytes());
+            session.write(toMessage("data store backup command issued",true).toString().getBytes());
         }
         else if(session.action().equals("onMetrics")){
             Metrics metrics = deploymentServiceProvider.metrics(Metrics.PERFORMANCE);
@@ -166,6 +165,7 @@ public class DataStoreSudoRoleModule implements Module {
         this.context = context;
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
+        this.deployService = this.context.serviceProvider(DeployService.NAME);
         this.userService = this.context.serviceProvider(UserService.NAME);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());

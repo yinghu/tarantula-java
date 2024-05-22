@@ -160,6 +160,10 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void onDisablePresenceService(String clusterNameSuffix) {
         this.tarantulaContext.tokenValidatorProvider().disablePresenceService(clusterNameSuffix);
     }
+
+    public void onIssueDataStoreBackup(int scope){
+        deploymentServiceProvider.issueDataStoreBackup(scope);
+    }
     @Override
     public void migrationStarted(MigrationEvent migrationEvent) {
 

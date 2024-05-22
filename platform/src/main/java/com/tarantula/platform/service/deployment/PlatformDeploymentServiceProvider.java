@@ -625,10 +625,15 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
 
-    public File issueDataStoreBackup(int scope){
+    public File dataStoreBackup(int scope){
         return this.tarantulaContext.deploymentDataStoreProvider.backup(scope);
     }
-
+    public void issueDataStoreBackup(int scope){
+        new Thread(()->{
+            File f = this.tarantulaContext.deploymentDataStoreProvider.backup(scope);
+            log.warn("Data store scope ["+scope+"] back finished on file ["+f.getAbsolutePath()+"]");
+        }).start();
+    }
     public List<String> listDataStore(int scope) {
         return this.tarantulaContext.dataStoreProvider().list(scope);
     }

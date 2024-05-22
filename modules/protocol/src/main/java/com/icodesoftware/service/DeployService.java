@@ -37,5 +37,6 @@ public interface DeployService extends ServiceProvider {
     void onEnablePresenceService(String root,String password,String classNameSuffix,String host);
     void onDisablePresenceService(String classNameSuffix);
 
+    void onIssueDataStoreBackup(int scope);
 
 }
