@@ -313,17 +313,15 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
 
 
     public int onProfileSequence(String name){
-        return profileNameSequenceMapping.compute(name,(k,v)->{
-            if(v==null){
-                v = ProfileNameSequence.lookup(profileDataStore,gameCluster.distributionId(),name);
-            }
-            v.sequence++;
-            final ProfileNameSequence vx = v;
-            serviceContext.schedule(new ScheduleRunner(100,()->{
-                vx.update();
-            }));
-            return v;
-        }).sequence;
+        ProfileNameSequence profileNameSequence = profileNameSequenceMapping.computeIfAbsent(name,(k)->{
+            //Just in case the name is not preloaded
+            ProfileNameSequence notCached = new ProfileNameSequence(name);
+            notCached.ownerKey(SnowflakeKey.from(gameCluster.distributionId()));
+            notCached.dataStore(dataStore);
+            dataStore.create(notCached);
+            return notCached;
+        });
+        return profileNameSequence.sequence();
     }
 
 }

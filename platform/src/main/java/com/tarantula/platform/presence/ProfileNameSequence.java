@@ -1,15 +1,14 @@
 package com.tarantula.platform.presence;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.DataStore;
 import com.icodesoftware.util.RecoverableObject;
-import com.icodesoftware.util.SnowflakeKey;
+
 
 public class ProfileNameSequence extends RecoverableObject {
 
     public static final String LABEL = "profile_name_sequence";
 
-    public int sequence;
+    private int sequence;
 
     public ProfileNameSequence(){
         this.onEdge = true;
@@ -53,20 +52,11 @@ public class ProfileNameSequence extends RecoverableObject {
         return resp;
     }
 
-    public static ProfileNameSequence lookup(DataStore dataStore,long gameClusterId, String pendingMame){
-        ProfileNameSequence[] pending = {null};
-        dataStore.list(new ProfileNameSequenceQuery(gameClusterId),profileNameSequence -> {
-            if(profileNameSequence.name.equals(pendingMame)){
-                pending[0]=profileNameSequence;
-                return false;
-            }
-            return true;
-        });
-        if(pending[0]!=null) return pending[0];
-        pending[0] = new ProfileNameSequence(pendingMame);
-        pending[0].ownerKey(SnowflakeKey.from(gameClusterId));
-        dataStore.create(pending[0]);
-        pending[0].dataStore(dataStore);
-        return pending[0];
+    public synchronized int sequence(){
+        this.sequence++;
+        this.update(); //have to sync update
+        return sequence;
     }
+
+
 }
