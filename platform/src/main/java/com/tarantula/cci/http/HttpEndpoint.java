@@ -1,46 +1,19 @@
 package com.tarantula.cci.http;
 
-import java.net.InetSocketAddress;
-import java.util.concurrent.*;
-
-import com.icodesoftware.service.EndPoint;
-import com.icodesoftware.service.MetricsListener;
-import com.icodesoftware.service.Serviceable;
-import com.icodesoftware.util.TarantulaExecutorServiceFactory;
-import com.sun.net.httpserver.HttpServer;
+import com.icodesoftware.protocol.HttpEndpointService;
 import com.icodesoftware.logging.JDKLogger;
 
-public class HttpEndpoint implements EndPoint {
+public class HttpEndpoint extends HttpEndpointService{
 
 	private static final JDKLogger log = JDKLogger.getLogger(HttpEndpoint.class);
-	
-	private String address;
-	private int port;
-	private String inboundThreadPoolSetting;
-	private int backlog;
 
-	private ExecutorService tpool;
-	private Serviceable retryPool;
-	private HttpServer hserver;
-
-	private boolean started;
-
-    private Resource resource;
-
-    private MetricsListener metricsListener;
 
     public HttpEndpoint(){
-		metricsListener =(k,v)->{};
+		super();
 	}
 
-	public void start() throws Exception {
-		TarantulaExecutorServiceFactory.createExecutorService(this.inboundThreadPoolSetting,(pool, poolSize, rh)->{
-			this.tpool = pool;
-			this.retryPool = rh;
-		});
-		InetSocketAddress ip = this.address==null?new InetSocketAddress(this.port):new InetSocketAddress(this.address,this.port);
-		hserver = HttpServer.create(ip,this.backlog);
-		hserver.setExecutor(this.tpool);
+	public void onStart() throws Exception {
+
 		HttpRootHandler root = new HttpRootHandler(metricsListener);
 		root.resource(this.resource);
 		this.hserver.createContext(root.path(),root);
@@ -94,50 +67,11 @@ public class HttpEndpoint implements EndPoint {
 		httpDevelopmentHandler.resource(this.resource);
 		this.hserver.createContext(httpDevelopmentHandler.path(),httpDevelopmentHandler);
 
-		hserver.start();
-        started = true;
-        log.info("Tarantula HTTP Endpoint is listening on ["+ip+"]");
+        log.info("Tarantula HTTP Endpoint is listening on ["+address+"]");
 	}
 
-	public void shutdown() throws Exception {
-		if(started){
-			retryPool.shutdown();
-			tpool.shutdown();
-        	this.hserver.stop(0);
-        	log.info("Tarantula HTTP Endpoint Closed");
-		}
-		else{
-			log.warn("Tarantula HTTP Endpoint not running locally");
-		}
-	}
-
-	public void address(String address) {
-		this.address = address;
-	}
-
-	public void port(int port) {
-		this.port = port;
-	}
-
-	public void backlog(int backlog) {
-		this.backlog = backlog;
-	}
-
-	public void inboundThreadPoolSetting(String inboundThreadPoolSetting){
-		this.inboundThreadPoolSetting = inboundThreadPoolSetting;
-	}
-
-	public String name(){
-		return EndPoint.HTTP_ENDPOINT;
-	}
-
-	public void resource(Resource resource){
-		this.resource = resource;
-	}
 	@Override
-	public void registerMetricsListener(MetricsListener metricsListener){
-		if(metricsListener == null) return;
-		this.metricsListener = metricsListener;
+	protected void onStop() throws Exception {
+		log.warn("Tarantula HTTP Endpoint is stopping on ["+address+"]");
 	}
-
 }
