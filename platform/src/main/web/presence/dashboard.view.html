@@ -271,6 +271,30 @@
                     <canvas id="tx-service-chart-7"></canvas>
                 </div>
             </div>
+            <div class="w3-display-container w3-white tx-content-16"></div>
+            <div class="w3-row w3-border-bottom w3-border-red">
+                <div class="w3-third w3-container">
+                    <canvas id="tx-service-chart-8"></canvas>
+                </div>
+                <div class="w3-third w3-container">
+                    <canvas id="tx-service-chart-9"></canvas>
+                </div>
+                <div class="w3-third w3-container">
+                    <canvas id="tx-service-chart-10"></canvas>
+                </div>
+            </div>
+            <div class="w3-display-container w3-white tx-content-16"></div>
+            <div class="w3-row w3-border-bottom w3-border-red">
+                <div class="w3-third w3-container">
+                    <canvas id="tx-service-chart-11"></canvas>
+                </div>
+                <div class="w3-third w3-container">
+                    <canvas id="tx-service-chart-12"></canvas>
+                </div>
+                <div class="w3-third w3-container">
+                    <canvas id="tx-service-chart-13"></canvas>
+                </div>
+            </div>
             </div>
             <div class="w3-display-container w3-white tx-content-16"></div>
             <div id='tx-monitor-warning' class="w3-container w3-center" style="display:none;"><p class="tx-text-12 w3-text-red">Only admin user can access metrics resources.</p></div>
@@ -346,7 +370,7 @@
     let metricsCategoryCheckBar = document.querySelector('#tx-service-metrics-category');
     let metricsStart = document.querySelector('#tx-start-service-metrics');
     let metricPullTimer;
-    const mChartSize = 8;
+    const mChartSize = 14;
     document.querySelector('#tx-start-service-metrics').style.display = 'none';
     let metricsSelected={name:'',categories:[],nodes:[]};
     metricsSelected.data = [];

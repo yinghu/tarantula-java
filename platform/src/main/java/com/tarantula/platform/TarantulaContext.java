@@ -550,16 +550,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
  	    this.serviceProviders.put(this.deploymentDataStoreProvider.name(),this.deploymentDataStoreProvider);
         this.serviceProviders.put(AccessIndexService.NAME,accessIndexService());
         this.serviceProviders.put(DeployService.NAME,integrationCluster.deployService());
-        this.serviceProviders.put(JVMMonitor.NAME,new JVMMonitor());
-        DataStoreMonitor dataStoreMonitor = new DataStoreMonitor(this);
-        dataStoreMonitor.start();
-        this.serviceProviders.put(DataStoreMonitor.NAME,dataStoreMonitor);
+
         ServiceProviderConfigurationParser spc = new ServiceProviderConfigurationParser("tarantula-platform-service-provider-config.xml",serviceProviders);
         spc.start(this);
-        serviceViewList.add(DataStoreMonitor.NAME);
-        serviceViewList.add(JVMMonitor.NAME);
-        serviceViewList.add(UDPEndpoint.UDP_ENDPOINT);
-        serviceViewList.add(this.integrationCluster.name());
+
         this.deploymentDataStoreProvider.registerMetricsListener(this.metrics(Metrics.DATA_STORE));
         this.integrationCluster.registerMetricsListener(this.metrics(Metrics.CLUSTER));
         this.serviceProvider(UserService.NAME).registerMetricsListener(this.metrics(Metrics.SYSTEM));
@@ -897,6 +891,17 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             Metrics metrics = (Metrics) Class.forName(cln).getConstructor().newInstance();
             metrics.setup(this);
             metricsManager.addMetrics(metrics);
+        }
+        mlist = json.getAsJsonArray("monitor-list");
+        for(JsonElement e : mlist){
+            String cln = e.getAsJsonObject().get("class-name").getAsString();
+            boolean enabled = e.getAsJsonObject().get("enabled").getAsBoolean();
+            if(!enabled) continue;
+            ServiceProvider monitor = (ServiceProvider)Class.forName(cln).getConstructor().newInstance();
+            monitor.setup(this);
+            monitor.start();
+            serviceProviders.put(monitor.name(),monitor);
+            serviceViewList.add(monitor.name());
         }
  	}
 

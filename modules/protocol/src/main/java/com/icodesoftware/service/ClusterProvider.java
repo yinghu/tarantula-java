@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public interface ClusterProvider extends ServiceProvider {
+    String PENDING_EVENT_NUMBER = "pendingEventNumber";
 
     String name();
     //EventListener Register

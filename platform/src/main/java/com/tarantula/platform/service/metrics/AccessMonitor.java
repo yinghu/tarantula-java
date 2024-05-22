@@ -2,15 +2,14 @@ package com.tarantula.platform.service.metrics;
 
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
-
 import com.icodesoftware.service.ServiceContext;
 
 
-public class DataStoreMonitor extends MetricsMonitor {
+public class AccessMonitor extends MetricsMonitor {
 
-    private TarantulaLogger logger = JDKLogger.getLogger(DataStoreMonitor.class);
+    private TarantulaLogger logger = JDKLogger.getLogger(AccessMonitor.class);
 
-    public static final String NAME = "DataStoreMonitor";
+    public static final String NAME = "AccessMonitor";
 
     @Override
     public String name() {
@@ -18,7 +17,7 @@ public class DataStoreMonitor extends MetricsMonitor {
     }
     @Override
     public void setup(ServiceContext serviceContext){
-        metrics = serviceContext.metrics(DataStoreMetrics.DATA_STORE);
-        logger.warn("Starting data store monitor");
+        metrics = serviceContext.metrics(AccessMetrics.ACCESS);
+        logger.warn("Starting access monitor");
     }
 }

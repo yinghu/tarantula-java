@@ -31,7 +31,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private static JDKLogger log = JDKLogger.getLogger(IntegrationCluster.class);
 
-    private static String PENDING_EVENT_NUMBER = "pendingEventNumber";
     private final Config config;
     private final String bucket;
     private final String INDEX_MAP_PREFIX = "tarantula.index.";
@@ -419,6 +418,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         n.fromBinary(ret);
         return n;
     }
+
     @Override
     public void registerSummary(ServiceProvider.Summary summary){
         summary.registerCategory(PENDING_EVENT_NUMBER);

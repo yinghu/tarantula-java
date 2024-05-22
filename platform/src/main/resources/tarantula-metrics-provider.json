@@ -8,5 +8,11 @@
     {"class-name":"com.tarantula.platform.service.metrics.PaymentMetrics","enabled": true },
     {"class-name":"com.tarantula.platform.service.metrics.DeploymentMetrics","enabled": true },
     {"class-name":"com.tarantula.platform.service.metrics.SystemMetrics","enabled": true }
+  ],
+  "monitor-list": [
+    {"class-name": "com.tarantula.platform.service.metrics.DataStoreMonitor","enabled": true},
+    {"class-name": "com.tarantula.platform.service.metrics.JVMMonitor","enabled": true},
+    {"class-name": "com.tarantula.platform.service.metrics.ClusterMonitor","enabled": true},
+    {"class-name": "com.tarantula.platform.service.metrics.AccessMonitor","enabled": true}
   ]
 }
