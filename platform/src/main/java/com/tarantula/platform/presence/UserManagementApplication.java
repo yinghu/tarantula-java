@@ -291,6 +291,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         account.distributionId(accountId);
         payload.ownerKey(new SnowflakeKey(accountId));
         Access access =userService.createUser(account,toAccess(payload));
+        payload.command("onLoginCreated");
         this.deploymentServiceProvider.onGameClusterEvent(payload);
         return access;
     }
@@ -302,6 +303,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         payload.property(OnAccess.PRIMARY_USER,primary);
         payload.property(OnAccess.ACTIVATED,activated);
         Access access = userService.createUser(payload);
+        payload.command("onLoginCreated");
         this.deploymentServiceProvider.onGameClusterEvent(payload);
         return access;
     }
