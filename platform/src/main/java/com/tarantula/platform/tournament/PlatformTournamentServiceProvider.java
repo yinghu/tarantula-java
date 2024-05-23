@@ -21,7 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class PlatformTournamentServiceProvider implements TournamentServiceProvider, ReloadListener, ConfigurationServiceProvider, ItemDistributionCallback {
 
@@ -80,7 +79,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     int recentlyTournamentListSize;
     int topRaceBoardSize;
     int myRaceBoardSize;
-    AtomicInteger sortingTimerInterval = new AtomicInteger(0);
+    AtomicInteger snapshotTimerInterval = new AtomicInteger(0);
     private String reloadKey;
     final GameCluster gameCluster;
     private ApplicationPreSetup applicationPreSetup;
@@ -173,7 +172,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.recentlyTournamentListSize = ((Number)configuration.property("recentlyTournamentListSize")).intValue();
         this.topRaceBoardSize = ((Number)configuration.property("topRaceBoardSize")).intValue();
         this.myRaceBoardSize = ((Number)configuration.property("myRaceBoardSize")).intValue();
-        this.sortingTimerInterval.set(((Number)configuration.property("sortingIntervalMinutes")).intValue());
+        this.snapshotTimerInterval.set(((Number)configuration.property("snapshotIntervalMinutes")).intValue());
         this.dataStore = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_DATA_STORE);
         this.tournamentJoin = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_JOIN_DATA_STORE);
         this.tournamentEntry = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_ENTRY_DATA_STORE);
@@ -266,14 +265,33 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         });
     }
 
+    private long sortingTimer(){
+        return snapshotTimerInterval.get()*60*1000+3*60000;//add 3 minute buffer
+    }
     void startTournament(TournamentManager tournament){
         logger.warn("Tournament start : "+tournament.distributionId()+" : "+tournament.global());
         tournament.setup(this);
-        tournament.pendingSchedule = this.serviceContext.schedule(new TournamentCloseMonitor(tournament,this));
+        if(tournament.toClosingTime()>=sortingTimer()){
+            tournament.nextSortingTime = LocalDateTime.now().plusMinutes(snapshotTimerInterval.get());
+            logger.warn("Next sorting time : "+tournament.nextSortingTime);
+            tournament.pendingSchedule = this.serviceContext.schedule(new TournamentSnapshotMonitor(tournament,this));
+        }else{
+            tournament.pendingSchedule = this.serviceContext.schedule(new TournamentCloseMonitor(tournament,this));
+        }
         logger.warn(tournament.toString());
         if(this.application==null) return;
         tournament.loadPrizes(this.applicationPreSetup,this.application);
         listeners.forEach(l->l.tournamentStarted(tournament));
+    }
+    void sortTournament(TournamentManager tournament){
+        tournament.snapshot();
+        if(tournament.toClosingTime()>=sortingTimer()){
+            tournament.nextSortingTime = LocalDateTime.now().plusMinutes(snapshotTimerInterval.get());
+            logger.warn("Next sorting time : "+tournament.nextSortingTime);
+            tournament.pendingSchedule = this.serviceContext.schedule(new TournamentSnapshotMonitor(tournament,this));
+        }else{
+            tournament.pendingSchedule = this.serviceContext.schedule(new TournamentCloseMonitor(tournament,this));
+        }
     }
     void closeTournament(TournamentManager tournament){
         logger.warn("Tournament Close : "+tournament.distributionId()+" : "+tournament.global());

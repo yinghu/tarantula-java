@@ -10,5 +10,5 @@
   "recentlyTournamentListSize": 9,
   "topRaceBoardSize": 10,
   "myRaceBoardSize": 7,
-  "sortingIntervalMinutes": 15
+  "snapshotIntervalMinutes": 15
 }

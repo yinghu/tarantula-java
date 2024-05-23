@@ -3,12 +3,12 @@ package com.tarantula.platform.tournament;
 import com.icodesoftware.SchedulingTask;
 
 
-public class TournamentSortingMonitor implements SchedulingTask {
+public class TournamentSnapshotMonitor implements SchedulingTask {
 
     private final TournamentManager tournamentManager;
     private final PlatformTournamentServiceProvider tournamentServiceProvider;
 
-    public TournamentSortingMonitor(TournamentManager tournamentManager, PlatformTournamentServiceProvider tournamentServiceProvider){
+    public TournamentSnapshotMonitor(TournamentManager tournamentManager, PlatformTournamentServiceProvider tournamentServiceProvider){
         this.tournamentManager = tournamentManager;
         this.tournamentServiceProvider = tournamentServiceProvider;
     }

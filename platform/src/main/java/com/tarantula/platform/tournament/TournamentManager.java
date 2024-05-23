@@ -6,7 +6,7 @@ import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.*;
-import com.icodesoftware.logging.JDKLogger;
+
 import com.icodesoftware.service.ApplicationPreSetup;
 
 import com.icodesoftware.util.*;
@@ -25,7 +25,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class TournamentManager extends RecoverableObject implements Tournament, Portable {
 
-    private TarantulaLogger logger = JDKLogger.getLogger(TournamentManager.class);
     private Schedule schedule;
     private String type;
 
@@ -64,7 +63,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     private long scheduleId;
 
-    private LocalDateTime nextSortingTime;
+    LocalDateTime nextSortingTime;
+
 
     public TournamentManager(PlatformTournamentServiceProvider platformTournamentServiceProvider){
         this.tournamentServiceProvider = platformTournamentServiceProvider;
@@ -296,8 +296,6 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.tournamentServiceProvider = tournamentServiceProvider;
         this.distributionTournamentService = tournamentServiceProvider.distributionTournamentService;
         if(global){
-            nextSortingTime = LocalDateTime.now().plusMinutes(tournamentServiceProvider.sortingTimerInterval.get());
-            logger.warn("Next sorting time : "+nextSortingTime);
             if(status!=Status.STARTED){
                 status = Status.STARTED;
                 this.dataStore.update(this);
@@ -430,6 +428,15 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.dataStore.update(this);
     }
 
+    public void snapshot(){
+        if(!global) return;
+        for(TournamentSegment segment : tournamentSegments) {
+            if (!distributionTournamentService.ownership(segment.tournamentInstance.distributionId())) continue;
+            segment.snapshot();
+            tournamentServiceProvider.logger.warn("Tournament is sorting on : "+segment.tournamentInstance.distributionId());
+        }
+    }
+
     private void rank(TournamentInstance ended){
         int rank =1;
         LocalDateTime endTime = LocalDateTime.now();
@@ -497,11 +504,15 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     long toClosingTime(){
         if(TimeUtil.expired(closeTime)) return 1000;
-        return TimeUtil.durationUTCMilliseconds(startTime,closeTime);
+        return TimeUtil.durationUTCMilliseconds(LocalDateTime.now(),closeTime);
     }
     long toEndingTime(){
         if(TimeUtil.expired(endTime)) return 1000;
-        return TimeUtil.durationUTCMilliseconds(closeTime,endTime);
+        return TimeUtil.durationUTCMilliseconds(LocalDateTime.now(),endTime);
+    }
+    long toNextSortingTime(){
+        if(nextSortingTime==null || TimeUtil.expired(nextSortingTime)) return 1000;
+        return TimeUtil.durationUTCMilliseconds(LocalDateTime.now(),nextSortingTime);
     }
 
     private int segmentSlot(){
