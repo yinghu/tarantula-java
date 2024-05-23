@@ -396,7 +396,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         jsonObject.addProperty("StartTime",startTime.format(DateTimeFormatter.ISO_DATE_TIME));
         jsonObject.addProperty("CloseTime",closeTime.format(DateTimeFormatter.ISO_DATE_TIME));
         jsonObject.addProperty("EndTime",endTime.format(DateTimeFormatter.ISO_DATE_TIME));
-        jsonObject.addProperty("NextSortingTimer",TimeUtil.durationUTCInSeconds(LocalDateTime.now(),nextSortingTime));
+        if(nextSortingTime!=null) jsonObject.addProperty("NextSortingTimer",TimeUtil.durationUTCInSeconds(LocalDateTime.now(),nextSortingTime));
         jsonObject.addProperty("DurationMinutes",durationMinutes);
         jsonObject.addProperty("MaxEntries",maxEntriesPerInstance);
         jsonObject.addProperty("EnterCost",enterCost);
