@@ -64,6 +64,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     private long scheduleId;
 
+    private LocalDateTime nextSortingTime;
+
     public TournamentManager(PlatformTournamentServiceProvider platformTournamentServiceProvider){
         this.tournamentServiceProvider = platformTournamentServiceProvider;
         this.distributionTournamentService = platformTournamentServiceProvider.distributionTournamentService;
@@ -294,6 +296,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.tournamentServiceProvider = tournamentServiceProvider;
         this.distributionTournamentService = tournamentServiceProvider.distributionTournamentService;
         if(global){
+            nextSortingTime = LocalDateTime.now().plusMinutes(tournamentServiceProvider.sortingTimerInterval.get());
+            logger.warn("Next sorting time : "+nextSortingTime);
             if(status!=Status.STARTED){
                 status = Status.STARTED;
                 this.dataStore.update(this);
@@ -392,6 +396,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         jsonObject.addProperty("StartTime",startTime.format(DateTimeFormatter.ISO_DATE_TIME));
         jsonObject.addProperty("CloseTime",closeTime.format(DateTimeFormatter.ISO_DATE_TIME));
         jsonObject.addProperty("EndTime",endTime.format(DateTimeFormatter.ISO_DATE_TIME));
+        jsonObject.addProperty("NextSortingTimer",TimeUtil.durationUTCInSeconds(LocalDateTime.now(),nextSortingTime));
         jsonObject.addProperty("DurationMinutes",durationMinutes);
         jsonObject.addProperty("MaxEntries",maxEntriesPerInstance);
         jsonObject.addProperty("EnterCost",enterCost);
