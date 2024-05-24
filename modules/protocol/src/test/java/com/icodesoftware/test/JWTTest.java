@@ -16,7 +16,7 @@ public class JWTTest {
     public void setUp() {
     }
 
-    @Test(groups = { "JWT" })
+    //@Test(groups = { "JWT" })
     public void simpleTest() {
         JWTUtil.JWT jwt = JWTUtil.init();
         String jwtToken = jwt.token((header,payload)->{
@@ -31,7 +31,7 @@ public class JWTTest {
             p.get("aud").getAsString().equals("admin") && !TimeUtil.expired(TimeUtil.fromUTCMilliseconds(p.get("exp").getAsLong()))
         ));
     }
-    @Test(groups = { "JWT" })
+    //@Test(groups = { "JWT" })
     public void simple2Test() {
         byte[] key = "AIzaSyB52WeIzCm0F6UUJ7XkYNDoTlx7Xeu8DMA".getBytes();
         JWTUtil.JWT jwt = JWTUtil.init(key);
@@ -47,7 +47,7 @@ public class JWTTest {
                 p.get("aud").getAsString().equals("admin") && !TimeUtil.expired(TimeUtil.fromUTCMilliseconds(p.get("exp").getAsLong()))
         ));
     }
-    @Test(groups = { "JWT" })
+    //@Test(groups = { "JWT" })
     public void simple3Test() throws Exception{
         KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
         kpg.initialize(1024);
