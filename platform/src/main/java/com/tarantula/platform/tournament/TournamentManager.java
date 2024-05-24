@@ -188,6 +188,11 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         startLevel = buffer.readLong();
         endLevel = buffer.readLong();
         segmentsPerSchedule = buffer.readInt();
+
+        if(global) {
+            tournamentSegments = new TournamentSegment[this.segmentsPerSchedule];
+            segmentSlot = new AtomicInteger(0);
+        }
         return true;
     }
 

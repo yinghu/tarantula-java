@@ -605,7 +605,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public String jwtToken(Access access,OnSession session){
         return jwt.token((h,p)->{
             long expiry = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusHours(24));
-            Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(200,false);
+            Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(16,false);
             dataBuffer.writeLong(access.distributionId()).writeLong(session.stub());
             byte[] mark = encrypt(dataBuffer.array());
             h.addProperty("kid",CipherUtil.toBase64Key(mark));
@@ -620,12 +620,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             if (!jwt.verify(token, (h, p) -> {
                 long expiry = p.get("exp").getAsLong();
                 if (TimeUtil.expired(TimeUtil.fromUTCMilliseconds(expiry))) {
-                    log.warn("TOKEN EXPIRED : ");
+                    log.warn("Token expired  : "+expiry);
                     return false;
                 }
                 Access.Role r = rMap.get(p.get("aud").getAsString());
                 if (r == null) {
-                    log.warn("NO ROLE : ");
+                    log.warn("Role cannot be null");
                     return false;
                 }
                 byte[] data = decrypt(CipherUtil.fromBase64Key(h.get("kid").getAsString()));
@@ -638,7 +638,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             })) return OnSessionTrack.INVALID_TOKEN;
         }
         catch (Exception ex){
-            log.error("Token issue",ex);
+            log.warn("Should not be here :",ex);
             return OnSessionTrack.INVALID_TOKEN;
         }
         onSession.ticket(ticket(onSession.distributionId(),onSession.stub(),timeoutInSeconds));

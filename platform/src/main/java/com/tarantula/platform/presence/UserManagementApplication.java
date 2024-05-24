@@ -168,7 +168,14 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 onSession(access,session);
             }
             else{
-                session.write(JsonUtil.toSimpleResponse(false,"Device not registered").getBytes());
+                ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin("device",SystemUtil.oid(),deviceId);
+                thirdPartyLogin.distributionKey(session.systemId());
+                userService.createLoginProvider(thirdPartyLogin);
+                acc.property("login",deviceId);
+                acc.property("password",thirdPartyLogin.password());
+                this.createLogin(acc,session.distributionId(),AccessControl.player.name(),true,"device",true);
+                OnSession access = this.login(session.distributionId(),thirdPartyLogin.password(),session);
+                onSession(access,session);
             }
         }
         else if(session.action().equals("onDeviceRegister")){
