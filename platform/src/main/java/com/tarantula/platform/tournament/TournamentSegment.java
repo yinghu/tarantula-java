@@ -26,6 +26,8 @@ public class TournamentSegment {
     public Tournament.RaceBoard myRaceBoard(long systemId){
         TournamentEntry me = playerIndex.get(systemId);
         if(me==null) return new TournamentRaceBoard();
-        return null;
+        List<Tournament.Entry> board = new ArrayList<>();
+        
+        return new TournamentRaceBoard(board);
     }
 }
