@@ -616,6 +616,18 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
     public OnSession jwtToken(String token){
         OnSession onSession = new OnSessionTrack();
+        if(token == null)
+        {
+            log.warn("Null Token Received");
+            return OnSessionTrack.INVALID_TOKEN;
+        }
+
+        if(token.endsWith("clear.token"))
+        {
+            log.warn("Unity Default Token Received");
+            return OnSessionTrack.INVALID_TOKEN;
+        }
+
         try {
             if (!jwt.verify(token, (h, p) -> {
                 long expiry = p.get("exp").getAsLong();

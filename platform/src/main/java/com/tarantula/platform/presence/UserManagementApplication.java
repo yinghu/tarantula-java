@@ -168,6 +168,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 onSession(access,session);
             }
             else{
+                context.log("Device " + deviceId + " not registered, failing login", OnLog.WARN);
                 session.write(JsonUtil.toSimpleResponse(false,"Device not registered").getBytes());
             }
         }
