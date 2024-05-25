@@ -1,7 +1,6 @@
 package com.icodesoftware.lmdb;
 
 import com.icodesoftware.*;
-import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DataStoreSummary;
 import com.icodesoftware.service.Metadata;
 import org.lmdbjava.*;
@@ -13,7 +12,6 @@ import java.util.List;
 
 public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
-    private TarantulaLogger logger = JDKLogger.getLogger(CachedLMDBDataStore.class);
 
 
     public final Env<ByteBuffer> env;
@@ -99,7 +97,6 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         }catch(Exception ex){
             txn.abort();
             lmdbDataStoreProvider.onAbort(metadata.scope(),transactionId);
-            logger.error("Error on create",ex);
             return false;
         }
         finally {
@@ -248,26 +245,29 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         });
         if(loaded){
             lmdbDataStoreProvider.metricsListener.onUpdated(METRICS_LOAD,1);
-            return true;
+            //return true;
         }
         Recoverable.DataBufferPair cache = lmdbDataStoreProvider.dataBufferPair();
         Recoverable.DataBuffer key = cache.key();
         if(!t.writeKey(key)) {
             cache.reset();
-            return false;
+            return loaded;
         }
         Recoverable.DataBuffer value = cache.value();
         key.flip();
         if(!lmdbDataStoreProvider.onRecovering(metadata,key,value)) {
             cache.reset();
-            return false;
+            return loaded;
         }
+        value.flip();
+        Recoverable.DataHeader header = value.readHeader();
+        //System.out.println("RV : "+t.revision()+" : "+header.revision());
+        if(loaded && t.revision() == header.revision()) return true;
         final Txn<ByteBuffer> txn = env.txnWrite(); //read only
         try{
-            if (!dbi.put(txn, key.rewind(),value.flip())) throw new RuntimeException("lmdb failure to insert key/value");
+            if (!dbi.put(txn, key.rewind(),value.rewind())) throw new RuntimeException("lmdb failure to insert key/value");
             txn.commit();
             value.rewind();
-            Recoverable.DataHeader header = value.readHeader();
             t.read(value);
             t.revision(header.revision());
             return true;
