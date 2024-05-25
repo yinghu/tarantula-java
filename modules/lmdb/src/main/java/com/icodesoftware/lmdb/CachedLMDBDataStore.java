@@ -263,13 +263,12 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         Recoverable.DataHeader header = value.readHeader();
         System.out.println("RV : "+t.revision()+" : "+header.revision()+" : "+header.factoryId()+" : "+header.classId());
         if(loaded && t.revision() == header.revision()) return true;
+        t.read(value);
+        t.revision(header.revision());
         final Txn<ByteBuffer> txn = env.txnWrite(); //read only
         try{
             if (!dbi.put(txn, key.rewind(),value.rewind())) throw new RuntimeException("lmdb failure to insert key/value");
             txn.commit();
-            value.rewind();
-            t.read(value);
-            t.revision(header.revision());
             return true;
         }finally {
             txn.close();
