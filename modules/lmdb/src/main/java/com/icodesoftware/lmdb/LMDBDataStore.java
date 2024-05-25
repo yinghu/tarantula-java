@@ -243,13 +243,12 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         Recoverable.DataHeader header = value.readHeader();
         //System.out.println("RLV : "+t.revision()+" : "+header.revision());
         if(loaded && t.revision() == header.revision()) return true;
+        t.read(value);
+        t.revision(header.revision());
         final Txn<ByteBuffer> txn = env.txn(ptxn);
         try{
             if (!dbi.put(txn, key.rewind(),value.rewind())) throw new RuntimeException("lmdb failure to insert key/value");
             txn.commit();
-            value.rewind();
-            t.read(value);
-            t.revision(header.revision());
             return true;
         }finally {
             txn.close();

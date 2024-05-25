@@ -261,10 +261,15 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         }
         value.flip();
         Recoverable.DataHeader header = value.readHeader();
-        System.out.println("RV : "+t.revision()+" : "+header.revision()+" : "+header.factoryId()+" : "+header.classId());
+        //System.out.println("RV : "+t.revision()+" : "+header.revision()+" : "+header.factoryId()+" : "+header.classId());
         if(loaded && t.revision() == header.revision()) return true;
         t.read(value);
         t.revision(header.revision());
+        lmdbDataStoreProvider.metricsListener.onUpdated(METRICS_LOAD,1);
+        set(key.rewind(),value.rewind());
+        cache.reset();
+        return true;
+        /**
         final Txn<ByteBuffer> txn = env.txnWrite(); //read only
         try{
             if (!dbi.put(txn, key.rewind(),value.rewind())) throw new RuntimeException("lmdb failure to insert key/value");
@@ -275,7 +280,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             cache.reset();
             lmdbDataStoreProvider.metricsListener.onUpdated(METRICS_LOAD,1);
         }
-
+        **/
     }
 
     public <T extends Recoverable> boolean createEdge(T t,String label){
