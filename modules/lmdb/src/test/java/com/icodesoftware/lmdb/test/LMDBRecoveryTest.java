@@ -49,20 +49,18 @@ public class LMDBRecoveryTest {
                 key.writeLong(ownerId).flip();
                 boolean recovery = testMapStoreListener.transactionLogManager.onRecovering(metadata,key,value);
                 Assert.assertTrue(recovery);
-                //if(recovery) {
-                    //value.flip();
-                    //Recoverable.DataHeader header = value.readHeader();
-                    //TestObject tc = new TestObject();
-                    //tc.read(value);
-                    //System.out.println("TC : " + tc.type + " : " + tc.name + " : " + header.revision());
-                //}
+                if(recovery) {
+                    value.flip();
+                    Recoverable.DataHeader header = value.readHeader();
+                    //System.out.println(header.revision());
+                    TestObject tc = new TestObject();
+                    tc.read(value);
+                    Assert.assertEquals(header.classId(),tc.getClassId());
+                    Assert.assertEquals(header.factoryId(),tc.getFactoryId());
+                }
             }catch (Exception ex){
 
             }
-            TestObject tx = new TestObject();
-            tx.distributionId(ownerId);
-            Assert.assertTrue(dataStore.load(tx));
-            //System.out.println("Tx : "+tx.type+" : "+tx.name+" : "+tx.revision());
         };
         TestObject user = new TestObject();
         user.name = "n001";
@@ -80,23 +78,23 @@ public class LMDBRecoveryTest {
     @Test(groups = { "LMDBRecovery" })
     public void testCreateOnTransaction(){
         long ownerId = localDistributionIdGenerator.id();
-        //DataStore dataStore = lmdbDataStoreProvider.createDataStore("test_user");
         Metadata metadata = new LocalMetadata(Distributable.DATA_SCOPE,"test_user");
         testMapStoreListener.verifier = (tid)->{
-            //Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid).size(),2);
-            ///System.out.println("TID : "+tid);
             List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
             testMapStoreListener.transactionLogManager.onTransaction(logs);
             try(Recoverable.DataBufferPair kv = lmdbDataStoreProvider.dataBufferPair()){
                 Recoverable.DataBuffer key  = kv.key();
                 Recoverable.DataBuffer value = kv.value();
                 key.writeLong(ownerId).flip();
-                if(testMapStoreListener.transactionLogManager.onRecovering(metadata,key,value)){
+                boolean recovery = testMapStoreListener.transactionLogManager.onRecovering(metadata,key,value);
+                Assert.assertTrue(recovery);
+                if(recovery) {
                     value.flip();
                     Recoverable.DataHeader header = value.readHeader();
                     TestObject tc = new TestObject();
                     tc.read(value);
-                    //System.out.println("TTC : "+tc.type+" : "+tc.name+" : "+header.revision());
+                    Assert.assertEquals(header.classId(),tc.getClassId());
+                    Assert.assertEquals(header.factoryId(),tc.getFactoryId());
                 }
             }catch (Exception ex){
 
@@ -117,7 +115,6 @@ public class LMDBRecoveryTest {
             user.name = "n003";
             user.type = "t003";
             ds.update(user);
-
             return true;
         });
 
@@ -126,11 +123,11 @@ public class LMDBRecoveryTest {
             DataStore dataStore = ctx.onDataStore("test_user");
             TestObject tx = new TestObject();
             tx.distributionId(ownerId);
-            dataStore.load(tx);
-            //System.out.println("TTx : "+tx.type+" : "+tx.name+" : "+tx.revision());
+            Assert.assertTrue(dataStore.load(tx));
             return true;
         });
-
     }
+
+
 
 }
