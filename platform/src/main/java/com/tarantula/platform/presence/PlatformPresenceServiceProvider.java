@@ -109,33 +109,33 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         this.logger = JDKLogger.getLogger(PlatformPresenceServiceProvider.class);
         this.logger.warn("Presence service provider started on ->"+gameServiceName);
     }
-    public void onFriendList(String systemId,String friendSystemId){
+    public void onFriendList(long systemId,long friendSystemId){
         PlayList playList = new PlayList(friendListSize);
-        playList.distributionKey(systemId);
+        playList.distributionId(systemId);
         this.dataStore.createIfAbsent(playList,true);
-        playList.playListIndex.push(friendSystemId);
+        playList.onList(friendSystemId);
         this.dataStore.update(playList);
     }
-    public void onPlay(String systemId){
-        this.recentlyPlayList.playListIndex.push(systemId);
+    public void onPlay(long systemId){
+        this.recentlyPlayList.onList(systemId);
         updates.incrementAndGet();
     }
-    public List<String> friendList(String systemId){
+    public List<Long> friendList(long systemId){
         PlayList playList = new PlayList(friendListSize);
-        playList.distributionKey(systemId);
+        playList.distributionId(systemId);
         this.dataStore.createIfAbsent(playList,true);
-        return playList.playListIndex.list(new ArrayList<>());
+        return playList.list();
     }
-    public List<String> recentlyPlayList(){
-        return this.recentlyPlayList.playListIndex.list(new ArrayList<>());
+    public List<Long> recentlyPlayList(){
+        return this.recentlyPlayList.list();
     }
 
     public Profile profile(String systemId){
         Profile profile = new Profile();
-        profile.displayName ="player";
-        profile.distributionKey(systemId);
-        this.dataStore.createIfAbsent(profile,true);
-        profile.dataStore(this.dataStore);
+        //profile.displayName ="player";
+        //profile.distributionKey(systemId);
+        //this.dataStore.createIfAbsent(profile,true);
+        //profile.dataStore(this.dataStore);
         return profile;
     }
 

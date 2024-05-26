@@ -25,7 +25,7 @@ public class GameLobbyModule extends ModuleHeader{
         Stub stub = gameLobby.join(session);
         session.write(stub.toJson().toString().getBytes());
         if(!stub.joined()) return;
-        gameServiceProvider.presenceServiceProvider().onPlay(session.systemId());
+        gameServiceProvider.presenceServiceProvider().onPlay(session.distributionId());
         gameServiceProvider.gameServiceProvider().onJoined(session, stub.room);
     }
 
@@ -58,7 +58,7 @@ public class GameLobbyModule extends ModuleHeader{
             Stub stub = gameLobby.join(session);
             session.write(stub.toJson().toString().getBytes());
             if(stub.joined()) {
-                gameServiceProvider.presenceServiceProvider().onPlay(session.systemId());
+                gameServiceProvider.presenceServiceProvider().onPlay(session.distributionId());
                 this.gameServiceProvider.gameServiceProvider().onJoined(session,stub.room);
             }
         }
