@@ -4,19 +4,22 @@ import com.google.gson.JsonObject;
 import com.tarantula.platform.item.Application;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
-import java.util.Map;
 
 public class PendingReward extends Application {
 
+    public static final String LABEL = "pending_reward";
 
     //name -- the name of reward like daily giveaway , achievement , tournament
     //index -- this key of the reward
     //disabled -- rewarded already
+    public long configurationId;
     public PendingReward(){
-
+        this.onEdge = true;
+        this.label = LABEL;
     }
     public PendingReward(Application application){
-        this.index = application.distributionKey();
+        this();
+        this.configurationId = application.distributionId();
         this.configurationName = application.configurationName();
         this.configurationTypeId = application.configurationTypeId();
         this.configurationCategory = application.configurationCategory();
@@ -31,23 +34,25 @@ public class PendingReward extends Application {
     }
 
     @Override
-    public Map<String,Object> toMap(){
-        properties.put("1",index);
-        properties.put("2",configurationName);
-        properties.put("3",configurationType);
-        properties.put("4",configurationTypeId);
-        properties.put("5",configurationCategory);
-        properties.put("6",disabled);
-        return properties;
+    public boolean write(DataBuffer buffer) {
+        buffer.writeLong(configurationId);
+        buffer.writeUTF8(configurationName);
+        buffer.writeUTF8(configurationType);
+        buffer.writeUTF8(configurationTypeId);
+        buffer.writeUTF8(configurationCategory);
+        buffer.writeBoolean(disabled);
+        return true;
     }
+
     @Override
-    public void fromMap(Map<String,Object> properties){
-        this.index = (String) properties.get("1");
-        this.configurationName = (String) properties.get("2");
-        this.configurationType = (String) properties.get("3");
-        this.configurationTypeId = (String) properties.get("4");
-        this.configurationCategory = (String) properties.get("5");
-        this.disabled = (boolean)properties.get("6");
+    public boolean read(DataBuffer buffer) {
+        configurationId = buffer.readLong();
+        configurationName = buffer.readUTF8();
+        configurationType = buffer.readUTF8();
+        configurationTypeId = buffer.readUTF8();
+        configurationCategory = buffer.readUTF8();
+        disabled = buffer.readBoolean();
+        return true;
     }
 
     @Override
@@ -64,7 +69,7 @@ public class PendingReward extends Application {
 
     public PendingReward toApplication(){
         PendingReward pendingReward = new PendingReward(this);
-        pendingReward.distributionKey(this.index);
+        pendingReward.distributionId(this.configurationId);
         return pendingReward;
     }
 }
