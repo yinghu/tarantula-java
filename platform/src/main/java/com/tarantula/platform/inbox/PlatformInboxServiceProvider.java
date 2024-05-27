@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceSetup;
 
@@ -56,20 +57,24 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         logger.warn("Platform inbox started->"+gameServiceName);
     }
 
-    public <T extends Application> void claim(String systemId,T item){
+    public <T extends Application> void claim(long systemId,T item){
         if(pendingReward){
-
-
             PendingReward pending = new PendingReward(item);
+            pending.ownerKey(SnowflakeKey.from(systemId));
             this.dataStore.create(pending);
-            //pendingRewardIndex.addKey(pending.distributionKey());
             return;
         }
-        this.inventoryServiceProvider.redeem(systemId,item);
+        this.inventoryServiceProvider.redeem(Long.toString(systemId),item);
     }
 
     public void pendingTournamentPrize(long systemId,TournamentPrize tournamentPrize){
-
+        if(pendingReward){
+            PendingReward pending = new PendingReward(tournamentPrize);
+            pending.ownerKey(SnowflakeKey.from(systemId));
+            this.dataStore.create(pending);
+            return;
+        }
+        this.inventoryServiceProvider.redeem(Long.toString(systemId),tournamentPrize);
     }
 
     public boolean redeem(Session session,String rewardKey){
@@ -79,8 +84,6 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         if(!inventoryServiceProvider.redeem(session.systemId(),reward.toApplication())) return false;
         reward.disabled(true);
         dataStore.update(reward);
-
-        //pendingRewardIndex.removeKey(rewardKey);
         return true;
     }
     private List<PendingReward> rewardList(long systemId){
