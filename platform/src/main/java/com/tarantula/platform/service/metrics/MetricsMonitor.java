@@ -34,9 +34,12 @@ abstract public class MetricsMonitor implements ServiceProvider {
     public void updateSummary(Summary summary){
         metrics.categories().forEach(cat->{
             double current = metrics.statistics().entry(cat).total();
-            double gain = current-delta.get(cat);
-            summary.update(cat,gain);
-            delta.replace(cat,current);
+            Double previous = delta.get(cat);
+            if(previous != null){
+                double gain = current-previous;
+                summary.update(cat,gain);
+            }
+            delta.put(cat,current);
         });
     }
 }

@@ -299,6 +299,7 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
 
     @Override
     public void onAction(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer, UDPEndpointServiceProvider.RelayListener callback) {
+        metricsListener.onUpdated(AccessMetrics.UDP_ACTION_COUNT,1);
         UDPChannel channel = channels.get(messageHeader.sessionId);
         channel.onAction(messageHeader,messageBuffer,callback);
     }

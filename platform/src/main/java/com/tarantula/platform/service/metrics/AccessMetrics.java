@@ -9,6 +9,7 @@ import com.icodesoftware.service.ServiceContext;
 public class AccessMetrics extends AbstractMetrics{
 
     public final static String UDP_REQUEST_COUNT = "udpRequestCount";
+    public final static String UDP_ACTION_COUNT = "udpActionCount";
 
     @Override
     void _setup(ServiceContext serviceContext) {
