@@ -226,11 +226,11 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(distributionIdGenerator==null) throw new RuntimeException("DistributionIdGenerator Not Registered");
         if(envNoSyncFlag){
             EnvFlags[] flags = new EnvFlags[]{EnvFlags.MDB_NOSYNC};
-            data = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.dataSetting.storePath).toFile(),flags);
-            integration = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.integrationSetting.storePath).toFile(),flags);
-            index = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.indexSetting.storePath).toFile(),flags);
-            local = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(localSetting.storePath).toFile(),flags);
-            log = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(logSetting.storePath).toFile(),flags);
+            data = Env.create().setMapSize(storeSize(this.dataSetting)).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.dataSetting.storePath).toFile(),flags);
+            integration = Env.create().setMapSize(storeSize(this.integrationSetting)).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.integrationSetting.storePath).toFile(),flags);
+            index = Env.create().setMapSize(storeSize(this.indexSetting)).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.indexSetting.storePath).toFile(),flags);
+            local = Env.create().setMapSize(storeSize(this.localSetting)).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(localSetting.storePath).toFile(),flags);
+            log = Env.create().setMapSize(storeSize(this.logSetting)).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(logSetting.storePath).toFile(),flags);
         }
         else{
             data = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.dataSetting.storePath).toFile());
@@ -282,11 +282,11 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(!backupLog.exists()){
             backupLog.createNewFile();
             jsonObject = new JsonObject();
-            jsonObject.addProperty("data",0);
-            jsonObject.addProperty("integration",0);
-            jsonObject.addProperty("index",0);
-            jsonObject.addProperty("log",0);
-            jsonObject.addProperty("local",0);
+            jsonObject.addProperty(EnvSetting.data,0);
+            jsonObject.addProperty(EnvSetting.integration,0);
+            jsonObject.addProperty(EnvSetting.index,0);
+            jsonObject.addProperty(EnvSetting.log,0);
+            jsonObject.addProperty(EnvSetting.local,0);
             saveJson();
         }
         FileInputStream in = new FileInputStream(backupLog);
@@ -543,6 +543,10 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     public void registerMetricsListener(MetricsListener metricsListener) {
         if(metricsListener==null) return;
         this.metricsListener = metricsListener;
+    }
+
+    private long storeSize(EnvSetting envSetting){
+        return storeSize;
     }
 
 }
