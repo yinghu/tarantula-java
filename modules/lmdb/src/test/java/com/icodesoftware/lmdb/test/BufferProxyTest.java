@@ -77,5 +77,21 @@ public class BufferProxyTest {
         Assert.assertEquals(dataWrap.readUTF8(),"loop");
     }
 
+    @Test(groups = { "bufferProxy" })
+    public void bufferArrayTest(){
+        Recoverable.DataBuffer directBuffer = BufferProxy.buffer(100,true);
+        directBuffer.writeUTF8("test");
+        directBuffer.flip();
+        byte[] bytes = directBuffer.array();
+        Assert.assertEquals(bytes.length,8);
+
+        Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(100,false);
+        dataBuffer.writeUTF8("test");
+        dataBuffer.flip();
+        byte[] bytes1 = dataBuffer.array();
+        Assert.assertEquals(bytes1.length,100);
+
+    }
+
 
 }

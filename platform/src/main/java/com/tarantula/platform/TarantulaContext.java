@@ -21,7 +21,7 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.util.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.tarantula.cci.udp.UDPEndpoint;
+
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.event.TransactionReplicationEvent;
 import com.tarantula.platform.item.ConfigurableTemplate;
@@ -32,8 +32,6 @@ import com.tarantula.platform.service.cluster.*;
 
 import com.tarantula.platform.service.deployment.*;
 
-import com.tarantula.platform.service.metrics.DataStoreMonitor;
-import com.tarantula.platform.service.metrics.JVMMonitor;
 import com.tarantula.platform.service.metrics.MetricsManager;
 import com.tarantula.platform.service.persistence.*;
 import com.tarantula.platform.util.*;

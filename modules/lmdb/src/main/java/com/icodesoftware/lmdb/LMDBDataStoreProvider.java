@@ -40,6 +40,12 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private String localPath = "target/lmdb/local";
     private String logPath = "target/lmdb/log";
 
+    private EnvSetting dataSetting = EnvSetting.DataSetting;
+    private EnvSetting integrationSetting = EnvSetting.IntegrationSetting;
+    private EnvSetting indexSetting = EnvSetting.IndexSetting;
+    private EnvSetting logSetting = EnvSetting.LogSetting;
+    private EnvSetting localSetting = EnvSetting.LocalSetting;
+
     public Env<ByteBuffer> data;
     private Env<ByteBuffer> integration;
     private Env<ByteBuffer> index;

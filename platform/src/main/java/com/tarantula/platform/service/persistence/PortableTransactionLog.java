@@ -58,6 +58,7 @@ public class PortableTransactionLog extends RecoverableObject implements Portabl
 
     @Override
     public byte[] toBinary() {
+        //DataBuffer buffer = BufferProxy.buffer()
         return new byte[0];
     }
 
