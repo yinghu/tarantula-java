@@ -2,6 +2,7 @@ package com.tarantula.platform.service.persistence;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.icodesoftware.lmdb.EnvSetting;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.ServiceContext;
@@ -12,6 +13,7 @@ import com.icodesoftware.service.DataStoreProvider;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.FileSystems;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,12 +71,15 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         properties.put("node",this.node);
         properties.put("migration",ds.get("migration").getAsJsonObject());
         DataStoreProvider dataStoreProvider = dataStoreProvider(provider.trim());
-        JsonArray props = ds.get("properties").getAsJsonArray();
-        props.forEach(e->{
-            JsonObject kv = e.getAsJsonObject();
-            kv.entrySet().forEach((v)->{
-                properties.put(v.getKey(),v.getValue());
-            });
+
+        JsonArray envs = ds.get("env-settings").getAsJsonArray();
+        envs.forEach(je->{
+            JsonObject env = je.getAsJsonObject();
+            String n = env.get("name").getAsString();
+            String p = node.dataStoreDirectory()+ FileSystems.getDefault().getSeparator() + env.get("path").getAsString();
+            int mz = env.get("mbSize").getAsInt();
+            boolean e = env.get("enabled").getAsBoolean();
+            properties.put(n,new EnvSetting(p,mz,e));
         });
         properties.put("serviceContext",this.serviceContext);
         dataStoreProvider.configure(properties);

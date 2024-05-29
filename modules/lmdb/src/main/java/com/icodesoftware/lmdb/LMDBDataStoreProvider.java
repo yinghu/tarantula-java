@@ -1,6 +1,5 @@
 package com.icodesoftware.lmdb;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
@@ -13,7 +12,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,11 +32,6 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private String name;
 
     private String baseDir = "target/lmdb";
-    private String dataPath ="target/lmdb/data";
-    private String integrationPath="target/lmdb/integration";
-    private String indexPath = "target/lmdb/index";
-    private String localPath = "target/lmdb/local";
-    private String logPath = "target/lmdb/log";
 
     private EnvSetting dataSetting = EnvSetting.DataSetting;
     private EnvSetting integrationSetting = EnvSetting.IntegrationSetting;
@@ -80,17 +73,12 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         this.name = (String)properties.get("name");
         this.storeSize = storeSize*(int)properties.get("storeSizeMb");
         this.envNoSyncFlag = (boolean)properties.get("envNoSyncFlag");
-        String _dataPath = ((JsonElement)properties.get("dataPath")).getAsString();
-        String _integrationPath = ((JsonElement)properties.get("integrationPath")).getAsString();
-        String _indexPath = ((JsonElement)properties.get("indexPath")).getAsString();
-        String _localPath = ((JsonElement)properties.get("localPath")).getAsString();
-        String _logPath = ((JsonElement)properties.get("logPath")).getAsString();
+        dataSetting = (EnvSetting) properties.get(EnvSetting.data);
+        integrationSetting = (EnvSetting) properties.get(EnvSetting.integration);
+        indexSetting = (EnvSetting) properties.get(EnvSetting.index);
+        logSetting = (EnvSetting) properties.get(EnvSetting.log);
+        localSetting = (EnvSetting) properties.get(EnvSetting.local);
         this.baseDir = (String)properties.get("dir");
-        this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_dataPath;
-        this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+_integrationPath;
-        this.indexPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_indexPath;
-        this.localPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_localPath;
-        this.logPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_logPath;
         this.migration = new LocalDataMigration((JsonObject)properties.get("migration"));
     }
 
@@ -238,18 +226,18 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(distributionIdGenerator==null) throw new RuntimeException("DistributionIdGenerator Not Registered");
         if(envNoSyncFlag){
             EnvFlags[] flags = new EnvFlags[]{EnvFlags.MDB_NOSYNC};
-            data = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.dataPath).toFile(),flags);
-            integration = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.integrationPath).toFile(),flags);
-            index = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.indexPath).toFile(),flags);
-            local = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(localPath).toFile(),flags);
-            log = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(logPath).toFile(),flags);
+            data = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.dataSetting.storePath).toFile(),flags);
+            integration = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.integrationSetting.storePath).toFile(),flags);
+            index = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.indexSetting.storePath).toFile(),flags);
+            local = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(localSetting.storePath).toFile(),flags);
+            log = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(logSetting.storePath).toFile(),flags);
         }
         else{
-            data = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.dataPath).toFile());
-            integration = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.integrationPath).toFile());
-            index = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.indexPath).toFile());
-            local = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(localPath).toFile());
-            log = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(logPath).toFile());
+            data = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.dataSetting.storePath).toFile());
+            integration = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.integrationSetting.storePath).toFile());
+            index = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.indexSetting.storePath).toFile());
+            local = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(localSetting.storePath).toFile());
+            log = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(logSetting.storePath).toFile());
         }
         for(int i=0;i<PENDING_BUFFER_SIZE;i++){
             pendingQueue.offer(new BufferCache(KEY_SIZE,VALUE_SIZE,pendingQueue));

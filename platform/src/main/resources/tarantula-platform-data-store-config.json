@@ -2,12 +2,12 @@
     "data-source": {
         "name" : "tarantula",
         "provider" : "com.icodesoftware.lmdb.LMDBDataStoreProvider",
-        "properties": [
-            {"dataPath":"tarantula/data"},
-            {"integrationPath":"tarantula/integration"},
-            {"localPath":"tarantula/local"},
-            {"indexPath":"tarantula/index"},
-            {"logPath":"tarantula/log"}
+        "env-settings": [
+            {"name": "data","path": "tarantula/data","mbSize": 0,"enabled": true},
+            {"name": "integration","path": "tarantula/integration","mbSize": 0,"enabled": true},
+            {"name": "index","path": "tarantula/index","mbSize": 0,"enabled": true},
+            {"name": "log","path": "tarantula/log","mbSize": 0,"enabled": true},
+            {"name": "local","path": "tarantula/local","mbSize": 0,"enabled": true}
         ],
         "migration": {
             "listeners": [
