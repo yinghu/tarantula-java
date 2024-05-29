@@ -249,19 +249,21 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return instance;
     }
     private TournamentSegment lookupSegmentInstance(long segmentInstanceId){
-        return tournamentSegmentIndex.computeIfAbsent(segmentInstanceId,(key)->{
-            TournamentInstance tournamentInstance = new TournamentInstance();
-            tournamentInstance.distributionId(segmentInstanceId);
-            tournamentInstance.dataStore(dataStore);
-            tournamentInstance.entryDataStore = tournamentServiceProvider.tournamentEntry;
-            tournamentInstance.raceBoardDataStore = tournamentServiceProvider.tournamentRaceBoard;
-            if(!this.dataStore.load(tournamentInstance)) return null;
-            tournamentInstance.load();
-            TournamentSegment segment = new TournamentSegment(tournamentServiceProvider);
-            segment.tournamentInstance = tournamentInstance;
-            segment.snapshot();
-            return segment;
-        });
+        TournamentSegment segment = tournamentSegmentIndex.get(segmentInstanceId);
+        if(segment!=null) return segment;
+        //ended tournament load and cache
+        TournamentInstance tournamentInstance = new TournamentInstance();
+        tournamentInstance.distributionId(segmentInstanceId);
+        tournamentInstance.dataStore(dataStore);
+        tournamentInstance.entryDataStore = tournamentServiceProvider.tournamentEntry;
+        tournamentInstance.raceBoardDataStore = tournamentServiceProvider.tournamentRaceBoard;
+        if(!this.dataStore.load(tournamentInstance)) return null;
+        tournamentInstance.load();
+        segment = new TournamentSegment(tournamentServiceProvider);
+        segment.tournamentInstance = tournamentInstance;
+        segment.snapshot();
+        tournamentSegmentIndex.putIfAbsent(segmentInstanceId,segment);
+        return segment;
     }
     @Override
     public int getFactoryId() {
@@ -436,7 +438,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         for(TournamentSegment segment : tournamentSegments) {
             if (!distributionTournamentService.ownership(segment.tournamentInstance.distributionId())) continue;
             segment.snapshot();
-            tournamentServiceProvider.logger.warn("Tournament is sorting on : "+segment.tournamentInstance.distributionId());
+            //tournamentServiceProvider.logger.warn("Tournament is sorting on : "+segment.tournamentInstance.distributionId());
         }
     }
 

@@ -122,6 +122,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         indexed = new TournamentManager(this);
         indexed.distributionId(tournamentId);
         if(!dataStore.load(indexed)) throw new RuntimeException("Tournament ["+tournamentId+"] not existed");
+        tournamentIndex.putIfAbsent(tournamentId,indexed);
         return indexed;
     }
     @Override
@@ -257,6 +258,13 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             }while(pendingSchedule!=null);
             scheduleTournament();
         }));
+        ArrayList<Long> removingList = new ArrayList<>();
+        tournamentIndex.forEach((k,v)->{
+            if(v.status()== Tournament.Status.ENDED) removingList.add(k);
+        });
+        removingList.forEach(r->{
+            tournamentIndex.remove(r);
+        });
     }
     private void scheduleTournament(){
         LocalDateTime _current = LocalDateTime.now();

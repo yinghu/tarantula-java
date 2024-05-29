@@ -35,7 +35,7 @@ public class TournamentSegment {
 
     public Tournament.RaceBoard myRaceBoard(long systemId,long entryId){
         TournamentEntry me = playerIndex.get(systemId);
-        if(me==null) return new TournamentRaceBoard();
+        if(me==null || me.distributionId() != entryId ) return new TournamentRaceBoard();
         List<Tournament.Entry> board = new ArrayList<>();
         for(int retry =0; retry<2;retry++){
             boolean passed = true;
