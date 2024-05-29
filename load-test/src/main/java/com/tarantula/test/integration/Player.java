@@ -549,7 +549,7 @@ public class Player implements Runnable{
         };
         JsonObject jsonObject = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("updateGame.json"));
         jsonObject.addProperty("PlayerLevel",Main.rng.onNext(19));
-        jsonObject.addProperty("Score",Main.rng.onNext(100));
+        jsonObject.addProperty("Score",Main.rng.onNext(2000));
         long requestStart = System.currentTimeMillis();
         String resp = httpCaller.post("service/action",jsonObject.toString().getBytes(),headers);
         LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);

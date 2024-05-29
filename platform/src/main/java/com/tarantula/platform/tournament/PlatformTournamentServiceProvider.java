@@ -27,6 +27,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private static final String CONFIG = "game-tournament-settings";
 
     static final String TOURNAMENT_DATA_STORE = "tournament";
+    static final String RECENTLY_TOURNAMENT_INDEX_DATA_STORE = "tournament_index";
     static final String TOURNAMENT_JOIN_DATA_STORE = "tournament_join";
     static final String TOURNAMENT_ENTRY_DATA_STORE = "tournament_entry";
     static final String TOURNAMENT_RACE_BOARD_DATA_STORE = "tournament_race_board";
@@ -47,6 +48,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     final String gameServiceName;
 
     DataStore dataStore;
+
+    DataStore recentlyTournamentIndex;
 
     DataStore tournamentJoin;
 
@@ -78,7 +81,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     int maxPlayerHistoryRecords = 10;
     int recentlyTournamentListSize;
     int topRaceBoardSize;
-    int myRaceBoardSize;
+    int myRaceBoardAheadNumber;
+    int myRaceBoardBehindNumber;
     AtomicInteger snapshotTimerInterval = new AtomicInteger(0);
     private String reloadKey;
     final GameCluster gameCluster;
@@ -171,9 +175,11 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.clusterLockTimeoutSeconds = ((Number)configuration.property("clusterLockTimeoutSeconds")).intValue();
         this.recentlyTournamentListSize = ((Number)configuration.property("recentlyTournamentListSize")).intValue();
         this.topRaceBoardSize = ((Number)configuration.property("topRaceBoardSize")).intValue();
-        this.myRaceBoardSize = ((Number)configuration.property("myRaceBoardSize")).intValue();
+        this.myRaceBoardAheadNumber = ((Number)configuration.property("myRaceBoardAheadNumber")).intValue();
+        this.myRaceBoardBehindNumber = ((Number)configuration.property("myRaceBoardBehindNumber")).intValue();
         this.snapshotTimerInterval.set(((Number)configuration.property("snapshotIntervalMinutes")).intValue());
         this.dataStore = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_DATA_STORE);
+        this.recentlyTournamentIndex = applicationPreSetup.dataStore(gameCluster,RECENTLY_TOURNAMENT_INDEX_DATA_STORE);
         this.tournamentJoin = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_JOIN_DATA_STORE);
         this.tournamentEntry = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_ENTRY_DATA_STORE);
         this.tournamentRaceBoard = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_RACE_BOARD_DATA_STORE);
@@ -188,9 +194,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     @Override
     public void start() throws Exception {
-        dataStore.list(new RecentlyTournamentListQuery(gameCluster.distributionId()),list->{
+        recentlyTournamentIndex.list(new RecentlyTournamentListQuery(gameCluster.distributionId()),list->{
             if(list.name()!=null) {
-                list.dataStore(dataStore);
+                list.dataStore(recentlyTournamentIndex);
                 typedTournamentIndex.put(list.name(),list);
             }
             return true;
@@ -550,7 +556,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     private RecentlyTournamentList lookupRecentlyTournamentList(String type){
         return typedTournamentIndex.computeIfAbsent(type,key->{
-            RecentlyTournamentList loaded = RecentlyTournamentList.lookup(this.dataStore,this.gameCluster.distributionId(),type,this.recentlyTournamentListSize);
+            RecentlyTournamentList loaded = RecentlyTournamentList.lookup(this.recentlyTournamentIndex,this.gameCluster.distributionId(),type,this.recentlyTournamentListSize);
             return loaded;
         });
     }

@@ -9,6 +9,7 @@
   "clusterLockTimeoutSeconds": 5,
   "recentlyTournamentListSize": 9,
   "topRaceBoardSize": 10,
-  "myRaceBoardSize": 7,
+  "myRaceBoardAheadNumber": 5,
+  "myRaceBoardBehindNumber": 1,
   "snapshotIntervalMinutes": 15
 }
