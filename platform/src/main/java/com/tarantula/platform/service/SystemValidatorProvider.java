@@ -489,13 +489,6 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public void waitForData() {
         try{
             PresenceKey pKey = new PresenceKey(serviceContext.node().bucketId());
-            //byte[] clusterKey = this.serviceContext.clusterProvider().deployService().onClusterKey();
-            //byte[] tokenKey = this.serviceContext.clusterProvider().deployService().onTokenKey();
-            //if(clusterKey!=null&&tokenKey!=null){
-                //pKey.clusterKey(CipherUtil.toBase64Key(clusterKey));
-                //pKey.tokenKey(CipherUtil.toBase64Key(tokenKey));
-            //}
-            //else{
             pKey.clusterKey(CipherUtil.toBase64Key());
             pKey.tokenKey(CipherUtil.toBase64Key(JWTUtil.key()));
             if(deployDataStore.createIfAbsent(pKey,true)){
@@ -504,7 +497,6 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             else{
                 log.warn("Cluster and token keys have loaded on node ["+serviceContext.node().nodeName()+"]");
             }
-            //}
             encrypt = CipherUtil.encrypt(pKey.clusterKey());
             decrypt = CipherUtil.decrypt(pKey.clusterKey());
             this.presenceKey = pKey;
