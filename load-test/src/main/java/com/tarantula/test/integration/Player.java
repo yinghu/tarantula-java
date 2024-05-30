@@ -548,6 +548,8 @@ public class Player implements Runnable{
                 Session.TARANTULA_TAG,game+"/lobby1",
         };
         JsonObject jsonObject = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("updateGame.json"));
+        jsonObject.addProperty("PlayerLevel",Main.rng.onNext(49));
+        jsonObject.addProperty("Score",Main.rng.onNext(30));
         long requestStart = System.currentTimeMillis();
         String resp = httpCaller.post("service/action",jsonObject.toString().getBytes(),headers);
         LoadResult.totalHttpRequestTime.addAndGet(System.currentTimeMillis()-requestStart);

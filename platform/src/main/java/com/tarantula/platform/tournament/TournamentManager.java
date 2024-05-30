@@ -6,7 +6,7 @@ import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.*;
-import com.icodesoftware.logging.JDKLogger;
+
 import com.icodesoftware.service.ApplicationPreSetup;
 
 import com.icodesoftware.util.*;
@@ -25,7 +25,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class TournamentManager extends RecoverableObject implements Tournament, Portable {
 
-    private TarantulaLogger logger = JDKLogger.getLogger(TournamentManager.class);
     private Schedule schedule;
     private String type;
 
@@ -37,7 +36,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     private boolean global;
     private boolean notificationOnFinish;
     private TournamentSegment[] tournamentSegments;
-    private ConcurrentHashMap<Long,TournamentInstance> tournamentSegmentIndex =  new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Long,TournamentSegment> tournamentSegmentIndex =  new ConcurrentHashMap<>();
     private AtomicInteger segmentSlot;
 
     private Status status = Status.STARTING;
@@ -63,6 +62,9 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
 
     private long scheduleId;
+
+    LocalDateTime nextSortingTime;
+
 
     public TournamentManager(PlatformTournamentServiceProvider platformTournamentServiceProvider){
         this.tournamentServiceProvider = platformTournamentServiceProvider;
@@ -251,17 +253,22 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         });
         return instance;
     }
-    private TournamentInstance lookupSegmentInstance(long segmentInstanceId){
-        return tournamentSegmentIndex.computeIfAbsent(segmentInstanceId,(key)->{
-            TournamentInstance tournamentInstance = new TournamentInstance();
-            tournamentInstance.distributionId(segmentInstanceId);
-            tournamentInstance.dataStore(dataStore);
-            tournamentInstance.entryDataStore = tournamentServiceProvider.tournamentEntry;
-            tournamentInstance.raceBoardDataStore = tournamentServiceProvider.tournamentRaceBoard;
-            if(!this.dataStore.load(tournamentInstance)) return null;
-            tournamentInstance.load();
-            return tournamentInstance;
-        });
+    private TournamentSegment lookupSegmentInstance(long segmentInstanceId){
+        TournamentSegment segment = tournamentSegmentIndex.get(segmentInstanceId);
+        if(segment!=null) return segment;
+        //ended tournament load and cache
+        TournamentInstance tournamentInstance = new TournamentInstance();
+        tournamentInstance.distributionId(segmentInstanceId);
+        tournamentInstance.dataStore(dataStore);
+        tournamentInstance.entryDataStore = tournamentServiceProvider.tournamentEntry;
+        tournamentInstance.raceBoardDataStore = tournamentServiceProvider.tournamentRaceBoard;
+        if(!this.dataStore.load(tournamentInstance)) return null;
+        tournamentInstance.load();
+        segment = new TournamentSegment(tournamentServiceProvider);
+        segment.tournamentInstance = tournamentInstance;
+        segment.snapshot();
+        tournamentSegmentIndex.putIfAbsent(segmentInstanceId,segment);
+        return segment;
     }
     @Override
     public int getFactoryId() {
@@ -310,13 +317,13 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             TournamentInstanceQuery query = new TournamentInstanceQuery(this.distributionId,Tournament.GLOBAL_INSTANCE_LABEL);
             int[] index = {0};
             this.dataStore.list(query).forEach((ins->{
-                TournamentSegment segment = new TournamentSegment();
+                TournamentSegment segment = new TournamentSegment(tournamentServiceProvider);
                 segment.tournamentInstance = ins;
                 ins.dataStore(dataStore);
                 ins.entryDataStore = tournamentServiceProvider.tournamentEntry;
                 ins.raceBoardDataStore = tournamentServiceProvider.tournamentRaceBoard;
                 ins.load();
-                tournamentSegmentIndex.put(ins.distributionId(),ins);
+                tournamentSegmentIndex.put(ins.distributionId(),segment);
                 tournamentSegments[index[0]++] = segment;
             }));
             if(index[0]!=segmentsPerSchedule) throw new RuntimeException("segment not matched with ["+segmentsPerSchedule+"]");
@@ -397,6 +404,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         jsonObject.addProperty("StartTime",startTime.format(DateTimeFormatter.ISO_DATE_TIME));
         jsonObject.addProperty("CloseTime",closeTime.format(DateTimeFormatter.ISO_DATE_TIME));
         jsonObject.addProperty("EndTime",endTime.format(DateTimeFormatter.ISO_DATE_TIME));
+        if(nextSortingTime!=null) jsonObject.addProperty("NextRefreshTime",nextSortingTime.format(DateTimeFormatter.ISO_DATE_TIME));
         jsonObject.addProperty("DurationMinutes",durationMinutes);
         jsonObject.addProperty("MaxEntries",maxEntriesPerInstance);
         jsonObject.addProperty("EnterCost",enterCost);
@@ -428,6 +436,15 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         }
         status = Status.ENDED;
         this.dataStore.update(this);
+    }
+
+    public void snapshot(){
+        if(!global) return;
+        for(TournamentSegment segment : tournamentSegments) {
+            if (!distributionTournamentService.ownership(segment.tournamentInstance.distributionId())) continue;
+            segment.snapshot();
+            //tournamentServiceProvider.logger.warn("Tournament is sorting on : "+segment.tournamentInstance.distributionId());
+        }
     }
 
     private void rank(TournamentInstance ended){
@@ -497,11 +514,15 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     long toClosingTime(){
         if(TimeUtil.expired(closeTime)) return 1000;
-        return TimeUtil.durationUTCMilliseconds(startTime,closeTime);
+        return TimeUtil.durationUTCMilliseconds(LocalDateTime.now(),closeTime);
     }
     long toEndingTime(){
         if(TimeUtil.expired(endTime)) return 1000;
-        return TimeUtil.durationUTCMilliseconds(closeTime,endTime);
+        return TimeUtil.durationUTCMilliseconds(LocalDateTime.now(),endTime);
+    }
+    long toNextSortingTime(){
+        if(nextSortingTime==null || TimeUtil.expired(nextSortingTime)) return 1000;
+        return TimeUtil.durationUTCMilliseconds(LocalDateTime.now(),nextSortingTime);
     }
 
     private int segmentSlot(){
@@ -573,13 +594,13 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     public long onEnterSegment(long systemId,long segmentInstanceId){
         if(!global) return 0;
         //logger.warn(distributionId+" : "+segmentInstanceId+" : "+systemId+" : joined");
-        TournamentInstance segmentInstance = lookupSegmentInstance(segmentInstanceId);
+        TournamentInstance segmentInstance = lookupSegmentInstance(segmentInstanceId).tournamentInstance;
         return segmentInstance.enterSegment(systemId,targetScore);
     }
 
     public double onScoreSegment(long systemId,long instanceId,long entryId,double credits,double score){
         if(!global) return 0;
-        TournamentInstance instance = lookupSegmentInstance(instanceId);
+        TournamentInstance instance = lookupSegmentInstance(instanceId).tournamentInstance;
         //logger.warn(distributionId+" : "+instanceId+" : "+systemId+" : scored");
         return instance.scoreSegment(entryId,systemId,credits,score);
     }
@@ -607,9 +628,9 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     public RaceBoard onRaceBoard(long instanceId){
         if(global){
-            TournamentInstance segment = lookupSegmentInstance(instanceId);
+            TournamentSegment segment = lookupSegmentInstance(instanceId);
             if(segment==null) return new TournamentRaceBoard();
-            return segment.raceBoard();
+            return segment.topList();
         }
         TournamentInstance instance = load(instanceId);
         if(instance==null) return new TournamentRaceBoard();
@@ -618,12 +639,12 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     public RaceBoard onMyRaceBoard(long instanceId,long entryId,long systemId){
         if(global){
-            TournamentInstance segment = lookupSegmentInstance(instanceId);
+            TournamentSegment segment = lookupSegmentInstance(instanceId);
             if(segment==null) return new TournamentRaceBoard();
-            return segment.myRaceBoard(entryId,systemId,tournamentServiceProvider.myRaceBoardSize);
+            return segment.myRaceBoard(systemId,entryId);
         }
         TournamentInstance instance = load(instanceId);
         if(instance==null) return new TournamentRaceBoard();
-        return instance.myRaceBoard(entryId,systemId,tournamentServiceProvider.myRaceBoardSize);
+        return instance.myRaceBoard(entryId,systemId,7);
     }
 }
