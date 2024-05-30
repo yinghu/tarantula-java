@@ -8,6 +8,8 @@ public class EnvSetting {
     public static final String log ="log";
     public static final String local ="local";
 
+    public static final long storeBaseMbSize = 1_048_576L; //1MB
+
     public static final EnvSetting DataSetting = new EnvSetting("target/lmdb/data",0,true);
     public static final EnvSetting IntegrationSetting = new EnvSetting("target/lmdb/integration",0,true);
     public static final EnvSetting IndexSetting = new EnvSetting("target/lmdb/index",0,true);
