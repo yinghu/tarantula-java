@@ -47,6 +47,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
 
     private DataStore mDataStore;
     private DataStore profileDataStore;
+    private DataStore playListDataStore;
 
     private DistributionPresenceService distributionPresenceService;
     private ConcurrentHashMap<String,ProfileNameSequence> profileNameSequenceMapping;
@@ -73,8 +74,8 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         });
         this.recentlyPlayList = new PlayList(recentlyPlayListSize);
         this.recentlyPlayList.distributionId(this.gameCluster.distributionId());
-        this.dataStore.createIfAbsent(this.recentlyPlayList,true);
-        this.recentlyPlayList.dataStore(this.dataStore);
+        this.playListDataStore.createIfAbsent(this.recentlyPlayList,true);
+        this.recentlyPlayList.dataStore(this.playListDataStore);
         this.scheduleRunner = new ScheduleRunner(syncIntervalSeconds*1000,()->{
             syncPlayList();
         });
@@ -105,6 +106,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         this.dataStore = this.applicationPreSetup.dataStore(gameCluster,NAME);
         this.mDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_mapping_object");
         this.profileDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_profile");
+        this.playListDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_play_list");
         this.distributionPresenceService = this.serviceContext.clusterProvider().serviceProvider(DistributionPresenceService.NAME);
         this.logger = JDKLogger.getLogger(PlatformPresenceServiceProvider.class);
         this.logger.warn("Presence service provider started on ->"+gameServiceName);
@@ -112,9 +114,9 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     public void onFriendList(long systemId,long friendSystemId){
         PlayList playList = new PlayList(friendListSize);
         playList.distributionId(systemId);
-        this.dataStore.createIfAbsent(playList,true);
+        this.playListDataStore.createIfAbsent(playList,true);
         playList.onList(friendSystemId);
-        this.dataStore.update(playList);
+        this.playListDataStore.update(playList);
     }
     public void onPlay(long systemId){
         this.recentlyPlayList.onList(systemId);
@@ -123,7 +125,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     public List<Long> friendList(long systemId){
         PlayList playList = new PlayList(friendListSize);
         playList.distributionId(systemId);
-        this.dataStore.createIfAbsent(playList,true);
+        this.playListDataStore.createIfAbsent(playList,true);
         return playList.list();
     }
     public List<Long> recentlyPlayList(){
