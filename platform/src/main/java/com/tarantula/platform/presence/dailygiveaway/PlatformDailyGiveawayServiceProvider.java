@@ -51,7 +51,6 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
         DailyGiveaway dailyGiveaway = dailyGiveaways.get(dailyLoginTrack.rewardKey());
         if(dailyGiveaway==null) return null;
         platformGameServiceProvider.inventoryServiceProvider().redeem(session.systemId(),dailyGiveaway);
-        //platformGameServiceProvider.inboxServiceProvider().claim(session.systemId(),dailyGiveaway);
         dailyLoginTrack.rewardPending = false;
         dailyLoginTrack.update();
         return dailyLoginTrack;

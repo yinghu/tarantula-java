@@ -1,8 +1,10 @@
 package com.tarantula.test.integration;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
 import com.icodesoftware.util.HttpCaller;
+import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.JvmRNG;
 import com.icodesoftware.util.TarantulaThreadFactory;
 
@@ -23,10 +25,10 @@ public class Main {
 
     static boolean onFile = false;
 
-    static String[] displayNames ={"Andy","Paul","Josh","Sam","Harrison","Nick","Andrew","Mike","Burn","Mark"};
+    static String[] displayNames = new String[2500];
     static JvmRNG rng = new JvmRNG();
     static int index(){
-        return rng.onNext(10);
+        return rng.onNext(2500);
     }
     static String accessKey;
     static long httpRequestInterval;
@@ -50,6 +52,16 @@ public class Main {
         System.out.println(httpCaller.post("server",jsonObject.toString().getBytes(),headers));
     }
     public static void main(String[] args) throws Exception{
+        JsonObject config = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("game-presence-settings.json")).get("profile").getAsJsonObject();
+        JsonArray adjs = config.get("adjectives").getAsJsonArray();
+        JsonArray nouns = config.get("nouns").getAsJsonArray();
+        int[] i={0};
+        adjs.forEach(adj->{
+            String pre = adj.getAsString();
+            nouns.forEach(noun->{
+                displayNames[i[0]++]=pre+noun.getAsString();
+            });
+        });
         Properties properties = new Properties();
         try(InputStream inputStream = new FileInputStream("load.properties")){
             properties.load(inputStream);

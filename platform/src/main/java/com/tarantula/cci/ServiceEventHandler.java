@@ -1,9 +1,11 @@
 package com.tarantula.cci;
 
+
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.tarantula.platform.OnSessionTrack;
+import com.icodesoftware.util.JsonUtil;
+import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServiceActionEvent;
 
 
@@ -31,7 +33,14 @@ public class ServiceEventHandler extends AbstractRequestHandler {
         String clientId = exchange.header(Session.TARANTULA_CLIENT_ID);
         String trackId = exchange.header(Session.TARANTULA_TRACK_ID);
         byte[]  _payload = exchange.payload();
-        if(path.startsWith("/service/action") && token!=null && !token.equals("undefined")){
+        if(token == null || token.equals("undefined")){
+            throw new IllegalAccessException("none game client access");
+        }
+        if(token.endsWith(".clear.token")){
+            log.warn("Game client is not authenticated with token ["+token+"]");
+            super.onEvent(new ResponsiveEvent("",0,JsonUtil.toSimpleResponse(false,"game not authenticated").getBytes(),0,"application/json",true));
+        }
+        else if(path.startsWith("/service/action")){
             OnSession id = auth.validateToken(token);
             if(!id.successful()) throw new IllegalAccessException(id.message());
             RoutingKey  routingKey = eventService.routingKey(id.distributionId(),tag);

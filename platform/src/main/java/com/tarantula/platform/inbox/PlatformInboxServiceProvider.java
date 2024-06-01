@@ -4,12 +4,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.RecoverService;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceSetup;
-import com.tarantula.platform.PresenceIndex;
+
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.Application;
 import com.tarantula.platform.tournament.TournamentPrize;
@@ -60,20 +59,22 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
 
     public <T extends Application> void claim(long systemId,T item){
         if(pendingReward){
-            PendingRewardIndex pendingRewardIndex = new PendingRewardIndex();
-            pendingRewardIndex.distributionId(systemId);
-            this.dataStore.createIfAbsent(pendingRewardIndex,true);
             PendingReward pending = new PendingReward(item);
+            pending.ownerKey(SnowflakeKey.from(systemId));
             this.dataStore.create(pending);
-            //pendingRewardIndex.addKey(pending.distributionKey());
-            this.dataStore.update(pendingRewardIndex);
             return;
         }
         this.inventoryServiceProvider.redeem(systemId,item);
     }
 
     public void pendingTournamentPrize(long systemId,TournamentPrize tournamentPrize){
-
+        if(pendingReward){
+            PendingReward pending = new PendingReward(tournamentPrize);
+            pending.ownerKey(SnowflakeKey.from(systemId));
+            this.dataStore.create(pending);
+            return;
+        }
+        this.inventoryServiceProvider.redeem(systemId,tournamentPrize);
     }
 
     public boolean redeem(Session session,String rewardKey){
@@ -83,23 +84,14 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         if(!inventoryServiceProvider.redeem(session.systemId(),reward.toApplication())) return false;
         reward.disabled(true);
         dataStore.update(reward);
-        PendingRewardIndex pendingRewardIndex = new PendingRewardIndex();
-        pendingRewardIndex.distributionId(session.systemId());
-        this.dataStore.createIfAbsent(pendingRewardIndex,true);
-        //pendingRewardIndex.removeKey(rewardKey);
-        dataStore.update(pendingRewardIndex);
         return true;
     }
     private List<PendingReward> rewardList(long systemId){
         ArrayList<PendingReward> rewards = new ArrayList();
-        PendingRewardIndex pendingRewardIndex = new PendingRewardIndex();
-        pendingRewardIndex.distributionId(systemId);
-        this.dataStore.createIfAbsent(pendingRewardIndex,true);
-        //pendingRewardIndex.keySet().forEach(k->{
-            //PendingReward pending = new PendingReward();
-            //pending.distributionKey(k);
-            //if(dataStore.load(pending)) rewards.add(pending);
-        //});
+        dataStore.list(new PendingRewardQuery(systemId),(reward)->{
+            if(!reward.disabled()) rewards.add(reward);
+            return true;
+        });
         return rewards;
     }
 }

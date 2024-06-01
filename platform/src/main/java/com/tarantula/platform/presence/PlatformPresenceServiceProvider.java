@@ -47,6 +47,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
 
     private DataStore mDataStore;
     private DataStore profileDataStore;
+    private DataStore playListDataStore;
 
     private DistributionPresenceService distributionPresenceService;
     private ConcurrentHashMap<String,ProfileNameSequence> profileNameSequenceMapping;
@@ -73,8 +74,8 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         });
         this.recentlyPlayList = new PlayList(recentlyPlayListSize);
         this.recentlyPlayList.distributionId(this.gameCluster.distributionId());
-        this.dataStore.createIfAbsent(this.recentlyPlayList,true);
-        this.recentlyPlayList.dataStore(this.dataStore);
+        this.playListDataStore.createIfAbsent(this.recentlyPlayList,true);
+        this.recentlyPlayList.dataStore(this.playListDataStore);
         this.scheduleRunner = new ScheduleRunner(syncIntervalSeconds*1000,()->{
             syncPlayList();
         });
@@ -105,23 +106,46 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         this.dataStore = this.applicationPreSetup.dataStore(gameCluster,NAME);
         this.mDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_mapping_object");
         this.profileDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_profile");
+        this.playListDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_play_list");
         this.distributionPresenceService = this.serviceContext.clusterProvider().serviceProvider(DistributionPresenceService.NAME);
         this.logger = JDKLogger.getLogger(PlatformPresenceServiceProvider.class);
         this.logger.warn("Presence service provider started on ->"+gameServiceName);
     }
 
+
     public void onPlay(Session session){
-        this.recentlyPlayList.playListIndex.push(session.distributionId());
+        this.recentlyPlayList.onList(session.distributionId());
         updates.incrementAndGet();
     }
 
 
+    public void onFriendList(long systemId,long friendSystemId){
+        PlayList playList = new PlayList(friendListSize);
+        playList.distributionId(systemId);
+        this.playListDataStore.createIfAbsent(playList,true);
+        playList.onList(friendSystemId);
+        this.playListDataStore.update(playList);
+    }
+    public void onPlay(long systemId){
+        this.recentlyPlayList.onList(systemId);
+        updates.incrementAndGet();
+    }
+    public List<Long> friendList(long systemId){
+        PlayList playList = new PlayList(friendListSize);
+        playList.distributionId(systemId);
+        this.playListDataStore.createIfAbsent(playList,true);
+        return playList.list();
+    }
+    public List<Long> recentlyPlayList(){
+        return this.recentlyPlayList.list();
+    }
+
     public Profile profile(String systemId){
         Profile profile = new Profile();
-        profile.displayName ="player";
-        profile.distributionKey(systemId);
-        this.dataStore.createIfAbsent(profile,true);
-        profile.dataStore(this.dataStore);
+        //profile.displayName ="player";
+        //profile.distributionKey(systemId);
+        //this.dataStore.createIfAbsent(profile,true);
+        //profile.dataStore(this.dataStore);
         return profile;
     }
 
@@ -277,17 +301,15 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
 
 
     public int onProfileSequence(String name){
-        return profileNameSequenceMapping.compute(name,(k,v)->{
-            if(v==null){
-                v = ProfileNameSequence.lookup(profileDataStore,gameCluster.distributionId(),name);
-            }
-            v.sequence++;
-            final ProfileNameSequence vx = v;
-            serviceContext.schedule(new ScheduleRunner(100,()->{
-                vx.update();
-            }));
-            return v;
-        }).sequence;
+        ProfileNameSequence profileNameSequence = profileNameSequenceMapping.computeIfAbsent(name,(k)->{
+            //Just in case the name is not preloaded
+            ProfileNameSequence notCached = new ProfileNameSequence(name);
+            notCached.ownerKey(SnowflakeKey.from(gameCluster.distributionId()));
+            notCached.dataStore(dataStore);
+            dataStore.create(notCached);
+            return notCached;
+        });
+        return profileNameSequence.sequence();
     }
 
 }

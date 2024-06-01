@@ -39,7 +39,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private EnvSetting logSetting = EnvSetting.LogSetting;
     private EnvSetting localSetting = EnvSetting.LocalSetting;
 
-    public Env<ByteBuffer> data;
+    private Env<ByteBuffer> data;
     private Env<ByteBuffer> integration;
     private Env<ByteBuffer> index;
     private Env<ByteBuffer> local;

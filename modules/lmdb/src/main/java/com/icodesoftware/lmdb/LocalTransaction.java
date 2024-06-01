@@ -24,7 +24,6 @@ public class LocalTransaction implements Transaction, Transaction.DataStoreConte
     public boolean execute(TransactionContext transactionContext) {
         txn = dataStoreProvider.txn(scope);
         transactionId = txn.getId();
-        //final long tid = txn.getId();
         try{
             if(!transactionContext.update(this.dataStoreContext)){
                 txn.abort();

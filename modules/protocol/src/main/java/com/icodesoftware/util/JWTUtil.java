@@ -1,6 +1,8 @@
 package com.icodesoftware.util;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.logging.JDKLogger;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -20,6 +22,8 @@ public class JWTUtil {
     static {
         secureRandom = new SecureRandom();
     }
+
+    private static TarantulaLogger logger = JDKLogger.getLogger(JWT.class);
 
     public static byte[] key(){
         byte[] key = new byte[KEY_SIZE];
@@ -70,6 +74,8 @@ public class JWTUtil {
         }
     }
     public static class JWT{
+
+
         private final Mac mac;
         private final Signature signer;
         private final Signature verifier;
@@ -122,7 +128,8 @@ public class JWTUtil {
                 if(!signature.equals(parts[2])) throw new RuntimeException("Bad signature");//need to verify json parser sync issue
                 return onVerify.process(h,p);
             }catch (Exception ex){
-                throw new RuntimeException(ex);
+                logger.warn("Wrong token :"+ex.getMessage());
+                return false;
             }
         }
 
@@ -130,7 +137,7 @@ public class JWTUtil {
             return JsonUtil.parse(Base64.getUrlDecoder().decode(base64));
         }
         private String base64(JsonObject json){
-            return Base64.getUrlEncoder().encodeToString(json.toString().getBytes());
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(json.toString().getBytes());
         }
 
         private String sign(byte[] data,byte[] signature) throws Exception{
