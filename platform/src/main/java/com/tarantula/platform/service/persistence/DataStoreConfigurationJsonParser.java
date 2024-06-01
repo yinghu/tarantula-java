@@ -120,12 +120,12 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         }catch (Exception ex){
             json = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(config));
         }
-        JsonArray props = json.get("data-source").getAsJsonObject().getAsJsonArray("properties");
+        JsonArray props = json.get("data-source").getAsJsonObject().getAsJsonArray("env-settings");
         String[] indexDir = {"tarantula/index"};
         props.forEach(p->{
             JsonObject pd = p.getAsJsonObject();
-            if(pd.has("indexPath")){
-                indexDir[0] = pd.get("indexPath").getAsString();
+            if(pd.get("name").equals(EnvSetting.index)){
+                indexDir[0] = pd.get("path").getAsString();
             }
         });
         return indexDir[0];
