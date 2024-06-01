@@ -169,7 +169,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             }
             else{
                 ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin("device",SystemUtil.oid(),deviceId);
-                thirdPartyLogin.distributionKey(session.systemId());
+                thirdPartyLogin.distributionId(session.systemId());
                 userService.createLoginProvider(thirdPartyLogin);
                 acc.property("login",deviceId);
                 acc.property("password",thirdPartyLogin.password());
