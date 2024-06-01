@@ -1,23 +1,55 @@
-version: '3'
-
 services:
-  platform:
-    container_name: platform
+  platform-01:
+    container_name: platform01
     hostname: platform-01
+    environment:
+      USE_HOSTNAME: true
     build: 
       context: .
       dockerfile: Dockerfile-dev
-    ports:
-      - "8090:8090"
     volumes:
       - platform-data:/tarantula
       - ./config:/etc/tarantula
     restart: unless-stopped
     networks:
+      gamecluster-net:
+        ipv4_address: 10.20.0.2
+
+  platform-02:
+    container_name: platform02
+    hostname: platform-02
+    environment:
+      USE_HOSTNAME: true
+    build: 
+      context: .
+      dockerfile: Dockerfile-dev
+    volumes:
+      - platform-data-2:/tarantula
+      - ./config:/etc/tarantula
+    restart: unless-stopped
+    networks:
+      gamecluster-net:
+        ipv4_address: 10.20.0.3
+
+  loadbalancer:
+    image: nginx:latest
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - platform-01
+      - platform-02
+    ports:
+      - "8090:4000"
+    networks:
       - gamecluster-net
 
 volumes:
   platform-data:
+  platform-data-2:
 
 networks:
   gamecluster-net:
+    ipam:
+      config:
+        - subnet: 10.20.0.0/16
+          gateway: 10.20.0.1

@@ -47,6 +47,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
 
     private DataStore mDataStore;
     private DataStore profileDataStore;
+    private DataStore playListDataStore;
 
     private DistributionPresenceService distributionPresenceService;
     private ConcurrentHashMap<String,ProfileNameSequence> profileNameSequenceMapping;
@@ -73,8 +74,8 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         });
         this.recentlyPlayList = new PlayList(recentlyPlayListSize);
         this.recentlyPlayList.distributionId(this.gameCluster.distributionId());
-        this.dataStore.createIfAbsent(this.recentlyPlayList,true);
-        this.recentlyPlayList.dataStore(this.dataStore);
+        this.playListDataStore.createIfAbsent(this.recentlyPlayList,true);
+        this.recentlyPlayList.dataStore(this.playListDataStore);
         this.scheduleRunner = new ScheduleRunner(syncIntervalSeconds*1000,()->{
             syncPlayList();
         });
@@ -105,37 +106,38 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         this.dataStore = this.applicationPreSetup.dataStore(gameCluster,NAME);
         this.mDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_mapping_object");
         this.profileDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_profile");
+        this.playListDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_play_list");
         this.distributionPresenceService = this.serviceContext.clusterProvider().serviceProvider(DistributionPresenceService.NAME);
         this.logger = JDKLogger.getLogger(PlatformPresenceServiceProvider.class);
         this.logger.warn("Presence service provider started on ->"+gameServiceName);
     }
-    public void onFriendList(String systemId,String friendSystemId){
+    public void onFriendList(long systemId,long friendSystemId){
         PlayList playList = new PlayList(friendListSize);
-        playList.distributionKey(systemId);
-        this.dataStore.createIfAbsent(playList,true);
-        playList.playListIndex.push(friendSystemId);
-        this.dataStore.update(playList);
+        playList.distributionId(systemId);
+        this.playListDataStore.createIfAbsent(playList,true);
+        playList.onList(friendSystemId);
+        this.playListDataStore.update(playList);
     }
-    public void onPlay(String systemId){
-        this.recentlyPlayList.playListIndex.push(systemId);
+    public void onPlay(long systemId){
+        this.recentlyPlayList.onList(systemId);
         updates.incrementAndGet();
     }
-    public List<String> friendList(String systemId){
+    public List<Long> friendList(long systemId){
         PlayList playList = new PlayList(friendListSize);
-        playList.distributionKey(systemId);
-        this.dataStore.createIfAbsent(playList,true);
-        return playList.playListIndex.list(new ArrayList<>());
+        playList.distributionId(systemId);
+        this.playListDataStore.createIfAbsent(playList,true);
+        return playList.list();
     }
-    public List<String> recentlyPlayList(){
-        return this.recentlyPlayList.playListIndex.list(new ArrayList<>());
+    public List<Long> recentlyPlayList(){
+        return this.recentlyPlayList.list();
     }
 
     public Profile profile(String systemId){
         Profile profile = new Profile();
-        profile.displayName ="player";
-        profile.distributionKey(systemId);
-        this.dataStore.createIfAbsent(profile,true);
-        profile.dataStore(this.dataStore);
+        //profile.displayName ="player";
+        //profile.distributionKey(systemId);
+        //this.dataStore.createIfAbsent(profile,true);
+        //profile.dataStore(this.dataStore);
         return profile;
     }
 
