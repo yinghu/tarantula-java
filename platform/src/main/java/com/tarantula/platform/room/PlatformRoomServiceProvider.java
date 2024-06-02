@@ -198,6 +198,11 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             }
         }
         GameRoom gameRoom = gameRoomIndex.get(stub.roomId);
+        if(gameRoom==null){
+            gameRoom = new GameRoomHeader();
+            gameRoom.distributionId(stub.roomId);
+            loadGameRoom(index,gameRoom);
+        }
         gameRoom.leave(stub);
         if(gameRoom.empty()) resetGameRoom(index,gameRoom);
     }
