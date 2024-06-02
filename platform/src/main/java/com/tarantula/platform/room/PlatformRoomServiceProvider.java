@@ -243,8 +243,11 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public <T extends Configurable> void release(T t) {
-        GameZoneIndex index = gameZoneIndex.remove(t.distributionId());
-        if(dedicated) return;
+        if(dedicated) {
+            gameZoneIndex.remove(t.distributionId());
+            return;
+        }
+        GameZoneIndex index = gameZoneIndex.get(t.distributionId());
         ArrayList<Long> pendingReleased = new ArrayList<>();
         gameRoomIndex.forEach((k,r)->{
             if(r.zoneId()==index.gameZone.distributionId()){
@@ -256,7 +259,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             GameRoom remove = gameRoomIndex.remove(roomId);
             closeGameRoom(remove);
         });
-
+        gameRoomIndex.remove(t.distributionId());
     }
 
 
