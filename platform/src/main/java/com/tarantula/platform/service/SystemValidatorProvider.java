@@ -91,7 +91,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public boolean resetClusterKey(){
         try{
             PresenceKey existing = new PresenceKey(presenceKey.distributionId());
-            if(this.deployDataStore.load(existing)){
+            if(!this.deployDataStore.load(existing)){
                 log.warn("Key not existed");
                 return false;
             }
