@@ -28,11 +28,13 @@ public class ServiceView extends RecoverableObject{
         int[] ix = {0};
         categories.forEach((c)->{
             FIFOBuffer<Property> metrics = metricsMap.get(c.getAsString());
-            List<Property> snapshot = metrics.list(new ArrayList<>());
-            if(ix[0]<chartSize){
-                list.add(_chart(snapshot,c.getAsString()));
+            if(metrics!=null){
+                List<Property> snapshot = metrics.list(new ArrayList<>());
+                if(ix[0]<chartSize){
+                    list.add(_chart(snapshot,c.getAsString()));
+                }
+                ix[0]++;
             }
-            ix[0]++;
         });
         JsonObject m = new JsonObject();
         m.addProperty("memberId",name);
