@@ -43,11 +43,7 @@ public class SudoRoleModule implements Module {
             }
             session.write(JsonUtil.toSimpleResponse(suc,suc?"Cluster reset":"failed to reset key").getBytes());
         }
-        else if(session.action().equals("onPresenceKey")){
-            byte[] key = this.tokenValidatorProvider.clusterKey(session.name());
-            PermissionContext permissionContext = new PermissionContext(key!=null?SystemUtil.toBase64String(key):null);
-            session.write(permissionContext.toJson().toString().getBytes());
-        }
+
         else if(session.action().equals("onCreateLabeledKey")){
             String key = tokenValidatorProvider.createAccessKey(session.name());
             PermissionContext pc = new PermissionContext(key);

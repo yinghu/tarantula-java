@@ -12,8 +12,6 @@ public interface TokenValidatorProvider extends ServiceProvider,Resettable {
 
     TokenValidator tokenValidator();
 
-    byte[] clusterKey(String clusterNameSuffix);
-
     boolean resetClusterKey();
 
     //labeled access key
@@ -34,9 +32,7 @@ public interface TokenValidatorProvider extends ServiceProvider,Resettable {
     void timeout(int minutes,int seconds);
 
     Presence presence(Session session);
-    OnSession onSession(Session session);
-    //void updateVendorAccessToken(String systemId,String accessToken);
-
+   
     String token(long systemId,long stub);
     Access.Role role(long systemId);
     boolean checkRole(Access access,String role);

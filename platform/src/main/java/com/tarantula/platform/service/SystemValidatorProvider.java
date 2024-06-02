@@ -19,6 +19,7 @@ import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -69,16 +70,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public TokenValidator tokenValidator(){
         return systemValidator.tokenValidator();
     }
+
     public Presence presence(Session session){
         Presence presence = presence(session.distributionId());
         return presence;
     }
-    public OnSession onSession(Session session){
-        SessionIndex onSessionTrack = new SessionIndex();
-        onSessionTrack.distributionId(session.stub());
-        onSessionTrack.dataStore(sdatastore);
-        return sdatastore.load(onSessionTrack)? onSessionTrack: OnSessionTrack.SESSION_NOT_AVAILABLE;
-    }
+
     public Presence presence(long id){
         return pMap.computeIfAbsent(id,(k)->{
             PresenceIndex px = new PresenceIndex(sdatastore);
@@ -91,17 +88,18 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         });
     }
 
-    public byte[] clusterKey(String clusterNameSuffix){
-        if(!clusterNameSuffix.equals(this.serviceContext.node().clusterNameSuffix())) return null;
-        return presenceKey.clusterKey();
-    }
-
-
     public boolean resetClusterKey(){
         try{
-            presenceKey.clusterKey(CipherUtil.toBase64Key());
-            this.deployDataStore.update(presenceKey);
-            this.clusterStore.mapSet(presenceKey.distributionKey().getBytes(),presenceKey.clusterKey());
+            PresenceKey existing = new PresenceKey();
+            existing.distributionId(presenceKey.distributionId());
+            if(this.deployDataStore.load(existing)) return false;
+            existing.clusterKey(CipherUtil.toBase64Key());
+            existing.tokenKey(CipherUtil.toBase64Key(JWTUtil.key()));
+            if(!this.deployDataStore.update(existing)) return false;
+            byte[] ck = (serviceContext.node().bucketName()+"_ck").getBytes();
+            byte[] jk = (serviceContext.node().bucketName()+"_jk").getBytes();
+            this.clusterStore.mapSet(ck,existing.clusterKey());
+            this.clusterStore.mapSet(jk,existing.tokenKey());
             return true;
         }catch (Exception ex){
             log.error("reset key error",ex);
@@ -111,11 +109,33 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     public void reset(){
         try{
-            byte[] key = this.clusterStore.mapGet(presenceKey.distributionKey().getBytes());
-            if(key==null) return;
-            presenceKey.clusterKey(CipherUtil.toBase64Key(key));
+            byte[] ck = (serviceContext.node().bucketName()+"_ck").getBytes();
+            byte[] jk = (serviceContext.node().bucketName()+"_jk").getBytes();
+            byte[] ckey = this.clusterStore.mapGet(ck);
+            byte[] jkey = this.clusterStore.mapGet(jk);
+            if(ckey==null) {
+                log.warn("Cluster key not set on cluster !");
+                return;
+            }
+            if(jkey==null ) {
+                log.warn("JWT key not set on cluster !");
+                return;
+            }
+            PresenceKey existing = new PresenceKey(presenceKey.distributionId());
+            if(!deployDataStore.load(existing)) return;
+            if(!Arrays.equals(ckey,existing.clusterKey())) {
+                log.warn("Cluster key not replicated ");
+                return;
+            }
+            if(!Arrays.equals(jkey,existing.tokenKey())) {
+                log.warn("JWT key not replicated ");
+                return;
+            }
+            this.presenceKey = existing;
             encrypt = CipherUtil.encrypt(presenceKey.clusterKey());
-            log.warn("Cluster key has set!");
+            decrypt = CipherUtil.decrypt(presenceKey.clusterKey());
+            jwt = JWTUtil.init(this.presenceKey.tokenKey());
+            log.warn("Cluster key has been reset!");
         }catch (Exception ex){
             log.error("reset key error",ex);
         }
