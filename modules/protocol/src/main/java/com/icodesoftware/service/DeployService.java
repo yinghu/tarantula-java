@@ -26,16 +26,13 @@ public interface DeployService extends ServiceProvider {
     void onStartConnection(Connection connection);
     void onReleaseConnection(Connection connection);
 
-    byte[] onClusterKey();
 
     void onResetClusterKey();
 
-    byte[] onTokenKey();
-
     void onResetTokenKey();
 
-    void onEnablePresenceService(String root,String password,String classNameSuffix,String host);
-    void onDisablePresenceService(String classNameSuffix);
+    //void onEnablePresenceService(String root,String password,String classNameSuffix,String host);
+    //void onDisablePresenceService(String classNameSuffix);
 
     void onIssueDataStoreBackup(int scope);
 

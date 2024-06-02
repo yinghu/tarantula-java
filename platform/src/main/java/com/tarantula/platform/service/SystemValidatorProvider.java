@@ -10,7 +10,6 @@ import com.tarantula.platform.presence.Membership;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;
 import com.tarantula.platform.presence.UserPortableRegistry;
-import com.tarantula.platform.util.PresenceFetcher;
 import com.tarantula.platform.util.RecoverableQuery;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -52,9 +51,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private ConcurrentHashMap<String, OnLobby> oMap;
     private DeploymentServiceProvider deploymentServiceProvider;
 
-    private ConcurrentHashMap<String,PresenceFetcher> fMap;
 
-    private boolean remotePresenceEnabled;
     private PresenceKey presenceKey;
     private Cipher encrypt;
     private Cipher decrypt;
@@ -74,29 +71,6 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
     public Presence presence(Session session){
         Presence presence = presence(session.distributionId());
-        /**
-        pMap.computeIfAbsent(session.distributionId(),(k)->{
-            PresenceIndex px = new PresenceIndex();
-            px.distributionId(session.distributionId());
-            if(!pdataStore.load(px)) return null;
-            px.dataStore(pdataStore);
-            px.load(5);
-            px.registerEventService(this.serviceContext.eventService());
-            return px;
-        });**/
-        /**
-        if(presence==null&&remotePresenceEnabled){
-            log.warn("Fetching presence from presence service ...");
-            PresenceFetcher httpCaller = fMap.get(session.trackId());
-            OnSession onSession = httpCaller.presence(session.token());
-            PresenceIndex px = new PresenceIndex(onSession.stub(),session.trackId());
-            px.distributionId(onSession.distributionId());
-            pdataStore.update(px);
-            px.dataStore(pdataStore);
-            px.registerEventService(this.serviceContext.eventService());
-            pMap.put(session.distributionId(),px);
-            return px;
-        }**/
         return presence;
     }
     public OnSession onSession(Session session){
@@ -121,29 +95,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         if(!clusterNameSuffix.equals(this.serviceContext.node().clusterNameSuffix())) return null;
         return presenceKey.clusterKey();
     }
-    public byte[] tokenKey(String clusterNameSuffix){
-        if(!clusterNameSuffix.equals(this.serviceContext.node().clusterNameSuffix())) return null;
-        return presenceKey.tokenKey();
-    }
-    public boolean enablePresenceService(String root,String password,String clusterNameSuffix,String presenceServiceHost){
-        try {
-            PresenceFetcher httpCaller = new PresenceFetcher(presenceServiceHost,this.serviceContext.httpClientProvider());
-            OnSession onSession = httpCaller.login(root,password);
-            byte[] key = httpCaller.presenceKey(onSession.token(),clusterNameSuffix);
-            if(key==null) return false;
-            httpCaller.encrypt = CipherUtil.encrypt(key);
-            this.remotePresenceEnabled = true;
-            fMap.put(clusterNameSuffix,httpCaller);
-            return true;
-        }catch (Exception ex){
-            log.error("error",ex);
-            return false;
-        }
-    }
-    public  void disablePresenceService(String classNameSuffix){
-        fMap.remove(classNameSuffix);
-        this.remotePresenceEnabled = fMap.size()>0;
-    }
+
 
     public boolean resetClusterKey(){
         try{
@@ -169,25 +121,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         }
     }
 
-    public String clusterNameSuffix(){
-        return this.serviceContext.node().clusterNameSuffix();
-    }
+
     public byte[] encrypt(byte[] data){
         try{
             synchronized (encrypt){
                 return encrypt.doFinal(data);
             }
-        }catch (Exception ex){
-            throw new RuntimeException(ex);
-        }
-    }
-    public byte[] encrypt(Presence presence,byte[] data){
-        try{
-            Cipher cipher = fMap.get(presence.index()).encrypt;
-            synchronized (cipher){
-                return cipher.doFinal(data);
-            }
-            //return fMap.get(presence.index()).encrypt.doFinal(data);
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
@@ -404,7 +343,6 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.sdatastore = this.serviceContext.dataStore(Distributable.DATA_SCOPE,OnSession.DataStore);
         this.deployDataStore = this.serviceContext.dataStore(Distributable.DATA_SCOPE,DeploymentServiceProvider.DEPLOY_DATA_STORE);
         oMap = new ConcurrentHashMap<>();
-        fMap = new ConcurrentHashMap<>();
 
         AuthVendorRegistry google = TarantulaContext.getInstance().authVendor(OnAccess.GOOGLE);
         if(google!=null){

@@ -244,23 +244,6 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
     }
 
-    @Override
-    public byte[] onClusterKey() {
-        NodeEngine nodeEngine = getNodeEngine();
-        if(nodeEngine.getMasterAddress().equals(nodeEngine.getLocalMember().getAddress())){
-            logger.warn("Master node on local node, load key from local disk");
-            return null;
-        }
-        ClusterKeyOperation operation = new ClusterKeyOperation();
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-            Future<byte[]> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        },metricsListener);
-        if(callResult.result == null) throw new RuntimeException("no master key existed");
-        return (byte[]) callResult.result;
-    }
-
     public void onResetClusterKey(){
         NodeEngine nodeEngine = getNodeEngine();
         ResetClusterKeyOperation operation = new ResetClusterKeyOperation();
@@ -275,55 +258,11 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
     }
 
-    public byte[] onTokenKey(){
-        NodeEngine nodeEngine = getNodeEngine();
-        if(nodeEngine.getMasterAddress().equals(nodeEngine.getLocalMember().getAddress())){
-            logger.warn("Master node on local node, load key from local disk");
-            return null;
-        }
-        TokenKeyOperation operation = new TokenKeyOperation();
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-            Future<byte[]> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        },metricsListener);
-        if(callResult.result == null) throw new RuntimeException("no master key existed");
-        return (byte[]) callResult.result;
-    }
-
     public void onResetTokenKey(){
         NodeEngine nodeEngine = getNodeEngine();
         ResetClusterKeyOperation operation = new ResetClusterKeyOperation();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         for(Member m :mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<Void> future = builder.invoke();
-                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            },metricsListener);
-            if(!result.successful) throw new RuntimeException(result.exception);
-        }
-    }
-    public void onEnablePresenceService(String root,String password,String clusterNameSuffix,String host){
-        NodeEngine nodeEngine = getNodeEngine();
-        EnablePresenceServiceOperation operation = new EnablePresenceServiceOperation(root,password,clusterNameSuffix,host);
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        for(Member m :mlist){
-            if(m.localMember()) continue;
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<Void> future = builder.invoke();
-                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            },metricsListener);
-            if(!result.successful) throw new RuntimeException(result.exception);
-        }
-    }
-    public void onDisablePresenceService(String clusterNameSuffix){
-        NodeEngine nodeEngine = getNodeEngine();
-        DisablePresenceServiceOperation operation = new DisablePresenceServiceOperation(clusterNameSuffix);
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        for(Member m :mlist){
-            if(m.localMember()) continue;
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
             ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<Void> future = builder.invoke();

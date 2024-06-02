@@ -13,9 +13,6 @@ public interface TokenValidatorProvider extends ServiceProvider,Resettable {
     TokenValidator tokenValidator();
 
     byte[] clusterKey(String clusterNameSuffix);
-    byte[] tokenKey(String clusterNameSuffix);
-    boolean enablePresenceService(String root,String password,String clusterNameSuffix,String presenceServiceHost);
-    void disablePresenceService(String clusterNameSuffix);
 
     boolean resetClusterKey();
 

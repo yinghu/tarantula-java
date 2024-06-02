@@ -35,24 +35,7 @@ public class SudoRoleModule implements Module {
             Access acc = userService.loadUser(session.distributionId());
             session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes());
         }
-        else if(session.action().equals("onEnablePresenceService")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            String root = (String) onAccess.property("user");
-            String password = (String) onAccess.property("password");
-            String host = (String) onAccess.property("host");
-            String suffix = (String) onAccess.property("suffix");
-            String localPassword = (String) onAccess.property("localPassword");
-            boolean suc = this.tokenValidatorProvider.enablePresenceService(root,password,suffix,host);
-            if(suc){
-                this.context.clusterProvider().deployService().onEnablePresenceService(root,password,suffix,host);
-            }
-            session.write(JsonUtil.toSimpleResponse(suc,suc?"remote presence service enabled on ["+host+"]":"failed").getBytes());
-        }
-        else if(session.action().equals("onDisablePresenceService")){
-            this.tokenValidatorProvider.disablePresenceService(session.name());
-            this.context.clusterProvider().deployService().onDisablePresenceService(session.name());
-            session.write(JsonUtil.toSimpleResponse(true,"remote presence service disabled").getBytes());
-        }
+
         else if(session.action().equals("onResetClusterKey")){
             boolean suc = this.tokenValidatorProvider.resetClusterKey();
             if(suc){
