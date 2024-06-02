@@ -92,10 +92,16 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         try{
             PresenceKey existing = new PresenceKey();
             existing.distributionId(presenceKey.distributionId());
-            if(this.deployDataStore.load(existing)) return false;
+            if(this.deployDataStore.load(existing)){
+                log.warn("Key not existed");
+                return false;
+            }
             existing.clusterKey(CipherUtil.toBase64Key());
             existing.tokenKey(CipherUtil.toBase64Key(JWTUtil.key()));
-            if(!this.deployDataStore.update(existing)) return false;
+            if(!this.deployDataStore.update(existing)){
+                log.warn("Key cannot updated");
+                return false;
+            }
             byte[] ck = (serviceContext.node().bucketName()+"_ck").getBytes();
             byte[] jk = (serviceContext.node().bucketName()+"_jk").getBytes();
             this.clusterStore.mapSet(ck,existing.clusterKey());
