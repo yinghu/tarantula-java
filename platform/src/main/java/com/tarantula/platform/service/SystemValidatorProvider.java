@@ -19,7 +19,6 @@ import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -116,8 +115,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         try{
             byte[] ck = (serviceContext.node().bucketName()+"_ck").getBytes();
             byte[] jk = (serviceContext.node().bucketName()+"_jk").getBytes();
-            byte[] ckey = this.clusterStore.mapRemove(ck);
-            byte[] jkey = this.clusterStore.mapRemove(jk);
+            byte[] ckey = this.clusterStore.mapGet(ck);
+            byte[] jkey = this.clusterStore.mapGet(jk);
             if(ckey == null) {
                 log.warn("Cluster key not set on cluster !");
                 return;
@@ -244,7 +243,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
 
     public String ticket(long key,long stub,int duration){
-        byte[] data = BufferProxy.buffer(200,false).writeLong(key).writeLong(stub).writeInt(duration).array();
+        byte[] data = BufferProxy.buffer(20,false).writeLong(key).writeLong(stub).writeInt(duration).array();
         byte[] mark = encrypt(data);
         return SystemUtil.toBase64String(mark);
     }
