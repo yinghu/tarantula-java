@@ -71,4 +71,15 @@ public class CipherTest {
         }
     }
 
+    @Test(groups = { "cipher util" })
+    public void keyBase64Test(){
+        String bkey = CipherUtil.toBase64Key();
+        byte[] key = CipherUtil.fromBase64Key(bkey);
+        String akey = CipherUtil.toBase64Key(key);
+        byte[] key1 = CipherUtil.fromBase64Key(akey);
+        Assert.assertEquals(akey,bkey);
+        Assert.assertTrue(Arrays.equals(key1,key));
+    }
+
+
 }

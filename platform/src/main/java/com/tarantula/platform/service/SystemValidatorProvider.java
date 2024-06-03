@@ -116,27 +116,18 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         try{
             byte[] ck = (serviceContext.node().bucketName()+"_ck").getBytes();
             byte[] jk = (serviceContext.node().bucketName()+"_jk").getBytes();
-            byte[] ckey = this.clusterStore.mapGet(ck);
-            byte[] jkey = this.clusterStore.mapGet(jk);
-            if(ckey==null) {
+            byte[] ckey = this.clusterStore.mapRemove(ck);
+            byte[] jkey = this.clusterStore.mapRemove(jk);
+            if(ckey == null) {
                 log.warn("Cluster key not set on cluster !");
                 return;
             }
-            if(jkey==null ) {
+            if(jkey == null ) {
                 log.warn("JWT key not set on cluster !");
                 return;
             }
-            PresenceKey existing = new PresenceKey(presenceKey.distributionId());
-            if(!deployDataStore.load(existing)) return;
-            if(!Arrays.equals(ckey,existing.clusterKey())) {
-                log.warn("Cluster key not replicated ");
-                return;
-            }
-            if(!Arrays.equals(jkey,existing.tokenKey())) {
-                log.warn("JWT key not replicated ");
-                return;
-            }
-            this.presenceKey = existing;
+            this.presenceKey.clusterKey(CipherUtil.toBase64Key(ckey));
+            this.presenceKey.tokenKey(CipherUtil.toBase64Key(jkey));
             encrypt = CipherUtil.encrypt(presenceKey.clusterKey());
             decrypt = CipherUtil.decrypt(presenceKey.clusterKey());
             jwt = JWTUtil.init(this.presenceKey.tokenKey());
