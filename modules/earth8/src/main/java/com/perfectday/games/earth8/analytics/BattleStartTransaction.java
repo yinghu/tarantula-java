@@ -2,11 +2,8 @@ package com.perfectday.games.earth8.analytics;
 
 import com.icodesoftware.Session;
 import com.icodesoftware.util.JsonUtil;
-import com.perfectday.games.earth8.BattleUpdate;
 
-import java.util.UUID;
-
-public class BattleStartTransaction extends AnalyticsTransaction {
+public class BattleStartTransaction extends UserAnalyticsTransaction {
     private static final String MESSAGE_TYPE = "/earth8/player/0.0.1/battleStart";
 
     public BattleStartTransaction(Session session,long serverSessionId, long battleId, byte[] clientData, long analyticsBatchId)

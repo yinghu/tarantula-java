@@ -30,6 +30,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Map;
+import java.util.logging.Logger;
 
 
 public class GoogleStorePurchaseValidator extends AuthObject {
@@ -44,102 +45,136 @@ public class GoogleStorePurchaseValidator extends AuthObject {
     private PlatformGameServiceProvider gameServiceProvider;
 
 
-    public GoogleStorePurchaseValidator(PlatformGameServiceProvider gameServiceProvider,MetricsListener metricsListener){
-        super(gameServiceProvider.gameCluster().typeId(),"");
+    public GoogleStorePurchaseValidator(PlatformGameServiceProvider gameServiceProvider, MetricsListener metricsListener) {
+        super(gameServiceProvider.gameCluster().typeId(), "");
         this.gameServiceProvider = gameServiceProvider;
         this.configurationServiceProvider = gameServiceProvider.configurationServiceProvider();
         this.applicationMetricsListener = metricsListener;
     }
+
     @Override
-    public String name(){
+    public String name() {
         return OnAccess.GOOGLE_STORE;
     }
 
 
-    public boolean validate(Map<String,Object> params){
-        try{
-            //Session session = (Session)params.get(OnAccess.SESSION);
+    public boolean validate(Map<String, Object> params) {
+        try {
             GoogleCredentialConfiguration googleCredentialConfiguration = configurationServiceProvider.credentialConfiguration(OnAccess.GOOGLE);
-            if(googleCredentialConfiguration==null){
-                logger.warn("No credential available ["+typeId+"]");
+            if (googleCredentialConfiguration == null) {
+                logger.warn("No credential available [" + typeId + "]");
                 return false;
             }
-            GoogleServiceAccount serviceAccount  =googleCredentialConfiguration.serviceAccount();
+
+            GoogleServiceAccount serviceAccount = googleCredentialConfiguration.serviceAccount();
             String _tk = serviceAccount.token(serviceContext);
             String sku = (String) params.get(OnAccess.STORE_PRODUCT_ID);
-            String token = (String)params.get(OnAccess.STORE_RECEIPT);//purchase token
-            String orderId = (String)params.get(OnAccess.STORE_TRANSACTION_ID);
-            //{packageName}/purchases/products/{productId}/tokens/{token}",
+            String token = (String) params.get(OnAccess.STORE_RECEIPT);
+
             String query = new StringBuffer(VALIDATION_URI).append(googleCredentialConfiguration.packageName()).append("/purchases/products/").append(sku)
                     .append("/tokens/").append(token).toString();
+
             HttpRequest _request = HttpRequest.newBuilder()
                     .uri(URI.create(query))
                     .timeout(Duration.ofSeconds(TIMEOUT))
-                     .header(AUTHORIZATION,"Bearer "+_tk)
+                    .header(AUTHORIZATION, "Bearer " + _tk)
                     .header(ACCEPT, ACCEPT_JSON)
                     .GET()
                     .build();
             HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
-            int code = this.serviceContext.httpClientProvider().request(client->{
+
+            int code = this.serviceContext.httpClientProvider().request(client -> {
                 HttpResponse<String> _response = client.send(_request, HttpResponse.BodyHandlers.ofString());
                 responseData.dataAsString = _response.body();
                 return _response.statusCode();
             });
-            if(code!=200) throw new RuntimeException("Google store gateway none 200 response");
+
+            if (code != 200) throw new RuntimeException("Google store gateway none 200 response");
             onMetrics(PaymentMetrics.PAYMENT_GOOGLE_STORE_AMOUNT);
-            if(!checkResponsePayload(responseData.dataAsString,params)) return false;
-            String bundleId = (String)params.get(OnAccess.STORE_BUNDLE_ID);
-            String systemId = (String)params.get(OnAccess.SYSTEM_ID);
+
+            if (!checkResponsePayload(responseData.dataAsString, params)) return false;
+
+            consumePurchase(query, _tk);
+
+            String bundleId = (String) params.get(OnAccess.STORE_BUNDLE_ID);
+            String systemId = (String) params.get(OnAccess.SYSTEM_ID);
             ShoppingItem shoppingItem = gameServiceProvider.storeServiceProvider().shoppingItem(bundleId);
-            if(shoppingItem==null){
-                logger.warn("Shopping Item not existed  : "+bundleId);
-                throw new RuntimeException("Shopping not existed ["+bundleId+"]");
+
+            if (shoppingItem == null) {
+                logger.warn("Shopping Item not existed  : " + bundleId);
+                throw new RuntimeException("Shopping not existed [" + bundleId + "]");
             }
+
             GameCluster gameCluster = gameServiceProvider.gameCluster();
             Transaction t = gameCluster.transaction();
-            boolean suc = t.execute(ctx->{
-                ApplicationPreSetup setup =(ApplicationPreSetup)ctx;
+
+            boolean suc = t.execute(ctx -> {
+                ApplicationPreSetup setup = (ApplicationPreSetup) ctx;
                 Descriptor app = gameCluster.application(shoppingItem.configurationTypeId());
-                ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,setup);
+                ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId, setup);
                 redeemer.distributionKey(bundleId);
-                if(!setup.load(app,redeemer)) return false;
+                if (!setup.load(app, redeemer)) return false;
                 redeemer.redeem();
                 return true;
             });
-            if(suc) return true;
-            logger.warn("Item : "+bundleId+" cannot be redeemed");
-            throw new RuntimeException("Item : "+bundleId+" cannot be redeemed");
-        }catch (Exception ex){
-            logger.error("Error on google pay",ex);
-            return false;//false;
+
+            if (suc) return true;
+
+            logger.warn("Item : " + bundleId + " cannot be redeemed");
+
+            throw new RuntimeException("Item : " + bundleId + " cannot be redeemed");
+        } catch (Exception ex) {
+            logger.error("Error on google pay", ex);
+            return false;
         }
     }
 
-    private boolean checkResponsePayload(String resp,Map<String,Object> params){
-        String pendingTransactionId = (String)params.get("order_id"); //TODO:transactionId
+    private boolean checkResponsePayload(String resp, Map<String, Object> params) {
+        String pendingTransactionId = (String) params.get("transactionId");
         JsonObject receipt = JsonParser.parseString(resp).getAsJsonObject();
         int status = receipt.get("purchaseState").getAsInt();
+        int consumptionState = receipt.get("consumptionState").getAsInt();
         boolean validated = false;
-        if(status==0){
-            String transactionId = receipt.get("order_id").getAsString();
-            if(transactionId.equals(pendingTransactionId)){
-                String sku = receipt.get("product_id").getAsString();
-                int quantity  = receipt.get("quantity").getAsInt();
-                params.put(OnAccess.STORE_TRANSACTION_ID,transactionId);
-                params.put(OnAccess.STORE_PRODUCT_ID,sku);
-                params.put(OnAccess.STORE_QUANTITY,quantity);
+        if (status == 0 & consumptionState == 0) {
+            String transactionId = receipt.get("orderId").getAsString();
+            if (transactionId.equals(pendingTransactionId)) {
+                String sku = (String) params.get("storeProductId");
+                params.put(OnAccess.STORE_TRANSACTION_ID, transactionId);
+                params.put(OnAccess.STORE_PRODUCT_ID, sku);
+                params.put(OnAccess.STORE_QUANTITY, 1);
                 validated = true;
             }
-        }
-        else{
-            logger.warn("failure Google store response ["+status+"]");
+        } else {
+            logger.warn("failure Google store response [" + status + "]");
             logger.warn(receipt.toString());
-            //to do send out a system message
         }
-        if(!validated){
-            params.put(OnAccess.STORE_MESSAGE,"transaction cannot be validated");
+        if (!validated) {
+            params.put(OnAccess.STORE_MESSAGE, "transaction cannot be validated");
         }
         return validated;
     }
 
+    private boolean consumePurchase(String query, String _tk) throws Exception{
+        String consumeQuery = query + ":consume";
+
+        HttpRequest _request = HttpRequest.newBuilder()
+                .uri(URI.create(consumeQuery))
+                .timeout(Duration.ofSeconds(TIMEOUT))
+                .header(AUTHORIZATION,"Bearer "+_tk)
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
+
+        int code = serviceContext.httpClientProvider().request(client->{
+            HttpResponse<String> _response = client.send(_request, HttpResponse.BodyHandlers.ofString());
+            return _response.statusCode();
+        });
+
+        if(code!=200) logger.warn("Status of Google consume not 200: " + code);
+
+        logger.warn("Item consumed!");
+
+        return true;
+    }
 }

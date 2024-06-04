@@ -13,9 +13,10 @@ public class TournamentEntryProxy extends RecoverableObject implements Tournamen
     }
 
     @Override
-    public void score(double credit, double delta) {
+    public double score(double credit, double delta) {
         this.credit = credit;
         this.delta = delta;
+        return delta;
     }
 
     @Override

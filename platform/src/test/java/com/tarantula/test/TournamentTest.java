@@ -7,9 +7,11 @@ import com.icodesoftware.util.BufferUtil;
 import com.icodesoftware.util.SnowflakeKey;
 
 import com.tarantula.platform.tournament.*;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -70,13 +72,41 @@ public class TournamentTest extends DataStoreHook{
     @Test(groups = { "Tournament" })
     public void tournamentSlotSelectionTest() {
         AtomicInteger slot = new AtomicInteger(0);
+        int size =1;
         for(int i=0;i<20;i++){
-            int x = slot.getAndAccumulate(10,(value,limit)->{
+            int x = slot.getAndAccumulate(size,(value,limit)->{
                 value++;
                 return value==limit? 0:value;
             });
-            Assert.assertTrue(x>=0 && x<10);
+            Assert.assertTrue(x>=0 && x<size);
         }
+
+        size =3;
+        for(int i=0;i<20;i++){
+            int x = slot.getAndAccumulate(size,(value,limit)->{
+                value++;
+                return value==limit? 0:value;
+            });
+            Assert.assertTrue(x>=0 && x<size);
+        }
+
+        final int xsize =10;
+        CountDownLatch latch = new CountDownLatch(20);
+        for(int i=0;i<20;i++){
+            new Thread(()->{
+                int x = slot.getAndAccumulate(xsize,(value,limit)->{
+                    value++;
+                    return value==limit? 0:value;
+                });
+                Assert.assertTrue(x>=0 && x<xsize);
+                latch.countDown();
+            }).start();
+        }
+        Exception exception = null;
+        try{latch.await();}catch (Exception ex){
+            exception = ex;
+        }
+        Assert.assertNull(exception);
     }
 
 

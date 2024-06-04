@@ -1,8 +1,11 @@
 package com.tarantula.test.integration;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
 import com.icodesoftware.util.HttpCaller;
+import com.icodesoftware.util.JsonUtil;
+import com.icodesoftware.util.JvmRNG;
 import com.icodesoftware.util.TarantulaThreadFactory;
 
 import java.io.FileInputStream;
@@ -22,6 +25,18 @@ public class Main {
 
     static boolean onFile = false;
 
+    static String[] displayNames = new String[2500];
+    static JvmRNG rng = new JvmRNG();
+    static int index(){
+        return rng.onNext(2500);
+    }
+    static String accessKey;
+    static long httpRequestInterval;
+    static int playerUpdateRound = 10;
+
+    static String inventoryKey = "inventory";
+    static String campaignKey = "campaign";
+
     public static void vmain(String[] args) throws Exception{
         HttpCaller httpCaller = new HttpCaller("http://localhost:8090");
         httpCaller._init();
@@ -37,6 +52,16 @@ public class Main {
         System.out.println(httpCaller.post("server",jsonObject.toString().getBytes(),headers));
     }
     public static void main(String[] args) throws Exception{
+        JsonObject config = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("game-presence-settings.json")).get("profile").getAsJsonObject();
+        JsonArray adjs = config.get("adjectives").getAsJsonArray();
+        JsonArray nouns = config.get("nouns").getAsJsonArray();
+        int[] i={0};
+        adjs.forEach(adj->{
+            String pre = adj.getAsString();
+            nouns.forEach(noun->{
+                displayNames[i[0]++]=pre+noun.getAsString();
+            });
+        });
         Properties properties = new Properties();
         try(InputStream inputStream = new FileInputStream("load.properties")){
             properties.load(inputStream);
@@ -53,7 +78,8 @@ public class Main {
         int batch = Integer.parseInt(properties.getProperty("batch"));
         int poolSize = Integer.parseInt(properties.getProperty("pool.size"));
         boolean scheduledPlay = Boolean.parseBoolean(properties.getProperty("scheduled.play"));
-        long httpRequestInterval = Long.parseLong(properties.getProperty("http.request.interval.ms"));
+        httpRequestInterval = Long.parseLong(properties.getProperty("http.request.interval.ms"));
+        accessKey = properties.getProperty("access.key");
         boolean usePlayerPrefix = Boolean.parseBoolean(properties.getProperty("use.player.prefix"));
         String playerPrefix = properties.getProperty("player.prefix");
         boolean udpTested = Boolean.parseBoolean(properties.getProperty("test.udp"));
@@ -86,7 +112,7 @@ public class Main {
             for(int x=0;x<poolSize;x++){
                 String uname = playerPrefix!=null?(playerPrefix+"-"+ix):UUID.randomUUID().toString();
                 ix++;
-                Player simulator = new Player(httpCaller,waiting,game,uname,x,udpTested,timeout,duration);
+                Player simulator = new Player(httpCaller,waiting,game,uname,udpTested,timeout,duration);
                 pool.execute(simulator);
                 Thread.sleep(requestWaiting);
             }

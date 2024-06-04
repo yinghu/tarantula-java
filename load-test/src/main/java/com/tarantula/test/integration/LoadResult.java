@@ -3,12 +3,14 @@ package com.tarantula.test.integration;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 
 public class LoadResult {
 
+    static ConcurrentHashMap<String,RequestResult> results = new ConcurrentHashMap<>();
 
     static AtomicInteger totalSuccessRegister = new AtomicInteger(0);
     static AtomicInteger totalFailureRegister = new AtomicInteger(0);
@@ -31,6 +33,9 @@ public class LoadResult {
     static AtomicInteger totalSuccessCreateProfile = new AtomicInteger(0);
     static AtomicInteger totalFailureCreateProfile = new AtomicInteger(0);
 
+    static AtomicInteger totalSuccessUpdateGame = new AtomicInteger(0);
+    static AtomicInteger totalFailureUpdateGame = new AtomicInteger(0);
+
     static AtomicInteger totalSuccessStartGame = new AtomicInteger(0);
     static AtomicInteger totalFailureStartGame = new AtomicInteger(0);
 
@@ -52,9 +57,14 @@ public class LoadResult {
     static AtomicInteger totalSuccessLoadShop = new AtomicInteger(0);
     static AtomicInteger totalFailureLoadShop = new AtomicInteger(0);
 
-    static AtomicInteger totalSuccessCoinForm = new AtomicInteger(0);
-    static AtomicInteger totalFailureCoinForm = new AtomicInteger(0);
+    static AtomicInteger totalSuccessLoadTournament = new AtomicInteger(0);
+    static AtomicInteger totalFailureLoadTournament = new AtomicInteger(0);
 
+    static AtomicInteger totalSuccessLoadTournamentRaceBoard = new AtomicInteger(0);
+    static AtomicInteger totalFailureLoadTournamentRaceBoard = new AtomicInteger(0);
+
+    static AtomicInteger totalSuccessOnGameEvent = new AtomicInteger(0);
+    static AtomicInteger totalFailureOnGameEvent = new AtomicInteger(0);
 
     static AtomicInteger totalFailureOther = new AtomicInteger(0);
 
@@ -87,6 +97,9 @@ public class LoadResult {
     static String playerPrefix;
     static LocalDateTime startTime;
 
+    static RequestResult requestResult(String name){
+        return results.computeIfAbsent(name,(k)-> new RequestResult(name));
+    }
 
     public static void print(boolean onFile){
 
@@ -99,15 +112,19 @@ public class LoadResult {
                 bw.write("Batch Size ["+batch+"]\n");
                 bw.write("Pool Size ["+poolSize+"]\n");
                 bw.write("Player Prefix ["+playerPrefix+"]\n");
-                bw.write("Test UDP Enabled ["+udpTested+"]\n");
-                bw.write("Test UDP Receive Timeout ["+udpReceiveTimeout+"]\n");
-                bw.write("Test UDP Rounds ["+udpTestRounds+"]\n");
+                //bw.write("Test UDP Enabled ["+udpTested+"]\n");
+                //bw.write("Test UDP Receive Timeout ["+udpReceiveTimeout+"]\n");
+                //bw.write("Test UDP Rounds ["+udpTestRounds+"]\n");
                 bw.write("Start time ["+startTime.format(DateTimeFormatter.ISO_DATE_TIME)+"]\n");
                 bw.write("End time ["+localDateTime.format(DateTimeFormatter.ISO_DATE_TIME)+"]\n\n");
 
                 bw.write("###### HTTP Operation Summary ######\n");
                 bw.write("Total Rounds ["+totalRounds.get()+"]\n");
                 bw.write("Total Failure Other ["+totalFailureOther.get()+"]\n");
+                results.forEach((k,v)->{
+                    try{bw.write(v.toString());}catch (Exception ex){}
+                });
+                /**
                 bw.write("Total Success Register Count ["+totalSuccessRegister.get()+"]\n");
                 bw.write("Total Failure Register Count ["+totalFailureRegister.get()+"]\n");
                 bw.write("Total Success Login Count ["+totalSuccessLogin.get()+"]\n");
@@ -126,32 +143,36 @@ public class LoadResult {
                 bw.write("Total Failure SaveOnGet Count ["+totalFailureSaveOnGet.get()+"]\n");
                 bw.write("Total Success LoadShop Count ["+totalSuccessLoadShop.get()+"]\n");
                 bw.write("Total Failure LoadShop Count ["+totalFailureLoadShop.get()+"]\n");
+                bw.write("Total Success LoadTournament Count ["+totalSuccessLoadTournament.get()+"]\n");
+                bw.write("Total Failure LoadTournament Count ["+totalFailureLoadTournament.get()+"]\n");
+                bw.write("Total Success LoadTournamentRaceBoard Count ["+totalSuccessLoadTournamentRaceBoard.get()+"]\n");
+                bw.write("Total Failure LoadTournamentRaceBoard Count ["+totalFailureLoadTournamentRaceBoard.get()+"]\n");
                 bw.write("Total Success StartGame Count ["+totalSuccessStartGame.get()+"]\n");
                 bw.write("Total Failure StartGame Count ["+totalFailureStartGame.get()+"]\n");
                 bw.write("Total Success ScoreTournament Count ["+totalSuccessScoreTournament.get()+"]\n");
                 bw.write("Total Failure ScoreTournament Count ["+totalFailureScoreTournament.get()+"]\n");
                 bw.write("Total Success EndGame Count ["+totalSuccessEndGame.get()+"]\n");
                 bw.write("Total Failure EndGame Count ["+totalFailureEndGame.get()+"]\n");
-                bw.write("Total Success CoinForm Count ["+totalSuccessCoinForm.get()+"]\n");
-                bw.write("Total Failure CoinForm Count ["+totalFailureCoinForm.get()+"]\n");
-
+                bw.write("Total Success UpdateGame Count ["+totalSuccessUpdateGame.get()+"]\n");
+                bw.write("Total Failure UpdateGame Count ["+totalFailureUpdateGame.get()+"]\n");
+                bw.write("Total Success OnGameEvent Count ["+totalSuccessOnGameEvent.get()+"]\n");
+                bw.write("Total Failure OnGameEvent Count ["+totalFailureOnGameEvent.get()+"]\n");
                 bw.write("Total Success Leave Count ["+totalSuccessLeave.get()+"]\n");
-                bw.write("Total Failure Leave Count ["+totalFailureLeave.get()+"]\n");
+                bw.write("Total Failure Leave Count ["+totalFailureLeave.get()+"]\n");**/
                 bw.write("Total Http Request Count ["+totalHttpRequestCount.get()+"]\n");
                 bw.write("Average HTTP Request Duration (ms) ["+(totalHttpRequestTime.get()/totalHttpRequestCount.get())+"]\n\n");
+                //bw.write("###### UDP Operation Summary ######\n");
+                //bw.write("Total Success Play Count ["+totalSuccessPlay.get()+"]\n");
+                //bw.write("Total Failure Play Count ["+totalFailurePlay.get()+"]\n");
 
-                bw.write("###### UDP Operation Summary ######\n");
-                bw.write("Total Success Play Count ["+totalSuccessPlay.get()+"]\n");
-                bw.write("Total Failure Play Count ["+totalFailurePlay.get()+"]\n");
+                //bw.write("Total UDP Receive Duration (ms) ["+(totalUDPReceiveTime.get())+"]\n");
+                //bw.write("Total Success UDP Received Count ["+totalSuccessUDPReceived.get()+"]\n");
+                //bw.write("Total UDP Sent Duration (ms) ["+(totalUDPSentTime.get())+"]\n");
+                //bw.write("Total Success UDP Sent Count ["+totalSuccessUDPSent.get()+"]\n");
 
-                bw.write("Total UDP Receive Duration (ms) ["+(totalUDPReceiveTime.get())+"]\n");
-                bw.write("Total Success UDP Received Count ["+totalSuccessUDPReceived.get()+"]\n");
-                bw.write("Total UDP Sent Duration (ms) ["+(totalUDPSentTime.get())+"]\n");
-                bw.write("Total Success UDP Sent Count ["+totalSuccessUDPSent.get()+"]\n");
-
-                bw.write("Total Bytes UDP Sent ["+totalUDPBytesSent.get()+"]\n");
-                bw.write("Total Bytes UDP Received ["+totalUDPBytesReceived.get()+"]\n");
-                bw.write("Total UDP Receive Timeout Count ["+totalUDPReceiveTimeout.get()+"]\n");
+                //bw.write("Total Bytes UDP Sent ["+totalUDPBytesSent.get()+"]\n");
+                //bw.write("Total Bytes UDP Received ["+totalUDPBytesReceived.get()+"]\n");
+                //bw.write("Total UDP Receive Timeout Count ["+totalUDPReceiveTimeout.get()+"]\n");
             } catch (Exception ex){
                 ex.printStackTrace();
             }

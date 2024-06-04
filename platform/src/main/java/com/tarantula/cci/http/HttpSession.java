@@ -30,9 +30,6 @@ public class HttpSession extends RequestParser implements OnExchange {
         }catch(Exception ex){
             //skip client disconnect
         }
-        //finally{
-            //this.hex.close();
-        //}
         return true;
     }
     public long id(){
@@ -67,15 +64,11 @@ public class HttpSession extends RequestParser implements OnExchange {
     }
     public void onError(Exception error,String message){
         try(hex){
-            error.printStackTrace();
             hex.sendResponseHeaders(500,message.length());
             hex.getResponseBody().write(message.getBytes());
         }catch (Exception ex){
             //skip client disconnect
         }
-        //finally {
-            //hex.close();
-        //}
     }
 
 }

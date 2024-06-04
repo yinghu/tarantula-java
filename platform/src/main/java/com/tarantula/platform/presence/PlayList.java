@@ -2,28 +2,28 @@ package com.tarantula.platform.presence;
 
 import com.icodesoftware.util.FIFOBuffer;
 import com.icodesoftware.util.RecoverableObject;
-import com.tarantula.platform.AssociateKey;
-import com.tarantula.platform.GameCluster;
-
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
 
 public class PlayList extends RecoverableObject {
 
-    private final static String PLAY_LIST_INDEX ="playlist";
+    private FIFOBuffer<Long> playListIndex;
+    private int size;
 
-    public FIFOBuffer<String> playListIndex;
+    public PlayList(){
 
-    public PlayList(){}
+    }
     public PlayList(int size){
-        this.playListIndex = new FIFOBuffer<>(size,new String[size]);
+        this.size = size;
+        this.playListIndex = new FIFOBuffer<>(size,new Long[size]);
     }
     @Override
     public int getFactoryId() {
         return PresencePortableRegistry.OID;
     }
+
 
     @Override
     public int getClassId() {
@@ -31,19 +31,29 @@ public class PlayList extends RecoverableObject {
     }
 
     @Override
-    public Map<String,Object> toMap(){
-        List<String> list = this.playListIndex.list(new ArrayList<>());
-        list.forEach(a-> this.properties.put(a,"1"));
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        properties.forEach((k,v)->this.playListIndex.push(k));
-    }
-    @Override
-    public Key key(){
-        return new AssociateKey(this.distributionId, PLAY_LIST_INDEX);
+    public boolean read(DataBuffer buffer) {
+        size = buffer.readInt();
+        this.playListIndex = new FIFOBuffer<>(size,new Long[size]);
+        for(int i=0;i<size;i++){
+            playListIndex.push(buffer.readLong());
+        }
+        return true;
     }
 
-
+    @Override
+    public boolean write(DataBuffer buffer) {
+        buffer.writeInt(size);
+        Long[] list = new Long[size];
+        playListIndex.list(list);
+        for(int i=0;i<size;i++){
+            buffer.writeLong(list[i]==null?0:list[i]);
+        }
+        return true;
+    }
+    public void onList(long systemId){
+        playListIndex.push(systemId);
+    }
+    public List<Long> list(){
+        return playListIndex.list(new ArrayList<>());
+    }
 }

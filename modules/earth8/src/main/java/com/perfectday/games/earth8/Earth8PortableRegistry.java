@@ -42,6 +42,8 @@ public class Earth8PortableRegistry<T extends Recoverable> extends AbstractRecov
 
     public static final int PLAYER_DATA_TRACK_CID = 19;
 
+    public static final int SCORE_TOURNAMENT_CID = 20;
+
 
     public static Earth8PortableRegistry INS;
 

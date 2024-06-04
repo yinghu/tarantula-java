@@ -1,6 +1,7 @@
 package com.tarantula.platform.presence;
 
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
@@ -9,6 +10,7 @@ import com.icodesoftware.protocol.statistics.UserStatistics;
 import com.icodesoftware.service.ServiceContext;
 
 import com.icodesoftware.util.ScheduleRunner;
+import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.GamePortableRegistry;
 import com.tarantula.game.GameRating;
@@ -45,6 +47,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
 
     private DataStore mDataStore;
     private DataStore profileDataStore;
+    private DataStore playListDataStore;
 
     private DistributionPresenceService distributionPresenceService;
     private ConcurrentHashMap<String,ProfileNameSequence> profileNameSequenceMapping;
@@ -63,10 +66,16 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
             profileNameSequenceMapping.put(profileNameSequence.name(),profileNameSequence);
             return true;
         }));
+        profileNameSequenceMapping.forEach((n,p)->{
+            if(p.distributionId()==0){
+                p.ownerKey(SnowflakeKey.from(gameCluster.distributionId()));
+                if(this.profileDataStore.create(p)) p.dataStore(profileDataStore);
+            }
+        });
         this.recentlyPlayList = new PlayList(recentlyPlayListSize);
         this.recentlyPlayList.distributionId(this.gameCluster.distributionId());
-        this.dataStore.createIfAbsent(this.recentlyPlayList,true);
-        this.recentlyPlayList.dataStore(this.dataStore);
+        this.playListDataStore.createIfAbsent(this.recentlyPlayList,true);
+        this.recentlyPlayList.dataStore(this.playListDataStore);
         this.scheduleRunner = new ScheduleRunner(syncIntervalSeconds*1000,()->{
             syncPlayList();
         });
@@ -81,6 +90,15 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     public void setup(ServiceContext serviceContext) {
         super.setup(serviceContext);
         Configuration configuration = serviceContext.configuration("game-presence-settings");
+        JsonArray objsPreloaded = ((JsonElement)configuration.property("profile")).getAsJsonObject().get("adjectives").getAsJsonArray();
+        JsonArray namesPreloaded = ((JsonElement)configuration.property("profile")).getAsJsonObject().get("nouns").getAsJsonArray();
+        objsPreloaded.forEach(obj->{
+            String adjective = obj.getAsString();
+            namesPreloaded.forEach(pn->{
+                String pname = adjective+pn.getAsString();
+                profileNameSequenceMapping.put(pname,new ProfileNameSequence(pname));
+            });
+        });
         JsonObject plist = ((JsonElement)configuration.property("playList")).getAsJsonObject();
         this.recentlyPlayListSize = plist.get("recentlyListSize").getAsInt();
         this.friendListSize = plist.get("friendListSize").getAsInt();
@@ -88,37 +106,38 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         this.dataStore = this.applicationPreSetup.dataStore(gameCluster,NAME);
         this.mDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_mapping_object");
         this.profileDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_profile");
+        this.playListDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_play_list");
         this.distributionPresenceService = this.serviceContext.clusterProvider().serviceProvider(DistributionPresenceService.NAME);
         this.logger = JDKLogger.getLogger(PlatformPresenceServiceProvider.class);
         this.logger.warn("Presence service provider started on ->"+gameServiceName);
     }
-    public void onFriendList(String systemId,String friendSystemId){
+    public void onFriendList(long systemId,long friendSystemId){
         PlayList playList = new PlayList(friendListSize);
-        playList.distributionKey(systemId);
-        this.dataStore.createIfAbsent(playList,true);
-        playList.playListIndex.push(friendSystemId);
-        this.dataStore.update(playList);
+        playList.distributionId(systemId);
+        this.playListDataStore.createIfAbsent(playList,true);
+        playList.onList(friendSystemId);
+        this.playListDataStore.update(playList);
     }
-    public void onPlay(String systemId){
-        this.recentlyPlayList.playListIndex.push(systemId);
+    public void onPlay(long systemId){
+        this.recentlyPlayList.onList(systemId);
         updates.incrementAndGet();
     }
-    public List<String> friendList(String systemId){
+    public List<Long> friendList(long systemId){
         PlayList playList = new PlayList(friendListSize);
-        playList.distributionKey(systemId);
-        this.dataStore.createIfAbsent(playList,true);
-        return playList.playListIndex.list(new ArrayList<>());
+        playList.distributionId(systemId);
+        this.playListDataStore.createIfAbsent(playList,true);
+        return playList.list();
     }
-    public List<String> recentlyPlayList(){
-        return this.recentlyPlayList.playListIndex.list(new ArrayList<>());
+    public List<Long> recentlyPlayList(){
+        return this.recentlyPlayList.list();
     }
 
     public Profile profile(String systemId){
         Profile profile = new Profile();
-        profile.displayName ="player";
-        profile.distributionKey(systemId);
-        this.dataStore.createIfAbsent(profile,true);
-        profile.dataStore(this.dataStore);
+        //profile.displayName ="player";
+        //profile.distributionKey(systemId);
+        //this.dataStore.createIfAbsent(profile,true);
+        //profile.dataStore(this.dataStore);
         return profile;
     }
 
@@ -129,9 +148,10 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         Profile profile = new Profile();
         profile.distributionId(session.distributionId());
 
+        profileDataStore.createIfAbsent(profile, true);
         if(!profile.configureAndValidate(session.payload())) return false;
         profile.profileSequence = distributionPresenceService.profileSequence(gameCluster.serviceType(),profile.displayName);
-        return profileDataStore.createIfAbsent(profile, false);
+        return profileDataStore.update(profile);
     }
 
     public ProfilePayload getProfilePayload(String IDs){
@@ -293,20 +313,17 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         applicationPreSetup.dataStore(gameCluster,NAME+"_"+onLobby.tag().replaceAll(Recoverable.PATH_SEPARATOR,"_"));
     }
 
-    public void testSequence(String name){
-        int seq = distributionPresenceService.profileSequence(gameCluster.serviceType(),name);
-        logger.warn(name+"#"+seq);
-    }
 
     public int onProfileSequence(String name){
-        return profileNameSequenceMapping.compute(name,(k,v)->{
-            if(v==null){
-                v = ProfileNameSequence.lookup(profileDataStore,gameCluster.distributionId(),name);
-            }
-            v.sequence++;
-            v.update();
-            return v;
-        }).sequence;
+        ProfileNameSequence profileNameSequence = profileNameSequenceMapping.computeIfAbsent(name,(k)->{
+            //Just in case the name is not preloaded
+            ProfileNameSequence notCached = new ProfileNameSequence(name);
+            notCached.ownerKey(SnowflakeKey.from(gameCluster.distributionId()));
+            notCached.dataStore(dataStore);
+            dataStore.create(notCached);
+            return notCached;
+        });
+        return profileNameSequence.sequence();
     }
 
 }

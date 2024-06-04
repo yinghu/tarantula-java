@@ -1,9 +1,8 @@
 package com.perfectday.games.earth8.analytics;
 
 import com.icodesoftware.Session;
-import com.icodesoftware.util.JsonUtil;
 
-public class UnitXpUpTransaction extends AnalyticsTransaction {
+public class UnitXpUpTransaction extends UserAnalyticsTransaction {
     private static final String MESSAGE_TYPE = "/earth8/unit/0.0.1/xpUp";
 
     public UnitXpUpTransaction(Session session,long serverSessionId, long unitId, int xpGain, String unitName)

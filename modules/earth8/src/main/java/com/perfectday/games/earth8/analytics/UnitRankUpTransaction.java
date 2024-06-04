@@ -1,9 +1,8 @@
 package com.perfectday.games.earth8.analytics;
 
 import com.icodesoftware.Session;
-import com.icodesoftware.util.JsonUtil;
 
-public class UnitRankUpTransaction extends AnalyticsTransaction {
+public class UnitRankUpTransaction extends UserAnalyticsTransaction {
     private static final String MESSAGE_TYPE = "/earth8/unit/0.0.1/rankUp";
 
     public UnitRankUpTransaction(Session session,long serverSessionId, long unitId, int newRank, String unitName)
