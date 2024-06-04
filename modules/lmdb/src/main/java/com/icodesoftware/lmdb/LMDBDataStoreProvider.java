@@ -33,27 +33,24 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     private String baseDir = "target/lmdb";
 
-    private EnvSetting dataSetting = EnvSetting.DataSetting;
-    private EnvSetting integrationSetting = EnvSetting.IntegrationSetting;
-    private EnvSetting indexSetting = EnvSetting.IndexSetting;
-    private EnvSetting logSetting = EnvSetting.LogSetting;
-    private EnvSetting localSetting = EnvSetting.LocalSetting;
+    private LMDBEnv dataEnv = LMDBEnv.DATA_ENV;
+    private LMDBEnv integrationEnv = LMDBEnv.INTEGRATION_ENV;
+    private LMDBEnv indexEnv = LMDBEnv.INDEX_ENV;
+    private LMDBEnv logEnv = LMDBEnv.LOG_ENV;
+    private LMDBEnv localEnv = LMDBEnv.LOCAL_ENV;
 
-    private Env<ByteBuffer> data;
-    private Env<ByteBuffer> integration;
-    private Env<ByteBuffer> index;
-    private Env<ByteBuffer> local;
-    private Env<ByteBuffer> log;
-    private long storeSize = EnvSetting.storeBaseMbSize; // 1MB = 1,048,576 (1024*1024)
-    private int maxDatabaseNumber = 1024;
-    private int maxReaders = 100;
+
+    long storeSize = EnvSetting.storeBaseMbSize; // 1MB = 1,048,576 (1024*1024)
+
+    int maxDatabaseNumber = 1024;
+    int maxReaders = 100;
 
     private final static int KEY_SIZE = 200;
     private final static int VALUE_SIZE = 2000;
 
     private final static int PENDING_BUFFER_SIZE = 32;
 
-    private boolean envNoSyncFlag = true;
+    boolean envNoSyncFlag = true;
     private final static ConcurrentHashMap<String,DataStore> storeMap = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<String,LocalEdgeDataStore> edgMap = new ConcurrentHashMap<>();
 
@@ -73,11 +70,11 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         this.name = (String)properties.get("name");
         this.storeSize = EnvSetting.storeBaseMbSize*(int)properties.get("storeSizeMb");
         this.envNoSyncFlag = (boolean)properties.get("envNoSyncFlag");
-        dataSetting = (EnvSetting) properties.get(EnvSetting.data);
-        integrationSetting = (EnvSetting) properties.get(EnvSetting.integration);
-        indexSetting = (EnvSetting) properties.get(EnvSetting.index);
-        logSetting = (EnvSetting) properties.get(EnvSetting.log);
-        localSetting = (EnvSetting) properties.get(EnvSetting.local);
+        dataEnv.envSetting = (EnvSetting) properties.get(EnvSetting.data);
+        integrationEnv.envSetting = (EnvSetting) properties.get(EnvSetting.integration);
+        indexEnv.envSetting = (EnvSetting) properties.get(EnvSetting.index);
+        logEnv.envSetting = (EnvSetting) properties.get(EnvSetting.log);
+        localEnv.envSetting = (EnvSetting) properties.get(EnvSetting.local);
         this.baseDir = (String)properties.get("dir");
         this.migration = new LocalDataMigration((JsonObject)properties.get("migration"));
     }
@@ -156,62 +153,47 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     }
 
     public Txn<ByteBuffer> txn(int scope){
-        if(scope==Distributable.DATA_SCOPE) return data.txnWrite();
-        if(scope==Distributable.INTEGRATION_SCOPE) return integration.txnWrite();
-        if(scope==Distributable.INDEX_SCOPE) return index.txnWrite();
-        if(scope==Distributable.LOCAL_SCOPE) return local.txnWrite();
-        if(scope==Distributable.LOG_SCOPE) return log.txnWrite();
+        if(scope==Distributable.DATA_SCOPE) return dataEnv.txnWrite();
+        if(scope==Distributable.INTEGRATION_SCOPE) return integrationEnv.txnWrite();
+        if(scope==Distributable.INDEX_SCOPE) return indexEnv.txnWrite();
+        if(scope==Distributable.LOCAL_SCOPE) return localEnv.txnWrite();
+        if(scope==Distributable.LOG_SCOPE) return logEnv.txnWrite();
         throw new RuntimeException("Scope ["+scope+"] not supported");
     }
 
     public DataStore createDataStore(int scope,String name,Txn<ByteBuffer> txn,long transactionId){
         if(scope==Distributable.DATA_SCOPE){
-            Dbi<ByteBuffer> dbi = txn==null? data.openDbi(name,DbiFlags.MDB_CREATE) : data.openDbi(txn,name.getBytes(),null,false,DbiFlags.MDB_CREATE);
-            return txn==null? new CachedLMDBDataStore(scope,name,dbi,data,this) : new LMDBDataStore(scope,name,dbi,data,this,txn,transactionId);
+            return dataEnv.createDataStore(scope,name,txn,transactionId);
         }
         if(scope==Distributable.INTEGRATION_SCOPE){
-            Dbi<ByteBuffer> dbi = txn==null? integration.openDbi(name,DbiFlags.MDB_CREATE) : integration.openDbi(txn,name.getBytes(),null,false,DbiFlags.MDB_CREATE);
-            return txn==null? new CachedLMDBDataStore(scope,name,dbi,integration,this) : new LMDBDataStore(scope,name,dbi,integration,this,txn,transactionId);
+           return integrationEnv.createDataStore(scope,name,txn,transactionId);
         }
         if(scope==Distributable.INDEX_SCOPE){
-            Dbi<ByteBuffer> dbi = txn==null? index.openDbi(name,DbiFlags.MDB_CREATE) : index.openDbi(txn,name.getBytes(),null,false,DbiFlags.MDB_CREATE);
-            return txn==null? new CachedLMDBDataStore(scope,name,dbi,index,this) : new LMDBDataStore(scope,name,dbi,index,this,txn,transactionId);
+            return indexEnv.createDataStore(scope,name,txn,transactionId);
         }
         if(scope==Distributable.LOCAL_SCOPE){
-            Dbi<ByteBuffer> dbi = txn==null? local.openDbi(name,DbiFlags.MDB_CREATE) : local.openDbi(txn,name.getBytes(),null,false,DbiFlags.MDB_CREATE);
-            return txn==null? new CachedLMDBDataStore(scope,name,dbi,local,this) : new LMDBDataStore(scope,name,dbi,local,this,txn,transactionId);
+           return localEnv.createDataStore(scope,name,txn,transactionId);
         }
         if(scope==Distributable.LOG_SCOPE){
-            Dbi<ByteBuffer> dbi = txn==null? log.openDbi(name,DbiFlags.MDB_CREATE) : log.openDbi(txn,name.getBytes(),null,false,DbiFlags.MDB_CREATE);
-            return txn==null? new CachedLMDBDataStore(scope,name,dbi,log,this) : new LMDBDataStore(scope,name,dbi,log,this,txn,transactionId);
+            return logEnv.createDataStore(scope,name,txn,transactionId);
         }
         throw new RuntimeException("Scope ["+scope+"] not supported");
     }
     public LocalEdgeDataStore localEdgeDataStore(int scope,String source,String label,Txn<ByteBuffer> txn){
         if(scope==Distributable.DATA_SCOPE){
-            String edgeName = source+"#"+label;
-            Dbi<ByteBuffer> dbi = txn==null? data.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : data.openDbi(txn,edgeName.getBytes(),null,false,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
-            return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
+            return dataEnv.localEdgeDataStore(scope,source,label,txn);
         }
         if(scope==Distributable.INTEGRATION_SCOPE){
-            String edgeName = source+"#"+label;
-            Dbi<ByteBuffer> dbi = txn==null? integration.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : integration.openDbi(txn,edgeName.getBytes(),null,false,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
-            return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
+            return integrationEnv.localEdgeDataStore(scope,source,label,txn);
         }
         if(scope==Distributable.INDEX_SCOPE){
-            String edgeName = source+"#"+label;
-            Dbi<ByteBuffer> dbi = txn==null? index.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : index.openDbi(txn,edgeName.getBytes(),null,false,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
-            return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
+            return indexEnv.localEdgeDataStore(scope,source,label,txn);
         }
         if(scope==Distributable.LOCAL_SCOPE){
-            String edgeName = source+"#"+label;
-            Dbi<ByteBuffer> dbi = txn==null? local.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : local.openDbi(txn,edgeName.getBytes(),null,false,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
-            return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
+            return localEnv.localEdgeDataStore(scope,source,label,txn);
         }
         if(scope==Distributable.LOG_SCOPE){
-            String edgeName = source+"#"+label;
-            Dbi<ByteBuffer> dbi = txn==null? log.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : log.openDbi(txn,edgeName.getBytes(),null,false,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
-            return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
+            return logEnv.localEdgeDataStore(scope,source,label,txn);
         }
         throw new RuntimeException("Scope ["+scope+"] not supported");
     }
@@ -224,39 +206,34 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     @Override
     public void start() throws Exception {
         if(distributionIdGenerator==null) throw new RuntimeException("DistributionIdGenerator Not Registered");
-        if(envNoSyncFlag){
-            EnvFlags[] flags = new EnvFlags[]{EnvFlags.MDB_NOSYNC};
-            data = Env.create().setMapSize(storeSize(this.dataSetting)).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.dataSetting.storePath).toFile(),flags);
-            integration = Env.create().setMapSize(storeSize(this.integrationSetting)).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.integrationSetting.storePath).toFile(),flags);
-            index = Env.create().setMapSize(storeSize(this.indexSetting)).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.indexSetting.storePath).toFile(),flags);
-            local = Env.create().setMapSize(storeSize(this.localSetting)).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(localSetting.storePath).toFile(),flags);
-            log = Env.create().setMapSize(storeSize(this.logSetting)).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(logSetting.storePath).toFile(),flags);
-        }
-        else{
-            data = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.dataSetting.storePath).toFile());
-            integration = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.integrationSetting.storePath).toFile());
-            index = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.indexSetting.storePath).toFile());
-            local = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(localSetting.storePath).toFile());
-            log = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(logSetting.storePath).toFile());
-        }
+        dataEnv.lmdbDataStoreProvider = this;
+        integrationEnv.lmdbDataStoreProvider = this;
+        indexEnv.lmdbDataStoreProvider = this;
+        logEnv.lmdbDataStoreProvider = this;
+        localEnv.lmdbDataStoreProvider = this;
+        dataEnv.start();
+        integrationEnv.start();
+        indexEnv.start();
+        logEnv.start();
+        localEnv.start();
         for(int i=0;i<PENDING_BUFFER_SIZE;i++){
             pendingQueue.offer(new BufferCache(KEY_SIZE,VALUE_SIZE,pendingQueue));
         }
-        data.getDbiNames().forEach(n->{
+        dataEnv.getDbiNames().forEach(n->{
             String dname = new String(n);
             //logger.warn("DATA : "+dname);
             if(!dname.contains("#")){
                 createDataStore(dname);
             }
         });
-        integration.getDbiNames().forEach(n->{
+        integrationEnv.getDbiNames().forEach(n->{
             String dname = new String(n);
             //logger.warn("ACCESS : "+dname);
             if(!dname.contains("#")){
                 createAccessIndexDataStore(dname);
             }
         });
-        index.getDbiNames().forEach(n->{
+        indexEnv.getDbiNames().forEach(n->{
             String dname = new String(n);
             //logger.warn("INDEX : "+dname);
             if(!dname.contains("#")){
@@ -264,14 +241,14 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
             }
 
         });
-        local.getDbiNames().forEach(n->{
+        localEnv.getDbiNames().forEach(n->{
             String dname = new String(n);
             //logger.warn("LOCAL : "+dname);
             if(!dname.contains("#")){
                 createLocalDataStore(dname);
             }
         });
-        log.getDbiNames().forEach(n->{
+        logEnv.getDbiNames().forEach(n->{
             String dname = new String(n);
             //logger.warn("LOG : "+dname);
             if(!dname.contains("#")){
@@ -348,16 +325,11 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         storeMap.clear();
         edgMap.forEach((k,v)->v.dbi.close());
         edgMap.clear();
-        data.sync(true);
-        data.close();
-        integration.sync(true);
-        integration.close();
-        index.sync(true);
-        index.close();
-        log.sync(true);
-        log.close();
-        local.sync(true);
-        local.close();
+        dataEnv.shutdown();
+        integrationEnv.shutdown();
+        indexEnv.shutdown();
+        logEnv.shutdown();
+        localEnv.shutdown();
         logger.warn("LMDB Shutting down with pending buffer size ["+pendingQueue.size()+"]");
         pendingQueue.clear();
     }
@@ -487,36 +459,31 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         try{
             if(scope==Distributable.DATA_SCOPE){
                 Path copyPath = path(baseDir+"/data_"+sequence);
-                data.sync(true);
-                data.copy(copyPath.toFile());
+                dataEnv.copy(copyPath.toFile());
                 saveJsonCopyDate(copyPath.toFile());
                 return copyPath.toFile();
             }
             if(scope==Distributable.INTEGRATION_SCOPE){
                 Path copyPath = path(baseDir+"/integration_"+sequence);
-                integration.sync(true);
-                integration.copy(copyPath.toFile());
+                integrationEnv.copy(copyPath.toFile());
                 saveJsonCopyDate(copyPath.toFile());
                 return copyPath.toFile();
             }
             if(scope==Distributable.INDEX_SCOPE){
                 Path copyPath = path(baseDir+"/index_"+sequence);
-                index.sync(true);
-                index.copy(copyPath.toFile());
+                indexEnv.copy(copyPath.toFile());
                 saveJsonCopyDate(copyPath.toFile());
                 return copyPath.toFile();
             }
             if(scope==Distributable.LOG_SCOPE){
                 Path copyPath = path(baseDir+"/log_"+sequence);
-                log.sync(true);
-                log.copy(copyPath.toFile());
+                logEnv.copy(copyPath.toFile());
                 saveJsonCopyDate(copyPath.toFile());
                 return copyPath.toFile();
             }
             if(scope==Distributable.LOCAL_SCOPE){
                 Path copyPath = path(baseDir+"/local_"+sequence);
-                local.sync(true);
-                local.copy(copyPath.toFile());
+                localEnv.copy(copyPath.toFile());
                 saveJsonCopyDate(copyPath.toFile());
                 return copyPath.toFile();
             }
@@ -543,11 +510,6 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     public void registerMetricsListener(MetricsListener metricsListener) {
         if(metricsListener==null) return;
         this.metricsListener = metricsListener;
-    }
-
-    private long storeSize(EnvSetting envSetting){
-        if(envSetting.mbSize==0) return storeSize;
-        return EnvSetting.storeBaseMbSize*envSetting.mbSize;
     }
 
 }
