@@ -33,14 +33,15 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     private String baseDir = "target/lmdb";
 
-    private LMDBEnv dataEnv = LMDBEnv.DATA_ENV;
-    private LMDBEnv integrationEnv = LMDBEnv.INTEGRATION_ENV;
-    private LMDBEnv indexEnv = LMDBEnv.INDEX_ENV;
-    private LMDBEnv logEnv = LMDBEnv.LOG_ENV;
-    private LMDBEnv localEnv = LMDBEnv.LOCAL_ENV;
+    private final LMDBEnv dataEnv = LMDBEnv.DATA_ENV;
+    private final LMDBEnv integrationEnv = LMDBEnv.INTEGRATION_ENV;
+    private final LMDBEnv indexEnv = LMDBEnv.INDEX_ENV;
+    private final LMDBEnv logEnv = LMDBEnv.LOG_ENV;
+    private final LMDBEnv localEnv = LMDBEnv.LOCAL_ENV;
 
+    public static final long storeBaseMbSize = 1_048_576L; //1MB
 
-    long storeSize = EnvSetting.storeBaseMbSize; // 1MB = 1,048,576 (1024*1024)
+    long storeSize = storeBaseMbSize; // 1MB = 1,048,576 (1024*1024)
 
     int maxDatabaseNumber = 1024;
     int maxReaders = 100;
@@ -68,7 +69,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     @Override
     public void configure(Map<String, Object> properties) {
         this.name = (String)properties.get("name");
-        this.storeSize = EnvSetting.storeBaseMbSize*(int)properties.get("storeSizeMb");
+        this.storeSize = storeBaseMbSize*(int)properties.get("storeSizeMb");
         this.envNoSyncFlag = (boolean)properties.get("envNoSyncFlag");
         dataEnv.envSetting = (EnvSetting) properties.get(EnvSetting.data);
         integrationEnv.envSetting = (EnvSetting) properties.get(EnvSetting.integration);
@@ -409,25 +410,25 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
             int ix;
             switch (scope){
                 case Distributable.DATA_SCOPE:
-                    ix = jsonObject.get("data").getAsInt()+1;
-                    jsonObject.addProperty("data",ix);
+                    ix = jsonObject.get(EnvSetting.data).getAsInt()+1;
+                    jsonObject.addProperty(EnvSetting.data,ix);
                     break;
                 case Distributable.INTEGRATION_SCOPE:
-                    ix = jsonObject.get("integration").getAsInt()+1;
-                    jsonObject.addProperty("integration",ix);
+                    ix = jsonObject.get(EnvSetting.integration).getAsInt()+1;
+                    jsonObject.addProperty(EnvSetting.integration,ix);
                     break;
                 case Distributable.INDEX_SCOPE:
-                    ix = jsonObject.get("index").getAsInt()+1;
-                    jsonObject.addProperty("index",ix);
+                    ix = jsonObject.get(EnvSetting.index).getAsInt()+1;
+                    jsonObject.addProperty(EnvSetting.index,ix);
                     break;
                 case Distributable.LOG_SCOPE:
-                    ix = jsonObject.get("log").getAsInt()+1;
-                    jsonObject.addProperty("log",ix);
+                    ix = jsonObject.get(EnvSetting.log).getAsInt()+1;
+                    jsonObject.addProperty(EnvSetting.log,ix);
                     break;
                 case Distributable.LOCAL_SCOPE:
                 default:
-                    ix = jsonObject.get("local").getAsInt()+1;
-                    jsonObject.addProperty("local",ix);
+                    ix = jsonObject.get(EnvSetting.local).getAsInt()+1;
+                    jsonObject.addProperty(EnvSetting.local,ix);
                     break;
             }
             saveJson();

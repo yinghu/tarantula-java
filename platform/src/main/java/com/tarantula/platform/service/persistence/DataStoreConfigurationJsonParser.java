@@ -79,7 +79,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
             String p = node.dataStoreDirectory()+ FileSystems.getDefault().getSeparator() + env.get("path").getAsString();
             int mz = env.get("mbSize").getAsInt();
             boolean e = env.get("enabled").getAsBoolean();
-            properties.put(n,new EnvSetting(p,mz,e));
+            properties.put(n,new EnvSetting(n,p,mz,e));
         });
         properties.put("serviceContext",this.serviceContext);
         dataStoreProvider.configure(properties);
