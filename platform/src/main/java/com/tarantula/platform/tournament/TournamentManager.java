@@ -426,7 +426,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.dataStore.update(this);
     }
     public void end(){
-        if(this.global){
+        if(this.global && (status==Status.CLOSED || status==Status.STARTED)){
             for(TournamentSegment segment : tournamentSegments){
                 if(!distributionTournamentService.ownership(segment.tournamentInstance.distributionId())) continue;
                 rank(segment.tournamentInstance);
@@ -533,10 +533,10 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
 
     public Instance register(Session session){
-        TournamentJoin join = TournamentJoin.lookup(tournamentServiceProvider.tournamentJoin,session,scheduleId);
+        TournamentJoin join = TournamentJoin.lookup(tournamentServiceProvider.tournamentJoin,session,distributionId);
         if(status == Status.ENDED) return new TournamentInstanceProxy(this,join);
         if(this.global) {
-            if(join.tournamentId == this.distributionId ) return new TournamentInstanceProxy(this,join);
+            if(join.tournamentId == this.distributionId && join.instanceId > 0 && join.entryId > 0) return new TournamentInstanceProxy(this,join);
             if(targetScore == 0) {
                 TournamentInstance pending = tournamentSegments[segmentSlot()].tournamentInstance;
                 long entryId = this.distributionTournamentService.onEnterGlobalTournament(tournamentServiceProvider.gameServiceName,this.distributionId,pending.distributionId(),session.distributionId());
@@ -555,7 +555,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
 
     public boolean enter(Session session){
-        TournamentJoin join = TournamentJoin.lookup(tournamentServiceProvider.tournamentJoin,session,scheduleId);
+        TournamentJoin join = TournamentJoin.lookup(tournamentServiceProvider.tournamentJoin,session,distributionId);
         if(!join.closed && join.tournamentId == this.distributionId ) return true;
         TournamentInstance pending = tournamentSegments[segmentSlot()].tournamentInstance;
         long entryId = distributionTournamentService.onEnterGlobalTournament(tournamentServiceProvider.gameServiceName,this.distributionId, pending.distributionId(),session.distributionId());
@@ -565,7 +565,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
 
     public double score(Session session,Entry entry){
-        TournamentJoin join = TournamentJoin.lookup(tournamentServiceProvider.tournamentJoin,session,scheduleId);
+        TournamentJoin join = TournamentJoin.lookup(tournamentServiceProvider.tournamentJoin,session,distributionId);
         if(join.closed || join.tournamentId != this.distributionId ) return 0;
         return distributionTournamentService.onScoreGlobalTournament(tournamentServiceProvider.gameServiceName,this.distributionId,join.instanceId,join.entryId,session.distributionId(),entry.credit(),entry.score());
     }
