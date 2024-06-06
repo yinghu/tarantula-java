@@ -213,6 +213,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
                 if(status.status != Tournament.Status.PENDING){
                     TournamentManager tournament = new TournamentManager();
                     tournament.distributionId(status.tournamentId);
+                    tournament.dataStore(dataStore);
                     if(dataStore.load(tournament)){
                         launch(tournament);
                     }

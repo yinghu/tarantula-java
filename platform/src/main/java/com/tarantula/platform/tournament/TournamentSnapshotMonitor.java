@@ -29,6 +29,10 @@ public class TournamentSnapshotMonitor implements SchedulingTask {
 
     @Override
     public void run() {
+        try{
         this.tournamentServiceProvider.sortTournament(tournamentManager);
+        }catch (Exception ex){
+            this.tournamentServiceProvider.logger.error("error on snapshot tournament",ex);
+        }
     }
 }
