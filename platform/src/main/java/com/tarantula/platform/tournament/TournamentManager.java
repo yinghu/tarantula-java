@@ -443,11 +443,12 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         for(TournamentSegment segment : tournamentSegments) {
             if(tournamentServiceProvider.localOperationEnabled){
                 segment.snapshot();
+                tournamentServiceProvider.logger.warn("Tournament is sorting on local : "+segment.tournamentInstance.distributionId());
                 continue;
             }
             if (!distributionTournamentService.ownership(segment.tournamentInstance.distributionId())) continue;
             segment.snapshot();
-            //tournamentServiceProvider.logger.warn("Tournament is sorting on : "+segment.tournamentInstance.distributionId());
+            tournamentServiceProvider.logger.warn("Tournament is sorting on : "+segment.tournamentInstance.distributionId());
         }
     }
 
