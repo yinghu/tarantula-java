@@ -441,6 +441,10 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     public void snapshot(){
         if(!global) return;
         for(TournamentSegment segment : tournamentSegments) {
+            if(tournamentServiceProvider.localOperationEnabled){
+                segment.snapshot();
+                continue;
+            }
             if (!distributionTournamentService.ownership(segment.tournamentInstance.distributionId())) continue;
             segment.snapshot();
             //tournamentServiceProvider.logger.warn("Tournament is sorting on : "+segment.tournamentInstance.distributionId());
