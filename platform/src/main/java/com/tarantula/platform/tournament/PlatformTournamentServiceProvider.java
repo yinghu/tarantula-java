@@ -1,5 +1,6 @@
 package com.tarantula.platform.tournament;
 
+import com.google.gson.JsonElement;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
@@ -83,6 +84,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     int topRaceBoardSize;
     int myRaceBoardAheadNumber;
     int myRaceBoardBehindNumber;
+    boolean localOperationEnabled;
     AtomicInteger snapshotTimerInterval = new AtomicInteger(0);
     private String reloadKey;
     final GameCluster gameCluster;
@@ -179,6 +181,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.myRaceBoardAheadNumber = ((Number)configuration.property("myRaceBoardAheadNumber")).intValue();
         this.myRaceBoardBehindNumber = ((Number)configuration.property("myRaceBoardBehindNumber")).intValue();
         this.snapshotTimerInterval.set(((Number)configuration.property("snapshotIntervalMinutes")).intValue());
+        this.localOperationEnabled = (boolean)configuration.property("localOperationEnabled");
         this.dataStore = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_DATA_STORE);
         this.recentlyTournamentIndex = applicationPreSetup.dataStore(gameCluster,RECENTLY_TOURNAMENT_INDEX_DATA_STORE);
         this.tournamentJoin = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_JOIN_DATA_STORE);
@@ -224,7 +227,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
                 }
             }
         });
-        this.logger.warn("Tournament service provider started with concurrent tournament pool size->[ on game service ["+gameServiceName+"]["+gameCluster.name()+"]");
+        this.logger.warn("Tournament service provider started on ["+gameServiceName+"]["+gameCluster.name()+"] with local operation enabled ["+localOperationEnabled+"]");
     }
 
     @Override
@@ -401,6 +404,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         TournamentManager tournament = new TournamentManager();
         tournament.distributionKey(itemId);
         if (!this.dataStore.load(tournament)) {
+            logger.warn("Tournament cannot be loaded ["+itemId+"]");
             return false;
         }
         tournament.dataStore(dataStore);
@@ -462,6 +466,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     private void launch(TournamentManager tournament){
         this.tournamentIndex.put(tournament.distributionId(),tournament);
+        logger.warn("Tournament ["+tournament.distributionId()+"] is scheduling to start at ["+tournament.startTime()+"]");
         tournament.pendingSchedule = this.serviceContext.schedule(new TournamentStartMonitor(tournament,this));
     }
 

@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class MatchMakingModule extends ModuleHeader implements Configurable.Listener<LobbyItem>,Tournament.Listener {
+public class MatchMakingModule extends ModuleHeader implements Configurable.Listener<LobbyItem> {
 
 
     private ConcurrentHashMap<Integer,Descriptor> mLobby;
@@ -52,6 +52,7 @@ public class MatchMakingModule extends ModuleHeader implements Configurable.List
             Module module = this.gameServiceProvider.serviceModule(query[0]);
             module.onRequest(session,payload);
         }
+        /**
         else if(session.action().equals("onTestTournament")){
             if(this.context.validator().role(session.distributionId()).accessControl()< AccessControl.admin.accessControl()){
                 throw new RuntimeException("no permission");
@@ -71,7 +72,7 @@ public class MatchMakingModule extends ModuleHeader implements Configurable.List
                 session.write(JsonUtil.toSimpleResponse(false,"no lobby available").getBytes());
             }
         }
-
+        **/
         else{
             throw new UnsupportedOperationException(session.action());
         }
@@ -89,7 +90,7 @@ public class MatchMakingModule extends ModuleHeader implements Configurable.List
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.registerKey = deploymentServiceProvider.registerConfigurableListener(OnLobby.TYPE,new OnLobbyListener());
         this.gameServiceProvider.lobbyServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
-        this.gameServiceProvider.tournamentServiceProvider().registerTournamentListener(this);
+        //this.gameServiceProvider.tournamentServiceProvider().registerTournamentListener(this);
         context.log("Started match making module on ->"+this.context.descriptor().tag(), OnLog.WARN);
     }
     @Override
@@ -125,21 +126,6 @@ public class MatchMakingModule extends ModuleHeader implements Configurable.List
             context.log("Access Rank ["+k+"] registered on ["+v.accessRank()+"]",OnLog.WARN);
         });
         return lobby;
-    }
-
-    @Override
-    public void tournamentStarted(Tournament tournament) {
-        this.context.log(tournament.distributionKey()+" STARTED",OnLog.WARN);
-    }
-
-    @Override
-    public void tournamentClosed(Tournament tournament) {
-        this.context.log(tournament.distributionKey()+" CLOSED",OnLog.WARN);
-    }
-
-    @Override
-    public void tournamentEnded(Tournament tournament) {
-        this.context.log(tournament.distributionKey()+" ENDED",OnLog.WARN);
     }
 
     private class OnLobbyListener implements Configurable.Listener<OnLobby>,Lobby.Listener{
