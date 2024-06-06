@@ -207,24 +207,22 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         });
         dataStore.list(new TournamentScheduleStatusQuery(this.gameCluster.distributionId())).forEach(status->{
             logger.warn("Tournament Status : "+status.tournamentId+" : "+status.status);
-            if(status.status != Tournament.Status.PENDING){
-                TournamentManager tournament = new TournamentManager();
-                tournament.distributionId(status.tournamentId);
-                dataStore.load(tournament);
-                tournament.dataStore(dataStore);
-                byte[] lockKey = status.key().asBinary();
-                try{
-                    scheduleStore.mapLock(lockKey);
-                    if(!this.scheduleStore.mapExists(lockKey)){
-                        this.scheduleStore.mapSet(lockKey,status.toBinary());
-                        this.distributionItemService.onRegisterItem(gameServiceName,name(),"TournamentSchedule",tournament.distributionKey());
-                    }
-                    else{
+            byte[] lockKey = status.key().asBinary();
+            try{
+                scheduleStore.mapLock(lockKey);
+                if(status.status != Tournament.Status.PENDING){
+                    TournamentManager tournament = new TournamentManager();
+                    tournament.distributionId(status.tournamentId);
+                    if(dataStore.load(tournament)){
                         launch(tournament);
                     }
-                }finally {
-                    scheduleStore.mapUnlock(lockKey);
+                    else{
+                        logger.warn("Tournament cannot be loaded ["+status.tournamentId+"]");
+                    }
                 }
+            }
+            finally {
+                scheduleStore.mapUnlock(lockKey);
             }
         });
         this.logger.warn("Tournament service provider started on ["+gameServiceName+"]["+gameCluster.name()+"] with local operation enabled ["+localOperationEnabled+"]");
@@ -246,6 +244,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         });
     }
     public void atMidnight(){
+        /** not used for onDemand schedule
         serviceContext.schedule(new ScheduleRunner(SCHEDULE_RUNNER_DELAY,()->{
             logger.warn("Running midnight check tasks ->"+gameServiceName);
             byte[] pendingSchedule;
@@ -260,7 +259,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
                 }
             }while(pendingSchedule!=null);
             scheduleTournament();
-        }));
+        }));**/
         ArrayList<Long> removingList = new ArrayList<>();
         tournamentIndex.forEach((k,v)->{
             if(v.status()== Tournament.Status.ENDED) removingList.add(k);
@@ -313,8 +312,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     void closeTournament(TournamentManager tournament){
         logger.warn("Tournament Close : "+tournament.distributionId()+" : "+tournament.global());
         this.listeners.forEach(l->l.tournamentClosed(tournament));
-        byte[] lockKey = SnowflakeKey.from(tournament.scheduleId()).asBinary();
         TournamentScheduleStatus status = loadStatus(tournament.scheduleId());
+        byte[] lockKey = status.key().asBinary();
         try {
             scheduleStore.mapLock(lockKey);
             status.update(Tournament.Status.CLOSED);
@@ -326,18 +325,13 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     void endTournament(TournamentManager tournament){
         logger.warn("Tournament End : "+tournament.distributionId()+" : "+tournament.global());
-        this.listeners.forEach(l->l.tournamentEnded(tournament));
-        byte[] lockKey = SnowflakeKey.from(tournament.scheduleId()).asBinary();
+        this.distributionItemService.onReleaseItem(gameServiceName, name(), "TournamentSchedule", tournament.distributionKey());
         TournamentScheduleStatus status = loadStatus(tournament.scheduleId());
+        byte[] lockKey = status.key().asBinary();
         try {
             scheduleStore.mapLock(lockKey);
-            status.update(Tournament.Status.ENDED);
-            if(scheduleStore.mapExists(lockKey)) {
-                scheduleStore.mapRemove(lockKey);
-                clearTournament(tournament);
-                this.distributionItemService.onReleaseItem(gameServiceName, name(), "TournamentSchedule", tournament.distributionKey());
-            }
             tournament.end();
+            clearTournament(tournament);
             tournamentIndex.remove(tournament.distributionId());
         }
         catch (Exception ex){
@@ -353,13 +347,13 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     @Override
     public <T extends Configurable> void register(T t) {
         if(!t.configurationCategory().equals("TournamentSchedule")) throw new RuntimeException(t.configurationCategory()+" cannot be registered");
-        byte[] lockKey = t.key().asBinary();
+        TournamentSchedule schedule = new TournamentSchedule((ConfigurableObject) t);
+        TournamentScheduleStatus status = schedule.status();
+        status.ownerKey(SnowflakeKey.from(this.gameCluster.distributionId()));
+        dataStore.createIfAbsent(status,true);
+        byte[] lockKey = status.key().asBinary();
         try{
             scheduleStore.mapLock(lockKey);
-            TournamentSchedule schedule = new TournamentSchedule((ConfigurableObject) t);
-            TournamentScheduleStatus status = schedule.status();
-            status.ownerKey(SnowflakeKey.from(this.gameCluster.distributionId()));
-            dataStore.createIfAbsent(status,true);
             if(status.status != Tournament.Status.PENDING) throw new RuntimeException("schedule is running on tournament ["+status.tournamentId+"]");
             validateSchedule(schedule);
             switch (schedule.schedule()){
@@ -384,7 +378,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         if(!t.configurationCategory().equals("TournamentSchedule")) throw new RuntimeException(t.configurationCategory()+" cannot be released");
         TournamentScheduleStatus status = loadStatus(t.distributionId());
         if(status == null) throw new RuntimeException("no schedule status installed");
-        byte[] lockKey = t.key().asBinary();
+        byte[] lockKey = status.key().asBinary();
         try {
             scheduleStore.mapLock(lockKey);
             if (status.status == Tournament.Status.PENDING) { //cancel schedule
@@ -447,6 +441,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         }
         status.tournamentId = tournament.distributionId();
         status.update(Tournament.Status.STARTING);
+
         this.serviceContext.schedule(new ScheduleRunner(SCHEDULE_RUNNER_DELAY,()->{
             TournamentScheduleStatus started = loadStatus(tournament.scheduleId());
             if(started==null) {
@@ -456,7 +451,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             byte[] lockKey = started.key().asBinary();
             try{
                 this.scheduleStore.mapLock(lockKey);
-                this.scheduleStore.mapSet(lockKey,status.toBinary());//tournament id binary format
                 started.update(Tournament.Status.STARTED);
                 this.distributionItemService.onRegisterItem(gameServiceName,name(),"TournamentSchedule",tournament.distributionKey());
             }finally {
@@ -542,7 +536,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             return;
         }
         tournament.pendingSchedule.cancel(true);
-        this.listeners.forEach(l->l.tournamentClosed(tournament));
+        //this.listeners.forEach(l->l.tournamentClosed(tournament));
         this.serviceContext.schedule(new ScheduleRunner(SCHEDULE_RUNNER_DELAY,()->{
             endTournament(tournament);
         }));

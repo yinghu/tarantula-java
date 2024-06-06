@@ -443,12 +443,12 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         for(TournamentSegment segment : tournamentSegments) {
             if(tournamentServiceProvider.localOperationEnabled){
                 segment.snapshot();
-                tournamentServiceProvider.logger.warn("Tournament is sorting on local : "+segment.tournamentInstance.distributionId());
+                //tournamentServiceProvider.logger.warn("Tournament is sorting on local : "+segment.tournamentInstance.distributionId());
                 continue;
             }
             if (!distributionTournamentService.ownership(segment.tournamentInstance.distributionId())) continue;
             segment.snapshot();
-            tournamentServiceProvider.logger.warn("Tournament is sorting on : "+segment.tournamentInstance.distributionId());
+            //tournamentServiceProvider.logger.warn("Tournament is sorting on : "+segment.tournamentInstance.distributionId());
         }
     }
 
@@ -580,7 +580,11 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
     public RaceBoard raceBoard(TournamentJoin session){
         if(session.instanceId==0) return new TournamentRaceBoard();
-        if(tournamentServiceProvider.localOperationEnabled) return onRaceBoard(session.instanceId);
+        if(tournamentServiceProvider.localOperationEnabled){
+            Tournament.RaceBoard localBoard = onRaceBoard(session.instanceId);
+            localBoard.distributionId(session.instanceId);
+            return localBoard;
+        }
         byte[] payload = this.distributionTournamentService.onRaceBoard(tournamentServiceProvider.gameServiceName,distributionId,session.instanceId);
         TournamentRaceBoard raceBoard = TournamentRaceBoard.from(payload);
         raceBoard.distributionId(session.instanceId);
@@ -589,7 +593,11 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     public RaceBoard myRaceBoard(TournamentJoin session){
         if(session.instanceId==0) return new TournamentRaceBoard();
-        if(tournamentServiceProvider.localOperationEnabled) return onMyRaceBoard(session.instanceId,session.entryId,session.stub());
+        if(tournamentServiceProvider.localOperationEnabled) {
+            Tournament.RaceBoard localBoard = onMyRaceBoard(session.instanceId,session.entryId,session.stub());
+            localBoard.distributionId(session.instanceId);
+            return localBoard;
+        }
         byte[] payload = this.distributionTournamentService.onMyRaceBoard(tournamentServiceProvider.gameServiceName,distributionId,session.instanceId,session.entryId,session.stub());
         TournamentRaceBoard raceBoard = TournamentRaceBoard.from(payload);
         raceBoard.distributionId(session.instanceId);
