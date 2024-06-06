@@ -429,9 +429,10 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         if(this.global && (status==Status.CLOSED || status==Status.STARTED)){
             for(TournamentSegment segment : tournamentSegments){
                 if(!distributionTournamentService.ownership(segment.tournamentInstance.distributionId())) continue;
-                rank(segment.tournamentInstance);
+                int randed = rank(segment.tournamentInstance);
                 segment.tournamentInstance.ended();
                 this.dataStore.update(segment.tournamentInstance);
+                tournamentServiceProvider.logger.warn("Segment ["+segment.tournamentInstance.distributionId()+"] ranked ["+randed+"]");
             }
         }
         status = Status.ENDED;
@@ -452,7 +453,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         }
     }
 
-    private void rank(TournamentInstance ended){
+    private int rank(TournamentInstance ended){
         int rank =1;
         LocalDateTime endTime = LocalDateTime.now();
         for(TournamentEntry entry : ended.sorted()){
@@ -472,6 +473,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             this.tournamentServiceProvider.tournamentHistory.create(history);
             rank++;
         }
+        return rank;
     }
     TournamentInstance createGlobalInstance(){
         TournamentInstance instance = TournamentInstance.global(targetScore,maxEntriesPerInstance);
