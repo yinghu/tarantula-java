@@ -237,12 +237,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     @Override
     public void reload(int partition,boolean localMember) {
-        tournamentIndex.forEach((k,v)->{
-            int pid = distributionTournamentService.partitionId(k);
-            if(pid==partition){
-                logger.warn("Reload tournament with partition ["+pid+"] : ["+localMember+"] : "+k);
-            }
-        });
+        //skip for segmented global schedule
     }
     public void atMidnight(){
         /** not used for onDemand schedule
@@ -388,7 +383,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             }
             if(status.status == Tournament.Status.STARTING) throw new RuntimeException("Tournament cannot be canceled during starting.");
             distributionTournamentService.onEndTournament(gameServiceName, status.tournamentId);
-            t.released();
+            //t.released();
         }finally {
             scheduleStore.mapUnlock(lockKey);
         }
