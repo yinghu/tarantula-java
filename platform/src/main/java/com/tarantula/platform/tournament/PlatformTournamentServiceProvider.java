@@ -1,6 +1,5 @@
 package com.tarantula.platform.tournament;
 
-import com.google.gson.JsonElement;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;

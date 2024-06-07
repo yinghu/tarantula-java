@@ -72,7 +72,7 @@
             tournamentList.innerHTML ='';
             if(resp.Successful){
                 resp._tournamentList.forEach(item => {
-                    tournamentList.innerHTML += TARA_HTML.command(item.TournamentId,item.Type+'/'+item.Name+'['+item.StartLevel+'-'+item.EndLevel+']',item.Status,'tournament-join','LeaderBoard');
+                    tournamentList.innerHTML += TARA_HTML.command(item.TournamentId,item.Type+'/'+item.Name+'['+item.StartLevel+'-'+item.EndLevel+']',item.Status+' : End By ['+item.EndTime+']','tournament-join','LeaderBoard');
                 });    
                 document.querySelectorAll('.tx-live-tournament-join').forEach(a=>{
                       a.onclick = ()=>{
