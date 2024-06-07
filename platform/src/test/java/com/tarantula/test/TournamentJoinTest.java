@@ -26,14 +26,14 @@ public class TournamentJoinTest extends DataStoreHook{
         long tournamentId = 2000;
         long instanceId = 3000;
         long entryId = 4000;
-        TournamentJoin tournamentJoin = TournamentJoin.lookup(dataStore,stub,scheduleId);
-        Assert.assertEquals(tournamentJoin.scheduleId,scheduleId);
+        TournamentJoin tournamentJoin = TournamentJoin.lookup(dataStore,stub,tournamentId);
+        Assert.assertEquals(tournamentJoin.scheduleId,0);
         Assert.assertEquals(tournamentJoin.stub(),stub.distributionId());
         Assert.assertEquals(tournamentJoin.closed,true);
-        Assert.assertEquals(tournamentJoin.tournamentId,0);
+        Assert.assertEquals(tournamentJoin.tournamentId,tournamentId);
         Assert.assertEquals(tournamentJoin.instanceId,0);
 
-        TournamentJoin loaded = TournamentJoin.lookup(dataStore,stub,scheduleId);
+        TournamentJoin loaded = TournamentJoin.lookup(dataStore,stub,tournamentId);
         Assert.assertEquals(tournamentJoin.distributionId(),loaded.distributionId());
         Assert.assertEquals(tournamentJoin.scheduleId,loaded.scheduleId);
         Assert.assertEquals(tournamentJoin.stub(),loaded.stub());

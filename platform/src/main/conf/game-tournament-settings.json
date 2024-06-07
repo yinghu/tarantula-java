@@ -11,5 +11,6 @@
   "topRaceBoardSize": 10,
   "myRaceBoardAheadNumber": 5,
   "myRaceBoardBehindNumber": 1,
-  "snapshotIntervalMinutes": 15
+  "snapshotIntervalMinutes": 3,
+  "localOperationEnabled": true
 }
