@@ -1,5 +1,7 @@
 package com.tarantula.platform.tournament;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.util.FIFOBuffer;
 import com.icodesoftware.util.RecoverableObject;
@@ -85,4 +87,17 @@ public class RecentlyTournamentList extends RecoverableObject {
         return ret[0];
     }
 
+    @Override
+    public JsonObject toJson() {
+        JsonObject jsonObject = new JsonObject();
+        Long[] ids = pop();
+        JsonArray arrs = new JsonArray();
+        for(Long i : ids){
+            arrs.add(i==null? "0": i.toString());
+        }
+        jsonObject.addProperty("name",name);
+        jsonObject.addProperty("size",size);
+        jsonObject.add("index",arrs);
+        return jsonObject;
+    }
 }

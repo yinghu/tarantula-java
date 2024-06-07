@@ -426,12 +426,13 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.dataStore.update(this);
     }
     public void end(){
-        if(this.global){
+        if(this.global && (status==Status.CLOSED || status==Status.STARTED)){
             for(TournamentSegment segment : tournamentSegments){
                 if(!distributionTournamentService.ownership(segment.tournamentInstance.distributionId())) continue;
-                rank(segment.tournamentInstance);
+                int randed = rank(segment.tournamentInstance);
                 segment.tournamentInstance.ended();
                 this.dataStore.update(segment.tournamentInstance);
+                tournamentServiceProvider.logger.warn("Segment ["+segment.tournamentInstance.distributionId()+"] ranked ["+randed+"]");
             }
         }
         status = Status.ENDED;
@@ -441,13 +442,18 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     public void snapshot(){
         if(!global) return;
         for(TournamentSegment segment : tournamentSegments) {
+            if(tournamentServiceProvider.localOperationEnabled){
+                segment.snapshot();
+                //tournamentServiceProvider.logger.warn("Tournament is sorting on local : "+segment.tournamentInstance.distributionId());
+                continue;
+            }
             if (!distributionTournamentService.ownership(segment.tournamentInstance.distributionId())) continue;
             segment.snapshot();
             //tournamentServiceProvider.logger.warn("Tournament is sorting on : "+segment.tournamentInstance.distributionId());
         }
     }
 
-    private void rank(TournamentInstance ended){
+    private int rank(TournamentInstance ended){
         int rank =1;
         LocalDateTime endTime = LocalDateTime.now();
         for(TournamentEntry entry : ended.sorted()){
@@ -467,6 +473,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             this.tournamentServiceProvider.tournamentHistory.create(history);
             rank++;
         }
+        return rank;
     }
     TournamentInstance createGlobalInstance(){
         TournamentInstance instance = TournamentInstance.global(targetScore,maxEntriesPerInstance);
@@ -533,13 +540,13 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
 
     public Instance register(Session session){
-        TournamentJoin join = TournamentJoin.lookup(tournamentServiceProvider.tournamentJoin,session,scheduleId);
+        TournamentJoin join = TournamentJoin.lookup(tournamentServiceProvider.tournamentJoin,session,distributionId);
         if(status == Status.ENDED) return new TournamentInstanceProxy(this,join);
         if(this.global) {
-            if(join.tournamentId == this.distributionId ) return new TournamentInstanceProxy(this,join);
+            if(join.tournamentId == this.distributionId && join.instanceId > 0 && join.entryId > 0) return new TournamentInstanceProxy(this,join);
             if(targetScore == 0) {
                 TournamentInstance pending = tournamentSegments[segmentSlot()].tournamentInstance;
-                long entryId = this.distributionTournamentService.onEnterGlobalTournament(tournamentServiceProvider.gameServiceName,this.distributionId,pending.distributionId(),session.distributionId());
+                long entryId = tournamentServiceProvider.localOperationEnabled ? this.onEnterSegment(session.distributionId(),pending.distributionId()) : this.distributionTournamentService.onEnterGlobalTournament(tournamentServiceProvider.gameServiceName,this.distributionId,pending.distributionId(),session.distributionId());
                 if(entryId==0) throw new RuntimeException("Failed to enter tournament :"+pending.distributionId());
                 join.onTournament(this.distributionId,pending.distributionId(),entryId);
             }
@@ -555,19 +562,19 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
 
     public boolean enter(Session session){
-        TournamentJoin join = TournamentJoin.lookup(tournamentServiceProvider.tournamentJoin,session,scheduleId);
+        TournamentJoin join = TournamentJoin.lookup(tournamentServiceProvider.tournamentJoin,session,distributionId);
         if(!join.closed && join.tournamentId == this.distributionId ) return true;
         TournamentInstance pending = tournamentSegments[segmentSlot()].tournamentInstance;
-        long entryId = distributionTournamentService.onEnterGlobalTournament(tournamentServiceProvider.gameServiceName,this.distributionId, pending.distributionId(),session.distributionId());
+        long entryId = tournamentServiceProvider.localOperationEnabled ? this.onEnterSegment(session.distributionId(),pending.distributionId()) : distributionTournamentService.onEnterGlobalTournament(tournamentServiceProvider.gameServiceName,this.distributionId, pending.distributionId(),session.distributionId());
         if(entryId==0) return false;
         join.onTournament(this.distributionId,pending.distributionId(),entryId);
         return true;
     }
 
     public double score(Session session,Entry entry){
-        TournamentJoin join = TournamentJoin.lookup(tournamentServiceProvider.tournamentJoin,session,scheduleId);
+        TournamentJoin join = TournamentJoin.lookup(tournamentServiceProvider.tournamentJoin,session,distributionId);
         if(join.closed || join.tournamentId != this.distributionId ) return 0;
-        return distributionTournamentService.onScoreGlobalTournament(tournamentServiceProvider.gameServiceName,this.distributionId,join.instanceId,join.entryId,session.distributionId(),entry.credit(),entry.score());
+        return this.tournamentServiceProvider.localOperationEnabled? onScoreSegment(session.distributionId(), join.instanceId,join.entryId,entry.credit(),entry.score()) : distributionTournamentService.onScoreGlobalTournament(tournamentServiceProvider.gameServiceName,this.distributionId,join.instanceId,join.entryId,session.distributionId(),entry.credit(),entry.score());
     }
 
     public double score(Session session,long instanceId,Entry entry){
@@ -575,6 +582,11 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
     public RaceBoard raceBoard(TournamentJoin session){
         if(session.instanceId==0) return new TournamentRaceBoard();
+        if(tournamentServiceProvider.localOperationEnabled){
+            Tournament.RaceBoard localBoard = onRaceBoard(session.instanceId);
+            localBoard.distributionId(session.instanceId);
+            return localBoard;
+        }
         byte[] payload = this.distributionTournamentService.onRaceBoard(tournamentServiceProvider.gameServiceName,distributionId,session.instanceId);
         TournamentRaceBoard raceBoard = TournamentRaceBoard.from(payload);
         raceBoard.distributionId(session.instanceId);
@@ -583,6 +595,11 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     public RaceBoard myRaceBoard(TournamentJoin session){
         if(session.instanceId==0) return new TournamentRaceBoard();
+        if(tournamentServiceProvider.localOperationEnabled) {
+            Tournament.RaceBoard localBoard = onMyRaceBoard(session.instanceId,session.entryId,session.stub());
+            localBoard.distributionId(session.instanceId);
+            return localBoard;
+        }
         byte[] payload = this.distributionTournamentService.onMyRaceBoard(tournamentServiceProvider.gameServiceName,distributionId,session.instanceId,session.entryId,session.stub());
         TournamentRaceBoard raceBoard = TournamentRaceBoard.from(payload);
         raceBoard.distributionId(session.instanceId);
