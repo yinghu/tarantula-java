@@ -52,27 +52,7 @@ public class MatchMakingModule extends ModuleHeader implements Configurable.List
             Module module = this.gameServiceProvider.serviceModule(query[0]);
             module.onRequest(session,payload);
         }
-        /**
-        else if(session.action().equals("onTestTournament")){
-            if(this.context.validator().role(session.distributionId()).accessControl()< AccessControl.admin.accessControl()){
-                throw new RuntimeException("no permission");
-            }
-            session.tournamentId(Long.parseLong(session.name()));
-            session.clientId("device_"+session.stub());
-            session.name("web_device");
-            session.action("onPlay");
-            GameRating rating = this.gameServiceProvider.presenceServiceProvider().rating(session);
-            int mix = rating.rank>maxRank?maxRank:rating.rank;
-            Descriptor lobby = mLobby.get(mix);
-            if(lobby!=null) {
-                Response response = context.presence(session).onPlay(session, lobby);
-                if (response != null) session.write(this.builder.create().toJson(response).getBytes());
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false,"no lobby available").getBytes());
-            }
-        }
-        **/
+
         else{
             throw new UnsupportedOperationException(session.action());
         }
