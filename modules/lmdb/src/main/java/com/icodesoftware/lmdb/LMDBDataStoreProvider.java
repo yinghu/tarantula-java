@@ -39,7 +39,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private final LMDBEnv logEnv = LMDBEnv.LOG_ENV;
     private final LMDBEnv localEnv = LMDBEnv.LOCAL_ENV;
 
-    public static final long storeBaseMbSize = 1_048_576L; //1MB
+    public static final long storeBaseMbSize = EnvSetting.MB_1; //1MB
 
     long storeSize = storeBaseMbSize; // 1MB = 1,048,576 (1024*1024)
 
@@ -159,6 +159,15 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(scope==Distributable.INDEX_SCOPE) return indexEnv.txnWrite();
         if(scope==Distributable.LOCAL_SCOPE) return localEnv.txnWrite();
         if(scope==Distributable.LOG_SCOPE) return logEnv.txnWrite();
+        throw new RuntimeException("Scope ["+scope+"] not supported");
+    }
+
+    public LMDBEnv env(int scope){
+        if(scope==Distributable.DATA_SCOPE) return dataEnv;
+        if(scope==Distributable.INTEGRATION_SCOPE) return integrationEnv;
+        if(scope==Distributable.INDEX_SCOPE) return indexEnv;
+        if(scope==Distributable.LOCAL_SCOPE) return localEnv;
+        if(scope==Distributable.LOG_SCOPE) return logEnv;
         throw new RuntimeException("Scope ["+scope+"] not supported");
     }
 
@@ -494,6 +503,9 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
             logger.error("Failed to backup data store ["+scope+"]",ex);
             throw new RuntimeException(ex);
         }
+    }
+    public String baseDir(){
+        return baseDir;
     }
     private Path path(String path) throws Exception{
         Path _path = Paths.get(path);

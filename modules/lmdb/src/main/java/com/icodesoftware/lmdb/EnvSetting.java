@@ -1,7 +1,9 @@
 package com.icodesoftware.lmdb;
 
 public class EnvSetting {
-    
+
+    public static final long MB_1 = 1_048_576L;
+
     public static final String data ="data";
     public static final String integration ="integration";
     public static final String index ="index";

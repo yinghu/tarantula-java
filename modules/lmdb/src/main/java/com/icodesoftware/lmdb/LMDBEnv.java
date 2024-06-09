@@ -62,7 +62,7 @@ public class LMDBEnv implements Serviceable {
     public void copy(File file){
         if(!envSetting.enabled) return;
         env.sync(true);
-        env.copy(file);
+        env.copy(file,CopyFlags.MDB_CP_COMPACT);
     }
 
     @Override

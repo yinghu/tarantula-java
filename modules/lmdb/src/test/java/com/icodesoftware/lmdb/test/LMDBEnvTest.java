@@ -1,0 +1,82 @@
+package com.icodesoftware.lmdb.test;
+
+import com.icodesoftware.DataStore;
+import com.icodesoftware.Distributable;
+import com.icodesoftware.lmdb.*;
+import com.icodesoftware.util.BufferUtil;
+import com.icodesoftware.util.FileUtil;
+import com.icodesoftware.util.SnowflakeKey;
+import org.lmdbjava.*;
+import org.testng.Assert;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import java.io.File;
+import java.nio.ByteBuffer;
+
+import java.util.List;
+
+
+public class LMDBEnvTest {
+
+    LMDBDataStoreProvider lmdbDataStoreProvider;
+    TestMapStoreListener testMapStoreListener;
+
+    LocalDistributionIdGenerator localDistributionIdGenerator;
+    @BeforeClass
+    public void setUp() throws Exception{
+        TestSetup.setUp();
+        lmdbDataStoreProvider = TestSetup.lmdbDataStoreProvider;
+        localDistributionIdGenerator = TestSetup.localDistributionIdGenerator;//new LocalDistributionIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
+        testMapStoreListener = TestSetup.testMapStoreListener;//new TestMapStoreListener(lmdbDataStoreProvider);
+    }
+    @AfterTest
+    public void tearDown() throws Exception{
+
+        //lmdbDataStoreProvider.shutdown();
+    }
+    @Test(groups = { "LMDBRecovery" })
+    public void testCreate(){
+        testMapStoreListener.verifier = (tid)->{
+            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
+            testMapStoreListener.transactionLogManager.onTransaction(logs);
+        };
+        long ownerId = localDistributionIdGenerator.id();
+        DataStore dataStore = lmdbDataStoreProvider.createDataStore("test_env_user");
+        TestObject testObject = new TestObject();
+        testObject.name = "test";
+        testObject.type = "user";
+        testObject.onEdge(true);
+        testObject.label("name_index");
+        testObject.ownerKey(SnowflakeKey.from(ownerId));
+        Assert.assertTrue(dataStore.create(testObject));
+        Assert.assertTrue(dataStore.createEdge(testObject,"type_index"));
+        Assert.assertTrue(dataStore.createEdge(testObject,"key_index"));
+        dataStore.backup().drop(false);
+        Assert.assertFalse(dataStore.backup().get(testObject.key(),(keyBuffer, dataBuffer) ->true));
+        File snapshot = FileUtil.createFileIfNotExisted(lmdbDataStoreProvider.baseDir()+"/backup");
+        lmdbDataStoreProvider.env(Distributable.INDEX_SCOPE).copy(snapshot);
+        EnvFlags[] flags = new EnvFlags[]{EnvFlags.MDB_NOSYNC,EnvFlags.MDB_RDONLY_ENV};
+        Env<ByteBuffer> lmdb = Env.create().setMapSize(EnvSetting.MB_1).setMaxDbs(1024).setMaxReaders(10).open(snapshot,flags);
+        try(lmdb){
+            Dbi<ByteBuffer> dbi = lmdb.openDbi(TransactionLogManager.DATA_PREFIX_I+"test_env_user",DbiFlags.MDB_CREATE);
+            Cursor<ByteBuffer> cursor = dbi.openCursor(lmdb.txnRead());
+            try(cursor){
+                Assert.assertTrue(cursor.first());
+                ByteBuffer key = cursor.key();
+                ByteBuffer value = cursor.val();
+                dataStore.backup().set((k,v)->{
+                    BufferUtil.copy(key,k);
+                    BufferUtil.copy(value,v);
+                    return true;
+                });
+            }
+            dbi.close();
+        }
+        Assert.assertTrue(dataStore.backup().get(testObject.key(),(keyBuffer, dataBuffer) ->true));
+    }
+
+
+
+}
