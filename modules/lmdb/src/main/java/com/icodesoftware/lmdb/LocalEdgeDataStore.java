@@ -39,5 +39,8 @@ public class LocalEdgeDataStore {
             }
         }
     }
+    public void drop(Txn<ByteBuffer> txn,boolean delete){
+        dbi.drop(txn,delete);
+    }
 
 }

@@ -49,13 +49,20 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     private List<String> edgeList(){
         ArrayList<String> elist = new ArrayList<>();
+        env.getDbiNames().forEach(n-> {
+            String dn = new String(n);
+            if(dn.startsWith(name) && dn.contains("#")){
+                elist.add(dn.split("#")[1]);
+            }
+        });
         return elist;
     }
 
     @Override
     public void view(DataStoreSummary dataStoreSummary){
+        List<String> elist = edgeList();
         Txn<ByteBuffer> txn = env.txn(ptxn);
-        try{
+        try(txn){
             Stat st = dbi.stat(txn);
             dataStoreSummary.count(st.entries);
             dataStoreSummary.depth(st.depth);
@@ -63,9 +70,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             dataStoreSummary.overflowPages(st.overflowPages);
             dataStoreSummary.branchPages(st.branchPages);
             dataStoreSummary.pageSize(st.pageSize);
-            dataStoreSummary.edgeList(edgeList());
-        }finally {
-            txn.close();
+            dataStoreSummary.edgeList(elist);
         }
     }
 

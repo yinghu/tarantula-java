@@ -55,6 +55,8 @@ public class LMDBEnvTest {
         Assert.assertTrue(dataStore.create(testObject));
         Assert.assertTrue(dataStore.createEdge(testObject,"type_index"));
         Assert.assertTrue(dataStore.createEdge(testObject,"key_index"));
+
+
         dataStore.backup().drop(false);
         Assert.assertFalse(dataStore.backup().get(testObject.key(),(keyBuffer, dataBuffer) ->true));
         LMDBEnv env = lmdbDataStoreProvider.env(Distributable.DATA_SCOPE);
@@ -63,10 +65,13 @@ public class LMDBEnvTest {
         try(read){
             Recoverable.DataBuffer key = BufferProxy.buffer(8,true);
             key.writeLong(ownerId);
+            int[] ct={0};
             edgeDataStore.onEdge(read,key.flip(),(k,v)->{
-                Assert.assertEquals(k.readLong(),testObject.distributionId());
+                //Assert.assertEquals(k.readLong(),testObject.distributionId());
+                ct[0]++;
                 return true;
             });
+            Assert.assertEquals(ct[0],0);
         }
         File snapshot = FileUtil.createFileIfNotExisted(lmdbDataStoreProvider.baseDir()+"/backup");
         lmdbDataStoreProvider.env(Distributable.INDEX_SCOPE).copy(snapshot);

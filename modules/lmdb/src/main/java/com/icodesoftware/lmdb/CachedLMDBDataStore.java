@@ -48,15 +48,21 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
 
 
     private List<String> edgeList(){
-        //env.getDbiNames().forEach(n->System.out.println(new String(n)));
         ArrayList<String> elist = new ArrayList<>();
+        env.getDbiNames().forEach(n-> {
+            String dn = new String(n);
+            if(dn.startsWith(name) && dn.contains("#")){
+                elist.add(dn.split("#")[1]);
+            }
+        });
         return elist;
     }
 
     @Override
     public void view(DataStoreSummary dataStoreSummary){
+        List<String> elist = edgeList();
         Txn<ByteBuffer> txn = env.txnRead();
-        try{
+        try(txn){
             Stat st = dbi.stat(txn);
             dataStoreSummary.count(st.entries);
             dataStoreSummary.depth(st.depth);
@@ -64,9 +70,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             dataStoreSummary.overflowPages(st.overflowPages);
             dataStoreSummary.branchPages(st.branchPages);
             dataStoreSummary.pageSize(st.pageSize);
-            dataStoreSummary.edgeList(edgeList());
-        }finally {
-            txn.close();
+            dataStoreSummary.edgeList(elist);
         }
     }
 
@@ -548,8 +552,17 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         }
     }
     public void drop(boolean delete){
+        List<byte[]> edges = env.getDbiNames();
         Txn<ByteBuffer> txn = env.txnWrite();
         dbi.drop(txn,delete);
+        edges.forEach(edge->{
+            String dn = new String(edge);
+            if(dn.startsWith(name+"#")){
+                String[] src = dn.split("#");
+                LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(metadata.scope(),src[0],src[1]);
+                localEdgeDataStore.drop(txn,delete);
+            }
+        });
         txn.commit();
     }
     //help methods

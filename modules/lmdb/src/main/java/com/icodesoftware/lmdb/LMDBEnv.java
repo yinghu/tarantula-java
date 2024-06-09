@@ -23,6 +23,7 @@ public class LMDBEnv implements Serviceable {
     public EnvSetting envSetting;
     public Env<ByteBuffer> env;
     public LMDBDataStoreProvider lmdbDataStoreProvider;
+
     public LMDBEnv(EnvSetting envSetting){
         this.envSetting = envSetting;
     }
