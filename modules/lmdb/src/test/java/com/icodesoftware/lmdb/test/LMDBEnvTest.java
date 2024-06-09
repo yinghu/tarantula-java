@@ -2,7 +2,9 @@ package com.icodesoftware.lmdb.test;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.*;
+import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.util.BufferUtil;
 import com.icodesoftware.util.FileUtil;
 import com.icodesoftware.util.SnowflakeKey;
@@ -55,6 +57,17 @@ public class LMDBEnvTest {
         Assert.assertTrue(dataStore.createEdge(testObject,"key_index"));
         dataStore.backup().drop(false);
         Assert.assertFalse(dataStore.backup().get(testObject.key(),(keyBuffer, dataBuffer) ->true));
+        LMDBEnv env = lmdbDataStoreProvider.env(Distributable.DATA_SCOPE);
+        Txn<ByteBuffer> read = env.txnRead();
+        LocalEdgeDataStore edgeDataStore = env.localEdgeDataStore(Distributable.DATA_SCOPE,"test_env_user","name_index",read);
+        try(read){
+            Recoverable.DataBuffer key = BufferProxy.buffer(8,true);
+            key.writeLong(ownerId);
+            edgeDataStore.onEdge(read,key.flip(),(k,v)->{
+                Assert.assertEquals(k.readLong(),testObject.distributionId());
+                return true;
+            });
+        }
         File snapshot = FileUtil.createFileIfNotExisted(lmdbDataStoreProvider.baseDir()+"/backup");
         lmdbDataStoreProvider.env(Distributable.INDEX_SCOPE).copy(snapshot);
         EnvFlags[] flags = new EnvFlags[]{EnvFlags.MDB_NOSYNC,EnvFlags.MDB_RDONLY_ENV};
@@ -72,7 +85,6 @@ public class LMDBEnvTest {
                     return true;
                 });
             }
-            dbi.close();
         }
         Assert.assertTrue(dataStore.backup().get(testObject.key(),(keyBuffer, dataBuffer) ->true));
     }

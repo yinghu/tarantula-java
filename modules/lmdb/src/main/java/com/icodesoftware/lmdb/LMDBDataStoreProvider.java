@@ -52,6 +52,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private final static int PENDING_BUFFER_SIZE = 32;
 
     boolean envNoSyncFlag = true;
+    boolean storeReindexing;
     private final static ConcurrentHashMap<String,DataStore> storeMap = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<String,LocalEdgeDataStore> edgMap = new ConcurrentHashMap<>();
 
@@ -71,6 +72,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         this.name = (String)properties.get("name");
         this.storeSize = storeBaseMbSize*(int)properties.get("storeSizeMb");
         this.envNoSyncFlag = (boolean)properties.get("envNoSyncFlag");
+        this.storeReindexing = (boolean)properties.get("storeReindexing");
         dataEnv.envSetting = (EnvSetting) properties.get(EnvSetting.data);
         integrationEnv.envSetting = (EnvSetting) properties.get(EnvSetting.integration);
         indexEnv.envSetting = (EnvSetting) properties.get(EnvSetting.index);
@@ -278,11 +280,14 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         }
         FileInputStream in = new FileInputStream(backupLog);
         jsonObject = JsonUtil.parse(in);
+        if(storeReindexing){
+            logger.warn("Starting store reindex from index store");
+        }
         if(migration!=null && migration.migrating()){
             migration.migrate(this,storeMap);
             System.exit(0);
         }
-        logger.warn("LMDB Provider started with store size ["+storeSize+"] queue side ["+pendingQueue.size()+"] store no sync mode ["+envNoSyncFlag+"]");
+        logger.warn("LMDB Provider started with store size ["+storeSize+"] queue side ["+pendingQueue.size()+"] store no sync mode ["+envNoSyncFlag+"] reindexing ["+storeReindexing+"]");
     }
 
     @Override

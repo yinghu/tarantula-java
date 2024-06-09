@@ -127,7 +127,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public boolean storeNoSync = false;
     public String dataStoreDir;
-
+    public static boolean dataStoreReindexing;
 
     public boolean dataStoreDailyBackup;
 
@@ -214,6 +214,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         HashMap<String,Object> storeAdditions = new HashMap<>();
         storeAdditions.put("storeSizeMb",storeSizeMb);
         storeAdditions.put("envNoSyncFlag",storeNoSync);
+        storeAdditions.put("storeReindexing",dataStoreReindexing);
         DataStoreConfigurationJsonParser sparser = new DataStoreConfigurationJsonParser(DATA_STORE_CONFIG,this,storeAdditions,dataStoreProvider -> {
             try{
                 this.deploymentDataStoreProvider = dataStoreProvider;

@@ -31,8 +31,8 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
 
     private boolean envNoSyncFlag;
 
+    private boolean storeReindexing;
     private boolean dataStoreDailyBackup;
-
 
     private ServiceContext serviceContext;
     private DataStoreProvider.OnStart onStart;
@@ -43,6 +43,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
     public DataStoreConfigurationJsonParser(String config,ServiceContext tx,Map<String,Object> additions, DataStoreProvider.OnStart onStart){
         this.storeSizeMb = (int)additions.get("storeSizeMb");
         this.envNoSyncFlag = (boolean)additions.get("envNoSyncFlag");
+        this.storeReindexing = (boolean)additions.get("storeReindexing");
         this.dataStoreProviderConfiguration = config;
         this.node = tx.node();
         this.dataBucketGroup = node.bucketName();
@@ -66,6 +67,7 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         //properties.put("partitionNumber",this.partitionNumber);
         properties.put("storeSizeMb",this.storeSizeMb);
         properties.put("envNoSyncFlag",envNoSyncFlag);
+        properties.put("storeReindexing",storeReindexing);
         properties.put("dir",this.dataDir);
         properties.put("dailyBackup",dataStoreDailyBackup);
         properties.put("node",this.node);

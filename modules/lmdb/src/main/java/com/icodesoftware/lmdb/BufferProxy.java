@@ -11,7 +11,7 @@ public class BufferProxy implements Recoverable.DataBuffer {
 
     private BufferProxy(ByteBuffer buffer){
         this.buffer = buffer;
-        this.buffer.order(ByteOrder.nativeOrder());
+        if(buffer.order()!=ByteOrder.nativeOrder()) this.buffer.order(ByteOrder.nativeOrder());
     }
 
     public Recoverable.DataBuffer writeHeader(Recoverable.DataHeader dataHeader){

@@ -23,6 +23,10 @@ public class TarantulaMain {
 		try{
 			if(args.length == 3){
 				DataBootstrap.run(args[0],args[1],args[2]);
+				TarantulaContext.dataStoreReindexing = true;
+			}
+			else if(args.length == 1 && args[0].equals("-reindex")){
+				TarantulaContext.dataStoreReindexing = true;
 			}
 			runtime = new TarantulaMain._Runtime();
 			runtime.bootstrap();

@@ -55,6 +55,10 @@ public class LMDBEnv implements Serviceable {
         if(!envSetting.enabled) throw new RuntimeException("lmdb ["+envSetting.name+"] disabled");
         return env.txnWrite();
     }
+    public Txn<ByteBuffer> txnRead(){
+        if(!envSetting.enabled) throw new RuntimeException("lmdb ["+envSetting.name+"] disabled");
+        return env.txnRead();
+    }
     public List<byte[]> getDbiNames(){
         if(!envSetting.enabled) return new ArrayList<>();
         return env.getDbiNames();
