@@ -77,15 +77,12 @@ public class TarantulaMain {
 					var hostname = System.getenv("HOSTNAME");
 					log.info("Hostname is " + hostname);
 
-					var index = hostname.substring(hostname.lastIndexOf('-') + 1);
-					if(index.length() == 1)
-					{
-						index = "0" + index;
-					}
-					log.info("Hostname Index is " + index);
-
-					_user.setProperty("tarantula.data.bucket.node", "N" + index);
-					_user.setProperty("tarantula.snowflake.node.number", index);
+					var indexStr = hostname.substring(hostname.lastIndexOf('-') + 1);
+					var index = Integer.parseInt(indexStr);
+					indexStr = String.format("%02d", index);
+					
+					_user.setProperty("tarantula.data.bucket.node", "N" + indexStr);
+					_user.setProperty("tarantula.snowflake.node.number", indexStr);
 				}
 			} catch (Exception ignored) {}
 
