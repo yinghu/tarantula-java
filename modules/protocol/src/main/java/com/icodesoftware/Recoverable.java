@@ -96,5 +96,8 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable,V
     interface DataBufferPair extends Resettable,AutoCloseable{
         DataBuffer key();
         DataBuffer value();
+
+        @Override
+        void close();
     }
 }
