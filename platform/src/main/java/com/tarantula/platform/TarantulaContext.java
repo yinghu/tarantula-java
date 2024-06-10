@@ -253,9 +253,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         if(kubernetesDiscoveryEnabled && kubernetesServiceDns != null){
             gcfg.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
             gcfg.getNetworkConfig().getJoin().getKubernetesConfig().setEnabled(true);
-            gcfg.getNetworkConfig().getJoin().getKubernetesConfig().setProperty("service-dns",kubernetesServiceDns);
+            // gcfg.getNetworkConfig().getJoin().getKubernetesConfig().setProperty("service-dns",kubernetesServiceDns);
             gcfg.getNetworkConfig().getJoin().getKubernetesConfig().setProperty("service-port","5702");
-
+            gcfg.getNetworkConfig().getJoin().getKubernetesConfig().setProperty("service-name","gameserver");
         }
         else{
             DiscoveryStrategyConfig discoveryStrategyConfig = new DiscoveryStrategyConfig("com.tarantula.platform.service.cluster.TarantulaDiscoveryStrategy");
