@@ -1,8 +1,10 @@
 package com.icodesoftware.lmdb;
 
+import com.icodesoftware.Distributable;
+
 public class EnvSetting {
 
-    public static final long MB_1 = 1_048_576L;
+    private static final long MB_1 = 1_048_576L;
 
     public static final String data ="data";
     public static final String integration ="integration";
@@ -16,15 +18,29 @@ public class EnvSetting {
     public static final EnvSetting LogSetting = new EnvSetting(log,"target/lmdb/log",0,true);
     public static final EnvSetting LocalSetting = new EnvSetting(local,"target/lmdb/local",0,true);
 
-    public EnvSetting(String name,String storePath,long mbSize,boolean enabled){
+    public EnvSetting(String name,String storePath,int mbSize,boolean enabled){
         this.name = name;
         this.storePath = storePath;
         this.mbSize = mbSize;
         this.enabled = enabled;
+        this.scope = scope();
     }
+    public int scope;
     public String name;
     public String storePath;
-    public long mbSize;
+    public int mbSize;
     public boolean enabled;
 
+    private int scope(){
+        if(name.equals(data)) return Distributable.DATA_SCOPE;
+        if(name.equals(integration)) return Distributable.INTEGRATION_SCOPE;
+        if(name.equals(index)) return Distributable.INDEX_SCOPE;
+        if(name.equals(log)) return Distributable.LOG_SCOPE;
+        if(name.equals(local)) return Distributable.LOCAL_SCOPE;
+        throw new UnsupportedOperationException("named LMDB env ["+name+"] not supported");
+    }
+
+    public static long toBytesFromMb(int mbSize){
+        return MB_1*mbSize;
+    }
 }

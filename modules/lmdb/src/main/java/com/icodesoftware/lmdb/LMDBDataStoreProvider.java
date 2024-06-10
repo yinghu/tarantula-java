@@ -39,9 +39,9 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private final LMDBEnv logEnv = LMDBEnv.LOG_ENV;
     private final LMDBEnv localEnv = LMDBEnv.LOCAL_ENV;
 
-    public static final long storeBaseMbSize = EnvSetting.MB_1; //1MB
+    //public static final long storeBaseMbSize = EnvSetting.toBytesFromMb(1); //1MB
 
-    long storeSize = storeBaseMbSize; // 1MB = 1,048,576 (1024*1024)
+    long storeSize = EnvSetting.toBytesFromMb(1); // 1MB = 1,048,576 (1024*1024)
 
     int maxDatabaseNumber = 1024;
     int maxReaders = 100;
@@ -70,7 +70,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     @Override
     public void configure(Map<String, Object> properties) {
         this.name = (String)properties.get("name");
-        this.storeSize = storeBaseMbSize*(int)properties.get("storeSizeMb");
+        this.storeSize = EnvSetting.toBytesFromMb((int)properties.get("storeSizeMb"));
         this.envNoSyncFlag = (boolean)properties.get("envNoSyncFlag");
         this.storeReindexing = (boolean)properties.get("storeReindexing");
         dataEnv.envSetting = (EnvSetting) properties.get(EnvSetting.data);
@@ -175,37 +175,37 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     public DataStore createDataStore(int scope,String name,Txn<ByteBuffer> txn,long transactionId){
         if(scope==Distributable.DATA_SCOPE){
-            return dataEnv.createDataStore(scope,name,txn,transactionId);
+            return dataEnv.createDataStore(name,txn,transactionId);
         }
         if(scope==Distributable.INTEGRATION_SCOPE){
-           return integrationEnv.createDataStore(scope,name,txn,transactionId);
+           return integrationEnv.createDataStore(name,txn,transactionId);
         }
         if(scope==Distributable.INDEX_SCOPE){
-            return indexEnv.createDataStore(scope,name,txn,transactionId);
+            return indexEnv.createDataStore(name,txn,transactionId);
         }
         if(scope==Distributable.LOCAL_SCOPE){
-           return localEnv.createDataStore(scope,name,txn,transactionId);
+           return localEnv.createDataStore(name,txn,transactionId);
         }
         if(scope==Distributable.LOG_SCOPE){
-            return logEnv.createDataStore(scope,name,txn,transactionId);
+            return logEnv.createDataStore(name,txn,transactionId);
         }
         throw new RuntimeException("Scope ["+scope+"] not supported");
     }
     public LocalEdgeDataStore localEdgeDataStore(int scope,String source,String label,Txn<ByteBuffer> txn){
         if(scope==Distributable.DATA_SCOPE){
-            return dataEnv.localEdgeDataStore(scope,source,label,txn);
+            return dataEnv.localEdgeDataStore(source,label,txn);
         }
         if(scope==Distributable.INTEGRATION_SCOPE){
-            return integrationEnv.localEdgeDataStore(scope,source,label,txn);
+            return integrationEnv.localEdgeDataStore(source,label,txn);
         }
         if(scope==Distributable.INDEX_SCOPE){
-            return indexEnv.localEdgeDataStore(scope,source,label,txn);
+            return indexEnv.localEdgeDataStore(source,label,txn);
         }
         if(scope==Distributable.LOCAL_SCOPE){
-            return localEnv.localEdgeDataStore(scope,source,label,txn);
+            return localEnv.localEdgeDataStore(source,label,txn);
         }
         if(scope==Distributable.LOG_SCOPE){
-            return logEnv.localEdgeDataStore(scope,source,label,txn);
+            return logEnv.localEdgeDataStore(source,label,txn);
         }
         throw new RuntimeException("Scope ["+scope+"] not supported");
     }

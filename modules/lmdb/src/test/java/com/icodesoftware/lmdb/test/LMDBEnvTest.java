@@ -61,7 +61,7 @@ public class LMDBEnvTest {
         Assert.assertFalse(dataStore.backup().get(testObject.key(),(keyBuffer, dataBuffer) ->true));
         LMDBEnv env = lmdbDataStoreProvider.env(Distributable.DATA_SCOPE);
         Txn<ByteBuffer> read = env.txnRead();
-        LocalEdgeDataStore edgeDataStore = env.localEdgeDataStore(Distributable.DATA_SCOPE,"test_env_user","name_index",read);
+        LocalEdgeDataStore edgeDataStore = env.localEdgeDataStore("test_env_user","name_index",read);
         try(read){
             Recoverable.DataBuffer key = BufferProxy.buffer(8,true);
             key.writeLong(ownerId);
@@ -76,7 +76,7 @@ public class LMDBEnvTest {
         File snapshot = FileUtil.createFileIfNotExisted(lmdbDataStoreProvider.baseDir()+"/backup");
         lmdbDataStoreProvider.env(Distributable.INDEX_SCOPE).copy(snapshot);
         EnvFlags[] flags = new EnvFlags[]{EnvFlags.MDB_NOSYNC,EnvFlags.MDB_RDONLY_ENV};
-        Env<ByteBuffer> lmdb = Env.create().setMapSize(EnvSetting.MB_1).setMaxDbs(1024).setMaxReaders(10).open(snapshot,flags);
+        Env<ByteBuffer> lmdb = Env.create().setMapSize(EnvSetting.toBytesFromMb(1)).setMaxDbs(1024).setMaxReaders(10).open(snapshot,flags);
         try(lmdb){
             Dbi<ByteBuffer> dbi = lmdb.openDbi(TransactionLogManager.DATA_PREFIX_I+"test_env_user",DbiFlags.MDB_CREATE);
             Cursor<ByteBuffer> cursor = dbi.openCursor(lmdb.txnRead());

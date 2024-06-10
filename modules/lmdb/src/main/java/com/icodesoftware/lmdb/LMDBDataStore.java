@@ -25,13 +25,14 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
     private final LMDBDataStoreProvider lmdbDataStoreProvider;
     private final Txn<ByteBuffer> ptxn;
     private final long transactionId;
-    public LMDBDataStore(int scope,String name, Dbi<ByteBuffer> dbi,Env<ByteBuffer> env,LMDBDataStoreProvider lmdbDataStoreProvider,Txn<ByteBuffer> ptxn,long transactionId){
-        this.metadata = new LocalMetadata(scope,name);
-        this.scope = scope;
+
+    public LMDBDataStore(String name, Dbi<ByteBuffer> dbi,Txn<ByteBuffer> ptxn,long transactionId,LMDBEnv env){
+        this.metadata = new LocalMetadata(env.envSetting.scope,name);
+        this.scope = env.envSetting.scope;
         this.name = name;
         this.dbi = dbi;
-        this.env = env;
-        this.lmdbDataStoreProvider = lmdbDataStoreProvider;
+        this.env = env.env;
+        this.lmdbDataStoreProvider = env.lmdbDataStoreProvider;
         this.ptxn = ptxn;
         this.transactionId = transactionId;
     }

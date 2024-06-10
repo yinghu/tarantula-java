@@ -39,17 +39,17 @@ public class LMDBEnv implements Serviceable {
         env = Env.create().setMapSize(storeSize(this.envSetting)).setMaxDbs(lmdbDataStoreProvider.maxDatabaseNumber).setMaxReaders(lmdbDataStoreProvider.maxReaders).open(path(this.envSetting.storePath).toFile(),flags);
     }
 
-    public DataStore createDataStore(int scope,String name,Txn<ByteBuffer> txn,long transactionId){
+    public DataStore createDataStore(String name,Txn<ByteBuffer> txn,long transactionId){
         if(!envSetting.enabled) throw new RuntimeException("lmdb ["+envSetting.name+"] disabled");
         Dbi<ByteBuffer> dbi = txn==null? env.openDbi(name, DbiFlags.MDB_CREATE) : env.openDbi(txn,name.getBytes(),null,false,DbiFlags.MDB_CREATE);
-        return txn==null? new CachedLMDBDataStore(scope,name,dbi,env,lmdbDataStoreProvider) : new LMDBDataStore(scope,name,dbi,env,lmdbDataStoreProvider,txn,transactionId);
+        return txn==null? new CachedLMDBDataStore(name,dbi,this) : new LMDBDataStore(name,dbi,txn,transactionId,this);
     }
 
-    public LocalEdgeDataStore localEdgeDataStore(int scope,String source,String label,Txn<ByteBuffer> txn){
+    public LocalEdgeDataStore localEdgeDataStore(String source,String label,Txn<ByteBuffer> txn){
         if(!envSetting.enabled) throw new RuntimeException("lmdb ["+envSetting.name+"] disabled");
         String edgeName = source+"#"+label;
         Dbi<ByteBuffer> dbi = txn==null? env.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : env.openDbi(txn,edgeName.getBytes(),null,false,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
-        return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
+        return new LocalEdgeDataStore(new LocalMetadata(envSetting.scope,source,label),dbi);
     }
 
     public Txn<ByteBuffer> txnWrite(){
@@ -60,6 +60,12 @@ public class LMDBEnv implements Serviceable {
         if(!envSetting.enabled) throw new RuntimeException("lmdb ["+envSetting.name+"] disabled");
         return env.txnRead();
     }
+    public Txn<ByteBuffer> txn(Txn<ByteBuffer> parent){
+        if(!envSetting.enabled) throw new RuntimeException("lmdb ["+envSetting.name+"] disabled");
+        if(parent==null) new RuntimeException("parent context cannot be null");
+        return env.txn(parent);
+    }
+
     public List<byte[]> getDbiNames(){
         if(!envSetting.enabled) return new ArrayList<>();
         return env.getDbiNames();
@@ -83,6 +89,6 @@ public class LMDBEnv implements Serviceable {
     }
     private long storeSize(EnvSetting envSetting){
         if(envSetting.mbSize==0) return lmdbDataStoreProvider.storeSize;
-        return lmdbDataStoreProvider.storeBaseMbSize*envSetting.mbSize;
+        return EnvSetting.toBytesFromMb(envSetting.mbSize);
     }
 }
