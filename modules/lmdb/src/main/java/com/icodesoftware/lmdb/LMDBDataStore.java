@@ -49,12 +49,12 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     private List<String> edgeList(){
         ArrayList<String> elist = new ArrayList<>();
-        env.getDbiNames().forEach(n-> {
-            String dn = new String(n);
-            if(dn.startsWith(name) && dn.contains("#")){
-                elist.add(dn.split("#")[1]);
-            }
-        });
+        //env.getDbiNames().forEach(n-> {
+            //String dn = new String(n);
+            //if(dn.startsWith(name) && dn.contains("#")){
+                //elist.add(dn.split("#")[1]);
+            //}
+        //});
         return elist;
     }
 
