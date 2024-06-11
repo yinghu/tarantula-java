@@ -2,11 +2,10 @@ package com.icodesoftware.lmdb.test;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.BufferProxy;
-import com.icodesoftware.util.UnsafeUtil;
+
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import sun.misc.Unsafe;
 
 import java.nio.ByteBuffer;
 
