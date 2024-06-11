@@ -11,7 +11,7 @@ import java.util.List;
 
 public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
-    public final Env<ByteBuffer> env;
+    public final LMDBEnv env;
     private final Dbi<ByteBuffer> dbi;
 
     private final String name;
@@ -31,7 +31,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         this.scope = env.envSetting.scope;
         this.name = name;
         this.dbi = dbi;
-        this.env = env.env;
+        this.env = env;
         this.lmdbDataStoreProvider = env.lmdbDataStoreProvider;
         this.ptxn = ptxn;
         this.transactionId = transactionId;
@@ -274,7 +274,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             if(!query.key().write(key)) return;
             LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.localEdgeDataStore(scope,name,query.label(),ptxn);
             key.flip();
-            if(lmdbDataStoreProvider.onRecovering(localEdgeDataStore.metadata,key,(e,v)->{
+            if(lmdbDataStoreProvider.onRecovering(localEdgeDataStore.metadata(),key,(e,v)->{
                 set(e.rewind(),v.rewind());
                 e.rewind();
                 key.rewind();
@@ -303,7 +303,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     @Override
     public void close() {
-        dbi.close();
+        //dbi.close();
     }
 
     //BACKUP METHODS
@@ -332,7 +332,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
                 return;
             }
             try(final Txn<ByteBuffer> txn = env.txn(ptxn)){
-                try(Cursor<ByteBuffer> cursor = localEdgeDataStore.dbi.openCursor(txn)){
+                try(Cursor<ByteBuffer> cursor = localEdgeDataStore.openCursor(txn)){
                     if(cursor.get(cache.key().flip(),GetOp.MDB_SET)){
                         if(cursor.seek(SeekOp.MDB_FIRST_DUP)) bufferStream.on(cache.key(),BufferProxy.buffer(cursor.val()));
                         while (cursor.seek(SeekOp.MDB_NEXT_DUP)){
@@ -352,7 +352,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
                 return;
             }
             try(final Txn<ByteBuffer> txn = env.txn(ptxn)){
-                try(Cursor<ByteBuffer> cursor = localEdgeDataStore.dbi.openCursor(txn)){
+                try(Cursor<ByteBuffer> cursor = localEdgeDataStore.openCursor(txn)){
                     if(cursor.get(cache.key().flip(),GetOp.MDB_SET)){
                         if(cursor.seek(SeekOp.MDB_FIRST_DUP)){
                             if(dbi.get(txn,cursor.val()) !=null) bufferStream.on(cache.key(),BufferProxy.buffer(txn.val()));
@@ -382,7 +382,8 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.localEdgeDataStore(scope,name,label,ptxn);
         try(final Recoverable.DataBufferPair cache = lmdbDataStoreProvider.dataBufferPair();final Txn<ByteBuffer> txn = env.txn(ptxn)){
             if(!bufferStream.on(cache.key(),cache.value())) return false;
-            if(!localEdgeDataStore.dbi.put(txn,cache.key().flip(),cache.value().flip())) return false;
+            //if(!localEdgeDataStore.dbi.put(txn,cache.key().flip(),cache.value().flip())) return false;
+            if(!localEdgeDataStore.addEdge(txn,cache.key().flip(),cache.value().flip())) return false;
             txn.commit();
             return true;
         }
@@ -396,10 +397,12 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             Recoverable.DataBuffer value = cache.value();
             if(!bufferStream.on(key,value)) return false;
             if(fromLabel){
-                if(!localEdgeDataStore.dbi.delete(txn,key.flip())) return false;
+                //if(!localEdgeDataStore.dbi.delete(txn,key.flip())) return false;
+                if(!localEdgeDataStore.deleteEdge(txn,key.flip())) return false;
             }
             else {
-                if (!localEdgeDataStore.dbi.delete(txn, key.flip(), value.flip())) return false;
+                //if (!localEdgeDataStore.dbi.delete(txn, key.flip(), value.flip())) return false;
+                if(!localEdgeDataStore.deleteEdge(txn,key.flip(),value.flip())) return false;
             }
             txn.commit();
             return true;
@@ -423,7 +426,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
     private <T extends Recoverable> boolean list(ByteBuffer key,LocalEdgeDataStore localEdgeDataStore,RecoverableFactory<T> query, Stream<T> stream){
 
-        try(final Txn<ByteBuffer> txn = env.txn(ptxn);final Cursor<ByteBuffer> cursor = localEdgeDataStore.dbi.openCursor(txn)){
+        try(final Txn<ByteBuffer> txn = env.txn(ptxn);final Cursor<ByteBuffer> cursor = localEdgeDataStore.openCursor(txn)){
             if(cursor.get(key,GetOp.MDB_SET)) {
                 boolean keepGoing = true;
                 if(cursor.seek(SeekOp.MDB_FIRST_DUP)){
@@ -474,12 +477,12 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
                 if(!ownerKey.write(key)) return false;
                 if(!edgeKey.write(value)) return false;
 
-                if(!localEdgeDataStore.dbi.put(txn,key.flip(),value.flip(), PutFlags.MDB_NODUPDATA)) return false;//no duplicate entry
-
+                //if(!localEdgeDataStore.dbi.put(txn,key.flip(),value.flip(), PutFlags.MDB_NODUPDATA)) return false;//no duplicate entry
+                if(!localEdgeDataStore.addEdge(txn,key.flip(),value.flip())) return false;
                 txn.commit();
                 key.rewind();
                 value.rewind();
-                lmdbDataStoreProvider.onUpdating(localEdgeDataStore.metadata,key,value,transactionId);
+                lmdbDataStoreProvider.onUpdating(localEdgeDataStore.metadata(),key,value,transactionId);
                 return true;
             }
         }
@@ -493,11 +496,12 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             try(final Txn<ByteBuffer> txn = env.txn(ptxn);){
                 if(!t.write(key)) return false;
                 if(!edge.write(value)) return false;
-                if(!localEdgeDataStore.dbi.delete(txn,key.flip(),value.flip())) return false;
+                //if(!localEdgeDataStore.dbi.delete(txn,key.flip(),value.flip())) return false;
+                if(!localEdgeDataStore.deleteEdge(txn,key.flip(),value.flip())) return false;
                 txn.commit();
                 key.rewind();
                 value.rewind();
-                lmdbDataStoreProvider.onDeleting(localEdgeDataStore.metadata,key,value,transactionId);
+                lmdbDataStoreProvider.onDeleting(localEdgeDataStore.metadata(),key,value,transactionId);
                 return true;
             }
         }
@@ -509,10 +513,11 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             if(!t.write(key)) return false;
             LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.localEdgeDataStore(scope,name,label,ptxn);
             try(final Txn<ByteBuffer> txn = env.txn(ptxn)){
-                if(!localEdgeDataStore.dbi.delete(txn,key.flip())) return false;
+                //if(!localEdgeDataStore.dbi.delete(txn,key.flip())) return false;
+                if(!localEdgeDataStore.deleteEdge(txn,key.flip())) return false;
                 txn.commit();
                 key.rewind();
-                this.lmdbDataStoreProvider.onDeleting(localEdgeDataStore.metadata,key,null,transactionId);
+                this.lmdbDataStoreProvider.onDeleting(localEdgeDataStore.metadata(),key,null,transactionId);
                 return true;
             }
         }

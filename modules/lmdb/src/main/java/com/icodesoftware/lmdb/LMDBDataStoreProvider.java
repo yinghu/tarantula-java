@@ -338,7 +338,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         closeMapStore();
         storeMap.forEach((k,v)->v.close());
         storeMap.clear();
-        edgMap.forEach((k,v)->v.dbi.close());
+        edgMap.forEach((k,v)->v.close());
         edgMap.clear();
         dataEnv.shutdown();
         integrationEnv.shutdown();
