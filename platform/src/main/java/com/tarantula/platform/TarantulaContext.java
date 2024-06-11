@@ -137,7 +137,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public long timeoutOnInstance;
 
     public boolean kubernetesDiscoveryEnabled;
-    public String kubernetesServiceDns;
+    public String kubernetesServiceName;
     public String clusterNameSuffix;
     public int clusterInitialSize;
     public int clusterMaxSize;
@@ -250,18 +250,19 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         gcfg.getProperties().setProperty("hazelcast.partition.count",""+accessIndexRoutingNumber);
         gcfg.getProperties().setProperty("hazelcast.initial.min.cluster.size",""+clusterInitialSize);
         gcfg.getGroupConfig().setName("tarantula-integration-"+this.clusterNameSuffix);
-        if(kubernetesDiscoveryEnabled && kubernetesServiceDns != null){
-            gcfg.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
-            gcfg.getNetworkConfig().getJoin().getKubernetesConfig().setEnabled(true);
-            // gcfg.getNetworkConfig().getJoin().getKubernetesConfig().setProperty("service-dns",kubernetesServiceDns);
-            gcfg.getNetworkConfig().getJoin().getKubernetesConfig().setProperty("service-port","5702");
-            gcfg.getNetworkConfig().getJoin().getKubernetesConfig().setProperty("service-name","gameserver");
+
+        var hazelcastJoin = gcfg.getNetworkConfig().getJoin();
+        if(kubernetesDiscoveryEnabled && kubernetesServiceName != null){
+            hazelcastJoin.getMulticastConfig().setEnabled(false);
+            hazelcastJoin.getKubernetesConfig().setEnabled(true);
+            hazelcastJoin.getKubernetesConfig().setProperty("service-port", "5702");
+            hazelcastJoin.getKubernetesConfig().setProperty("service-name", kubernetesServiceName);
         }
         else{
             DiscoveryStrategyConfig discoveryStrategyConfig = new DiscoveryStrategyConfig("com.tarantula.platform.service.cluster.TarantulaDiscoveryStrategy");
-            discoveryStrategyConfig.addProperty("tarantula-port",5702);
-            discoveryStrategyConfig.addProperty("tarantula-scope",2);
-            gcfg.getNetworkConfig().getJoin().getDiscoveryConfig().addDiscoveryStrategyConfig(discoveryStrategyConfig);
+            discoveryStrategyConfig.addProperty("tarantula-port", "5702");
+            discoveryStrategyConfig.addProperty("tarantula-scope", "2");
+            hazelcastJoin.getDiscoveryConfig().addDiscoveryStrategyConfig(discoveryStrategyConfig);
         }
         this.integrationCluster = new IntegrationCluster(gcfg,this.dataBucketGroup,this);
         new ServiceBootstrap(_storageInstanceStarted,_integrationClusterStarted,this.integrationCluster,"integration-cluster",true).start(); //integration cluster start
