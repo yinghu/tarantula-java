@@ -52,8 +52,6 @@ public class LMDBDataStoreTest {
         try(Recoverable.DataBufferPair cache = lmdbDataStoreProvider.dataBufferPair()){
             cache.key().writeDouble(100);
             cache.value().writeDouble(100);
-        }catch (Exception ex){
-
         }
     }
     @Test(groups = { "LMDB" })
@@ -108,16 +106,17 @@ public class LMDBDataStoreTest {
         testMapStoreListener.abort = (tid)->{
             aborted[0]=true;
         };
-        Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE);
-        boolean committed = transaction.execute(ctx->{
-            DataStore dataStore = ctx.onDataStore("test_user_abort");
-            TestUser user = new TestUser("test001",ownerId);
-            Assert.assertTrue(dataStore.create(user));
-            TestUser user1 = new TestUser("test002",ownerId);
-            Assert.assertTrue(dataStore.create(user1));
-            return false;
-        });
-        Assert.assertFalse(committed);
+        try(Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE)){
+            boolean committed = transaction.execute(ctx->{
+                DataStore dataStore = ctx.onDataStore("test_user_abort");
+                TestUser user = new TestUser("test001",ownerId);
+                Assert.assertTrue(dataStore.create(user));
+                TestUser user1 = new TestUser("test002",ownerId);
+                Assert.assertTrue(dataStore.create(user1));
+                return false;
+            });
+            Assert.assertFalse(committed);
+        }
         DataStore dataStore = lmdbDataStoreProvider.createDataStore("test_user_abort");
         int[] cnt={0};
         dataStore.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId),TestUser.LABEL,(e,v)->{
@@ -152,17 +151,18 @@ public class LMDBDataStoreTest {
         };
         long ownerId = localDistributionIdGenerator.id();
         int size = 5;
-        Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.INTEGRATION_SCOPE);
-        transaction.execute(ctx->{
-            DataStore dataStore = ctx.onDataStore("test_access_committed");
-            for(int i=0;i<size;i++){
-                TestAccessIndex testUser = new TestAccessIndex("user"+i);
-                testUser.ownerKey(SnowflakeKey.from(ownerId));
-                testUser.distributionId(localDistributionIdGenerator.id());
-                Assert.assertTrue(dataStore.createIfAbsent(testUser,false));
-            }
-            return true;
-        });
+        try(Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.INTEGRATION_SCOPE)){
+            transaction.execute(ctx->{
+                DataStore dataStore = ctx.onDataStore("test_access_committed");
+                for(int i=0;i<size;i++){
+                    TestAccessIndex testUser = new TestAccessIndex("user"+i);
+                    testUser.ownerKey(SnowflakeKey.from(ownerId));
+                    testUser.distributionId(localDistributionIdGenerator.id());
+                    Assert.assertTrue(dataStore.createIfAbsent(testUser,false));
+                }
+                return true;
+            });
+        }
         DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore("test_access_committed");
         Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"access")).size(),5);
     }
@@ -178,17 +178,18 @@ public class LMDBDataStoreTest {
         };
         long ownerId = localDistributionIdGenerator.id();
         int size = 5;
-        Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.INTEGRATION_SCOPE);
-        transaction.execute(ctx->{
-            DataStore dataStore = ctx.onDataStore("test_access_abort");
-            for(int i=0;i<size;i++){
-                TestAccessIndex testUser = new TestAccessIndex("user"+i);
-                testUser.ownerKey(SnowflakeKey.from(ownerId));
-                testUser.distributionId(localDistributionIdGenerator.id());
-                Assert.assertTrue(dataStore.createIfAbsent(testUser,false));
-            }
-            return false;
-        });
+        try(Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.INTEGRATION_SCOPE)){
+            transaction.execute(ctx->{
+                DataStore dataStore = ctx.onDataStore("test_access_abort");
+                for(int i=0;i<size;i++){
+                    TestAccessIndex testUser = new TestAccessIndex("user"+i);
+                    testUser.ownerKey(SnowflakeKey.from(ownerId));
+                    testUser.distributionId(localDistributionIdGenerator.id());
+                    Assert.assertTrue(dataStore.createIfAbsent(testUser,false));
+                }
+                return false;
+            });
+        }
         DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore("test_access_abort");
         int[] cnt={0};
         ds.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId),"access",(e,v)->{
@@ -236,29 +237,31 @@ public class LMDBDataStoreTest {
         List<TestUser> empty = ds.list(new TestUserQuery(ownerId1));
         Assert.assertTrue(empty.size()==0);
         List<TestUser> users = new ArrayList<>();
-        Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE);
-        transaction.execute((ctx)->{
-            DataStore dataStore = ctx.onDataStore("test_user_edge_committed");
-            for(int i=0;i<10;i++) {
-                TestUser testUser = new TestUser("user"+i,ownerId1);
-                Assert.assertTrue(dataStore.create(testUser));
-                users.add(testUser);
-            }
-            return true;
-        });
+        try(Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE)){
+            transaction.execute((ctx)->{
+                DataStore dataStore = ctx.onDataStore("test_user_edge_committed");
+                for(int i=0;i<10;i++) {
+                    TestUser testUser = new TestUser("user"+i,ownerId1);
+                    Assert.assertTrue(dataStore.create(testUser));
+                    users.add(testUser);
+                }
+                return true;
+            });
+        }
         Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,TestUser.LABEL)).size(),10);
         testMapStoreListener.verifier = (tid)->{
             Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid).size(),20);
         };
-        Transaction transaction1 = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE);
-        transaction1.execute((ctx)->{
-            DataStore dataStore = ctx.onDataStore("test_user_edge_committed");
-            users.forEach(user->{
-                Assert.assertTrue(dataStore.createEdge(user,"friends"));
-                Assert.assertTrue(dataStore.createEdge(user,"games"));
+        try(Transaction transaction1 = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE)){
+            transaction1.execute((ctx)->{
+                DataStore dataStore = ctx.onDataStore("test_user_edge_committed");
+                users.forEach(user->{
+                    Assert.assertTrue(dataStore.createEdge(user,"friends"));
+                    Assert.assertTrue(dataStore.createEdge(user,"games"));
+                });
+                return true;
             });
-            return true;
-        });
+        }
         Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),10);
         Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"games")).size(),10);
     }
@@ -276,16 +279,17 @@ public class LMDBDataStoreTest {
         List<TestUser> empty = ds.list(new TestUserQuery(ownerId1));
         Assert.assertTrue(empty.size()==0);
         List<TestUser> users = new ArrayList<>();
-        Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE);
-        transaction.execute((ctx)->{
-            DataStore dataStore = ctx.onDataStore("test_user_edge_aborted");
-            for(int i=0;i<10;i++) {
-                TestUser testUser = new TestUser("user"+i,ownerId1);
-                Assert.assertTrue(dataStore.create(testUser));
-                users.add(testUser);
-            }
-            return false;
-        });
+        try(Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE)){
+            transaction.execute((ctx)->{
+                DataStore dataStore = ctx.onDataStore("test_user_edge_aborted");
+                for(int i=0;i<10;i++) {
+                    TestUser testUser = new TestUser("user"+i,ownerId1);
+                    Assert.assertTrue(dataStore.create(testUser));
+                    users.add(testUser);
+                }
+                return false;
+            });
+        }
         int[] cnt={0};
         ds.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId1),TestUser.LABEL,(e,v)->{
             cnt[0]++;
@@ -296,15 +300,16 @@ public class LMDBDataStoreTest {
         testMapStoreListener.verifier = (tid)->{
             Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid).size(),20);
         };
-        Transaction transaction1 = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE);
-        transaction1.execute((ctx)->{
-            DataStore dataStore = ctx.onDataStore("test_user_edge_aborted");
-            users.forEach(user->{
-                Assert.assertTrue(dataStore.createEdge(user,"friends"));
-                Assert.assertTrue(dataStore.createEdge(user,"games"));
+        try(Transaction transaction1 = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE)){
+            transaction1.execute((ctx)->{
+                DataStore dataStore = ctx.onDataStore("test_user_edge_aborted");
+                users.forEach(user->{
+                    Assert.assertTrue(dataStore.createEdge(user,"friends"));
+                    Assert.assertTrue(dataStore.createEdge(user,"games"));
+                });
+                return false;
             });
-            return false;
-        });
+        }
         cnt[0]=0;
         ds.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId1),"friends",(e,v)->{
             cnt[0]++;

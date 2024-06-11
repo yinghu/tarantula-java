@@ -87,17 +87,19 @@ public class AppleStoreProvider extends AuthObject{
                 throw new RuntimeException("Shopping not existed ["+bundleId+"]");
             }
             GameCluster gameCluster = gameServiceProvider.gameCluster();
-            Transaction t = gameCluster.transaction();
-            boolean suc = t.execute(ctx->{
-                ApplicationPreSetup setup =(ApplicationPreSetup)ctx;
-                Descriptor app = gameCluster.application(shoppingItem.configurationTypeId());
-                ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,setup);
-                redeemer.distributionKey(bundleId);
-                if(!setup.load(app,redeemer)) return false;
-                redeemer.redeem();
-                return true;
-            });
-            if(suc) return true;
+            boolean[] suc ={false};
+            try(Transaction t = gameCluster.transaction()){
+                suc[0] = t.execute(ctx->{
+                    ApplicationPreSetup setup =(ApplicationPreSetup)ctx;
+                    Descriptor app = gameCluster.application(shoppingItem.configurationTypeId());
+                    ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,setup);
+                    redeemer.distributionKey(bundleId);
+                    if(!setup.load(app,redeemer)) return false;
+                    redeemer.redeem();
+                    return true;
+                });
+            }
+            if(suc[0]) return true;
             logger.warn("Item : "+bundleId+" cannot be redeemed");
             throw new RuntimeException("Item : "+bundleId+" cannot be redeemed");
         }catch (Exception ex){

@@ -101,31 +101,33 @@ public class LMDBRecoveryTest {
             }
         };
 
-        Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE);
-        transaction.execute(ctx->{
-            DataStore ds = ctx.onDataStore("test_user");
-            TestObject user = new TestObject();
-            user.name = "n001";
-            user.type = "t001";
-            user.distributionId(ownerId);
-            Assert.assertTrue(ds.createIfAbsent(user,false));
-            user.name = "n002";
-            user.type = "t002";
-            ds.update(user);
-            user.name = "n003";
-            user.type = "t003";
-            ds.update(user);
-            return true;
-        });
+        try(Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE)){
+            transaction.execute(ctx->{
+                DataStore ds = ctx.onDataStore("test_user");
+                TestObject user = new TestObject();
+                user.name = "n001";
+                user.type = "t001";
+                user.distributionId(ownerId);
+                Assert.assertTrue(ds.createIfAbsent(user,false));
+                user.name = "n002";
+                user.type = "t002";
+                ds.update(user);
+                user.name = "n003";
+                user.type = "t003";
+                ds.update(user);
+                return true;
+            });
+        }
 
-        Transaction read = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE);
-        read.execute(ctx->{
-            DataStore dataStore = ctx.onDataStore("test_user");
-            TestObject tx = new TestObject();
-            tx.distributionId(ownerId);
-            Assert.assertTrue(dataStore.load(tx));
-            return true;
-        });
+        try(Transaction read = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE)){
+            read.execute(ctx->{
+                DataStore dataStore = ctx.onDataStore("test_user");
+                TestObject tx = new TestObject();
+                tx.distributionId(ownerId);
+                Assert.assertTrue(dataStore.load(tx));
+                return true;
+            });
+        }
     }
 
 

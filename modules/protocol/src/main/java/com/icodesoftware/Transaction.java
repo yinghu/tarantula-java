@@ -1,10 +1,14 @@
 package com.icodesoftware;
 
-public interface Transaction extends Closable{
+public interface Transaction extends AutoCloseable{
 
     boolean execute(TransactionContext transactionContext);
 
-    void register(DataStoreContext dataStoreContext,Listener listener);
+    @Override
+    void close();
+
+    void register(DataStoreContext dataStoreContext, Listener listener);
+
     interface TransactionContext{
         boolean update(DataStoreContext dataStoreContext);
     }

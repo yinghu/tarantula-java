@@ -10,39 +10,36 @@ public class LocalTransaction implements Transaction, Transaction.DataStoreConte
     private final LMDBDataStoreProvider dataStoreProvider;
     private final int scope;
 
-    private Txn<ByteBuffer> txn;
-    private long transactionId;
+    final private Txn<ByteBuffer> txn;
+    final private long transactionId;
     private DataStoreContext dataStoreContext;
     private Listener listener;
+
     public LocalTransaction(int scope,LMDBDataStoreProvider dataStoreProvider){
         this.scope = scope;
         this.dataStoreProvider = dataStoreProvider;
         this.dataStoreContext = this;
-        this.listener = this;
+        txn = dataStoreProvider.txn(scope);
+        transactionId = txn.getId();
     }
     @Override
     public boolean execute(TransactionContext transactionContext) {
-        txn = dataStoreProvider.txn(scope);
-        transactionId = txn.getId();
-        try{
+        try(txn){
             if(!transactionContext.update(this.dataStoreContext)){
                 txn.abort();
                 this.dataStoreProvider.onAbort(scope,transactionId);
-                listener.afterAbort(transactionId,null);
+                this.afterAbort(transactionId,null);
                 return false;
             }
             txn.commit();
             this.dataStoreProvider.onCommit(scope,transactionId);
-            listener.afterCommit(transactionId);
+            this.afterCommit(transactionId);
             return true;
         }catch (Exception ex){
             txn.abort();
             this.dataStoreProvider.onAbort(scope,transactionId);
-            listener.afterAbort(transactionId,ex);
+            this.afterAbort(transactionId,ex);
             return false;
-        }
-        finally {
-            txn.close();
         }
     }
 
@@ -65,17 +62,16 @@ public class LocalTransaction implements Transaction, Transaction.DataStoreConte
         this.listener = listener;
     }
 
-    public void parent(DataStoreContext parentContext){
-
-    }
-
     @Override
     public void afterCommit(long transactionId) {
-
+        if(listener==null) return;
+        listener.afterCommit(transactionId);
     }
 
     @Override
     public void afterAbort(long transactionId,Exception exception) {
-
+        if(listener==null) return;
+        listener.afterAbort(transactionId,exception);
     }
+
 }

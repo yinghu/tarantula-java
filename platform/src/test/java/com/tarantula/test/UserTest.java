@@ -2,17 +2,13 @@ package com.tarantula.test;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.AccessIndexService;
-import com.icodesoftware.service.DataStoreProvider;
-import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.presence.Membership;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;
-import com.tarantula.platform.util.SystemUtil;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.time.LocalDateTime;
@@ -22,10 +18,12 @@ public class UserTest extends DataStoreHook{
 
 
     @Test(groups = { "User" })
-    public void userTest() {
-        DataStore accessStore = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.NAME);
+    public void userCreateTest() {
+        DataStore accessStore = dataStoreProvider.createAccessIndexDataStore(AccessIndexService.STORE_NAME);
+        Assert.assertEquals(accessStore.name(),AccessIndexService.STORE_NAME);
         AccessIndex accessIndex = new AccessIndexTrack("test1",1,serviceContext.distributionId());
         Assert.assertTrue(accessStore.createIfAbsent(accessIndex,false));
+
         DataStore dUser = dataStoreProvider.createDataStore("test_user");
         DataStore pUser = dataStoreProvider.createDataStore("test_presence");
         User user = new User("user1",true, OnAccess.GAME_CENTER);
@@ -47,6 +45,7 @@ public class UserTest extends DataStoreHook{
         PresenceIndex presenceIndex = new PresenceIndex();
         presenceIndex.distributionId(user.distributionId());
         Assert.assertTrue(pUser.createIfAbsent(presenceIndex,false));
+
     }
 
     //@Test(groups = { "Account" })

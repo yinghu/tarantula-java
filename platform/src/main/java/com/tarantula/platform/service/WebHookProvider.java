@@ -29,12 +29,12 @@ public class WebHookProvider extends AuthObject {
     public boolean upload(String query, byte[] bytes) {
         WebHookCredentialConfiguration webHookCredentialConfiguration = configurationServiceProvider.credentialConfiguration(OnAccess.WEB_HOOK);
         if(webHookCredentialConfiguration==null){
-            log.warn("No web hook configuration available for ["+typeId+"]");
+            //log.warn("No web hook configuration available for ["+typeId+"]");
             return false;
         }
         WebClient webClient = webHookCredentialConfiguration.webClient(query);
         if(webClient==null){
-            log.warn("No web client configuration available for ["+query+"]");
+            //log.warn("No web client configuration available for ["+query+"]");
             return false;
         }
         return webClient.post(serviceContext,bytes);

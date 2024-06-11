@@ -41,17 +41,19 @@ public class DeveloperStoreProvider extends AuthObject {
             logger.warn("Shopping Item not existed  : "+bundleId);
             return false;
         }
-        Transaction t = gameCluster.transaction();
-        boolean suc = t.execute(ctx->{
-            ApplicationPreSetup setup =(ApplicationPreSetup)ctx;
-            Descriptor app = gameCluster.application(shoppingItem.configurationTypeId());
-            ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,setup);
-            redeemer.distributionKey(bundleId);
-            if(!setup.load(app,redeemer)) return false;
-            redeemer.redeem();
-            return true;
-        });
-        if(!suc) return false;
+        boolean[] suc ={false};
+        try(final Transaction t = gameCluster.transaction()){
+            suc[0] = t.execute(ctx->{
+                ApplicationPreSetup setup =(ApplicationPreSetup)ctx;
+                Descriptor app = gameCluster.application(shoppingItem.configurationTypeId());
+                ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,setup);
+                redeemer.distributionKey(bundleId);
+                if(!setup.load(app,redeemer)) return false;
+                redeemer.redeem();
+                return true;
+            });
+        }
+        if(!suc[0]) return false;
         params.put(OnAccess.STORE_TRANSACTION_ID,serviceContext.distributionId());
         params.put(OnAccess.STORE_QUANTITY,1);
         //TransactionLog transaction = new TransactionLog((String)params.get(OnAccess.SYSTEM_ID),(String)params.get(OnAccess.STORE_BUNDLE_ID),"token access");

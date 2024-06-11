@@ -23,15 +23,15 @@ public class DataStoreSummaryTest extends DataStoreHook{
         DataStoreSummary dataStoreSummary = new DataStoreViewer();
         dataStore.backup().view(dataStoreSummary);
         Assert.assertEquals(dataStoreSummary.count(),1);
-        Transaction transaction = dataStoreProvider.transaction(Distributable.INTEGRATION_SCOPE);
-        transaction.execute(ctx->{
-            DataStore ds = ctx.onDataStore(AccessIndexService.STORE_NAME+"_x");
-            DataStoreSummary summary = new DataStoreViewer();
-            ds.backup().view(summary);
-            Assert.assertEquals(dataStoreSummary.count(),summary.count());
-            return false;
-        });
-        transaction.close();
+        try(Transaction transaction = dataStoreProvider.transaction(Distributable.INTEGRATION_SCOPE)){
+            transaction.execute(ctx->{
+                DataStore ds = ctx.onDataStore(AccessIndexService.STORE_NAME+"_x");
+                DataStoreSummary summary = new DataStoreViewer();
+                ds.backup().view(summary);
+                Assert.assertEquals(dataStoreSummary.count(),summary.count());
+                return false;
+            });
+        }
     }
 
 }

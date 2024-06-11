@@ -116,7 +116,6 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             if(!t.writeKey(key)){
                 return false;
             }
-            boolean updated = false;
             try(final Txn<ByteBuffer> txn = env.txnWrite()){
                 final long transactionId = txn.getId();
                 if (dbi.get(txn, key.flip()) != null){
@@ -136,12 +135,9 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
                         update.rewind();
                         lmdbDataStoreProvider.onUpdating(metadata,key,update,transactionId);
                         lmdbDataStoreProvider.onCommit(metadata.scope(),transactionId);
-                        updated = true;
+                        return true;
                     }
                 }
-            }
-            if(updated){
-                return true;
             }
             key.rewind();
             Recoverable.DataBuffer value = cache.value();
