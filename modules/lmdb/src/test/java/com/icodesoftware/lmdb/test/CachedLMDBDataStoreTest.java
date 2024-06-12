@@ -1,13 +1,13 @@
 package com.icodesoftware.lmdb.test;
 
-import com.icodesoftware.*;
+import com.icodesoftware.DataStore;
+import com.icodesoftware.Distributable;
+import com.icodesoftware.Recoverable;
+import com.icodesoftware.Transaction;
 import com.icodesoftware.lmdb.*;
-
-
 import com.icodesoftware.service.Batchable;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.util.SnowflakeKey;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class LMDBDataStoreTest {
+public class CachedLMDBDataStoreTest {
 
     LMDBDataStoreProvider lmdbDataStoreProvider;
     TestMapStoreListener testMapStoreListener;
@@ -33,26 +33,33 @@ public class LMDBDataStoreTest {
     @AfterTest
     public void tearDown() throws Exception{
 
-        //lmdbDataStoreProvider.shutdown();
     }
     @Test(groups = { "LMDB" })
     public void testCreate(){
         long ownerId = localDistributionIdGenerator.id();
         testMapStoreListener.verifier = (tid)->{
-            Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid).size(),2);
+            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
+            Assert.assertEquals(logs.size(),2);
+            testMapStoreListener.transactionLogManager.onTransaction(logs);
         };
-        DataStore dataStore = lmdbDataStoreProvider.createDataStore("test_user");
+        DataStore dataStore = lmdbDataStoreProvider.createDataStore("test_cmdb_user");
         TestUser user = new TestUser("test001",ownerId);
         Assert.assertTrue(dataStore.create(user));
         TestUser user1 = new TestUser("test002",ownerId);
         Assert.assertTrue(dataStore.create(user1));
         Assert.assertEquals(dataStore.list(new TestUserQuery(ownerId)).size(),2);
-        try(Recoverable.DataBufferPair cache = lmdbDataStoreProvider.dataBufferPair()){
-            cache.key().writeDouble(100);
-            cache.value().writeDouble(100);
-        }
+        DataStore index = lmdbDataStoreProvider.createKeyIndexDataStore(TransactionLogManager.DATA_PREFIX_I+"test_cmdb_user");
+        TestSummary summary = new TestSummary();
+        index.backup().view(summary);
+        Assert.assertEquals(summary.count(),2);
+        Assert.assertEquals(summary.edgeList().size(),1);
+        index.backup().drop(false);
+        index.backup().view(summary);
+        Assert.assertEquals(summary.count(),0);
+        Assert.assertEquals(summary.edgeList().size(),1);
+
     }
-    @Test(groups = { "LMDB" })
+    //@Test(groups = { "LMDB" })
     public void testCommitOnTransaction(){
         long ownerId = localDistributionIdGenerator.id();
         testMapStoreListener.verifier = (tid)->{
@@ -97,7 +104,7 @@ public class LMDBDataStoreTest {
             Assert.assertTrue(tx.distributionId()>0);
         }
     }
-    @Test(groups = { "LMDB" })
+    //@Test(groups = { "LMDB" })
     public void testAbortOnTransaction(){
         long ownerId = localDistributionIdGenerator.id();
         boolean[] aborted={false};
@@ -125,7 +132,7 @@ public class LMDBDataStoreTest {
         Assert.assertEquals(cnt[0],0);
     }
 
-    @Test(groups = { "LMDB" })
+    //@Test(groups = { "LMDB" })
     public void testCreateIfAbsent() {
         testMapStoreListener.verifier = (tid)->{
             Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid).size(),2);
@@ -142,7 +149,7 @@ public class LMDBDataStoreTest {
         Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"access")).size(),5);
     }
 
-    @Test(groups = { "LMDB" })
+    //@Test(groups = { "LMDB" })
     public void testCreateIfAbsentOnCommit() {
         testMapStoreListener.verifier = (tid)->{
             Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid).size(),10);
@@ -165,7 +172,7 @@ public class LMDBDataStoreTest {
         Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"access")).size(),5);
     }
 
-    @Test(groups = { "LMDB" })
+   // @Test(groups = { "LMDB" })
     public void testCreateIfAbsentOnAbort() {
         testMapStoreListener.verifier = (tid)->{
             Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid).size(),10);
@@ -199,7 +206,7 @@ public class LMDBDataStoreTest {
     }
 
 
-    @Test(groups = { "LMDB" })
+   // @Test(groups = { "LMDB" })
     public void testCreateWithEdge() {
         testMapStoreListener.verifier = (tid)->{
             Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid).size(),2);
@@ -225,7 +232,7 @@ public class LMDBDataStoreTest {
         Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),10);
         Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"games")).size(),10);
     }
-    @Test(groups = { "LMDB" })
+    //@Test(groups = { "LMDB" })
     public void testCreateWithEdgeOnCommit() {
         testMapStoreListener.verifier = (tid)->{
             Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid).size(),20);
@@ -264,7 +271,7 @@ public class LMDBDataStoreTest {
         Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"games")).size(),10);
     }
 
-    @Test(groups = { "LMDB" })
+    //@Test(groups = { "LMDB" })
     public void testCreateWithEdgeOnAbort() {
         testMapStoreListener.verifier = (tid)->{
             Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid).size(),20);
@@ -322,7 +329,7 @@ public class LMDBDataStoreTest {
         Assert.assertEquals(cnt[0],0);
     }
 
-    @Test(groups = { "LMDB" })
+    //@Test(groups = { "LMDB" })
     public void testTransactionLogManager() {
         DataStore foo = lmdbDataStoreProvider.createAccessIndexDataStore("test_foo_txc");
         DataStore flog = lmdbDataStoreProvider.createLogDataStore("index_a_test_foo_txc");

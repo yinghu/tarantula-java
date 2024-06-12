@@ -3,23 +3,23 @@ package com.icodesoftware.lmdb.test;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.BufferProxy;
 
+import com.icodesoftware.lmdb.LocalHeader;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.nio.ByteBuffer;
 
 public class BufferProxyTest {
 
-    @BeforeClass
-    public void setUp() {
-    }
 
     @Test(groups = { "bufferProxy" })
-    public void bufferTest() {
+    public void bufferBasicTest() {
         ByteBuffer buffer = ByteBuffer.allocateDirect(700);
         Recoverable.DataBuffer proxy = BufferProxy.buffer(buffer);
+        Recoverable.DataHeader dataHeader = new LocalHeader(100,10,1);
+        proxy.writeHeader(dataHeader);
         proxy.writeBoolean(true);
+        proxy.writeByte((byte)1);
         proxy.writeDouble(10);
         proxy.writeShort((short)4);
         proxy.writeInt(100);
@@ -27,7 +27,12 @@ public class BufferProxyTest {
         proxy.writeLong(800l);
         proxy.writeUTF8("hello");
         buffer.flip();
+        Recoverable.DataHeader header1 = proxy.readHeader();
+        Assert.assertEquals(header1.revision(),100);
+        Assert.assertEquals(header1.factoryId(),10);
+        Assert.assertEquals(header1.classId(),1);
         Assert.assertTrue(proxy.readBoolean());
+        Assert.assertEquals(proxy.readByte(),(byte)1);
         Assert.assertEquals(proxy.readDouble(),10.0d);
         Assert.assertEquals(proxy.readShort(),4);
         Assert.assertEquals(proxy.readInt(),100);
@@ -36,8 +41,12 @@ public class BufferProxyTest {
         Assert.assertEquals(proxy.readUTF8(),"hello");
 
         buffer.rewind();
-
+        Recoverable.DataHeader header2 = proxy.readHeader();
+        Assert.assertEquals(header2.revision(),100);
+        Assert.assertEquals(header2.factoryId(),10);
+        Assert.assertEquals(header2.classId(),1);
         Assert.assertTrue(proxy.readBoolean());
+        Assert.assertEquals(proxy.readByte(),(byte)1);
         Assert.assertEquals(proxy.readDouble(),10.0d);
         Assert.assertEquals(proxy.readShort(),4);
         Assert.assertEquals(proxy.readInt(),100);
@@ -91,6 +100,38 @@ public class BufferProxyTest {
         Assert.assertEquals(bytes1.length,100);
 
     }
+
+    @Test(groups = { "bufferProxy" })
+    public void bufferWrapTest(){
+        Recoverable.DataBuffer directBuffer = BufferProxy.buffer(100,true);
+        directBuffer.writeUTF8("test");
+        directBuffer.writeLong(100);
+        directBuffer.writeInt(200);
+        directBuffer.flip();
+        byte[] bytes = directBuffer.array();
+        Assert.assertEquals(bytes.length,20);
+
+        Recoverable.DataBuffer dataBuffer = BufferProxy.wrapDirectly(bytes);
+        dataBuffer.flip();
+        Assert.assertEquals(dataBuffer.readUTF8(),"test");
+        Assert.assertEquals(dataBuffer.readLong(),100);
+        Assert.assertEquals(dataBuffer.readInt(),200);
+
+    }
+
+    @Test(groups = { "bufferProxy" })
+    public void bufferClearTest(){
+        Recoverable.DataBuffer directBuffer = BufferProxy.buffer(100,true);
+        directBuffer.writeUTF8("test");
+        directBuffer.flip();
+        Assert.assertEquals(directBuffer.readUTF8(),"test");
+        directBuffer.clear();
+        directBuffer.writeUTF8("clear");
+        directBuffer.flip();
+        Assert.assertEquals(directBuffer.readUTF8(),"clear");
+    }
+
+
 
 
 }

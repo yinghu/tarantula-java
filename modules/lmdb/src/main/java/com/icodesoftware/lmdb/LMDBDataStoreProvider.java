@@ -39,7 +39,6 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private final LMDBEnv logEnv = LMDBEnv.LOG_ENV;
     private final LMDBEnv localEnv = LMDBEnv.LOCAL_ENV;
 
-    //public static final long storeBaseMbSize = EnvSetting.toBytesFromMb(1); //1MB
 
     long storeSize = EnvSetting.toBytesFromMb(1); // 1MB = 1,048,576 (1024*1024)
 

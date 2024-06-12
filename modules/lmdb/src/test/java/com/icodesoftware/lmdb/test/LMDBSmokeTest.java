@@ -1,5 +1,6 @@
 package com.icodesoftware.lmdb.test;
 
+import com.icodesoftware.lmdb.EnvSetting;
 import org.lmdbjava.*;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
@@ -16,7 +17,7 @@ public class LMDBSmokeTest {
 
 
     private String dir = "target/lmdb/smoke";
-    private long mapSize = 1_048_576L;
+    private long mapSize = EnvSetting.toBytesFromMb(1);
 
     private int maxStores = 100;
     private int maxReader = 100;

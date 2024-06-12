@@ -1,6 +1,5 @@
 package com.icodesoftware.lmdb;
 
-
 import com.icodesoftware.Recoverable;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -10,7 +9,7 @@ public class BufferCache implements Recoverable.DataBufferPair {
     private final Recoverable.DataBuffer key;
     private final Recoverable.DataBuffer value;
 
-    private ArrayBlockingQueue<BufferCache> bufferQueue;
+    private final ArrayBlockingQueue<BufferCache> bufferQueue;
 
     public BufferCache(final int keySize,final int valueSize,ArrayBlockingQueue<BufferCache> bufferQueue){
         this.key = BufferProxy.buffer(keySize,true);

@@ -8,6 +8,7 @@ public class LocalHeader implements Recoverable.DataHeader {
 
     private final int factoryId;
     private final int classId;
+
     public LocalHeader(long revision,int factoryId, int classId){
         this.revision = revision;
         this.factoryId = factoryId;
