@@ -19,6 +19,7 @@ public class TestSetup {
     static LocalDistributionIdGenerator localDistributionIdGenerator;
 
     static boolean started = false;
+
     public static void setUp() throws Exception{
         if(started) return;
         started = true;

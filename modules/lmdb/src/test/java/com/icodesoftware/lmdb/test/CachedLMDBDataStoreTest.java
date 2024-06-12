@@ -3,37 +3,19 @@ package com.icodesoftware.lmdb.test;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.Transaction;
 import com.icodesoftware.lmdb.*;
-import com.icodesoftware.service.Batchable;
-import com.icodesoftware.service.Metadata;
 import com.icodesoftware.util.SnowflakeKey;
+
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class CachedLMDBDataStoreTest {
+public class CachedLMDBDataStoreTest extends LMDBHook{
 
-    LMDBDataStoreProvider lmdbDataStoreProvider;
-    TestMapStoreListener testMapStoreListener;
 
-    LocalDistributionIdGenerator localDistributionIdGenerator;
-    @BeforeClass
-    public void setUp() throws Exception{
-        TestSetup.setUp();
-        lmdbDataStoreProvider = TestSetup.lmdbDataStoreProvider;
-        localDistributionIdGenerator = TestSetup.localDistributionIdGenerator;//new LocalDistributionIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
-        testMapStoreListener = TestSetup.testMapStoreListener;//new TestMapStoreListener(lmdbDataStoreProvider);
-    }
-    @AfterTest
-    public void tearDown() throws Exception{
-
-    }
     @Test(groups = { "LMDB" })
     public void testCreate(){
         long ownerId = localDistributionIdGenerator.id();
@@ -48,317 +30,197 @@ public class CachedLMDBDataStoreTest {
         TestUser user1 = new TestUser("test002",ownerId);
         Assert.assertTrue(dataStore.create(user1));
         Assert.assertEquals(dataStore.list(new TestUserQuery(ownerId)).size(),2);
+
+        //verify from index
         DataStore index = lmdbDataStoreProvider.createKeyIndexDataStore(TransactionLogManager.DATA_PREFIX_I+"test_cmdb_user");
-        TestSummary summary = new TestSummary();
-        index.backup().view(summary);
-        Assert.assertEquals(summary.count(),2);
-        Assert.assertEquals(summary.edgeList().size(),1);
-        index.backup().drop(false);
-        index.backup().view(summary);
-        Assert.assertEquals(summary.count(),0);
-        Assert.assertEquals(summary.edgeList().size(),1);
-
-    }
-    //@Test(groups = { "LMDB" })
-    public void testCommitOnTransaction(){
-        long ownerId = localDistributionIdGenerator.id();
-        testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
-            Assert.assertEquals(logs.size(),4);
-            testMapStoreListener.transactionLogManager.onTransaction(logs);
-        };
-        Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE);
-        TestUser user = new TestUser("test001",ownerId);
-        TestUser user1 = new TestUser("test002",ownerId);
-        boolean committed = transaction.execute(ctx->{
-            DataStore dataStore = ctx.onDataStore("test_user_committed");
-            //TestUser user = new TestUser("test001",ownerId);
-            Assert.assertTrue(dataStore.create(user));
-            //TestUser user1 = new TestUser("test002",ownerId);
-            Assert.assertTrue(dataStore.create(user1));
+        List<TestUser> pending = new ArrayList<>();
+        index.backup().forEachEdgeKey(SnowflakeKey.from(ownerId),TestUser.LABEL,(k,v)->{
+            TestUser uid = new TestUser();
+            uid.readKey(v);
+            pending.add(uid);
+            k.rewind();
+            Assert.assertEquals(k.readLong(),ownerId);
+            Assert.assertTrue(uid.distributionId()==user1.distributionId() || uid.distributionId()==user.distributionId());
             return true;
         });
-        Assert.assertTrue(committed);
-        DataStore dataStore = lmdbDataStoreProvider.createDataStore("test_user_committed");
-        Assert.assertEquals(dataStore.list(new TestUserQuery(ownerId)).size(),2);
-        byte[] data = testMapStoreListener.transactionLogManager.loadFromCommitted(new LocalMetadata(Distributable.DATA_SCOPE,"test_user_committed"), SnowflakeKey.from(user.distributionId()).asBinary());
-        Assert.assertNotNull(data);
-        Recoverable.DataBuffer bufferProxy = BufferProxy.wrap(data);
-        bufferProxy.readHeader();
-        TestUser testUser = new TestUser();
-        testUser.read(bufferProxy);
-        Assert.assertEquals(testUser.login,"test001");
-        Metadata metadata = new LocalMetadata(Distributable.DATA_SCOPE,"test_user_committed",TestUser.LABEL);
-        List<Batchable.BatchData> batchable = testMapStoreListener.transactionLogManager.loadEdgeValueFromCommitted(metadata,SnowflakeKey.from(ownerId).asBinary());
-        Assert.assertEquals(batchable.size(),2);
-        //List<byte[]> kp = batchable.key();
-        //List<byte[]> vp = batchable.data();
-        for(int i=0;i<batchable.size();i++){
-            TestUser tx = new TestUser();
-            Batchable.BatchData batchData = batchable.get(i);
-            tx.readKey(BufferProxy.wrap(batchData.key()));
-            Recoverable.DataBuffer buffer = BufferProxy.wrap(batchData.value());
-            buffer.readHeader();
-            tx.read(buffer);
-            Assert.assertTrue(tx.login().startsWith("test00"));
-            Assert.assertTrue(tx.distributionId()>0);
-        }
-    }
-    //@Test(groups = { "LMDB" })
-    public void testAbortOnTransaction(){
-        long ownerId = localDistributionIdGenerator.id();
-        boolean[] aborted={false};
-        testMapStoreListener.abort = (tid)->{
-            aborted[0]=true;
-        };
-        try(Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE)){
-            boolean committed = transaction.execute(ctx->{
-                DataStore dataStore = ctx.onDataStore("test_user_abort");
-                TestUser user = new TestUser("test001",ownerId);
-                Assert.assertTrue(dataStore.create(user));
-                TestUser user1 = new TestUser("test002",ownerId);
-                Assert.assertTrue(dataStore.create(user1));
-                return false;
-            });
-            Assert.assertFalse(committed);
-        }
-        DataStore dataStore = lmdbDataStoreProvider.createDataStore("test_user_abort");
-        int[] cnt={0};
-        dataStore.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId),TestUser.LABEL,(e,v)->{
-            cnt[0]++;
+        Assert.assertEquals(pending.size(),2);
+        pending.forEach(u->{
+            Assert.assertTrue(index.load(u));
+        });
+        index.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId),TestUser.LABEL,(k,v)->{
+            Recoverable.DataHeader header = v.readHeader();
+            Assert.assertEquals(header.factoryId(),user.getFactoryId());
+            Assert.assertEquals(header.classId(),user.getClassId());
+            TestUser u = new TestUser();
+            Assert.assertTrue(u.readKey(k));
+            Assert.assertTrue(u.read(v));
             return true;
         });
-        Assert.assertTrue(aborted[0]);
-        Assert.assertEquals(cnt[0],0);
     }
 
-    //@Test(groups = { "LMDB" })
+
+    @Test(groups = { "LMDB" })
     public void testCreateIfAbsent() {
         testMapStoreListener.verifier = (tid)->{
-            Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid).size(),2);
-        };
-        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore("test_access");
-        long ownerId = localDistributionIdGenerator.id();
-        int size = 5;
-        for(int i=0;i<size;i++){
-            TestAccessIndex testUser = new TestAccessIndex("user"+i);
-            testUser.ownerKey(SnowflakeKey.from(ownerId));
-            testUser.distributionId(localDistributionIdGenerator.id());
-            Assert.assertTrue(ds.createIfAbsent(testUser,false));
-        }
-        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"access")).size(),5);
-    }
-
-    //@Test(groups = { "LMDB" })
-    public void testCreateIfAbsentOnCommit() {
-        testMapStoreListener.verifier = (tid)->{
-            Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid).size(),10);
-        };
-        long ownerId = localDistributionIdGenerator.id();
-        int size = 5;
-        try(Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.INTEGRATION_SCOPE)){
-            transaction.execute(ctx->{
-                DataStore dataStore = ctx.onDataStore("test_access_committed");
-                for(int i=0;i<size;i++){
-                    TestAccessIndex testUser = new TestAccessIndex("user"+i);
-                    testUser.ownerKey(SnowflakeKey.from(ownerId));
-                    testUser.distributionId(localDistributionIdGenerator.id());
-                    Assert.assertTrue(dataStore.createIfAbsent(testUser,false));
-                }
-                return true;
-            });
-        }
-        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore("test_access_committed");
-        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"access")).size(),5);
-    }
-
-   // @Test(groups = { "LMDB" })
-    public void testCreateIfAbsentOnAbort() {
-        testMapStoreListener.verifier = (tid)->{
-            Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid).size(),10);
-        };
-        boolean[] aborted={false};
-        testMapStoreListener.abort = (tid)->{
-            aborted[0]=true;
-        };
-        long ownerId = localDistributionIdGenerator.id();
-        int size = 5;
-        try(Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.INTEGRATION_SCOPE)){
-            transaction.execute(ctx->{
-                DataStore dataStore = ctx.onDataStore("test_access_abort");
-                for(int i=0;i<size;i++){
-                    TestAccessIndex testUser = new TestAccessIndex("user"+i);
-                    testUser.ownerKey(SnowflakeKey.from(ownerId));
-                    testUser.distributionId(localDistributionIdGenerator.id());
-                    Assert.assertTrue(dataStore.createIfAbsent(testUser,false));
-                }
-                return false;
-            });
-        }
-        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore("test_access_abort");
-        int[] cnt={0};
-        ds.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId),"access",(e,v)->{
-            cnt[0]++;
-            return true;
-        });
-        Assert.assertTrue(aborted[0]);
-        Assert.assertEquals(cnt[0],0);
-    }
-
-
-   // @Test(groups = { "LMDB" })
-    public void testCreateWithEdge() {
-        testMapStoreListener.verifier = (tid)->{
-            Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid).size(),2);
-        };
-        DataStore ds = lmdbDataStoreProvider.createDataStore("test_user_edge");
-        long ownerId1 = localDistributionIdGenerator.id();
-        List<TestUser> empty = ds.list(new TestUserQuery(ownerId1));
-        Assert.assertTrue(empty.size()==0);
-        List<TestUser> users = new ArrayList<>();
-        for(int i=0;i<10;i++) {
-            TestUser testUser = new TestUser("user"+i,ownerId1);
-            Assert.assertTrue(ds.create(testUser));
-            users.add(testUser);
-        }
-        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,TestUser.LABEL)).size(),10);
-        testMapStoreListener.verifier = (tid)->{
-            Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid).size(),1);
-        };
-        users.forEach(user->{
-            Assert.assertTrue(ds.createEdge(user,"friends"));
-            Assert.assertTrue(ds.createEdge(user,"games"));
-        });
-        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),10);
-        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"games")).size(),10);
-    }
-    //@Test(groups = { "LMDB" })
-    public void testCreateWithEdgeOnCommit() {
-        testMapStoreListener.verifier = (tid)->{
-            Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid).size(),20);
-        };
-        DataStore ds = lmdbDataStoreProvider.createDataStore("test_user_edge_committed");
-        long ownerId1 = localDistributionIdGenerator.id();
-        List<TestUser> empty = ds.list(new TestUserQuery(ownerId1));
-        Assert.assertTrue(empty.size()==0);
-        List<TestUser> users = new ArrayList<>();
-        try(Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE)){
-            transaction.execute((ctx)->{
-                DataStore dataStore = ctx.onDataStore("test_user_edge_committed");
-                for(int i=0;i<10;i++) {
-                    TestUser testUser = new TestUser("user"+i,ownerId1);
-                    Assert.assertTrue(dataStore.create(testUser));
-                    users.add(testUser);
-                }
-                return true;
-            });
-        }
-        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,TestUser.LABEL)).size(),10);
-        testMapStoreListener.verifier = (tid)->{
-            Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid).size(),20);
-        };
-        try(Transaction transaction1 = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE)){
-            transaction1.execute((ctx)->{
-                DataStore dataStore = ctx.onDataStore("test_user_edge_committed");
-                users.forEach(user->{
-                    Assert.assertTrue(dataStore.createEdge(user,"friends"));
-                    Assert.assertTrue(dataStore.createEdge(user,"games"));
-                });
-                return true;
-            });
-        }
-        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"friends")).size(),10);
-        Assert.assertEquals(ds.list(new TestUserQuery(ownerId1,"games")).size(),10);
-    }
-
-    //@Test(groups = { "LMDB" })
-    public void testCreateWithEdgeOnAbort() {
-        testMapStoreListener.verifier = (tid)->{
-            Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid).size(),20);
-        };
-        testMapStoreListener.abort = (tid)->{
-            //System.out.println("ABORT : "+tid);
-        };
-        DataStore ds = lmdbDataStoreProvider.createDataStore("test_user_edge_aborted");
-        long ownerId1 = localDistributionIdGenerator.id();
-        List<TestUser> empty = ds.list(new TestUserQuery(ownerId1));
-        Assert.assertTrue(empty.size()==0);
-        List<TestUser> users = new ArrayList<>();
-        try(Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE)){
-            transaction.execute((ctx)->{
-                DataStore dataStore = ctx.onDataStore("test_user_edge_aborted");
-                for(int i=0;i<10;i++) {
-                    TestUser testUser = new TestUser("user"+i,ownerId1);
-                    Assert.assertTrue(dataStore.create(testUser));
-                    users.add(testUser);
-                }
-                return false;
-            });
-        }
-        int[] cnt={0};
-        ds.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId1),TestUser.LABEL,(e,v)->{
-            cnt[0]++;
-            return true;
-        });
-        Assert.assertEquals(cnt[0],0);
-
-        testMapStoreListener.verifier = (tid)->{
-            Assert.assertEquals(testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid).size(),20);
-        };
-        try(Transaction transaction1 = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE)){
-            transaction1.execute((ctx)->{
-                DataStore dataStore = ctx.onDataStore("test_user_edge_aborted");
-                users.forEach(user->{
-                    Assert.assertTrue(dataStore.createEdge(user,"friends"));
-                    Assert.assertTrue(dataStore.createEdge(user,"games"));
-                });
-                return false;
-            });
-        }
-        cnt[0]=0;
-        ds.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId1),"friends",(e,v)->{
-            cnt[0]++;
-            return true;
-        });
-        Assert.assertEquals(cnt[0],0);
-        cnt[0]=0;
-        ds.backup().forEachEdgeKeyValue(SnowflakeKey.from(ownerId1),"games",(e,v)->{
-            cnt[0]++;
-            return true;
-        });
-        Assert.assertEquals(cnt[0],0);
-    }
-
-    //@Test(groups = { "LMDB" })
-    public void testTransactionLogManager() {
-        DataStore foo = lmdbDataStoreProvider.createAccessIndexDataStore("test_foo_txc");
-        DataStore flog = lmdbDataStoreProvider.createLogDataStore("index_a_test_foo_txc");
-        long ownerId = localDistributionIdGenerator.id();
-        testMapStoreListener.verifier = (tid)->{
             List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
-            logs.forEach(e->{
-                e.source = "test_foo_txc";
-            });
             testMapStoreListener.transactionLogManager.onTransaction(logs);
         };
-        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore("test_access_txc");
-
+        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore("test_cmdb_access");
+        long ownerId = localDistributionIdGenerator.id();
         int size = 5;
         for(int i=0;i<size;i++){
             TestAccessIndex testUser = new TestAccessIndex("user"+i);
             testUser.ownerKey(SnowflakeKey.from(ownerId));
             testUser.distributionId(localDistributionIdGenerator.id());
             Assert.assertTrue(ds.createIfAbsent(testUser,false));
-            Assert.assertTrue(ds.createEdge(testUser,"links"));
+            Assert.assertTrue(ds.createEdge(testUser,"friend"));
         }
+        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"access")).size(),5);
+        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"friend")).size(),5);
+        DataStore index = lmdbDataStoreProvider.createKeyIndexDataStore(TransactionLogManager.ACCESS_PREFIX_I+"test_cmdb_access");
+        Assert.assertEquals(index.list(new TestAccessQuery(ownerId,"access")).size(),5);
+        Assert.assertEquals(index.list(new TestAccessQuery(ownerId,"friend")).size(),5);
 
-        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"access")).size(),size);
-        Assert.assertEquals(flog.list(new TestAccessQuery(ownerId,"access")).size(),size);
-        Assert.assertEquals(foo.list(new TestAccessQuery(ownerId,"access")).size(),size);
-        Assert.assertEquals(flog.list(new TestAccessQuery(ownerId,"links")).size(),size);
-        Assert.assertEquals(foo.list(new TestAccessQuery(ownerId,"links")).size(),size);
     }
 
+    @Test(groups = { "LMDB" })
+    public void testUpdate() {
+        testMapStoreListener.verifier = (tid)->{
+            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
+            testMapStoreListener.transactionLogManager.onTransaction(logs);
+        };
+        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore("test_cmdb_update");
+        long ownerId = localDistributionIdGenerator.id();
+        TestAccessIndex testUser = new TestAccessIndex("player1");
+        int referenceId = testUser.referenceId();
+        testUser.ownerKey(SnowflakeKey.from(ownerId));
+        testUser.distributionId(localDistributionIdGenerator.id());
+        Assert.assertTrue(ds.createIfAbsent(testUser,false));
+        Assert.assertTrue(ds.createEdge(testUser,"friend"));
+        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"access")).size(),1);
+        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"friend")).size(),1);
+        TestAccessIndex load = new TestAccessIndex("player1");
+        Assert.assertTrue(ds.load(load));
+        Assert.assertEquals(load.referenceId(),referenceId);
+        load.referenceId = 100;
+        Assert.assertTrue(ds.update(load));
+        Assert.assertEquals(load.revision(),Long.MIN_VALUE+1);
+        TestAccessIndex load1 = new TestAccessIndex("player1");
+        Assert.assertTrue(ds.load(load1));
+        Assert.assertEquals(load1.referenceId(),100);
+
+        DataStore index = lmdbDataStoreProvider.createKeyIndexDataStore(TransactionLogManager.ACCESS_PREFIX_I+"test_cmdb_update");
+        Assert.assertEquals(index.list(new TestAccessQuery(ownerId,"access")).size(),1);
+        Assert.assertEquals(index.list(new TestAccessQuery(ownerId,"friend")).size(),1);
+        TestAccessIndex load3 = new TestAccessIndex("player1");
+        Assert.assertTrue(index.load(load3));
+        Assert.assertEquals(load3.referenceId(),100);
+        Assert.assertEquals(load3.revision(),Long.MIN_VALUE+1);
+
+    }
+
+    @Test(groups = { "LMDB" })
+    public void testDelete() {
+        testMapStoreListener.verifier = (tid)->{
+            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
+            testMapStoreListener.transactionLogManager.onTransaction(logs);
+        };
+        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore("test_cmdb_delete");
+        long ownerId = localDistributionIdGenerator.id();
+        TestAccessIndex testUser = new TestAccessIndex("player1");
+        int referenceId = testUser.referenceId();
+        testUser.ownerKey(SnowflakeKey.from(ownerId));
+        testUser.distributionId(localDistributionIdGenerator.id());
+        Assert.assertTrue(ds.createIfAbsent(testUser,false));
+        Assert.assertTrue(ds.createEdge(testUser,"friend"));
+        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"access")).size(),1);
+        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"friend")).size(),1);
+        TestAccessIndex load = new TestAccessIndex("player1");
+        Assert.assertTrue(ds.load(load));
+        Assert.assertEquals(load.referenceId(),referenceId);
+        load.referenceId = 100;
+        Assert.assertTrue(ds.update(load));
+        Assert.assertEquals(load.revision(),Long.MIN_VALUE+1);
+        TestAccessIndex load1 = new TestAccessIndex("player1");
+        Assert.assertTrue(ds.load(load1));
+        Assert.assertEquals(load1.referenceId(),100);
+
+        DataStore index = lmdbDataStoreProvider.createKeyIndexDataStore(TransactionLogManager.ACCESS_PREFIX_I+"test_cmdb_delete");
+        Assert.assertTrue(ds.deleteEdge(SnowflakeKey.from(ownerId),testUser.key(),"friend"));
+        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"access")).size(),1);
+        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"friend")).size(),0);
+
+        TestAccessIndex load3 = new TestAccessIndex("player1");
+        Assert.assertTrue(ds.load(load3));
+        Assert.assertEquals(index.list(new TestAccessQuery(ownerId,"access")).size(),1);
+        Assert.assertEquals(index.list(new TestAccessQuery(ownerId,"friend")).size(),0);
+
+        ds.deleteEdge(SnowflakeKey.from(ownerId),"access");
+
+        TestAccessIndex load4 = new TestAccessIndex("player1");
+        Assert.assertTrue(ds.load(load4));
+        Assert.assertEquals(index.list(new TestAccessQuery(ownerId,"access")).size(),0);
+        Assert.assertEquals(index.list(new TestAccessQuery(ownerId,"friend")).size(),0);
+
+        ds.delete(load4);
+        TestAccessIndex load5 = new TestAccessIndex("player1");
+        Assert.assertFalse(index.load(load5));
+        Assert.assertEquals(index.list(new TestAccessQuery(ownerId,"access")).size(),0);
+        Assert.assertEquals(index.list(new TestAccessQuery(ownerId,"friend")).size(),0);
+
+    }
+
+    @Test(groups = { "LMDB" })
+    public void testDeleteEdge() {
+        testMapStoreListener.verifier = (tid)->{
+            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
+            testMapStoreListener.transactionLogManager.onTransaction(logs);
+        };
+        DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore("test_cmdb_delete_edge");
+        long ownerId = localDistributionIdGenerator.id();
+        int size = 5;
+        for(int i=0;i<size;i++){
+            TestAccessIndex testUser = new TestAccessIndex("user"+i);
+            testUser.ownerKey(SnowflakeKey.from(ownerId));
+            testUser.distributionId(localDistributionIdGenerator.id());
+            Assert.assertTrue(ds.createIfAbsent(testUser,false));
+            Assert.assertTrue(ds.createEdge(testUser,"friend"));
+        }
+        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"access")).size(),5);
+        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"friend")).size(),5);
+        DataStore index = lmdbDataStoreProvider.createKeyIndexDataStore(TransactionLogManager.ACCESS_PREFIX_I+"test_cmdb_delete_edge");
+        Assert.assertEquals(index.list(new TestAccessQuery(ownerId,"access")).size(),5);
+        Assert.assertEquals(index.list(new TestAccessQuery(ownerId,"friend")).size(),5);
+
+        TestAccessIndex testUser = new TestAccessIndex("user0");
+        ds.deleteEdge(SnowflakeKey.from(ownerId),testUser.key(),"access");
+        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"access")).size(),4);
+        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"friend")).size(),5);
+        Assert.assertEquals(index.list(new TestAccessQuery(ownerId,"access")).size(),4);
+        Assert.assertEquals(index.list(new TestAccessQuery(ownerId,"friend")).size(),5);
+
+        TestAccessIndex testUser1 = new TestAccessIndex("user1");
+        ds.deleteEdge(SnowflakeKey.from(ownerId),testUser1.key(),"friend");
+
+        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"access")).size(),4);
+        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"friend")).size(),4);
+        Assert.assertEquals(index.list(new TestAccessQuery(ownerId,"access")).size(),4);
+        Assert.assertEquals(index.list(new TestAccessQuery(ownerId,"friend")).size(),4);
+
+        ds.deleteEdge(SnowflakeKey.from(ownerId),"access");
+        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"access")).size(),0);
+        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"friend")).size(),4);
+        Assert.assertEquals(index.list(new TestAccessQuery(ownerId,"access")).size(),0);
+        Assert.assertEquals(index.list(new TestAccessQuery(ownerId,"friend")).size(),4);
+
+        ds.deleteEdge(SnowflakeKey.from(ownerId),"friend");
+        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"access")).size(),0);
+        Assert.assertEquals(ds.list(new TestAccessQuery(ownerId,"friend")).size(),0);
+        Assert.assertEquals(index.list(new TestAccessQuery(ownerId,"access")).size(),0);
+        Assert.assertEquals(index.list(new TestAccessQuery(ownerId,"friend")).size(),0);
+
+
+    }
 
 
 

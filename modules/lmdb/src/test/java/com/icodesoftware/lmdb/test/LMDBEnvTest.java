@@ -10,8 +10,7 @@ import com.icodesoftware.util.FileUtil;
 import com.icodesoftware.util.SnowflakeKey;
 import org.lmdbjava.*;
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeClass;
+
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -20,24 +19,9 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 
-public class LMDBEnvTest {
+public class LMDBEnvTest extends LMDBHook{
 
-    LMDBDataStoreProvider lmdbDataStoreProvider;
-    TestMapStoreListener testMapStoreListener;
 
-    LocalDistributionIdGenerator localDistributionIdGenerator;
-    @BeforeClass
-    public void setUp() throws Exception{
-        TestSetup.setUp();
-        lmdbDataStoreProvider = TestSetup.lmdbDataStoreProvider;
-        localDistributionIdGenerator = TestSetup.localDistributionIdGenerator;//new LocalDistributionIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
-        testMapStoreListener = TestSetup.testMapStoreListener;//new TestMapStoreListener(lmdbDataStoreProvider);
-    }
-    @AfterTest
-    public void tearDown() throws Exception{
-
-        //lmdbDataStoreProvider.shutdown();
-    }
     @Test(groups = { "LMDBRecovery" })
     public void testCreate(){
         testMapStoreListener.verifier = (tid)->{

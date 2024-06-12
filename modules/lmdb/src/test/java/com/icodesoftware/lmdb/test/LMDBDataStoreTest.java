@@ -9,32 +9,15 @@ import com.icodesoftware.service.Metadata;
 import com.icodesoftware.util.SnowflakeKey;
 
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class LMDBDataStoreTest {
+public class LMDBDataStoreTest extends LMDBHook{
 
-    LMDBDataStoreProvider lmdbDataStoreProvider;
-    TestMapStoreListener testMapStoreListener;
 
-    LocalDistributionIdGenerator localDistributionIdGenerator;
-    @BeforeClass
-    public void setUp() throws Exception{
-        TestSetup.setUp();
-        lmdbDataStoreProvider = TestSetup.lmdbDataStoreProvider;
-        localDistributionIdGenerator = TestSetup.localDistributionIdGenerator;//new LocalDistributionIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
-        testMapStoreListener = TestSetup.testMapStoreListener;//new TestMapStoreListener(lmdbDataStoreProvider);
-    }
-    @AfterTest
-    public void tearDown() throws Exception{
-
-        //lmdbDataStoreProvider.shutdown();
-    }
     @Test(groups = { "LMDB" })
     public void testCreate(){
         long ownerId = localDistributionIdGenerator.id();

@@ -277,16 +277,20 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
 
     public  boolean deleteEdge(Recoverable.Key t,String label){
         try(final Txn<ByteBuffer> txn = env.txnWrite()){
+            final long transactionId = txn.getId();
             if(!offEdge(t,label,txn)) return false;
             txn.commit();
+            lmdbDataStoreProvider.onCommit(metadata.scope(),transactionId);
             return true;
         }
     }
 
     public boolean deleteEdge(Recoverable.Key t,Recoverable.Key edge,String label){
         try(final Txn<ByteBuffer> txn = env.txnWrite()){
+            final long transactionId = txn.getId();
             if(!offEdge(t,label,edge,txn)) return false;
             txn.commit();
+            lmdbDataStoreProvider.onCommit(metadata.scope(),transactionId);
             return true;
         }
     }
