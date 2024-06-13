@@ -91,6 +91,7 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable,V
         ByteBuffer flip();
         ByteBuffer rewind();
         ByteBuffer clear();
+        boolean hasRemaining();
     }
 
     interface DataBufferPair extends Resettable,AutoCloseable{

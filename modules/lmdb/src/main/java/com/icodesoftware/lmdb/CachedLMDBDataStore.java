@@ -51,8 +51,9 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         ArrayList<String> elist = new ArrayList<>();
         env.getDbiNames().forEach(n-> {
             String dn = new String(n);
-            if(dn.startsWith(name) && dn.contains("#")){
-                elist.add(dn.split("#")[1]);
+            if(dn.contains("#")){
+                String[] parts = dn.split("#");
+                if(parts[0].equals(name)) elist.add(parts[1]);
             }
         });
         return elist;
@@ -386,15 +387,15 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             if(!key.write(cache.key())) {
                 return;
             }
-            try(final Txn<ByteBuffer> txn = env.txnRead()){
-                try(Cursor<ByteBuffer> cursor = localEdgeDataStore.openCursor(txn)){
+            try(final Txn<ByteBuffer> txn = env.txnRead();Cursor<ByteBuffer> cursor = localEdgeDataStore.openCursor(txn)){
+                //try(Cursor<ByteBuffer> cursor = localEdgeDataStore.openCursor(txn)){
                     if(cursor.get(cache.key().flip(),GetOp.MDB_SET)){
                         if(cursor.seek(SeekOp.MDB_FIRST_DUP)) bufferStream.on(cache.key(),BufferProxy.buffer(cursor.val()));
                         while (cursor.seek(SeekOp.MDB_NEXT_DUP)){
                             bufferStream.on(cache.key(),BufferProxy.buffer(cursor.val()));
                         }
                     }
-                }
+                //}
             }
         }
     }
@@ -405,8 +406,8 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             if(!key.write(cache.key())){
                 return;
             }
-            try(final Txn<ByteBuffer> txn = env.txnRead()){
-                try(Cursor<ByteBuffer> cursor = localEdgeDataStore.openCursor(txn)){
+            try(final Txn<ByteBuffer> txn = env.txnRead();Cursor<ByteBuffer> cursor = localEdgeDataStore.openCursor(txn)){
+                //try(Cursor<ByteBuffer> cursor = localEdgeDataStore.openCursor(txn)){
                     if(cursor.get(cache.key().flip(),GetOp.MDB_SET)){
                         if(cursor.seek(SeekOp.MDB_FIRST_DUP)){
                             if(dbi.get(txn,cursor.val()) !=null) bufferStream.on(BufferProxy.buffer(cursor.val().rewind()),BufferProxy.buffer(txn.val()));
@@ -416,7 +417,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
                             bufferStream.on(BufferProxy.buffer(cursor.val().rewind()),BufferProxy.buffer(txn.val()));
                         }
                     }
-                }
+                //}
             }
         }
     }

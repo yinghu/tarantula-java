@@ -158,5 +158,8 @@ public class BufferProxy implements Recoverable.DataBuffer {
         buffer.clear();
         return buffer;
     }
+    public boolean hasRemaining(){
+        return buffer.hasRemaining();
+    }
 
 }

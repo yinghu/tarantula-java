@@ -34,4 +34,10 @@ public class BufferUtil {
             dest.writeByte(src.get());
         }
     }
+
+    public static void copy(Recoverable.DataBuffer src, Recoverable.DataBuffer dest){
+        while (src.hasRemaining()){
+            dest.writeByte(src.readByte());
+        }
+    }
 }
