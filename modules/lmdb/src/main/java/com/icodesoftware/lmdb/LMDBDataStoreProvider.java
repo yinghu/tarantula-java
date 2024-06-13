@@ -45,7 +45,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     int maxDatabaseNumber = 1024;
     int maxReaders = 100;
 
-    private final static int KEY_SIZE = 200;
+    final static int KEY_SIZE = 200;
     private final static int VALUE_SIZE = 2000;
 
     private final static int PENDING_BUFFER_SIZE = 32;
