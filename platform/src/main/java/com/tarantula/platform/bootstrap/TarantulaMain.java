@@ -2,9 +2,11 @@ package com.tarantula.platform.bootstrap;
 
 import java.io.*;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
 
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.EndPoint;
+import com.icodesoftware.util.OSUtil;
 import com.tarantula.licensing.Validator;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
@@ -155,15 +157,37 @@ public class TarantulaMain {
 			hook.setName("tarantula-shutdown-hook");
 			Runtime.getRuntime().addShutdownHook(hook);
 			hook.register(btx);
-			FileWriter fw = new FileWriter("tarantula.pid");
-			fw.write(""+ProcessHandle.current().pid());
-			fw.close();
+			try(FileWriter fw = new FileWriter("tarantula.pid")){
+				fw.write(""+ProcessHandle.current().pid());
+			}
 		}
-
 		public void shutdown() throws Exception{
 			Runtime.getRuntime().removeShutdownHook(hook);
 			hook.run();
 			System.exit(1);
+		}
+		public void restart() throws Exception{
+			CountDownLatch countDownLatch = new CountDownLatch(1);
+			Runtime.getRuntime().removeShutdownHook(hook);
+			hook.run();
+			new Thread(()->{
+				try{
+					ProcessBuilder processBuilder = new ProcessBuilder(command());
+					processBuilder.inheritIO();
+					processBuilder.start();
+				}catch (Exception ex){
+					log.error("Cannot start bootstrap to restart application",ex);
+				}
+				finally {
+					countDownLatch.countDown();
+				}
+			}).start();
+			countDownLatch.await();
+			System.exit(1);
+		}
+		private static String[] command(){
+			if(OSUtil.windows()) return new String[]{"cmd.exe", "/c", "java -jar gec-bootstrap.jar"};
+			return new String[]{"/bin/sh", "-c", "java -jar gec-bootstrap.jar"};
 		}
 	}
 	

@@ -21,6 +21,7 @@
 			<include>bootstrap.sh</include>
 			<include>license.txt</include>
 			<include>version.txt</include>
+			<include>gec-bootstrap.jar</include>
       	</includes>
       	<fileMode>0777</fileMode>
      </fileSet>

@@ -173,7 +173,17 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 Thread.sleep(3000);
                 TarantulaMain.runtime.shutdown();
             }catch (Exception ex){
-                log.warn("cannot shutdown node");
+                log.error("cannot shutdown node",ex);
+            }
+        }).start();
+    }
+    public void onNodeRestart(){
+        new Thread(()->{
+            try{
+                Thread.sleep(3000);
+                TarantulaMain.runtime.restart();
+            }catch (Exception ex){
+                log.error("cannot restart node",ex);
             }
         }).start();
     }

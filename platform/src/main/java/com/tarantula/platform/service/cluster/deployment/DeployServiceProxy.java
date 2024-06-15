@@ -293,4 +293,16 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         },metricsListener);
         if(!result.successful) throw new RuntimeException("failed to shutdown node : "+removed.memberId());
     }
+    public void restart(ClusterProvider.Node restarted){
+        logger.warn("Restart node : "+restarted.memberId());
+        NodeEngine nodeEngine = getNodeEngine();
+        Member pending = nodeEngine.getClusterService().getMember(restarted.memberId());
+        NodeRestartOperation operation = new NodeRestartOperation();
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,pending.getAddress());
+        ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+            Future<Void> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+        },metricsListener);
+        if(!result.successful) throw new RuntimeException("failed to restart node : "+restarted.memberId());
+    }
 }

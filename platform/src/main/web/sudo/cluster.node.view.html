@@ -10,9 +10,10 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div class="w3-container">
+    <div class="w3-container"> 
         <div class='w3-bar w3-white'>
-            <span id="tx-cluster-shutdown" class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-node-action'>Shutdown</span>
+            <span id="tx-cluster-shutdown" class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-node-action'>Shutdown</span>
+            <span id="tx-cluster-restart" class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-node-action'>Restart</span>
         </div>            
     </div>
     <div class="w3-panel">
@@ -71,6 +72,11 @@
     };
     document.querySelector('#tx-cluster-shutdown').onclick = ()=>{
         TARA_API.onGet('role/sudo','onClusterShutdown',node.memberId,(resp)=>{
+            console.log(resp);    
+        });
+    };
+    document.querySelector('#tx-cluster-restart').onclick = ()=>{
+        TARA_API.onGet('role/sudo','onClusterRestart',node.memberId,(resp)=>{
             console.log(resp);    
         });
     };

@@ -6,12 +6,13 @@ import com.icodesoftware.Module;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 
-import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.List;
 
 public class SudoRoleModule implements Module {
@@ -106,11 +107,19 @@ public class SudoRoleModule implements Module {
         }
         else if(session.action().equals("onClusterShutdown")){
             Access acc = userService.loadUser(session.distributionId());
-            session.write(JsonUtil.toSimpleResponse(true,"shutdown :"+session.name()).getBytes());
+            session.write(JsonUtil.toSimpleResponse(true,"shutdown : "+session.name()).getBytes());
             DeploymentServiceProvider.NodeShutdownOperator shutdownOperator = deploymentServiceProvider.nodeShutdownOperator(acc);
             ClusterNode node = new ClusterNode();
             node.memberId = session.name();
             shutdownOperator.shutdown(node);
+        }
+        else if(session.action().equals("onClusterRestart")){
+            Access acc = userService.loadUser(session.distributionId());
+            session.write(JsonUtil.toSimpleResponse(true,"restart : "+session.name()).getBytes());
+            DeploymentServiceProvider.NodeShutdownOperator shutdownOperator = deploymentServiceProvider.nodeShutdownOperator(acc);
+            ClusterNode node = new ClusterNode();
+            node.memberId = session.name();
+            shutdownOperator.restart(node);
         }
         else{
            throw new UnsupportedOperationException("operation ["+session.action()+"] not supported");

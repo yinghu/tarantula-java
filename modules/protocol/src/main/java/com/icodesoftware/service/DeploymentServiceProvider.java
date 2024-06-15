@@ -124,6 +124,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
     interface NodeShutdownOperator{
         void shutdown(ClusterProvider.Node node);
+        void restart(ClusterProvider.Node node);
     }
 
 }
