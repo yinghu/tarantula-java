@@ -538,6 +538,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
         log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
         log.info("Backup Development id ["+node.deploymentId+"] is registered on node ["+node.nodeName+"]");
+        log.info("Current directory : "+FileUtil.currentDirectory());
         integrationCluster.registerNode(this.node);//may throw node already registered runtime exception
 
         initMetricsProvider();

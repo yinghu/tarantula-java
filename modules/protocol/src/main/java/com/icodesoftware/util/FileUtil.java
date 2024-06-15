@@ -41,4 +41,8 @@ public class FileUtil {
             throw new RuntimeException("cannot create file ["+path+"]");
         }
     }
+
+    public static String currentDirectory(){
+        return Paths.get(".").toFile().getAbsolutePath();
+    }
 }
