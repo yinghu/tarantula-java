@@ -43,6 +43,6 @@ public class FileUtil {
     }
 
     public static String currentDirectory(){
-        return Paths.get(".").toFile().getAbsolutePath();
+        return Paths.get(".").toAbsolutePath().normalize().toString();
     }
 }
