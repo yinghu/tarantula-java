@@ -658,7 +658,14 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         if(global){
             TournamentSegment segment = lookupSegmentInstance(instanceId);
             if(segment==null) return new TournamentRaceBoard();
-            return segment.myRaceBoard(systemId,entryId);
+            TournamentRaceBoard myRaceBoard = segment.myRaceBoard(systemId, entryId);
+            TournamentEntry livePlayerEntry = new TournamentEntry();
+            livePlayerEntry.distributionId(entryId);
+            livePlayerEntry.dataStore(segment.tournamentInstance.entryDataStore);
+            if(!segment.tournamentInstance.entryDataStore.load(livePlayerEntry) || livePlayerEntry.systemId()!= systemId) return myRaceBoard;
+            myRaceBoard.livePlayerEntry = livePlayerEntry;
+
+            return myRaceBoard;
         }
         TournamentInstance instance = load(instanceId);
         if(instance==null) return new TournamentRaceBoard();
