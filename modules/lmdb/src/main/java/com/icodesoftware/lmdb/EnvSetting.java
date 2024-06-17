@@ -6,6 +6,12 @@ public class EnvSetting {
 
     private static final long MB_1 = 1_048_576L;
 
+    public static final int MAX_STORE_NUMBER = 1024;
+    public static final int MAX_READER_NUMBER = 100;
+    public static final int KEY_SIZE = 200;//less than 511
+    public static final int VALUE_SIZE = 1500; //less than 1521
+    public static final int MAX_PENDING_BUFFER_NUMBER = 32;
+
     public static final String data ="data";
     public static final String integration ="integration";
     public static final String index ="index";

@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Configuration;
 
 import com.icodesoftware.Session;
+import com.icodesoftware.lmdb.EnvSetting;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.RecoverableObject;
@@ -26,7 +27,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
 
     public static final String NAME = "save";
 
-    private int mappingObjectMaxSize = 2000;
+    private final int mappingObjectMaxSize = EnvSetting.VALUE_SIZE;
     private int saveSize = 3;
 
     private long saveTimeout = 1; //1 hour
@@ -41,12 +42,11 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         super.setup(serviceContext);
         Configuration configuration = serviceContext.configuration("game-presence-settings");
         JsonObject saveGame = ((JsonElement)configuration.property("savedGame")).getAsJsonObject();
-        mappingObjectMaxSize = saveGame.get("mappingObjectMaxSize").getAsInt();
         saveSize = saveGame.get("saveSize").getAsInt();
         saveTimeout = saveGame.get("saveTimeout").getAsInt()*saveTimeout;
         dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
         this.logger = JDKLogger.getLogger(PlatformSavedGameServiceProvider.class);
-        this.logger.warn("Saved game service provider started on ->"+gameServiceName+" : "+mappingObjectMaxSize);
+        this.logger.warn("Saved game service provider started on ->"+gameServiceName+" : Max mapping object size : "+mappingObjectMaxSize);
     }
 
 

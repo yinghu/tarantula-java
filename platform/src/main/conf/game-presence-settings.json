@@ -10,8 +10,7 @@
    },
    "savedGame":{
       "saveSize": 3,
-      "saveTimeout": 1,
-      "mappingObjectMaxSize": 2000
+      "saveTimeout": 1
    },
    "inbox": {
       "pendingReward": true

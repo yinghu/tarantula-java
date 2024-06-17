@@ -42,13 +42,13 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     long storeSize = EnvSetting.toBytesFromMb(1); // 1MB = 1,048,576 (1024*1024)
 
-    int maxDatabaseNumber = 1024;
-    int maxReaders = 100;
+    int maxDatabaseNumber = EnvSetting.MAX_STORE_NUMBER;
+    int maxReaders = EnvSetting.MAX_READER_NUMBER;
 
-    final static int KEY_SIZE = 200;
-    private final static int VALUE_SIZE = 2000;
+    final static int KEY_SIZE = EnvSetting.KEY_SIZE;
+    private final static int VALUE_SIZE = EnvSetting.VALUE_SIZE;
 
-    private final static int PENDING_BUFFER_SIZE = 32;
+    private final static int PENDING_BUFFER_SIZE = EnvSetting.MAX_PENDING_BUFFER_NUMBER;
 
     boolean envNoSyncFlag = true;
     boolean storeReindexing;
