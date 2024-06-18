@@ -2,7 +2,7 @@ package com.icodesoftware.util;
 
 import net.jpountz.lz4.LZ4Compressor;
 import net.jpountz.lz4.LZ4Factory;
-import net.jpountz.lz4.LZ4FastDecompressor;
+import net.jpountz.lz4.LZ4SafeDecompressor;
 
 import java.nio.ByteBuffer;
 import java.util.zip.Deflater;
@@ -44,21 +44,35 @@ public class CompressUtil {
         }
     }
 
-    public static void lz4Compress(ByteBuffer src, ByteBuffer dest){
-        LZ4Factory factory = LZ4Factory.fastestInstance();
-        LZ4Compressor compressor = factory.fastCompressor();
-        compressor.compress(src,dest);
-        if (src.hasRemaining()) {
-            throw new RuntimeException("dest buffer too small");
-        }
+
+    public static LZ4 lz4(){
+        return new LZ4();
     }
 
-    public static void lz4Decompress(ByteBuffer src, ByteBuffer dest){
-        LZ4Factory factory = LZ4Factory.fastestInstance();
-        LZ4FastDecompressor decompressor = factory.fastDecompressor();
-        decompressor.decompress(src,dest);
-        if (src.hasRemaining()) {
-            throw new RuntimeException("dest buffer too small");
+    public static class LZ4{
+
+        private static LZ4Factory factory;
+
+        static {
+            factory = LZ4Factory.fastestJavaInstance();
+        }
+
+        private LZ4(){}
+
+        public void compress(ByteBuffer src, ByteBuffer dest){
+            LZ4Compressor compressor = factory.fastCompressor();
+            compressor.compress(src,dest);
+            if (src.hasRemaining()) {
+                throw new RuntimeException("dest buffer too small");
+            }
+        }
+
+        public void decompress(ByteBuffer src, ByteBuffer dest){
+            LZ4SafeDecompressor decompressor = factory.safeDecompressor();
+            decompressor.decompress(src,dest);
+            if (src.hasRemaining()) {
+                throw new RuntimeException("dest buffer too small");
+            }
         }
     }
 }

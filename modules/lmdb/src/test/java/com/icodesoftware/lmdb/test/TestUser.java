@@ -7,6 +7,7 @@ import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.SnowflakeKey;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class TestUser extends RecoverableObject implements Access {
 
@@ -23,9 +24,9 @@ public class TestUser extends RecoverableObject implements Access {
     public TestUser(){
         this.label = LABEL;
         this.onEdge = true;
-        this.password = "password";
+        this.password = UUID.randomUUID().toString();
         this.role = "tester";
-        this.emailAddress = "teser@mail.com";
+        this.emailAddress = "tester@gmail.com";
         this.validator = "validator";
     }
     public TestUser(String login,long owner){

@@ -39,7 +39,6 @@
                     </properties>
                 </discovery-strategy>
             </discovery-strategies>
-
         </join>
     </network>
     <services>

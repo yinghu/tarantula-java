@@ -1,7 +1,6 @@
 package com.tarantula.platform.presence.saves;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayDeque;
 import java.util.HashMap;
 
 public class OversizeDataBatch {

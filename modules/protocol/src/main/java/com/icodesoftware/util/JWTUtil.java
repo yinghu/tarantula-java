@@ -81,14 +81,14 @@ public class JWTUtil {
         private final Signature verifier;
 
         private final String alg;
-        public JWT(Mac mac){
+        private JWT(Mac mac){
             this.mac = mac;
             this.signer = null ;
             this.verifier = null;
             this.alg = "HS256";
         }
 
-        public JWT(Signature signature,boolean signing){
+        private JWT(Signature signature,boolean signing){
             if(signing){
                 this.signer = signature;
                 this.verifier = null;
