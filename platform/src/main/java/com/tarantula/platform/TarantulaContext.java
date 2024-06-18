@@ -15,6 +15,7 @@ import com.google.gson.JsonObject;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
 import com.icodesoftware.*;
+import com.icodesoftware.lmdb.EnvSetting;
 import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
 import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
@@ -121,9 +122,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public int[] snowflakeEpochStart = {2020,1,1};// start from 2020 1,1
 
     public int storeSizeMb = 100;
-    public int storeKeySize = 200;
-    public int storeValueSize = 1800;
-    public int storePendingBufferSize = 32;
+    public boolean externalKeyValueBufferUsed;
+    public int storeKeySize = EnvSetting.KEY_SIZE;
+    public int storeValueSize = EnvSetting.VALUE_SIZE;
+    public int storePendingBufferSize = EnvSetting.MAX_PENDING_BUFFER_NUMBER;
 
     public boolean storeNoSync = false;
     public String dataStoreDir;
@@ -215,6 +217,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         storeAdditions.put("storeSizeMb",storeSizeMb);
         storeAdditions.put("envNoSyncFlag",storeNoSync);
         storeAdditions.put("storeReindexing",dataStoreReindexing);
+        storeAdditions.put("externalKeyValueBufferUsed",externalKeyValueBufferUsed);
+        storeAdditions.put("storeKeySize",storeKeySize);
+        storeAdditions.put("storeValueSize",storeValueSize);
+        storeAdditions.put("storePendingBufferSize",storePendingBufferSize);
         DataStoreConfigurationJsonParser sparser = new DataStoreConfigurationJsonParser(DATA_STORE_CONFIG,this,storeAdditions,dataStoreProvider -> {
             try{
                 this.deploymentDataStoreProvider = dataStoreProvider;

@@ -28,7 +28,10 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
     //private int partitionNumber;
 
     private int storeSizeMb;
-
+    private int storeKeySize;
+    private int storeValueSize;
+    private int storePendingBufferSize;
+    private boolean externalKeyValueBufferUsed;
     private boolean envNoSyncFlag;
 
     private boolean storeReindexing;
@@ -44,6 +47,10 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         this.storeSizeMb = (int)additions.get("storeSizeMb");
         this.envNoSyncFlag = (boolean)additions.get("envNoSyncFlag");
         this.storeReindexing = (boolean)additions.get("storeReindexing");
+        this.storeKeySize = (int)additions.get("storeKeySize");
+        this.storeValueSize = (int)additions.get("storeValueSize");
+        this.storePendingBufferSize = (int)additions.get("storePendingBufferSize");
+        this.externalKeyValueBufferUsed = (boolean)additions.get("externalKeyValueBufferUsed");
         this.dataStoreProviderConfiguration = config;
         this.node = tx.node();
         this.dataBucketGroup = node.bucketName();
@@ -68,6 +75,10 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         properties.put("storeSizeMb",this.storeSizeMb);
         properties.put("envNoSyncFlag",envNoSyncFlag);
         properties.put("storeReindexing",storeReindexing);
+        properties.put("storeKeySize",storeKeySize);
+        properties.put("storeValueSize",storeValueSize);
+        properties.put("storePendingBufferSize",storePendingBufferSize);
+        properties.put("externalKeyValueBufferUsed",externalKeyValueBufferUsed);
         properties.put("dir",this.dataDir);
         properties.put("dailyBackup",dataStoreDailyBackup);
         properties.put("node",this.node);

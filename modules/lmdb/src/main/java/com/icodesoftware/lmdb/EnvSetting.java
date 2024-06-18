@@ -5,7 +5,7 @@ import com.icodesoftware.Distributable;
 public class EnvSetting {
 
     private static final long MB_1 = 1_048_576L;
-
+    public static final int MAX_LMDB_KEY_SIZE = 511;
     public static final int MAX_STORE_NUMBER = 1024;
     public static final int MAX_READER_NUMBER = 100;
     public static final int KEY_SIZE = 200;//less than 511

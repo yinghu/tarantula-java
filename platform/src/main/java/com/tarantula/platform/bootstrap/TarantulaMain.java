@@ -103,6 +103,7 @@ public class TarantulaMain {
 			TarantulaContext.operationRejectInterval = Long.parseLong(override(overriding,"tarantula.operation.reject.interval.ms",_user,_config));
 			btx.snowflakeNodeNumber = Integer.parseInt(override(overriding,"tarantula.snowflake.node.number",_user,_config));
 			btx.storeSizeMb = Integer.parseInt(override(overriding,"tarantula.data.store.size.mb",_user,_config));
+			btx.externalKeyValueBufferUsed = Boolean.parseBoolean(override(overriding,"tarantula.data.store.key.value.buffer.used",_user,_config));
 			btx.storeKeySize = Integer.parseInt(override(overriding,"tarantula.data.store.key.size",_user,_config));
 			btx.storeValueSize = Integer.parseInt(override(overriding,"tarantula.data.store.value.size",_user,_config));
 			btx.storePendingBufferSize = Integer.parseInt(override(overriding,"tarantula.data.store.pending.buffer.size",_user,_config));

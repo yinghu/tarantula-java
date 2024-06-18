@@ -45,10 +45,10 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     int maxDatabaseNumber = EnvSetting.MAX_STORE_NUMBER;
     int maxReaders = EnvSetting.MAX_READER_NUMBER;
 
-    final static int KEY_SIZE = EnvSetting.KEY_SIZE;
-    private final static int VALUE_SIZE = EnvSetting.VALUE_SIZE;
+    static int KEY_SIZE = EnvSetting.KEY_SIZE;
+    private static int VALUE_SIZE = EnvSetting.VALUE_SIZE;
 
-    private final static int PENDING_BUFFER_SIZE = EnvSetting.MAX_PENDING_BUFFER_NUMBER;
+    private static int PENDING_BUFFER_SIZE = EnvSetting.MAX_PENDING_BUFFER_NUMBER;
 
     boolean envNoSyncFlag = true;
     boolean storeReindexing;
@@ -72,6 +72,16 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         this.storeSize = EnvSetting.toBytesFromMb((int)properties.get("storeSizeMb"));
         this.envNoSyncFlag = (boolean)properties.get("envNoSyncFlag");
         this.storeReindexing = (boolean)properties.get("storeReindexing");
+        boolean externalKeyValueBufferUsed = (boolean)properties.get("externalKeyValueBufferUsed");
+        if(externalKeyValueBufferUsed){
+            logger.warn("External key size, value size and pending buffer size used");
+            int keySizeUsed = (int)properties.get("storeKeySize");
+            int valueSizeUsed = (int)properties.get("storeValueSize");
+            int bufferSizeUsed = (int)properties.get("storePendingBufferSize");
+            if(keySizeUsed>0 && keySizeUsed <= EnvSetting.MAX_LMDB_KEY_SIZE) KEY_SIZE = keySizeUsed;
+            if(valueSizeUsed>0 && valueSizeUsed <= 2032 ) VALUE_SIZE = valueSizeUsed;
+            if(bufferSizeUsed > EnvSetting.MAX_PENDING_BUFFER_NUMBER) PENDING_BUFFER_SIZE = bufferSizeUsed;
+        }
         dataEnv.envSetting = (EnvSetting) properties.get(EnvSetting.data);
         integrationEnv.envSetting = (EnvSetting) properties.get(EnvSetting.integration);
         indexEnv.envSetting = (EnvSetting) properties.get(EnvSetting.index);
