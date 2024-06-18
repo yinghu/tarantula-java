@@ -33,7 +33,7 @@ public class TournamentSegment {
         snapshot = sorted;
     }
 
-    public Tournament.RaceBoard myRaceBoard(long systemId,long entryId){
+    public TournamentRaceBoard myRaceBoard(long systemId,long entryId){
         TournamentEntry me = playerIndex.get(systemId);
         if(me==null || me.distributionId() != entryId ) return new TournamentRaceBoard();
         List<Tournament.Entry> board = new ArrayList<>();
