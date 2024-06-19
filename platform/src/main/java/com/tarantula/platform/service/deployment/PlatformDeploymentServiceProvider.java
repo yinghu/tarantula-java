@@ -693,9 +693,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         LobbyDescriptor lobbyDescriptor = new LobbyDescriptor();
         lobbyDescriptor.distributionId(query.lobbyId());
-        if(!ds.load(lobbyDescriptor)||!lobbyDescriptor.disabled()){
-            return false;
-        }
+        //if(!ds.load(lobbyDescriptor) || !lobbyDescriptor.disabled()){
+            //return false;
+        //}
         lobbyDescriptor.disabled(false);
         ds.update(lobbyDescriptor);
         return true;
@@ -709,9 +709,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         LobbyDescriptor lobbyDescriptor = new LobbyDescriptor();
         lobbyDescriptor.distributionId(query.lobbyId());
-        if(!ds.load(lobbyDescriptor)||lobbyDescriptor.disabled()){
-            return false;
-        }
+        //if(!ds.load(lobbyDescriptor) || lobbyDescriptor.disabled()){
+            //return false;
+        //}
         lobbyDescriptor.disabled(true);
         ds.update(lobbyDescriptor);
         return true;
@@ -720,35 +720,47 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     boolean enableGameCluster(long gameClusterId){
         GameCluster gameCluster = this.tarantulaContext.loadGameCluster(gameClusterId);
         DataStore mds = this.tarantulaContext.masterDataStore();
+        mds.load(gameCluster);
         if(gameCluster==null){
+            log.warn("Should be a null game cluster");
+            return false;
+        }
+        if(!gameCluster.disabled()){
+            log.warn("Game cluster already running");
             return false;
         }
         String data = gameCluster.gameDataName;//1
         String lobby = gameCluster.gameLobbyName;//2
         String service = gameCluster.gameServiceName;//3
-        boolean suc1 = enableLobby(data);
-        boolean suc2 = enableLobby(lobby);
-        boolean suc3 = enableLobby(service);
+        if(!enableLobby(data)) return false;
+        if(!enableLobby(lobby)) return false;
+        if(!enableLobby(service)) return false;
         gameCluster.disabled(false);
         mds.update(gameCluster);
-        return suc1 && suc2 && suc3;//make sure all enabled
+        return true;//make sure all enabled
     }
 
     boolean disableGameCluster(long gameClusterId){
         GameCluster gameCluster = this.tarantulaContext.loadGameCluster(gameClusterId);
         DataStore mds = this.tarantulaContext.masterDataStore();
+        mds.load(gameCluster);
         if(gameCluster==null){
+            log.warn("Should be a null game cluster");
+            return false;
+        }
+        if(gameCluster.disabled()){
+            log.warn("Game cluster already shut down");
             return false;
         }
         String data = gameCluster.gameDataName;//1
         String lobby = gameCluster.gameLobbyName;//2
         String service = gameCluster.gameServiceName;//3
-        boolean suc1 = disableLobby(data);
-        boolean suc2 = disableLobby(lobby);
-        boolean suc3 = disableLobby(service);
+        if(!disableLobby(data)) return false;
+        if(!disableLobby(lobby)) return false;
+        if(!disableLobby(service)) return false;
         gameCluster.disabled(true);
         mds.update(gameCluster);
-        return suc1 && suc2 && suc3;
+        return true;
     }
 
     public NodeShutdownOperator nodeShutdownOperator(Access access){
