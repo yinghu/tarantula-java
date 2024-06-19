@@ -68,23 +68,7 @@ public class TarantulaMain {
 				overriding = false;
 			}
 
-			// This block uses the hostname to generate node id for both bucket and snowflake config
-			// This allows us to not need to specify unique config for every node
-			try {
-				var useHostname = System.getenv("USE_HOSTNAME");
-				if(useHostname.equals("true"))
-				{
-					var hostname = System.getenv("HOSTNAME");
-					log.info("Hostname is " + hostname);
-
-					var indexStr = hostname.substring(hostname.lastIndexOf('-') + 1);
-					var index = Integer.parseInt(indexStr);
-					indexStr = String.format("%02d", index);
-					
-					_user.setProperty("tarantula.data.bucket.node", "N" + indexStr);
-					_user.setProperty("tarantula.snowflake.node.number", indexStr);
-				}
-			} catch (Exception ignored) {}
+			findEnvironmentOverrides(_user);
 
 			TarantulaContext btx = TarantulaContext.getInstance();
 			TarantulaContext.memberDiscovery = (ScopedMemberDiscovery) Class.forName(override(overriding,"tarantula.member.discovery.name",_user,_config)).getConstructor().newInstance();
@@ -157,6 +141,48 @@ public class TarantulaMain {
 			FileWriter fw = new FileWriter("tarantula.pid");
 			fw.write(""+ProcessHandle.current().pid());
 			fw.close();
+		}
+
+		private void findEnvironmentOverrides(Properties _user) throws Exception {
+			// This block uses the hostname to generate node id for both bucket and snowflake config
+			try {
+				var useHostname = System.getenv("USE_HOSTNAME");
+				if(useHostname.equals("true"))
+				{
+					var hostname = System.getenv("HOSTNAME");
+					log.info("Hostname is " + hostname);
+
+					var indexStr = hostname.substring(hostname.lastIndexOf('-') + 1);
+					var index = Integer.parseInt(indexStr);
+					indexStr = String.format("%02d", index);
+					
+					_user.setProperty("tarantula.data.bucket.node", "N" + indexStr);
+					_user.setProperty("tarantula.snowflake.node.number", indexStr);
+				}
+			} catch (Exception ignored) {}
+
+			try {
+				parseEnvVar(_user, "TARANTULA_DATA_STORE_DIR", "tarantula.data.store.dir");
+				parseEnvVar(_user, "TARANTULA_DATA_STORE_SIZE", "tarantula.data.store.size.mb");
+
+				parseEnvVar(_user, "TARANTULA_SERVICE_DEPLOY_DIR", "tarantula.service.deployment.dir");
+
+				parseEnvVar(_user, "TARANTULA_KUBERNETES_ENABLED", "tarantula.member.discovery.kubernetes.enabled");
+				parseEnvVar(_user, "TARANTULA_KUBERNETES_NAME", "tarantula.member.discovery.kubernetes.service.name");
+
+				parseEnvVar(_user, "TARANTULA_AUTH_CONTEXT", "tarantula.auth.context");
+				parseEnvVar(_user, "TARANTULA_CLUSTER_SUFFIX", "tarantula.cluster.name.suffix");
+			} catch (Exception ignored) {}
+		}
+
+		private boolean parseEnvVar(Properties _user, String envName, String propertiesName) {
+			var envVar = System.getenv(envName);
+			if(envVar != null && !envVar.isEmpty()) {
+				log.info("Using Environment Override for " + propertiesName + " = " + envVar);
+				_user.setProperty(propertiesName, envVar);
+				return true;
+			}
+			return false;
 		}
 
 		public void shutdown() throws Exception{

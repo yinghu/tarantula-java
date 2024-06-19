@@ -20,7 +20,15 @@ EXPOSE 8090
 
 ENV USE_HOSTNAME=true
 
+ENV TARANTULA_DATA_STORE_SIZE=10000
+ENV TARANTULA_DATA_STORE_DIR=/tarantula/data
+ENV TARANTULA_SERVICE_DEPLOY_DIR=/tarantula/deploy
+ENV TARANTULA_AUTH_CONTEXT=production
+
+ENV TARANTULA_KUBERNETES_ENABLED=true
+ENV TARANTULA_KUBERNETES_NAME=gameserver
+
 VOLUME /tarantula
 
 WORKDIR /platform/bin
-ENTRYPOINT ["java", "-server", "-Xms24g", "-Xmx24g", "-XX:+UseG1GC", "-XX:MaxGCPauseMillis=200", "-XX:ParallelGCThreads=20", "-XX:ConcGCThreads=5", "-XX:InitiatingHeapOccupancyPercent=70", "--add-modules", "java.se", "--add-exports", "java.base/jdk.internal.ref=ALL-UNNAMED", "--add-opens", "java.base/java.lang=ALL-UNNAMED", "--add-opens", "java.base/java.nio=ALL-UNNAMED", "--add-opens", "java.base/sun.nio.ch=ALL-UNNAMED", "--add-opens", "java.management/sun.management=ALL-UNNAMED", "--add-opens", "jdk.management/com.sun.management.internal=ALL-UNNAMED", "-classpath", "../lib/*:../conf:../deploy:../web", "com.tarantula.platform.bootstrap.TarantulaMain"]
+ENTRYPOINT ["java", "-server", "-Xms2g", "-Xmx24g", "-XX:+UseG1GC", "-XX:MaxGCPauseMillis=200", "-XX:ParallelGCThreads=20", "-XX:ConcGCThreads=5", "-XX:InitiatingHeapOccupancyPercent=70", "--add-modules", "java.se", "--add-exports", "java.base/jdk.internal.ref=ALL-UNNAMED", "--add-opens", "java.base/java.lang=ALL-UNNAMED", "--add-opens", "java.base/java.nio=ALL-UNNAMED", "--add-opens", "java.base/sun.nio.ch=ALL-UNNAMED", "--add-opens", "java.management/sun.management=ALL-UNNAMED", "--add-opens", "jdk.management/com.sun.management.internal=ALL-UNNAMED", "-classpath", "../lib/*:../conf:../deploy:../web", "com.tarantula.platform.bootstrap.TarantulaMain"]
