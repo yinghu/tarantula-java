@@ -408,6 +408,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         if(this.enableGameCluster(gameCluster.distributionId()) && deployService.onStartGameService(gameCluster.distributionId())){
+            log.warn("Launching game cluster->"+gameCluster.distributionId());
             return tarantulaContext.integrationCluster().deployService().onLaunchGameCluster(gameCluster.distributionId());
         }
         else{
@@ -417,7 +418,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public <T extends OnAccess> boolean shutdownGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         if(this.disableGameCluster(gameCluster.distributionId())){
-            log.warn("close game cluster->"+gameCluster.distributionId());
+            log.warn("Shutting down game cluster->"+gameCluster.distributionId());
             return deployService.onShutdownGameCluster(gameCluster.distributionId());
         }
         else{
@@ -730,7 +731,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         boolean suc3 = enableLobby(service);
         gameCluster.disabled(false);
         mds.update(gameCluster);
-        return suc1&&suc2&&suc3;//make sure all enabled
+        return suc1 && suc2 && suc3;//make sure all enabled
     }
 
     boolean disableGameCluster(long gameClusterId){
@@ -747,7 +748,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         boolean suc3 = disableLobby(service);
         gameCluster.disabled(true);
         mds.update(gameCluster);
-        return suc1&&suc2&&suc3;
+        return suc1 && suc2 && suc3;
     }
 
     public NodeShutdownOperator nodeShutdownOperator(Access access){
