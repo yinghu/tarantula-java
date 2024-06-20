@@ -14,7 +14,9 @@
   "savedGame":{
       "saveSize": 3,
       "saveTimeout": 1,
-      "mappingObjectMaxSize": 2000
+      "mappingObjectMaxSize": 2000,
+      "oversizePayloadMaxBatchSize": 12,
+      "oversizePayloadReadRetryNumber": 2
   },
   "inbox": {
       "pendingReward": true
