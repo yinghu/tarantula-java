@@ -312,8 +312,30 @@
         </div>
         <div id="tx-Sudo" class="w3-container tx-pane" style="display:none;">
             <div id='tx-extension-open'>
+                
                 <div class="w3-panel w3-border-bottom w3-border-red">
-                    <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Configuration Operations</span></div>
+                    <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Management Operations</span></div>
+                    <div class='w3-bar w3-white'>
+                        <span view-id='find.user' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Find Access Index</span>
+                        <span view-id='metrics.list' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Metrics</span>
+                    </div>            
+                </div>
+
+                <div class="w3-panel w3-border-bottom w3-border-red">
+                    <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Data Store Operations</span></div>
+                    <div class='w3-bar w3-white'>
+                        <span view-id='data.store.count.list' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Data Store List</span>
+                        <span view-id='data.store.backup' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Data Store Backup</span>
+                        <!--
+                        <span view-id='access.index.store' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Access Index Store</span> 
+                        <span view-id='key.index.store' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Key Index Store</span>
+                        <span view-id='metrics.list' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Metrics</span>
+                        -->
+                    </div>            
+                </div>
+                
+                <div class="w3-panel w3-border-bottom w3-border-red">
+                    <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Cluster Operations</span></div>
                     <div class='w3-bar w3-white'>
                         <span view-id='stop.access.index' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Stop Access Index</span>
                         <span view-id='start.access.index' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Start Access Index</span>    
@@ -325,28 +347,12 @@
                         <span view-id='disable.presence.service' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Disable Presence Service</span>
                         -->
                         <span view-id='reset.cluster.key' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Reset Cluster Key</span>
+                        <span view-id='cluster.list' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Cluster</span>
                     </div>            
                 </div>
                 
-                <div class="w3-panel w3-border-bottom w3-border-red">
-                    <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">System Operations</span></div>
-                    <div class='w3-bar w3-white'>
-                        <span view-id='data.store.count.list' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Data Store List</span>
-                        <span view-id='data.store.backup' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Data Store Backup</span>
-                        <!--
-                        <span view-id='access.index.store' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Access Index Store</span> 
-                        <span view-id='key.index.store' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Key Index Store</span>
-                        -->
-                        <span view-id='cluster.list' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Cluster</span>
-                        <span view-id='metrics.list' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Metrics</span>
-                    </div>            
-                </div>
-                <div class="w3-panel w3-border-bottom w3-border-red">
-                    <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Access Index Management Operations</span></div>
-                    <div class='w3-bar w3-white'>
-                        <span view-id='find.user' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Find Access Index</span>
-                    </div>            
-                </div>
+                
+                <!--
                 <div class="w3-panel w3-border-bottom w3-border-red">
                     <div class="w3-panel w3-green tx-padding-title"><span class="tx-text-14">Web View Operations</span></div>
                     <div class='w3-bar w3-white'>
@@ -354,7 +360,7 @@
                         <span view-id='upload.view' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Upload File</span>
                         <span view-id='deploy.resource' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4 tx-action'>Deploy Resource</span>
                     </div>            
-                </div>
+                </div>-->
             </div>
             <div class="w3-display-container w3-white tx-content-16"></div>
             <div id='tx-extension-warning' class="w3-container w3-center"><p class="tx-text-12 w3-text-red">Only super user can access sudo permission resources.</p></div>
