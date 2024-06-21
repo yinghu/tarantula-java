@@ -9,12 +9,17 @@ import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
 
 import javax.crypto.Cipher;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Base64;
 import java.util.concurrent.CountDownLatch;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class Player implements Runnable{
 
@@ -447,8 +452,8 @@ public class Player implements Runnable{
                 Session.TARANTULA_NAME,key
         };
         long requestStart = System.currentTimeMillis();
-        JsonObject jsonObject = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(key+".json"));
-        String resp = httpCaller.post("service/action",jsonObject.toString().getBytes(),headers);
+        byte[] payload = compress(Thread.currentThread().getContextClassLoader().getResourceAsStream(key+".json"));
+        String resp = httpCaller.post("service/action",payload,headers);
         long delta = System.currentTimeMillis()-requestStart;
         RequestResult result = LoadResult.requestResult("onSet");
         LoadResult.totalHttpRequestTime.addAndGet(delta);
@@ -478,8 +483,7 @@ public class Player implements Runnable{
         LoadResult.totalHttpRequestTime.addAndGet(delta);
         LoadResult.totalHttpRequestCount.incrementAndGet();
         RequestResult result = LoadResult.requestResult("onGet");
-        //JsonObject json = JsonUtil.parse(resp);
-        boolean suc = resp.length()>2000;
+        boolean suc = decompress(resp.getBytes());
         if(!suc) {
             result.totalFailure.incrementAndGet();
             result.totalTimed.addAndGet(delta);
@@ -619,6 +623,39 @@ public class Player implements Runnable{
         }else{
             result.totalSuccess.incrementAndGet();
         }
+    }
+
+    private byte[] compress(InputStream inputStream) throws Exception{
+        if(!Main.saveDataCompressed){
+            return JsonUtil.parse(inputStream).toString().getBytes();
+        }
+        ByteArrayOutputStream fos = new ByteArrayOutputStream();
+        try(GZIPOutputStream gzipOS = new GZIPOutputStream(fos);inputStream){
+            byte[] buffer = new byte[1024];
+            int len;
+            while((len =inputStream.read(buffer)) != -1){
+                gzipOS.write(buffer, 0, len);
+            }
+        }
+        return Base64.getEncoder().encode(fos.toByteArray());
+    }
+    private boolean decompress(byte[] payload) throws Exception{
+        JsonObject jsonObject = JsonUtil.parse(payload);
+        if(!Main.saveDataCompressed){
+            return jsonObject.get("Successful").getAsBoolean();
+        }
+        if(!jsonObject.get("Successful").getAsBoolean()) return false;
+        byte[] base64 = Base64.getDecoder().decode(jsonObject.get("message").getAsString());
+        ByteArrayOutputStream fos = new ByteArrayOutputStream();
+        try(ByteArrayInputStream fis = new ByteArrayInputStream(base64);GZIPInputStream gis = new GZIPInputStream(fis)){
+            byte[] buffer = new byte[1024];
+            int len;
+            while((len = gis.read(buffer)) != -1){
+                fos.write(buffer, 0, len);
+            }
+        }
+        JsonUtil.parse(fos.toByteArray());
+        return true;
     }
 
 }
