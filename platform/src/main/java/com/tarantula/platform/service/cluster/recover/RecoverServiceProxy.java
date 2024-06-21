@@ -13,7 +13,6 @@ import com.tarantula.platform.event.TransactionReplicationEvent;
 import com.tarantula.platform.service.cluster.ClusterDataView;
 import com.tarantula.platform.service.cluster.ClusterUtil;
 import com.tarantula.platform.service.cluster.DistributionReplicator;
-import com.tarantula.platform.service.cluster.accessindex.AccessIndexReplicationOperation;
 
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -127,6 +126,7 @@ public class RecoverServiceProxy extends AbstractDistributedObject<ClusterRecove
             }
         }
         return expected;
+
     }
     public boolean onDeleteEdge(String source,String label,byte[] key){
         NodeEngine nodeEngine = getNodeEngine();
