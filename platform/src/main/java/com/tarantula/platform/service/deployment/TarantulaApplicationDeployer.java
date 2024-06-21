@@ -63,6 +63,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 			if(gameCluster.disabled()){
 				logger.warn("Game cluster is disabled ["+gameCluster.disabled()+"]");
 				return;
+
 			}
 			this.context.setGameServiceProvider(gameCluster);
 			this.context.setGameClusterOnLobby(gameCluster,this);
