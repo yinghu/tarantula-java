@@ -36,7 +36,7 @@ public class Main {
 
     static String inventoryKey = "inventory";
     static String campaignKey = "campaign";
-
+    static boolean saveDataCompressed;
     public static void vmain(String[] args) throws Exception{
         HttpCaller httpCaller = new HttpCaller("http://localhost:8090");
         httpCaller._init();
@@ -80,6 +80,7 @@ public class Main {
         boolean scheduledPlay = Boolean.parseBoolean(properties.getProperty("scheduled.play"));
         httpRequestInterval = Long.parseLong(properties.getProperty("http.request.interval.ms"));
         accessKey = properties.getProperty("access.key");
+        saveDataCompressed = Boolean.parseBoolean(properties.getProperty("save.data.compressed"));
         boolean usePlayerPrefix = Boolean.parseBoolean(properties.getProperty("use.player.prefix"));
         String playerPrefix = properties.getProperty("player.prefix");
         boolean udpTested = Boolean.parseBoolean(properties.getProperty("test.udp"));

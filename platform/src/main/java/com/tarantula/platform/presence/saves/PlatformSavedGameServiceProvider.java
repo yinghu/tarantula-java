@@ -174,7 +174,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         int chunkSize = chunks.size();
         if(chunkSize > maxOverSizeBatch){
             //throw new RuntimeException("oversize payload reached max chunk size ["+chunks.size()+"]");
-            logger.warn("Chunk size : "+chunks+" is over max batch size : "+mappingObjectMaxSize);
+            logger.warn("Chunk size : "+chunkSize +" is over max batch size : "+maxOverSizeBatch);
         }
         Transaction transaction = gameCluster.transaction();
         try{
@@ -182,13 +182,12 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
                 ApplicationPreSetup preSetup = (ApplicationPreSetup)ctx;
                 DataStore saveDataStore = preSetup.onDataStore(NAME);
                 OversizeDataIndex index = OversizeDataIndex.createIfNotExisted(saveDataStore,session,chunkSize);
-                saveDataStore.list(new OversizeDataQuery(SnowflakeKey.from(index.distributionId()),key),(chunk)->{
+                saveDataStore.list(new OversizeDataQuery(SnowflakeKey.from(index.distributionId()),key)).forEach((chunk)->{
                     byte[] pending = chunks.remove(chunk.batch);
                     if(pending!=null){
                         chunk.value(pending);
                         saveDataStore.update(chunk);
                     }
-                    return true;
                 });
                 chunks.forEach((k,v)->{
                     BatchedMappingObject batchedMappingObject = new BatchedMappingObject(key);
@@ -206,7 +205,10 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
 
     public byte[] loadData(Session session, String key){
         OversizeDataIndex indexed = OversizeDataIndex.load(dataStore,session);
-        if(indexed==null) return null;
+        if(indexed==null){
+            logger.warn("Over-sized data index not ready for load ["+key+"]");
+            return null;
+        }
         HashMap<Integer,BatchedMappingObject> batchData = new HashMap<>();
         boolean loaded = false;
         for(int i=0; i<oversizePayloadReadRetryNumber; i++){
