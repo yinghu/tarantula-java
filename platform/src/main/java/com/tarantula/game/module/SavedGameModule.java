@@ -36,7 +36,7 @@ public class SavedGameModule extends ModuleHeader {
             byte[] data = this.savedGameServiceProvider.loadData(session,session.name());
             session.write(JsonUtil.toSimpleResponse(
                     data != null,
-                    data == null ? session.name() : new String(data)
+                    data == null ? session.name() : new String(data)//need to use byte array directly down to wire
             ).getBytes());
         }
         else if(session.action().equals("onReset")){
