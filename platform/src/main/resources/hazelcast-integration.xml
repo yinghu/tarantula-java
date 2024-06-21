@@ -31,15 +31,6 @@
                 <member>10.142.0.2:5702</member>
             </tcp-ip>
             <aws enabled="false"></aws>
-            <discovery-strategies>
-                <discovery-strategy enabled="true" class="com.tarantula.platform.service.cluster.TarantulaDiscoveryStrategy">
-                    <properties>
-                        <property name="tarantula-port">5702</property>
-                        <property name="tarantula-scope">2</property>
-                    </properties>
-                </discovery-strategy>
-            </discovery-strategies>
-
         </join>
     </network>
     <services>

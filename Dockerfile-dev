@@ -18,6 +18,16 @@ FROM gcr.io/distroless/java21:debug
 COPY --from=build /app/platform/target/release/gec-platform-2.0-bin/gec-platform-2.0 /platform
 EXPOSE 8090
 
+ENV USE_HOSTNAME=true
+
+ENV TARANTULA_DATA_STORE_SIZE=2000
+ENV TARANTULA_DATA_STORE_DIR=/tarantula/data
+ENV TARANTULA_SERVICE_DEPLOY_DIR=/tarantula/deploy
+ENV TARANTULA_AUTH_CONTEXT=localhost
+
+ENV TARANTULA_KUBERNETES_ENABLED=false
+ENV TARANTULA_KUBERNETES_NAME=gameserver
+
 VOLUME /tarantula
 
 WORKDIR /platform/bin
