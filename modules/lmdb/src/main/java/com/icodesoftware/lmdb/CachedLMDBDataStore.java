@@ -362,7 +362,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         dbi.close();
     }
 
-    //BACKUP METHODs
+    //BACKUP METHODS
     public boolean get(Recoverable.Key key, BufferStream buffer) {
         try(final Recoverable.DataBufferPair cache = lmdbDataStoreProvider.dataBufferPair()){
             Recoverable.DataBuffer akey = cache.key();

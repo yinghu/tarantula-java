@@ -9,7 +9,8 @@ public class EnvSetting {
     public static final int MAX_STORE_NUMBER = 1024;
     public static final int MAX_READER_NUMBER = 100;
     public static final int KEY_SIZE = 200;//less than 511
-    public static final int VALUE_SIZE = 1500; //less than 1521
+    //NOTES : key+value (4096-16)/2-8< 2032 bytes ( 200 bytes for key ; value <= 1832 bytes (2032 - 200)
+    public static final int VALUE_SIZE = 1832; //less than 1832
     public static final int MAX_PENDING_BUFFER_NUMBER = 32;
 
     public static final String data ="data";

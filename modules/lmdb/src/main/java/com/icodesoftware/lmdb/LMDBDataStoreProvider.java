@@ -297,6 +297,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
             System.exit(0);
         }
         logger.warn("LMDB Provider started with store size ["+storeSize+"] queue side ["+pendingQueue.size()+"] store no sync mode ["+envNoSyncFlag+"] reindexing ["+storeReindexing+"]");
+        logger.warn("LMDB Provider using key/value size ["+KEY_SIZE+"/"+VALUE_SIZE+"]");
     }
 
     @Override
