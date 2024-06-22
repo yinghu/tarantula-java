@@ -388,14 +388,14 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
                 return;
             }
             try(final Txn<ByteBuffer> txn = env.txnRead();Cursor<ByteBuffer> cursor = localEdgeDataStore.openCursor(txn)){
-                //try(Cursor<ByteBuffer> cursor = localEdgeDataStore.openCursor(txn)){
-                    if(cursor.get(cache.key().flip(),GetOp.MDB_SET)){
-                        if(cursor.seek(SeekOp.MDB_FIRST_DUP)) bufferStream.on(cache.key(),BufferProxy.buffer(cursor.val()));
-                        while (cursor.seek(SeekOp.MDB_NEXT_DUP)){
-                            bufferStream.on(cache.key(),BufferProxy.buffer(cursor.val()));
-                        }
+
+                if(cursor.get(cache.key().flip(),GetOp.MDB_SET)){
+                    if(cursor.seek(SeekOp.MDB_FIRST_DUP)) bufferStream.on(cache.key(),BufferProxy.buffer(cursor.val()));
+                    while (cursor.seek(SeekOp.MDB_NEXT_DUP)){
+                        bufferStream.on(cache.key(),BufferProxy.buffer(cursor.val()));
                     }
-                //}
+                }
+
             }
         }
     }
@@ -407,17 +407,17 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
                 return;
             }
             try(final Txn<ByteBuffer> txn = env.txnRead();Cursor<ByteBuffer> cursor = localEdgeDataStore.openCursor(txn)){
-                //try(Cursor<ByteBuffer> cursor = localEdgeDataStore.openCursor(txn)){
-                    if(cursor.get(cache.key().flip(),GetOp.MDB_SET)){
-                        if(cursor.seek(SeekOp.MDB_FIRST_DUP)){
-                            if(dbi.get(txn,cursor.val()) !=null) bufferStream.on(BufferProxy.buffer(cursor.val().rewind()),BufferProxy.buffer(txn.val()));
-                        }
-                        while (cursor.seek(SeekOp.MDB_NEXT_DUP)){
-                            if(dbi.get(txn,cursor.val()) ==null) continue;
-                            bufferStream.on(BufferProxy.buffer(cursor.val().rewind()),BufferProxy.buffer(txn.val()));
-                        }
+
+                if(cursor.get(cache.key().flip(),GetOp.MDB_SET)){
+                    if(cursor.seek(SeekOp.MDB_FIRST_DUP)){
+                        if(dbi.get(txn,cursor.val()) !=null) bufferStream.on(BufferProxy.buffer(cursor.val().rewind()),BufferProxy.buffer(txn.val()));
                     }
-                //}
+                    while (cursor.seek(SeekOp.MDB_NEXT_DUP)){
+                        if(dbi.get(txn,cursor.val()) ==null) continue;
+                        bufferStream.on(BufferProxy.buffer(cursor.val().rewind()),BufferProxy.buffer(txn.val()));
+                    }
+                }
+
             }
         }
     }
@@ -437,7 +437,6 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(scope,name,label);
         try(final Txn<ByteBuffer> txn = env.txnWrite();Recoverable.DataBufferPair cache = lmdbDataStoreProvider.dataBufferPair()){
             if(!bufferStream.on(cache.key(),cache.value())) return false;
-            //if(!localEdgeDataStore.dbi.put(txn,cache.key().flip(),cache.value().flip())) return false;
             if(!localEdgeDataStore.addEdge(txn,cache.key().flip(),cache.value().flip())) return false;
             txn.commit();
             return true;
@@ -452,11 +451,9 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             Recoverable.DataBuffer value = cache.value();
             if(!bufferStream.on(key,value)) return false;
             if(fromLabel){
-                //if(!localEdgeDataStore.dbi.delete(txn,key.flip())) return false;
                 if(!localEdgeDataStore.deleteEdge(txn,key.flip())) return false;
             }
             else {
-                //if (!localEdgeDataStore.dbi.delete(txn, key.flip(), value.flip())) return false;
                 if(!localEdgeDataStore.deleteEdge(txn,key.flip(),value.flip())) return false;
             }
             txn.commit();
