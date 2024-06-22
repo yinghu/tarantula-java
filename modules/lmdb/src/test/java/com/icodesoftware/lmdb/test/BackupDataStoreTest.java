@@ -249,6 +249,7 @@ public class BackupDataStoreTest extends LMDBHook{
             user.password("password111");
             user.writeKey(k);
             Recoverable.DataHeader header = new LocalHeader(user.revision(), user.getFactoryId(), user.getClassId());
+            //header.update(2);
             v.writeHeader(header);
             user.write(v);
             return true;
@@ -264,6 +265,7 @@ public class BackupDataStoreTest extends LMDBHook{
                     user.password("password222");
                     user.writeKey(k);
                     Recoverable.DataHeader header = new LocalHeader(user.revision(), user.getFactoryId(), user.getClassId());
+                    //header.update(2);
                     v.writeHeader(header);
                     user.write(v);
                     return true;

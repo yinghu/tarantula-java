@@ -321,7 +321,22 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             Recoverable.DataBuffer key = cache.key();
             Recoverable.DataBuffer value = cache.value();
             if(!bufferStream.on(key,value)) return false;
-            return set(key.flip(),value.flip());
+            try(final Txn<ByteBuffer> txn = env.txn(ptxn)) {
+                if(dbi.get(txn,key.flip())==null){
+                    if(!dbi.put(txn,key.rewind(),value.flip())) return false;
+                    txn.commit();
+                    return true;
+                }
+                Recoverable.DataBuffer existed = BufferProxy.buffer(txn.val());
+                Recoverable.DataHeader existingHeader = existed.readHeader();
+                value.flip();
+                Recoverable.DataHeader header = value.readHeader();
+                if(header.revision() < existingHeader.revision()) return false;
+
+                if(!dbi.put(txn,key.rewind(),value.rewind())) return false;
+                txn.commit();
+                return true;
+            }
         }
     }
 
