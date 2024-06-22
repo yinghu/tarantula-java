@@ -77,7 +77,6 @@ public class TarantulaMain {
 			findEnvironmentOverrides(_user);
 
 			TarantulaContext btx = TarantulaContext.getInstance();
-			TarantulaContext.memberDiscovery = (ScopedMemberDiscovery) Class.forName(override(overriding,"tarantula.member.discovery.name",_user,_config)).getConstructor().newInstance();
 			TarantulaContext.operationTimeout = Integer.parseInt(override(overriding,"tarantula.operation.timeout.seconds",_user,_config));
 			TarantulaContext.lobbySubscriptionEnabled  = Boolean.parseBoolean(override(overriding,"tarantula.lobby.subscription.enabled",_user,_config));
 			TarantulaContext.operationRetries = Integer.parseInt(override(overriding,"tarantula.operation.retries",_user,_config));

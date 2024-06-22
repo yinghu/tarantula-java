@@ -26,10 +26,7 @@
         <port auto-increment="false">5702</port>
         <join>    
         	<multicast enabled="false"></multicast>
-            <tcp-ip enabled="false">
-                <member>10.142.0.5:5702</member>
-                <member>10.142.0.2:5702</member>
-            </tcp-ip>
+            <tcp-ip enabled="false"/>
             <aws enabled="false"></aws>
         </join>
     </network>

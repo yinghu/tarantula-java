@@ -147,7 +147,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public int maxReplicationNumber = 3;
 
-    public static ScopedMemberDiscovery memberDiscovery;
     public static int operationTimeout = 5;
     public static boolean lobbySubscriptionEnabled = false;
 
@@ -252,7 +251,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         else{
             DiscoveryStrategyConfig discoveryStrategyConfig = new DiscoveryStrategyConfig("com.tarantula.platform.service.cluster.TarantulaDiscoveryStrategy");
             discoveryStrategyConfig.addProperty("tarantula-port", "5702");
-            discoveryStrategyConfig.addProperty("tarantula-scope", "2");
             hazelcastJoin.getDiscoveryConfig().addDiscoveryStrategyConfig(discoveryStrategyConfig);
         }
         this.integrationCluster = new IntegrationCluster(gcfg,this.dataBucketGroup,this);
@@ -631,10 +629,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
          return this.node;
     }
 
-    public static MemberDiscovery memberDiscovery(int scope){
- 	    memberDiscovery.scope(scope);
- 	    return memberDiscovery;
-    }
+
     public void atMidnight() {
  	    try{
             serviceProviders.forEach((k,v)->{
