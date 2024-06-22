@@ -553,7 +553,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             if(!ownerKey.write(key)) return false;
             if(!edgeKey.write(value)) return false;
             LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(scope,name,label);
-            //if(!localEdgeDataStore.dbi.put(txn,key.flip(),value.flip(), PutFlags.MDB_NODUPDATA)) return false;//no duplicate entry
+
             if(!localEdgeDataStore.addEdge(txn,key.flip(),value.flip())) return false;
             key.rewind();
             value.rewind();
@@ -569,7 +569,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             if(!t.write(key)) return false;
             if(!edge.write(value)) return false;
             LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(scope,name,label);
-            //if(!localEdgeDataStore.dbi.delete(txn,key.flip(),value.flip())) return false;
+
             if(!localEdgeDataStore.deleteEdge(txn,key.flip(),value.flip())) return false;
             key.rewind();
             value.rewind();
@@ -583,7 +583,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             Recoverable.DataBuffer key = cache.key();
             if(!t.write(key)) return false;
             LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(scope,name,label);
-            //if(!localEdgeDataStore.dbi.delete(txn,key.flip())) return false;
+
             if(!localEdgeDataStore.deleteEdge(txn,key.flip())) return false;
             key.rewind();
             this.lmdbDataStoreProvider.onDeleting(localEdgeDataStore.metadata(),key,null,txn.getId());
