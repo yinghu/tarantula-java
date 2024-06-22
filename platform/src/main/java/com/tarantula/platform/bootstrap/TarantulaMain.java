@@ -10,7 +10,6 @@ import com.icodesoftware.util.OSUtil;
 import com.tarantula.licensing.Validator;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
-import com.tarantula.platform.service.cluster.ScopedMemberDiscovery;
 
 public class TarantulaMain {
 	static {
