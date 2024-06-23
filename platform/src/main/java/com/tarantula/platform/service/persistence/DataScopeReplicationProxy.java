@@ -119,16 +119,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy implements
 
     @Override
     public void onTransactionLog(TransactionLog transactionLog) {
-        serviceContext.schedule(new ScheduleRunner(100,()->{
-            try {
-                String[] headers = new String[]{
-                        Session.TARANTULA_ACTION,"onLog"
-                };
-                logger.warn(serviceContext.httpClientProvider().post("http://10.0.0.20:8091", "log", headers, transactionLog.toBinary()));
-            }catch (Exception ex){
-                logger.error("err",ex);
-            }
-            }));
+        super.onHomingAgent(transactionLog);
         if(!transactionLog.deleting) return;
         logger.warn("Deleting from : "+transactionLog.source+" : "+transactionLog.edgeLabel+" : "+transactionLog.updatingRevision);
         DataStore dataStore = serviceContext.dataStore(scope,transactionLog.source);

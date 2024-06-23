@@ -30,8 +30,8 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
 
     public boolean dailyBackupEnabled;
     public String dataStoreDirectory;
-
-
+    public boolean homingAgentEnabled;
+    public String homingAgentHost;
     public ClusterNode(String bucketName, String nodeName,int partitionNumber,int bucketNumber){
         this.bucketName = bucketName;
         this.nodeName = nodeName;
@@ -105,6 +105,14 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     public boolean dailyBackupEnabled(){ return this.dailyBackupEnabled;}
     public String dataStoreDirectory(){
         return this.dataStoreDirectory;
+    }
+    public boolean homingAgentEnabled(){
+        return homingAgentEnabled;
+    }
+
+    @Override
+    public String homingAgentHost() {
+        return homingAgentHost;
     }
 
     @Override

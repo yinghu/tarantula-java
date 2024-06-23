@@ -76,8 +76,6 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy imp
     @Override
     public void onTransactionLog(TransactionLog transactionLog) {
         //operations on original data store
-        serviceContext.schedule(new ScheduleRunner(100,()->{
-
-        }));
+        super.onHomingAgent(transactionLog);
     }
 }

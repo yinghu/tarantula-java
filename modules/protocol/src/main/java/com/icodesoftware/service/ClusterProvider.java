@@ -103,7 +103,8 @@ public interface ClusterProvider extends ServiceProvider {
 
         boolean dailyBackupEnabled();
         String dataStoreDirectory();
-
+        default boolean homingAgentEnabled(){ return false;}
+        default String homingAgentHost(){ return null;}
     }
 
 

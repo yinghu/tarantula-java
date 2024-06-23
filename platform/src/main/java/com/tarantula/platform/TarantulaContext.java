@@ -162,6 +162,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     private DataStoreProvider.DistributionIdGenerator distributionIdGenerator;
 
+    public boolean homingAgentEnabled;
+    public String homingAgentHost;
+
     private TarantulaContext(){
          this.endpointService = new EndpointService(this);
  	     this.metricsManager = new MetricsManager(this);
@@ -200,6 +203,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
         this.node.dailyBackupEnabled = this.dataStoreDailyBackup;
         this.node.dataStoreDirectory = this.dataStoreDir;
+        this.node.homingAgentEnabled = this.homingAgentEnabled;
+        this.node.homingAgentHost = this.homingAgentHost;
         long epochStart = TimeUtil.epochMillisecondsFromMidnight(snowflakeEpochStart[0],snowflakeEpochStart[1],snowflakeEpochStart[2]);
         this.distributionIdGenerator = new LocalDistributionIdGenerator(snowflakeNodeNumber,epochStart);
 

@@ -8,6 +8,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.lmdb.TransactionLog;
 import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
+import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.platform.event.TransactionReplicationEvent;
 import com.tarantula.platform.service.cluster.DistributionReplicator;
 
@@ -32,6 +33,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
     protected TransactionLogManager transactionLogManager;
     protected DistributionReplicator distributionReplicator;
+
     public ScopedReplicationProxy(String name,int scope){
         this.name = name;
         this.scope = scope;
@@ -115,6 +117,19 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
     public TransactionLogManager transactionLogManager(){
         return transactionLogManager;
+    }
+    protected void onHomingAgent(TransactionLog transactionLog){
+        if(!serviceContext.node().homingAgentEnabled()) return;
+        serviceContext.schedule(new ScheduleRunner(100,()->{
+            try {
+                String[] headers = new String[]{
+                        Session.TARANTULA_ACCESS_KEY,"accesskey"
+                };
+                logger.warn(serviceContext.httpClientProvider().post(serviceContext.node().homingAgentHost(), "log", headers, transactionLog.toBinary()));
+            }catch (Exception ex){
+                logger.error("err",ex);
+            }
+        }));
     }
 
 }
