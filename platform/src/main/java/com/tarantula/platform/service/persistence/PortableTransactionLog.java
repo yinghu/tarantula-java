@@ -56,14 +56,4 @@ public class PortableTransactionLog extends RecoverableObject implements Portabl
         transactionLog.edgeKey = portableReader.readByteArray("8");
     }
 
-    @Override
-    public byte[] toBinary() {
-        //DataBuffer buffer = BufferProxy.buffer()
-        return new byte[0];
-    }
-
-    @Override
-    public void fromBinary(byte[] payload) {
-
-    }
 }

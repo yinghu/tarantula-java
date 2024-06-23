@@ -3,6 +3,7 @@ package com.tarantula.platform.service.persistence;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.Session;
 import com.icodesoftware.lmdb.TransactionLog;
 import com.icodesoftware.lmdb.TransactionLogListener;
 import com.icodesoftware.logging.JDKLogger;
@@ -10,6 +11,7 @@ import com.icodesoftware.service.Batchable;
 import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.platform.event.TransactionReplicationEvent;
 
 import java.util.List;
@@ -117,6 +119,16 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy implements
 
     @Override
     public void onTransactionLog(TransactionLog transactionLog) {
+        serviceContext.schedule(new ScheduleRunner(100,()->{
+            try {
+                String[] headers = new String[]{
+                        Session.TARANTULA_ACTION,"onLog"
+                };
+                logger.warn(serviceContext.httpClientProvider().post("http://10.0.0.20:8091", "log", headers, transactionLog.toBinary()));
+            }catch (Exception ex){
+                logger.error("err",ex);
+            }
+            }));
         if(!transactionLog.deleting) return;
         logger.warn("Deleting from : "+transactionLog.source+" : "+transactionLog.edgeLabel+" : "+transactionLog.updatingRevision);
         DataStore dataStore = serviceContext.dataStore(scope,transactionLog.source);

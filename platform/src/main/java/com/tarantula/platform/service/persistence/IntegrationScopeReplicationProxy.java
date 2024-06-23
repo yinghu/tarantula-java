@@ -7,6 +7,7 @@ import com.icodesoftware.lmdb.TransactionLog;
 import com.icodesoftware.lmdb.TransactionLogListener;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
+import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.platform.event.TransactionReplicationEvent;
 import com.tarantula.platform.service.cluster.DistributionReplicator;
 
@@ -75,5 +76,8 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy imp
     @Override
     public void onTransactionLog(TransactionLog transactionLog) {
         //operations on original data store
+        serviceContext.schedule(new ScheduleRunner(100,()->{
+
+        }));
     }
 }
