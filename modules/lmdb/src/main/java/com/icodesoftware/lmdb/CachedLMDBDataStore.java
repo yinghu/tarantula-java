@@ -387,7 +387,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
                 Recoverable.DataHeader existingHeader = existed.readHeader();
                 value.flip();
                 Recoverable.DataHeader header = value.readHeader();
-                System.out.println(existingHeader.revision()+" : "+header.revision());
+                //System.out.println(existingHeader.revision()+" : "+header.revision());
                 if(header.revision() < existingHeader.revision()) return false;
 
                 if(!dbi.put(txn,key.rewind(),value.rewind())) return false;

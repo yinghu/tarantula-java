@@ -118,7 +118,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy implements
     @Override
     public void onTransactionLog(TransactionLog transactionLog) {
         //if(!transactionLog.deleting) return;
-        logger.warn("Transaction log : "+transactionLog.scope+ " : "+transactionLog.source+" : "+transactionLog.edgeLabel);
+        //logger.warn("Transaction log : "+transactionLog.scope+ " : "+transactionLog.source+" : "+transactionLog.edgeLabel);
     }
 }
 
