@@ -74,7 +74,6 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy imp
     }
     @Override
     public void onTransactionLog(TransactionLog transactionLog) {
-        //if(!transactionLog.deleting) return;
-        //logger.warn("Transaction log : "+transactionLog.scope+ " : "+transactionLog.source);
+        //operations on original data store
     }
 }

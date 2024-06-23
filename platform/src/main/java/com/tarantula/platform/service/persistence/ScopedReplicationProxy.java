@@ -23,7 +23,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
     protected TarantulaLogger logger;
 
     private final String name;
-    private final int scope;
+    protected final int scope;
     protected boolean asyncDistributing = true;
     protected boolean broadcasting = true;
     protected long asyncInterval = 100;

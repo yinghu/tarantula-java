@@ -117,8 +117,29 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy implements
 
     @Override
     public void onTransactionLog(TransactionLog transactionLog) {
-        //if(!transactionLog.deleting) return;
-        //logger.warn("Transaction log : "+transactionLog.scope+ " : "+transactionLog.source+" : "+transactionLog.edgeLabel);
+        if(!transactionLog.deleting) return;
+        logger.warn("Deleting from : "+transactionLog.source+" : "+transactionLog.edgeLabel+" : "+transactionLog.updatingRevision);
+        DataStore dataStore = serviceContext.dataStore(scope,transactionLog.source);
+        if(transactionLog.edgeLabel==null){
+            dataStore.backup().unset((k,v)->{
+                for(byte b : transactionLog.key){
+                    k.writeByte(b);
+                }
+                return true;
+            });
+            return;
+        }
+        dataStore.backup().unsetEdge(transactionLog.edgeLabel,(k,v)->{
+            for (byte b : transactionLog.key) {
+                k.writeByte(b);
+            }
+            if (transactionLog.edgeKey == null) return true;
+            for (byte b : transactionLog.edgeKey) {
+                v.writeByte(b);
+            }
+            return true;
+        },transactionLog.edgeLabel==null);
+
     }
 }
 
