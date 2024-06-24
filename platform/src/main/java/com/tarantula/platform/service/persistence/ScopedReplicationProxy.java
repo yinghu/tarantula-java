@@ -125,9 +125,9 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
                 String[] headers = new String[]{
                         Session.TARANTULA_ACCESS_KEY,"accesskey"
                 };
-                logger.warn(serviceContext.httpClientProvider().post(serviceContext.node().homingAgentHost(), "log", headers, transactionLog.toBinary()));
+                serviceContext.httpClientProvider().post(serviceContext.node().homingAgentHost(), "log", headers, transactionLog.toBinary());
             }catch (Exception ex){
-                logger.error("err",ex);
+                logger.warn("error on homing agent : "+ex.getMessage());
             }
         }));
     }
