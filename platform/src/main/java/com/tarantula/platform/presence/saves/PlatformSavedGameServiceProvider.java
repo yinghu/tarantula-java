@@ -4,8 +4,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configuration;
 
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Session;
+import com.icodesoftware.Transaction;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.SnowflakeKey;
@@ -14,17 +17,13 @@ import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 
 import com.tarantula.platform.item.PlatformItemServiceProvider;
-import com.tarantula.platform.presence.MappingObject;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.util.RecoverableQuery;
-import jnr.ffi.annotations.In;
 
-import java.io.ByteArrayOutputStream;
+
 import java.time.LocalDateTime;
-import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvider {
@@ -35,8 +34,8 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
     private int saveSize = 3;
 
     private long saveTimeout = 1; //1 hour
-
-
+    private int maxOverSizeBatch = 12;
+    private int oversizePayloadReadRetryNumber = 2;
     public PlatformSavedGameServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
     }
@@ -47,6 +46,8 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         Configuration configuration = serviceContext.configuration("game-presence-settings");
         JsonObject saveGame = ((JsonElement)configuration.property("savedGame")).getAsJsonObject();
         mappingObjectMaxSize = saveGame.get("mappingObjectMaxSize").getAsInt();
+        maxOverSizeBatch = saveGame.get("oversizePayloadMaxBatchSize").getAsInt();
+        oversizePayloadReadRetryNumber = saveGame.get("oversizePayloadReadRetryNumber").getAsInt();
         saveSize = saveGame.get("saveSize").getAsInt();
         saveTimeout = saveGame.get("saveTimeout").getAsInt()*saveTimeout;
         dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
@@ -169,62 +170,62 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
     }
 
     public void saveData(Session session,String key,byte[] data){
-        OversizeDataIndex[] indexed = {null};
-        dataStore.list(new OversizeDataIndexQuery(SnowflakeKey.from(session.distributionId())),(index)->{
-            if(!index.saveKey.equals(key)) return true;
-            indexed[0] = index;
-            return false;
-        });
         HashMap<Integer,byte[]> chunks = OversizeDataBatch.toBatch(data,mappingObjectMaxSize-BatchedMappingObject.MAP_OBJECT_HEADER_SIZE);
-        if(indexed[0]==null){
-            indexed[0] = new OversizeDataIndex(key);
-            indexed[0].saveKey = key;
-            indexed[0].batch = chunks.size();
-            indexed[0].ownerKey(SnowflakeKey.from(session.distributionId()));
-            dataStore.create(indexed[0]);
-            for(int i=0;i<chunks.size();i++){
-                byte[] chunk = chunks.get(i);
-                BatchedMappingObject batchedMappingObject = new BatchedMappingObject(key);
-                batchedMappingObject.value(chunk);
-                batchedMappingObject.batch = i;
-                batchedMappingObject.ownerKey(SnowflakeKey.from(indexed[0].distributionId()));
-                dataStore.create(batchedMappingObject);
-            }
-            return;
+        int chunkSize = chunks.size();
+        if(chunkSize > maxOverSizeBatch){
+            //throw new RuntimeException("oversize payload reached max chunk size ["+chunks.size()+"]");
+            logger.warn("Chunk size : "+chunkSize +" is over max batch size : "+maxOverSizeBatch);
         }
-        indexed[0].batch = chunks.size();
-        dataStore.update(indexed[0]);
-        dataStore.list(new OversizeDataQuery(SnowflakeKey.from(indexed[0].distributionId()),key),(chunk)->{
-            byte[] pending = chunks.remove(chunk.batch);
-            if(pending!=null){
-                chunk.value(pending);
-                dataStore.update(chunk);
-            }
-            return true;
-        });
-        chunks.forEach((k,v)->{
-            BatchedMappingObject batchedMappingObject = new BatchedMappingObject(key);
-            batchedMappingObject.value(v);
-            batchedMappingObject.batch = k;
-            batchedMappingObject.ownerKey(SnowflakeKey.from(indexed[0].distributionId()));
-            dataStore.create(batchedMappingObject);
-        });
+        Transaction transaction = gameCluster.transaction();
+        try{
+            transaction.execute(ctx->{
+                ApplicationPreSetup preSetup = (ApplicationPreSetup)ctx;
+                DataStore saveDataStore = preSetup.onDataStore(NAME);
+                OversizeDataIndex index = OversizeDataIndex.createIfNotExisted(saveDataStore,session,chunkSize);
+                saveDataStore.list(new OversizeDataQuery(SnowflakeKey.from(index.distributionId()),key)).forEach((chunk)->{
+                    byte[] pending = chunks.remove(chunk.batch);
+                    if(pending!=null){
+                        chunk.value(pending);
+                        saveDataStore.update(chunk);
+                    }
+                });
+                chunks.forEach((k,v)->{
+                    BatchedMappingObject batchedMappingObject = new BatchedMappingObject(key);
+                    batchedMappingObject.value(v);
+                    batchedMappingObject.batch = k;
+                    batchedMappingObject.ownerKey(SnowflakeKey.from(index.distributionId()));
+                    saveDataStore.create(batchedMappingObject);
+                });
+                return true;
+            });
+        }finally {
+            transaction.close();
+        }
     }
 
     public byte[] loadData(Session session, String key){
-        OversizeDataIndex[] indexed = {null};
-        dataStore.list(new OversizeDataIndexQuery(SnowflakeKey.from(session.distributionId())),(index)->{
-            if(!index.saveKey.equals(key)) return true;
-            indexed[0] = index;
-            return false;
-        });
-        if(indexed[0]==null) return null;
+        OversizeDataIndex indexed = OversizeDataIndex.load(dataStore,session);
+        if(indexed==null){
+            logger.warn("Over-sized data index not ready for load ["+key+"]");
+            return null;
+        }
         HashMap<Integer,BatchedMappingObject> batchData = new HashMap<>();
-        dataStore.list(new OversizeDataQuery(SnowflakeKey.from(indexed[0].distributionId()),key),(batch)->{
-            if(batch.batch<indexed[0].batch) batchData.put(batch.batch,batch);
-            return true;
-        });
-        return OversizeDataBatch.fromBatch(batchData);
+        boolean loaded = false;
+        for(int i=0; i<oversizePayloadReadRetryNumber; i++){
+            final OversizeDataIndex index = indexed;
+            dataStore.list(new OversizeDataQuery(SnowflakeKey.from(indexed.distributionId()),key),(batch)->{
+                if(batch.batch<index.batch) batchData.put(batch.batch,batch);
+                return true;
+            });
+            OversizeDataIndex verified = OversizeDataIndex.load(dataStore,session);
+            if(verified.revision()==indexed.revision()){
+                loaded = true;
+                break;
+            }
+            logger.warn("Oversize payload retrying ["+i+"]");
+            indexed = verified;
+        }
+        return loaded? OversizeDataBatch.fromBatch(batchData):null;
     }
 
 

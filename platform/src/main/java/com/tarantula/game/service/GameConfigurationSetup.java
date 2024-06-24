@@ -164,6 +164,10 @@ public class GameConfigurationSetup extends GamePreSetup implements ApplicationP
         //dataStore.deleteEdge(configurableObject.key(),VersionedConfigurableObject.LABEL);
     }
 
+    public Inventory createInventory(String category, String typeId){
+        return gameCluster.createInventory(this,category,typeId);
+    }
+
     public List<Inventory> inventoryList(long systemId){
         DataStore ids = onDataStore(Inventory.DataStore);
         InventoryQuery query = new InventoryQuery(systemId);

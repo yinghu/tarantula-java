@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
 
 
-public class BatchedManualAnalyticsTransaction extends AnalyticsTransaction {
+public class BatchedManualAnalyticsTransaction extends UserAnalyticsTransaction {
     public BatchedManualAnalyticsTransaction(
             Session session,
             long serverSessionId,

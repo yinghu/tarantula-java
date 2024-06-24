@@ -2,7 +2,7 @@ package com.perfectday.games.earth8.analytics;
 
 import com.icodesoftware.Session;
 
-public class EquipmentLevelUpTransaction extends AnalyticsTransaction {
+public class EquipmentLevelUpTransaction extends UserAnalyticsTransaction {
     private static final String MESSAGE_TYPE = "/earth8/equipment/0.0.1/levelUp";
 
     public EquipmentLevelUpTransaction(Session session, long serverSessionId,AnalyticsEquipmentData equipmentData, long equipmentId, int prevLevel, int newLevel)

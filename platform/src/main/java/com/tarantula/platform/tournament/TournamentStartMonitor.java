@@ -29,6 +29,10 @@ public class TournamentStartMonitor implements SchedulingTask {
 
     @Override
     public void run() {
-        this.tournamentServiceProvider.startTournament(tournamentManager);
+        try{
+            this.tournamentServiceProvider.startTournament(tournamentManager);
+        }catch (Exception ex){
+            this.tournamentServiceProvider.logger.error("error on start tournament",ex);
+        }
     }
 }

@@ -11,8 +11,6 @@ import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 import com.tarantula.platform.presence.saves.PlatformSavedGameServiceProvider;
 import com.tarantula.platform.presence.saves.SavedGame;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class SavedGameModule extends ModuleHeader {
 
@@ -36,7 +34,10 @@ public class SavedGameModule extends ModuleHeader {
         }
         else if(session.action().equals("onGet")){
             byte[] data = this.savedGameServiceProvider.loadData(session,session.name());
-            session.write(data!=null? data : JsonUtil.toSimpleResponse(false,session.name()).getBytes());
+            session.write(JsonUtil.toSimpleResponse(
+                    data != null,
+                    data == null ? session.name() : new String(data)//need to use byte array directly down to wire
+            ).getBytes());
         }
         else if(session.action().equals("onReset")){
             CurrentSaveIndex selected = this.savedGameServiceProvider.reset(session);

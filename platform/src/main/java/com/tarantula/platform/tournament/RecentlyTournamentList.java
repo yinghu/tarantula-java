@@ -1,5 +1,7 @@
 package com.tarantula.platform.tournament;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.util.FIFOBuffer;
 import com.icodesoftware.util.RecoverableObject;
@@ -66,14 +68,11 @@ public class RecentlyTournamentList extends RecoverableObject {
         tournamentIndex.push(tournamentManager.distributionId());
     }
 
-    public static RecentlyTournamentList lookup(PlatformTournamentServiceProvider provider,String type){
-        return lookup(provider.dataStore,provider.gameCluster.distributionId(),type,provider.recentlyTournamentListSize);
-    }
 
     public static RecentlyTournamentList lookup(DataStore dataStore,long gameClusterId, String type,int size){
         RecentlyTournamentList[] ret = new RecentlyTournamentList[]{null};
         dataStore.list(new RecentlyTournamentListQuery(gameClusterId),list->{
-            if(list.name.equals(type)){
+            if(list.name !=null && list.name.equals(type)){
                 ret[0]=list;
                 ret[0].dataStore = dataStore;
                 return false;
@@ -88,4 +87,17 @@ public class RecentlyTournamentList extends RecoverableObject {
         return ret[0];
     }
 
+    @Override
+    public JsonObject toJson() {
+        JsonObject jsonObject = new JsonObject();
+        Long[] ids = pop();
+        JsonArray arrs = new JsonArray();
+        for(Long i : ids){
+            arrs.add(i==null? "0": i.toString());
+        }
+        jsonObject.addProperty("name",name);
+        jsonObject.addProperty("size",size);
+        jsonObject.add("index",arrs);
+        return jsonObject;
+    }
 }

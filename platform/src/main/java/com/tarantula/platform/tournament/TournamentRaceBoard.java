@@ -17,6 +17,8 @@ public class TournamentRaceBoard extends RecoverableObject implements Tournament
 
     private final List<Tournament.Entry> snapshot;
 
+    public TournamentEntry livePlayerEntry;
+
     public TournamentRaceBoard(List<Tournament.Entry> snapshot){
         this.snapshot = snapshot;
     }
@@ -61,6 +63,10 @@ public class TournamentRaceBoard extends RecoverableObject implements Tournament
             plist.add(v.toJson());
         });
         jsonObject.add("_board",plist);
+        if(livePlayerEntry!=null){
+            jsonObject.add("_livePlayerEntry", livePlayerEntry.toJson());
+
+        }
         return jsonObject;
     }
 
