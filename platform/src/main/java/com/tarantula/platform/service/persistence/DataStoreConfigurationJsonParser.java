@@ -44,13 +44,13 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
 
 
     public DataStoreConfigurationJsonParser(String config,ServiceContext tx,Map<String,Object> additions, DataStoreProvider.OnStart onStart){
-        this.storeSizeMb = (int)additions.get("storeSizeMb");
-        this.envNoSyncFlag = (boolean)additions.get("envNoSyncFlag");
-        this.storeReindexing = (boolean)additions.get("storeReindexing");
-        this.storeKeySize = (int)additions.get("storeKeySize");
-        this.storeValueSize = (int)additions.get("storeValueSize");
-        this.storePendingBufferSize = (int)additions.get("storePendingBufferSize");
-        this.externalKeyValueBufferUsed = (boolean)additions.get("externalKeyValueBufferUsed");
+        this.storeSizeMb = (int)additions.get(EnvSetting.ENV_CONFIG_STORE_SIZE_MB);
+        this.envNoSyncFlag = (boolean)additions.get(EnvSetting.ENV_CONFIG_NO_SYNC_FLAG);
+        this.storeReindexing = (boolean)additions.get(EnvSetting.ENV_CONFIG_STORE_REINDEXING);
+        this.storeKeySize = (int)additions.get(EnvSetting.ENV_CONFIG_STORE_KEY_SIZE);
+        this.storeValueSize = (int)additions.get(EnvSetting.ENV_CONFIG_STORE_VALUE_SIZE);
+        this.storePendingBufferSize = (int)additions.get(EnvSetting.ENV_CONFIG_STORE_PENDING_BUFFER_SIZE);
+        this.externalKeyValueBufferUsed = (boolean)additions.get(EnvSetting.ENV_CONFIG_EXTERNAL_KEY_VALUE_BUFFER_USED);
         this.dataStoreProviderConfiguration = config;
         this.node = tx.node();
         this.dataBucketGroup = node.bucketName();
@@ -72,17 +72,17 @@ public class DataStoreConfigurationJsonParser implements Serviceable {
         properties.put("bucket",this.dataBucketGroup);
         properties.put("node",this.dataBucketNode);
         //properties.put("partitionNumber",this.partitionNumber);
-        properties.put("storeSizeMb",this.storeSizeMb);
-        properties.put("envNoSyncFlag",envNoSyncFlag);
-        properties.put("storeReindexing",storeReindexing);
-        properties.put("storeKeySize",storeKeySize);
-        properties.put("storeValueSize",storeValueSize);
-        properties.put("storePendingBufferSize",storePendingBufferSize);
-        properties.put("externalKeyValueBufferUsed",externalKeyValueBufferUsed);
-        properties.put("dir",this.dataDir);
+        properties.put(EnvSetting.ENV_CONFIG_STORE_SIZE_MB,this.storeSizeMb);
+        properties.put(EnvSetting.ENV_CONFIG_NO_SYNC_FLAG,envNoSyncFlag);
+        properties.put(EnvSetting.ENV_CONFIG_STORE_REINDEXING,storeReindexing);
+        properties.put(EnvSetting.ENV_CONFIG_STORE_KEY_SIZE,storeKeySize);
+        properties.put(EnvSetting.ENV_CONFIG_STORE_VALUE_SIZE,storeValueSize);
+        properties.put(EnvSetting.ENV_CONFIG_STORE_PENDING_BUFFER_SIZE,storePendingBufferSize);
+        properties.put(EnvSetting.ENV_CONFIG_EXTERNAL_KEY_VALUE_BUFFER_USED,externalKeyValueBufferUsed);
+        properties.put(EnvSetting.ENV_CONFIG_BASE_DIR,this.dataDir);
         properties.put("dailyBackup",dataStoreDailyBackup);
         properties.put("node",this.node);
-        properties.put("migration",ds.get("migration").getAsJsonObject());
+        properties.put(EnvSetting.ENV_CONFIG_MIGRATION,ds.get("migration").getAsJsonObject());
         DataStoreProvider dataStoreProvider = dataStoreProvider(provider.trim());
 
         JsonArray envs = ds.get("env-settings").getAsJsonArray();

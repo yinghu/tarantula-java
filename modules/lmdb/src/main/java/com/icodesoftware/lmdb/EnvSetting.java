@@ -4,6 +4,18 @@ import com.icodesoftware.Distributable;
 
 public class EnvSetting {
 
+    public static final String ENV_CONFIG_NAME = "name";
+    public static final String ENV_CONFIG_BASE_DIR = "dir";
+    public static final String ENV_CONFIG_STORE_SIZE_MB = "storeSizeMb";
+    public static final String ENV_CONFIG_NO_SYNC_FLAG = "envNoSyncFlag";
+    public static final String ENV_CONFIG_STORE_REINDEXING = "storeReindexing";
+    public static final String ENV_CONFIG_EXTERNAL_KEY_VALUE_BUFFER_USED = "externalKeyValueBufferUsed";
+    public static final String ENV_CONFIG_STORE_KEY_SIZE= "storeKeySize";
+    public static final String ENV_CONFIG_STORE_VALUE_SIZE = "storeValueSize";
+    public static final String ENV_CONFIG_STORE_PENDING_BUFFER_SIZE = "storePendingBufferSize";
+    public static final String ENV_CONFIG_MIGRATION = "migration";
+
+
     private static final long MB_1 = 1_048_576L;
     public static final int MAX_LMDB_KEY_SIZE = 511;
     public static final int MAX_STORE_NUMBER = 1024;
