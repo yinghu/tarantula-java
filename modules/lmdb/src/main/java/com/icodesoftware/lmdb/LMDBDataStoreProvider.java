@@ -29,9 +29,9 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     private TarantulaLogger logger = JDKLogger.getLogger(LMDBDataStoreProvider.class);
 
-    private String name;
+    private String name = EnvSetting.ENV_PROVIDER_NAME;
 
-    private String baseDir = "target/lmdb";
+    private String baseDir = EnvSetting.ENV_BASE_DIR;
 
     private final LMDBEnv dataEnv = LMDBEnv.DATA_ENV;
     private final LMDBEnv integrationEnv = LMDBEnv.INTEGRATION_ENV;
@@ -50,7 +50,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     private static int PENDING_BUFFER_SIZE = EnvSetting.MAX_PENDING_BUFFER_NUMBER;
 
-    boolean envNoSyncFlag = true;
+    boolean envNoSyncFlag = EnvSetting.ENV_NO_SYNC_Flag;
     boolean storeReindexing;
     private final static ConcurrentHashMap<String,DataStore> storeMap = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<String,LocalEdgeDataStore> edgMap = new ConcurrentHashMap<>();
@@ -68,26 +68,26 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private LocalDataMigration migration;
     @Override
     public void configure(Map<String, Object> properties) {
-        this.name = (String)properties.get(EnvSetting.ENV_CONFIG_NAME);
-        this.storeSize = EnvSetting.toBytesFromMb((int)properties.get(EnvSetting.ENV_CONFIG_STORE_SIZE_MB));
-        this.envNoSyncFlag = (boolean)properties.get(EnvSetting.ENV_CONFIG_NO_SYNC_FLAG);
-        this.storeReindexing = (boolean)properties.get(EnvSetting.ENV_CONFIG_STORE_REINDEXING);
-        boolean externalKeyValueBufferUsed = (boolean)properties.get(EnvSetting.ENV_CONFIG_EXTERNAL_KEY_VALUE_BUFFER_USED);
+        this.name = (String)properties.getOrDefault(EnvSetting.ENV_CONFIG_NAME,EnvSetting.ENV_PROVIDER_NAME);
+        this.storeSize = EnvSetting.toBytesFromMb((int)properties.getOrDefault(EnvSetting.ENV_CONFIG_STORE_SIZE_MB,EnvSetting.toBytesFromMb(1)));
+        this.envNoSyncFlag = (boolean)properties.getOrDefault(EnvSetting.ENV_CONFIG_NO_SYNC_FLAG,EnvSetting.ENV_NO_SYNC_Flag);
+        this.storeReindexing = (boolean)properties.getOrDefault(EnvSetting.ENV_CONFIG_STORE_REINDEXING,false);
+        boolean externalKeyValueBufferUsed = (boolean)properties.getOrDefault(EnvSetting.ENV_CONFIG_EXTERNAL_KEY_VALUE_BUFFER_USED,false);
         if(externalKeyValueBufferUsed){
             logger.warn("External key size, value size and pending buffer size used");
-            int keySizeUsed = (int)properties.get(EnvSetting.ENV_CONFIG_STORE_KEY_SIZE);
-            int valueSizeUsed = (int)properties.get(EnvSetting.ENV_CONFIG_STORE_VALUE_SIZE);
-            int bufferSizeUsed = (int)properties.get(EnvSetting.ENV_CONFIG_STORE_PENDING_BUFFER_SIZE);
+            int keySizeUsed = (int)properties.getOrDefault(EnvSetting.ENV_CONFIG_STORE_KEY_SIZE,EnvSetting.KEY_SIZE);
+            int valueSizeUsed = (int)properties.getOrDefault(EnvSetting.ENV_CONFIG_STORE_VALUE_SIZE,EnvSetting.VALUE_SIZE);
+            int bufferSizeUsed = (int)properties.getOrDefault(EnvSetting.ENV_CONFIG_STORE_PENDING_BUFFER_SIZE,EnvSetting.MAX_PENDING_BUFFER_NUMBER);
             if(keySizeUsed>0 && keySizeUsed <= EnvSetting.MAX_LMDB_KEY_SIZE) KEY_SIZE = keySizeUsed;
             if(valueSizeUsed>0 && valueSizeUsed <= 2032 ) VALUE_SIZE = valueSizeUsed;
             if(bufferSizeUsed > EnvSetting.MAX_PENDING_BUFFER_NUMBER) PENDING_BUFFER_SIZE = bufferSizeUsed;
         }
-        dataEnv.envSetting = (EnvSetting) properties.get(EnvSetting.data);
-        integrationEnv.envSetting = (EnvSetting) properties.get(EnvSetting.integration);
-        indexEnv.envSetting = (EnvSetting) properties.get(EnvSetting.index);
-        logEnv.envSetting = (EnvSetting) properties.get(EnvSetting.log);
-        localEnv.envSetting = (EnvSetting) properties.get(EnvSetting.local);
-        this.baseDir = (String)properties.get(EnvSetting.ENV_CONFIG_BASE_DIR);
+        dataEnv.envSetting = (EnvSetting) properties.getOrDefault(EnvSetting.data,EnvSetting.DataSetting);
+        integrationEnv.envSetting = (EnvSetting) properties.getOrDefault(EnvSetting.integration,EnvSetting.IntegrationSetting);
+        indexEnv.envSetting = (EnvSetting) properties.getOrDefault(EnvSetting.index,EnvSetting.IndexSetting);
+        logEnv.envSetting = (EnvSetting) properties.getOrDefault(EnvSetting.log,EnvSetting.LogSetting);
+        localEnv.envSetting = (EnvSetting) properties.getOrDefault(EnvSetting.local,EnvSetting.LocalSetting);
+        this.baseDir = (String)properties.getOrDefault(EnvSetting.ENV_CONFIG_BASE_DIR,EnvSetting.ENV_BASE_DIR);
         this.migration = new LocalDataMigration((JsonObject)properties.get(EnvSetting.ENV_CONFIG_MIGRATION));
     }
 

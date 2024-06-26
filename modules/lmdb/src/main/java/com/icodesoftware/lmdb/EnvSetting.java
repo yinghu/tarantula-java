@@ -17,6 +17,10 @@ public class EnvSetting {
 
 
     private static final long MB_1 = 1_048_576L;
+
+    public static final String ENV_PROVIDER_NAME ="tarantula";
+    public static final String ENV_BASE_DIR ="target/lmdb";
+    public static final boolean ENV_NO_SYNC_Flag = true;
     public static final int MAX_LMDB_KEY_SIZE = 511;
     public static final int MAX_STORE_NUMBER = 1024;
     public static final int MAX_READER_NUMBER = 100;
@@ -31,11 +35,11 @@ public class EnvSetting {
     public static final String log ="log";
     public static final String local ="local";
 
-    public static final EnvSetting DataSetting = new EnvSetting(data,"target/lmdb/data",0,true);
-    public static final EnvSetting IntegrationSetting = new EnvSetting(integration,"target/lmdb/integration",0,true);
-    public static final EnvSetting IndexSetting = new EnvSetting(index,"target/lmdb/index",0,true);
-    public static final EnvSetting LogSetting = new EnvSetting(log,"target/lmdb/log",0,true);
-    public static final EnvSetting LocalSetting = new EnvSetting(local,"target/lmdb/local",0,true);
+    public static final EnvSetting DataSetting = new EnvSetting(data,ENV_BASE_DIR+"/data",0,true);
+    public static final EnvSetting IntegrationSetting = new EnvSetting(integration,ENV_BASE_DIR+"/integration",0,true);
+    public static final EnvSetting IndexSetting = new EnvSetting(index,ENV_BASE_DIR+"/index",0,true);
+    public static final EnvSetting LogSetting = new EnvSetting(log,ENV_BASE_DIR+"/log",0,true);
+    public static final EnvSetting LocalSetting = new EnvSetting(local,ENV_BASE_DIR+"/local",0,true);
 
     public EnvSetting(String name,String storePath,int mbSize,boolean enabled){
         this.name = name;
