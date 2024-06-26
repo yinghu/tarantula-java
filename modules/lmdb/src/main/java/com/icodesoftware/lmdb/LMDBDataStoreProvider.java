@@ -69,7 +69,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     @Override
     public void configure(Map<String, Object> properties) {
         this.name = (String)properties.getOrDefault(EnvSetting.ENV_CONFIG_NAME,EnvSetting.ENV_PROVIDER_NAME);
-        this.storeSize = EnvSetting.toBytesFromMb((int)properties.getOrDefault(EnvSetting.ENV_CONFIG_STORE_SIZE_MB,EnvSetting.toBytesFromMb(1)));
+        this.storeSize = EnvSetting.toBytesFromMb((int)properties.getOrDefault(EnvSetting.ENV_CONFIG_STORE_SIZE_MB,1));
         this.envNoSyncFlag = (boolean)properties.getOrDefault(EnvSetting.ENV_CONFIG_NO_SYNC_FLAG,EnvSetting.ENV_NO_SYNC_Flag);
         this.storeReindexing = (boolean)properties.getOrDefault(EnvSetting.ENV_CONFIG_STORE_REINDEXING,false);
         boolean externalKeyValueBufferUsed = (boolean)properties.getOrDefault(EnvSetting.ENV_CONFIG_EXTERNAL_KEY_VALUE_BUFFER_USED,false);
@@ -296,7 +296,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
             migration.migrate(this,storeMap);
             System.exit(0);
         }
-        logger.warn("LMDB Provider started with store size ["+storeSize+"] queue side ["+pendingQueue.size()+"] store no sync mode ["+envNoSyncFlag+"] reindexing ["+storeReindexing+"]");
+        logger.warn("LMDB Provider ["+name+"] started with store size ["+storeSize+"] queue side ["+pendingQueue.size()+"] store no sync mode ["+envNoSyncFlag+"] reindexing ["+storeReindexing+"]");
         logger.warn("LMDB Provider using key/value size ["+KEY_SIZE+"/"+VALUE_SIZE+"]");
     }
 

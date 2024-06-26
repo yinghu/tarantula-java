@@ -1,6 +1,8 @@
 package com.icodesoftware.lmdb;
 
 import com.icodesoftware.DataStore;
+import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Serviceable;
 import org.lmdbjava.*;
 
@@ -13,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LMDBEnv implements Serviceable {
+
+    private static final TarantulaLogger logger = JDKLogger.getLogger(LMDBEnv.class);
 
     public static final LMDBEnv DATA_ENV = new LMDBEnv(EnvSetting.DataSetting);
     public static final LMDBEnv INTEGRATION_ENV = new LMDBEnv(EnvSetting.IntegrationSetting);
@@ -89,6 +93,7 @@ public class LMDBEnv implements Serviceable {
     }
     private long storeSize(EnvSetting envSetting){
         if(envSetting.mbSize==0) return lmdbDataStoreProvider.storeSize;
+        logger.warn("Env ["+envSetting.name+"] starting with store size :"+envSetting.mbSize+"MB");
         return EnvSetting.toBytesFromMb(envSetting.mbSize);
     }
 }
