@@ -1,9 +1,9 @@
-package com.tarantula.platform;
+package com.icodesoftware.protocol.session;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnSession;
 import com.icodesoftware.util.OnApplicationHeader;
-import com.tarantula.platform.service.cluster.PortableRegistry;
+
 
 public class OnSessionTrack extends OnApplicationHeader implements OnSession {
 
@@ -15,7 +15,6 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
     public static final OnSession INVALID_TOKEN = new OnSessionTrack("INVALID TOKEN");
 
     public static final OnSession SESSION_NOT_AVAILABLE = new OnSessionTrack("SESSION NOT AVAILABLE");
-
 
 
     public OnSessionTrack(){
@@ -32,16 +31,6 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
         this.distributionId = systemId;
         this.stub = stub;
         this.successful = true;
-    }
-
-    @Override
-    public int getFactoryId() {
-        return PortableRegistry.OID;
-    }
-
-    @Override
-    public int getClassId() {
-        return PortableRegistry.ON_SESSION_CID;
     }
 
 
@@ -66,8 +55,8 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
     public JsonObject toJson() {
         JsonObject jp = new JsonObject();
         jp.addProperty("Successful",true);
-        jp.addProperty("SystemId",distributionId);
-        jp.addProperty("Stub",stub);
+        jp.addProperty("SystemId",Long.toString(distributionId));
+        jp.addProperty("Stub",Long.toString(stub));
         jp.addProperty("Token",token);
         jp.addProperty("Login",login);
         return jp;

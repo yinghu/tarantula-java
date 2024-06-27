@@ -4,7 +4,6 @@ package com.tarantula.test;
 import com.icodesoftware.DataStore;
 
 import com.tarantula.platform.OnSessionQuery;
-import com.tarantula.platform.OnSessionTrack;
 import com.tarantula.platform.PresenceIndex;
 
 import com.tarantula.platform.SessionIndex;
