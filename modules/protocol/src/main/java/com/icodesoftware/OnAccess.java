@@ -17,7 +17,7 @@ public interface OnAccess extends Session, DataStore.Updatable {
 
     String APPLE = "apple";
     String GOOGLE = "google";
-    String STRIPE = "stripe";
+
     String FACEBOOK = "facebook";
     String AMAZON = "amazon";
 

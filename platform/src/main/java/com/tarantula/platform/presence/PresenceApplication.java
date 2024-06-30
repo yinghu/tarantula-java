@@ -52,7 +52,6 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             pc.access = user(session.distributionId());
             pc.account = account(pc.access);
             pc.subscription = membership(pc.access.primary()?session.distributionId():pc.access.primaryId());
-            pc.stripeClientId = this.tokenValidatorProvider.authVendor(OnAccess.STRIPE).clientId();
             session.write(this.builder.create().toJson(pc).getBytes());
         }
         //public lobby access by page number

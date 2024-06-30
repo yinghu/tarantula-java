@@ -128,6 +128,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
 
     @Override
     public void onUpdated(String category, double delta) {
+        logger.warn("Metrics : "+name+" : "+category+" : " +delta);
         pendingUpdates.compute(category,(k,v)->{
             if(delta<=0) return v;//ignore
             if(v==null) {

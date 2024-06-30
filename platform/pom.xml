@@ -15,11 +15,6 @@
   <name>Game Cluster Platform</name>
   <description>Game Cluster Platform</description>
   <dependencies>
-	  <dependency>
-		  <groupId>com.stripe</groupId>
-		  <artifactId>stripe-java</artifactId>
-		  <version>8.0.2</version>
-	  </dependency>
    	<dependency>
 		<groupId>com.hazelcast</groupId>
 		<artifactId>hazelcast</artifactId>

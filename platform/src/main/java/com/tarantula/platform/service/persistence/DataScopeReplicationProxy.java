@@ -3,7 +3,6 @@ package com.tarantula.platform.service.persistence;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.Session;
 import com.icodesoftware.lmdb.TransactionLog;
 import com.icodesoftware.lmdb.TransactionLogListener;
 import com.icodesoftware.logging.JDKLogger;
@@ -11,7 +10,7 @@ import com.icodesoftware.service.Batchable;
 import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.util.ScheduleRunner;
+
 import com.tarantula.platform.event.TransactionReplicationEvent;
 
 import java.util.List;

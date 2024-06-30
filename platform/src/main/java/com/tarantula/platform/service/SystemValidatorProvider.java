@@ -390,12 +390,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             developerStore.setup(serviceContext);
             aMap.put(OnAccess.DEVELOPER_STORE,developerStore);
         }
-        AuthVendorRegistry stripe = TarantulaContext.getInstance().authVendor(OnAccess.STRIPE);
-        if(stripe!=null){
-            stripe.registerMetricsLister(serviceContext.metrics(Metrics.PAYMENT));
-            stripe.setup(serviceContext);
-            aMap.put(OnAccess.STRIPE,(stripe));
-        }
+
         AuthVendorRegistry googleStore = TarantulaContext.getInstance().authVendor(OnAccess.GOOGLE_STORE);
         if(googleStore!=null){
             googleStore.registerMetricsLister(serviceContext.metrics(Metrics.PAYMENT));

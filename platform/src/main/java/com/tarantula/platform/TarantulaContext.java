@@ -660,8 +660,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
         if(name.equals(OnAccess.APPLE_STORE)) return new ThirdPartyServiceProvider(OnAccess.APPLE_STORE);
 
- 	    if(name.equals(OnAccess.STRIPE)) return loadStripeCredentials();//system config
-
         if(name.equals(OnAccess.DEVELOPER_STORE)) return new ThirdPartyServiceProvider(OnAccess.DEVELOPER_STORE);
 
         if(name.equals(OnAccess.GAME_CENTER)) return new ThirdPartyServiceProvider(OnAccess.GAME_CENTER);
@@ -679,22 +677,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         if(name.equals(OnAccess.DOWNLOAD_CENTER)) return new ThirdPartyServiceProvider(OnAccess.DOWNLOAD_CENTER);
         return null;
 
-    }
-
-    private AuthVendorRegistry loadStripeCredentials(){
-        try{
-            String config = this.authContext+"-stripe-credentials.json";
-            File f = new File("/etc/tarantula/"+config);
-            InputStream in = f.exists()?new FileInputStream(f):Thread.currentThread().getContextClassLoader().getResourceAsStream(config);
-            byte[] data = new byte[in.available()];
-            in.read(data);
-            in.close();
-            GsonBuilder gb = new GsonBuilder();
-            gb.registerTypeAdapter(AuthVendorRegistry.class,new StripePaymentCredentialsDeserializer());
-            return gb.create().fromJson(new String(data),AuthVendorRegistry.class);
-        }catch (Exception ex){
-            return null;
-        }
     }
 
     //file name web/[game cluster name]/file.png etc
