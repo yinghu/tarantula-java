@@ -123,7 +123,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         serviceContext.schedule(new ScheduleRunner(100,()->{
             try {
                 String[] headers = new String[]{
-                        Session.TARANTULA_ACCESS_KEY,"accesskey"
+                        Session.TARANTULA_ACCESS_KEY,serviceContext.node().homingAgentKey()
                 };
                 serviceContext.httpClientProvider().post(serviceContext.node().homingAgentHost(), "log", headers, transactionLog.toBinary());
             }catch (Exception ex){

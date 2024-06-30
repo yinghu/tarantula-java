@@ -105,6 +105,7 @@ public interface ClusterProvider extends ServiceProvider {
         String dataStoreDirectory();
         default boolean homingAgentEnabled(){ return false;}
         default String homingAgentHost(){ return null;}
+        default String homingAgentKey(){return null;}
     }
 
 

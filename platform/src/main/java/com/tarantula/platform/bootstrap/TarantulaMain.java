@@ -117,7 +117,10 @@ public class TarantulaMain {
 			btx.applicationSchedulingPoolSetting = override(overriding,"tarantula.scheduler.pool.setting",_user,_config);
 			btx.dataStoreDailyBackup = Boolean.parseBoolean(override(overriding,"tarantula.data.store.daily.backup",_user,_config));
 			btx.homingAgentEnabled = Boolean.parseBoolean(override(overriding,"tarantula.homing.agent.enabled",_user,_config));
-			if(btx.homingAgentEnabled) btx.homingAgentHost = override(overriding,"tarantula.homing.agent.host",_user,_config);
+			if(btx.homingAgentEnabled){
+				btx.homingAgentHost = override(overriding,"tarantula.homing.agent.host",_user,_config);
+				btx.homingAgentKey = override(overriding,"tarantula.homing.agent.key",_user,_config);
+			}
 			btx.authContext = override(overriding,"tarantula.auth.context",_user,_config);
 			boolean udpEndpointEnabled = Boolean.parseBoolean(override(overriding,"tarantula.endpoint.udp.enable",_user,_config));
 			boolean endpointEnabled = Boolean.parseBoolean(override(overriding,"tarantula.endpoint.http.enable",_user,_config));
