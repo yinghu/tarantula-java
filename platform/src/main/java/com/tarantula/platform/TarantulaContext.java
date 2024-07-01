@@ -1014,6 +1014,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
     @Override
     public void onMetrics(String name, List<Statistics.Entry> updated) {
         if(!node.homingAgentEnabled) return;
+        log.warn(node.nodeName+ " :: "+name+" :: "+updated.isEmpty());
         schedule(new ScheduleRunner(100,()->{
             try {
                 String[] headers = new String[]{

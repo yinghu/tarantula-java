@@ -45,7 +45,7 @@ public class MetricsLog extends RecoverableObject {
     }
 
     public static MetricsLog metricsLog(String node,String name, List<Statistics.Entry> updates){
-        if(name==null || updates.isEmpty()) throw new RuntimeException("name or updates cannot null or empty");
+        if(node==null || name==null || updates.isEmpty()) throw new RuntimeException("node/name or updates cannot null or empty");
         return new MetricsLog(node,name,updates);
     }
 }

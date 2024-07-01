@@ -189,7 +189,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
                 logger.error("Error on update",ex);
             }
         });
-        metricsHomingAgent.onMetrics(name,updated);
+        if(!updated.isEmpty()) metricsHomingAgent.onMetrics(name,updated);
         pendings.clear();
     }
 
