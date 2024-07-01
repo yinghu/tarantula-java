@@ -146,6 +146,7 @@ public class BufferProxy implements Recoverable.DataBuffer {
         return buffer.array();
     }
 
+
     public ByteBuffer flip(){
         buffer.flip();
         return buffer;
@@ -160,6 +161,10 @@ public class BufferProxy implements Recoverable.DataBuffer {
     }
     public boolean hasRemaining(){
         return buffer.hasRemaining();
+    }
+
+    public int remaining(){
+        return buffer.remaining();
     }
 
 }

@@ -8,6 +8,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 public class BufferProxyTest {
 
@@ -129,6 +130,27 @@ public class BufferProxyTest {
         directBuffer.writeUTF8("clear");
         directBuffer.flip();
         Assert.assertEquals(directBuffer.readUTF8(),"clear");
+    }
+
+    @Test(groups = { "bufferProxy" })
+    public void bufferRemainingTest(){
+        Recoverable.DataBuffer directBuffer = BufferProxy.buffer(100,true);
+        directBuffer.writeUTF8("test");
+        directBuffer.flip();
+        Assert.assertEquals(directBuffer.remaining(),8);
+        byte[] ret = directBuffer.array();
+        Assert.assertEquals(ret.length,8);
+
+        Recoverable.DataBuffer buffer = BufferProxy.buffer(100,false);
+        buffer.writeUTF8("test");
+        buffer.flip();
+        Assert.assertEquals(buffer.remaining(),8);
+        byte[] ret1 = buffer.array();
+        Assert.assertEquals(ret1.length,100);
+        byte[] arr = Arrays.copyOf(ret1,8);
+        Assert.assertEquals(arr.length,8);
+        Recoverable.DataBuffer data = BufferProxy.wrap(arr);
+        Assert.assertEquals(data.readUTF8(),"test");
     }
 
 

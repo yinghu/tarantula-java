@@ -18,6 +18,7 @@ import com.hazelcast.config.DiscoveryStrategyConfig;
 import com.icodesoftware.*;
 import com.icodesoftware.lmdb.EnvSetting;
 import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
+import com.icodesoftware.lmdb.MetricsLog;
 import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
 import com.icodesoftware.service.Metrics;
@@ -34,12 +35,14 @@ import com.tarantula.platform.service.cluster.*;
 
 import com.tarantula.platform.service.deployment.*;
 
+import com.tarantula.platform.service.metrics.AbstractMetrics;
+import com.tarantula.platform.service.metrics.MetricsHomingAgent;
 import com.tarantula.platform.service.metrics.MetricsManager;
 import com.tarantula.platform.service.persistence.*;
-import com.tarantula.platform.util.*;
 
 
-public class TarantulaContext implements Serviceable, ServiceContext {
+
+public class TarantulaContext implements Serviceable, ServiceContext, MetricsHomingAgent {
 
 
     private static TarantulaLogger log = JDKLogger.getLogger(TarantulaContext.class);
@@ -781,27 +784,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             }
  	        return false;
         });
- 	    //alist.addAll(availableServicesUpgraded());
  	    return alist;
     }
-    private List<Descriptor> availableServicesUpgraded(){
-        ArrayList<Descriptor> alist = new ArrayList<>();
-        try{
-            URL url = Thread.currentThread().getContextClassLoader().getResource("application/upgrade");
-            File f = new File(url.getFile());
-            f.list((m,n)->{
-                if(n.endsWith(".json")){
-                    Descriptor app = JsonServiceParser.descriptor("application/upgrade",n);
-                    if(!app.disabled()) alist.add(app);
-                }
-                return false;
-            });
-        }
-        catch (Exception ex){
-            log.error("failed to load upgrade services",ex);
-        }
-        return alist;
-    }
+
 
     public Configuration configuration(GameCluster gameCluster,String config){
         return cMap.computeIfAbsent(config,(k)->{
@@ -895,6 +880,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             boolean enabled = e.getAsJsonObject().get("enabled").getAsBoolean();
             if(!enabled) continue;
             Metrics metrics = (Metrics) Class.forName(cln).getConstructor().newInstance();
+            if(metrics instanceof AbstractMetrics){
+                ((AbstractMetrics)metrics).registerMetricsHomeAgent(this);
+            }
             metrics.setup(this);
             metricsManager.addMetrics(metrics);
         }
@@ -1023,4 +1011,18 @@ public class TarantulaContext implements Serviceable, ServiceContext {
          return deploymentDataStoreProvider.dataBufferPair();
     }
 
+    @Override
+    public void onMetrics(String name, List<Statistics.Entry> updated) {
+        if(!node.homingAgentEnabled) return;
+        schedule(new ScheduleRunner(100,()->{
+            try {
+                String[] headers = new String[]{
+                        Session.TARANTULA_ACCESS_KEY,node().homingAgentKey()
+                };
+                httpClientProvider().post(node().homingAgentHost(), "metrics", headers, MetricsLog.metricsLog(node.nodeName,name,updated).toBinary());
+            }catch (Exception ex){
+                log.warn("error on homing agent metrics log: "+ex.getMessage());
+            }
+        }));
+    }
 }

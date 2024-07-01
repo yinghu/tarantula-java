@@ -38,6 +38,10 @@ public class StatisticsEntry extends OnApplicationHeader implements Statistics.E
         this.yearly = entry.yearly();
         this.total = entry.total();
     }
+    private StatisticsEntry(String category,double value){
+        this.name = category;
+        this.total = value;
+    }
     public void listener(Statistics.Listener listener){
         this.listener = listener;
     }
@@ -150,5 +154,9 @@ public class StatisticsEntry extends OnApplicationHeader implements Statistics.E
         buffer.writeDouble(total);
         buffer.writeLong(timestamp);
         return true;
+    }
+
+    public static Statistics.Entry simpleValue(String category,double value){
+        return new StatisticsEntry(category,value);
     }
 }
