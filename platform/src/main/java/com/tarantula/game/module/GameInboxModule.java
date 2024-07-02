@@ -24,6 +24,9 @@ public class GameInboxModule extends ModuleHeader{
             boolean suc = this.gameServiceProvider.inboxServiceProvider().redeem(session,session.name());
             session.write(JsonUtil.toSimpleResponse(suc,session.name()).getBytes());
         }
+        else if(session.action().equals("onMailbox")){
+            session.write(this.gameServiceProvider.inboxServiceProvider().mailbox(session).toJson().toString().getBytes());
+        }
         else{
             throw new UnsupportedOperationException(session.action()+" not support");
         }
