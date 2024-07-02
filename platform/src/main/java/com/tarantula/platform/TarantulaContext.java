@@ -684,12 +684,11 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
 
     //file name web/[game cluster name]/file.png etc
     public void _writeContent(String fileName,byte[] content){
-        try{
+        try(BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(this.deployDir+"/"+fileName))){
             //write to local deploy dir to be ready for deployment
-            BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(this.deployDir+"/"+fileName));
             fos.write(content);
             fos.flush();
-            fos.close();
+            onUpload(fileName,content);
         }catch (Exception ex){
             log.error("error on content write",ex);
         }
@@ -1014,7 +1013,6 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
     @Override
     public void onMetrics(String name, List<Statistics.Entry> updated) {
         if(!node.homingAgentEnabled) return;
-        log.warn(node.nodeName+ " :: "+name+" :: "+updated.isEmpty());
         schedule(new ScheduleRunner(100,()->{
             try {
                 String[] headers = new String[]{
@@ -1023,6 +1021,21 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
                 httpClientProvider().post(node().homingAgentHost(), "metrics", headers, MetricsLog.metricsLog(node.nodeName,name,updated).toBinary());
             }catch (Exception ex){
                 log.warn("error on homing agent metrics log: "+ex.getMessage());
+            }
+        }));
+    }
+
+    private void onUpload(String fileName,byte[] payload){
+        if(!node.homingAgentEnabled) return;
+        schedule(new ScheduleRunner(100,()->{
+            try {
+                String[] headers = new String[]{
+                        Session.TARANTULA_ACCESS_KEY,node().homingAgentKey(),
+                        Session.TARANTULA_NAME,fileName
+                };
+                httpClientProvider().post(node().homingAgentHost(), "content", headers,payload);
+            }catch (Exception ex){
+                log.warn("error on homing agent content log: "+ex.getMessage());
             }
         }));
     }
