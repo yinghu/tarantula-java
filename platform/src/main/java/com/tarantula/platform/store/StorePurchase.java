@@ -11,7 +11,7 @@ public class StorePurchase extends ResponseHeader {
 
     public String transactionId;
     public List<Inventory> inventoryList;
-
+    public boolean isSandbox;
 
     @Override
     public Map<String,Object> toMap(){
@@ -28,6 +28,7 @@ public class StorePurchase extends ResponseHeader {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("Successful",true);
         jsonObject.addProperty("TransactionId",transactionId);
+        jsonObject.addProperty("IsSandbox", isSandbox);
         JsonArray inventories = new JsonArray();
         inventoryList.forEach((inventory -> inventories.add(inventory.toJson())));
         jsonObject.add("_inventoryList",inventories);
