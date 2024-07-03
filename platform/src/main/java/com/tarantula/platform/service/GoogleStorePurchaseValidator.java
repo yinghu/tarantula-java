@@ -142,6 +142,14 @@ public class GoogleStorePurchaseValidator extends AuthObject {
                 params.put(OnAccess.STORE_TRANSACTION_ID, transactionId);
                 params.put(OnAccess.STORE_PRODUCT_ID, sku);
                 params.put(OnAccess.STORE_QUANTITY, 1);
+
+                if(receipt.has("purchaseType") && receipt.get("purchaseType").getAsInt() == 0){
+                    params.put(OnAccess.IS_SANDBOX, true);
+                }
+                else{
+                    params.put(OnAccess.IS_SANDBOX, false);
+                }
+
                 validated = true;
             }
         } else {

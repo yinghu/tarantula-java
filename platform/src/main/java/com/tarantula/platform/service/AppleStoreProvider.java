@@ -97,7 +97,15 @@ public class AppleStoreProvider extends AuthObject{
                 redeemer.redeem();
                 return true;
             });
-            if(suc) return true;
+
+            if(appleStoreKey.isSandbox()){
+                params.put(OnAccess.IS_SANDBOX, true);
+            }
+            else{
+                params.put(OnAccess.IS_SANDBOX, false);
+            }
+
+            if(suc)return true;
             logger.warn("Item : "+bundleId+" cannot be redeemed");
             throw new RuntimeException("Item : "+bundleId+" cannot be redeemed");
         }catch (Exception ex){

@@ -55,6 +55,7 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
     String STORE_MESSAGE = "storeMessage";
     String STORE_BUNDLE_ID = "bundleId";
     String STORE_RECEIPT = "receipt";
+    String IS_SANDBOX = "isSandbox";
 
     String SYSTEM_ID = "systemId";
     String SESSION = "session";

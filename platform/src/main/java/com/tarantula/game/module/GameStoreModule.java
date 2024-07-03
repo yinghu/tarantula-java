@@ -41,6 +41,7 @@ public class GameStoreModule extends ModuleHeader implements Configurable.Listen
                 StorePurchase storePurchase = new StorePurchase();
                 //storePurchase.transactionId = (String) params.get(OnAccess.STORE_TRANSACTION_ID);
                 storePurchase.inventoryList = inventoryServiceProvider.inventoryList(session.distributionId());
+                storePurchase.isSandbox = (boolean) params.get(OnAccess.IS_SANDBOX);
                 session.write(storePurchase.toJson().toString().getBytes());
             }
             else{
