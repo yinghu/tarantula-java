@@ -9,6 +9,15 @@ public class Announcement extends RecoverableObject {
     public String subject;
     public String body;
 
+    public Announcement(){
+
+    }
+
+    public Announcement(String subject,String body){
+        this.subject = subject;
+        this.body = body;
+    }
+
     @Override
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();

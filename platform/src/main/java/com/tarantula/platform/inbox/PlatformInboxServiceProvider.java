@@ -6,6 +6,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.SnowflakeKey;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceSetup;
 
@@ -54,8 +55,10 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         if(inbox.size()==0) return mailbox;
         String locId  = session.name();
         inbox.forEach((k,v)->{
-            //check config startTime and expirationTime to decide to add to mailBox
-            mailbox.announcementList.add(v.announcement(locId));
+            if(TimeUtil.expired(v.startTime()) && !TimeUtil.expired(v.expirationTime())){
+                Announcement announcement = v.announcement(locId);
+                if(announcement!=null) mailbox.announcementList.add(announcement);
+            }
         });
         return mailbox;
     }

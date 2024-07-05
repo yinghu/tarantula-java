@@ -1,5 +1,6 @@
 package com.tarantula.platform.inbox;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.util.RecoverableObject;
 
@@ -11,7 +12,15 @@ public class Mailbox extends RecoverableObject {
 
     @Override
     public JsonObject toJson() {
-
-        return null;
+        JsonObject resp = new JsonObject();
+        resp.addProperty("Successful",true);
+        JsonArray announcements = new JsonArray();
+        if(announcementList!=null){
+            announcementList.forEach(a->{
+                announcements.add(a.toJson());
+            });
+        }
+        resp.add("_announcements",announcements);
+        return resp;
     }
 }
