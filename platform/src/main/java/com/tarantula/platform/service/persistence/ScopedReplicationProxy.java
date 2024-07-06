@@ -119,13 +119,13 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         return transactionLogManager;
     }
     protected void onHomingAgent(TransactionLog transactionLog){
-        if(!serviceContext.node().homingAgentEnabled()) return;
+        if(!serviceContext.node().homingAgent().enabled()) return;
         serviceContext.schedule(new ScheduleRunner(100,()->{
             try {
                 String[] headers = new String[]{
-                        Session.TARANTULA_ACCESS_KEY,serviceContext.node().homingAgentKey()
+                        Session.TARANTULA_ACCESS_KEY,serviceContext.node().homingAgent().accessKey()
                 };
-                serviceContext.httpClientProvider().post(serviceContext.node().homingAgentHost(), "log", headers, transactionLog.toBinary());
+                serviceContext.httpClientProvider().post(serviceContext.node().homingAgent().host(), "log", headers, transactionLog.toBinary());
             }catch (Exception ex){
                 logger.warn("error on homing agent : "+ex.getMessage());
             }

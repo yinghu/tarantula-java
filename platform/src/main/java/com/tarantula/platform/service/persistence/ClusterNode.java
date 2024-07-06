@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.util.TarantulaAgent;
 import com.icodesoftware.util.TimeUtil;
 
 import java.time.format.DateTimeFormatter;
@@ -30,16 +31,19 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
 
     public boolean dailyBackupEnabled;
     public String dataStoreDirectory;
-    public boolean homingAgentEnabled;
-    public String homingAgentHost;
-    public String homingAgentKey;
+    //public boolean homingAgentEnabled;
+    //public String homingAgentHost;
+    //public String homingAgentKey;
+    public final TarantulaAgent tarantulaAgent;
     public ClusterNode(String bucketName, String nodeName,int partitionNumber,int bucketNumber){
+        this();
         this.bucketName = bucketName;
         this.nodeName = nodeName;
         this.partitionNumber = partitionNumber;
         this.bucketNumber = bucketNumber;
     }
     public ClusterNode(){
+        this.tarantulaAgent = new TarantulaAgent();
     }
 
     public String toString(){
@@ -107,18 +111,12 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     public String dataStoreDirectory(){
         return this.dataStoreDirectory;
     }
-    public boolean homingAgentEnabled(){
-        return homingAgentEnabled;
-    }
 
-    @Override
-    public String homingAgentHost() {
-        return homingAgentHost;
-    }
 
-    @Override
-    public String homingAgentKey(){
-        return homingAgentKey;
+
+
+    public ClusterProvider.HomingAgent homingAgent(){
+        return this.tarantulaAgent;
     }
 
     @Override

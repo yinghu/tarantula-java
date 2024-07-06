@@ -237,4 +237,9 @@ public class TestNode implements ClusterProvider.Node {
     public String dataStoreDirectory() {
         return null;
     }
+
+    @Override
+    public ClusterProvider.HomingAgent homingAgent() {
+        return null;
+    }
 }

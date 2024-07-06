@@ -11,12 +11,12 @@ import java.util.Base64;
 
 public class JWTUtil {
     //Secret key algorithm
-    private final static String ALG_HMAC = "HmacSHA256";
+    public final static String ALG_HMAC = "HmacSHA256";
 
     //private public key pair algorithm RSA or ECDSA
-    private final static String ALG_RSA = "SHA256WithRSA";
+    public final static String ALG_RSA = "SHA256WithRSA";
     //private final static String ALG_ECDSA = "ECDSA";
-    private final static int KEY_SIZE = 32;
+    public final static int KEY_SIZE = 32;
     private static SecureRandom secureRandom;
 
     static {

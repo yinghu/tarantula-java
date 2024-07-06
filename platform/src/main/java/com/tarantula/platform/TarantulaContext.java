@@ -8,7 +8,6 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -207,9 +206,9 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
 
         this.node.dailyBackupEnabled = this.dataStoreDailyBackup;
         this.node.dataStoreDirectory = this.dataStoreDir;
-        this.node.homingAgentEnabled = this.homingAgentEnabled;
-        this.node.homingAgentHost = this.homingAgentHost;
-        this.node.homingAgentKey = this.homingAgentKey;
+        this.node.tarantulaAgent.enabled = this.homingAgentEnabled;
+        this.node.tarantulaAgent.host = this.homingAgentHost;
+        this.node.tarantulaAgent.accessKey = this.homingAgentKey;
         long epochStart = TimeUtil.epochMillisecondsFromMidnight(snowflakeEpochStart[0],snowflakeEpochStart[1],snowflakeEpochStart[2]);
         this.distributionIdGenerator = new LocalDistributionIdGenerator(snowflakeNodeNumber,epochStart);
 
@@ -1012,13 +1011,13 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
 
     @Override
     public void onMetrics(String name, List<Statistics.Entry> updated) {
-        if(!node.homingAgentEnabled) return;
+        if(!node.tarantulaAgent.enabled()) return;
         schedule(new ScheduleRunner(100,()->{
             try {
                 String[] headers = new String[]{
-                        Session.TARANTULA_ACCESS_KEY,node().homingAgentKey()
+                        Session.TARANTULA_ACCESS_KEY,node().homingAgent().accessKey()
                 };
-                httpClientProvider().post(node().homingAgentHost(), "metrics", headers, MetricsLog.metricsLog(node.nodeName,name,updated).toBinary());
+                httpClientProvider().post(node().homingAgent().host(), "metrics", headers, MetricsLog.metricsLog(node.nodeName,name,updated).toBinary());
             }catch (Exception ex){
                 log.warn("error on homing agent metrics log: "+ex.getMessage());
             }
@@ -1026,14 +1025,14 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
     }
 
     private void onUpload(String fileName,byte[] payload){
-        if(!node.homingAgentEnabled) return;
+        if(!node.homingAgent().enabled()) return;
         schedule(new ScheduleRunner(100,()->{
             try {
                 String[] headers = new String[]{
-                        Session.TARANTULA_ACCESS_KEY,node().homingAgentKey(),
+                        Session.TARANTULA_ACCESS_KEY,node().homingAgent().accessKey(),
                         Session.TARANTULA_NAME,fileName
                 };
-                httpClientProvider().post(node().homingAgentHost(), "content", headers,payload);
+                httpClientProvider().post(node().homingAgent().host(), "content", headers,payload);
             }catch (Exception ex){
                 log.warn("error on homing agent content log: "+ex.getMessage());
             }
