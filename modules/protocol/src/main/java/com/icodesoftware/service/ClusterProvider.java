@@ -112,6 +112,8 @@ public interface ClusterProvider extends ServiceProvider {
         String host();
         String accessKey();
         String encryptionKey();
+        byte[] encrypt(byte[] data);
+        byte[] decrypt(byte[] data);
     }
 
 

@@ -27,6 +27,8 @@ public interface Session extends OnApplication {
 
     String TARANTULA_TRACK_ID ="Tarantula-track-id";
 
+    String TARANTULA_DATA_ENCRYPTED ="Tarantula-data-encrypted";
+
 
     String source();
     void source(String source);

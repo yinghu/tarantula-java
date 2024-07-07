@@ -3,6 +3,7 @@ package com.icodesoftware.test;
 import com.icodesoftware.protocol.MessageBuffer;
 import com.icodesoftware.util.BatchUtil;
 import com.icodesoftware.util.CipherUtil;
+import com.icodesoftware.util.TarantulaAgent;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -81,5 +82,14 @@ public class CipherTest {
         Assert.assertTrue(Arrays.equals(key1,key));
     }
 
+    @Test(groups = { "cipher util" })
+    public void tarantulaAgentTest(){
+        String bkey = CipherUtil.toBase64Key();
+        TarantulaAgent tarantulaAgent = new TarantulaAgent();
+        tarantulaAgent.encryptionKey = bkey;
+        byte[] input = "hello".getBytes();
+        byte[] output = tarantulaAgent.encrypt(input);
+        Assert.assertTrue(Arrays.equals(input,tarantulaAgent.decrypt(output)));
+    }
 
 }

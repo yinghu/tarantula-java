@@ -209,6 +209,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
         this.node.tarantulaAgent.enabled = this.homingAgentEnabled;
         this.node.tarantulaAgent.host = this.homingAgentHost;
         this.node.tarantulaAgent.accessKey = this.homingAgentKey;
+        this.onAgent();
         long epochStart = TimeUtil.epochMillisecondsFromMidnight(snowflakeEpochStart[0],snowflakeEpochStart[1],snowflakeEpochStart[2]);
         this.distributionIdGenerator = new LocalDistributionIdGenerator(snowflakeNodeNumber,epochStart);
 
@@ -1030,12 +1031,21 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
             try {
                 String[] headers = new String[]{
                         Session.TARANTULA_ACCESS_KEY,node().homingAgent().accessKey(),
+                        Session.TARANTULA_DATA_ENCRYPTED,"true",
                         Session.TARANTULA_NAME,fileName
                 };
-                httpClientProvider().post(node().homingAgent().host(), "content", headers,payload);
+                httpClientProvider().post(node().homingAgent().host(), "content", headers,node.homingAgent().encrypt(payload));
             }catch (Exception ex){
                 log.warn("error on homing agent content log: "+ex.getMessage());
             }
         }));
+    }
+    private void onAgent() throws Exception{
+        String[] headers = new String[]{
+                Session.TARANTULA_ACCESS_KEY,node().homingAgent().accessKey(),
+        };
+        String resp = httpClientProvider().get(node().homingAgent().host(), "agent", headers);
+        JsonObject agent = JsonUtil.parse(resp);
+        node.tarantulaAgent.encryptionKey = agent.get("encryptionKey").getAsString();
     }
 }
