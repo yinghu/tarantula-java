@@ -177,7 +177,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
                 if(p.value>0){
                     Statistics.Entry e = statistics.entry(p.name);
                     e.update(p.value).update();
-                    updated.add(e);
+                    updated.add(SystemStatisticsEntry.delta(e.name(),p.value));
                     metricsSnapshot(e.name(),LeaderBoard.HOURLY).update(e.hourly()).update();
                     metricsSnapshot(e.name(),LeaderBoard.DAILY).update(e.daily()).update();
                     metricsSnapshot(e.name(),LeaderBoard.WEEKLY).update(e.weekly()).update();

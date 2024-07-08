@@ -40,6 +40,11 @@ public class SystemStatisticsEntry extends OnApplicationHeader implements Statis
         this.timestamp = entry.timestamp();
     }
 
+    private SystemStatisticsEntry(String name,double delta){
+        this.name = name;
+        this.total = delta;
+    }
+
     @Override
     public int scope() {
         return Distributable.LOCAL_SCOPE;
@@ -162,5 +167,9 @@ public class SystemStatisticsEntry extends OnApplicationHeader implements Statis
         resp.addProperty("total",total);
         resp.addProperty("timestamp",timestamp);
         return resp;
+    }
+
+    public static Statistics.Entry delta(String category,double delta){
+        return new SystemStatisticsEntry(category,delta);
     }
 }
