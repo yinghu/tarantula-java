@@ -57,7 +57,10 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         inbox.forEach((k,v)->{
             if(TimeUtil.expired(v.startTime()) && !TimeUtil.expired(v.expirationTime())){
                 Announcement announcement = v.announcement(locId);
-                if(announcement!=null) mailbox.announcementList.add(announcement);
+                if(announcement!=null){
+                    announcement.startTime = v.startTime();
+                    mailbox.announcementList.add(announcement);
+                }
             }
         });
         return mailbox;
