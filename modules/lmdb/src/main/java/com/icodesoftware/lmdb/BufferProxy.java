@@ -167,4 +167,8 @@ public class BufferProxy implements Recoverable.DataBuffer {
         return buffer.remaining();
     }
 
+    public void position(int position){
+        buffer.position(position);
+    }
+
 }

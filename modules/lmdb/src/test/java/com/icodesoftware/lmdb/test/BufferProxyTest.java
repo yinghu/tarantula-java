@@ -153,6 +153,30 @@ public class BufferProxyTest {
         Assert.assertEquals(data.readUTF8(),"test");
     }
 
+    @Test(groups = { "bufferProxy" })
+    public void bufferPositionTest(){
+        Recoverable.DataBuffer buffer = BufferProxy.buffer(20, true);
+        Recoverable.DataHeader header = new LocalHeader(100, 1, 10);
+        Exception exception = null;
+        try {
+            buffer.writeHeader(header);
+            buffer.writeInt(2);
+            buffer.writeInt(3);
+        }catch (Exception ex){
+            exception = ex;
+            buffer.position(Recoverable.DataHeader.SIZE);
+            buffer.writeInt(10);
+        }
+        Assert.assertNotNull(exception);
+        buffer.flip();
+        Recoverable.DataHeader h = buffer.readHeader();
+        int value = buffer.readInt();
+        Assert.assertEquals(h.revision(),header.revision());
+        Assert.assertEquals(h.classId(),header.classId());
+        Assert.assertEquals(h.factoryId(),header.factoryId());
+        Assert.assertEquals(value,10);
+    }
+
 
 
 

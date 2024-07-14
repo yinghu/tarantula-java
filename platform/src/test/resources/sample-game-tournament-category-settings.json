@@ -1,0 +1,169 @@
+{
+  "type": "category",
+  "category": "system",
+  "version": "1.0",
+  "description": "category item template list",
+  "name": "application-type-settings",
+  "itemList":
+  [
+    {
+      "header": {
+        "scope": "application.tournament",
+        "type": "TournamentSchedule",
+        "description": "tournament category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Global",
+            "type": "boolean",
+            "reference": "Boolean",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "NotificationOnFinish",
+            "type": "boolean",
+            "reference": "Boolean",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "SegmentsPerSchedule",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "TargetScore",
+            "type": "number",
+            "reference": "Double",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Name",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Type",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Schedule",
+            "type": "enum",
+            "reference": "Schedule",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "StartTime",
+            "type": "dateTime",
+            "reference": "DateTime",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "EndTime",
+            "type": "dateTime",
+            "reference": "DateTime",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "DurationMinutesPerInstance",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "MaxEntriesPerInstance",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "EnterCost",
+            "type": "number",
+            "reference": "Double",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Credit",
+            "type": "number",
+            "reference": "Double",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "StartLevel",
+            "type": "number",
+            "reference": "Long",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "EndLevel",
+            "type": "number",
+            "reference": "Long",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "PrizeSet",
+            "type": "set",
+            "reference": "category:TournamentPrize",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "application.tournament",
+        "type": "TournamentPrize",
+        "description": "application category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "MinRank",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "MaxRank",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "SkuList",
+            "type": "list",
+            "reference": "category:Sku",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    }
+  ]
+}

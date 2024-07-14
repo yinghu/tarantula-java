@@ -40,7 +40,9 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable,V
 
 
     interface DataHeader{
-        //boolean local();
+
+        int SIZE = 16;
+
         long revision();
 
         int factoryId();
@@ -93,6 +95,7 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable,V
         ByteBuffer clear();
         boolean hasRemaining();
         int remaining();
+        void position(int position);
     }
 
     interface DataBufferPair extends Resettable,AutoCloseable{

@@ -4,6 +4,7 @@ package com.tarantula.test;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import com.icodesoftware.util.CompressUtil;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.GameObjectSetup;
 import com.tarantula.platform.DeploymentDescriptor;
@@ -14,6 +15,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 
@@ -70,7 +72,53 @@ public class ConfigurableObjectTestSet extends DataStoreHook{
         Assert.assertEquals(gameObjectSetup.list(app,new VersionedConfigurableObjectQuery(g500.get(0).distributionId())).size(),0);
     }
 
+    @Test(groups = { "ConfigurableObject" })
+    public void sampleTournamentCompress() {
+        Exception exception = null;
+        try(InputStream in = (Thread.currentThread().getContextClassLoader().getResourceAsStream("sample-game-tournament-category-settings.json"))){
+            JsonObject jsonObject = JsonUtil.parse(in);
+            jsonObject.get("itemList").getAsJsonArray().forEach(e->{
+                JsonObject je = e.getAsJsonObject();
+                int srcLength = je.toString().length();
+                //System.out.println(srcLength);
+                ByteBuffer src = ByteBuffer.wrap(je.toString().getBytes());
+                ByteBuffer dest = ByteBuffer.allocate(srcLength);
+                CompressUtil.lz4().compress(src,dest);
+                dest.flip();
+                byte[] comp = new byte[dest.remaining()];
+                dest.get(comp);
+                //System.out.println(comp.length);
+                src.clear();
+                dest.rewind();
+                CompressUtil.lz4().decompress(dest,src);
+                src.flip();
+                Assert.assertEquals(src.remaining(),srcLength);
+                //make sure no issue from decompress
+                JsonUtil.parse(src.array());
+            });
 
+        }catch (Exception ex){
+            exception = ex;
+        }
+        Assert.assertNull(exception);
+    }
+
+    @Test(groups = { "ConfigurableObject" })
+    public void sampleTournamentOverflow() {
+        Exception exception = null;
+        try(InputStream in = (Thread.currentThread().getContextClassLoader().getResourceAsStream("sample-game-tournament-category-settings.json"))){
+            JsonObject jsonObject = JsonUtil.parse(in);
+            jsonObject.get("itemList").getAsJsonArray().forEach(e->{
+                JsonObject je = e.getAsJsonObject();
+                ByteBuffer buffer = ByteBuffer.allocate(1000);
+                buffer.put(je.toString().getBytes());
+            });
+
+        }catch (Exception ex){
+            exception = ex;
+        }
+        Assert.assertNotNull(exception);
+    }
 
 
 
