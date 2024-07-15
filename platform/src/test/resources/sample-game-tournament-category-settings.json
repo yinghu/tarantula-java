@@ -130,40 +130,6 @@
           }
         ]
       }
-    },
-    {
-      "header": {
-        "scope": "application.tournament",
-        "type": "TournamentPrize",
-        "description": "application category",
-        "version": "1.0",
-        "rechargeable": false
-      },
-      "application": {
-        "properties": [
-          {
-            "name": "MinRank",
-            "type": "number",
-            "reference": "Integer",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "MaxRank",
-            "type": "number",
-            "reference": "Integer",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "SkuList",
-            "type": "list",
-            "reference": "category:Sku",
-            "nullable": false,
-            "downloadable": false
-          }
-        ]
-      }
     }
   ]
 }
