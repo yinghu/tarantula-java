@@ -22,7 +22,7 @@ public class PostOfficeProvider extends AuthObject {
 
     @Override
     public String name() {
-        return OnAccess.DOWNLOAD_CENTER;
+        return OnAccess.POST_OFFICE;
     }
 
     @Override
