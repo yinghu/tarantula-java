@@ -228,6 +228,11 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         gameContext.log("Tournament started : "+tournament.distributionId()+" : "+tournament.name()+" : "+tournament.type()+" : "+tournament.global(),OnLog.WARN);
         tournamentIndex.put(tournament.distributionId(),tournament);
         for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
+            Tournament dropped = tournamentIndex.get(start);
+            if(dropped != null){
+                gameContext.log("Tournament ["+dropped.distributionId()+" replaced with new one",OnLog.WARN);
+                tournamentIndex.remove(dropped.distributionId());
+            }
             tournamentIndex.put(start,tournament);
         }
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
@@ -260,7 +265,18 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
     @Override
     public void tournamentEnded(Tournament tournament) {
-        tournamentIndex.remove(tournament.distributionId());
+        gameContext.log("Tournament ended : "+tournament.distributionId()+" : "+tournament.name()+" : "+tournament.type()+" : "+tournament.global(),OnLog.WARN);
+        if(tournamentIndex.remove(tournament.distributionId())==null) {
+            gameContext.log("Tournament already removed : "+tournament.distributionId()+" : "+tournament.name()+" : "+tournament.type()+" : "+tournament.global(),OnLog.WARN);
+            return;
+        }
+        for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
+            tournamentIndex.remove(start);
+        }
+        TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+        gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
+                webhook.upload(ANALYTICS_QUERY, new RLCTournamentEndTransaction(tournament.distributionId()).toBytes())
+        ));
     }
 
     //UDP Channel Listener Callbacks
