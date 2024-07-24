@@ -3,31 +3,31 @@ package com.tarantula.platform.tournament;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.DataStore;
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.FIFOBuffer;
+import com.icodesoftware.util.NaturalKey;
 import com.icodesoftware.util.RecoverableObject;
-import com.icodesoftware.util.SnowflakeKey;
 
 
 public class RecentlyTournamentList extends RecoverableObject {
 
-    public static final String LABEL = "recently_tournament_list";
+
 
     private FIFOBuffer<Long> tournamentIndex;
 
     private int size;
 
     public RecentlyTournamentList(){
-        this.onEdge = true;
-        this.label = LABEL;
     }
 
 
 
-    public RecentlyTournamentList(String name,int size){
+    private RecentlyTournamentList(String name,int size){
         this();
         this.name = name;
         this.size = size;
         tournamentIndex = new FIFOBuffer<>(size,new Long[size]);
+        fill();
     }
 
     public int getFactoryId() {
@@ -39,22 +39,24 @@ public class RecentlyTournamentList extends RecoverableObject {
 
     @Override
     public boolean write(DataBuffer buffer) {
-        buffer.writeUTF8(name);
+        //buffer.writeUTF8(name);
         buffer.writeInt(size);
         Long[] ids = tournamentIndex.list(new Long[size]);
         for(int i=0;i<size;i++){
             Long id = ids[i];
-            buffer.writeLong(id==null?0:id);
+            buffer.writeLong(id);
         }
         return true;
     }
 
     @Override
     public boolean read(DataBuffer buffer) {
-        name = buffer.readUTF8();
-        size = buffer.readInt();
+        //name = buffer.readUTF8();
+        int sz = buffer.readInt();
+        if(size==0) size = sz;
         tournamentIndex = new FIFOBuffer<>(size,new Long[size]);
-        for(int i=0;i<size;i++){
+        fill();
+        for(int i=0;i<sz;i++){
             tournamentIndex.push(buffer.readLong());
         }
         return true;
@@ -69,22 +71,11 @@ public class RecentlyTournamentList extends RecoverableObject {
     }
 
 
-    public static RecentlyTournamentList lookup(DataStore dataStore,long gameClusterId, String type,int size){
-        RecentlyTournamentList[] ret = new RecentlyTournamentList[]{null};
-        dataStore.list(new RecentlyTournamentListQuery(gameClusterId),list->{
-            if(list.name !=null && list.name.equals(type)){
-                ret[0]=list;
-                ret[0].dataStore = dataStore;
-                return false;
-            }
-            return true;
-        });
-        if(ret[0]!=null) return ret[0];
-        ret[0] = new RecentlyTournamentList(type,size);
-        ret[0].ownerKey(SnowflakeKey.from(gameClusterId));
-        dataStore.create(ret[0]);
-        ret[0].dataStore = dataStore;
-        return ret[0];
+    public static RecentlyTournamentList lookup(DataStore dataStore,String type,int size){
+        RecentlyTournamentList recentlyTournamentList = new RecentlyTournamentList(type,size);
+        dataStore.createIfAbsent(recentlyTournamentList,true);
+        recentlyTournamentList.dataStore(dataStore);
+        return recentlyTournamentList;
     }
 
     @Override
@@ -99,5 +90,26 @@ public class RecentlyTournamentList extends RecoverableObject {
         jsonObject.addProperty("size",size);
         jsonObject.add("index",arrs);
         return jsonObject;
+    }
+
+    @Override
+    public boolean readKey(Recoverable.DataBuffer buffer){
+        name = buffer.readUTF8();
+        return true;
+    }
+    @Override
+    public boolean writeKey(Recoverable.DataBuffer buffer){
+        if(name==null) return false;
+        buffer.writeUTF8(name);
+        return true;
+    }
+    public Key key(){
+        return new NaturalKey(this.name);
+    }
+
+    private void fill(){
+        for(int i=0;i<size;i++){
+            tournamentIndex.push(0L);
+        }
     }
 }
