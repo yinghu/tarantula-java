@@ -27,7 +27,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private static final String CONFIG = "game-tournament-settings";
 
     static final String TOURNAMENT_DATA_STORE = "tournament";
-    //static final String RECENTLY_TOURNAMENT_INDEX_DATA_STORE = "tournament_index";
+    static final String RECENTLY_TOURNAMENT_INDEX_DATA_STORE = "tournament_recently_index";
     static final String TOURNAMENT_JOIN_DATA_STORE = "tournament_join";
     static final String TOURNAMENT_ENTRY_DATA_STORE = "tournament_entry";
     static final String TOURNAMENT_RACE_BOARD_DATA_STORE = "tournament_race_board";
@@ -182,9 +182,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.snapshotTimerInterval.set(((Number)configuration.property("snapshotIntervalMinutes")).intValue());
         this.localOperationEnabled = (boolean)configuration.property("localOperationEnabled");
         this.dataStore = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_DATA_STORE);
-        String localIndexDataStoreName = gameCluster.serviceType().replaceAll("-","_")+"_"+NAME+"_local_index";
-        this.recentlyTournamentIndex = serviceContext.dataStore(Distributable.LOCAL_SCOPE,localIndexDataStoreName);
-        //this.recentlyTournamentIndex = applicationPreSetup.dataStore(gameCluster,RECENTLY_TOURNAMENT_INDEX_DATA_STORE);
+        //String localIndexDataStoreName = gameCluster.serviceType().replaceAll("-","_")+"_"+NAME+"_local_index";
+        //this.recentlyTournamentIndex = serviceContext.dataStore(Distributable.LOCAL_SCOPE,localIndexDataStoreName);
+        this.recentlyTournamentIndex = applicationPreSetup.dataStore(gameCluster,RECENTLY_TOURNAMENT_INDEX_DATA_STORE);
         this.tournamentJoin = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_JOIN_DATA_STORE);
         this.tournamentEntry = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_ENTRY_DATA_STORE);
         this.tournamentRaceBoard = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_RACE_BOARD_DATA_STORE);
