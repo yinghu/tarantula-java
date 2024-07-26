@@ -177,7 +177,43 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                 ));
             }
         }
+        else if(event.command().equals("GrantCurrency")){
+            if(gameContext.applicationSchema().transaction().execute(ctx->{
+                var currencyAmount = JsonUtil.parse((byte[])event.property(OnAccess.PAYLOAD)).get("currency_amount").getAsString();
+                DataStore playerActionStore = ctx.onDataStore("player_inventory_grant");
+                PlayerAction playerAction = new PlayerAction("GrantCurrency-" + currencyAmount,false);
+                playerAction.ownerKey(SnowflakeKey.from(Long.parseLong(event.systemId())));
+                return playerActionStore.create(playerAction);
+            })){
+                TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+                gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
+                        webhook.upload(ANALYTICS_QUERY, new ServerMetadataTransaction(event).toBytes())
+                ));
+            }
+        }
 
+    }
+
+    public boolean onGameEventCompleted(Session session){
+        if (session.name().startsWith("GrantCurrency")){
+            Transaction transaction = gameContext.applicationSchema().transaction();
+
+            PlayerAction playerAction = new PlayerAction(session.name(), false);
+            playerAction.ownerKey(SnowflakeKey.from(session.distributionId()));
+
+            return transaction.execute(ctx->{
+                DataStore playerActionStore = ctx.onDataStore("player_inventory_grant");
+
+                if(!playerActionStore.load(playerAction)) return false;
+
+                playerAction.completed = true;
+                playerActionStore.update(playerAction);
+
+                return true;
+            });
+        }
+
+        return false;
     }
 
     public void onInventory(ApplicationPreSetup applicationPreSetup,Inventory inventory, Inventory.Stock stock){
@@ -212,6 +248,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     public List<OnInbox> inbox(Session session){
         List<OnInbox> inbox = new ArrayList<>();
         List<OnAccess> playerEvents = new ArrayList<>();
+        List<OnAccess> playerCurrencyGrantEvents = new ArrayList<>();
+
         gameContext.applicationSchema().transaction().execute(ctx->{
             DataStore dataStore = ctx.onDataStore("player_coin_form");
             dataStore.list(new PlayerActionQuery(session.distributionId())).forEach(playerAction -> {
@@ -219,7 +257,18 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             });
             return true;
         });
+
+        gameContext.applicationSchema().transaction().execute(ctx->{
+            DataStore dataStore = ctx.onDataStore("player_inventory_grant");
+            dataStore.list(new PlayerActionQuery(session.distributionId())).forEach(playerAction -> {
+                playerCurrencyGrantEvents.add(playerAction);
+            });
+            return true;
+        });
+
         inbox.add(new PlayerEventInbox("coinForm","tournament",playerEvents));
+        inbox.add(new PlayerEventInbox("inventoryGrant", "inventory", playerCurrencyGrantEvents));
+
         return inbox;
     }
 
