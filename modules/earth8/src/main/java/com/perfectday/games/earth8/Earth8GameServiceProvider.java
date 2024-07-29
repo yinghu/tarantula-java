@@ -180,15 +180,14 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         else if(event.command().equals("GrantCurrency")){
             if(gameContext.applicationSchema().transaction().execute(ctx->{
                 var currencyAmount = JsonUtil.parse((byte[])event.property(OnAccess.PAYLOAD)).get("currency_amount").getAsString();
+
                 DataStore playerActionStore = ctx.onDataStore("player_inventory_grant");
                 PlayerAction playerAction = new PlayerAction("GrantCurrency-" + currencyAmount,false);
                 playerAction.ownerKey(SnowflakeKey.from(Long.parseLong(event.systemId())));
+
                 return playerActionStore.create(playerAction);
             })){
-                TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
-                gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
-                        webhook.upload(ANALYTICS_QUERY, new ServerMetadataTransaction(event).toBytes())
-                ));
+
             }
         }
 
@@ -198,16 +197,15 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         if (session.name().startsWith("GrantCurrency")){
             Transaction transaction = gameContext.applicationSchema().transaction();
 
-            PlayerAction playerAction = new PlayerAction(session.name(), false);
-            playerAction.ownerKey(SnowflakeKey.from(session.distributionId()));
-
             return transaction.execute(ctx->{
                 DataStore playerActionStore = ctx.onDataStore("player_inventory_grant");
 
-                if(!playerActionStore.load(playerAction)) return false;
-
-                playerAction.completed = true;
-                playerActionStore.update(playerAction);
+                playerActionStore.list(new PlayerActionQuery(session.distributionId())).forEach(playerAction -> {
+                    if(playerAction.name().equals(session.name())){
+                        playerAction.completed = true;
+                        playerActionStore.update(playerAction);
+                    }
+                });
 
                 return true;
             });
