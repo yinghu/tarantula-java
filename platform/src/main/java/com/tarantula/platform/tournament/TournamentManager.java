@@ -1,6 +1,7 @@
 package com.tarantula.platform.tournament;
 
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
@@ -413,6 +414,16 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         jsonObject.addProperty("StartLevel",startLevel);
         jsonObject.addProperty("EndLevel",endLevel);
         jsonObject.addProperty("Status",status.name());
+        JsonArray prizeList = new JsonArray();
+        if(prizes==null) {
+            this.tournamentServiceProvider.loadPrizes(this);
+        }
+        for(TournamentPrize p : prizes.values()){
+            this.tournamentServiceProvider.inventoryServiceProvider.loadPrize(p);
+            //this.tournamentServiceProvider.logger.warn(p.toJson().toString());
+            prizeList.add(p.toJson());
+        }
+        jsonObject.add("prizes",prizeList);
         return jsonObject;
     }
 

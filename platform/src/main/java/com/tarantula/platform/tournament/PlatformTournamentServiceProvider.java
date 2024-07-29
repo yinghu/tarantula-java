@@ -117,6 +117,10 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         return null;
     }
 
+    void loadPrizes(TournamentManager tournamentManager){
+        tournamentManager.loadPrizes(applicationPreSetup,application);
+    }
+
     public Tournament tournament(long tournamentId){
         TournamentManager indexed = tournamentIndex.get(tournamentId);
         if(indexed!=null) return indexed;
@@ -155,6 +159,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             tournamentManager = new TournamentManager();
             tournamentManager.distributionId(id);
             if(!dataStore.load(tournamentManager)) continue;
+            tournamentManager.tournamentServiceProvider = this;
             _tms.add(tournamentManager);
         }
         return _tms;

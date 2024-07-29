@@ -110,6 +110,13 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
         return suc;
     }
 
+    public void loadPrize(TournamentPrize prize){
+        Descriptor app = gameCluster.application(prize.configurationTypeId());
+        prize.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
+        applicationPreSetup.load(app,prize);
+        prize.setup();
+    }
+
 
     private Category category(Category.Filter filter){
         Descriptor app = gameCluster.serviceWithCategory("inventory");
