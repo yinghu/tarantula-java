@@ -10,8 +10,10 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.service.UserService;
 import com.icodesoftware.util.JsonUtil;
+import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 
+import com.perfectday.games.earth8.inbox.PlayerAction;
 import com.tarantula.platform.*;
 import com.tarantula.platform.presence.*;
 import com.tarantula.platform.util.OnAccessDeserializer;
@@ -37,7 +39,6 @@ public class AdminRoleModule implements Module{
     private Configuration gameClusterConfiguration;
 
     private ConcurrentHashMap<String,Descriptor> pendingGameServices;
-
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onCheckPermission")){
@@ -179,6 +180,30 @@ public class AdminRoleModule implements Module{
             boolean suc = this.deploymentServiceProvider.shutdownGameCluster(gc);
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"operation successfully":"operation failed",suc)).getBytes());
         }
+
+        else if(session.action().equals("onCurrencyGrantEvent")){
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
+
+            DataStore dataStore = gameCluster.applicationPreSetup().onDataStore("player_inventory_grant");
+
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            String playerID = (String)onAccess.property("playerID");
+            String amount = (String)onAccess.property("currencyAmount");
+            String currencyType = (String)onAccess.property("currencyType");
+
+            PlayerAction playerAction = new PlayerAction("GrantCurrency-" + currencyType + "-" + amount,false);
+            playerAction.ownerKey(SnowflakeKey.from(Long.parseLong(playerID)));
+
+            if(dataStore.create(playerAction)){
+                session.write(JsonUtil.toSimpleResponse(true, amount + " " + currencyType + " Granted to Player " + playerID).getBytes());
+
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false, "Failed To Create Grant Event For Player " + playerID).getBytes());
+
+            }
+
+        }
         else{
             session.write(this.builder.create().toJson(new ResponseHeader("onError", session.action()+" operation not supported", false)).getBytes());
         }
@@ -197,6 +222,7 @@ public class AdminRoleModule implements Module{
         this.gameClusterConfiguration = this.context.configuration("cluster");
         this.maxGameClusterCount = ((Number)this.gameClusterConfiguration.property("maxGameClusterCount")).intValue();
         this.pendingGameServices = new ConcurrentHashMap<>();
+
         this.context.log("Admin role module started with max game cluster count ["+maxGameClusterCount+"]", OnLog.INFO);
     }
 

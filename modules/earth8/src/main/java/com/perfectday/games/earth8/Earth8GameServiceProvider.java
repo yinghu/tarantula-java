@@ -177,20 +177,6 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                 ));
             }
         }
-        else if(event.command().equals("GrantCurrency")){
-            if(gameContext.applicationSchema().transaction().execute(ctx->{
-                var currencyAmount = JsonUtil.parse((byte[])event.property(OnAccess.PAYLOAD)).get("currency_amount").getAsString();
-
-                DataStore playerActionStore = ctx.onDataStore("player_inventory_grant");
-                PlayerAction playerAction = new PlayerAction("GrantCurrency-" + currencyAmount,false);
-                playerAction.ownerKey(SnowflakeKey.from(Long.parseLong(event.systemId())));
-
-                return playerActionStore.create(playerAction);
-            })){
-
-            }
-        }
-
     }
 
     public boolean onGameEventCompleted(Session session){

@@ -1,0 +1,70 @@
+<div class="w3-modal-content">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-grant-item-close"><i class="fa fa-close" style="font-size:12px"></i></span>
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">Grant Currency</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
+    <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-grant-item-message"></div>
+    <div class="w3-panel w3-border-bottom w3-border-white">
+        <div class="w3-panel">
+            <label class="tx-text-12">PlayerID</label>
+            <input id ="tx-player-id" class="w3-input w3-round w3-border" type="number" placeholder='playerID'/>
+        </div>
+        <div class="w3-panel">
+            <label class="tx-text-12">Currency Amount</label>
+            <input id ="tx-currency-amount" class="w3-input w3-round w3-border" type="number" placeholder='amount'/>
+        </div>
+        <div class="w3-third w3-container">
+            <label class="tx-text-12 tx-margin-right-4">Currency Type</label>
+            <select id='tx-currency-type' class="w3-select w3-border w3-round tx-text-12" name='currencyType'>
+                <option value="Gems" selected>Gems</option>
+                <option value="Gold">Gold</option>
+            </select>
+        </div>
+        <div class="w3-panel">
+            <span id="tx-grant-currency" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Grant Currency</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div>
+</div>
+<script>
+    document.querySelector('#tx-grant-currency').onclick=()=>{
+        let _playerID = document.querySelector('#tx-player-id').value;
+        let _currencyAmount = document.querySelector('#tx-currency-amount').value;
+        let _currencyType = document.querySelector('#tx-currency-type').value;
+
+        if(_playerID==''){
+            document.querySelector('#tx-grant-item-message').innerHTML = "PlayerID Field Cannot Be Empty";
+            return;
+        }
+
+        if(_currencyAmount==''){
+            document.querySelector('#tx-grant-item-message').innerHTML = "Currency Amount Field Cannot Be Empty";
+            return;
+        }
+
+        let payload ={playerID:_playerID,currencyAmount:_currencyAmount,currencyType:_currencyType};
+        console.log(TARA_API.query().gameClusterId);
+        TARA_API.onSet('role/admin','onCurrencyGrantEvent',TARA_API.query().gameClusterId,payload,(resp)=>{
+            console.log(resp);
+            document.querySelector('#tx-grant-item-message').innerHTML = resp.message;
+        });
+    };
+
+    document.querySelector('#tx-grant-item-close').onclick=()=>{
+        tx_close_current_page();
+    };
+</script>
