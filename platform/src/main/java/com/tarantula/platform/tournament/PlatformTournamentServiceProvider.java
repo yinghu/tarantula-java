@@ -112,8 +112,12 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
         this.application = descriptor;
-        this.tournamentIndex.forEach((k,t)->t.loadPrizes(applicationPreSetup,application));
-        scheduleTournament();
+        serviceContext.schedule(new ScheduleRunner(100,()->{
+            try{gameCluster.ready.await();}catch (Exception ex){}
+            this.tournamentIndex.forEach((k,t)->t.loadPrizes(applicationPreSetup,application));
+            scheduleTournament();
+
+        }));
         return null;
     }
 
@@ -160,6 +164,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             tournamentManager.distributionId(id);
             if(!dataStore.load(tournamentManager)) continue;
             tournamentManager.tournamentServiceProvider = this;
+            this.loadPrizes(tournamentManager);
             _tms.add(tournamentManager);
         }
         return _tms;
