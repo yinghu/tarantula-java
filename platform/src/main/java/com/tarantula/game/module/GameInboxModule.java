@@ -31,24 +31,11 @@ public class GameInboxModule extends ModuleHeader{
         }
         else if(session.action().equals("onPlayerEventCompleted")){
             if(gameServiceProvider.gameServiceProvider().onGameEventCompleted(session)){
-                session.write(JsonUtil.toSimpleResponse(true, "Player event " + session.name() + "completed").getBytes());
+                session.write(JsonUtil.toSimpleResponse(true, "Player event " + session.name() + " completed").getBytes());
             }
             else{
-                session.write(JsonUtil.toSimpleResponse(false, "Player event " + session.name() + "failed to be completed").getBytes());
+                session.write(JsonUtil.toSimpleResponse(false, "Player event " + session.name() + " failed to be completed").getBytes());
             }
-
-        }
-        else if(session.action().equals("onPlayerEventCreate")){
-            //TODO: Set CurrencyGrant Event to true
-
-            OnAccessTrack onAccessTrack = new OnAccessTrack();
-            onAccessTrack.systemId(String.valueOf(session.distributionId()));
-            onAccessTrack.command("GrantCurrency");
-            onAccessTrack.property(OnAccess.PAYLOAD,session.payload());
-
-            gameServiceProvider.gameServiceProvider().onGameEvent(onAccessTrack);
-            session.write(JsonUtil.toSimpleResponse(true, "Player Event" ).getBytes());
-
 
         }
         else{

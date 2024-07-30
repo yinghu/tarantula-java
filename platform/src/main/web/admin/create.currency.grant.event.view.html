@@ -57,9 +57,8 @@
         }
 
         let payload ={playerID:_playerID,currencyAmount:_currencyAmount,currencyType:_currencyType};
-        console.log(TARA_API.query().gameClusterId);
+
         TARA_API.onSet('role/admin','onCurrencyGrantEvent',TARA_API.query().gameClusterId,payload,(resp)=>{
-            console.log(resp);
             document.querySelector('#tx-grant-item-message').innerHTML = resp.message;
         });
     };

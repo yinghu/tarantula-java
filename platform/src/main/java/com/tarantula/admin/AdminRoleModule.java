@@ -196,11 +196,9 @@ public class AdminRoleModule implements Module{
 
             if(dataStore.create(playerAction)){
                 session.write(JsonUtil.toSimpleResponse(true, amount + " " + currencyType + " Granted to Player " + playerID).getBytes());
-
             }
             else{
                 session.write(JsonUtil.toSimpleResponse(false, "Failed To Create Grant Event For Player " + playerID).getBytes());
-
             }
 
         }
