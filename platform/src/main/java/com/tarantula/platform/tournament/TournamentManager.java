@@ -1,6 +1,7 @@
 package com.tarantula.platform.tournament;
 
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
@@ -12,6 +13,7 @@ import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.util.*;
 import com.tarantula.game.SimpleStub;
 import com.tarantula.platform.event.PortableEventRegistry;
+import com.tarantula.platform.item.ConfigurableObject;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -55,7 +57,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     PlatformTournamentServiceProvider tournamentServiceProvider;
     private DistributionTournamentService distributionTournamentService;
     private HashMap<Integer,TournamentPrize> prizes;
-
+    private List<ConfigurableObject> rangedPrizeList;
     ScheduledFuture<?> pendingSchedule;
 
     private ConcurrentHashMap<Long,ScheduledFuture<?>> pendingSchedules = new ConcurrentHashMap<>();
@@ -413,6 +415,11 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         jsonObject.addProperty("StartLevel",startLevel);
         jsonObject.addProperty("EndLevel",endLevel);
         jsonObject.addProperty("Status",status.name());
+        JsonArray prizeList = new JsonArray();
+        for(ConfigurableObject p : rangedPrizeList){
+            prizeList.add(p.toJson());
+        }
+        jsonObject.add("prizes",prizeList);
         return jsonObject;
     }
 
@@ -513,8 +520,14 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         schedule.distributionId(this.scheduleId);
         if(!applicationPreSetup.load(application,schedule)) return;
         schedule.setup();
-        schedule.list().forEach(c-> {
-            prizes.put(c.rank(),c);
+        this.rangedPrizeList = schedule.prizeList(this.tournamentServiceProvider.inventoryServiceProvider);
+        this.rangedPrizeList.forEach(c->{
+            int from = c.header().get("MinRank").getAsInt();
+            int to = c.header().get("MaxRank").getAsInt();
+            for(int i = from;i<=to;i++){
+                TournamentPrize prize = new TournamentPrize(c,i);
+                prizes.put(prize.rank(),prize);
+            }
         });
     }
 

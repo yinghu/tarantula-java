@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
 
 public class GameCluster extends OnApplicationHeader implements ApplicationSchema,Portable, ApplicationPreSetup.Listener, Inventory.Listener {
 
@@ -46,7 +47,7 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
     public final static String GAME_APPLICATION_CATEGORY_TEMPLATE = "applications";
     public final static String GAME_COMMON_TYPE_TEMPLATE = "common-type-settings";
 
-
+    public final CountDownLatch ready = new CountDownLatch(1);
 
     protected ServiceContext serviceContext;
 
@@ -55,6 +56,7 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
     protected CopyOnWriteArrayList<Inventory.Listener> onInventory = new CopyOnWriteArrayList<>();
 
     protected CopyOnWriteArrayList<ApplicationPreSetup.Listener> listeners = new CopyOnWriteArrayList<>();
+
 
     public String mode;
 
