@@ -419,7 +419,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         for(ConfigurableObject p : rangedPrizeList){
             prizeList.add(p.toJson());
         }
-        jsonObject.add("prizes",prizeList);
+        jsonObject.add("_prizes",prizeList);
         return jsonObject;
     }
 
