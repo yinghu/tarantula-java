@@ -114,9 +114,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.application = descriptor;
         serviceContext.schedule(new ScheduleRunner(100,()->{
             try{gameCluster.ready.await();}catch (Exception ex){}
-            this.tournamentIndex.forEach((k,t)->t.loadPrizes(applicationPreSetup,application));
+            this.tournamentIndex.forEach((k, t) -> t.loadPrizes(applicationPreSetup, application));
             scheduleTournament();
-
         }));
         return null;
     }
@@ -467,6 +466,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     private void launch(TournamentManager tournament){
         this.tournamentIndex.put(tournament.distributionId(),tournament);
+        tournament.tournamentServiceProvider = this;
         logger.warn("Tournament ["+tournament.distributionId()+"] is scheduling to start at ["+tournament.startTime()+"]");
         tournament.pendingSchedule = this.serviceContext.schedule(new TournamentStartMonitor(tournament,this));
     }
