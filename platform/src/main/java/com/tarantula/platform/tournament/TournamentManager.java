@@ -416,8 +416,10 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         jsonObject.addProperty("EndLevel",endLevel);
         jsonObject.addProperty("Status",status.name());
         JsonArray prizeList = new JsonArray();
-        for(ConfigurableObject p : rangedPrizeList){
-            prizeList.add(p.toJson());
+        if(rangedPrizeList!=null){
+            for(ConfigurableObject p : rangedPrizeList){
+                prizeList.add(p.toJson());
+            }
         }
         jsonObject.add("_prizes",prizeList);
         return jsonObject;
