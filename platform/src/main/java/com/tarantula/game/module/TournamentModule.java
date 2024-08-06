@@ -1,7 +1,6 @@
 package com.tarantula.game.module;
 
 import com.icodesoftware.*;
-import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.tournament.TournamentContext;
@@ -10,7 +9,7 @@ import com.tarantula.platform.tournament.TournamentContext;
 public class TournamentModule extends ModuleHeader implements Configurable.Listener {
 
     private TournamentServiceProvider tournamentServiceProvider;
-    private TokenValidatorProvider tokenValidatorProvider;
+
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
         if(session.action().equals("onList")){
@@ -28,11 +27,6 @@ public class TournamentModule extends ModuleHeader implements Configurable.Liste
                 session.write(new TournamentContext(board,myBoard).toJson().toString().getBytes());
             }
         }
-        else if(session.action().equals("onEvent")){
-            TokenValidatorProvider.AuthVendor download = tokenValidatorProvider.authVendor(OnAccess.DOWNLOAD_CENTER);
-            byte[] payload = download.download(gameServiceProvider.gameCluster().typeId()+"#"+session.name());
-            session.write(payload);
-        }
         else{
             throw new UnsupportedOperationException(session.action()+" not supported");
         }
@@ -42,7 +36,6 @@ public class TournamentModule extends ModuleHeader implements Configurable.Liste
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         super.setup(applicationContext);
-        tokenValidatorProvider = applicationContext.serviceProvider(TokenValidatorProvider.NAME);
         this.tournamentServiceProvider = gameServiceProvider.tournamentServiceProvider();
         this.tournamentServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
         this.context.log("Tournament module started", OnLog.WARN);

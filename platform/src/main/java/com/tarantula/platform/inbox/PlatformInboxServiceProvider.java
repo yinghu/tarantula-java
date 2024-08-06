@@ -6,18 +6,15 @@ import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.SnowflakeKey;
-import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceSetup;
 
-import com.tarantula.platform.configuration.MailboxCredentialConfiguration;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.Application;
 import com.tarantula.platform.tournament.TournamentPrize;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
 
@@ -47,23 +44,6 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         inbox.dailyGiveawayList = this.platformGameServiceProvider.dailyGiveawayServiceProvider().list();
         inbox.inboxList = this.platformGameServiceProvider.gameServiceProvider().inbox(session);
         return inbox;
-    }
-
-    public Mailbox mailbox(Session session){
-        Map<Long,MailboxCredentialConfiguration> inbox = this.platformGameServiceProvider.configurationServiceProvider().inbox();
-        Mailbox mailbox = new Mailbox();
-        if(inbox.size()==0) return mailbox;
-        String locId  = session.name();
-        inbox.forEach((k,v)->{
-            if(TimeUtil.expired(v.startTime()) && !TimeUtil.expired(v.expirationTime())){
-                Announcement announcement = v.announcement(locId);
-                if(announcement!=null){
-                    announcement.startTime = v.startTime();
-                    mailbox.announcementList.add(announcement);
-                }
-            }
-        });
-        return mailbox;
     }
 
     @Override
