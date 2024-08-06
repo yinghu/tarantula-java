@@ -10,9 +10,11 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.service.UserService;
 import com.icodesoftware.util.JsonUtil;
+import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 
 import com.tarantula.platform.*;
+import com.tarantula.platform.inbox.ItemGrantEvent;
 import com.tarantula.platform.presence.*;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
@@ -178,6 +180,27 @@ public class AdminRoleModule implements Module{
             GameCluster gc = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
             boolean suc = this.deploymentServiceProvider.shutdownGameCluster(gc);
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"operation successfully":"operation failed",suc)).getBytes());
+        }
+        else if(session.action().equals("onCurrencyGrantEvent")){
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
+
+            DataStore dataStore = gameCluster.applicationPreSetup().onDataStore("player_inventory_grant");
+
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            String playerID = (String)onAccess.property("playerID");
+            String amount = (String)onAccess.property("currencyAmount");
+            String currencyType = (String)onAccess.property("currencyType");
+
+            ItemGrantEvent serverGrantEvent = new ItemGrantEvent("GrantCurrency-" + currencyType + "-" + amount,false);
+            serverGrantEvent.ownerKey(SnowflakeKey.from(Long.parseLong(playerID)));
+
+            if(dataStore.create(serverGrantEvent)){
+                session.write(JsonUtil.toSimpleResponse(true, amount + " " + currencyType + " Granted to Player " + playerID).getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false, "Failed To Create Grant Event For Player " + playerID).getBytes());
+            }
+
         }
         else{
             session.write(this.builder.create().toJson(new ResponseHeader("onError", session.action()+" operation not supported", false)).getBytes());

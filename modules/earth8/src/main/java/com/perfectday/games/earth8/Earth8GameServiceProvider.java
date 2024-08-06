@@ -93,6 +93,25 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     }
 
     public void updateGame(Session session,byte[] payload) throws Exception{
+        if (session.name().startsWith("GrantCurrency")){
+            Transaction transaction = gameContext.applicationSchema().transaction();
+
+            transaction.execute(ctx->{
+                DataStore playerActionStore = ctx.onDataStore("player_inventory_grant");
+
+                playerActionStore.list(new PlayerActionQuery(session.distributionId())).forEach(playerAction -> {
+                    if(playerAction.name().equals(session.name())){
+                        playerAction.completed = true;
+                        playerActionStore.update(playerAction);
+                    }
+                });
+
+                return true;
+            });
+
+            return;
+        }
+
         BattleUpdate update = BattleUpdate.fromJson(payload);
         PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext,session.distributionId(), PlayerDataTrack.Type.Analytics);
 
@@ -212,6 +231,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     public List<OnInbox> inbox(Session session){
         List<OnInbox> inbox = new ArrayList<>();
         List<OnAccess> playerEvents = new ArrayList<>();
+        List<OnAccess> playerCurrencyGrantEvents = new ArrayList<>();
+
+
         gameContext.applicationSchema().transaction().execute(ctx->{
             DataStore dataStore = ctx.onDataStore("player_coin_form");
             dataStore.list(new PlayerActionQuery(session.distributionId())).forEach(playerAction -> {
@@ -219,7 +241,18 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             });
             return true;
         });
+
+        gameContext.applicationSchema().transaction().execute(ctx->{
+            DataStore dataStore = ctx.onDataStore("player_inventory_grant");
+            dataStore.list(new PlayerActionQuery(session.distributionId())).forEach(playerAction -> {
+                playerCurrencyGrantEvents.add(playerAction);
+            });
+            return true;
+        });
+
         inbox.add(new PlayerEventInbox("coinForm","tournament",playerEvents));
+        inbox.add(new PlayerEventInbox("inventoryGrant", "inventory", playerCurrencyGrantEvents));
+
         return inbox;
     }
 
