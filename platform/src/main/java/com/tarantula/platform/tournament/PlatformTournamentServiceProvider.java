@@ -114,7 +114,17 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.application = descriptor;
         serviceContext.schedule(new ScheduleRunner(100,()->{
             try{gameCluster.ready.await();}catch (Exception ex){}
-            this.tournamentIndex.forEach((k, t) -> t.loadPrizes(applicationPreSetup, application));
+            this.tournamentIndex.forEach((k, t) -> {
+                try{
+                    if(t.tournamentServiceProvider==null){
+                        logger.warn("Tournament ["+t.distributionId()+" not assigned service provider");
+                        t.tournamentServiceProvider = this;
+                    }
+                    t.loadPrizes(applicationPreSetup, application);
+                }catch (Exception ex){
+                    logger.warn("Unexpected exception",ex);
+                }
+            });
             scheduleTournament();
         }));
         return null;
