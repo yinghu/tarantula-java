@@ -33,7 +33,6 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
 
     String DOWNLOAD_CENTER = "downloadCenter";
 
-    String POST_OFFICE = "postOffice";
 
     String LOGIN = "login";
     String DEVICE_ID = "deviceId";

@@ -16,7 +16,6 @@
     {"type": "category","name": "AppleCredentialConfiguration"},
     {"type": "category","name": "FacebookCredentialConfiguration"},
     {"type": "category","name": "GoogleCredentialConfiguration"},
-    {"type": "category","name": "FileCredentialConfiguration"},
-    {"type": "category","name": "MailboxCredentialConfiguration"}
+    {"type": "category","name": "FileCredentialConfiguration"}
   ]
 }
