@@ -13,8 +13,8 @@ import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 
-import com.perfectday.games.earth8.inbox.PlayerAction;
 import com.tarantula.platform.*;
+import com.tarantula.platform.inbox.ItemGrantEvent;
 import com.tarantula.platform.presence.*;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
@@ -191,10 +191,10 @@ public class AdminRoleModule implements Module{
             String amount = (String)onAccess.property("currencyAmount");
             String currencyType = (String)onAccess.property("currencyType");
 
-            PlayerAction playerAction = new PlayerAction("GrantCurrency-" + currencyType + "-" + amount,false);
-            playerAction.ownerKey(SnowflakeKey.from(Long.parseLong(playerID)));
+            ItemGrantEvent serverGrantEvent = new ItemGrantEvent("GrantCurrency-" + currencyType + "-" + amount,false);
+            serverGrantEvent.ownerKey(SnowflakeKey.from(Long.parseLong(playerID)));
 
-            if(dataStore.create(playerAction)){
+            if(dataStore.create(serverGrantEvent)){
                 session.write(JsonUtil.toSimpleResponse(true, amount + " " + currencyType + " Granted to Player " + playerID).getBytes());
             }
             else{
