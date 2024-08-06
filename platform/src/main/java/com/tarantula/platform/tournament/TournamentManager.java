@@ -8,6 +8,7 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.*;
 
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ApplicationPreSetup;
 
 import com.icodesoftware.util.*;
@@ -26,6 +27,8 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TournamentManager extends RecoverableObject implements Tournament, Portable {
+
+    private static TarantulaLogger logger = JDKLogger.getLogger(TournamentManager.class);
 
     private Schedule schedule;
     private String type;
@@ -416,6 +419,11 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         jsonObject.addProperty("EndLevel",endLevel);
         jsonObject.addProperty("Status",status.name());
         JsonArray prizeList = new JsonArray();
+        if(rangedPrizeList==null||tournamentServiceProvider==null){
+            //should not be return no prize set/ need to local why
+            logger.warn("SHOULD BE A NONE PRIZE HERE/");
+            return jsonObject;
+        }
         for(ConfigurableObject p : rangedPrizeList){
             prizeList.add(p.toJson());
         }
