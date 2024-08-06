@@ -523,20 +523,27 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
 
     void loadPrizes(ApplicationPreSetup applicationPreSetup, Descriptor application){
-        this.prizes = new HashMap<>();
-        TournamentSchedule schedule = new TournamentSchedule();
-        schedule.distributionId(this.scheduleId);
-        if(!applicationPreSetup.load(application,schedule)) return;
-        schedule.setup();
-        this.rangedPrizeList = schedule.prizeList(this.tournamentServiceProvider.inventoryServiceProvider);
-        this.rangedPrizeList.forEach(c->{
-            int from = c.header().get("MinRank").getAsInt();
-            int to = c.header().get("MaxRank").getAsInt();
-            for(int i = from;i<=to;i++){
-                TournamentPrize prize = new TournamentPrize(c,i);
-                prizes.put(prize.rank(),prize);
+        try{
+            this.prizes = new HashMap<>();
+            TournamentSchedule schedule = new TournamentSchedule();
+            schedule.distributionId(this.scheduleId);
+            if(!applicationPreSetup.load(application,schedule)){
+                throw new RuntimeException("Schedule Missed");
+                //return;
             }
-        });
+            schedule.setup();
+            this.rangedPrizeList = schedule.prizeList(this.tournamentServiceProvider.inventoryServiceProvider);
+            this.rangedPrizeList.forEach(c->{
+                int from = c.header().get("MinRank").getAsInt();
+                int to = c.header().get("MaxRank").getAsInt();
+                for(int i = from;i<=to;i++){
+                    TournamentPrize prize = new TournamentPrize(c,i);
+                    prizes.put(prize.rank(),prize);
+                }
+            });
+        }catch (Exception ex){
+            logger.error("Prize load issues",ex);
+        }
     }
 
     long toStartTime(){
