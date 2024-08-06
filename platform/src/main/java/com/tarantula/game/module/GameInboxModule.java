@@ -30,13 +30,8 @@ public class GameInboxModule extends ModuleHeader{
             session.write(this.gameServiceProvider.inboxServiceProvider().mailbox(session).toJson().toString().getBytes());
         }
         else if(session.action().equals("onPlayerEventCompleted")){
-            if(gameServiceProvider.gameServiceProvider().onGameEventCompleted(session)){
-                session.write(JsonUtil.toSimpleResponse(true, "Player event " + session.name() + " completed").getBytes());
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(false, "Player event " + session.name() + " failed to be completed").getBytes());
-            }
-
+            gameServiceProvider.gameServiceProvider().updateGame(session,null);
+            session.write(JsonUtil.toSimpleResponse(true, "Player event " + session.name() + " completed").getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action()+" not support");

@@ -93,6 +93,25 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     }
 
     public void updateGame(Session session,byte[] payload) throws Exception{
+        if (session.name().startsWith("GrantCurrency")){
+            Transaction transaction = gameContext.applicationSchema().transaction();
+
+            transaction.execute(ctx->{
+                DataStore playerActionStore = ctx.onDataStore("player_inventory_grant");
+
+                playerActionStore.list(new PlayerActionQuery(session.distributionId())).forEach(playerAction -> {
+                    if(playerAction.name().equals(session.name())){
+                        playerAction.completed = true;
+                        playerActionStore.update(playerAction);
+                    }
+                });
+
+                return true;
+            });
+
+            return;
+        }
+
         BattleUpdate update = BattleUpdate.fromJson(payload);
         PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext,session.distributionId(), PlayerDataTrack.Type.Analytics);
 
@@ -177,27 +196,6 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                 ));
             }
         }
-    }
-
-    public boolean onGameEventCompleted(Session session){
-        if (session.name().startsWith("GrantCurrency")){
-            Transaction transaction = gameContext.applicationSchema().transaction();
-
-            return transaction.execute(ctx->{
-                DataStore playerActionStore = ctx.onDataStore("player_inventory_grant");
-
-                playerActionStore.list(new PlayerActionQuery(session.distributionId())).forEach(playerAction -> {
-                    if(playerAction.name().equals(session.name())){
-                        playerAction.completed = true;
-                        playerActionStore.update(playerAction);
-                    }
-                });
-
-                return true;
-            });
-        }
-
-        return false;
     }
 
     public void onInventory(ApplicationPreSetup applicationPreSetup,Inventory inventory, Inventory.Stock stock){
