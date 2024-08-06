@@ -64,20 +64,21 @@ public class GridlyDownload {
             }
 
             JsonArray data = JsonUtil.parseAsJsonArray(responseData.dataAsString);
-
             data.forEach(e->{
                 JsonObject view = e.getAsJsonObject();
                 String id = view.get("id").getAsString();
                 if(id.equals(subjectKey)){
+                    String defaultHeader = GetDefaultContent(view);
                     view.get("cells").getAsJsonArray().forEach(c->{
                         JsonObject loc = c.getAsJsonObject();
-                        subLoc.put(loc.get("columnId").getAsString(),loc.get("value").getAsString());
+                        subLoc.put(loc.get("columnId").getAsString(),loc.get("value") == null ? defaultHeader : loc.get("value").getAsString());
                     });
                 }
                 if(id.equals(bodyKey)){
+                    String defaultBody = GetDefaultContent(view);
                     view.get("cells").getAsJsonArray().forEach(c->{
                         JsonObject loc = c.getAsJsonObject();
-                        bodyLoc.put(loc.get("columnId").getAsString(),loc.get("value").getAsString());
+                        bodyLoc.put(loc.get("columnId").getAsString(),loc.get("value") == null ? defaultBody : loc.get("value").getAsString());
                     });
                 }
 
@@ -87,6 +88,17 @@ public class GridlyDownload {
             logger.error("Gridly error",ex);
             return false;
         }
+    }
+
+    private String GetDefaultContent(JsonObject view) {
+        JsonArray cells = view.get("cells").getAsJsonArray();
+        for (int i = 0; i < cells.size(); i++) {
+            var loc = cells.get(i).getAsJsonObject();
+            if (loc.get("columnId").getAsString().equals("enUS")) {
+                return loc.get("columnId").getAsString();
+            }
+        }
+        return "";
     }
 
     public Announcement announcement(String locId){
