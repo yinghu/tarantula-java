@@ -95,7 +95,7 @@ public class GridlyDownload {
         for (int i = 0; i < cells.size(); i++) {
             var loc = cells.get(i).getAsJsonObject();
             if (loc.get("columnId").getAsString().equals("enUS")) {
-                return loc.get("columnId").getAsString();
+                return loc.get("value").getAsString();
             }
         }
         return "";
