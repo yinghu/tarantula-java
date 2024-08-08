@@ -486,8 +486,12 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private void clearTournament(TournamentManager tournament){
         TournamentScheduleStatus status = this.loadStatus(tournament.scheduleId());
         status.update(Tournament.Status.PENDING);
-        ConfigurableObject schedule = this.tournamentSchedule(tournament.scheduleId()).configurableObject;
-        schedule.released();
+        TournamentSchedule schedule = this.tournamentSchedule(tournament.scheduleId());
+        if(schedule==null){
+            logger.warn("Tournament schedule should not be deleted once tournament registered in lifetime");
+            return;
+        }
+        schedule.configurableObject.released();
     }
     private TournamentSchedule tournamentSchedule(long scheduleId){
         ConfigurableObject schedule = new ConfigurableObject();
