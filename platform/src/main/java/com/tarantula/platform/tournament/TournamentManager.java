@@ -421,7 +421,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         JsonArray prizeList = new JsonArray();
         if(rangedPrizeList==null||tournamentServiceProvider==null){
             //should not be return no prize set/ need to local why
-            logger.warn("SHOULD BE A NONE PRIZE HERE/");
+            logger.warn("SHOULD BE A NONE PRIZE HERE AND SHOULD BE SHUTDOWN");
             return jsonObject;
         }
         for(ConfigurableObject p : rangedPrizeList){
@@ -528,7 +528,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             TournamentSchedule schedule = new TournamentSchedule();
             schedule.distributionId(this.scheduleId);
             if(!applicationPreSetup.load(application,schedule)){
-                throw new RuntimeException("Schedule Missed");
+                throw new RuntimeException("Schedule should not be deleted once tournament has registered");
                 //return;
             }
             schedule.setup();
@@ -542,7 +542,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
                 }
             });
         }catch (Exception ex){
-            logger.error("Prize load issues",ex);
+            logger.error("Prize load issues ",ex);
+            this.tournamentServiceProvider.endTournament(this);
         }
     }
 
