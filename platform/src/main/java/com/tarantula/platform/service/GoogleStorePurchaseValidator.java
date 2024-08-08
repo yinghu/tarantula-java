@@ -176,8 +176,11 @@ public class GoogleStorePurchaseValidator extends AuthObject {
 
         int code = serviceContext.httpClientProvider().request(client->{
             HttpResponse<String> _response = client.send(_request, HttpResponse.BodyHandlers.ofString());
+            responseData.dataAsString = _response.toString();
             return _response.statusCode();
         });
+
+        logger.warn(responseData.dataAsString);
 
         if(code!=200) logger.warn("Status of Google consume not 200: " + code);
 
