@@ -94,7 +94,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
 
             if (!checkResponsePayload(responseData.dataAsString, params)) return false;
 
-            consumePurchase(query, _tk);
+            if (!consumePurchase(query, _tk)) return false;
 
             String bundleId = (String) params.get(OnAccess.STORE_BUNDLE_ID);
             String systemId = (String) params.get(OnAccess.SYSTEM_ID);
@@ -172,17 +172,15 @@ public class GoogleStorePurchaseValidator extends AuthObject {
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .build();
 
-        HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
-
         int code = serviceContext.httpClientProvider().request(client->{
             HttpResponse<String> _response = client.send(_request, HttpResponse.BodyHandlers.ofString());
-            responseData.dataAsString = _response.toString();
             return _response.statusCode();
         });
 
-        logger.warn(responseData.dataAsString);
-
-        if(code!=200) logger.warn("Status of Google consume not 200: " + code);
+        if(code!=204){
+            logger.warn("Status of Google consume not 204: " + code);
+            return false;
+        }
 
         logger.warn("Item consumed!");
 
