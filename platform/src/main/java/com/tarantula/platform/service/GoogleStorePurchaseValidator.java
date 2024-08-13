@@ -164,6 +164,7 @@ public class GoogleStorePurchaseValidator extends AuthObject {
                 .timeout(Duration.ofSeconds(TIMEOUT))
                 .header(AUTHORIZATION,"Bearer "+_tk)
                 .POST(HttpRequest.BodyPublishers.noBody())
+
                 .build();
 
         HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
