@@ -133,6 +133,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             return false;
         }
         CredentialConfiguration credentialConfiguration = vendorCredentials.remove(itemId);
+        if(credentialConfiguration==null) return true;
         CredentialConfiguration cx = vendorCredentials.remove(credentialConfiguration.name());
         cx.release();
         return true;

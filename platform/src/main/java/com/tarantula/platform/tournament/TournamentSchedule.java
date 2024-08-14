@@ -1,8 +1,7 @@
 package com.tarantula.platform.tournament;
 
-import com.icodesoftware.Descriptor;
+
 import com.icodesoftware.Tournament;
-import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.Application;
