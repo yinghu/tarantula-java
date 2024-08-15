@@ -63,8 +63,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     private ConcurrentHashMap<Long,TournamentManager> tournamentIndex = new ConcurrentHashMap<>();
 
-    //private ConcurrentHashMap<String,RecentlyTournamentList> typedTournamentIndex = new ConcurrentHashMap<>();
-
 
 
     int smallConcurrentInstanceSize = 3;
@@ -201,8 +199,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.snapshotTimerInterval.set(((Number)configuration.property("snapshotIntervalMinutes")).intValue());
         this.localOperationEnabled = (boolean)configuration.property("localOperationEnabled");
         this.dataStore = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_DATA_STORE);
-        //String localIndexDataStoreName = gameCluster.serviceType().replaceAll("-","_")+"_"+NAME+"_local_index";
-        //this.recentlyTournamentIndex = serviceContext.dataStore(Distributable.LOCAL_SCOPE,localIndexDataStoreName);
         this.recentlyTournamentIndex = applicationPreSetup.dataStore(gameCluster,RECENTLY_TOURNAMENT_INDEX_DATA_STORE);
         this.tournamentJoin = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_JOIN_DATA_STORE);
         this.tournamentEntry = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_ENTRY_DATA_STORE);
@@ -311,9 +307,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             tournament.pendingSchedule = this.serviceContext.schedule(new TournamentCloseMonitor(tournament,this));
         }
         logger.warn(tournament.toString());
+        listeners.forEach(l->l.tournamentStarted(tournament));
         if(this.application==null) return;
         tournament.loadPrizes(this.applicationPreSetup,this.application);
-        listeners.forEach(l->l.tournamentStarted(tournament));
     }
     void sortTournament(TournamentManager tournament){
         tournament.snapshot();
@@ -479,6 +475,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         tournament.tournamentServiceProvider = this;
         logger.warn("Tournament ["+tournament.distributionId()+"] is scheduling to start at ["+tournament.startTime()+"]");
         tournament.pendingSchedule = this.serviceContext.schedule(new TournamentStartMonitor(tournament,this));
+        if(application==null) return;
+        loadPrizes(tournament);
     }
 
 

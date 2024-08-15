@@ -542,6 +542,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
                 }
             });
         }catch (Exception ex){
+            if(this.status == Status.ENDED) return;
             logger.error("Prize load issues ",ex);
             this.tournamentServiceProvider.endTournament(this);
         }
