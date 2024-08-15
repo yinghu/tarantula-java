@@ -161,7 +161,8 @@
                         <span id='game-cluster-id-0' tx-game-cluster-id='' view-id='create.access.key' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>AccessKey</span>
                         <span id='game-cluster-developer-0' tx-game-cluster-id='' view-id='create.developer.key' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>DeveloperKey</span>  
                         <span id='game-cluster-list-key-0' tx-game-cluster-id='' view-id='list.developer.key' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>List Key</span> 
-                        <span id='game-cluster-cloud-key-0' tx-game-category='application' tx-service-category='data' tx-game-cluster-id='' view-id='game.asset.list' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Cloud</span> 
+                        <span id='game-cluster-cloud-key-0' tx-game-category='application' tx-service-category='data' tx-game-cluster-id='' view-id='game.asset.list' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Cloud</span>
+                        <span id='game-cluster-currency-grant-id-0' tx-game-cluster-id='' view-id='create.currency.grant.event' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Currency Grant</span>
                     </div>  
                 </div>    
                  
@@ -571,6 +572,7 @@
                     document.querySelector('#game-zone-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
                     document.querySelector('#game-room-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
                     document.querySelector('#game-arena-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
+                    document.querySelector('#game-cluster-currency-grant-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
                     document.querySelector('#game-cluster-'+i).style.display='block';
                 });
                 TARA_API.query().gameClusterIndex = resp.index;
