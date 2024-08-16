@@ -63,8 +63,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     private ConcurrentHashMap<Long,TournamentManager> tournamentIndex = new ConcurrentHashMap<>();
 
-    //private ConcurrentHashMap<String,RecentlyTournamentList> typedTournamentIndex = new ConcurrentHashMap<>();
-
 
 
     int smallConcurrentInstanceSize = 3;
@@ -112,9 +110,26 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
         this.application = descriptor;
-        this.tournamentIndex.forEach((k,t)->t.loadPrizes(applicationPreSetup,application));
-        scheduleTournament();
+        serviceContext.schedule(new ScheduleRunner(100,()->{
+            try{gameCluster.ready.await();}catch (Exception ex){}
+            this.tournamentIndex.forEach((k, t) -> {
+                try{
+                    if(t.tournamentServiceProvider==null){
+                        logger.warn("Tournament ["+t.distributionId()+" not assigned service provider");
+                        t.tournamentServiceProvider = this;
+                    }
+                    t.loadPrizes(applicationPreSetup, application);
+                }catch (Exception ex){
+                    logger.warn("Unexpected exception",ex);
+                }
+            });
+            scheduleTournament();
+        }));
         return null;
+    }
+
+    void loadPrizes(TournamentManager tournamentManager){
+        tournamentManager.loadPrizes(applicationPreSetup,application);
     }
 
     public Tournament tournament(long tournamentId){
@@ -155,6 +170,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             tournamentManager = new TournamentManager();
             tournamentManager.distributionId(id);
             if(!dataStore.load(tournamentManager)) continue;
+            tournamentManager.tournamentServiceProvider = this;
+            this.loadPrizes(tournamentManager);
             _tms.add(tournamentManager);
         }
         return _tms;
@@ -182,8 +199,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.snapshotTimerInterval.set(((Number)configuration.property("snapshotIntervalMinutes")).intValue());
         this.localOperationEnabled = (boolean)configuration.property("localOperationEnabled");
         this.dataStore = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_DATA_STORE);
-        //String localIndexDataStoreName = gameCluster.serviceType().replaceAll("-","_")+"_"+NAME+"_local_index";
-        //this.recentlyTournamentIndex = serviceContext.dataStore(Distributable.LOCAL_SCOPE,localIndexDataStoreName);
         this.recentlyTournamentIndex = applicationPreSetup.dataStore(gameCluster,RECENTLY_TOURNAMENT_INDEX_DATA_STORE);
         this.tournamentJoin = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_JOIN_DATA_STORE);
         this.tournamentEntry = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_ENTRY_DATA_STORE);
@@ -292,9 +307,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             tournament.pendingSchedule = this.serviceContext.schedule(new TournamentCloseMonitor(tournament,this));
         }
         logger.warn(tournament.toString());
+        listeners.forEach(l->l.tournamentStarted(tournament));
         if(this.application==null) return;
         tournament.loadPrizes(this.applicationPreSetup,this.application);
-        listeners.forEach(l->l.tournamentStarted(tournament));
     }
     void sortTournament(TournamentManager tournament){
         tournament.snapshot();
@@ -457,8 +472,11 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     private void launch(TournamentManager tournament){
         this.tournamentIndex.put(tournament.distributionId(),tournament);
+        tournament.tournamentServiceProvider = this;
         logger.warn("Tournament ["+tournament.distributionId()+"] is scheduling to start at ["+tournament.startTime()+"]");
         tournament.pendingSchedule = this.serviceContext.schedule(new TournamentStartMonitor(tournament,this));
+        if(application==null) return;
+        loadPrizes(tournament);
     }
 
 
@@ -466,8 +484,12 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private void clearTournament(TournamentManager tournament){
         TournamentScheduleStatus status = this.loadStatus(tournament.scheduleId());
         status.update(Tournament.Status.PENDING);
-        ConfigurableObject schedule = this.tournamentSchedule(tournament.scheduleId()).configurableObject;
-        schedule.released();
+        TournamentSchedule schedule = this.tournamentSchedule(tournament.scheduleId());
+        if(schedule==null){
+            logger.warn("Tournament schedule should not be deleted once tournament registered in lifetime");
+            return;
+        }
+        schedule.configurableObject.released();
     }
     private TournamentSchedule tournamentSchedule(long scheduleId){
         ConfigurableObject schedule = new ConfigurableObject();

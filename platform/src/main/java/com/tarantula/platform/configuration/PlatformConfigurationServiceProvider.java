@@ -19,6 +19,7 @@ import com.tarantula.platform.util.RecoverableQuery;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
@@ -132,6 +133,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             return false;
         }
         CredentialConfiguration credentialConfiguration = vendorCredentials.remove(itemId);
+        if(credentialConfiguration==null) return true;
         CredentialConfiguration cx = vendorCredentials.remove(credentialConfiguration.name());
         cx.release();
         return true;
@@ -196,6 +198,19 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         scheduledFuture = serviceContext.schedule(new ScheduleRunner(5000,()->{
             exposeMetrics();
         }));
+    }
+
+    public Map<Long,MailboxCredentialConfiguration> inbox(){
+        HashMap<Long,MailboxCredentialConfiguration> tem = new HashMap<>();
+        vendorCredentials.forEach((k,c)->{
+            if(c instanceof MailboxCredentialConfiguration){
+                MailboxCredentialConfiguration m = (MailboxCredentialConfiguration)c;
+                if(m.inbox() && !tem.containsKey(c.distributionId())){
+                    tem.put(c.distributionId(),(MailboxCredentialConfiguration)c);
+                }
+            }
+        });
+        return tem;
     }
 
 }

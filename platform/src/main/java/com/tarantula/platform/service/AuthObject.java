@@ -10,12 +10,12 @@ import java.util.Map;
 
 public class AuthObject implements TokenValidatorProvider.AuthVendor {
 
-    protected static String ACCEPT = HttpCaller.ACCEPT;
-    protected static String ACCEPT_JSON = HttpCaller.ACCEPT_JSON;
-    protected static int TIMEOUT = HttpCaller.TIME_OUT;
+    public static String ACCEPT = HttpCaller.ACCEPT;
+    public static String ACCEPT_JSON = HttpCaller.ACCEPT_JSON;
+    public static int TIMEOUT = HttpCaller.TIME_OUT;
     protected static String CONTENT_TYPE = HttpCaller.CONTENT_TYPE;
     protected static String CONTENT_FORM = HttpCaller.CONTENT_FORM;
-    protected static String AUTHORIZATION = HttpCaller.AUTHORIZATION;
+    public static String AUTHORIZATION = HttpCaller.AUTHORIZATION;
     protected final String typeId;
 
     protected   String clientId;
