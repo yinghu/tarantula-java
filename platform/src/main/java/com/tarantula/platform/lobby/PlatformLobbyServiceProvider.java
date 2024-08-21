@@ -1,5 +1,6 @@
 package com.tarantula.platform.lobby;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
 
@@ -9,8 +10,10 @@ import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.HomingAgentConfiguration;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.item.ItemDistributionCallback;
 
@@ -101,6 +104,20 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     }
 
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
+        JsonObject jsonObject = JsonUtil.parse(HomingAgentConfiguration.configuration("Map"));
+        logger.warn(jsonObject.toString());
+        jsonObject.get("list").getAsJsonArray().forEach((map->{
+            JsonObject jo = map.getAsJsonObject();
+            logger.warn(jo.get("Name").getAsString());
+            jo.get("_zoneList").getAsJsonArray().forEach(zone->{
+                JsonObject jz = zone.getAsJsonObject();
+                logger.warn(""+jz.get("PlayMode").getAsInt());
+                logger.warn(jz.get("Name").getAsString()+" : "+jz.get("Rank"));
+                logger.warn(jz.get("_room").toString());
+                logger.warn(jz.get("_arenaList").toString());
+            });
+
+        }));
         lobbyListeners.put(descriptor.tag(),new ListenerOnLobby(descriptor,listener));
         List<LobbyItem> items = applicationPreSetup.list(descriptor,new LobbyItemObjectQuery(descriptor.key(),descriptor.category()));
         items.forEach((a)-> {

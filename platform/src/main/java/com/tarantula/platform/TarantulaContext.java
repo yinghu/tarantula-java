@@ -1041,11 +1041,13 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
         }));
     }
     private void onAgent() throws Exception{
+        if(!node.homingAgent().enabled()) return;
         String[] headers = new String[]{
-                Session.TARANTULA_ACCESS_KEY,node().homingAgent().accessKey(),
+                Session.TARANTULA_ACCESS_KEY,node().homingAgent().accessKey()
         };
         String resp = httpClientProvider().get(node().homingAgent().host(), "agent", headers);
         JsonObject agent = JsonUtil.parse(resp);
         node.tarantulaAgent.encryptionKey = agent.get("encryptionKey").getAsString();
+        HomingAgentConfiguration.init(this);
     }
 }
