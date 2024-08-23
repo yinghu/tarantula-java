@@ -16,6 +16,7 @@ RUN mvn clean install -DskipTests
 FROM gcr.io/distroless/java21:debug
 
 COPY --from=build /app/platform/target/release/gec-platform-2.0-bin/gec-platform-2.0 /platform
+COPY docker-entrypoint.sh /platform/bin/docker-entrypoint.sh
 EXPOSE 8090
 
 ENV USE_HOSTNAME=true
