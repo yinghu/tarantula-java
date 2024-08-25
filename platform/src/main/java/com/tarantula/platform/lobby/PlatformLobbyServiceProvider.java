@@ -104,20 +104,20 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     }
 
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        JsonObject jsonObject = JsonUtil.parse(HomingAgentConfiguration.configuration("Map"));
-        logger.warn(jsonObject.toString());
-        jsonObject.get("list").getAsJsonArray().forEach((map->{
-            JsonObject jo = map.getAsJsonObject();
-            logger.warn(jo.get("Name").getAsString());
-            jo.get("_zoneList").getAsJsonArray().forEach(zone->{
-                JsonObject jz = zone.getAsJsonObject();
-                logger.warn(""+jz.get("PlayMode").getAsInt());
-                logger.warn(jz.get("Name").getAsString()+" : "+jz.get("Rank"));
-                logger.warn(jz.get("_room").toString());
-                logger.warn(jz.get("_arenaList").toString());
-            });
+        String resp = HomingAgentConfiguration.configuration(gameTypeId,"Map");
+        logger.warn(resp);
+        //jsonObject.get("list").getAsJsonArray().forEach((map->{
+            //JsonObject jo = map.getAsJsonObject();
+            //logger.warn(jo.get("Name").getAsString());
+            //jo.get("_zoneList").getAsJsonArray().forEach(zone->{
+                //JsonObject jz = zone.getAsJsonObject();
+                //logger.warn(""+jz.get("PlayMode").getAsInt());
+                //logger.warn(jz.get("Name").getAsString()+" : "+jz.get("Rank"));
+                //logger.warn(jz.get("_room").toString());
+                //logger.warn(jz.get("_arenaList").toString());
+            //});
 
-        }));
+        //}));
         lobbyListeners.put(descriptor.tag(),new ListenerOnLobby(descriptor,listener));
         List<LobbyItem> items = applicationPreSetup.list(descriptor,new LobbyItemObjectQuery(descriptor.key(),descriptor.category()));
         items.forEach((a)-> {
