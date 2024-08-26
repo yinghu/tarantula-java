@@ -104,7 +104,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     }
 
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        String resp = HomingAgentConfiguration.configuration(gameTypeId,"Map");
+        String resp = HomingAgentConfiguration.configuration("614474168859103232","DisplayCard");
         logger.warn(resp);
         //jsonObject.get("list").getAsJsonArray().forEach((map->{
             //JsonObject jo = map.getAsJsonObject();
