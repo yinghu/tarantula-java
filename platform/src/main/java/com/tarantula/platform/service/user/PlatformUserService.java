@@ -166,6 +166,21 @@ public class PlatformUserService implements UserService {
         return null;
     }
 
+    public boolean deleteUser(long systemId){
+        ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin();
+        thirdPartyLogin.distributionId(systemId);
+        loginProviderDataStore.load(thirdPartyLogin);
+        boolean loginProviderDelete = loginProviderDataStore.delete(thirdPartyLogin);
+
+        User u = new User();
+        u.distributionId(systemId);
+        userDataStore.load(u);
+        boolean userDelete = userDataStore.delete(u);
+
+        logger.warn(String.valueOf(loginProviderDelete) + " " + String.valueOf(userDelete));
+        return  loginProviderDelete && userDelete;
+    }
+
     public Account loadAccount(Access access){
         Account account = new UserAccount();
         account.distributionId(access.primary()?access.distributionId():access.primaryId());

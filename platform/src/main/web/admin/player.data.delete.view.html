@@ -1,0 +1,104 @@
+<div class="w3-modal-content">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-delete-data-close"><i class="fa fa-close" style="font-size:12px"></i></span>
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">Delete Player Data</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
+    <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-delete-data-message"></div>
+    <div class="w3-panel w3-border-bottom w3-border-white">
+        <div class="w3-panel">
+            <label class="tx-text-12">PlayerID</label>
+            <input id ="tx-player-id" class="w3-input w3-round w3-border" type="number" placeholder='playerID'/>
+        </div>
+        <div class="w3-panel">
+            <span id="tx-delete-data" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Delete Data</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div>
+
+    <!-- item operation selection form -->
+    <div class="w3-card-4 w3-border w3-round w3-white tx-popup-w300-h150" id="tx-confirm-player-data-delete-popup">
+        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+            <div class="w3-display-topright w3-padding">
+                <span id="tx-confirm-popup-cancel"><i class="fa fa-close" style="font-size:12px"></i></span>
+            </div>
+            <div class="w3-display-topleft w3-padding">
+                <span><i class="fa fa-exclamation-triangle w3-text-yellow tx-margin-top-4" style="font-size:16px"></i></span>
+                <span class="tx-margin-left-8 tx-text-14">Warning!</span>
+            </div>
+        </div>
+        <div class="w3-display-container" style="height: 78px;">
+            <div id="tx-confirm-popup-message" class="w3-display-topmiddle w3-center tx-margin-top-8 tx-text-14">Are You Sure You Want to Delete Player</div>
+            <div class="w3-display-bottomleft tx-margin-left-16 tx-margin-bottom-8">
+                <span id='tx-confirm-popup-confirm-button' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button">Confirm</span>
+            </div>
+            <div class="w3-display-bottomright tx-margin-right-16 tx-margin-bottom-8">
+                <span id='tx-confirm-popup-cancel-button' class="w3-tag w3-green w3-round w3-border w3-border-red tx-text-16 tx-padding-button">Cancel</span>
+            </div>
+        </div>
+        <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+            <div class="w3-display-topleft w3-padding">
+                <span><i class="fa fa-cubes" style="font-size:18px"></i></span>
+            </div>
+            <div class="w3-display-bottomright w3-padding">
+                <span class="tx-text-12">Powered By ICodeSoftware</span>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    let confirmPopup = document.querySelector('#tx-confirm-player-data-delete-popup');
+
+    document.querySelector('#tx-delete-data').onclick=()=>{
+        let _playerID = document.querySelector('#tx-player-id').value;
+
+        if(_playerID==''){
+            document.querySelector('#tx-delete-data-message').innerHTML = "PlayerID Field Cannot Be Empty";
+            return;
+        }
+
+        document.querySelector('#tx-confirm-popup-message').innerHTML = "Delete Data for Player " + _playerID + "?";
+
+        confirmPopup.style.display = 'block';
+    };
+
+    document.querySelector('#tx-delete-data-close').onclick=()=>{
+        tx_close_current_page();
+    };
+
+    document.querySelector('#tx-confirm-popup-cancel-button').onclick =()=>{
+        tx_close_current_page();
+    }
+
+    document.querySelector('#tx-confirm-popup-cancel').onclick =()=>{
+        confirmPopup.style.display = 'none';
+    }
+
+    document.querySelector('#tx-confirm-popup-confirm-button').onclick =()=>{
+        let _playerID = document.querySelector('#tx-player-id').value;
+
+        let payload ={playerID:_playerID};
+
+        TARA_API.onSet('role/admin','onDeletePlayerData',TARA_API.query().gameClusterId,payload,(resp)=>{
+            document.querySelector('#tx-delete-data-message').innerHTML = resp.message;
+        });
+
+        document.querySelector('#tx-player-id').value = '';
+
+        confirmPopup.style.display = 'none';
+    }
+
+</script>

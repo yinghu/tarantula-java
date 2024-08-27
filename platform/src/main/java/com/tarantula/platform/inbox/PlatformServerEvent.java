@@ -3,15 +3,15 @@ package com.tarantula.platform.inbox;
 import com.google.gson.JsonObject;
 import com.icodesoftware.util.RecoverableObject;
 
-public class ItemGrantEvent extends RecoverableObject {
+public class PlatformServerEvent extends RecoverableObject {
     public static final String LABEL = "inbox";
     public boolean completed;
-    public ItemGrantEvent(){
+    public PlatformServerEvent(){
         this.onEdge = true;
         this.label = LABEL;
     }
 
-    public ItemGrantEvent(String name, boolean completed){
+    public PlatformServerEvent(String name, boolean completed){
         this();
         this.name = name;
         this.completed = completed;
