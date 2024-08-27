@@ -177,7 +177,6 @@ public class PlatformUserService implements UserService {
         userDataStore.load(u);
         boolean userDelete = userDataStore.delete(u);
 
-        logger.warn(String.valueOf(loginProviderDelete) + " " + String.valueOf(userDelete));
         return  loginProviderDelete && userDelete;
     }
 

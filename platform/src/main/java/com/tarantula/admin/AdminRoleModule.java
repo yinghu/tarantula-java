@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.SnowflakeKey;
@@ -240,7 +239,6 @@ public class AdminRoleModule implements Module{
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.userService = this.context.serviceProvider(UserService.NAME);
-        //this.accessIndexService = this.context.serviceProvider(AccessIndexServiceProxy.NAME);
         this.accessIndexService = this.context.clusterProvider().accessIndexService();
         this.gameClusterConfiguration = this.context.configuration("cluster");
         this.maxGameClusterCount = ((Number)this.gameClusterConfiguration.property("maxGameClusterCount")).intValue();
