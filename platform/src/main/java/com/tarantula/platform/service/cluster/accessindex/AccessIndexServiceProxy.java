@@ -60,6 +60,20 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         if(!callResult.successful) throw new RuntimeException(callResult.exception);
         return (AccessIndex)callResult.result;
     }
+
+    public boolean delete(String accessKey){
+        NodeEngine nodeEngine = getNodeEngine();
+        AccessIndexDeleteOperation operation = new AccessIndexDeleteOperation(accessKey);
+        int partitionId = nodeEngine.getPartitionService().getPartitionId(accessKey);
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,partitionId);
+        ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+            Future<AccessIndex> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+        },metricsListener);
+        if(!callResult.successful) throw new RuntimeException(callResult.exception);
+        return (boolean)callResult.result;
+    }
+
     @Override
     public AccessIndex setIfAbsent(String accessKey,int referenceId){
         NodeEngine nodeEngine = getNodeEngine();

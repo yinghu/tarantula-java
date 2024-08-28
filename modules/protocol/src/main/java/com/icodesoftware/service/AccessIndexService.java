@@ -11,6 +11,7 @@ public interface AccessIndexService extends ServiceProvider {
     AccessIndex setIfAbsent(String accessKey,int referenceId);
 
     AccessIndex get(String accessKey);
+    boolean delete(String accessKey);
 
     boolean onEnable();
     boolean onDisable();
