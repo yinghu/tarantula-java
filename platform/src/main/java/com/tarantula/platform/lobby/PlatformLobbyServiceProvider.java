@@ -104,8 +104,12 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     }
 
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        String resp = HomingAgentConfiguration.configuration("614474168859103232","DisplayCard");
-        logger.warn(resp);
+        //String resp = HomingAgentConfiguration.configuration("614474168859103232","Shop");
+        //logger.warn(resp);
+        //String resp1 = HomingAgentConfiguration.configuration("8");
+        //logger.warn(resp1);
+        //String resp2 = HomingAgentConfiguration.configurationReleased("8");
+        //logger.warn(resp2);
         //jsonObject.get("list").getAsJsonArray().forEach((map->{
             //JsonObject jo = map.getAsJsonObject();
             //logger.warn(jo.get("Name").getAsString());

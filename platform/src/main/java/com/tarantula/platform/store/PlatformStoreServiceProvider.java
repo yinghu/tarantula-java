@@ -1,13 +1,17 @@
 package com.tarantula.platform.store;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.HomingAgentConfiguration;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
+import com.tarantula.platform.item.Commodity;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.item.ItemDistributionCallback;
 
@@ -101,6 +105,25 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     }
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
+        //logger.warn(descriptor.distributionKey()+" : "+descriptor.tag());
+        String resp = HomingAgentConfiguration.configuration("614474168859103232","Shop");
+        //logger.warn(resp);
+        JsonObject configs = JsonUtil.parse(resp);
+        configs.get("list").getAsJsonArray().forEach(e->{
+            Shop shop = Shop.build(e.getAsJsonObject());
+            //logger.warn(shop.configurationName());
+            //logger.warn(shop.application().toString());
+            shop.itemList().forEach(shoppingItem -> {
+                logger.warn(shoppingItem.name());
+                logger.warn(shoppingItem.skuName());
+                List<Commodity> commodities = shoppingItem.commodityList();
+                commodities.forEach(commodity -> {
+                    gameCluster.registerConfigurableCategory(commodity.application().get("template").getAsJsonObject());
+                });
+                shoppingItems.put(shoppingItem.distributionKey(),shoppingItem);
+            });
+            shopIndex.put("Tami",shop);
+        });
         List<Shop> items = applicationPreSetup.list(descriptor,new ShoppingItemObjectQuery(descriptor.key(),"Shop"));
         items.forEach((a)-> {
             if (!a.disabled()) {

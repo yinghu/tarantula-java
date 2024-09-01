@@ -99,7 +99,7 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
         this.application = descriptor;
         this.platformGameServiceProvider.achievementServiceProvider().registerConfigurableListener(descriptor,listener);
         this.platformGameServiceProvider.dailyGiveawayServiceProvider().registerConfigurableListener(descriptor,listener);
-        this.platformGameServiceProvider.storeServiceProvider().registerConfigurableListener(descriptor,listener);
+        //this.platformGameServiceProvider.storeServiceProvider().registerConfigurableListener(descriptor,listener);
         return null;
     }
 

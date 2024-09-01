@@ -4,6 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.tarantula.platform.item.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class ShoppingItem extends Item{
 
@@ -81,5 +84,21 @@ public class ShoppingItem extends Item{
         if(type==VirtualCurrency.Coin.ordinal()) return VirtualCurrency.Coin;
         if(type==VirtualCurrency.Chip.ordinal()) return VirtualCurrency.Chip;
         return VirtualCurrency.None;
+    }
+
+    public static ShoppingItem build(JsonObject payload){
+        ShoppingItem shoppingItem = new ShoppingItem();
+        shoppingItem.header = payload;
+        shoppingItem.configurationName = payload.get("Name").getAsString();
+        shoppingItem.distributionId = payload.get("ItemId").getAsInt();
+        return shoppingItem;
+    }
+    public List<Commodity> commodityList(){
+        ArrayList<Commodity> commodities = new ArrayList<>();
+        header.get("_skuList").getAsJsonArray().forEach((e)->{
+            JsonObject sku = e.getAsJsonObject().get("_sku").getAsJsonObject();
+            commodities.add(Commodity.build(sku));
+        });
+        return commodities;
     }
 }

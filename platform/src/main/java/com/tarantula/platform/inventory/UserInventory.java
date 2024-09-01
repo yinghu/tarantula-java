@@ -6,7 +6,7 @@ import com.icodesoftware.Inventory;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.util.RecoverableObject;
-import com.tarantula.platform.item.ConfigurableObject;
+import com.tarantula.platform.item.Commodity;
 import com.tarantula.platform.item.ItemPortableRegistry;
 
 import java.util.ArrayList;
@@ -58,6 +58,18 @@ public class UserInventory extends RecoverableObject implements Inventory {
         dataStore.create(inventoryItem);
         if(this.rechargeable){
             balance += commodity.amount();
+        }
+        count++;
+        dataStore.update(this);
+        listener.onInventory(this.applicationPreSetup,this,inventoryItem);
+    }
+
+    public void redeem(Commodity commodity){
+        InventoryItem inventoryItem = new InventoryItem(commodity,applicationPreSetup.distributionId());
+        inventoryItem.ownerKey(this.key());
+        dataStore.create(inventoryItem);
+        if(this.rechargeable){
+            balance += commodity.application().get("Amount").getAsDouble();
         }
         count++;
         dataStore.update(this);

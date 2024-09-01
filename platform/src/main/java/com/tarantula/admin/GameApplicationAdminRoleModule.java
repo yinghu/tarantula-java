@@ -74,6 +74,12 @@ public class GameApplicationAdminRoleModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(false,"failed to release item").getBytes());
             }
         }
+        else if(session.action().equals("onRegistered")){
+            session.write(JsonUtil.toSimpleResponse(false,"failed to register item").getBytes());
+        }
+        else if(session.action().equals("onReleased")){
+            session.write(JsonUtil.toSimpleResponse(false,"failed to release item").getBytes());
+        }
         else {
             throw new UnsupportedOperationException(session.action()+" not supported");
         }

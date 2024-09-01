@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 
 import java.util.ArrayList;
-import java.util.Map;
+
 
 public class Component extends ConfigurableObject{
 
@@ -13,16 +13,6 @@ public class Component extends ConfigurableObject{
 
     public Component(ConfigurableObject configurableObject){
         super(configurableObject);
-    }
-
-    @Override
-    public Map<String,Object> toMap(){
-        super.toMap();
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        super.fromMap(properties);
     }
 
     @Override

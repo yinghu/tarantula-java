@@ -88,6 +88,7 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
             try{
                 ServiceProvider serviceProvider = (ServiceProvider)Class.forName(e.getAsString()).getConstructor(PlatformGameServiceProvider.class).newInstance(this);
                 gameServiceProviders.put(serviceProvider.name(),serviceProvider);
+                logger.warn(serviceProvider.name()+" : "+e.getAsString());
             }catch (Exception nex){
                 throw new RuntimeException(nex);
             }

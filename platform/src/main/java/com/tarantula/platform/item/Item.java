@@ -18,16 +18,6 @@ public class Item extends ConfigurableObject{
     }
 
     @Override
-    public Map<String,Object> toMap(){
-        super.toMap();
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        super.fromMap(properties);
-    }
-
-    @Override
     public int getClassId() {
         return ItemPortableRegistry.ITEM_CID;
     }

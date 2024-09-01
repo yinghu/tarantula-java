@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GameCluster extends OnApplicationHeader implements ApplicationSchema,Portable, ApplicationPreSetup.Listener, Inventory.Listener {
@@ -56,6 +57,8 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
     protected CopyOnWriteArrayList<Inventory.Listener> onInventory = new CopyOnWriteArrayList<>();
 
     protected CopyOnWriteArrayList<ApplicationPreSetup.Listener> listeners = new CopyOnWriteArrayList<>();
+
+    protected ConcurrentHashMap<String,ConfigurableCategory> categories = new ConcurrentHashMap<>();
 
     public String mode;
 
@@ -462,12 +465,15 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
     }
 
     public Inventory createInventory(ApplicationPreSetup applicationPreSetup,String category,String typeId){
-        ConfigurableCategories categories = this.configurableCategories(applicationPreSetup,Configurable.COMMODITY_CONFIG_TYPE);
-        ConfigurableCategory conf = categories.configurableSetting(category);
-        conf.parse();
+        //ConfigurableCategories categories = this.configurableCategories(applicationPreSetup,Configurable.COMMODITY_CONFIG_TYPE);
+        //ConfigurableCategory conf = categories.configurableSetting(category);
+        //conf.parse();
+        ConfigurableCategory conf = categories.get(category);
         Inventory inventory = new UserInventory(conf.name(),typeId,conf.rechargeable,conf.constrained,this);
         return inventory;
     }
+
+
 
     @Override
     public void onInventory(ApplicationPreSetup applicationPreSetup,Inventory inventory, Inventory.Stock inventoryItem) {
@@ -476,5 +482,18 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
 
     public String gameServiceProvider(){
         return gameServiceProvider;
+    }
+
+    public void registerConfigurableCategory(JsonObject template){
+        //logger.warn(template.toString());
+        ConfigurableCategory category = new ConfigurableCategory(template);
+        category.parse();
+        logger.warn(category.name());
+        logger.warn(category.scope);
+        logger.warn(category.version);
+        logger.warn(category.rechargeable+"");
+        logger.warn(category.constrained+"");
+        categories.put(category.name(),category);
+
     }
 }

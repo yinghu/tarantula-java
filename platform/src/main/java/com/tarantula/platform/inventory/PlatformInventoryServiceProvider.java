@@ -4,9 +4,11 @@ import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 
 import com.tarantula.platform.item.*;
+import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.tournament.TournamentPrize;
 
 import java.util.List;
@@ -116,6 +118,31 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
             });
         }
         return suc[0];
+    }
+    public boolean redeem(long systemId, ShoppingItem shoppingItem){
+        shoppingItem.commodityList().forEach(commodity -> {
+            logger.warn(commodity.application().toString());
+            String type = commodity.application().get("ConfigurationCategory").getAsString();
+            String typeId = commodity.application().get("ConfigurationTypeId").getAsString();
+            UserInventory inventory = (UserInventory)applicationPreSetup.inventory(systemId,typeId);
+            if(inventory!=null){
+                logger.warn("inventory :"+inventory.typeId());
+                inventory.redeem(commodity);
+            }
+            else{
+                inventory = (UserInventory) gameCluster.createInventory(applicationPreSetup,type,typeId);
+                logger.warn("in :"+inventory.typeId());
+                inventory.ownerKey(SnowflakeKey.from(systemId));
+                inventoryDataStore.create(inventory);
+                inventoryDataStore.create(inventory);
+                inventoryDataStore.createEdge(inventory,typeId);
+                inventoryDataStore.createEdge(inventory,type);
+                inventory.dataStore(inventoryDataStore);
+                inventory.applicationPreSetup(applicationPreSetup);
+                inventory.redeem(commodity);
+            }
+        });
+        return true;
     }
 
 

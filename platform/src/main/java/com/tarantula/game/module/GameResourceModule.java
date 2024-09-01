@@ -41,7 +41,7 @@ public class GameResourceModule extends ModuleHeader implements Configurable.Lis
         super.setup(applicationContext);
         this.platformResourceServiceProvider = gameServiceProvider.resourceServiceProvider();
         this.platformResourceServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
-        this.context.log("Game resource module started", OnLog.WARN);
+        this.context.log("Game resource module started : "+this.platformResourceServiceProvider.name(), OnLog.WARN);
     }
     public void onCreated(ConfigurableObject item){
         this.context.log(item.toJson().toString(),OnLog.WARN);

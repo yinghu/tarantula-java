@@ -30,4 +30,31 @@ public class HomingAgentConfiguration {
         }
     }
 
+    public static String configuration(String publishedId){
+        try {
+            String[] headers = new String[]{
+                    Session.TARANTULA_ACCESS_KEY, SC.node().homingAgent().accessKey(),
+                    Session.TARANTULA_TRACK_ID,publishedId,
+            };
+            String resp = SC.httpClientProvider().get(SC.node().homingAgent().host(), "configuration/registered", headers);
+            return resp;
+        }catch (Exception ex){
+            logger.error("Homing Error",ex);
+            return "{}";
+        }
+    }
+    public static String configurationReleased(String publishedId){
+        try {
+            String[] headers = new String[]{
+                    Session.TARANTULA_ACCESS_KEY, SC.node().homingAgent().accessKey(),
+                    Session.TARANTULA_TRACK_ID,publishedId,
+            };
+            String resp = SC.httpClientProvider().get(SC.node().homingAgent().host(), "configuration/released", headers);
+            return resp;
+        }catch (Exception ex){
+            logger.error("Homing Error",ex);
+            return "{}";
+        }
+    }
+
 }

@@ -4,6 +4,7 @@ package com.tarantula.platform.inventory;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Inventory;
 import com.icodesoftware.Recoverable;
+import com.tarantula.platform.item.Commodity;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ItemPortableRegistry;
 
@@ -22,6 +23,14 @@ public class InventoryItem extends ConfigurableObject implements Inventory.Stock
         this.label = LABEL;
     }
     public InventoryItem(ApplicationRedeemer commodity,long stockId){
+        this();
+        this.configurationName = commodity.configurationName();
+        this.configurationTypeId = commodity.configurationTypeId();
+        this.itemId = commodity.distributionId();
+        this.stockId = stockId;
+    }
+
+    public InventoryItem(Commodity commodity, long stockId){
         this();
         this.configurationName = commodity.configurationName();
         this.configurationTypeId = commodity.configurationTypeId();

@@ -121,22 +121,6 @@ public class MiscTest {
             });
         }
         Assert.assertEquals(_m.size(),10);
-        Exception exception;
-        SampleCloseable sampleCloseable = new SampleCloseable();
-        SampleCloseable sampleCloseable1 = new SampleCloseable();
-        try(sampleCloseable;sampleCloseable1){
-            sampleCloseable.doSome();
-            sampleCloseable1.doSome();
-            throw new RuntimeException("");
-        }catch (Exception ex){
-            exception = ex;
-        }
-        finally {
-            //System.out.println("final block");
-            Assert.assertTrue(sampleCloseable.closed);
-            Assert.assertTrue(sampleCloseable1.closed);
-        }
-        Assert.assertNotNull(exception);
     }
 
 

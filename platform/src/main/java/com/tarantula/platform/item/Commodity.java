@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 
 import java.util.ArrayList;
-import java.util.Map;
+
 
 public class Commodity extends ConfigurableObject{
 
@@ -15,15 +15,6 @@ public class Commodity extends ConfigurableObject{
         super(configurableObject);
     }
 
-    @Override
-    public Map<String,Object> toMap(){
-        super.toMap();
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        super.fromMap(properties);
-    }
 
     @Override
     public int getClassId() {
@@ -75,6 +66,12 @@ public class Commodity extends ConfigurableObject{
         String[] comp = this.configurationType.split("\\.");
         if(comp.length != 2) return false; //asset.xxx
         return comp[0].equals(Configurable.COMMODITY_CONFIG_TYPE);
+    }
+
+    public static Commodity build(JsonObject payload){
+        Commodity commodity = new Commodity();
+        commodity.application = payload;
+        return commodity;
     }
 
 }
