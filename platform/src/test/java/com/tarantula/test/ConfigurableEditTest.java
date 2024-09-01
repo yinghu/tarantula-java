@@ -1,11 +1,12 @@
 package com.tarantula.test;
 
-import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import com.icodesoftware.DataStore;
 import com.tarantula.platform.item.ConfigurableEdit;
 import com.tarantula.platform.item.PropertyEdit;
 import com.tarantula.platform.item.PropertyEditQuery;
+import org.checkerframework.checker.units.qual.C;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -25,6 +26,7 @@ public class ConfigurableEditTest extends DataStoreHook{
         configurableEdit.configurationTypeId("typeId");
         configurableEdit.configurationVersion("version");
         configurableEdit.configurationCategory("category");
+        configurableEdit.configurationScope("scope");
         Assert.assertTrue(dataStore.createIfAbsent(configurableEdit,false));
 
         ConfigurableEdit load = new ConfigurableEdit();
@@ -39,6 +41,8 @@ public class ConfigurableEditTest extends DataStoreHook{
         Assert.assertEquals(load.configurationVersion(),configurableEdit.configurationVersion());
 
         PropertyEdit prop = new PropertyEdit();
+        prop.name("Level");
+        prop.type ="number";
         prop.edit = new JsonPrimitive(1);
         prop.ownerKey(configurableEdit.key());
         Assert.assertTrue(dataStore.create(prop));
@@ -46,7 +50,28 @@ public class ConfigurableEditTest extends DataStoreHook{
         List<PropertyEdit> edits = dataStore.list(new PropertyEditQuery(configurableEdit.key()));
         Assert.assertEquals(edits.size(),1);
         Assert.assertEquals(edits.get(0).edit.getAsInt(),1);
+        Assert.assertEquals(edits.get(0).type,"number");
+        Assert.assertEquals(edits.get(0).name(),"Level");
+
+        PropertyEdit prop1 = new PropertyEdit();
+        prop1.name("Sku");
+        prop1.type = "category";
+        JsonArray arr = new JsonArray();
+        arr.add(1);
+        prop1.edit = arr;
+        prop1.ownerKey(configurableEdit.key());
+        Assert.assertTrue(dataStore.create(prop1));
+
+        List<PropertyEdit> loads = dataStore.list(new PropertyEditQuery(configurableEdit.key()));
+        Assert.assertEquals(loads.size(),2);
+
+        ConfigurableEdit edit = new ConfigurableEdit();
+        edit.configurationId = 1;
+        edit.dataStore(dataStore);
+        Assert.assertTrue(dataStore.load(edit));
+        System.out.println(edit.assembly());
     }
+
 
 
 }

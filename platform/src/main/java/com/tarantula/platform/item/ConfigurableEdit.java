@@ -1,7 +1,10 @@
 package com.tarantula.platform.item;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.IntegerKey;
+
+import java.util.List;
 
 
 public class ConfigurableEdit extends ConfigurableObject {
@@ -59,5 +62,38 @@ public class ConfigurableEdit extends ConfigurableObject {
     @Override
     public Key key() {
         return IntegerKey.from(configurationId);
+    }
+
+    @Override
+    public JsonObject toJson() {
+        JsonObject resp = new JsonObject();
+        resp.addProperty("configurationId",configurationId);
+        resp.addProperty("configurationName",configurationName);
+        resp.addProperty("configurationType",configurationType);
+        resp.addProperty("configurationTypeId",configurationTypeId);
+        resp.addProperty("configurationCategory",configurationCategory);
+        resp.addProperty("configurationVersion",configurationVersion);
+        resp.addProperty("configurationScope",configurationScope);
+        return resp;
+    }
+
+    public JsonObject assembly(){
+        JsonObject resp = toJson();
+        List<PropertyEdit> props = dataStore.list(new PropertyEditQuery(this.key()));
+        props.forEach(prop->{
+            if(prop.type.equals("number")){
+                resp.addProperty(prop.name(),prop.edit.getAsNumber());
+            }
+            else if(prop.type.equals("enum")){
+                resp.addProperty(prop.name(),prop.edit.getAsInt());
+            }
+            else if(prop.type.equals("string")){
+                resp.addProperty(prop.name(),prop.edit.getAsString());
+            }
+            else if(prop.type.equals("category") || prop.type.equals("list")){
+                resp.add(prop.name(),prop.edit.getAsJsonArray());
+            }
+        });
+        return resp;
     }
 }
