@@ -32,9 +32,10 @@ public class InventoryItem extends ConfigurableObject implements Inventory.Stock
         this.itemId = commodity.distributionId();
         this.stockId = stockId;
     }
-    public InventoryItem(long configurationId){
+    public InventoryItem(long itemId,long stockId){
         this();
-        this.itemId = configurationId;
+        this.itemId = itemId;
+        this.stockId = stockId;
     }
 
     @Override

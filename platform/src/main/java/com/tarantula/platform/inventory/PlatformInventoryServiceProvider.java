@@ -128,7 +128,7 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
             UserInventory inventory = (UserInventory)applicationPreSetup.inventory(systemId,typeId);
             if(inventory!=null){
                 logger.warn("inventory :"+inventory.typeId());
-                inventory.redeem(commodity);
+                inventory.redeem(shoppingItem.distributionId(),commodity);
             }
             else{
                 inventory = (UserInventory) gameCluster.createInventory(applicationPreSetup,type,typeId);
@@ -140,7 +140,7 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
                 inventoryDataStore.createEdge(inventory,type);
                 inventory.dataStore(inventoryDataStore);
                 inventory.applicationPreSetup(applicationPreSetup);
-                inventory.redeem(commodity);
+                inventory.redeem(shoppingItem.distributionId(),commodity);
             }
         });
         return true;

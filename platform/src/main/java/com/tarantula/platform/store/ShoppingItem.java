@@ -90,7 +90,7 @@ public class ShoppingItem extends Item{
         ShoppingItem shoppingItem = new ShoppingItem();
         shoppingItem.header = payload;
         shoppingItem.configurationName = payload.get("Name").getAsString();
-        shoppingItem.distributionId = payload.get("ItemId").getAsInt();
+        shoppingItem.distributionId = payload.get("ConfigurationId").getAsInt();
         return shoppingItem;
     }
     public List<Commodity> commodityList(){

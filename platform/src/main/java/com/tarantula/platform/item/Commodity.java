@@ -86,8 +86,8 @@ public class Commodity extends ConfigurableObject{
         return commodity;
     }
 
-    public InventoryItem inventoryItem(){
-        InventoryItem inventoryItem = new InventoryItem(distributionId);
+    public InventoryItem inventoryItem(long itemId){
+        InventoryItem inventoryItem = new InventoryItem(itemId,distributionId);
         inventoryItem.configurationName = configurationName;
         inventoryItem.configurationTypeId = configurationTypeId;
         return inventoryItem;

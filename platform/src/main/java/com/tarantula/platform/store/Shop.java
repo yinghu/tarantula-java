@@ -53,7 +53,6 @@ public class Shop extends Application {
         ArrayList<ShoppingItem> items = new ArrayList<>();
         application.get("_shoppingItemList").getAsJsonArray().forEach(e->{
             JsonObject jo = e.getAsJsonObject();
-            jo.addProperty("ItemId",jo.get("ConfigurationId").getAsString());
             items.add(ShoppingItem.build(jo));
         });
         return items;

@@ -66,8 +66,8 @@ public class UserInventory extends RecoverableObject implements Inventory {
         listener.onInventory(this.applicationPreSetup,this,inventoryItem);
     }
 
-    public void redeem(Commodity commodity){
-        InventoryItem inventoryItem = commodity.inventoryItem();
+    public void redeem(long itemId,Commodity commodity){
+        InventoryItem inventoryItem = commodity.inventoryItem(itemId);
         inventoryItem.ownerKey(this.key());
         dataStore.create(inventoryItem);
         List<PropertyEdit> edits = commodity.stock();

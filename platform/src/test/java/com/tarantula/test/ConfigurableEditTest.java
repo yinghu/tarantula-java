@@ -69,7 +69,7 @@ public class ConfigurableEditTest extends DataStoreHook{
         edit.configurationId = 1;
         edit.dataStore(dataStore);
         Assert.assertTrue(dataStore.load(edit));
-        System.out.println(edit.assembly());
+        //System.out.println(edit.assembly());
     }
 
 

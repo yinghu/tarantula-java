@@ -120,6 +120,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
                 commodities.forEach(commodity -> {
                     gameCluster.registerConfigurableCategory(commodity.application().get("template").getAsJsonObject());
                 });
+                logger.warn("item id : "+shoppingItem.distributionKey());
                 shoppingItems.put(shoppingItem.distributionKey(),shoppingItem);
             });
             shopIndex.put("Tami",shop);
