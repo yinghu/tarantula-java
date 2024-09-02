@@ -20,15 +20,6 @@ public class ConfigurableEdit extends ConfigurableObject {
         return ItemPortableRegistry.CONFIGURABLE_EDIT_CID;
     }
 
-    public String configurationScope() {
-        return configurationScope;
-    }
-
-    public void configurationScope(String configurationScope) {
-        this.configurationScope = configurationScope;
-    }
-
-
     public boolean read(DataBuffer buffer){
         this.configurationType = buffer.readUTF8();
         this.configurationTypeId = buffer.readUTF8();

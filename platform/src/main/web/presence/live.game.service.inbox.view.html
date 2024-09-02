@@ -79,9 +79,7 @@
     document.querySelector('#tx-inbox-leader-board-load').onclick=()=>{
         tx_leader_board_json();
     };
-    TARA_API.onGet(TARA_API.query().serviceTag,'onInbox','',(resp)=>{
-        editor.set(resp);
-    });
+    
     function tx_download_json_file(){
         let cname = document.querySelector('#tx-inbox-find-file-config-name').value;
         TARA_API.onGet(TARA_API.query().serviceTag,'onFile',cname,(resp)=>{

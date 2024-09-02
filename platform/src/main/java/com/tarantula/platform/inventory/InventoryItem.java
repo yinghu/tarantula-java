@@ -4,9 +4,12 @@ package com.tarantula.platform.inventory;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Inventory;
 import com.icodesoftware.Recoverable;
-import com.tarantula.platform.item.Commodity;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ItemPortableRegistry;
+import com.tarantula.platform.item.PropertyEdit;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class InventoryItem extends ConfigurableObject implements Inventory.Stock {
@@ -15,7 +18,7 @@ public class InventoryItem extends ConfigurableObject implements Inventory.Stock
 
     private long stockId;
     private long itemId;
-    private Recoverable stock;
+    private List<PropertyEdit> stock = new ArrayList<>();
 
 
     public InventoryItem(){
@@ -29,15 +32,10 @@ public class InventoryItem extends ConfigurableObject implements Inventory.Stock
         this.itemId = commodity.distributionId();
         this.stockId = stockId;
     }
-
-    public InventoryItem(Commodity commodity, long stockId){
+    public InventoryItem(long configurationId){
         this();
-        this.configurationName = commodity.configurationName();
-        this.configurationTypeId = commodity.configurationTypeId();
-        this.itemId = commodity.distributionId();
-        this.stockId = stockId;
+        this.itemId = configurationId;
     }
-
 
     @Override
     public boolean write(DataBuffer buffer) {
@@ -73,7 +71,20 @@ public class InventoryItem extends ConfigurableObject implements Inventory.Stock
         jsonObject.addProperty("Name",configurationName);
         jsonObject.addProperty("ItemId",Long.toString(itemId));
         jsonObject.addProperty("StockId",Long.toString(stockId));
-        jsonObject.add("_stock",stock!=null?stock.toJson():new JsonObject());
+        stock.forEach(prop->{
+            if(prop.type.equals("number")){
+                jsonObject.addProperty(prop.name(),prop.edit.getAsNumber());
+            }
+            else if(prop.type.equals("enum")){
+                jsonObject.addProperty(prop.name(),prop.edit.getAsInt());
+            }
+            else if(prop.type.equals("string")){
+                jsonObject.addProperty(prop.name(),prop.edit.getAsString());
+            }
+            else if(prop.type.equals("category") || prop.type.equals("list")){
+                jsonObject.add(prop.name(),prop.edit.getAsJsonArray());
+            }
+        });
         return jsonObject;
     }
 
@@ -85,8 +96,7 @@ public class InventoryItem extends ConfigurableObject implements Inventory.Stock
     }
 
     public void stock(Recoverable recoverable){
-        this.stock = recoverable;
+        stock.add((PropertyEdit)recoverable);
     }
-
 
 }

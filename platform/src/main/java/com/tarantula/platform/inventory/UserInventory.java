@@ -3,11 +3,13 @@ package com.tarantula.platform.inventory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Inventory;
-import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.item.Commodity;
 import com.tarantula.platform.item.ItemPortableRegistry;
+import com.tarantula.platform.item.PropertyEdit;
+import com.tarantula.platform.item.PropertyEditQuery;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,11 +67,16 @@ public class UserInventory extends RecoverableObject implements Inventory {
     }
 
     public void redeem(Commodity commodity){
-        InventoryItem inventoryItem = new InventoryItem(commodity,applicationPreSetup.distributionId());
+        InventoryItem inventoryItem = commodity.inventoryItem();
         inventoryItem.ownerKey(this.key());
         dataStore.create(inventoryItem);
+        List<PropertyEdit> edits = commodity.stock();
+        for (PropertyEdit edit : edits) {
+            edit.ownerKey(inventoryItem.key());
+            dataStore.create(edit);
+        }
         if(this.rechargeable){
-            balance += commodity.application().get("Amount").getAsDouble();
+            balance += commodity.amount();
         }
         count++;
         dataStore.update(this);
@@ -77,16 +84,13 @@ public class UserInventory extends RecoverableObject implements Inventory {
     }
 
     public void list(){
-         InventoryItemQuery query = new InventoryItemQuery(this.distributionId);
+        InventoryItemQuery query = new InventoryItemQuery(this.distributionId);
          dataStore.list(query).forEach(inventoryItem -> {
-             if(!rechargeable){
-                 Recoverable stock = applicationPreSetup.create(stockFactoryId,stockClassId);
-                 stock.distributionId(inventoryItem.stockId());
-                 if(dataStore.load(stock)){
-                     inventoryItem.stock(stock);
-                 }
-             }
              itemList.add(inventoryItem);
+             PropertyEditQuery query1 = new PropertyEditQuery(inventoryItem.key());
+             dataStore.list(query1).forEach((edit)->{
+                 inventoryItem.stock(edit);
+             });
          });
     }
     @Override
@@ -136,7 +140,7 @@ public class UserInventory extends RecoverableObject implements Inventory {
         jsonObject.addProperty("Rechargeable",rechargeable);
         jsonObject.addProperty("Constrained",constrained);
         jsonObject.addProperty("Count",count);
-        if(rechargeable) return jsonObject;
+        //if(rechargeable) return jsonObject;
         JsonArray items = new JsonArray();
         itemList.forEach((item)->items.add(item.toJson()));
         jsonObject.add("_itemList",items);

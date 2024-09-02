@@ -94,6 +94,13 @@ public class ConfigurableObject extends RecoverableObject implements Configurati
         this.configurationVersion = configurationVersion;
     }
 
+    public String configurationScope() {
+        return configurationScope;
+    }
+
+    public void configurationScope(String configurationScope) {
+        this.configurationScope = configurationScope;
+    }
     @Override
     public void registered(){
         this.disabled = false;

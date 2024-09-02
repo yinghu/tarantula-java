@@ -468,6 +468,7 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
         //ConfigurableCategories categories = this.configurableCategories(applicationPreSetup,Configurable.COMMODITY_CONFIG_TYPE);
         //ConfigurableCategory conf = categories.configurableSetting(category);
         //conf.parse();
+        logger.warn(category+" ::"+typeId);
         ConfigurableCategory conf = categories.get(category);
         Inventory inventory = new UserInventory(conf.name(),typeId,conf.rechargeable,conf.constrained,this);
         return inventory;
@@ -485,7 +486,7 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
     }
 
     public void registerConfigurableCategory(JsonObject template){
-        //logger.warn(template.toString());
+        logger.warn(template.toString());
         ConfigurableCategory category = new ConfigurableCategory(template);
         category.parse();
         logger.warn(category.name());
