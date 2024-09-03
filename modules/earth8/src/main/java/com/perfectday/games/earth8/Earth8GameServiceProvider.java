@@ -93,7 +93,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     }
 
     public void updateGame(Session session,byte[] payload) throws Exception{
-        if (session.name() != null && session.name().startsWith("GrantCurrency")){
+        if (session.name() != null && session.name().startsWith("ItemGrant")){
             Transaction transaction = gameContext.applicationSchema().transaction();
 
             transaction.execute(ctx->{
@@ -245,7 +245,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         gameContext.applicationSchema().transaction().execute(ctx->{
             DataStore dataStore = ctx.onDataStore("player_inventory_grant");
             dataStore.list(new PlayerActionQuery(session.distributionId())).forEach(playerAction -> {
-                playerCurrencyGrantEvents.add(playerAction);
+                if(!playerAction.completed){
+                    playerCurrencyGrantEvents.add(playerAction);
+                }
             });
             return true;
         });
