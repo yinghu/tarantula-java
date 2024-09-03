@@ -1,5 +1,6 @@
 package com.icodesoftware;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.service.ApplicationPreSetup;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public interface Inventory extends Configurable,Balance,Countable{
 
         long itemId();
         long stockId();
+        JsonObject assembly();
     }
 
     interface Listener{

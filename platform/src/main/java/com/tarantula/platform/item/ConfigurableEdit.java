@@ -58,6 +58,7 @@ public class ConfigurableEdit extends ConfigurableObject {
         return resp;
     }
 
+
     public JsonObject assembly(){
         this.dataStore.load(this);
         JsonObject resp = toJson();
@@ -72,19 +73,23 @@ public class ConfigurableEdit extends ConfigurableObject {
             else if(prop.type.equals("string")){
                 resp.addProperty(prop.name(),prop.edit.getAsString());
             }
-            else if(prop.type.equals("category") || prop.type.equals("list")){
-                if(prop.name().startsWith("_")){
-                    resp.add(prop.name(),prop.edit.getAsJsonArray());
-                }
-                else if(prop.name().startsWith("$$")){
-                    JsonArray pes = prop.edit.getAsJsonArray();
-                    pes.forEach(pe->{
-                        ConfigurableEdit edit = new ConfigurableEdit();
-                        edit.distributionId(pe.getAsLong());
-
-                    });
-                    System.out.println(prop);
-                }
+            else if(prop.type.equals("list")){
+                JsonArray pes = prop.edit.getAsJsonArray();
+                JsonArray list = new JsonArray();
+                pes.forEach(pe->{
+                    ConfigurableEdit edit = new ConfigurableEdit();
+                    edit.distributionId(pe.getAsLong());
+                    edit.dataStore(dataStore);
+                    list.add(edit.assembly());
+                });
+                resp.add(prop.name(),list);
+            }
+            else if(prop.type.equals("category")){
+                JsonArray pes = prop.edit.getAsJsonArray();
+                ConfigurableEdit edit = new ConfigurableEdit();
+                edit.distributionId(pes.get(0).getAsLong());
+                edit.dataStore(dataStore);
+                resp.add(prop.name(),edit.assembly());
             }
         });
         return resp;
@@ -104,7 +109,8 @@ public class ConfigurableEdit extends ConfigurableObject {
             propertyEdit.ownerKey(this.key());
             dataStore.create(propertyEdit);
             if(type.equals("list")){
-                JsonArray list = application.get(StringUtil.toUnderScore(name)).getAsJsonArray();
+                String _name = StringUtil.toUnderScore(name);
+                JsonArray list = application.get(_name).getAsJsonArray();
                 JsonArray pes = new JsonArray();
                 list.forEach((category->{
                     ConfigurableEdit configurableEdit = new ConfigurableEdit();
@@ -112,18 +118,19 @@ public class ConfigurableEdit extends ConfigurableObject {
                     long editId = configurableEdit.build(category.getAsJsonObject());
                     pes.add(editId);
                 }));
-                PropertyEdit pe = new PropertyEdit("list","$$"+name,pes);
+                PropertyEdit pe = new PropertyEdit("list",_name,pes);
                 pe.ownerKey(this.key());
                 dataStore.create(pe);
             }
             else if(type.equals("category")){
-                JsonObject category = application.get(StringUtil.toUnderScore(name)).getAsJsonObject();
+                String _name = StringUtil.toUnderScore(name);
+                JsonObject category = application.get(_name).getAsJsonObject();
                 ConfigurableEdit configurableEdit = new ConfigurableEdit();
                 configurableEdit.dataStore(dataStore);
                 long editId = configurableEdit.build(category.getAsJsonObject());
                 JsonArray pes = new JsonArray();
                 pes.add(editId);
-                PropertyEdit pe = new PropertyEdit("category","$$"+name,pes);
+                PropertyEdit pe = new PropertyEdit("category",_name,pes);
                 pe.ownerKey(this.key());
                 dataStore.create(pe);
             }

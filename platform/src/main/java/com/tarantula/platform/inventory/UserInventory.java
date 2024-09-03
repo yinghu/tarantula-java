@@ -7,7 +7,6 @@ import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.item.Commodity;
 import com.tarantula.platform.item.ItemPortableRegistry;
-import com.tarantula.platform.item.PropertyEdit;
 import com.tarantula.platform.item.PropertyEditQuery;
 
 
@@ -69,12 +68,14 @@ public class UserInventory extends RecoverableObject implements Inventory {
     public void redeem(long itemId,Commodity commodity){
         InventoryItem inventoryItem = commodity.inventoryItem(itemId);
         inventoryItem.ownerKey(this.key());
-        dataStore.create(inventoryItem);
-        List<PropertyEdit> edits = commodity.stock();
-        for (PropertyEdit edit : edits) {
-            edit.ownerKey(inventoryItem.key());
-            dataStore.create(edit);
-        }
+        inventoryItem.dataStore(dataStore);
+        inventoryItem.build(commodity.application());
+        //dataStore.create(inventoryItem);
+        //List<PropertyEdit> edits = commodity.stock();
+        //for (PropertyEdit edit : edits) {
+            //edit.ownerKey(inventoryItem.key());
+            //dataStore.create(edit);
+        //}
         if(this.rechargeable){
             balance += commodity.amount();
         }
@@ -87,10 +88,11 @@ public class UserInventory extends RecoverableObject implements Inventory {
         InventoryItemQuery query = new InventoryItemQuery(this.distributionId);
          dataStore.list(query).forEach(inventoryItem -> {
              itemList.add(inventoryItem);
-             PropertyEditQuery query1 = new PropertyEditQuery(inventoryItem.key());
-             dataStore.list(query1).forEach((edit)->{
-                 inventoryItem.stock(edit);
-             });
+             inventoryItem.dataStore(dataStore);
+             //PropertyEditQuery query1 = new PropertyEditQuery(inventoryItem.key());
+             //dataStore.list(query1).forEach((edit)->{
+                 //inventoryItem.stock(edit);
+             //});
          });
     }
     @Override
@@ -142,7 +144,7 @@ public class UserInventory extends RecoverableObject implements Inventory {
         jsonObject.addProperty("Count",count);
         //if(rechargeable) return jsonObject;
         JsonArray items = new JsonArray();
-        itemList.forEach((item)->items.add(item.toJson()));
+        itemList.forEach((item)->items.add(item.assembly()));
         jsonObject.add("_itemList",items);
         return jsonObject;
     }

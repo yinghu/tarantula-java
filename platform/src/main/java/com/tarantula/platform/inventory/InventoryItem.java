@@ -4,7 +4,7 @@ package com.tarantula.platform.inventory;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Inventory;
 import com.icodesoftware.Recoverable;
-import com.tarantula.platform.item.ConfigurableObject;
+import com.tarantula.platform.item.ConfigurableEdit;
 import com.tarantula.platform.item.ItemPortableRegistry;
 import com.tarantula.platform.item.PropertyEdit;
 
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class InventoryItem extends ConfigurableObject implements Inventory.Stock {
+public class InventoryItem extends ConfigurableEdit implements Inventory.Stock {
 
     public final static String LABEL = "inventory_item";
 
@@ -66,12 +66,15 @@ public class InventoryItem extends ConfigurableObject implements Inventory.Stock
 
     @Override
     public JsonObject toJson() {
+        //return assembly();
+
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("InventoryId",distributionKey());
         jsonObject.addProperty("TypeId",configurationTypeId);
         jsonObject.addProperty("Name",configurationName);
         jsonObject.addProperty("ItemId",Long.toString(itemId));
         jsonObject.addProperty("StockId",Long.toString(stockId));
+        /**
         stock.forEach(prop->{
             if(prop.type.equals("number")){
                 jsonObject.addProperty(prop.name(),prop.edit.getAsNumber());
@@ -85,7 +88,7 @@ public class InventoryItem extends ConfigurableObject implements Inventory.Stock
             else if(prop.type.equals("category") || prop.type.equals("list")){
                 jsonObject.add(prop.name(),prop.edit.getAsJsonArray());
             }
-        });
+        });**/
         return jsonObject;
     }
 
