@@ -3,18 +3,17 @@ package com.tarantula.platform.tournament;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
-import com.icodesoftware.util.BufferUtil;
-import com.icodesoftware.util.SnowflakeKey;
-import com.icodesoftware.util.TimeUtil;
+import com.icodesoftware.util.*;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
-import com.icodesoftware.util.ScheduleRunner;
+import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.inbox.PlatformInboxServiceProvider;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.item.ItemDistributionCallback;
 
+import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -150,7 +149,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         ArrayList<Tournament> _tms = new ArrayList<>();
         tournamentIndex.forEach((k,v)->
         {
-            if(v.status() == Tournament.Status.STARTED) _tms.add(v);
+            if(v.status() == Tournament.Status.STARTED || v.status() == Tournament.Status.STARTING) _tms.add(v);
         });
         return _tms;
     }
@@ -580,11 +579,25 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     }
 
-    //private RecentlyTournamentList lookupRecentlyTournamentList(String type){
-        //return typedTournamentIndex.computeIfAbsent(type,key->{
-            //RecentlyTournamentList loaded = RecentlyTournamentList.lookup(this.recentlyTournamentIndex,this.gameCluster.distributionId(),type,this.recentlyTournamentListSize);
-            //return loaded;
-        //});
-    //}
+    public byte[] onTournamentScanned(){
+        List<Long> scheduled = new ArrayList<>();
+        tournamentIndex.forEach((i,t)->{
+            scheduled.add(i);
+        });
+        ByteBuffer byteBuffer = ByteBuffer.allocate(scheduled.size()*8+4);
+        int sz = scheduled.size();
+        byteBuffer.putInt(sz);
+        scheduled.forEach(id->byteBuffer.putLong(id));
+        return byteBuffer.array();
+    }
+    public Response verifyTournamentStatusOnCluster(String accessKey){
+        TokenValidatorProvider tokenValidator = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
+        GameCluster valid = tokenValidator.validateGameClusterAccessKey(accessKey);
+        if(valid==null || valid.distributionId() != gameCluster.distributionId()) new RuntimeException("Illegal access");
+        List<TournamentOnNode> scanned = distributionTournamentService.onScan(gameServiceName);
+        return new TournamentScanResponse(scanned);
+    }
+
+
 
 }
