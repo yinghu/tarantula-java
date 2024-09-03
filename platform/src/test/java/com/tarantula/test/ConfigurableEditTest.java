@@ -82,13 +82,12 @@ public class ConfigurableEditTest extends DataStoreHook{
             ConfigurableEdit edit = new ConfigurableEdit();
             edit.dataStore(dataStore);
             edit.build(payload);
-            System.out.println(edit.distributionId());
+            Assert.assertTrue(edit.distributionId()!=0);
             ConfigurableEdit load = new ConfigurableEdit();
             load.distributionId(edit.distributionId());
-            //Assert.assertTrue(dataStore.load(load));
             load.dataStore(dataStore);
             JsonObject resp = load.assembly();
-            System.out.println(resp);
+            Assert.assertNotNull(resp.get("_shoppingItemList"));
         }
     }
 
