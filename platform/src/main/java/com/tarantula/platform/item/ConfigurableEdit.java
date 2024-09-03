@@ -1,9 +1,11 @@
 package com.tarantula.platform.item;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.icodesoftware.Recoverable;
-import com.icodesoftware.util.IntegerKey;
+import com.google.gson.JsonPrimitive;
+import com.icodesoftware.util.StringUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -21,6 +23,7 @@ public class ConfigurableEdit extends ConfigurableObject {
     }
 
     public boolean read(DataBuffer buffer){
+        this.configurationId = buffer.readInt();
         this.configurationType = buffer.readUTF8();
         this.configurationTypeId = buffer.readUTF8();
         this.configurationName = buffer.readUTF8();
@@ -31,6 +34,7 @@ public class ConfigurableEdit extends ConfigurableObject {
     }
     @Override
     public boolean write(DataBuffer buffer) {
+        buffer.writeInt(configurationId);
         buffer.writeUTF8(this.configurationType);
         buffer.writeUTF8(this.configurationTypeId);
         buffer.writeUTF8(this.configurationName);
@@ -40,20 +44,6 @@ public class ConfigurableEdit extends ConfigurableObject {
         return true;
     }
 
-    public boolean readKey(Recoverable.DataBuffer buffer){
-        configurationId = buffer.readInt();
-        return true;
-    }
-    public boolean writeKey(Recoverable.DataBuffer buffer){
-        if(configurationId <=0 ) return false;
-        buffer.writeInt(configurationId);
-        return true;
-    }
-
-    @Override
-    public Key key() {
-        return IntegerKey.from(configurationId);
-    }
 
     @Override
     public JsonObject toJson() {
@@ -69,6 +59,7 @@ public class ConfigurableEdit extends ConfigurableObject {
     }
 
     public JsonObject assembly(){
+        this.dataStore.load(this);
         JsonObject resp = toJson();
         List<PropertyEdit> props = dataStore.list(new PropertyEditQuery(this.key()));
         props.forEach(prop->{
@@ -82,9 +73,76 @@ public class ConfigurableEdit extends ConfigurableObject {
                 resp.addProperty(prop.name(),prop.edit.getAsString());
             }
             else if(prop.type.equals("category") || prop.type.equals("list")){
-                resp.add(prop.name(),prop.edit.getAsJsonArray());
+                if(prop.name().startsWith("_")){
+                    resp.add(prop.name(),prop.edit.getAsJsonArray());
+                }
+                else if(prop.name().startsWith("$$")){
+                    JsonArray pes = prop.edit.getAsJsonArray();
+                    pes.forEach(pe->{
+                        ConfigurableEdit edit = new ConfigurableEdit();
+                        edit.distributionId(pe.getAsLong());
+
+                    });
+                    System.out.println(prop);
+                }
             }
         });
         return resp;
+    }
+
+    private void list(){
+        JsonObject template = application.getAsJsonObject("template");
+        JsonArray props = template.getAsJsonObject("application").getAsJsonArray("properties");
+        props.forEach(prop->{
+            JsonObject edit = prop.getAsJsonObject();
+            String type = edit.get("type").getAsString();
+            String name = edit.get("name").getAsString();
+            PropertyEdit propertyEdit = new PropertyEdit();
+            propertyEdit.name(name);
+            propertyEdit.type = type;
+            propertyEdit.edit = application.get(name);
+            propertyEdit.ownerKey(this.key());
+            dataStore.create(propertyEdit);
+            if(type.equals("list")){
+                JsonArray list = application.get(StringUtil.toUnderScore(name)).getAsJsonArray();
+                JsonArray pes = new JsonArray();
+                list.forEach((category->{
+                    ConfigurableEdit configurableEdit = new ConfigurableEdit();
+                    configurableEdit.dataStore(dataStore);
+                    long editId = configurableEdit.build(category.getAsJsonObject());
+                    pes.add(editId);
+                }));
+                PropertyEdit pe = new PropertyEdit("list","$$"+name,pes);
+                pe.ownerKey(this.key());
+                dataStore.create(pe);
+            }
+            else if(type.equals("category")){
+                JsonObject category = application.get(StringUtil.toUnderScore(name)).getAsJsonObject();
+                ConfigurableEdit configurableEdit = new ConfigurableEdit();
+                configurableEdit.dataStore(dataStore);
+                long editId = configurableEdit.build(category.getAsJsonObject());
+                JsonArray pes = new JsonArray();
+                pes.add(editId);
+                PropertyEdit pe = new PropertyEdit("category","$$"+name,pes);
+                pe.ownerKey(this.key());
+                dataStore.create(pe);
+            }
+            else{
+                System.out.println(application.get(name));
+            }
+        });
+    }
+
+    public long build(JsonObject payload){
+        this.application = payload;
+        this.configurationId = payload.get("ConfigurationId").getAsInt();
+        this.configurationType = payload.get("ConfigurationType").getAsString();
+        this.configurationTypeId = payload.get("ConfigurationTypeId").getAsString();
+        this.configurationName = payload.get("ConfigurationName").getAsString();
+        this.configurationCategory = payload.get("ConfigurationCategory").getAsString();
+        this.configurationVersion = payload.get("ConfigurationVersion").getAsString();
+        this.dataStore.create(this);
+        list();
+        return this.distributionId;
     }
 }

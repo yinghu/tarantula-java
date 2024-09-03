@@ -15,6 +15,13 @@ public class PropertyEdit extends RecoverableObject {
         this.onEdge = true;
     }
 
+    public PropertyEdit(String type,String name,JsonElement edit){
+        this();
+        this.type = type;
+        this.name = name;
+        this.edit = edit;
+    }
+
     @Override
     public int getFactoryId() {
         return ItemPortableRegistry.OID;
@@ -36,5 +43,9 @@ public class PropertyEdit extends RecoverableObject {
         buffer.writeUTF8(type);
         buffer.writeUTF8(edit.toString());
         return true;
+    }
+
+    public String toString(){
+        return type+"<:> "+name+"<:>"+edit;
     }
 }

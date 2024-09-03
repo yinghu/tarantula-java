@@ -1,8 +1,10 @@
 package com.tarantula.test;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.icodesoftware.DataStore;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.item.ConfigurableEdit;
 import com.tarantula.platform.item.PropertyEdit;
 import com.tarantula.platform.item.PropertyEditQuery;
@@ -10,6 +12,7 @@ import org.checkerframework.checker.units.qual.C;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.io.InputStream;
 import java.util.List;
 
 public class ConfigurableEditTest extends DataStoreHook{
@@ -27,10 +30,10 @@ public class ConfigurableEditTest extends DataStoreHook{
         configurableEdit.configurationVersion("version");
         configurableEdit.configurationCategory("category");
         configurableEdit.configurationScope("scope");
-        Assert.assertTrue(dataStore.createIfAbsent(configurableEdit,false));
+        Assert.assertTrue(dataStore.create(configurableEdit));
 
         ConfigurableEdit load = new ConfigurableEdit();
-        load.configurationId = 1;
+        load.distributionId(configurableEdit.distributionId());
         Assert.assertTrue(dataStore.load(load));
         Assert.assertEquals(load.configurationId,configurableEdit.configurationId);
         Assert.assertEquals(load.configurationName(),configurableEdit.configurationName());
@@ -66,10 +69,27 @@ public class ConfigurableEditTest extends DataStoreHook{
         Assert.assertEquals(loads.size(),2);
 
         ConfigurableEdit edit = new ConfigurableEdit();
-        edit.configurationId = 1;
+        edit.distributionId(configurableEdit.distributionId());
         edit.dataStore(dataStore);
         Assert.assertTrue(dataStore.load(edit));
         //System.out.println(edit.assembly());
+    }
+    @Test(groups = { "ConfigurableEdit" })
+    public void testShop() throws Exception{
+        DataStore dataStore = dataStoreProvider.createDataStore("test_configurable_edit_sample");
+        try(InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("sample-shop.json")){
+            JsonObject payload = JsonUtil.parse(inputStream);
+            ConfigurableEdit edit = new ConfigurableEdit();
+            edit.dataStore(dataStore);
+            edit.build(payload);
+            System.out.println(edit.distributionId());
+            ConfigurableEdit load = new ConfigurableEdit();
+            load.distributionId(edit.distributionId());
+            //Assert.assertTrue(dataStore.load(load));
+            load.dataStore(dataStore);
+            JsonObject resp = load.assembly();
+            System.out.println(resp);
+        }
     }
 
 

@@ -1,0 +1,347 @@
+{
+  "ConfigurationId": 9,
+  "ConfigurationCategory": "Shop",
+  "ConfigurationName": "Moon",
+  "ConfigurationType": "IAP",
+  "ConfigurationTypeId": "Store",
+  "ConfigurationVersion": "v1.0",
+  "ConfigurationTemplate": "game-cluster/shops/shop",
+  "template": {
+    "header": {
+      "scope": "shop",
+      "type": "Shop",
+      "editor": "ConfigurationEditor",
+      "version": "1.0",
+      "rechargeable": false
+    },
+    "application": {
+      "properties": [
+        {
+          "name": "Name",
+          "type": "string",
+          "reference": "String",
+          "nullable": false,
+          "downloadable": false
+        },
+        {
+          "name": "ShoppingItemList",
+          "type": "list",
+          "reference": "category:ShoppingItem",
+          "nullable": false,
+          "downloadable": false
+        }
+      ]
+    },
+    "configuration": {
+      "header": {
+        "scope": "shop",
+        "type": "Configuration"
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "ConfigurationName",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "ConfigurationType",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "ConfigurationTypeId",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "ConfigurationVersion",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    }
+  },
+  "Name": "Holee",
+  "_shoppingItemList": [
+    {
+      "ConfigurationId": 7,
+      "ConfigurationCategory": "ShoppingItem",
+      "ConfigurationName": "IC500",
+      "ConfigurationType": "IAP",
+      "ConfigurationTypeId": "Store",
+      "ConfigurationVersion": "v1.0",
+      "ConfigurationTemplate": "game-cluster/shops/shopping.item",
+      "template": {
+        "header": {
+          "scope": "shop",
+          "type": "ShoppingItem",
+          "editor": "ConfigurationEditor",
+          "version": "1.0",
+          "rechargeable": false
+        },
+        "application": {
+          "properties": [
+            {
+              "name": "Name",
+              "type": "string",
+              "reference": "String",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "ItemType",
+              "type": "enum",
+              "reference": "ItemType",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "PurchaseType",
+              "type": "enum",
+              "reference": "PurchaseType",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "SkuName",
+              "type": "string",
+              "reference": "String",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "Price",
+              "type": "number",
+              "reference": "Double",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "VirtualCurrency",
+              "type": "enum",
+              "reference": "VirtualCurrency",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "SkuList",
+              "type": "list",
+              "reference": "category:SkuCoin",
+              "nullable": false,
+              "downloadable": false
+            }
+          ]
+        },
+        "configuration": {
+          "header": {
+            "scope": "shop",
+            "type": "Configuration"
+          },
+          "application": {
+            "properties": [
+              {
+                "name": "ConfigurationName",
+                "type": "string",
+                "reference": "String",
+                "nullable": false,
+                "downloadable": false
+              },
+              {
+                "name": "ConfigurationType",
+                "type": "string",
+                "reference": "String",
+                "nullable": false,
+                "downloadable": false
+              },
+              {
+                "name": "ConfigurationTypeId",
+                "type": "string",
+                "reference": "String",
+                "nullable": false,
+                "downloadable": false
+              },
+              {
+                "name": "ConfigurationVersion",
+                "type": "string",
+                "reference": "String",
+                "nullable": false,
+                "downloadable": false
+              }
+            ]
+          }
+        }
+      },
+      "Name": "COIN500",
+      "ItemType": 1,
+      "PurchaseType": 2,
+      "SkuName": "sku_01",
+      "Price": 1.99,
+      "VirtualCurrency": 4,
+      "_skuList": [
+        {
+          "ConfigurationId": 6,
+          "ConfigurationCategory": "SkuCoin",
+          "ConfigurationName": "SKU500",
+          "ConfigurationType": "IAP",
+          "ConfigurationTypeId": "SKU",
+          "ConfigurationVersion": "v1.0",
+          "ConfigurationTemplate": "game-cluster/items/sku.coin",
+          "template": {
+            "header": {
+              "scope": "item",
+              "type": "SkuCoin",
+              "editor": "ConfigurationEditor",
+              "version": "1.0",
+              "rechargeable": false
+            },
+            "application": {
+              "properties": [
+                {
+                  "name": "Sku",
+                  "type": "category",
+                  "reference": "category:SoftCurrency",
+                  "nullable": false,
+                  "downloadable": false
+                }
+              ]
+            },
+            "configuration": {
+              "header": {
+                "scope": "item",
+                "type": "Configuration"
+              },
+              "application": {
+                "properties": [
+                  {
+                    "name": "ConfigurationName",
+                    "type": "string",
+                    "reference": "String",
+                    "nullable": false,
+                    "downloadable": false
+                  },
+                  {
+                    "name": "ConfigurationType",
+                    "type": "string",
+                    "reference": "String",
+                    "nullable": false,
+                    "downloadable": false
+                  },
+                  {
+                    "name": "ConfigurationTypeId",
+                    "type": "string",
+                    "reference": "String",
+                    "nullable": false,
+                    "downloadable": false
+                  },
+                  {
+                    "name": "ConfigurationVersion",
+                    "type": "string",
+                    "reference": "String",
+                    "nullable": false,
+                    "downloadable": false
+                  }
+                ]
+              }
+            }
+          },
+          "_sku": {
+            "ConfigurationId": 3,
+            "ConfigurationCategory": "SoftCurrency",
+            "ConfigurationName": "COIN500",
+            "ConfigurationType": "IAP",
+            "ConfigurationTypeId": "Coin",
+            "ConfigurationVersion": "v1.0",
+            "ConfigurationTemplate": "game-cluster/commodities/soft.currency",
+            "template": {
+              "header": {
+                "scope": "commodity",
+                "type": "SoftCurrency",
+                "editor": "ConfigurationEditor",
+                "version": "1.0",
+                "rechargeable": true
+              },
+              "application": {
+                "properties": [
+                  {
+                    "name": "Name",
+                    "type": "string",
+                    "reference": "String",
+                    "nullable": false,
+                    "downloadable": false
+                  },
+                  {
+                    "name": "Amount",
+                    "type": "number",
+                    "reference": "Double",
+                    "nullable": false,
+                    "downloadable": false
+                  }
+                ]
+              },
+              "configuration": {
+                "header": {
+                  "scope": "commodity",
+                  "type": "Configuration"
+                },
+                "application": {
+                  "properties": [
+                    {
+                      "name": "ConfigurationName",
+                      "type": "string",
+                      "reference": "String",
+                      "nullable": false,
+                      "downloadable": false
+                    },
+                    {
+                      "name": "ConfigurationType",
+                      "type": "string",
+                      "reference": "String",
+                      "nullable": false,
+                      "downloadable": false
+                    },
+                    {
+                      "name": "ConfigurationTypeId",
+                      "type": "string",
+                      "reference": "String",
+                      "nullable": false,
+                      "downloadable": false
+                    },
+                    {
+                      "name": "ConfigurationVersion",
+                      "type": "string",
+                      "reference": "String",
+                      "nullable": false,
+                      "downloadable": false
+                    }
+                  ]
+                }
+              }
+            },
+            "Name": "COIN500",
+            "Amount": 500
+          },
+          "Sku": [
+            "3"
+          ]
+        }
+      ],
+      "SkuList": [
+        "6"
+      ]
+    }
+  ],
+  "ShoppingItemList": [
+    "7"
+  ],
+  "ConfigurationPublishId": 8
+}
