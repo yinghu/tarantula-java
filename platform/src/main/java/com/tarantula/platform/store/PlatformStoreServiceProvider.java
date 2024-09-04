@@ -125,12 +125,12 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
             });
             shopIndex.put("Tami",shop);
         });
-        List<Shop> items = applicationPreSetup.list(descriptor,new ShoppingItemObjectQuery(descriptor.key(),"Shop"));
-        items.forEach((a)-> {
-            if (!a.disabled()) {
-                registerShop(a);
-            }
-        });
+        //List<Shop> items = applicationPreSetup.list(descriptor,new ShoppingItemObjectQuery(descriptor.key(),"Shop"));
+        //items.forEach((a)-> {
+            //if (!a.disabled()) {
+                //registerShop(a);
+            //}
+        //});
         return null;
     }
 

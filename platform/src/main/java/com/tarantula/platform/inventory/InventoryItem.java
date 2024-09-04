@@ -6,10 +6,6 @@ import com.icodesoftware.Inventory;
 import com.icodesoftware.Recoverable;
 import com.tarantula.platform.item.ConfigurableEdit;
 import com.tarantula.platform.item.ItemPortableRegistry;
-import com.tarantula.platform.item.PropertyEdit;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class InventoryItem extends ConfigurableEdit implements Inventory.Stock {
@@ -18,7 +14,7 @@ public class InventoryItem extends ConfigurableEdit implements Inventory.Stock {
 
     private long stockId;
     private long itemId;
-    private List<PropertyEdit> stock = new ArrayList<>();
+    //private List<PropertyEdit> stock = new ArrayList<>();
 
 
     public InventoryItem(){
@@ -100,7 +96,7 @@ public class InventoryItem extends ConfigurableEdit implements Inventory.Stock {
     }
 
     public void stock(Recoverable recoverable){
-        stock.add((PropertyEdit)recoverable);
+        //stock.add((PropertyEdit)recoverable);
     }
 
 }

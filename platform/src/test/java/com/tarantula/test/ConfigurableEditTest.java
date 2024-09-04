@@ -8,7 +8,6 @@ import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.item.ConfigurableEdit;
 import com.tarantula.platform.item.PropertyEdit;
 import com.tarantula.platform.item.PropertyEditQuery;
-import org.checkerframework.checker.units.qual.C;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -87,6 +86,7 @@ public class ConfigurableEditTest extends DataStoreHook{
             load.distributionId(edit.distributionId());
             load.dataStore(dataStore);
             JsonObject resp = load.assembly();
+            //System.out.println(resp);
             Assert.assertNotNull(resp.get("_shoppingItemList"));
         }
     }

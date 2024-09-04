@@ -2,10 +2,8 @@ package com.tarantula.platform.item;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import com.icodesoftware.util.StringUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -102,12 +100,6 @@ public class ConfigurableEdit extends ConfigurableObject {
             JsonObject edit = prop.getAsJsonObject();
             String type = edit.get("type").getAsString();
             String name = edit.get("name").getAsString();
-            PropertyEdit propertyEdit = new PropertyEdit();
-            propertyEdit.name(name);
-            propertyEdit.type = type;
-            propertyEdit.edit = application.get(name);
-            propertyEdit.ownerKey(this.key());
-            dataStore.create(propertyEdit);
             if(type.equals("list")){
                 String _name = StringUtil.toUnderScore(name);
                 JsonArray list = application.get(_name).getAsJsonArray();
@@ -135,7 +127,13 @@ public class ConfigurableEdit extends ConfigurableObject {
                 dataStore.create(pe);
             }
             else{
-                System.out.println(application.get(name));
+                PropertyEdit propertyEdit = new PropertyEdit();
+                propertyEdit.name(name);
+                propertyEdit.type = type;
+                propertyEdit.edit = application.get(name);
+                propertyEdit.ownerKey(this.key());
+                dataStore.create(propertyEdit);
+                //System.out.println(application.get(name));
             }
         });
     }

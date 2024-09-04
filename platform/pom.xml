@@ -51,6 +51,11 @@
 		  <artifactId>gec-earth8</artifactId>
 		  <version>1.0</version>
 	  </dependency>
+	  <dependency>
+		  <groupId>com.icodesoftware</groupId>
+		  <artifactId>gec-games</artifactId>
+		  <version>1.0</version>
+	  </dependency>
   </dependencies>
   <build>
   	<plugins>
