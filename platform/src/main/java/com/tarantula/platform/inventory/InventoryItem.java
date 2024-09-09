@@ -14,7 +14,6 @@ public class InventoryItem extends ConfigurableEdit implements Inventory.Stock {
 
     private long stockId;
     private long itemId;
-    //private List<PropertyEdit> stock = new ArrayList<>();
 
 
     public InventoryItem(){
@@ -62,29 +61,12 @@ public class InventoryItem extends ConfigurableEdit implements Inventory.Stock {
 
     @Override
     public JsonObject toJson() {
-        //return assembly();
-
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("InventoryId",distributionKey());
         jsonObject.addProperty("TypeId",configurationTypeId);
         jsonObject.addProperty("Name",configurationName);
         jsonObject.addProperty("ItemId",Long.toString(itemId));
         jsonObject.addProperty("StockId",Long.toString(stockId));
-        /**
-        stock.forEach(prop->{
-            if(prop.type.equals("number")){
-                jsonObject.addProperty(prop.name(),prop.edit.getAsNumber());
-            }
-            else if(prop.type.equals("enum")){
-                jsonObject.addProperty(prop.name(),prop.edit.getAsInt());
-            }
-            else if(prop.type.equals("string")){
-                jsonObject.addProperty(prop.name(),prop.edit.getAsString());
-            }
-            else if(prop.type.equals("category") || prop.type.equals("list")){
-                jsonObject.add(prop.name(),prop.edit.getAsJsonArray());
-            }
-        });**/
         return jsonObject;
     }
 

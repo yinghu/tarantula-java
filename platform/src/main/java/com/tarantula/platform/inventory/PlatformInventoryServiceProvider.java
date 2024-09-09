@@ -121,8 +121,8 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
     }
     public boolean redeem(long systemId, ShoppingItem shoppingItem){
         shoppingItem.commodityList().forEach(commodity -> {
-            logger.warn(commodity.application().toString());
-            logger.warn(commodity.application().get("template").getAsJsonObject().get("application").toString());
+            ///logger.warn(commodity.application().toString());
+            //logger.warn(commodity.application().get("template").getAsJsonObject().get("application").toString());
             String type = commodity.configurationCategory();
             String typeId = commodity.configurationTypeId();
             UserInventory inventory = (UserInventory)applicationPreSetup.inventory(systemId,typeId);
@@ -135,7 +135,6 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
                 logger.warn("in :"+inventory.typeId());
                 inventory.ownerKey(SnowflakeKey.from(systemId));
                 inventoryDataStore.create(inventory);
-                //inventoryDataStore.create(inventory);
                 inventoryDataStore.createEdge(inventory,typeId);
                 inventoryDataStore.createEdge(inventory,type);
                 inventory.dataStore(inventoryDataStore);

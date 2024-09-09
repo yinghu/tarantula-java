@@ -133,7 +133,6 @@ public class ConfigurableEdit extends ConfigurableObject {
                 propertyEdit.edit = application.get(name);
                 propertyEdit.ownerKey(this.key());
                 dataStore.create(propertyEdit);
-                //System.out.println(application.get(name));
             }
         });
     }

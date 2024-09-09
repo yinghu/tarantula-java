@@ -114,23 +114,17 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
             //logger.warn(shop.configurationName());
             //logger.warn(shop.application().toString());
             shop.itemList().forEach(shoppingItem -> {
-                logger.warn(shoppingItem.name());
-                logger.warn(shoppingItem.skuName());
+                //logger.warn(shoppingItem.name());
+                //logger.warn(shoppingItem.skuName());
                 List<Commodity> commodities = shoppingItem.commodityList();
                 commodities.forEach(commodity -> {
                     gameCluster.registerConfigurableCategory(commodity.application().get("template").getAsJsonObject());
                 });
-                logger.warn("item id : "+shoppingItem.distributionKey());
+                //logger.warn("item id : "+shoppingItem.distributionKey());
                 shoppingItems.put(shoppingItem.distributionKey(),shoppingItem);
             });
-            shopIndex.put("Tami",shop);
+            shopIndex.put(shop.configurationName(),shop);
         });
-        //List<Shop> items = applicationPreSetup.list(descriptor,new ShoppingItemObjectQuery(descriptor.key(),"Shop"));
-        //items.forEach((a)-> {
-            //if (!a.disabled()) {
-                //registerShop(a);
-            //}
-        //});
         return null;
     }
 

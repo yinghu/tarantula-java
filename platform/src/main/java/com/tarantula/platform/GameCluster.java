@@ -465,10 +465,6 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
     }
 
     public Inventory createInventory(ApplicationPreSetup applicationPreSetup,String category,String typeId){
-        //ConfigurableCategories categories = this.configurableCategories(applicationPreSetup,Configurable.COMMODITY_CONFIG_TYPE);
-        //ConfigurableCategory conf = categories.configurableSetting(category);
-        //conf.parse();
-        logger.warn(category+" ::"+typeId);
         ConfigurableCategory conf = categories.get(category);
         Inventory inventory = new UserInventory(conf.name(),typeId,conf.rechargeable,conf.constrained,this);
         return inventory;
@@ -489,11 +485,6 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
         logger.warn(template.toString());
         ConfigurableCategory category = new ConfigurableCategory(template);
         category.parse();
-        logger.warn(category.name());
-        logger.warn(category.scope);
-        logger.warn(category.version);
-        logger.warn(category.rechargeable+"");
-        logger.warn(category.constrained+"");
         categories.put(category.name(),category);
 
     }

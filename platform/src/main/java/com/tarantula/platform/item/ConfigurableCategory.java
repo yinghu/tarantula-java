@@ -101,5 +101,4 @@ public class ConfigurableCategory extends RecoverableObject implements Configura
         header = update.get("header").toString();
         application = update.get("application").toString();
     }
-
 }
