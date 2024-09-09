@@ -1012,17 +1012,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
 
     @Override
     public void onMetrics(String name, List<Statistics.Entry> updated) {
-        if(!node.tarantulaAgent.enabled()) return;
-        schedule(new ScheduleRunner(100,()->{
-            try {
-                String[] headers = new String[]{
-                        Session.TARANTULA_ACCESS_KEY,node().homingAgent().accessKey()
-                };
-                httpClientProvider().post(node().homingAgent().host(), "metrics", headers, MetricsLog.metricsLog(node.nodeName,name,updated).toBinary());
-            }catch (Exception ex){
-                log.warn("error on homing agent metrics log: "+ex.getMessage());
-            }
-        }));
+        this.node.tarantulaAgent.onMetrics(name,updated);
     }
 
     private void onUpload(String fileName,byte[] payload){
@@ -1049,6 +1039,6 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
         String resp = httpClientProvider().get(node().homingAgent().host(), "agent", headers);
         JsonObject agent = JsonUtil.parse(resp);
         node.tarantulaAgent.encryptionKey = agent.get("encryptionKey").getAsString();
-        HomingAgentConfiguration.init(this);
+        node.homingAgent().setup(this);
     }
 }

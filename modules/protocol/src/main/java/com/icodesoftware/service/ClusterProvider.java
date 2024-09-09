@@ -2,6 +2,7 @@ package com.icodesoftware.service;
 
 import com.icodesoftware.EventListener;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.Statistics;
 
 import java.util.Collection;
 import java.util.List;
@@ -114,6 +115,10 @@ public interface ClusterProvider extends ServiceProvider {
         String encryptionKey();
         byte[] encrypt(byte[] data);
         byte[] decrypt(byte[] data);
+
+        default void setup(ServiceContext serviceContext){}
+        default String onConfiguration(long gameClusterId,String category){ return "{}";}
+        default void onMetrics(String name, List<Statistics.Entry> updates){}
     }
 
 

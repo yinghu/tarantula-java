@@ -9,7 +9,6 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.HomingAgentConfiguration;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.Commodity;
 import com.tarantula.platform.item.DistributionItemService;
@@ -106,7 +105,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
         //logger.warn(descriptor.distributionKey()+" : "+descriptor.tag());
-        String resp = HomingAgentConfiguration.configuration("614474168859103232","Shop");
+        String resp = serviceContext.node().homingAgent().onConfiguration(614474168859103232L,"Shop");
         //logger.warn(resp);
         JsonObject configs = JsonUtil.parse(resp);
         configs.get("list").getAsJsonArray().forEach(e->{

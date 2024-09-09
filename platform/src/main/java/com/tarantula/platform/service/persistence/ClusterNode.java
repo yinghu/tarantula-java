@@ -2,13 +2,16 @@ package com.tarantula.platform.service.persistence;
 
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.Statistics;
 import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TarantulaAgent;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.platform.service.PlatformHomingAgent;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 
 public class ClusterNode extends RecoverableObject implements ClusterProvider.Node {
@@ -31,10 +34,8 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
 
     public boolean dailyBackupEnabled;
     public String dataStoreDirectory;
-    //public boolean homingAgentEnabled;
-    //public String homingAgentHost;
-    //public String homingAgentKey;
-    public final TarantulaAgent tarantulaAgent;
+
+    public final PlatformHomingAgent tarantulaAgent;
     public ClusterNode(String bucketName, String nodeName,int partitionNumber,int bucketNumber){
         this();
         this.bucketName = bucketName;
@@ -43,7 +44,7 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         this.bucketNumber = bucketNumber;
     }
     public ClusterNode(){
-        this.tarantulaAgent = new TarantulaAgent();
+        this.tarantulaAgent = new PlatformHomingAgent();
     }
 
     public String toString(){
@@ -190,5 +191,4 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         if(memberId!=null) return memberId.equals(r.memberId);
         return this.nodeName.equals(r.nodeName());
     }
-
 }
