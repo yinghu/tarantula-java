@@ -22,7 +22,6 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
 
     private String configurationTypeId;
 
-    private String gameModule;
 
     public String configurationTypeId() {
         return this.configurationTypeId;
@@ -36,7 +35,6 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
     }
 
     public ConfigurableZone(LobbyItem lobbyItem, ZoneItem zoneItem){
-        this.gameModule = lobbyItem.gameModule();
         this.configurationTypeId = lobbyItem.configurationName()+"_"+zoneItem.configurationName()+"_"+zoneItem.configurationVersion();
         this.zoneItem = zoneItem;
         this.arenaList = new ArrayList<>();
@@ -49,7 +47,6 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
     }
 
     public ConfigurableZone(ZoneItem zoneItem){
-        //this.gameModule = lobbyItem.configurationName();
         this.zoneItem = zoneItem;
         this.arenaList = new ArrayList<>();
         this.arenaIndex = new ConcurrentHashMap<>();
@@ -72,11 +69,6 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
         return zoneItem.playMode();
     }
 
-
-    @Override
-    public String gameModule(){
-        return this.gameModule;
-    }
     @Override
     public int capacity() {
         return this.zoneItem.room().capacity();

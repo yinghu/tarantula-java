@@ -16,6 +16,7 @@ public class LobbyItem extends Application{
 
     public LobbyItem(JsonObject payload){
         this.header = payload;
+        this.configurationName = payload.get("ConfigurationName").getAsString();
     }
 
     public int getFactoryId() {
@@ -31,10 +32,6 @@ public class LobbyItem extends Application{
         return this.header.get("Name").getAsString();
     }
 
-    public String gameModule(){
-        return "gameModuleName";//header.get("GameModuleName").getAsString();
-    }
-
     public List<ZoneItem> zoneList(){
         ArrayList<ZoneItem> zlist = new ArrayList<>();
         header.get("_zoneList").getAsJsonArray().forEach(z->{
@@ -42,9 +39,6 @@ public class LobbyItem extends Application{
             ZoneItem zoneItem = new ZoneItem(zo);
             zlist.add(zoneItem);
         });
-        //_reference.forEach(ref->{
-            //zlist.add((ZoneItem)ref);
-        //});
         return zlist;
     }
 

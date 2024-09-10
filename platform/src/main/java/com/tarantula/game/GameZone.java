@@ -16,8 +16,6 @@ public interface GameZone extends Configurable{
 
     String playMode();
 
-    String gameModule();
-
     int capacity();
     int joinsOnStart();
     long roundDuration();
