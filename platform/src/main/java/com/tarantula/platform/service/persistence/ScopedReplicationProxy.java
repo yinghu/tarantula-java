@@ -8,7 +8,6 @@ import com.icodesoftware.*;
 import com.icodesoftware.lmdb.TransactionLog;
 import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
-import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.platform.event.TransactionReplicationEvent;
 import com.tarantula.platform.service.cluster.DistributionReplicator;
 
@@ -119,19 +118,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         return transactionLogManager;
     }
     protected void onHomingAgent(TransactionLog transactionLog){
-        if(!serviceContext.node().homingAgent().enabled()) return;
-        serviceContext.schedule(new ScheduleRunner(100,()->{
-            try {
-                String[] headers = new String[]{
-                        Session.TARANTULA_ACCESS_KEY,serviceContext.node().homingAgent().accessKey(),
-                        Session.TARANTULA_DATA_ENCRYPTED,"true"
-                };
-                byte[] encrypted = serviceContext.node().homingAgent().encrypt(transactionLog.toBinary());
-                serviceContext.httpClientProvider().post(serviceContext.node().homingAgent().host(), "log", headers,encrypted);
-            }catch (Exception ex){
-                logger.warn("error on homing agent : "+ex.getMessage());
-            }
-        }));
+        serviceContext.node().homingAgent().onTransactionLog(transactionLog.toBinary());
     }
 
 }

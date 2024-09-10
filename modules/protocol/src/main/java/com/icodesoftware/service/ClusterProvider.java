@@ -117,6 +117,7 @@ public interface ClusterProvider extends ServiceProvider {
         byte[] decrypt(byte[] data);
 
         default void setup(ServiceContext serviceContext){}
+        default void onTransactionLog(byte[] log){}
         default String onConfiguration(long gameClusterId,String category){ return "{}";}
         default void onMetrics(String name, List<Statistics.Entry> updates){}
     }

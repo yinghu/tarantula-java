@@ -49,7 +49,24 @@ public class PlatformHomingAgent extends TarantulaAgent {
         }));
     }
 
-    public  String configuration(String publishedId){
+    @Override
+    public void onTransactionLog(byte[] log) {
+        if(!enabled()) return;
+        serviceContext.schedule(new ScheduleRunner(100,()->{
+            try {
+                String[] headers = new String[]{
+                        Session.TARANTULA_ACCESS_KEY,serviceContext.node().homingAgent().accessKey(),
+                        Session.TARANTULA_DATA_ENCRYPTED,"true"
+                };
+                byte[] encrypted = serviceContext.node().homingAgent().encrypt(log);
+                serviceContext.httpClientProvider().post(serviceContext.node().homingAgent().host(), "log", headers,encrypted);
+            }catch (Exception ex){
+                logger.warn("error on homing agent : "+ex.getMessage());
+            }
+        }));
+    }
+
+    public  String configurationRegistered(String publishedId){
         try {
             String[] headers = new String[]{
                     Session.TARANTULA_ACCESS_KEY, serviceContext.node().homingAgent().accessKey(),
