@@ -18,6 +18,10 @@ public class ZoneItem extends Item {
 
     }
 
+    public ZoneItem(JsonObject payload){
+        this.header = payload;
+    }
+
     public int getFactoryId() {
         return PresencePortableRegistry.OID;
     }
@@ -42,13 +46,24 @@ public class ZoneItem extends Item {
 
 
     public RoomItem room(){
-
-        return room;
+        RoomItem roomItem = new RoomItem(header.get("_room").getAsJsonObject());
+        return roomItem;
     }
 
     public List<ArenaItem> arenaList(){
         ArrayList<ArenaItem> alist = new ArrayList<>();
-        _reference.forEach(ref-> alist.add((ArenaItem) ref));
+        //ZoneItem zoneItem = new ZoneItem(zo);
+        //RoomItem roomItem = new RoomItem(zo.get("_room").getAsJsonObject());
+        //logger.warn(roomItem.capacity()+" : "+roomItem.joinsOnStart()+" : "+roomItem.duration()+" : "+roomItem.overtime());
+        //logger.warn(zoneItem.playMode()+": "+zoneItem.name()+" : "+zoneItem.rank());
+        header.get("_arenaList").getAsJsonArray().forEach(a->{
+            JsonObject ao = a.getAsJsonObject();
+            ArenaItem arenaItem = new ArenaItem(ao);
+            alist.add(arenaItem);
+            //logger.warn(arenaItem.name()+" : "+arenaItem.level()+" : "+arenaItem.xp());
+        });
+
+        //_reference.forEach(ref-> alist.add((ArenaItem) ref));
         return alist;
     }
 

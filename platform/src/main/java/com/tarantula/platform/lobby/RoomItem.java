@@ -1,5 +1,6 @@
 package com.tarantula.platform.lobby;
 
+import com.google.gson.JsonObject;
 import com.tarantula.platform.item.Component;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
@@ -7,6 +8,10 @@ public class RoomItem extends Component {
 
     public RoomItem(){
 
+    }
+
+    public RoomItem(JsonObject payload){
+        this.header = payload;
     }
     public int getFactoryId() {
         return PresencePortableRegistry.OID;

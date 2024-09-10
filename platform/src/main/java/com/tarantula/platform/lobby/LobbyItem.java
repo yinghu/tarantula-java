@@ -1,6 +1,7 @@
 package com.tarantula.platform.lobby;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.tarantula.platform.item.Application;
 import com.tarantula.platform.presence.PresencePortableRegistry;
@@ -12,6 +13,10 @@ public class LobbyItem extends Application{
 
 
     public LobbyItem(){}
+
+    public LobbyItem(JsonObject payload){
+        this.header = payload;
+    }
 
     public int getFactoryId() {
         return PresencePortableRegistry.OID;
@@ -27,14 +32,19 @@ public class LobbyItem extends Application{
     }
 
     public String gameModule(){
-        return header.get("GameModuleName").getAsString();
+        return "gameModuleName";//header.get("GameModuleName").getAsString();
     }
 
     public List<ZoneItem> zoneList(){
         ArrayList<ZoneItem> zlist = new ArrayList<>();
-        _reference.forEach(ref->{
-            zlist.add((ZoneItem)ref);
+        header.get("_zoneList").getAsJsonArray().forEach(z->{
+            JsonObject zo = z.getAsJsonObject();
+            ZoneItem zoneItem = new ZoneItem(zo);
+            zlist.add(zoneItem);
         });
+        //_reference.forEach(ref->{
+            //zlist.add((ZoneItem)ref);
+        //});
         return zlist;
     }
 

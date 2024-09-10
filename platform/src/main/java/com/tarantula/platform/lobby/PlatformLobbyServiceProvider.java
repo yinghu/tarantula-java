@@ -10,6 +10,7 @@ import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 
@@ -17,7 +18,6 @@ import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.item.ItemDistributionCallback;
 
 
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -57,7 +57,13 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
 
     @Override
     public void start() throws Exception {
-
+        String resp = serviceContext.node().homingAgent().onConfiguration(614474168859103232L,"Map");
+        JsonObject mapList = JsonUtil.parse(resp);
+        mapList.get("list").getAsJsonArray().forEach(e->{
+            JsonObject mo = e.getAsJsonObject();
+            LobbyItem lobbyItem = new LobbyItem(mo);
+            lobbyItems.put(gameTypeId+"/"+mo.get("ConfigurationName").getAsString(),lobbyItem);
+        });
     }
 
     @Override
@@ -103,34 +109,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     }
 
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        //String resp = HomingAgentConfiguration.configuration("614474168859103232","Shop");
-        //logger.warn(resp);
-        //String resp1 = HomingAgentConfiguration.configuration("8");
-        //logger.warn(resp1);
-        //String resp2 = HomingAgentConfiguration.configurationReleased("8");
-        //logger.warn(resp2);
-        //jsonObject.get("list").getAsJsonArray().forEach((map->{
-            //JsonObject jo = map.getAsJsonObject();
-            //logger.warn(jo.get("Name").getAsString());
-            //jo.get("_zoneList").getAsJsonArray().forEach(zone->{
-                //JsonObject jz = zone.getAsJsonObject();
-                //logger.warn(""+jz.get("PlayMode").getAsInt());
-                //logger.warn(jz.get("Name").getAsString()+" : "+jz.get("Rank"));
-                //logger.warn(jz.get("_room").toString());
-                //logger.warn(jz.get("_arenaList").toString());
-            //});
-
-        //}));
         lobbyListeners.put(descriptor.tag(),new ListenerOnLobby(descriptor,listener));
-        List<LobbyItem> items = applicationPreSetup.list(descriptor,new LobbyItemObjectQuery(descriptor.key(),descriptor.category()));
-        items.forEach((a)-> {
-            logger.warn(a.configurationCategory()+""+a.distributionId());
-            if(!a.disabled()){
-                a.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
-                a.setup();
-                lobbyItems.put(gameTypeId+"/"+a.configurationName(),a);
-            }
-        });
         lobbyItems.forEach((k,v)->{
             ListenerOnLobby lobbyListener = lobbyListeners.get(k);
             if(lobbyListener!=null && k.equals(lobbyListener.lobby.tag())) lobbyListener.listener.onLoaded(v);
