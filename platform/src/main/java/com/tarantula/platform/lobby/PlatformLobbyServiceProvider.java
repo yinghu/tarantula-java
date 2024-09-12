@@ -60,7 +60,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
         String resp = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"Map");
         JsonObject mapList = JsonUtil.parse(resp);
         if(!mapList.get("successful").getAsBoolean()){
-            this.logger.warn("Lobby service provider started on->"+gameServiceName);
+            this.logger.warn("Lobby service provider started on->"+gameServiceName+" without lobby configuration");
             return;
         }
         mapList.get("list").getAsJsonArray().forEach(e->{
@@ -68,6 +68,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
             LobbyItem lobbyItem = new LobbyItem(mo);
             lobbyItems.put(gameTypeId+"/"+mo.get("ConfigurationName").getAsString(),lobbyItem);
         });
+        this.logger.warn("Lobby service provider started on->"+gameServiceName+" with lobby configuration");
     }
 
     @Override

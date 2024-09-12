@@ -48,7 +48,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
         String resp = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"Shop");
         JsonObject configs = JsonUtil.parse(resp);
         if(!configs.get("successful").getAsBoolean()){
-            this.logger.warn("Store service provider started on->"+gameServiceName);
+            this.logger.warn("Store service provider started on->"+gameServiceName+" without store configuration");
             return;
         }
         configs.get("list").getAsJsonArray().forEach(e->{
