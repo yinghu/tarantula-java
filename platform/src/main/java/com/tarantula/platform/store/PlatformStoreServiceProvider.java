@@ -45,6 +45,23 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
 
     @Override
     public void start() throws Exception {
+        String resp = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"Shop");
+        JsonObject configs = JsonUtil.parse(resp);
+        if(!configs.get("successful").getAsBoolean()){
+            this.logger.warn("Store service provider started on->"+gameServiceName);
+            return;
+        }
+        configs.get("list").getAsJsonArray().forEach(e->{
+            Shop shop = Shop.build(e.getAsJsonObject());
+            shop.itemList().forEach(shoppingItem -> {
+                List<Commodity> commodities = shoppingItem.commodityList();
+                commodities.forEach(commodity -> {
+                    gameCluster.registerConfigurableCategory(commodity.application().get("template").getAsJsonObject());
+                });
+                shoppingItems.put(shoppingItem.distributionKey(),shoppingItem);
+            });
+            shopIndex.put(shop.configurationName(),shop);
+        });
         this.logger.warn("Store service provider started on->"+gameServiceName);
     }
 
@@ -108,6 +125,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
         String resp = serviceContext.node().homingAgent().onConfiguration(614474168859103232L,"Shop");
         //logger.warn(resp);
         JsonObject configs = JsonUtil.parse(resp);
+
         configs.get("list").getAsJsonArray().forEach(e->{
             Shop shop = Shop.build(e.getAsJsonObject());
             //logger.warn(shop.configurationName());
