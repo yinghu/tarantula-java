@@ -59,10 +59,6 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     public void start() throws Exception {
         String resp = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"Map");
         JsonObject mapList = JsonUtil.parse(resp);
-        if(!mapList.get("successful").getAsBoolean()){
-            this.logger.warn("Lobby service provider started on->"+gameServiceName+" without lobby configuration");
-            return;
-        }
         mapList.get("list").getAsJsonArray().forEach(e->{
             JsonObject mo = e.getAsJsonObject();
             LobbyItem lobbyItem = new LobbyItem(mo);

@@ -47,10 +47,6 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     public void start() throws Exception {
         String resp = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"Shop");
         JsonObject configs = JsonUtil.parse(resp);
-        if(!configs.get("successful").getAsBoolean()){
-            this.logger.warn("Store service provider started on->"+gameServiceName+" without store configuration");
-            return;
-        }
         configs.get("list").getAsJsonArray().forEach(e->{
             Shop shop = Shop.build(e.getAsJsonObject());
             shop.itemList().forEach(shoppingItem -> {
@@ -121,27 +117,6 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     }
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        //logger.warn(descriptor.distributionKey()+" : "+descriptor.tag());
-        String resp = serviceContext.node().homingAgent().onConfiguration(614474168859103232L,"Shop");
-        //logger.warn(resp);
-        JsonObject configs = JsonUtil.parse(resp);
-
-        configs.get("list").getAsJsonArray().forEach(e->{
-            Shop shop = Shop.build(e.getAsJsonObject());
-            //logger.warn(shop.configurationName());
-            //logger.warn(shop.application().toString());
-            shop.itemList().forEach(shoppingItem -> {
-                //logger.warn(shoppingItem.name());
-                //logger.warn(shoppingItem.skuName());
-                List<Commodity> commodities = shoppingItem.commodityList();
-                commodities.forEach(commodity -> {
-                    gameCluster.registerConfigurableCategory(commodity.application().get("template").getAsJsonObject());
-                });
-                //logger.warn("item id : "+shoppingItem.distributionKey());
-                shoppingItems.put(shoppingItem.distributionKey(),shoppingItem);
-            });
-            shopIndex.put(shop.configurationName(),shop);
-        });
         return null;
     }
 

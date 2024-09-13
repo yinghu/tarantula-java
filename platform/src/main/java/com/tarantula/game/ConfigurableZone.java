@@ -116,7 +116,9 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
 
     @Override
     public GameArena arena(int level) {
-        return arenaIndex.get(level);
+        GameArena arena = arenaIndex.get(level);
+        if(arena!=null) return arena;
+        return arenaIndex.get(1);
     }
 
     @Override
