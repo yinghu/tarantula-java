@@ -198,4 +198,12 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         }));
     }
 
+    public void register(int publishId){
+
+    }
+
+    public void release(int publishId){
+
+    }
+
 }

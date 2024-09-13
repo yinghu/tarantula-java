@@ -75,10 +75,20 @@ public class GameApplicationAdminRoleModule implements Module {
             }
         }
         else if(session.action().equals("onRegistered")){
-            session.write(JsonUtil.toSimpleResponse(false,"failed to register item").getBytes());
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
+            this.context.log(gameCluster.gameServiceName,OnLog.WARN);
+            PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider(gameCluster.serviceType());
+            gameServiceProvider.configurationServiceProvider(query[2]).register(Integer.parseInt(query[1]));
+            session.write(JsonUtil.toSimpleResponse(false,"failed to register item=>"+session.name()).getBytes());
         }
         else if(session.action().equals("onReleased")){
-            session.write(JsonUtil.toSimpleResponse(false,"failed to release item").getBytes());
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
+            this.context.log(gameCluster.gameServiceName,OnLog.WARN);
+            PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider(gameCluster.serviceType());
+            gameServiceProvider.configurationServiceProvider(query[2]).release(Integer.parseInt(query[1]));
+            session.write(JsonUtil.toSimpleResponse(false,"failed to release item>"+session.name()).getBytes());
         }
         else {
             throw new UnsupportedOperationException(session.action()+" not supported");

@@ -120,4 +120,15 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     public void unregisterConfigurableListener(String registryKey){
         lobbyListeners.remove(registryKey);
     }
+
+
+    @Override
+    public void register(int publishId) {
+        logger.warn("register : "+publishId);
+    }
+
+    @Override
+    public void release(int publishId) {
+        logger.warn("release : "+publishId);
+    }
 }
