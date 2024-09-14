@@ -23,21 +23,14 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
 
     public static final String NAME = "store";
 
-    //private TarantulaLogger logger;
-    //private final String gameServiceName;
-    //private final GameCluster gameCluster;
+
     private final PlatformInventoryServiceProvider inventoryServiceProvider;
-    //private ServiceContext serviceContext;
-    //private DistributionItemService distributionItemService;
-    //private ApplicationPreSetup applicationPreSetup;
 
     private ConcurrentHashMap<String,Shop> shopIndex;
     private ConcurrentHashMap<String,ShoppingItem> shoppingItems;
 
     public PlatformStoreServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
-        //this.gameCluster = gameServiceProvider.gameCluster();
-        //this.gameServiceName = gameCluster.gameServiceName;//(String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
     }
     @Override
@@ -69,10 +62,7 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
         super.setup(serviceContext);
         this.shoppingItems = new ConcurrentHashMap<>();
         this.shopIndex = new ConcurrentHashMap<>();
-        //this.serviceContext = serviceContext;
-        ///this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.logger = JDKLogger.getLogger(PlatformStoreServiceProvider.class);
-        //this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
     }
 
     public Shop shop(String name){
@@ -91,14 +81,9 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
     @Override
     public <T extends Configurable> void register(T t) {
         if(!t.configurationCategory().equals("Shop")) return;
-        t.registered();
-        distributionItemService.onRegisterItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
+        super.register(t);
     }
-    @Override
-    public <T extends Configurable> void release(T t){
-        t.released();
-        this.distributionItemService.onReleaseItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
-    }
+
     public boolean onItemRegistered(String category,String itemId){
         Shop configurableObject = new Shop();
         configurableObject.distributionKey(itemId);
@@ -115,6 +100,7 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
         shop.list().forEach(item->shoppingItems.remove(item.distributionKey()));
         return true;
     }
+
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
         return null;
