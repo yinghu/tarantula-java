@@ -11,10 +11,13 @@ import java.util.List;
 
 public class LobbyItem extends Application{
 
-
-    public LobbyItem(){}
+    public final int publishId;
+    public LobbyItem(){
+        this.publishId = 0;
+    }
 
     public LobbyItem(JsonObject payload){
+        this.publishId = payload.get("ConfigurationPublishId").getAsInt();
         this.header = payload;
         this.configurationName = payload.get("ConfigurationName").getAsString();
     }

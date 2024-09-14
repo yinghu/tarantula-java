@@ -91,10 +91,25 @@ public class PlatformLobbyServiceProvider extends PlatformItemServiceProvider{
     public boolean onItemRegistered(int publishId){
         String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
         logger.warn(config);
+        JsonObject lobby = JsonUtil.parse(config);
+        LobbyItem lobbyItem = new LobbyItem(lobby);
+        String k = gameTypeId+"/"+lobby.get("ConfigurationName").getAsString();
+        lobbyItems.put(k,lobbyItem);
+        ListenerOnLobby lobbyListener = lobbyListeners.get(k);
+        if(lobbyListener!=null && k.equals(lobbyListener.lobby.tag())) lobbyListener.listener.onLoaded(lobbyItem);
         return true;
     }
     public boolean onItemReleased(int publishId){
         logger.warn("release local resource with ["+publishId+"]");
+        lobbyItems.forEach((k,v)->{
+            logger.warn("key : "+k+" : "+v.publishId);
+            if(v.publishId == publishId){
+                ListenerOnLobby listener = lobbyListeners.get(k);
+                if(listener!=null&& k.equals(listener.lobby.tag())){
+                    listener.listener.onRemoved(v);
+                }
+            }
+        });
         return true;
     }
 }
