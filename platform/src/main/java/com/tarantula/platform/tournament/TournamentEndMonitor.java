@@ -33,7 +33,7 @@ public class TournamentEndMonitor implements SchedulingTask {
             this.tournamentServiceProvider.endTournament(tournamentHeader);
         }
         catch (Exception ex){
-            this.tournamentServiceProvider.logger.error("error on end tournament",ex);
+            this.tournamentServiceProvider.logger().error("error on end tournament",ex);
         }
     }
 }

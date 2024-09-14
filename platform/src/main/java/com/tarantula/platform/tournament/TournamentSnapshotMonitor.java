@@ -32,7 +32,7 @@ public class TournamentSnapshotMonitor implements SchedulingTask {
         try{
         this.tournamentServiceProvider.sortTournament(tournamentManager);
         }catch (Exception ex){
-            this.tournamentServiceProvider.logger.error("error on snapshot tournament",ex);
+            this.tournamentServiceProvider.logger().error("error on snapshot tournament",ex);
         }
     }
 }

@@ -32,7 +32,7 @@ public class TournamentStartMonitor implements SchedulingTask {
         try{
             this.tournamentServiceProvider.startTournament(tournamentManager);
         }catch (Exception ex){
-            this.tournamentServiceProvider.logger.error("error on start tournament",ex);
+            this.tournamentServiceProvider.logger().error("error on start tournament",ex);
         }
     }
 }

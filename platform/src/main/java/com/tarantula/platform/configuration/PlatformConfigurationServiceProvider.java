@@ -198,12 +198,26 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         }));
     }
 
-    public void register(int publishId){
-
+    @Override
+    public void register(int publishId) {
+        logger.warn("register : "+publishId);
+        distributionItemService.onRegisterItem(gameServiceName,name(),publishId);
     }
 
-    public void release(int publishId){
+    @Override
+    public void release(int publishId) {
+        logger.warn("release : "+publishId);
+        distributionItemService.onReleaseItem(gameServiceName,name(),publishId);
+    }
 
+    public boolean onItemRegistered(int publishId){
+        String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
+        logger.warn(config);
+        return true;
+    }
+    public boolean onItemReleased(int publishId){
+        logger.warn("release local resource with ["+publishId+"]");
+        return true;
     }
 
 }

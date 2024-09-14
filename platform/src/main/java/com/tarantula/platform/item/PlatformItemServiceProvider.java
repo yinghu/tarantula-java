@@ -77,4 +77,17 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
         return false;
     }
 
+    @Override
+    public void register(int publishId) {
+        logger.warn("register : "+publishId);
+        distributionItemService.onRegisterItem(gameServiceName,name(),publishId);
+    }
+
+    @Override
+    public void release(int publishId) {
+        logger.warn("release : "+publishId);
+        distributionItemService.onReleaseItem(gameServiceName,name(),publishId);
+    }
+
+
 }

@@ -13,29 +13,31 @@ import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.Commodity;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.item.ItemDistributionCallback;
+import com.tarantula.platform.item.PlatformItemServiceProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PlatformStoreServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback {
+public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
 
     public static final String NAME = "store";
 
-    private TarantulaLogger logger;
-    private final String gameServiceName;
-    private final GameCluster gameCluster;
+    //private TarantulaLogger logger;
+    //private final String gameServiceName;
+    //private final GameCluster gameCluster;
     private final PlatformInventoryServiceProvider inventoryServiceProvider;
-    private ServiceContext serviceContext;
-    private DistributionItemService distributionItemService;
-    private ApplicationPreSetup applicationPreSetup;
+    //private ServiceContext serviceContext;
+    //private DistributionItemService distributionItemService;
+    //private ApplicationPreSetup applicationPreSetup;
 
     private ConcurrentHashMap<String,Shop> shopIndex;
     private ConcurrentHashMap<String,ShoppingItem> shoppingItems;
 
     public PlatformStoreServiceProvider(PlatformGameServiceProvider gameServiceProvider){
-        this.gameCluster = gameServiceProvider.gameCluster();
-        this.gameServiceName = gameCluster.gameServiceName;//(String)gameCluster.property(GameCluster.GAME_SERVICE);
+        super(gameServiceProvider,NAME);
+        //this.gameCluster = gameServiceProvider.gameCluster();
+        //this.gameServiceName = gameCluster.gameServiceName;//(String)gameCluster.property(GameCluster.GAME_SERVICE);
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
     }
     @Override
@@ -61,18 +63,16 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
         this.logger.warn("Store service provider started on->"+gameServiceName);
     }
 
-    @Override
-    public void shutdown() throws Exception {
 
-    }
     @Override
     public void setup(ServiceContext serviceContext) {
+        super.setup(serviceContext);
         this.shoppingItems = new ConcurrentHashMap<>();
         this.shopIndex = new ConcurrentHashMap<>();
-        this.serviceContext = serviceContext;
-        this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        //this.serviceContext = serviceContext;
+        ///this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.logger = JDKLogger.getLogger(PlatformStoreServiceProvider.class);
-        this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
+        //this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
     }
 
     public Shop shop(String name){
@@ -131,11 +131,16 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
         });
     }
 
+
+
     public boolean onItemRegistered(int publishId){
-        return false;
+        String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
+        logger.warn(config);
+        return true;
     }
     public boolean onItemReleased(int publishId){
-        return false;
+        logger.warn("release local resource with ["+publishId+"]");
+        return true;
     }
 
 }

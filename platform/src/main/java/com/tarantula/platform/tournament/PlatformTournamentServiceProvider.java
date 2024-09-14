@@ -14,6 +14,7 @@ import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.item.ItemDistributionCallback;
+import com.tarantula.platform.item.PlatformItemServiceProvider;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -22,7 +23,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class PlatformTournamentServiceProvider implements TournamentServiceProvider, ReloadListener, ConfigurationServiceProvider, ItemDistributionCallback {
+public class PlatformTournamentServiceProvider extends PlatformItemServiceProvider implements TournamentServiceProvider, ReloadListener{
 
     private static final String CONFIG = "game-tournament-settings";
 
@@ -38,14 +39,14 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     final static long SCHEDULE_RUNNER_DELAY = 500;
 
-    TarantulaLogger logger;
+    //TarantulaLogger logger;
 
-    ServiceContext serviceContext;
+    //ServiceContext serviceContext;
 
     DistributionTournamentService distributionTournamentService;
 
-    private DistributionItemService distributionItemService;
-    final String gameServiceName;
+    //private DistributionItemService distributionItemService;
+    //final String gameServiceName;
 
     DataStore dataStore;
 
@@ -86,8 +87,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     boolean localOperationEnabled;
     AtomicInteger snapshotTimerInterval = new AtomicInteger(0);
     private String reloadKey;
-    final GameCluster gameCluster;
-    private ApplicationPreSetup applicationPreSetup;
+    //final GameCluster gameCluster;
+    //private ApplicationPreSetup applicationPreSetup;
     private Descriptor application;
     PlatformInventoryServiceProvider inventoryServiceProvider;
     PlatformInboxServiceProvider inboxServiceProvider;
@@ -96,8 +97,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private ClusterProvider.ClusterStore scheduleStore;
 
     public PlatformTournamentServiceProvider(PlatformGameServiceProvider gameServiceProvider){
-        this.gameCluster = gameServiceProvider.gameCluster();
-        this.gameServiceName = this.gameCluster.serviceType();
+        super(gameServiceProvider,NAME);
+        //this.gameCluster = gameServiceProvider.gameCluster();
+        //this.gameServiceName = this.gameCluster.serviceType();
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
         this.inboxServiceProvider = gameServiceProvider.inboxServiceProvider();
     }
@@ -159,13 +161,20 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         }
         return _tms;
     }
-    public String name(){
-        return NAME;
+
+
+    public TarantulaLogger logger(){
+        return logger;
+    }
+
+    public String gameServiceName(){
+        return gameServiceName;
     }
     @Override
     public void setup(ServiceContext serviceContext) {
-        this.serviceContext = serviceContext;
-        this.applicationPreSetup = gameCluster.applicationPreSetup();
+        super.setup(serviceContext);
+        //this.serviceContext = serviceContext;
+        //this.applicationPreSetup = gameCluster.applicationPreSetup();
         Configuration configuration = serviceContext.configuration(CONFIG);
         this.smallConcurrentInstanceSize = ((Number)configuration.property("smallConcurrentInstanceSize")).intValue();
         this.mediumConcurrentInstanceSize = ((Number)configuration.property("mediumConcurrentInstanceSize")).intValue();
@@ -190,7 +199,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.logger = JDKLogger.getLogger(PlatformTournamentServiceProvider.class);
         this.reloadKey = this.serviceContext.clusterProvider().registerReloadListener(this);
         this.distributionTournamentService = this.serviceContext.clusterProvider().serviceProvider(DistributionTournamentService.NAME);
-        this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
+        //this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.scheduleStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,gameCluster.typeId()+"."+NAME);
         this.systemValidatorProvider = (TokenValidatorProvider)serviceContext.serviceProvider(TokenValidatorProvider.NAME);
     }
@@ -563,11 +572,26 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         });
     }
 
+    @Override
+    public void register(int publishId) {
+        logger.warn("register : "+publishId);
+        distributionItemService.onRegisterItem(gameServiceName,name(),publishId);
+    }
+
+    @Override
+    public void release(int publishId) {
+        logger.warn("release : "+publishId);
+        distributionItemService.onReleaseItem(gameServiceName,name(),publishId);
+    }
+
     public boolean onItemRegistered(int publishId){
-        return false;
+        String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
+        logger.warn(config);
+        return true;
     }
     public boolean onItemReleased(int publishId){
-        return false;
+        logger.warn("release local resource with ["+publishId+"]");
+        return true;
     }
 
 }

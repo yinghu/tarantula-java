@@ -65,10 +65,10 @@ public class TournamentRegister extends OnApplicationHeader {
         this.timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now().minusMinutes(duration));
         this.totalJoined.set(joins);
         provider.updateTournamentRegister(this);
-        provider.logger.warn("Setup Instance : "+tournamentId);
+        provider.logger().warn("Setup Instance : "+tournamentId);
         if(scheduledFuture!=null) scheduledFuture.cancel(true);
         scheduledFuture = provider.schedule(new ScheduleRunner((duration-provider.endBufferTimeMinutes)*60*1000,()->{
-            provider.logger.warn("Timeout Instance : "+tournamentId);
+            provider.logger().warn("Timeout Instance : "+tournamentId);
             setup(provider,provider.nextInstanceId(),duration,joins);
         }));
     }

@@ -4,55 +4,37 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
 
-import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.ApplicationPreSetup;
-import com.icodesoftware.service.ConfigurationServiceProvider;
+
 import com.icodesoftware.service.ServiceContext;
 
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
-import com.tarantula.platform.GameCluster;
-
-import com.tarantula.platform.item.DistributionItemService;
-import com.tarantula.platform.item.ItemDistributionCallback;
+import com.tarantula.platform.item.PlatformItemServiceProvider;
 
 
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class PlatformLobbyServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback {
+public class PlatformLobbyServiceProvider extends PlatformItemServiceProvider{
 
     public static final String NAME = "lobby";
 
-    private ServiceContext serviceContext;
-    private TarantulaLogger logger;
-    private final GameCluster gameCluster;
-    private String gameServiceName;
     private String gameTypeId;
-    private ApplicationPreSetup applicationPreSetup;
-    private DistributionItemService distributionItemService;
     private ConcurrentHashMap<String,ListenerOnLobby> lobbyListeners;
     private ConcurrentHashMap<String,LobbyItem> lobbyItems;
 
     public PlatformLobbyServiceProvider(PlatformGameServiceProvider gameServiceProvider){
-        this.gameCluster = gameServiceProvider.gameCluster();
-        this.gameServiceName = gameCluster.serviceType();
+        super(gameServiceProvider,NAME);
         this.gameTypeId = gameCluster.typeId();
     }
     @Override
     public void setup(ServiceContext serviceContext) {
+        super.setup(serviceContext);
         this.lobbyListeners = new ConcurrentHashMap<>();
         this.lobbyItems = new ConcurrentHashMap<>();
-        this.serviceContext = serviceContext;
-        this.applicationPreSetup = gameCluster.applicationPreSetup();
-        this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.logger = JDKLogger.getLogger(PlatformLobbyServiceProvider.class);
         this.logger.warn("Lobby service provider started on ->"+gameServiceName+"-->"+gameTypeId);
-    }
-    @Override
-    public String name() {
-        return NAME;
     }
 
     @Override
@@ -67,23 +49,6 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
         this.logger.warn("Lobby service provider started on->"+gameServiceName+" with lobby configuration");
     }
 
-    @Override
-    public void shutdown() throws Exception {
-
-    }
-
-    @Override
-    public <T extends Configurable> void register(T t) {
-        t.registered();
-        logger.warn("register->"+t.distributionKey());
-        distributionItemService.onRegisterItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
-    }
-    @Override
-    public <T extends Configurable> void release(T t) {
-        t.released();
-        logger.warn("release->"+t.distributionKey());
-        distributionItemService.onReleaseItem(gameServiceName,name(),t.configurationTypeId(),t.configurationName());
-    }
 
     public boolean onItemRegistered(String category,String itemId){
         LobbyItem lobbyItem = new LobbyItem();
@@ -122,21 +87,6 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     }
 
 
-    @Override
-    public void register(int publishId) {
-        logger.warn("register : "+publishId);
-        //String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
-        //logger.warn(config);
-        distributionItemService.onRegisterItem(gameServiceName,name(),publishId);
-    }
-
-    @Override
-    public void release(int publishId) {
-        logger.warn("release : "+publishId);
-        //String config = serviceContext.node().homingAgent().onConfigurationReleased(publishId);
-        //logger.warn(config);
-        distributionItemService.onReleaseItem(gameServiceName,name(),publishId);
-    }
 
     public boolean onItemRegistered(int publishId){
         String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
