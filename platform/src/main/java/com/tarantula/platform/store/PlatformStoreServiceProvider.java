@@ -131,4 +131,11 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
         });
     }
 
+    public boolean onItemRegistered(int publishId){
+        return false;
+    }
+    public boolean onItemReleased(int publishId){
+        return false;
+    }
+
 }

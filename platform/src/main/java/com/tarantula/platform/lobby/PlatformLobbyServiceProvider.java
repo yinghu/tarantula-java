@@ -125,10 +125,26 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     @Override
     public void register(int publishId) {
         logger.warn("register : "+publishId);
+        //String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
+        //logger.warn(config);
+        distributionItemService.onRegisterItem(gameServiceName,name(),publishId);
     }
 
     @Override
     public void release(int publishId) {
         logger.warn("release : "+publishId);
+        //String config = serviceContext.node().homingAgent().onConfigurationReleased(publishId);
+        //logger.warn(config);
+        distributionItemService.onReleaseItem(gameServiceName,name(),publishId);
+    }
+
+    public boolean onItemRegistered(int publishId){
+        String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
+        logger.warn(config);
+        return true;
+    }
+    public boolean onItemReleased(int publishId){
+        logger.warn("release local resource with ["+publishId+"]");
+        return true;
     }
 }

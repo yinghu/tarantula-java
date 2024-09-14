@@ -120,6 +120,8 @@ public interface ClusterProvider extends ServiceProvider {
         default void onTransactionLog(byte[] log){}
         default String onConfiguration(long gameClusterId,String category){ return "{}";}
         default void onMetrics(String name, List<Statistics.Entry> updates){}
+        default String onConfigurationRegistered(int publishId){ return "{}";}
+        default String onConfigurationReleased(int publishId){ return "{}";}
     }
 
 

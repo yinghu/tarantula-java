@@ -563,4 +563,11 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         });
     }
 
+    public boolean onItemRegistered(int publishId){
+        return false;
+    }
+    public boolean onItemReleased(int publishId){
+        return false;
+    }
+
 }

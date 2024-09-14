@@ -66,11 +66,12 @@ public class PlatformHomingAgent extends TarantulaAgent {
         }));
     }
 
-    public  String configurationRegistered(String publishedId){
+    @Override
+    public  String onConfigurationRegistered(int publishedId){
         try {
             String[] headers = new String[]{
                     Session.TARANTULA_ACCESS_KEY, serviceContext.node().homingAgent().accessKey(),
-                    Session.TARANTULA_TRACK_ID,publishedId,
+                    Session.TARANTULA_TRACK_ID,Integer.toString(publishedId)
             };
             String resp = serviceContext.httpClientProvider().get(serviceContext.node().homingAgent().host(), "configuration/registered", headers);
             return resp;
@@ -79,11 +80,12 @@ public class PlatformHomingAgent extends TarantulaAgent {
             return "{}";
         }
     }
-    public  String configurationReleased(String publishedId){
+    @Override
+    public  String onConfigurationReleased(int publishedId){
         try {
             String[] headers = new String[]{
                     Session.TARANTULA_ACCESS_KEY, serviceContext.node().homingAgent().accessKey(),
-                    Session.TARANTULA_TRACK_ID,publishedId,
+                    Session.TARANTULA_TRACK_ID,Integer.toString(publishedId)
             };
             String resp = serviceContext.httpClientProvider().get(serviceContext.node().homingAgent().host(), "configuration/released", headers);
             return resp;

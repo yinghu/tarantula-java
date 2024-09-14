@@ -70,5 +70,11 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     public boolean onItemReleased(String category,String itemId){
         return false;
     }
+    public boolean onItemRegistered(int publishId){
+        return false;
+    }
+    public boolean onItemReleased(int publishId){
+        return false;
+    }
 
 }
