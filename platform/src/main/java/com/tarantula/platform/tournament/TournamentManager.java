@@ -470,7 +470,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     private int rank(TournamentInstance ended){
         if(prizes==null){
-            this.tournamentServiceProvider.logger.warn("No prize pool associated with tournament Id ["+this.distributionId+"]");
+            this.tournamentServiceProvider.logger().warn("No prize pool associated with tournament Id ["+this.distributionId+"]");
             return 0;
         }
         int rank =1;
