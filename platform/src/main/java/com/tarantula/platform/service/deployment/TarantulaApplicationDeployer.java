@@ -68,6 +68,8 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 			}
 			this.context.setGameServiceProvider(gameCluster);
 			this.context.setGameClusterOnLobby(gameCluster,this);
+			logger.warn("Game cluster is ready ...");
+			gameCluster.ready.countDown();
 		}catch (Exception ex){
 			throw new RuntimeException(ex);
 		}

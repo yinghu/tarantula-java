@@ -1,7 +1,9 @@
 package com.tarantula.platform.tournament;
 
+
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
 
@@ -88,19 +90,15 @@ public class TournamentSchedule extends Application {
         return validated;
     }
 
-    public List<TournamentPrize> list(){
-        ArrayList<TournamentPrize> prizes = new ArrayList<>();
+    public List<ConfigurableObject> prizeList(PlatformInventoryServiceProvider inventoryServiceProvider){
+        ArrayList<ConfigurableObject> prizes = new ArrayList<>();
         _reference.forEach(c->{
-            int from = c.header().get("MinRank").getAsInt();
-            int to = c.header().get("MaxRank").getAsInt();
-            for(int i = from;i<=to;i++){
-                TournamentPrize prize = new TournamentPrize(c,i);
-                //prize.configureAndValidate();
-                prizes.add(prize);
-            }
+            inventoryServiceProvider.load(c);
+            prizes.add(c);
         });
         return prizes;
     }
+
 
     public TournamentScheduleStatus status(){
         TournamentScheduleStatus status = new TournamentScheduleStatus();

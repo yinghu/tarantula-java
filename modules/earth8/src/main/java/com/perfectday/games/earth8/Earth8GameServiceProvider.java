@@ -93,6 +93,25 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     }
 
     public void updateGame(Session session,byte[] payload) throws Exception{
+        if (session.name() != null && session.name().startsWith("ItemGrant")){
+            Transaction transaction = gameContext.applicationSchema().transaction();
+
+            transaction.execute(ctx->{
+                DataStore playerActionStore = ctx.onDataStore("player_inventory_grant");
+
+                playerActionStore.list(new PlayerActionQuery(session.distributionId())).forEach(playerAction -> {
+                    if(playerAction.name().equals(session.name())){
+                        playerAction.completed = true;
+                        playerActionStore.update(playerAction);
+                    }
+                });
+
+                return true;
+            });
+
+            return;
+        }
+
         BattleUpdate update = BattleUpdate.fromJson(payload);
         PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext,session.distributionId(), PlayerDataTrack.Type.Analytics);
 
@@ -213,6 +232,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     public List<OnInbox> inbox(Session session){
         List<OnInbox> inbox = new ArrayList<>();
         List<OnAccess> playerEvents = new ArrayList<>();
+        List<OnAccess> playerCurrencyGrantEvents = new ArrayList<>();
+
+
         gameContext.applicationSchema().transaction().execute(ctx->{
             DataStore dataStore = ctx.onDataStore("player_coin_form");
             dataStore.list(new PlayerActionQuery(session.distributionId())).forEach(playerAction -> {
@@ -220,7 +242,20 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             });
             return true;
         });
+
+        gameContext.applicationSchema().transaction().execute(ctx->{
+            DataStore dataStore = ctx.onDataStore("player_inventory_grant");
+            dataStore.list(new PlayerActionQuery(session.distributionId())).forEach(playerAction -> {
+                if(!playerAction.completed){
+                    playerCurrencyGrantEvents.add(playerAction);
+                }
+            });
+            return true;
+        });
+
         inbox.add(new PlayerEventInbox("coinForm","tournament",playerEvents));
+        inbox.add(new PlayerEventInbox("inventoryGrant", "inventory", playerCurrencyGrantEvents));
+
         return inbox;
     }
 
@@ -229,6 +264,11 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         gameContext.log("Tournament started : "+tournament.distributionId()+" : "+tournament.name()+" : "+tournament.type()+" : "+tournament.global(),OnLog.WARN);
         tournamentIndex.put(tournament.distributionId(),tournament);
         for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
+            Tournament dropped = tournamentIndex.get(start);
+            if(dropped != null){
+                gameContext.log("Tournament ["+dropped.distributionId()+" replaced with new one",OnLog.WARN);
+                tournamentIndex.remove(dropped.distributionId());
+            }
             tournamentIndex.put(start,tournament);
         }
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
@@ -261,7 +301,18 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
     @Override
     public void tournamentEnded(Tournament tournament) {
-        tournamentIndex.remove(tournament.distributionId());
+        gameContext.log("Tournament ended : "+tournament.distributionId()+" : "+tournament.name()+" : "+tournament.type()+" : "+tournament.global(),OnLog.WARN);
+        if(tournamentIndex.remove(tournament.distributionId())==null) {
+            gameContext.log("Tournament already removed : "+tournament.distributionId()+" : "+tournament.name()+" : "+tournament.type()+" : "+tournament.global(),OnLog.WARN);
+            return;
+        }
+        for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
+            tournamentIndex.remove(start);
+        }
+        TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+        gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
+                webhook.upload(ANALYTICS_QUERY, new RLCTournamentEndTransaction(tournament.distributionId()).toBytes())
+        ));
     }
 
     //UDP Channel Listener Callbacks

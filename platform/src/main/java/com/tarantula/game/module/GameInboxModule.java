@@ -54,9 +54,16 @@ public class GameInboxModule extends ModuleHeader{
             achievement.onProgress(Double.parseDouble(session.name()));
             session.write(achievement.toJson().toString().getBytes());
         }
-        else if(session.action().equals("onLeaderBoard")){
+        else if(session.action().equals("onLeaderBoard")) {
             LeaderBoard leaderBoard = this.gameServiceProvider.leaderBoardProvider().leaderBoard(session.name());
             session.write(leaderBoard.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onMailbox")){
+            session.write(this.gameServiceProvider.inboxServiceProvider().mailbox(session).toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onPlayerEventCompleted")){
+            gameServiceProvider.gameServiceProvider().updateGame(session,null);
+            session.write(JsonUtil.toSimpleResponse(true, "Player event " + session.name() + " completed").getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action()+" not support");

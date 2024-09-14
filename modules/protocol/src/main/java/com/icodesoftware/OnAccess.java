@@ -33,6 +33,7 @@ public interface OnAccess extends Session, DataStore.Updatable {
 
     String DOWNLOAD_CENTER = "downloadCenter";
 
+    String POST_OFFICE = "postOffice";
 
     String LOGIN = "login";
     String DEVICE_ID = "deviceId";
@@ -55,6 +56,7 @@ public interface OnAccess extends Session, DataStore.Updatable {
     String STORE_MESSAGE = "storeMessage";
     String STORE_BUNDLE_ID = "bundleId";
     String STORE_RECEIPT = "receipt";
+    String IS_SANDBOX = "isSandbox";
 
     String SYSTEM_ID = "systemId";
     String SESSION = "session";

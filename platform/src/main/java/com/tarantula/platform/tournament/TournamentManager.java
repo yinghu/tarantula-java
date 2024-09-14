@@ -1,17 +1,20 @@
 package com.tarantula.platform.tournament;
 
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.*;
 
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ApplicationPreSetup;
 
 import com.icodesoftware.util.*;
 import com.tarantula.game.SimpleStub;
 import com.tarantula.platform.event.PortableEventRegistry;
+import com.tarantula.platform.item.ConfigurableObject;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -24,6 +27,8 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TournamentManager extends RecoverableObject implements Tournament, Portable {
+
+    private static TarantulaLogger logger = JDKLogger.getLogger(TournamentManager.class);
 
     private Schedule schedule;
     private String type;
@@ -55,7 +60,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     PlatformTournamentServiceProvider tournamentServiceProvider;
     private DistributionTournamentService distributionTournamentService;
     private HashMap<Integer,TournamentPrize> prizes;
-
+    private List<ConfigurableObject> rangedPrizeList;
     ScheduledFuture<?> pendingSchedule;
 
     private ConcurrentHashMap<Long,ScheduledFuture<?>> pendingSchedules = new ConcurrentHashMap<>();
@@ -413,6 +418,16 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         jsonObject.addProperty("StartLevel",startLevel);
         jsonObject.addProperty("EndLevel",endLevel);
         jsonObject.addProperty("Status",status.name());
+        JsonArray prizeList = new JsonArray();
+        if(rangedPrizeList==null||tournamentServiceProvider==null){
+            //should not be return no prize set/ need to local why
+            logger.warn("SHOULD BE A NONE PRIZE HERE AND SHOULD BE SHUTDOWN");
+            return jsonObject;
+        }
+        for(ConfigurableObject p : rangedPrizeList){
+            prizeList.add(p.toJson());
+        }
+        jsonObject.add("_prizes",prizeList);
         return jsonObject;
     }
 
@@ -454,6 +469,10 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
 
     private int rank(TournamentInstance ended){
+        if(prizes==null){
+            this.tournamentServiceProvider.logger.warn("No prize pool associated with tournament Id ["+this.distributionId+"]");
+            return 0;
+        }
         int rank =1;
         LocalDateTime endTime = LocalDateTime.now();
         for(TournamentEntry entry : ended.sorted()){
@@ -504,14 +523,29 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
 
     void loadPrizes(ApplicationPreSetup applicationPreSetup, Descriptor application){
-        this.prizes = new HashMap<>();
-        TournamentSchedule schedule = new TournamentSchedule();
-        schedule.distributionId(this.scheduleId);
-        if(!applicationPreSetup.load(application,schedule)) return;
-        schedule.setup();
-        schedule.list().forEach(c-> {
-            prizes.put(c.rank(),c);
-        });
+        try{
+            this.prizes = new HashMap<>();
+            TournamentSchedule schedule = new TournamentSchedule();
+            schedule.distributionId(this.scheduleId);
+            if(!applicationPreSetup.load(application,schedule)){
+                throw new RuntimeException("Schedule should not be deleted once tournament has registered");
+                //return;
+            }
+            schedule.setup();
+            this.rangedPrizeList = schedule.prizeList(this.tournamentServiceProvider.inventoryServiceProvider);
+            this.rangedPrizeList.forEach(c->{
+                int from = c.header().get("MinRank").getAsInt();
+                int to = c.header().get("MaxRank").getAsInt();
+                for(int i = from;i<=to;i++){
+                    TournamentPrize prize = new TournamentPrize(c,i);
+                    prizes.put(prize.rank(),prize);
+                }
+            });
+        }catch (Exception ex){
+            if(this.status == Status.ENDED) return;
+            logger.error("Prize load issues ",ex);
+            this.tournamentServiceProvider.endTournament(this);
+        }
     }
 
     long toStartTime(){

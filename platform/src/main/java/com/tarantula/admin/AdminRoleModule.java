@@ -6,14 +6,16 @@ import com.google.gson.JsonObject;
 
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.service.DeploymentServiceProvider;
-import com.icodesoftware.service.TokenValidatorProvider;
-import com.icodesoftware.service.UserService;
+import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
+
 import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.SnowflakeKey;
+
 import com.icodesoftware.util.TimeUtil;
 
 import com.tarantula.platform.*;
+import com.tarantula.platform.inbox.PlatformServerEvent;
 import com.tarantula.platform.presence.*;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
@@ -32,8 +34,9 @@ public class AdminRoleModule implements Module{
 
     private DeploymentServiceProvider deploymentServiceProvider;
     private TokenValidatorProvider tokenValidatorProvider;
-
     private UserService userService;
+    private AccessIndexService accessIndexService;
+
     private int maxGameClusterCount;
     private Configuration gameClusterConfiguration;
 
@@ -178,6 +181,51 @@ public class AdminRoleModule implements Module{
             boolean suc = this.deploymentServiceProvider.shutdownGameCluster(gc);
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"operation successfully":"operation failed",suc)).getBytes());
         }
+        else if(session.action().equals("onItemGrantEvent")){
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
+
+            DataStore dataStore = gameCluster.applicationPreSetup().onDataStore("player_inventory_grant");
+
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            String playerID = (String)onAccess.property("playerID");
+            String amount = (String)onAccess.property("itemAmount");
+            String itemID = (String)onAccess.property("itemID");
+            String itemName = (String)onAccess.property("itemName");
+
+            PlatformServerEvent serverGrantEvent = new PlatformServerEvent("ItemGrant-" + itemID + "-" + amount,false);
+            serverGrantEvent.ownerKey(SnowflakeKey.from(Long.parseLong(playerID)));
+
+            if(dataStore.create(serverGrantEvent)){
+                session.write(JsonUtil.toSimpleResponse(true, amount + " " + itemName + " Granted to Player " + playerID).getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false, "Failed To Create Grant Event For Player " + playerID).getBytes());
+            }
+
+        }
+        else if(session.action().equals("onDeletePlayerData")){
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            String playerID = (String)onAccess.property("playerID");
+
+            Access user = userService.loadUser(Long.parseLong(playerID));
+
+            if(user.login() != null) {
+
+                AccessIndex acc = accessIndexService.get(user.login());
+                if (acc != null) {
+
+                    boolean accessIndexDelete = accessIndexService.delete(user.login());
+
+                    boolean userServiceDelete = userService.deleteUser(Long.parseLong(playerID));
+
+                    session.write(JsonUtil.toSimpleResponse(true, "Access Index Delete: " + accessIndexDelete + " | User Service Delete: " + userServiceDelete).getBytes());
+                    return true;
+                }
+
+            }
+
+            session.write(JsonUtil.toSimpleResponse(false, "No Data for Player " + playerID + " Deleted").getBytes());
+        }
         else{
             session.write(this.builder.create().toJson(new ResponseHeader("onError", session.action()+" operation not supported", false)).getBytes());
         }
@@ -193,6 +241,7 @@ public class AdminRoleModule implements Module{
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.userService = this.context.serviceProvider(UserService.NAME);
+        this.accessIndexService = this.context.clusterProvider().accessIndexService();
         this.gameClusterConfiguration = this.context.configuration("cluster");
         this.maxGameClusterCount = ((Number)this.gameClusterConfiguration.property("maxGameClusterCount")).intValue();
         this.pendingGameServices = new ConcurrentHashMap<>();

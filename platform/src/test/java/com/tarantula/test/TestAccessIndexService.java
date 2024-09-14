@@ -24,6 +24,11 @@ public class TestAccessIndexService implements AccessIndexService {
     }
 
     @Override
+    public boolean delete(String accessKey) {
+        return false;
+    }
+
+    @Override
     public boolean onEnable() {
         return false;
     }
