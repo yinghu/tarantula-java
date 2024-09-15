@@ -14,6 +14,7 @@ public class AmazonCredentialConfiguration extends CredentialConfiguration {
 
     public AmazonCredentialConfiguration(String typeId, JsonObject payload){
         super(typeId,payload);
+        this.name  = OnAccess.AMAZON;
     }
 
     public AmazonCredentialConfiguration(String typeId, ConfigurableObject configurableObject){
@@ -32,7 +33,7 @@ public class AmazonCredentialConfiguration extends CredentialConfiguration {
 
     @Override
     public boolean setup(ServiceContext serviceContext) {
-        byte[] data = serviceContext.node().homingAgent().onDownload(application.get("S3Client").getAsString());
+        byte[] data = serviceContext.node().homingAgent().onDownload(header.get("S3Client").getAsString());
         s3Client = new S3Client(JsonUtil.parse(data));
         return  s3Client.validate(serviceContext);
     }

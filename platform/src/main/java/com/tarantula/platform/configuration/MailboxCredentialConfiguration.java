@@ -45,6 +45,7 @@ public class MailboxCredentialConfiguration extends CredentialConfiguration {
     public boolean inbox(){
         return header.get("Inbox").getAsBoolean();
     }
+
     public LocalDateTime startTime() {
         return TimeUtil.fromString("yyyy-MM-dd'T'HH:mm",header.get("StartTime").getAsString());
     }

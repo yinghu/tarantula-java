@@ -16,9 +16,8 @@ public class CredentialConfiguration extends Application{
 
     public CredentialConfiguration(String typeId, JsonObject payload){
         this.typeId = typeId;
-        this.application = payload;
+        this.header = payload;
         this.configurationName = payload.get("ConfigurationName").getAsString();
-        this.name = this.configurationName;
     }
 
     public CredentialConfiguration(String typeId,String name,ConfigurableObject configurableObject){
@@ -73,6 +72,6 @@ public class CredentialConfiguration extends Application{
         return false;
     }
     public int publishId(){
-        return application.get("ConfigurationPublishId").getAsInt();
+        return header.get("ConfigurationPublishId").getAsInt();
     }
 }
