@@ -5,10 +5,12 @@ import com.icodesoftware.Statistics;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.lmdb.MetricsLog;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.Content;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.TarantulaAgent;
+import com.tarantula.platform.service.deployment.ContentMapping;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -103,7 +105,7 @@ public class PlatformHomingAgent extends TarantulaAgent {
         }
     }
 
-    public byte[] onDownload(String fileName){
+    public Content onDownload(String fileName){
         try {
             String[] headers = new String[]{
                     Session.TARANTULA_ACCESS_KEY, serviceContext.node().homingAgent().accessKey(),
@@ -122,11 +124,11 @@ public class PlatformHomingAgent extends TarantulaAgent {
                 responseData.dataAsBytes = resp.body();
                 return resp.statusCode();
             });
-            if(code==200) return responseData.dataAsBytes;
-            return "{}".getBytes();
+            if(code==200) return new ContentMapping(responseData.dataAsBytes,"",true);
+            return ContentMapping.NOT_EXISTED;
         }catch (Exception ex){
             logger.error("Homing Error",ex);
-            return "{}".getBytes();
+            return ContentMapping.NOT_EXISTED;
         }
     }
 }

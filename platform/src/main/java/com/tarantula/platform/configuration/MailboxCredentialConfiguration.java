@@ -1,5 +1,6 @@
 package com.tarantula.platform.configuration;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.Content;
 import com.icodesoftware.service.ServiceContext;
@@ -16,6 +17,11 @@ public class MailboxCredentialConfiguration extends CredentialConfiguration {
 
     private GridlyDownload gridlyDownload;
     private Content content;
+
+    public MailboxCredentialConfiguration(String typeId, JsonObject configurableObject){
+        super(typeId,configurableObject);
+        this.name = this.configurationName;
+    }
 
     public MailboxCredentialConfiguration(String typeId, ConfigurableObject configurableObject){
         super(typeId,configurableObject.configurationName(),configurableObject);
@@ -51,5 +57,14 @@ public class MailboxCredentialConfiguration extends CredentialConfiguration {
     }
     public LocalDateTime expirationTime() {
         return TimeUtil.fromString("yyyy-MM-dd'T'HH:mm",header.get("ExpirationTime").getAsString());
+    }
+
+
+    @Override
+    public boolean setup(ServiceContext serviceContext) {
+        content = serviceContext.node().homingAgent().onDownload(header.get("GridlyView").getAsString());
+        if(!content.existed()) return false;
+        gridlyDownload = new GridlyDownload(this,serviceContext);
+        return gridlyDownload.download();
     }
 }

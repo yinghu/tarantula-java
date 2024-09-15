@@ -10,8 +10,8 @@ import com.tarantula.platform.item.ConfigurableObject;
 
 public class FileCredentialConfiguration extends CredentialConfiguration {
 
-    private ServiceContext serviceContext;
-    private byte[] data;
+    private Content content;
+
     public FileCredentialConfiguration(String typeId, JsonObject configurableObject){
         super(typeId,configurableObject);
         this.name = this.configurationName;
@@ -24,20 +24,19 @@ public class FileCredentialConfiguration extends CredentialConfiguration {
 
     @Override
     public boolean setup(ServiceContext serviceContext, DataStore dataStore){
-        this.serviceContext = serviceContext;
-        Content content = serviceContext.deploymentServiceProvider().resource(header.get("File").getAsString());
+        content = serviceContext.deploymentServiceProvider().resource(header.get("File").getAsString());
         return content.existed();
     }
 
     public byte[] load(){
-        return data;
+        return content.data();
     }
 
 
     @Override
     public boolean setup(ServiceContext serviceContext) {
         String fileName = header.get("File").getAsString();
-        data = serviceContext.node().homingAgent().onDownload(fileName);
-        return true;
+        content = serviceContext.node().homingAgent().onDownload(fileName);
+        return content.existed();
     }
 }

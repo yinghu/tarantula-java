@@ -14,6 +14,7 @@ public class CredentialConfiguration extends Application{
 
     protected String typeId;
 
+    //homing agent
     public CredentialConfiguration(String typeId, JsonObject payload){
         this.typeId = typeId;
         this.header = payload;
@@ -68,6 +69,8 @@ public class CredentialConfiguration extends Application{
 
     }
 
+
+    //homing-agent enabling callbacks
     public boolean setup(ServiceContext serviceContext){
         return false;
     }

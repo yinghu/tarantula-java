@@ -19,7 +19,7 @@ public class PersonalDataStoreModule extends ModuleHeader implements Configurabl
     @Override
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
-        //gameServiceProvider.configurationServiceProvider().registerConfigurableListener(context.descriptor(),this);
+        gameServiceProvider.configurationServiceProvider().registerConfigurableListener(context.descriptor(),this);
         this.context.log("Game personal data module started", OnLog.WARN);
     }
 

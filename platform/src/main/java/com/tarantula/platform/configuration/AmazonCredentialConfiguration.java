@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.OnAccess;
 
+import com.icodesoftware.service.Content;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.item.ConfigurableObject;
@@ -33,8 +34,9 @@ public class AmazonCredentialConfiguration extends CredentialConfiguration {
 
     @Override
     public boolean setup(ServiceContext serviceContext) {
-        byte[] data = serviceContext.node().homingAgent().onDownload(header.get("S3Client").getAsString());
-        s3Client = new S3Client(JsonUtil.parse(data));
+        Content content = serviceContext.node().homingAgent().onDownload(header.get("S3Client").getAsString());
+        if(!content.existed()) return false;
+        s3Client = new S3Client(JsonUtil.parse(content.data()));
         return  s3Client.validate(serviceContext);
     }
 }

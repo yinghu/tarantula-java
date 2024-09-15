@@ -37,6 +37,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
     private HashMap<String,Vendor> vendors = new HashMap<>();
 
     private ScheduledFuture<?> scheduledFuture;
+
     public PlatformConfigurationServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
         this.typeId = gameCluster.typeId();
@@ -49,6 +50,15 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
                 logger.warn("Loading data from ["+k+"] : ["+v.configuration()+"]");
                 String configs = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),v.configuration());
                 logger.warn(configs);
+                JsonObject  list = JsonUtil.parse(configs);
+                list.get("list").getAsJsonArray().forEach(e->{
+                    CredentialConfiguration credentialConfiguration = v.credentialConfiguration(typeId,e.getAsJsonObject());
+                    if(credentialConfiguration!=null && credentialConfiguration.setup(serviceContext)){
+                        vendorCredentials.put(credentialConfiguration.name(), credentialConfiguration);
+                        vendorCredentials.put(Integer.toString(credentialConfiguration.publishId()),credentialConfiguration);
+                        logger.warn(credentialConfiguration.name()+" : "+credentialConfiguration.publishId());
+                    }
+                });
             }
         });
 
@@ -235,18 +245,14 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             logger.warn(category+" is disabled");
             return false;
         }
-        String cname = vendor.packageName()+"."+category;
-        try {
-            CredentialConfiguration credentialConfiguration = (CredentialConfiguration) Class.forName(cname).getConstructor(String.class, JsonObject.class).newInstance(this.typeId,load);
-            if (!credentialConfiguration.setup(serviceContext)) return false;
-            vendorCredentials.put(credentialConfiguration.name(), credentialConfiguration);
-            vendorCredentials.put(Integer.toString(credentialConfiguration.publishId()),credentialConfiguration);
-            logger.warn(credentialConfiguration.name()+" : "+credentialConfiguration.distributionKey());
-            return true;
-        }catch (Exception ex){
-            logger.warn("Credential configuration setup failed->"+vendor,ex);
-            return false;
-        }
+        CredentialConfiguration credentialConfiguration = vendor.credentialConfiguration(this.typeId,load);
+        if(credentialConfiguration==null) return false;
+        if(!credentialConfiguration.setup(serviceContext)) return false;
+        vendorCredentials.put(credentialConfiguration.name(), credentialConfiguration);
+        vendorCredentials.put(Integer.toString(credentialConfiguration.publishId()),credentialConfiguration);
+        logger.warn(credentialConfiguration.name()+" : "+credentialConfiguration.publishId());
+        return true;
+
     }
     public boolean onItemReleased(int publishId) {
         logger.warn("release local resource with [" + publishId + "]");
@@ -268,5 +274,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         });
         return tem;
     }
+
+
 
 }
