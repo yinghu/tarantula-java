@@ -11,6 +11,7 @@ import com.icodesoftware.OnAccess;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 
+import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
@@ -33,12 +34,24 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
 
     private ConcurrentHashMap<String,CredentialConfiguration> vendorCredentials = new ConcurrentHashMap<>();
 
-    private HashMap<String,JsonObject> vendors = new HashMap<>();
+    private HashMap<String,Vendor> vendors = new HashMap<>();
 
     private ScheduledFuture<?> scheduledFuture;
     public PlatformConfigurationServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
         this.typeId = gameCluster.typeId();
+    }
+
+    @Override
+    public void start() throws Exception{
+        vendors.forEach((k,v)->{
+            if(!v.disabled()){
+                logger.warn("Loading data from ["+k+"] : ["+v.configuration()+"]");
+                String configs = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),v.configuration());
+                logger.warn(configs);
+            }
+        });
+
     }
 
     @Override
@@ -55,8 +68,8 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             a.setup();
             if(!a.disabled()){
                 try{
-                    JsonObject vendor = vendors.get(a.configurationCategory());
-                    String cname = vendor.get("package").getAsString()+"."+a.configurationCategory();
+                    Vendor vendor = vendors.get(a.configurationCategory());
+                    String cname = vendor.packageName()+"."+a.configurationCategory();
                     CredentialConfiguration credentialConfiguration = (CredentialConfiguration) Class.forName(cname).getConstructor(String.class,ConfigurableObject.class).newInstance(this.typeId,a);
                     if(credentialConfiguration.setup(serviceContext,dataStore)){
                         vendorCredentials.put(credentialConfiguration.name(),credentialConfiguration);
@@ -68,17 +81,16 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             }
         });
         vendors.forEach((k,c)->{
-            JsonObject vendor = c.getAsJsonObject();
-            if(!vendor.get("disabled").getAsBoolean()){
-                JsonArray providers = vendor.get("providers").getAsJsonArray();
+            if(!c.disabled()){
+                List<String> providers = c.providers();
                 providers.forEach(p->{
-                    logger.warn("Register provider->"+p.getAsString());
+                    logger.warn("Register provider->"+p);
                     try{
-                        TokenValidatorProvider.AuthVendor authVendor = (TokenValidatorProvider.AuthVendor) Class.forName(p.getAsString()).getConstructor(PlatformGameServiceProvider.class, MetricsListener.class).newInstance(platformGameServiceProvider,serviceContext.metrics(gameServiceName));
+                        TokenValidatorProvider.AuthVendor authVendor = (TokenValidatorProvider.AuthVendor) Class.forName(p).getConstructor(PlatformGameServiceProvider.class, MetricsListener.class).newInstance(platformGameServiceProvider,serviceContext.metrics(gameServiceName));
                         serviceContext.registerAuthVendor(authVendor);
                         registered.put(authVendor.name(),authVendor);
                     } catch (Exception ex){
-                        logger.warn("Provider setup failed->"+p.getAsString(),ex);
+                        logger.warn("Provider setup failed->"+p,ex);
                     }
                 });
             }
@@ -105,12 +117,12 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         if(!applicationPreSetup.load(app,configurableObject)){
             return false;
         }
-        JsonObject vendor = vendors.get(configurableObject.configurationCategory());
-        if(vendor==null || vendor.get("disabled").getAsBoolean()){
+        Vendor vendor = vendors.get(configurableObject.configurationCategory());
+        if(vendor==null || vendor.disabled()){
             logger.warn(configurableObject.configurationCategory()+" is disabled");
             return false;
         }
-        String cname = vendor.get("package").getAsString()+"."+configurableObject.configurationCategory();
+        String cname = vendor.packageName()+"."+configurableObject.configurationCategory();
         try {
             CredentialConfiguration credentialConfiguration = (CredentialConfiguration) Class.forName(cname).getConstructor(String.class, ConfigurableObject.class).newInstance(this.typeId,configurableObject);
             if (credentialConfiguration.setup(serviceContext, dataStore)) {
@@ -150,7 +162,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         vlist.forEach(v->{
             logger.warn(v.toString());
             JsonObject jo = v.getAsJsonObject();
-            vendors.put(jo.get("configuration").getAsString(),jo);
+            vendors.put(jo.get("configuration").getAsString(),new Vendor(jo));
         });
         this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME+"_credentials");
         this.logger.warn("Configuration service provider started on ["+gameServiceName+"]["+gameCluster.property(GameCluster.NAME)+"]");
@@ -216,10 +228,32 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
     public boolean onItemRegistered(int publishId){
         String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
         logger.warn(config);
-        return true;
+        JsonObject load = JsonUtil.parse(config);
+        String category = load.get("ConfigurationCategory").getAsString();
+        Vendor vendor = vendors.get(category);
+        if(vendor==null || vendor.disabled()){
+            logger.warn(category+" is disabled");
+            return false;
+        }
+        String cname = vendor.packageName()+"."+category;
+        try {
+            CredentialConfiguration credentialConfiguration = (CredentialConfiguration) Class.forName(cname).getConstructor(String.class, JsonObject.class).newInstance(this.typeId,load);
+            if (!credentialConfiguration.setup(serviceContext)) return false;
+            vendorCredentials.put(credentialConfiguration.name(), credentialConfiguration);
+            vendorCredentials.put(Integer.toString(credentialConfiguration.publishId()),credentialConfiguration);
+            logger.warn(credentialConfiguration.name()+" : "+credentialConfiguration.distributionKey());
+            return true;
+        }catch (Exception ex){
+            logger.warn("Credential configuration setup failed->"+vendor,ex);
+            return false;
+        }
     }
     public boolean onItemReleased(int publishId) {
         logger.warn("release local resource with [" + publishId + "]");
+        CredentialConfiguration removed = vendorCredentials.remove(Integer.toString(publishId));
+        if(removed==null) return false;
+        logger.warn("removed credential configuration : "+removed.name());
+        vendorCredentials.remove(removed.name());
         return true;
     }
     public Map<Long,MailboxCredentialConfiguration> inbox(){

@@ -1,5 +1,6 @@
 package com.tarantula.platform.configuration;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.Content;
 import com.icodesoftware.service.DeploymentServiceProvider;
@@ -12,6 +13,13 @@ import com.tarantula.platform.util.RecoverableQuery;
 public class CredentialConfiguration extends Application{
 
     protected String typeId;
+
+    public CredentialConfiguration(String typeId, JsonObject payload){
+        this.typeId = typeId;
+        this.application = payload;
+        this.configurationName = payload.get("ConfigurationName").getAsString();
+        this.name = this.configurationName;
+    }
 
     public CredentialConfiguration(String typeId,String name,ConfigurableObject configurableObject){
         super(configurableObject);
@@ -59,5 +67,12 @@ public class CredentialConfiguration extends Application{
 
     public void release(){
 
+    }
+
+    public boolean setup(ServiceContext serviceContext){
+        return false;
+    }
+    public int publishId(){
+        return application.get("ConfigurationPublishId").getAsInt();
     }
 }

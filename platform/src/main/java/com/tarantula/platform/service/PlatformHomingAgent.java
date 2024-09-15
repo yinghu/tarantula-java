@@ -6,10 +6,18 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.lmdb.MetricsLog;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.TarantulaAgent;
 
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.List;
+
+import static com.tarantula.platform.service.AuthObject.ACCEPT;
+import static com.tarantula.platform.service.AuthObject.ACCEPT_JSON;
 
 public class PlatformHomingAgent extends TarantulaAgent {
 
@@ -92,6 +100,33 @@ public class PlatformHomingAgent extends TarantulaAgent {
         }catch (Exception ex){
             logger.error("Homing Error",ex);
             return "{}";
+        }
+    }
+
+    public byte[] onDownload(String fileName){
+        try {
+            String[] headers = new String[]{
+                    Session.TARANTULA_ACCESS_KEY, serviceContext.node().homingAgent().accessKey(),
+                    Session.TARANTULA_NAME,fileName
+            };
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(host+"/download"))
+                    .timeout(Duration.ofSeconds(10))
+                    .header(ACCEPT, ACCEPT_JSON)
+                    .headers(headers)
+                    .GET()
+                    .build();
+            HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
+            int code = serviceContext.httpClientProvider().request(client->{
+                HttpResponse<byte[]> resp = client.send(request,HttpResponse.BodyHandlers.ofByteArray());
+                responseData.dataAsBytes = resp.body();
+                return resp.statusCode();
+            });
+            if(code==200) return responseData.dataAsBytes;
+            return "{}".getBytes();
+        }catch (Exception ex){
+            logger.error("Homing Error",ex);
+            return "{}".getBytes();
         }
     }
 }

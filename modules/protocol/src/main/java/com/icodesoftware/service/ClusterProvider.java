@@ -122,6 +122,7 @@ public interface ClusterProvider extends ServiceProvider {
         default void onMetrics(String name, List<Statistics.Entry> updates){}
         default String onConfigurationRegistered(int publishId){ return "{}";}
         default String onConfigurationReleased(int publishId){ return "{}";}
+        default byte[] onDownload(String fileName){ return null;}
     }
 
 

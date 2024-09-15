@@ -77,7 +77,7 @@ public class GameApplicationAdminRoleModule implements Module {
         else if(session.action().equals("onRegistered")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
-            this.context.log(gameCluster.gameServiceName,OnLog.WARN);
+            this.context.log(session.name(),OnLog.WARN);
             PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider(gameCluster.serviceType());
             gameServiceProvider.configurationServiceProvider(query[2]).register(Integer.parseInt(query[1]));
             session.write(JsonUtil.toSimpleResponse(false,"failed to register item=>"+session.name()).getBytes());
@@ -85,7 +85,7 @@ public class GameApplicationAdminRoleModule implements Module {
         else if(session.action().equals("onReleased")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
-            this.context.log(gameCluster.gameServiceName,OnLog.WARN);
+            this.context.log(session.name(),OnLog.WARN);
             PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider(gameCluster.serviceType());
             gameServiceProvider.configurationServiceProvider(query[2]).release(Integer.parseInt(query[1]));
             session.write(JsonUtil.toSimpleResponse(false,"failed to release item>"+session.name()).getBytes());
