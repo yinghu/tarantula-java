@@ -1,6 +1,7 @@
 package com.tarantula.platform.tournament;
 
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
@@ -17,6 +18,10 @@ public class TournamentSchedule extends Application {
 
     public TournamentSchedule(){
 
+    }
+
+    public TournamentSchedule(JsonObject payload){
+        this.header = payload;
     }
 
     public TournamentSchedule(ConfigurableObject configurableObject){

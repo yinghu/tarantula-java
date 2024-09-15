@@ -1,19 +1,14 @@
 package com.tarantula.platform.tournament;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
-import com.icodesoftware.util.BufferUtil;
-import com.icodesoftware.util.SnowflakeKey;
-import com.icodesoftware.util.TimeUtil;
+import com.icodesoftware.util.*;
 import com.tarantula.game.service.PlatformGameServiceProvider;
-import com.tarantula.platform.GameCluster;
-import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.platform.inbox.PlatformInboxServiceProvider;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.ConfigurableObject;
-import com.tarantula.platform.item.DistributionItemService;
-import com.tarantula.platform.item.ItemDistributionCallback;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
 
 import java.time.LocalDateTime;
@@ -39,14 +34,9 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
 
     final static long SCHEDULE_RUNNER_DELAY = 500;
 
-    //TarantulaLogger logger;
-
-    //ServiceContext serviceContext;
 
     DistributionTournamentService distributionTournamentService;
 
-    //private DistributionItemService distributionItemService;
-    //final String gameServiceName;
 
     DataStore dataStore;
 
@@ -85,8 +75,6 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
     boolean localOperationEnabled;
     AtomicInteger snapshotTimerInterval = new AtomicInteger(0);
     private String reloadKey;
-    //final GameCluster gameCluster;
-    //private ApplicationPreSetup applicationPreSetup;
     private Descriptor application;
     PlatformInventoryServiceProvider inventoryServiceProvider;
     PlatformInboxServiceProvider inboxServiceProvider;
@@ -96,8 +84,6 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
 
     public PlatformTournamentServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
-        //this.gameCluster = gameServiceProvider.gameCluster();
-        //this.gameServiceName = this.gameCluster.serviceType();
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
         this.inboxServiceProvider = gameServiceProvider.inboxServiceProvider();
     }
@@ -223,13 +209,14 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
 
     @Override
     public void start() throws Exception {
-        //recentlyTournamentIndex.list(new RecentlyTournamentListQuery(gameCluster.distributionId()),list->{
-            //if(list.name()!=null) {
-                //list.dataStore(recentlyTournamentIndex);
-                //typedTournamentIndex.put(list.name(),list);
-            //}
-            //return true;
-        //});
+        String resp = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"TournamentSchedule");
+        logger.warn(resp);
+        JsonObject scheduleList = JsonUtil.parse(resp);
+        scheduleList.get("list").getAsJsonArray().forEach(e->{
+            TournamentSchedule schedule = new TournamentSchedule(e.getAsJsonObject());
+            logger.warn(schedule.startTime()+" : "+schedule.endTime());
+            logger.warn(schedule.startLevel()+" : "+schedule.endLevel());
+        });
         dataStore.list(new TournamentScheduleStatusQuery(this.gameCluster.distributionId())).forEach(status->{
             logger.warn("Tournament Status : "+status.tournamentId+" : "+status.status);
             byte[] lockKey = status.key().asBinary();
@@ -596,17 +583,7 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
         //});
     //}
 
-    @Override
-    public void register(int publishId) {
-        logger.warn("register : "+publishId);
-        distributionItemService.onRegisterItem(gameServiceName,name(),publishId);
-    }
 
-    @Override
-    public void release(int publishId) {
-        logger.warn("release : "+publishId);
-        distributionItemService.onReleaseItem(gameServiceName,name(),publishId);
-    }
 
     public boolean onItemRegistered(int publishId){
         String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
