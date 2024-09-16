@@ -40,6 +40,7 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
 
     @Override
     public void start() throws Exception {
+        if(!serviceContext.node().homingAgent().enabled()) return;
         String resp = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"Shop");
         JsonObject configs = JsonUtil.parse(resp);
         configs.get("list").getAsJsonArray().forEach(e->{
@@ -53,7 +54,7 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
             });
             shopIndex.put(shop.configurationName(),shop);
         });
-        this.logger.warn("Store service provider started on->"+gameServiceName);
+        this.logger.warn("Store service provider started with homing agent enabled");
     }
 
 

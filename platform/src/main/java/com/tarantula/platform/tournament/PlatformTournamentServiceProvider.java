@@ -209,14 +209,18 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
 
     @Override
     public void start() throws Exception {
-        String resp = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"TournamentSchedule");
-        logger.warn(resp);
-        JsonObject scheduleList = JsonUtil.parse(resp);
-        scheduleList.get("list").getAsJsonArray().forEach(e->{
-            TournamentSchedule schedule = new TournamentSchedule(e.getAsJsonObject());
-            logger.warn(schedule.startTime()+" : "+schedule.endTime());
-            logger.warn(schedule.startLevel()+" : "+schedule.endLevel());
-        });
+        if(serviceContext.node().homingAgent().enabled()){
+            String resp = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"TournamentSchedule");
+            logger.warn(resp);
+            JsonObject scheduleList = JsonUtil.parse(resp);
+            scheduleList.get("list").getAsJsonArray().forEach(e->{
+                TournamentSchedule schedule = new TournamentSchedule(e.getAsJsonObject());
+                logger.warn(schedule.startTime()+" : "+schedule.endTime());
+                logger.warn(schedule.startLevel()+" : "+schedule.endLevel());
+            });
+            this.logger.warn("Tournament service provider started with homing agent enabled");
+            return;
+        }
         dataStore.list(new TournamentScheduleStatusQuery(this.gameCluster.distributionId())).forEach(status->{
             logger.warn("Tournament Status : "+status.tournamentId+" : "+status.status);
             byte[] lockKey = status.key().asBinary();

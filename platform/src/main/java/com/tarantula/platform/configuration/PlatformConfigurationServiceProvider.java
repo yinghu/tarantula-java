@@ -45,6 +45,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
 
     @Override
     public void start() throws Exception{
+        if(!serviceContext.node().homingAgent().enabled()) return;
         vendors.forEach((k,v)->{
             if(!v.disabled()){
                 logger.warn("Loading data from ["+k+"] : ["+v.configuration()+"]");

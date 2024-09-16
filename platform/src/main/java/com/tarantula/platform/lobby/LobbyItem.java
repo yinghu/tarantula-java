@@ -37,6 +37,12 @@ public class LobbyItem extends Application{
 
     public List<ZoneItem> zoneList(){
         ArrayList<ZoneItem> zlist = new ArrayList<>();
+        if(!header.has("_zoneList")){
+            _reference.forEach(ref->{
+                zlist.add((ZoneItem)ref);
+            });
+            return zlist;
+        }
         header.get("_zoneList").getAsJsonArray().forEach(z->{
             JsonObject zo = z.getAsJsonObject();
             ZoneItem zoneItem = new ZoneItem(zo);

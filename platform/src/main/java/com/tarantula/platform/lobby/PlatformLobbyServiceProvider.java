@@ -39,6 +39,7 @@ public class PlatformLobbyServiceProvider extends PlatformItemServiceProvider{
 
     @Override
     public void start() throws Exception {
+        if(!serviceContext.node().homingAgent().enabled()) return;
         String resp = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"Map");
         JsonObject mapList = JsonUtil.parse(resp);
         mapList.get("list").getAsJsonArray().forEach(e->{
@@ -46,7 +47,7 @@ public class PlatformLobbyServiceProvider extends PlatformItemServiceProvider{
             LobbyItem lobbyItem = new LobbyItem(mo);
             lobbyItems.put(gameTypeId+"/"+mo.get("ConfigurationName").getAsString(),lobbyItem);
         });
-        this.logger.warn("Lobby service provider started on->"+gameServiceName+" with lobby configuration");
+        this.logger.warn("Lobby service provider started on->"+gameServiceName+" with homing agent enabled");
     }
 
 

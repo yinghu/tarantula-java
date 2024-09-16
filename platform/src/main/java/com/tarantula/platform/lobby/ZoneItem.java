@@ -48,12 +48,17 @@ public class ZoneItem extends Item {
 
 
     public RoomItem room(){
+        if(!header.has("_room")) return room;
         RoomItem roomItem = new RoomItem(header.get("_room").getAsJsonObject());
         return roomItem;
     }
 
     public List<ArenaItem> arenaList(){
         ArrayList<ArenaItem> alist = new ArrayList<>();
+        if(!header.has("_arenaList")){
+            _reference.forEach(ref-> alist.add((ArenaItem) ref));
+            return alist;
+        }
         header.get("_arenaList").getAsJsonArray().forEach(a->{
             JsonObject ao = a.getAsJsonObject();
             ArenaItem arenaItem = new ArenaItem(ao);
