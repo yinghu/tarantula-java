@@ -78,16 +78,12 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         items.forEach((a)-> {
             a.setup();
             if(!a.disabled()){
-                try{
-                    Vendor vendor = vendors.get(a.configurationCategory());
-                    String cname = vendor.packageName()+"."+a.configurationCategory();
-                    CredentialConfiguration credentialConfiguration = (CredentialConfiguration) Class.forName(cname).getConstructor(String.class,ConfigurableObject.class).newInstance(this.typeId,a);
-                    if(credentialConfiguration.setup(serviceContext,dataStore)){
-                        vendorCredentials.put(credentialConfiguration.name(),credentialConfiguration);
-                        vendorCredentials.put(credentialConfiguration.distributionKey(),credentialConfiguration);
-                    }
-                }catch (Exception nex){
-                    logger.warn("Credential Configuration Setup failed",nex);
+                Vendor vendor = vendors.get(a.configurationCategory());
+                CredentialConfiguration credentialConfiguration = vendor.credentialConfiguration(typeId,a);
+                if(credentialConfiguration!=null && credentialConfiguration.setup(serviceContext)){
+                    vendorCredentials.put(credentialConfiguration.name(),credentialConfiguration);
+                    vendorCredentials.put(credentialConfiguration.distributionKey(),credentialConfiguration);
+                    logger.warn(credentialConfiguration.name()+" : "+credentialConfiguration.distributionKey());
                 }
             }
         });
@@ -133,19 +129,14 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             logger.warn(configurableObject.configurationCategory()+" is disabled");
             return false;
         }
-        String cname = vendor.packageName()+"."+configurableObject.configurationCategory();
-        try {
-            CredentialConfiguration credentialConfiguration = (CredentialConfiguration) Class.forName(cname).getConstructor(String.class, ConfigurableObject.class).newInstance(this.typeId,configurableObject);
-            if (credentialConfiguration.setup(serviceContext, dataStore)) {
-                vendorCredentials.put(credentialConfiguration.name(), credentialConfiguration);
-                vendorCredentials.put(credentialConfiguration.distributionKey(),credentialConfiguration);
-                logger.warn(credentialConfiguration.name()+" : "+credentialConfiguration.distributionKey());
-            }
+        CredentialConfiguration credentialConfiguration = vendor.credentialConfiguration(this.typeId,configurableObject);
+        if (credentialConfiguration != null && credentialConfiguration.setup(serviceContext)) {
+            vendorCredentials.put(credentialConfiguration.name(), credentialConfiguration);
+            vendorCredentials.put(credentialConfiguration.distributionKey(),credentialConfiguration);
+            logger.warn(credentialConfiguration.name()+" : "+credentialConfiguration.distributionKey());
             return true;
-        }catch (Exception ex){
-            logger.warn("Credential configuration setup failed->"+vendor,ex);
-            return false;
         }
+        return false;
     }
     public boolean onItemReleased(String category,String itemId){
         ConfigurableObject configurableObject = new ConfigurableObject();

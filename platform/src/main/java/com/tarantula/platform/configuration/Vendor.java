@@ -1,6 +1,7 @@
 package com.tarantula.platform.configuration;
 
 import com.google.gson.JsonObject;
+import com.tarantula.platform.item.ConfigurableObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,14 @@ public class Vendor {
     public CredentialConfiguration credentialConfiguration(String typeId,JsonObject payload){
         try{
             return (CredentialConfiguration)Class.forName(packageName()+"."+configuration()).getConstructor(String.class,JsonObject.class).newInstance(typeId,payload);
+        }catch (Exception ex){
+            return null;
+        }
+    }
+
+    public CredentialConfiguration credentialConfiguration(String typeId, ConfigurableObject payload){
+        try{
+            return (CredentialConfiguration)Class.forName(packageName()+"."+configuration()).getConstructor(String.class, ConfigurableObject.class).newInstance(typeId,payload);
         }catch (Exception ex){
             return null;
         }

@@ -1,7 +1,6 @@
 package com.tarantula.platform.configuration;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.DataStore;
 import com.icodesoftware.OnAccess;
 
 import com.icodesoftware.service.Content;
@@ -28,13 +27,6 @@ public class JDBCPoolCredentialConfiguration extends CredentialConfiguration {
         pendingTasks = new ConcurrentHashMap<>();
     }
 
-    @Override
-    public boolean setup(ServiceContext serviceContext, DataStore dataStore){
-        ConfigurationObject configurationObject = saveConfigurationObject("DBCPPool",serviceContext.deploymentServiceProvider(),dataStore);
-        JsonObject poolConfig = JsonUtil.parse(configurationObject.value());
-        jdbcPool = new JDBCPool(poolConfig);
-        return jdbcPool.validate(serviceContext);
-    }
 
     public JDBCTask task(String name){
         pendingTasks.putIfAbsent(name,new StatisticsTask(jdbcPool));
@@ -47,7 +39,8 @@ public class JDBCPoolCredentialConfiguration extends CredentialConfiguration {
 
     @Override
     public boolean setup(ServiceContext serviceContext) {
-        Content content = serviceContext.node().homingAgent().onDownload(header.get("DBCPPool").getAsString());
+        super.setup(serviceContext);
+        Content content = super.content("DBCPPool");
         if(!content.existed()) return false;
         JsonObject poolConfig = JsonUtil.parse(content.data());
         jdbcPool = new JDBCPool(poolConfig);

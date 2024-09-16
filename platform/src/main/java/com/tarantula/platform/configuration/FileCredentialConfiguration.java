@@ -1,7 +1,6 @@
 package com.tarantula.platform.configuration;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.DataStore;
 import com.icodesoftware.service.Content;
 import com.icodesoftware.service.ServiceContext;
 
@@ -22,12 +21,6 @@ public class FileCredentialConfiguration extends CredentialConfiguration {
         this.typeId = typeId;
     }
 
-    @Override
-    public boolean setup(ServiceContext serviceContext, DataStore dataStore){
-        content = serviceContext.deploymentServiceProvider().resource(header.get("File").getAsString());
-        return content.existed();
-    }
-
     public byte[] load(){
         return content.data();
     }
@@ -35,8 +28,8 @@ public class FileCredentialConfiguration extends CredentialConfiguration {
 
     @Override
     public boolean setup(ServiceContext serviceContext) {
-        String fileName = header.get("File").getAsString();
-        content = serviceContext.node().homingAgent().onDownload(fileName);
+        super.setup(serviceContext);
+        content = super.content("File");
         return content.existed();
     }
 }

@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 
 public class MailboxCredentialConfiguration extends CredentialConfiguration {
 
-    private ServiceContext serviceContext;
 
     private GridlyDownload gridlyDownload;
     private Content content;
@@ -28,19 +27,8 @@ public class MailboxCredentialConfiguration extends CredentialConfiguration {
         this.typeId = typeId;
     }
 
-    @Override
-    public boolean setup(ServiceContext serviceContext, DataStore dataStore){
-        this.serviceContext = serviceContext;
-        content = serviceContext.deploymentServiceProvider().resource(header.get("GridlyView").getAsString());
-        if(!content.existed()) return false;
-        gridlyDownload = new GridlyDownload(this,serviceContext);
-        return gridlyDownload.download();
-    }
 
     public byte[] load(){
-        if(content!=null && content.existed()) return content.data();
-        content = serviceContext.deploymentServiceProvider().resource(header.get("GridlyView").getAsString());
-        if(!content.existed()) throw new RuntimeException("cannot load gridly view config");
         return content.data();
     }
 
@@ -62,7 +50,8 @@ public class MailboxCredentialConfiguration extends CredentialConfiguration {
 
     @Override
     public boolean setup(ServiceContext serviceContext) {
-        content = serviceContext.node().homingAgent().onDownload(header.get("GridlyView").getAsString());
+        super.setup(serviceContext);
+        content = super.content("GridlyView");
         if(!content.existed()) return false;
         gridlyDownload = new GridlyDownload(this,serviceContext);
         return gridlyDownload.download();

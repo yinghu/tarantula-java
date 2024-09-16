@@ -1,7 +1,6 @@
 package com.tarantula.platform.configuration;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.DataStore;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.service.Content;
 import com.icodesoftware.service.ServiceContext;
@@ -24,18 +23,6 @@ public class WebHookCredentialConfiguration extends CredentialConfiguration {
         super(typeId,OnAccess.WEB_HOOK,configurableObject);
     }
 
-    @Override
-    public boolean setup(ServiceContext serviceContext, DataStore dataStore){
-        ConfigurationObject configurationObject = saveConfigurationObject("Endpoint",serviceContext.deploymentServiceProvider(),dataStore);
-        JsonObject endpoint = JsonUtil.parse(configurationObject.value());
-        endpoint.entrySet().forEach(e->{
-            JsonObject config = e.getValue().getAsJsonObject();
-            WebClient wc = toWebClient(config);
-            if(wc!=null) webClients.put(e.getKey(),wc);
-        });
-        return endpoint.size()>0;
-    }
-
     public WebClient webClient(String name){
         return webClients.get(name);
     }
@@ -54,7 +41,8 @@ public class WebHookCredentialConfiguration extends CredentialConfiguration {
 
     @Override
     public boolean setup(ServiceContext serviceContext) {
-        Content content = serviceContext.node().homingAgent().onDownload(header.get("Endpoint").getAsString());
+        super.setup(serviceContext);
+        Content content = super.content("Endpoint");
         if(!content.existed()) return false;
         JsonObject endpoint = JsonUtil.parse(content.data());
         endpoint.entrySet().forEach(e->{

@@ -1,7 +1,7 @@
 package com.tarantula.platform.configuration;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.DataStore;
+
 import com.icodesoftware.OnAccess;
 
 import com.icodesoftware.service.Content;
@@ -22,19 +22,14 @@ public class AmazonCredentialConfiguration extends CredentialConfiguration {
         super(typeId,OnAccess.AMAZON,configurableObject);
     }
 
-    public boolean setup(ServiceContext serviceContext, DataStore dataStore){
-        ConfigurationObject configurationObject = saveConfigurationObject("S3Client",serviceContext.deploymentServiceProvider(),dataStore);
-        s3Client = new S3Client(JsonUtil.parse(configurationObject.value()));
-        return s3Client.validate(serviceContext);
-    }
-
     public S3Client s3Client(){
         return s3Client;
     }
 
     @Override
     public boolean setup(ServiceContext serviceContext) {
-        Content content = serviceContext.node().homingAgent().onDownload(header.get("S3Client").getAsString());
+        super.setup(serviceContext);
+        Content content = super.content("S3Client");
         if(!content.existed()) return false;
         s3Client = new S3Client(JsonUtil.parse(content.data()));
         return  s3Client.validate(serviceContext);
