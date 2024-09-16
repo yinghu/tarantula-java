@@ -13,6 +13,7 @@ import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
 
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -49,7 +50,18 @@ public class PlatformLobbyServiceProvider extends PlatformItemServiceProvider{
         });
         this.logger.warn("Lobby service provider started on->"+gameServiceName+" with homing agent enabled");
     }
-
+    @Override
+    public <T extends Configurable> void register(T t) {
+        t.registered();
+        logger.warn("register->"+t.distributionKey());
+        distributionItemService.onRegisterItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
+    }
+    @Override
+    public <T extends Configurable> void release(T t) {
+        t.released();
+        logger.warn("release->"+t.distributionKey());
+        distributionItemService.onReleaseItem(gameServiceName,name(),t.configurationTypeId(),t.configurationName());
+    }
 
     public boolean onItemRegistered(String category,String itemId){
         LobbyItem lobbyItem = new LobbyItem();
@@ -77,6 +89,15 @@ public class PlatformLobbyServiceProvider extends PlatformItemServiceProvider{
 
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
         lobbyListeners.put(descriptor.tag(),new ListenerOnLobby(descriptor,listener));
+        List<LobbyItem> items = applicationPreSetup.list(descriptor,new LobbyItemObjectQuery(descriptor.key(),descriptor.category()));
+        items.forEach((a)-> {
+            logger.warn(a.configurationCategory()+""+a.distributionId());
+            if(!a.disabled()){
+                a.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
+                a.setup();
+                lobbyItems.put(gameTypeId+"/"+a.configurationName(),a);
+            }
+        });
         lobbyItems.forEach((k,v)->{
             ListenerOnLobby lobbyListener = lobbyListeners.get(k);
             if(lobbyListener!=null && k.equals(lobbyListener.lobby.tag())) lobbyListener.listener.onLoaded(v);
