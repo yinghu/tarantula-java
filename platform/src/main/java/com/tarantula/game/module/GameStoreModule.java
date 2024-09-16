@@ -13,7 +13,7 @@ import com.tarantula.platform.util.OnAccessDeserializer;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GameStoreModule extends ModuleHeader{
+public class GameStoreModule extends ModuleHeader  implements Configurable.Listener<ShoppingItem>{
 
     private PlatformStoreServiceProvider storeServiceProvider;
     private PlatformInventoryServiceProvider inventoryServiceProvider;
@@ -86,6 +86,7 @@ public class GameStoreModule extends ModuleHeader{
         this.storeServiceProvider = gameServiceProvider.storeServiceProvider();
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
         this.serviceTypeId = this.context.descriptor().typeId().replace("-service","");
+        this.storeServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
         this.context.log("Game store module started with ["+serviceTypeId+"]", OnLog.WARN);
     }
 

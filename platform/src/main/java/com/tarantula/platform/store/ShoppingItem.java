@@ -23,6 +23,12 @@ public class ShoppingItem extends Item{
         super(configurableObject);
     }
 
+    public ShoppingItem(JsonObject payload){
+        this.header = payload;
+        this.configurationName = payload.get("Name").getAsString();
+        this.distributionId = payload.get("ConfigurationId").getAsInt();
+    }
+
     public int getFactoryId() {
         return ItemPortableRegistry.OID;
     }
@@ -86,13 +92,6 @@ public class ShoppingItem extends Item{
         return VirtualCurrency.None;
     }
 
-    public static ShoppingItem build(JsonObject payload){
-        ShoppingItem shoppingItem = new ShoppingItem();
-        shoppingItem.header = payload;
-        shoppingItem.configurationName = payload.get("Name").getAsString();
-        shoppingItem.distributionId = payload.get("ConfigurationId").getAsInt();
-        return shoppingItem;
-    }
     public List<Commodity> commodityList(){
         ArrayList<Commodity> commodities = new ArrayList<>();
         header.get("_skuList").getAsJsonArray().forEach((e)->{

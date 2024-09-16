@@ -468,8 +468,16 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
 
     public Inventory createInventory(ApplicationPreSetup applicationPreSetup,String category,String typeId){
         ConfigurableCategory conf = categories.get(category);
+        if(conf!=null){
+            Inventory inventory = new UserInventory(conf.name(),typeId,conf.rechargeable,conf.constrained,this);
+            return inventory;
+        }
+        ConfigurableCategories categories = this.configurableCategories(applicationPreSetup,Configurable.COMMODITY_CONFIG_TYPE);
+        conf = categories.configurableSetting(category);
+        conf.parse();
         Inventory inventory = new UserInventory(conf.name(),typeId,conf.rechargeable,conf.constrained,this);
         return inventory;
+
     }
 
 

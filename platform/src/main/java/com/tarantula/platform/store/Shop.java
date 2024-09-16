@@ -19,6 +19,11 @@ public class Shop extends Application {
         configurationName = name;
     }
 
+    public Shop(JsonObject payload){
+        this.application = payload;
+        this.configurationName = payload.get("ConfigurationName").getAsString();
+    }
+
     public String name(){
         return configurationName;
     }
@@ -38,22 +43,16 @@ public class Shop extends Application {
 
     @Override
     public JsonObject toJson() {
-        application.addProperty("Successful",true);
-        return application;
+        if(application.has("_shoppingItemList")) return application;
+        return super.toJson();
     }
 
-    public static Shop build(JsonObject payload){
-        Shop shop = new Shop();
-        shop.application = payload;
-        shop.configurationName = payload.get("ConfigurationName").getAsString();
-        return shop;
-    }
 
     public List<ShoppingItem> itemList(){
         ArrayList<ShoppingItem> items = new ArrayList<>();
         application.get("_shoppingItemList").getAsJsonArray().forEach(e->{
             JsonObject jo = e.getAsJsonObject();
-            items.add(ShoppingItem.build(jo));
+            items.add(new ShoppingItem(jo));
         });
         return items;
     }

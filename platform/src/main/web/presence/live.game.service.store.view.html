@@ -70,7 +70,7 @@
                 shoppingList.innerHTML ='';
                 resp._shoppingItemList.forEach((gi,i)=>{
                      
-                    shoppingList.innerHTML += TARA_HTML.command(gi.ConfigurationId,gi.Name,gi.SkuName,'store-grant','Grant');//tem.join('');  
+                    shoppingList.innerHTML += TARA_HTML.command(gi.ItemId,gi.Name,gi.SkuName,'store-grant','Grant');//tem.join('');  
                 });
                 document.querySelectorAll('.tx-live-store-grant').forEach(a=>{
                     a.onclick=()=>{

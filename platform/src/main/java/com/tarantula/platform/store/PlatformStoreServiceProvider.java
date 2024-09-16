@@ -3,16 +3,12 @@ package com.tarantula.platform.store;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.ApplicationPreSetup;
-import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.Commodity;
-import com.tarantula.platform.item.DistributionItemService;
-import com.tarantula.platform.item.ItemDistributionCallback;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
 
 import java.util.ArrayList;
@@ -44,7 +40,7 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
         String resp = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"Shop");
         JsonObject configs = JsonUtil.parse(resp);
         configs.get("list").getAsJsonArray().forEach(e->{
-            Shop shop = Shop.build(e.getAsJsonObject());
+            Shop shop = new Shop(e.getAsString());
             shop.itemList().forEach(shoppingItem -> {
                 List<Commodity> commodities = shoppingItem.commodityList();
                 commodities.forEach(commodity -> {
@@ -104,6 +100,12 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
 
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
+        List<Shop> items = applicationPreSetup.list(descriptor,new ShoppingItemObjectQuery(descriptor.key(),"Shop"));
+        items.forEach((a)-> {
+            if (!a.disabled()) {
+                registerShop(a);
+            }
+        });
         return null;
     }
 

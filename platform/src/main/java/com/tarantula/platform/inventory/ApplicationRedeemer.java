@@ -31,6 +31,7 @@ public class ApplicationRedeemer extends ConfigurableObject{
 
     public  void redeem(){
         //if(!this.configurationType.equals(Configurable.ITEM_CONFIG_TYPE)) return;
+        try{
         reference.forEach((ref)->{
             ApplicationRedeemer inventoryRedeemer = new ApplicationRedeemer(systemId,this.applicationPreSetup);
             inventoryRedeemer.distributionKey(ref.getAsString());
@@ -51,7 +52,9 @@ public class ApplicationRedeemer extends ConfigurableObject{
                     itemRedeemer.redeem();
                 }
             }
-        });
+        });}catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     public double amount() {
