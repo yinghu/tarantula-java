@@ -17,6 +17,16 @@ public class Commodity extends ConfigurableObject{
         super(configurableObject);
     }
 
+    public Commodity(JsonObject payload){
+        this.application = payload;
+        this.distributionId = payload.get("ConfigurationId").getAsInt();
+        this.configurationName(payload.get("ConfigurationName").getAsString());
+        this.configurationType(payload.get("ConfigurationType").getAsString());
+        this.configurationTypeId(payload.get("ConfigurationTypeId").getAsString());
+        this.configurationVersion(payload.get("ConfigurationVersion").getAsString());
+        this.configurationCategory(payload.get("ConfigurationCategory").getAsString());
+    }
+
 
     @Override
     public int getClassId() {
@@ -74,17 +84,6 @@ public class Commodity extends ConfigurableObject{
         return application.get("Amount").getAsDouble();
     }
 
-    public static Commodity build(JsonObject payload){
-        Commodity commodity = new Commodity();
-        commodity.application = payload;
-        commodity.distributionId = payload.get("ConfigurationId").getAsInt();
-        commodity.configurationName(payload.get("ConfigurationName").getAsString());
-        commodity.configurationType(payload.get("ConfigurationType").getAsString());
-        commodity.configurationTypeId(payload.get("ConfigurationTypeId").getAsString());
-        commodity.configurationVersion(payload.get("ConfigurationVersion").getAsString());
-        commodity.configurationCategory(payload.get("ConfigurationCategory").getAsString());
-        return commodity;
-    }
 
     public InventoryItem inventoryItem(long itemId){
         InventoryItem inventoryItem = new InventoryItem(itemId,distributionId);

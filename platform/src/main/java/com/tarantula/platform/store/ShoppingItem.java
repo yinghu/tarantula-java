@@ -97,7 +97,7 @@ public class ShoppingItem extends Item{
         ArrayList<Commodity> commodities = new ArrayList<>();
         header.get("_skuList").getAsJsonArray().forEach((e)->{
             JsonObject sku = e.getAsJsonObject().get("_sku").getAsJsonObject();
-            commodities.add(Commodity.build(sku));
+            commodities.add(new Commodity(sku));
         });
         return commodities;
     }

@@ -506,6 +506,7 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
     void updateTournamentRegister(TournamentRegister register){
         this.dataStore.update(register);
     }
+
     private TournamentScheduleStatus loadStatus(long scheduleId){
         TournamentScheduleStatus status = new TournamentScheduleStatus();
         status.distributionId(scheduleId);
@@ -583,21 +584,37 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
             //return loaded;
         //});
     //}
+    @Override
+    public void register(int publishId){
+        String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
+        JsonObject payload = JsonUtil.parse(config);
+        TournamentSchedule tournamentSchedule = new TournamentSchedule(payload);
+        tournamentSchedule.prizeList().forEach(tournamentPrize -> {
+            logger.warn(">>"+tournamentPrize.rank());
+            tournamentPrize.commodityList().forEach(c->{
+                logger.warn(c.amount()+"::");
+            });
+        });
+        logger.warn(tournamentSchedule.status().distributionKey());
+        TournamentScheduleStatus status = tournamentSchedule.status();
+        //status.ownerKey(SnowflakeKey.from(this.gameCluster.distributionId()));
+        dataStore.createIfAbsent(status,true);
 
+        //super.register(publishId);
+    }
+
+    @Override
+    public void release(int publishId){
+        super.release(publishId);
+    }
 
 
     public boolean onItemRegistered(int publishId){
-        String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
-        JsonObject payload = JsonUtil.parse(config);
-        payload.get("_prizeSet").getAsJsonArray().forEach(e->{
-            logger.warn(e.toString());
-        });
-        //TournamentSchedule tournamentSchedule = new TournamentSchedule(payload);
-
+        logger.warn("register local tournament : "+publishId);
         return true;
     }
     public boolean onItemReleased(int publishId){
-        logger.warn("release local resource with ["+publishId+"]");
+        logger.warn("release local tournament : "+publishId);
         return true;
     }
 

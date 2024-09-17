@@ -50,7 +50,12 @@ public class TournamentPrize extends Application implements Tournament.Prize {
     }
 
     public List<Commodity> commodityList(){
+        if(!header.has("_skuList")) return null;
         ArrayList<Commodity> commodities = new ArrayList<>();
+        header.get("_skuList").getAsJsonArray().forEach(e->{
+            JsonObject sku = e.getAsJsonObject().get("_sku").getAsJsonObject();
+            commodities.add(new Commodity(sku));
+        });
         return commodities;
     }
 

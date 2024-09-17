@@ -22,6 +22,7 @@ public class TournamentSchedule extends Application {
 
     public TournamentSchedule(JsonObject payload){
         this.header = payload;
+        this.distributionId = payload.get("ConfigurationId").getAsInt();
     }
 
     public TournamentSchedule(ConfigurableObject configurableObject){
@@ -104,6 +105,19 @@ public class TournamentSchedule extends Application {
         return prizes;
     }
 
+    public List<TournamentPrize> prizeList(){
+        if(!header.has("_prizeSet")) return null;
+        ArrayList<TournamentPrize> prizes = new ArrayList<>();
+        header.get("_prizeSet").getAsJsonArray().forEach(e->{
+            JsonObject pz = e.getAsJsonObject();
+            int min = pz.get("MinRank").getAsInt();
+            int max = pz.get("MaxRank").getAsInt();
+            for(int rank = min;rank<=max;rank++){
+                prizes.add(new TournamentPrize(pz,rank));
+            }
+        });
+        return prizes;
+    }
 
     public TournamentScheduleStatus status(){
         TournamentScheduleStatus status = new TournamentScheduleStatus();
