@@ -108,6 +108,10 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
     }
 
     public boolean redeem(long systemId, TournamentPrize item){
+        if(serviceContext.node().homingAgent().enabled()){
+
+            return true;
+        }
         boolean[] suc ={false};
         try(Transaction t = gameCluster.transaction()){
             suc[0] = t.execute(ctx->{
@@ -123,29 +127,43 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
         return suc[0];
     }
     public boolean redeem(long systemId, ShoppingItem shoppingItem){
-        shoppingItem.commodityList().forEach(commodity -> {
-            ///logger.warn(commodity.application().toString());
-            //logger.warn(commodity.application().get("template").getAsJsonObject().get("application").toString());
-            String type = commodity.configurationCategory();
-            String typeId = commodity.configurationTypeId();
-            UserInventory inventory = (UserInventory)applicationPreSetup.inventory(systemId,typeId);
-            if(inventory!=null){
-                logger.warn("inventory :"+inventory.typeId());
-                inventory.redeem(shoppingItem.distributionId(),commodity);
-            }
-            else{
-                inventory = (UserInventory) gameCluster.createInventory(applicationPreSetup,type,typeId);
-                logger.warn("in :"+inventory.typeId());
-                inventory.ownerKey(SnowflakeKey.from(systemId));
-                inventoryDataStore.create(inventory);
-                inventoryDataStore.createEdge(inventory,typeId);
-                inventoryDataStore.createEdge(inventory,type);
-                inventory.dataStore(inventoryDataStore);
-                inventory.applicationPreSetup(applicationPreSetup);
-                inventory.redeem(shoppingItem.distributionId(),commodity);
-            }
-        });
-        return true;
+        if(serviceContext.node().homingAgent().enabled()) {
+            shoppingItem.commodityList().forEach(commodity -> {
+                ///logger.warn(commodity.application().toString());
+                //logger.warn(commodity.application().get("template").getAsJsonObject().get("application").toString());
+                String type = commodity.configurationCategory();
+                String typeId = commodity.configurationTypeId();
+                UserInventory inventory = (UserInventory) applicationPreSetup.inventory(systemId, typeId);
+                if (inventory != null) {
+                    logger.warn("inventory :" + inventory.typeId());
+                    inventory.redeem(shoppingItem.distributionId(), commodity);
+                } else {
+                    inventory = (UserInventory) gameCluster.createInventory(applicationPreSetup, type, typeId);
+                    logger.warn("in :" + inventory.typeId());
+                    inventory.ownerKey(SnowflakeKey.from(systemId));
+                    inventoryDataStore.create(inventory);
+                    inventoryDataStore.createEdge(inventory, typeId);
+                    inventoryDataStore.createEdge(inventory, type);
+                    inventory.dataStore(inventoryDataStore);
+                    inventory.applicationPreSetup(applicationPreSetup);
+                    inventory.redeem(shoppingItem.distributionId(), commodity);
+                }
+            });
+            return true;
+        }
+        boolean[] suc ={false};
+        try(final Transaction t = gameCluster.transaction()){
+            suc[0] = t.execute(ctx->{
+                ApplicationPreSetup setup =(ApplicationPreSetup)ctx;
+                Descriptor app = gameCluster.application(shoppingItem.configurationTypeId());
+                ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,setup);
+                redeemer.distributionKey(shoppingItem.distributionKey());
+                if(!setup.load(app,redeemer)) return false;
+                redeemer.redeem();
+                return true;
+            });
+        }
+        return suc[0];
     }
 
     public void load(ConfigurableObject configurableObject){

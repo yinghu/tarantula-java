@@ -104,23 +104,9 @@ public class GoogleStorePurchaseValidator extends AuthObject {
                 logger.warn("Shopping Item not existed  : " + bundleId);
                 throw new RuntimeException("Shopping not existed [" + bundleId + "]");
             }
+            boolean suc = this.gameServiceProvider.inventoryServiceProvider().redeem(systemId,shoppingItem);
 
-            GameCluster gameCluster = gameServiceProvider.gameCluster();
-            boolean[] suc ={false};
-            try(final Transaction t = gameCluster.transaction()){
-
-                suc[0] = t.execute(ctx -> {
-                    ApplicationPreSetup setup = (ApplicationPreSetup) ctx;
-                    Descriptor app = gameCluster.application(shoppingItem.configurationTypeId());
-                    ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId, setup);
-                    redeemer.distributionKey(bundleId);
-                    if (!setup.load(app, redeemer)) return false;
-                    redeemer.redeem();
-                    return true;
-                });
-            }
-
-            if (suc[0]) return true;
+            if (suc) return true;
 
             logger.warn("Item : " + bundleId + " cannot be redeemed");
 

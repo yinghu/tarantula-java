@@ -27,6 +27,7 @@ public class ShoppingItem extends Item{
         this.header = payload;
         this.configurationName = payload.get("Name").getAsString();
         this.distributionId = payload.get("ConfigurationId").getAsInt();
+        this.header.addProperty("ItemId",this.distributionId());
     }
 
     public int getFactoryId() {

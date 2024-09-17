@@ -176,8 +176,6 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
     @Override
     public void setup(ServiceContext serviceContext) {
         super.setup(serviceContext);
-        //this.serviceContext = serviceContext;
-        //this.applicationPreSetup = gameCluster.applicationPreSetup();
         Configuration configuration = serviceContext.configuration(CONFIG);
         this.smallConcurrentInstanceSize = ((Number)configuration.property("smallConcurrentInstanceSize")).intValue();
         this.mediumConcurrentInstanceSize = ((Number)configuration.property("mediumConcurrentInstanceSize")).intValue();
@@ -202,7 +200,6 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
         this.logger = JDKLogger.getLogger(PlatformTournamentServiceProvider.class);
         this.reloadKey = this.serviceContext.clusterProvider().registerReloadListener(this);
         this.distributionTournamentService = this.serviceContext.clusterProvider().serviceProvider(DistributionTournamentService.NAME);
-        //this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.scheduleStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,gameCluster.typeId()+"."+NAME);
         this.systemValidatorProvider = (TokenValidatorProvider)serviceContext.serviceProvider(TokenValidatorProvider.NAME);
     }
@@ -591,7 +588,12 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
 
     public boolean onItemRegistered(int publishId){
         String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
-        logger.warn(config);
+        JsonObject payload = JsonUtil.parse(config);
+        payload.get("_prizeSet").getAsJsonArray().forEach(e->{
+            logger.warn(e.toString());
+        });
+        //TournamentSchedule tournamentSchedule = new TournamentSchedule(payload);
+
         return true;
     }
     public boolean onItemReleased(int publishId){

@@ -86,19 +86,7 @@ public class AppleStoreProvider extends AuthObject{
                 logger.warn("Shopping Item not existed  : "+bundleId);
                 throw new RuntimeException("Shopping not existed ["+bundleId+"]");
             }
-            GameCluster gameCluster = gameServiceProvider.gameCluster();
-
-            Transaction t = gameCluster.transaction();
-            boolean suc = t.execute(ctx->{
-                ApplicationPreSetup setup =(ApplicationPreSetup)ctx;
-                Descriptor app = gameCluster.application(shoppingItem.configurationTypeId());
-                ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,setup);
-                redeemer.distributionKey(bundleId);
-                if(!setup.load(app,redeemer)) return false;
-                redeemer.redeem();
-                return true;
-            });
-
+            boolean suc = this.gameServiceProvider.inventoryServiceProvider().redeem(systemId,shoppingItem);
             if(appleStoreKey.isSandbox()){
                 params.put(OnAccess.IS_SANDBOX, true);
             }

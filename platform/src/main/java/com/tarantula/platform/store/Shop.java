@@ -21,6 +21,7 @@ public class Shop extends Application {
 
     public Shop(JsonObject payload){
         this.application = payload;
+        this.application.addProperty("Successful",true);
         this.configurationName = payload.get("ConfigurationName").getAsString();
     }
 
@@ -43,7 +44,9 @@ public class Shop extends Application {
 
     @Override
     public JsonObject toJson() {
-        if(application.has("_shoppingItemList")) return application;
+        if(application.has("_shoppingItemList")){
+            return application;
+        }
         return super.toJson();
     }
 
