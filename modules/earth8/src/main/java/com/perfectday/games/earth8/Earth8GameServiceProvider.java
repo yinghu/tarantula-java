@@ -4,6 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.icodesoftware.*;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.TokenValidatorProvider;
@@ -31,6 +32,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
     private ConcurrentHashMap<Long,Tournament> tournamentIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,ApplicationResource> resourceIndex = new ConcurrentHashMap<>();
+    private TarantulaLogger logger = JDKLogger.getLogger(Earth8GameServiceProvider.class);
+
 
     public void setup(GameContext gameContext){
         this.gameContext = gameContext;
@@ -93,7 +96,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     }
 
     public void updateGame(Session session,byte[] payload) throws Exception{
-        if (session.name() != null && session.name().startsWith("ItemGrant")){
+        if (session.name() != null && session.name().startsWith("ItemGrant") || session.name().startsWith("GlobalGrant")){
             Transaction transaction = gameContext.applicationSchema().transaction();
 
             transaction.execute(ctx->{
@@ -226,6 +229,20 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             return;
         }
         this.gameContext.log("Inventory type ["+inventory.type()+"] not supported",OnLog.WARN);
+    }
+
+    public void checkGlobalItemGrants(Session session, long gameclusterID){
+
+
+        logger.warn(gameclusterID+"From Client");
+
+/*        gameContext.applicationSchema().transaction().execute(ctx->{
+            DataStore dataStore = ctx.onDataStore("global_item_grant");
+                  dataStore.list(new GlobalItemGrantEventQuery(gameclusterID)).forEach(globalGrantEvent -> {
+                      eventList.add(globalGrantEvent);
+                  });
+            return true;
+        });*/
     }
 
     public List<OnInbox> inbox(Session session){

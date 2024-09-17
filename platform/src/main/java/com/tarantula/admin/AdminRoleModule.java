@@ -6,19 +6,23 @@ import com.google.gson.JsonObject;
 
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
+import com.icodesoftware.lmdb.LMDBDataStoreProvider;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 
+import com.perfectday.games.earth8.inbox.PlayerActionQuery;
 import com.tarantula.platform.*;
-import com.tarantula.platform.inbox.PlatformServerEvent;
+import com.tarantula.platform.inbox.*;
 import com.tarantula.platform.presence.*;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +42,9 @@ public class AdminRoleModule implements Module{
     private Configuration gameClusterConfiguration;
 
     private ConcurrentHashMap<String,Descriptor> pendingGameServices;
+
+    private TarantulaLogger logger = JDKLogger.getLogger(LMDBDataStoreProvider.class);
+
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
@@ -191,7 +198,7 @@ public class AdminRoleModule implements Module{
             String itemID = (String)onAccess.property("itemID");
             String itemName = (String)onAccess.property("itemName");
 
-            PlatformServerEvent serverGrantEvent = new PlatformServerEvent("ItemGrant-" + itemID + "-" + amount,false);
+            PlatformServerEvent serverGrantEvent = new PlatformServerEvent("ItemGrant--" + itemID + "--" + amount,false);
             serverGrantEvent.ownerKey(SnowflakeKey.from(Long.parseLong(playerID)));
 
             if(dataStore.create(serverGrantEvent)){
@@ -224,6 +231,65 @@ public class AdminRoleModule implements Module{
             }
 
             session.write(JsonUtil.toSimpleResponse(false, "No Data for Player " + playerID + " Deleted").getBytes());
+        }
+        else if(session.action().equals("onGetGlobalGrantEvents")) {
+            long gameclusterID = Long.parseLong(session.name());
+
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameclusterID);
+            DataStore dataStore = gameCluster.applicationPreSetup().onDataStore("global_item_grant");
+            List<GlobalItemGrantEvent> eventList = new ArrayList<>();
+
+            dataStore.list(new GlobalItemGrantEventQuery(gameclusterID)).forEach(globalGrantEvent -> {
+                eventList.add(globalGrantEvent);
+            });
+
+            GlobalItemGrantList globalItemGrantList = new GlobalItemGrantList(eventList);
+
+            session.write(globalItemGrantList.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onDeleteGlobalGrantEvent")) {
+            long gameclusterID = Long.parseLong(session.name());
+
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            String dateCreatedString = (String)onAccess.property("dateCreated");
+
+            LocalDateTime dateCreated = LocalDateTime.parse(dateCreatedString);
+
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameclusterID);
+            DataStore dataStore = gameCluster.applicationPreSetup().onDataStore("global_item_grant");
+
+           dataStore.list(new GlobalItemGrantEventQuery(gameclusterID)).forEach(globalGrantEvent -> {
+                if(globalGrantEvent.dateCreated.equals(dateCreated)){
+                    dataStore.delete(globalGrantEvent);
+                    session.write(JsonUtil.toSimpleResponse(true, "Deleted").getBytes());
+                }
+            });
+
+            session.write(JsonUtil.toSimpleResponse(true, "Not Deleted").getBytes());
+
+        }
+        else if(session.action().equals("onCreateGlobalEvent")) {
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            String amount = (String)onAccess.property("itemAmount");
+            String itemID = (String)onAccess.property("itemID");
+            String itemName = (String)onAccess.property("itemName");
+            long gameclusterID = Long.parseLong(session.name());
+
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameclusterID);
+
+            DataStore dataStore = gameCluster.applicationPreSetup().onDataStore("global_item_grant");
+
+            LocalDateTime dateCreated = LocalDateTime.now();
+
+            GlobalItemGrantEvent globalItemGrantEvent = new GlobalItemGrantEvent(itemName, itemID, Long.parseLong(amount), dateCreated);
+            globalItemGrantEvent.ownerKey(SnowflakeKey.from(gameclusterID));
+
+            if(dataStore.create(globalItemGrantEvent)){
+                session.write(JsonUtil.toSimpleResponse(true, "Global Grant Event Created").getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(true, "Error Creating Global Grant Event").getBytes());
+            }
         }
         else{
             session.write(this.builder.create().toJson(new ResponseHeader("onError", session.action()+" operation not supported", false)).getBytes());
