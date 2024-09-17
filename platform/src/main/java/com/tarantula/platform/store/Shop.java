@@ -49,6 +49,7 @@ public class Shop extends Application {
 
 
     public List<ShoppingItem> itemList(){
+        if(!application.has("_shoppingItemList")) return null;
         ArrayList<ShoppingItem> items = new ArrayList<>();
         application.get("_shoppingItemList").getAsJsonArray().forEach(e->{
             JsonObject jo = e.getAsJsonObject();

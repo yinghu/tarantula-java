@@ -39,17 +39,7 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
         if(!serviceContext.node().homingAgent().enabled()) return;
         String resp = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"Shop");
         JsonObject configs = JsonUtil.parse(resp);
-        configs.get("list").getAsJsonArray().forEach(e->{
-            Shop shop = new Shop(e.getAsString());
-            shop.itemList().forEach(shoppingItem -> {
-                List<Commodity> commodities = shoppingItem.commodityList();
-                commodities.forEach(commodity -> {
-                    gameCluster.registerConfigurableCategory(commodity.application().get("template").getAsJsonObject());
-                });
-                shoppingItems.put(shoppingItem.distributionKey(),shoppingItem);
-            });
-            shopIndex.put(shop.configurationName(),shop);
-        });
+        configs.get("list").getAsJsonArray().forEach(e-> registerShop(new Shop(e.getAsJsonObject())));
         this.logger.warn("Store service provider started with homing agent enabled");
     }
 
@@ -100,6 +90,7 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
 
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
+        if(serviceContext.node().homingAgent().enabled()) return null;
         List<Shop> items = applicationPreSetup.list(descriptor,new ShoppingItemObjectQuery(descriptor.key(),"Shop"));
         items.forEach((a)-> {
             if (!a.disabled()) {
@@ -110,6 +101,17 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
     }
 
     private void registerShop(Shop shop){
+        if(shop.itemList()!=null){
+            shop.itemList().forEach(shoppingItem -> {
+                List<Commodity> commodities = shoppingItem.commodityList();
+                commodities.forEach(commodity -> {
+                    gameCluster.registerConfigurableCategory(commodity.application().get("template").getAsJsonObject());
+                });
+                shoppingItems.put(shoppingItem.distributionKey(),shoppingItem);
+            });
+            shopIndex.put(shop.configurationName(),shop);
+            return;
+        }
         shop.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
         Shop s = shop.setup();
         shopIndex.put(shop.configurationName(),s);
@@ -123,12 +125,19 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
 
 
     public boolean onItemRegistered(int publishId){
+        logger.warn("register shop with publish id : "+publishId);
         String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
-        logger.warn(config);
+        registerShop(new Shop(JsonUtil.parse(config)));
         return true;
     }
     public boolean onItemReleased(int publishId){
-        logger.warn("release local resource with ["+publishId+"]");
+        logger.warn("release local shop with ["+publishId+"]");
+        Shop removed = shopIndex.remove(Integer.toString(publishId));
+        if(removed==null) return false;
+        //remove items
+        removed.itemList().forEach(item->{
+            shoppingItems.remove(item.distributionKey());
+        });
         return true;
     }
 

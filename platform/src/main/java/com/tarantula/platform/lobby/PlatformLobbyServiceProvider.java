@@ -89,15 +89,17 @@ public class PlatformLobbyServiceProvider extends PlatformItemServiceProvider{
 
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
         lobbyListeners.put(descriptor.tag(),new ListenerOnLobby(descriptor,listener));
-        List<LobbyItem> items = applicationPreSetup.list(descriptor,new LobbyItemObjectQuery(descriptor.key(),descriptor.category()));
-        items.forEach((a)-> {
-            logger.warn(a.configurationCategory()+""+a.distributionId());
-            if(!a.disabled()){
-                a.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
-                a.setup();
-                lobbyItems.put(gameTypeId+"/"+a.configurationName(),a);
-            }
-        });
+        if(!serviceContext.node().homingAgent().enabled()){
+            List<LobbyItem> items = applicationPreSetup.list(descriptor,new LobbyItemObjectQuery(descriptor.key(),descriptor.category()));
+            items.forEach((a)-> {
+                logger.warn(a.configurationCategory()+""+a.distributionId());
+                if(!a.disabled()){
+                    a.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
+                    a.setup();
+                    lobbyItems.put(gameTypeId+"/"+a.configurationName(),a);
+                }
+            });
+        }
         lobbyItems.forEach((k,v)->{
             ListenerOnLobby lobbyListener = lobbyListeners.get(k);
             if(lobbyListener!=null && k.equals(lobbyListener.lobby.tag())) lobbyListener.listener.onLoaded(v);
