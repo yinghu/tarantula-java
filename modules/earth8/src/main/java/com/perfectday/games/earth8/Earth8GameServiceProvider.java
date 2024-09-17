@@ -231,20 +231,6 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         this.gameContext.log("Inventory type ["+inventory.type()+"] not supported",OnLog.WARN);
     }
 
-    public void checkGlobalItemGrants(Session session, long gameclusterID){
-
-
-        logger.warn(gameclusterID+"From Client");
-
-/*        gameContext.applicationSchema().transaction().execute(ctx->{
-            DataStore dataStore = ctx.onDataStore("global_item_grant");
-                  dataStore.list(new GlobalItemGrantEventQuery(gameclusterID)).forEach(globalGrantEvent -> {
-                      eventList.add(globalGrantEvent);
-                  });
-            return true;
-        });*/
-    }
-
     public List<OnInbox> inbox(Session session){
         List<OnInbox> inbox = new ArrayList<>();
         List<OnAccess> playerEvents = new ArrayList<>();
