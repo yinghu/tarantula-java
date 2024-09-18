@@ -96,7 +96,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     }
 
     public void updateGame(Session session,byte[] payload) throws Exception{
-        if (session.name() != null && session.name().startsWith("ItemGrant") || session.name().startsWith("GlobalGrant")){
+        if (session.name() != null && (session.name().startsWith("ItemGrant") || session.name().startsWith("GlobalGrant"))){
             Transaction transaction = gameContext.applicationSchema().transaction();
 
             transaction.execute(ctx->{

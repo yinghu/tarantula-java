@@ -26,6 +26,8 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
 
     public static final String NAME = "inbox";
 
+    private final String EVENTSPLIT = "--";
+
     @Override
     public void registerSummary(Summary summary) {
         super.registerSummary(summary);
@@ -61,7 +63,7 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
 
         playerDataStore.list(new PlatformServerEventQuery(session.distributionId())).forEach(playerGrantEvent -> {
             if(playerGrantEvent.name().startsWith("GlobalGrant")){
-                String[] playerEventNameSplit = playerGrantEvent.name().split("--");
+                String[] playerEventNameSplit = playerGrantEvent.name().split(EVENTSPLIT);
                 if(playerEventNameSplit.length == 4){
                     playerEventGlobalTimes.add(LocalDateTime.parse(playerEventNameSplit[3]));
                 }
@@ -71,8 +73,8 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         globalDataStore.list(new GlobalItemGrantEventQuery(gameclusterID)).forEach(globalGrantEvent -> {
 
             if(!playerEventGlobalTimes.contains(globalGrantEvent.dateCreated)){
-                PlatformServerEvent serverGrantEvent = new PlatformServerEvent("GlobalGrant--" + globalGrantEvent.itemID +
-                        "--" + globalGrantEvent.amount + "--" + globalGrantEvent.dateCreated,false);
+                PlatformServerEvent serverGrantEvent = new PlatformServerEvent("GlobalGrant"+ EVENTSPLIT + globalGrantEvent.itemID +
+                        EVENTSPLIT + globalGrantEvent.amount + EVENTSPLIT + globalGrantEvent.dateCreated,false);
 
                 serverGrantEvent.ownerKey(SnowflakeKey.from(session.distributionId()));
                 playerDataStore.create(serverGrantEvent);
@@ -85,7 +87,6 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         playerDataStore.list(new PlatformServerEventQuery(session.distributionId())).forEach(playerGrantEvent -> {
             logger.warn(playerGrantEvent.name());
         });
-
     }
 
     public Mailbox mailbox(Session session){
