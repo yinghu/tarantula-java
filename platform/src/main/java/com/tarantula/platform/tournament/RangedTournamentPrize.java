@@ -1,12 +1,12 @@
 package com.tarantula.platform.tournament;
 
 import com.google.gson.JsonObject;
-import com.tarantula.platform.item.ConfigurableObject;
+import com.tarantula.platform.item.ConfigurableEdit;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RangedTournamentPrize extends ConfigurableObject {
+public class RangedTournamentPrize extends ConfigurableEdit {
 
     private int minRank;
     private int maxRank;
