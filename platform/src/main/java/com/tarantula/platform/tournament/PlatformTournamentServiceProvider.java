@@ -120,7 +120,7 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
         if(serviceContext.node().homingAgent().enabled()){
             logger.warn("load prize from homing agent ...");
             String config = serviceContext.node().homingAgent().onConfigurationRegistered((int)tournamentManager.scheduleId());
-            TournamentSchedule schedule = new TournamentSchedule(JsonUtil.parse(config));
+            TournamentSchedule schedule = new TournamentSchedule(JsonUtil.parse(config),(int)tournamentManager.scheduleId());
             tournamentManager.loadPrize(schedule);
             return;
         }
@@ -218,7 +218,7 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
             logger.warn(resp);
             JsonObject scheduleList = JsonUtil.parse(resp);
             scheduleList.get("list").getAsJsonArray().forEach(e->{
-                TournamentSchedule schedule = new TournamentSchedule(e.getAsJsonObject());
+                TournamentSchedule schedule = new TournamentSchedule(e.getAsJsonObject(),1);
                 logger.warn(schedule.startTime()+" : "+schedule.endTime());
                 logger.warn(schedule.startLevel()+" : "+schedule.endLevel());
             });
@@ -341,6 +341,9 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
     }
     void endTournament(TournamentManager tournament){
         logger.warn("Tournament End : "+tournament.distributionId()+" : "+tournament.global());
+        if(serviceContext.node().homingAgent().enabled()){
+            logger.warn(serviceContext.node().homingAgent().onConfigurationReleased((int)tournament.scheduleId()));
+        }
         this.distributionItemService.onReleaseItem(gameServiceName, name(), "TournamentSchedule", tournament.distributionKey());
         TournamentScheduleStatus status = loadStatus(tournament.scheduleId());
         byte[] lockKey = status.key().asBinary();
@@ -599,7 +602,7 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
     public void register(int publishId){
         String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
         JsonObject payload = JsonUtil.parse(config);
-        TournamentSchedule tournamentSchedule = new TournamentSchedule(payload);
+        TournamentSchedule tournamentSchedule = new TournamentSchedule(payload,publishId);
         tournamentSchedule.prizeList().forEach(rangedTournamentPrize -> {
             rangedTournamentPrize.prizeList().forEach(p->{
                 p.commodityList().forEach(m->{
