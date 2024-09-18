@@ -91,6 +91,24 @@ public class ConfigurableEditTest extends DataStoreHook{
         }
     }
 
+    @Test(groups = { "ConfigurableEdit" })
+    public void testTournamentSchedule() throws Exception{
+        DataStore dataStore = dataStoreProvider.createDataStore("test_configurable_edit_sample");
+        try(InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("sample-tournament-schedule.json")){
+            JsonObject payload = JsonUtil.parse(inputStream);
+            ConfigurableEdit edit = new ConfigurableEdit();
+            edit.dataStore(dataStore);
+            edit.build(payload);
+            //System.out.println(edit.distributionId());
+            Assert.assertTrue(edit.distributionId()!=0);
+            ConfigurableEdit load = new ConfigurableEdit();
+            load.distributionId(edit.distributionId());
+            load.dataStore(dataStore);
+            JsonObject resp = load.assembly();
+            //System.out.println(resp);
+            Assert.assertNotNull(resp.get("_prizeSet"));
+        }
+    }
 
 
 }
