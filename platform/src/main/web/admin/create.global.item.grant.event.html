@@ -1,0 +1,438 @@
+<div class="w3-modal-content" id="tx-global-grant">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-global-granter-close"><i class="fa fa-close" style="font-size:12px"></i></span>
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">Global Grant List</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
+    <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel w3-border-bottom w3-border-white">
+        <div class='w3-panel' id="tx-global-grant-event-list-list">
+        </div>
+        <div class="w3-panel">
+            <span id="tx-global-grant-button" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Create New Global Grant</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div>
+</div>
+
+<!-- Create Event Popup -->
+
+<div class="w3-modal-content" id="tx-global-grant-popup" style="display: none">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-global-grant-popup-close"><i class="fa fa-close" style="font-size:12px"></i></span>
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">Create Global Item Grant</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
+    <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-grant-item-message"></div>
+    <div class="w3-panel w3-border-bottom w3-border-white">
+        <div class="w3-panel">
+            <label class="tx-text-12">Item Amount</label>
+            <input id ="tx-item-amount" class="w3-input w3-round w3-border" type="number" placeholder='amount'/>
+        </div>
+        <div class="w3-third w3-container">
+            <label class="tx-text-12 tx-margin-right-4">Item Type</label>
+            <select id='tx-item-type' class="w3-select w3-border w3-round tx-text-12" name='itemType'>
+                <option value="83699f2672c114915a732b32714ff10e" selected>HardCurrency</option>
+                <option value="7e806f168e5d14678bdf200347b5ee9d">SoftCurrency</option>
+                <option value="fe9ecdbf2560d47cfbf6b8f9735635d0">GwenUnitReward</option>
+                <option value="0264009846d2340d9a7e720b5e1d8dab">KeedoUnitReward</option>
+                <option value="c563623254024451eb058eb9de0ab339">ClonkUnitReward</option>
+                <option value="ef7d2b8bd09424106923ed065f1df923">VigaUnitReward</option>
+                <option value="fc8bd08a32f454126bb030e2ab33a41f">BerylUnitReward</option>
+                <option value="bfccfce9e193148dd8ee17cc6d0cbe05">ProfessorNumisUnitReward</option>
+                <option value="82f0de4a322e64b9eae1000cf4f1def0">Energy</option>
+                <option value="f298107c034b749f3ac8cf162a260b94">MultiBattleTicket</option>
+                <option value="ec69601141c944ebf9f7dc27922164f6">SkillDungeonEnergy</option>
+                <option value="aa83181e74b92459bb1c4ec9f44c9af6">CommonAssaultBootsReward</option>
+                <option value="35044aae010ba434fa17f0f13d2ee1bd">CommonAssaultChestReward</option>
+                <option value="51320493a0f4c4c8c95ce081d81b1e72">CommonAssaultGlovesReward</option>
+                <option value="c45318fdc84e4481c87cbc5c5c43bb36">CommonAssaultHelmetReward</option>
+                <option value="d217484bd71d94d0db8af210d3dd7551">CommonAssaultShieldReward</option>
+                <option value="c7e5629f09cd642ec8c5ef7e61c8d4c7">CommonAssaultWeaponReward</option>
+                <option value="ac3049b1bd569474180651652baffbb4">EpicAssaultBootsReward</option>
+                <option value="d804515d4a2b84ff794838d27a3776af">EpicAssaultChestReward</option>
+                <option value="af2d86b66d2384e06af8c852631947d0">EpicAssaultGlovesReward</option>
+                <option value="512dc1e86103747199b2e8a5d25239d5">EpicAssaultHelmetReward</option>
+                <option value="983a5628fb83e4f1f937d7b7e041f891">EpicAssaultShieldReward</option>
+                <option value="ddbeebda8e66b4a8b8f22491ac7e4c9e">EpicAssaultWeaponReward</option>
+                <option value="5ec9b883d6d80413f8cfef5c12081a72">LegendarAssaultHelmetReward</option>
+                <option value="b314d0df1318c413994ac4765c69f18c">LegendaryAssaultBootsReward</option>
+                <option value="cf17184b444ed4d5f9aedd295077c368">LegendaryAssaultChestReward</option>
+                <option value="e2b5441c484884585bcb8e755cf59d51">LegendaryAssaultGlovesReward</option>
+                <option value="e06b330e926644e19a9cd5fe96beeb8e">LegendaryAssaultShieldReward</option>
+                <option value="e1fd6f681f7954431a27454bb2572a2c">LegendaryAssaultWeaponReward</option>
+                <option value="6448e9af35cd54c1ca13f3c88bb4bafa">RareAssaultBootsReward</option>
+                <option value="8a6fc100219e948a49a62065249110df">RareAssaultChestReward</option>
+                <option value="dbef39b3736264caabc647ca0e9f048e">RareAssaultGlovesReward</option>
+                <option value="a8883b59bff3442a5838ce4558b8047a">RareAssaultHelmetReward</option>
+                <option value="fb189b76764e44be18009bee96fc4ffe">RareAssaultShieldReward</option>
+                <option value="acd7753a8a8c6404a8c92d313647ffbd">RareAssaultWeaponReward</option>
+                <option value="5146a60ef83144e9f8cc1ca9e27901d4">CommonBastionBootsReward</option>
+                <option value="8bccbb0fa19fa42f68305bf11d5a9ada">CommonBastionChestReward</option>
+                <option value="5179d9097cc494ed08f3343b2ff02aac">CommonBastionGlovesReward</option>
+                <option value="3dc3d282d5fa7427db6342738796f5f1">CommonBastionHelmetReward</option>
+                <option value="789c295680bad4b539001c7036f59f8f">CommonBastionShieldReward</option>
+                <option value="569e57896a1274efd8130e220ac20b0e">CommonBastionWeaponReward</option>
+                <option value="9438e9a8bb6b14c139464df9be037537">EpicBastionBootsReward</option>
+                <option value="ec1ff1b352b5744afbefc0ae8d5688ab">EpicBastionChestReward</option>
+                <option value="585636a7cff0b4490ae080ee523e10cb">EpicBastionGlovesReward</option>
+                <option value="c55529611f7014da5bc043a24fc20cd0">EpicBastionHelmetReward</option>
+                <option value="8c55e700e15554ac3805c25219531e92">EpicBastionShieldReward</option>
+                <option value="bf82c1c0f92824c36b41df61df3ab2d2">EpicBastionWeaponReward</option>
+                <option value="ddb5d87158f8c4aa594eee46f50cf9cd">LegendaryBastionBootsReward</option>
+                <option value="fed6703c7024447d18f36bfcc87887d7">LegendaryBastionChestReward</option>
+                <option value="b1facde19f2964790b648033aaf11bc3">LegendaryBastionGlovesReward</option>
+                <option value="f4dd4d133a17f4c1ab26974dfe9f1bb8">LegendaryBastionHelmetReward</option>
+                <option value="ede247af0930e48c6a7f7e8129ff8e26">LegendaryBastionShieldReward</option>
+                <option value="c27cda3a84166472282ab4e224f1d50b">LegendaryBastionWeaponReward</option>
+                <option value="da2b4dbb7d5b64ce19a4f0c8c9b0c303">RareBastionBootsReward</option>
+                <option value="540de4f4eff974e8b8e75df11e79fbe9">RareBastionChestReward</option>
+                <option value="04cd69138ada8463980adb6519659e37">RareBastionGlovesReward</option>
+                <option value="c2f5f718812484052af010dee4463a88">RareBastionHelmetReward</option>
+                <option value="9dcba508ff7ee4e4ea9b9a9309fcb2be">RareBastionShieldReward</option>
+                <option value="b059bf7810e70495f8ea3dddf09d60ab">RareBastionWeaponReward</option>
+                <option value="85634859c759b491386008dd36a8b712">CommonFuryBootsReward</option>
+                <option value="87b6f2a1a480e402c9a310197b052ac1">CommonFuryChestReward</option>
+                <option value="ad836e802f2fc4c70a405b57bc5da0c2">CommonFuryGlovesReward</option>
+                <option value="ff0320b1f8f7a4fc3aabf8f82054eaef">CommonFuryHelmetReward</option>
+                <option value="118a117b7b079448f9abad52af251854">CommonFuryShieldReward</option>
+                <option value="118b41503f8294af899cdf6507c0c59f">CommonFuryWeaponReward</option>
+                <option value="bb99b8355beec4ca6a90d4e7686df91a">EpicFuryBootsReward</option>
+                <option value="1f6f0f96ee18a42c99220e8dee89f12e">EpicFuryChestReward</option>
+                <option value="f86a273d61a8f4b50804f266957047a2">EpicFuryGlovesReward</option>
+                <option value="be0922662e6f2426eb5429a18c63b27c">EpicFuryHelmetReward</option>
+                <option value="de0828f9d17cb41eda71ef0c8917a376">EpicFuryShieldReward</option>
+                <option value="de8a09c39f5f74f18bb7cd870690b0a6">EpicFuryWeaponReward</option>
+                <option value="1c85215cf9bde4f9685567b8a3450bb4">LegendaryFuryBootsReward</option>
+                <option value="4d7bac9fb4a5940e1bb465303dc872e5">LegendaryFuryChestReward</option>
+                <option value="e4c2a5c33510a4da79c8f2f3170ee019">LegendaryFuryGlovesReward</option>
+                <option value="63eed611366fe49cf802aed9180c3bbb">LegendaryFuryHelmetReward</option>
+                <option value="68daa8631a6ea4439ad874955d486b02">LegendaryFuryShieldReward</option>
+                <option value="cf8c49eac45a84cc9809f68c7235c8ce">LegendaryFuryWeaponReward</option>
+                <option value="ffe09f889085a4f4ab16ca5e48628166">RareFuryBootsReward</option>
+                <option value="d982eee1821114e198226878d4d1c877">RareFuryChestReward</option>
+                <option value="f2c11a9908cbe4a6c9af33e45a47dc4b">RareFuryGlovesReward</option>
+                <option value="88e13948c1b7049459c603ad196903aa">RareFuryHelmetReward</option>
+                <option value="6406bf817036e492caf41fc6fabc68a6">RareFuryShieldReward</option>
+                <option value="b7f3b4a705ed94359b14328f776477ec">RareFuryWeaponReward</option>
+                <option value="dc72dcb76c3834ef0aaab8c1deef20d5">CommonGuardianBootsReward</option>
+                <option value="0a8843816706748338f032e15158b62e">CommonGuardianChestReward</option>
+                <option value="fc1c0b527d52a466faab2f522baf6ba4">CommonGuardianGlovesReward</option>
+                <option value="4e82e2823de2d42e093f8ebce8efa0cc">CommonGuardianHelmetReward</option>
+                <option value="65375bff3ccec4ebfacbcdd70ef454ca">CommonGuardianShieldReward</option>
+                <option value="cedda797c5fd140db81e37a091aed3ab">CommonGuardianWeaponReward</option>
+                <option value="6c432b65a99df40489a34f6ae7373baa">EpicGuardianBootsReward</option>
+                <option value="03977208b4d2e49beb0e4aee8479bbdd">EpicGuardianChestReward</option>
+                <option value="0f387d3d205a6489fad65e46828906f3">EpicGuardianGlovesReward</option>
+                <option value="b37e6cc15b441413fadf87cc21295b53">EpicGuardianHelmetReward</option>
+                <option value="b9acf6559b4ba4f9d83413eaf295810a">EpicGuardianShieldReward</option>
+                <option value="91b2ed69dcc9f4bf0ace69d1918f421c">EpicGuardianWeaponReward</option>
+                <option value="5e216a339867847e1b51176db95db170">LegendaryGuardianBootsReward</option>
+                <option value="77f530c7593184ab18e149eeb0666ab1">LegendaryGuardianChestReward</option>
+                <option value="85a8ba86d5f6a46a184af0307f566280">LegendaryGuardianGlovesReward</option>
+                <option value="85d92b4a6d1554a73a4f3001797fe309">LegendaryGuardianHelmetReward</option>
+                <option value="82be7a9adfa2b4df2a547220eff124a8">LegendaryGuardianShieldReward</option>
+                <option value="ec80cf8c176614062bab88c3b844ab7d">LegendaryGuardianWeaponReward</option>
+                <option value="71df034eade394da9b67e7e776e62e17">RareGuardianBootsReward</option>
+                <option value="1c607c0c4bbca4c4f98a4a0b465f9e1d">RareGuardianChestReward</option>
+                <option value="64642ec7048814e97b16d34943294e74">RareGuardianGlovesReward</option>
+                <option value="c8b3b885557d14284bdef5e399e9c6d2">RareGuardianHelmetReward</option>
+                <option value="87aac9044092e48fbaaa5ae6d43a0126">RareGuardianShieldReward</option>
+                <option value="4c359808031114fd6816bc6f504689b6">RareGuardianWeaponReward</option>
+                <option value="bf948d36cfce4446cb0e0c9023e7bdad">CommonRallyingSpiritBootsReward</option>
+                <option value="c7a4b776489314c4497047e51f0ec1c7">CommonRallyingSpiritGlovesReward</option>
+                <option value="af4137188e273464e89975a65a1fb19e">CommonRallyingSpiritHelmetReward</option>
+                <option value="db7c2f2357c244262ad55908ce74664b">CommonRallyingSpiritOneChestReward</option>
+                <option value="bafe0e28d14fd49ffa7e5f88b0e118a0">CommonRallyingSpiritShieldReward</option>
+                <option value="5767c4f03a9924896b84b5c45fb8b84e">CommonRallyingSpiritWeaponReward</option>
+                <option value="b5288c861e4f640c68f2fcd13438b5cc">EpicRallyingSpiritBootsReward</option>
+                <option value="4e6617c9e2da5471d91e32a218d5c327">EpicRallyingSpiritChestReward</option>
+                <option value="09ed360633f794301942c89ed8922494">EpicRallyingSpiritGlovesReward</option>
+                <option value="7af000d58c94941b0845d422c9ec55e5">EpicRallyingSpiritHelmetReward</option>
+                <option value="21a96ada303144605aafd30038e8a797">EpicRallyingSpiritShieldReward</option>
+                <option value="2027260aba326495ea2cc9b8ec89a5af">EpicRallyingSpiritWeaponReward</option>
+                <option value="93177a56dca534e5cbe31e50f64e4313">LegendaryRallyingSpiritBootsReward</option>
+                <option value="454e3ece9c92640d3a5b09de1ceb037c">LegendaryRallyingSpiritChestReward</option>
+                <option value="3a4eb1bc64f2a4aab864aa332b4d134a">LegendaryRallyingSpiritGlovesReward</option>
+                <option value="7a92d1f1ce8f142839e6c8d13909e56f">LegendaryRallyingSpiritHelmetReward</option>
+                <option value="dab7bc17bbfc141a7a9a888bd25527fa">LegendaryRallyingSpiritShieldReward</option>
+                <option value="6050923387adf4f6897d86ac2760e9d2">LegendaryRallyingSpiritWeaponReward</option>
+                <option value="7cc528b1922f24492a84a7649723a60b">RareRallyingSpiritBootsReward</option>
+                <option value="6e5a44e98b3444e82bb1ae5e9ba7f008">RareRallyingSpiritChestReward</option>
+                <option value="285fcde2e6d7b43f8a17641828c26d93">RareRallyingSpiritGlovesReward</option>
+                <option value="853e4eb80cef24595b1759bd8d398db1">RareRallyingSpiritHelmetReward</option>
+                <option value="b8acdb7c881a74e66b76f34dbb623c31">RareRallyingSpiritShieldReward</option>
+                <option value="3c0cb034602224eeca95452db1f77419">RareRallyingSpiritWeaponReward</option>
+                <option value="22b39265500b84d8ca14b16f9c9c7aa8">CommonRallyingValorBootsReward</option>
+                <option value="e2bb63c4e0d6141d7a3666c95a2b3fb9">CommonRallyingValorChestReward</option>
+                <option value="f1a8ba77ac1d5407984b5fdc4ff751aa">CommonRallyingValorGlovesReward</option>
+                <option value="8ccd928b1147a47aca81343ac30986d8">CommonRallyingValorHelmetReward</option>
+                <option value="f6eb70f22116e4379b08ffacb66b084b">CommonRallyingValorShieldReward</option>
+                <option value="fd8a3cf10ff0643bf9d960b86c2e63b7">CommonRallyingValorWeaponReward</option>
+                <option value="1b3374caa6a184d65aa2ac7458a30510">EpicRallyingValorBootsReward</option>
+                <option value="da8a2490d9112415ca4132318e1a5855">EpicRallyingValorChestReward</option>
+                <option value="d3a9999f9e22e4f3395f76551e64002e">EpicRallyingValorGlovesReward</option>
+                <option value="3960bb97d4b7b4a54a75c76a7f47afb7">EpicRallyingValorHelmetReward</option>
+                <option value="1a88da57343c44bfe810b0c39364fc8a">EpicRallyingValorShieldReward</option>
+                <option value="adee9d9035b094ec18f141620665a672">EpicRallyingValorWeaponReward</option>
+                <option value="343e87b18b19645c699eed80c203e5df">LegendaryRallyingValorBootsReward</option>
+                <option value="861b79c4b03574aaa9d212cd767c0738">LegendaryRallyingValorChestReward</option>
+                <option value="ed10c8e542b604411a69daca3a12cd07">LegendaryRallyingValorGlovesReward</option>
+                <option value="5d3c056c03a8f4bada4d2abb35fc2a6a">LegendaryRallyingValorHelmetReward</option>
+                <option value="fc28895ae001147df959d5f2cc011182">LegendaryRallyingValorShieldReward</option>
+                <option value="06a350bc973fa4fc09c3e81cec341c47">LegendaryRallyingValorWeaponReward</option>
+                <option value="5d30876a5284244d7ac34c6975397b6b">RareRallyingValorBootsReward</option>
+                <option value="5711f878af936498987cc7f29899ef66">RareRallyingValorChestReward</option>
+                <option value="c1d086312d24340d6b39fbf3233d141b">RareRallyingValorGlovesReward</option>
+                <option value="e1ffcb740da1847079415efd4632b490">RareRallyingValorHelmetReward</option>
+                <option value="ea71aca6e0508455db2ddd69f142f06b">RareRallyingValorShieldReward</option>
+                <option value="963d66dc580ca4080b975a786957d327">RareRallyingValorWeaponReward</option>
+                <option value="8110d6225dc704778908e370e6f4f03f">CommonSwiftGuard BootsReward</option>
+                <option value="50086d7cf57e94d3aabe06f2d31852fb">CommonSwiftGuardChestReward</option>
+                <option value="89d1b281e16dc4748bfa06e717727267">CommonSwiftGuardGlovesReward</option>
+                <option value="fbf6993c3a10947f7a6253a4fc242113">CommonSwiftGuardHelmetReward</option>
+                <option value="7665e4908487448b4bb412bb756a0235">CommonSwiftGuardShieldReward</option>
+                <option value="db6cb60d8989c4ec69b2965d33944d60">CommonSwiftGuardWeaponReward</option>
+                <option value="16c7b7b13e5b843b980301ca0ca01954">EpicSwiftGuardBootsReward</option>
+                <option value="640c22c94269545ddb0723971c18e5e8">EpicSwiftGuardChestReward</option>
+                <option value="8031af20e3d3a46d79f278c503d16087">EpicSwiftGuardGlovesReward</option>
+                <option value="52b77202b633d419f8d6773210bf52c8">EpicSwiftGuardHelmetReward</option>
+                <option value="70c820ee1ee0e40138c9152b0e503f15">EpicSwiftGuardShieldReward</option>
+                <option value="5a1170759a7aa49b492c68e09c0cc1cd">EpicSwiftGuardWeaponReward</option>
+                <option value="3d788add2a9734a17bd129d447e7bf4e">LegendarySwiftGuardBootsReward</option>
+                <option value="da4dfabc381544f8d92e7e508920b1e9">LegendarySwiftGuardChestReward</option>
+                <option value="ae2b473455e734588b35f83611a8bec9">LegendarySwiftGuardGlovesReward</option>
+                <option value="54a8f6ceab3604cfa8e19d26d764cee9">LegendarySwiftGuardHelmetReward</option>
+                <option value="9ff1862fd23614f9d8857962a8369e50">LegendarySwiftGuardShieldReward</option>
+                <option value="d59d925923586471bbfe1ce2de1777d7">LegendarySwiftGuardWeaponReward</option>
+                <option value="622a61e5036f0403e9a1354164ae7099">RareSwiftGuardBootsReward</option>
+                <option value="ee5ca8ba910224d858534fb660a63462">RareSwiftGuardChestReward</option>
+                <option value="b3c49289de47245b2aa2adc8ae2cf281">RareSwiftGuardGlovesReward</option>
+                <option value="3862556d98ad847c08e9fb587a29fdfc">RareSwiftGuardHelmetReward</option>
+                <option value="b327e7fa785ab4ad4854281f057b7032">RareSwiftGuardShieldReward</option>
+                <option value="7418416430d7c4714ba1d5eb463af77a">RareSwiftGuardWeaponReward</option>
+                <option value="b88639640477c4f64a3bf686e49be5f8">CommonVitalityBootsReward</option>
+                <option value="69c33db83b6194e96ad20a6b6909e40a">CommonVitalityChestReward</option>
+                <option value="8799a50a1af674e808adb35666b02313">CommonVitalityGlovesReward</option>
+                <option value="79cd0387e7ffd4bf08517bbdfbd25061">CommonVitalityHelmetReward</option>
+                <option value="4c0b8f406b95347469b4f5f793ff8e90">CommonVitalityShieldReward</option>
+                <option value="2dd3fd367dda44fe58bb5fb9d1dbe66e">CommonVitalityWeaponReward</option>
+                <option value="44cc5c5f4cfa44fda9d9a78488014bcc">EpicVitalityBootsReward</option>
+                <option value="a7d22d5731bf9475fab3934351cf0b93">EpicVitalityChestReward</option>
+                <option value="6fc5dd78ea1274de887391a8ba88f663">EpicVitalityGlovesReward</option>
+                <option value="00b65db91fa4f4a358e22ddf59e997e2">EpicVitalityHelmetReward</option>
+                <option value="bc335d4447b9a40fa98660c8b192450c">EpicVitalityShieldReward</option>
+                <option value="1f181d8615f8a460993ef9e9952a62fb">EpicVitalityWeaponReward</option>
+                <option value="7c0289d5ef3dd49d8a0a16f0c5ff4af4">LegendaryVitalityBootsReward</option>
+                <option value="7f24416c62d984fd58de86fcd294576f">LegendaryVitalityChestReward</option>
+                <option value="3be50086d777641cc9987e52116324bc">LegendaryVitalityGlovesReward</option>
+                <option value="445a76ca1e6724e119e371a64ec4eca7">LegendaryVitalityHelmetReward</option>
+                <option value="b134206e396354d85999c8f5fdfbee14">LegendaryVitalityShieldReward</option>
+                <option value="281305d3094dc457b987076077a86c7f">LegendaryVitalityWeaponReward</option>
+                <option value="325cb77fab18b4c269c6840b5fd4dd5b">RareVitalityBootsReward</option>
+                <option value="9b0eb4632892b418099812e869c9a99b">RareVitalityChestReward</option>
+                <option value="6b95158376eb04a0995457c9ee5bd420">RareVitalityGlovesReward</option>
+                <option value="7a298c0e39487492ca9f72ca657bde01">RareVitalityHelmetReward</option>
+                <option value="7640d48b1058a49b5ab7385dcbbfec9c">RareVitalityShieldReward</option>
+                <option value="eb579af467f7c419f85d1d0fd4e74556">RareVitalityWeaponReward</option>
+                <option value="41251c85108a44d5298233c55db63082">ExperienceReward</option>
+                <option value="33b0f0ac858704b6694925a21cf1f5c8">BootsEnhancerMod</option>
+                <option value="68d2a84e97bda4d2788803bfa2aab4d7">ChestpieceEnhancerMod</option>
+                <option value="ef6b3e62b955e4fc9a46d1123d217164">ForcefieldEnhancerMod</option>
+                <option value="63692cb5e821b4cae92283df4f8918e4">GlovesEnhancerMod</option>
+                <option value="dc895611f538b4093a33e26d955701a9">HelmetEnhancerMod</option>
+                <option value="63e1b7b8e6fe04d62898219199885c44">WeaponEnhancerMod</option>
+                <option value="65a0e64b8af534d23b8014c989e1fb96">EarthPotion</option>
+                <option value="aaf2ac61d0827423c809c4c81ff09561">MoonPotion</option>
+                <option value="e5faf22750c604162b52073b7d5b719b">SunPotion</option>
+                <option value="3f64145ff50de4b759b28be81eabd5fc">FreeDailyEnergy</option>
+                <option value="ab21e0dc266c546a79072e8db14b4146">Campaign Energy 60</option>
+                <option value="c6b5fd4b327d44453bc91f46523cfc71">PlayerExperience</option>
+                <option value="9e8a77393314d4c16bfb1951b631a44c">Ticket</option>
+                <option value="9a8decd6b793944959cf0ee8d3f8ac12">CommonEquipmentRankMod</option>
+                <option value="fd0c167b6244c4dbbaa90e848382460b">EpicEquipmentRankMod</option>
+                <option value="289b278508e8d4e9194a5467c78a37aa">LegendaryEquipmentRankMod</option>
+                <option value="1a42c4a04362343a6aed1ed9fbf58bee">RareEquipmentRankMod</option>
+                <option value="4eddc5d0e755d41189826f99386a467c">ClassAttackerSkillUpMaterial</option>
+                <option value="5b57dd477004a4f4cb9186281eba7980">ClassDefenderSkillUpMaterial</option>
+                <option value="0367ab910eeba418d90ad0a71a1cfa3e">ClassSupportSkillUpMaterial</option>
+                <option value="55d713d41913c4222b2232eaa41f4ef5">SkillCommonRankUpMaterial</option>
+                <option value="c6d68a2312e5444068871496808735ab">SkillEpicRankUpMaterial</option>
+                <option value="829d9f179065d4100b87612a6f3c1579">SkillLegendaryRankUpMaterial</option>
+                <option value="af0e007c0080d435ab4678d0c16869bc">SkillRareRankUpMaterial</option>
+                <option value="bb6a5ebe43e264bb7856c7f17f01da85">(Template)Coin</option>
+                <option value="7e8b272da1e6b4aa49a79008f4bf234b">AchelousCoin</option>
+                <option value="f078a3ead55554f01bfdfe2779c16ad4">AlexanderCoin</option>
+                <option value="1bda1a8d2a7674d14ac5081eee8c9938">ArmoredShogunCoin</option>
+                <option value="fa964f9c8497141abbd1c636242b3ff3">BelzogCoin</option>
+                <option value="02ae15c1b00184948830824926a7bef5">BerylCoin</option>
+                <option value="f50513cc62fc4412bafbf97e0ea844bd">CaptainEstianCoin</option>
+                <option value="c5ff61f9bd5ff4847ba0962b22516a74">ClonkCoin</option>
+                <option value="74a0ba33320804886be456b33d2a8b04">CortezioCoin</option>
+                <option value="e547b7deebffa46f8a5e64f3499bdbc3">DataEnforcerCoin</option>
+                <option value="1a07bc6751adf4641b84d80df8edfdf8">DataKnightCoin</option>
+                <option value="622a286d523204067bc24135482ebf00">DataRegulatorCoin</option>
+                <option value="e673a25f4531d4cc1841ebeae01ee966">DrekitheBlackCoin</option>
+                <option value="6736facaf3ee34a47a239d212eadab3c">DrynCoin</option>
+                <option value="c729cfcbf6ac748c5a6ef9851406838d">DrYuneCoin</option>
+                <option value="f5f0f5d9d26a542cd91b09c73e865d6b">EirkurCoin</option>
+                <option value="b1d4b58ae7f6547f3b7048f877151f75">EmperorPeuchenCoin</option>
+                <option value="0d5169b6ea1424894a20a777b43947a5">ErrorDebuggerCoin</option>
+                <option value="a6eeeaec59aba41a4899404f09abe502">ErrorLoggerCoin</option>
+                <option value="f6c56a2a02bc34fc78556291be9f8bbc">ErrorReporterCoin</option>
+                <option value="0e63f2fedefac4e5fbf3f7e082ddc019">FaerieCoin</option>
+                <option value="0a2f3739578ee49eeb992eedd4ef77fc">FangCoin</option>
+                <option value="e6819760c9f4e49b3a70adf10b7f6337">FelixCoin</option>
+                <option value="cba2518b5c8874030967796286d0f63e">GildedEagleKnightCoin</option>
+                <option value="f49e52176d7e74178a3c08d02296c435">GlitchConstrainerCoin</option>
+                <option value="4548ee7d3069148799960983a9125e09">GlitchExploiterCoin</option>
+                <option value="18c527112449440aabeb6a6ec608903f">GlitchReformerCoin</option>
+                <option value="d4f3ee3bd7a2e4b6f986d24a87916522">GreaterDaemonCoin</option>
+                <option value="f2bd867968fe04c8b9aa115662c3a70f">GusCoin</option>
+                <option value="79d2e9500e572450380d2bd63c515586">GwenCoin</option>
+                <option value="dd25e9d29dc684c56a415cf826ec1d9b">HetraofNectaneboCoin</option>
+                <option value="014977c11f54149219dbd1fd8a13006f">JaxonCoin</option>
+                <option value="3fff4bbab27234b688db1947357bf5e5">KamikiKikaiCoin</option>
+                <option value="0b3373ef256da4f00bfa314a66144b87">KeedoCoin</option>
+                <option value="8cd9a59de1b0b464d8aa88c9d9e4699f">KingBoboCoin</option>
+                <option value="b708007cb372843a19d1d03d77484cac">LesserDaemonCoin</option>
+                <option value="67cbe03916422456ca1fc38d362147c8">LordEdmundCoin</option>
+                <option value="beb01b5742ce34b6bb0104e382961f22">MajorFirewallCoin</option>
+                <option value="cc3bc73250c294477b8d893cc6276b66">ManiCoin</option>
+                <option value="74e910f4496b44851999edec5e672cc9">MarkIVCoin</option>
+                <option value="e494599f49bc54447af438fa0a4339a9">MaxineCoin</option>
+                <option value="118d7a37bedc34274b8fb56d33574873">MedianFirewallCoin</option>
+                <option value="26da6f5132a6d463bb18d58f59f978f1">MinorFirewallCoin</option>
+                <option value="cec506e6c2ecc4645881e21fcd757d15">MumeiCoin</option>
+                <option value="f61e7a865b6104d88b517386d23e60d5">PizarinoCoin</option>
+                <option value="36d33876f692445abbddd6e1a44e6371">ProfessorNumisCoin</option>
+                <option value="c1bf243d9e2124e58b9eece33e933c91">PulseBomberCoin</option>
+                <option value="a7793583bcd2941308c25356b74530c5">PulseLancerCoin</option>
+                <option value="3c41794cc4a5540858440aad24d93b64">PulseSlingerCoin</option>
+                <option value="3cc016af74e894fc9982d171abbed185">QueenBanjoCoin</option>
+                <option value="95d896db733834e28a338d89d534e0f2">R3NCoin</option>
+                <option value="905716646b8334fdda9d5321e5ed74f5">RedcrosseKnightCoin</option>
+                <option value="fae233a100b214e0b841f1ceaadbb8e7">RekjavikustheWhiteCoin</option>
+                <option value="a4a4a7b7715764e4d9ab019130888454">ScoriaCoin</option>
+                <option value="0574ba162319f4870868063dcc2172ef">SerenityCoin</option>
+                <option value="9e20120107b0643e2803d4c0ad6e6561">SoniaCoin</option>
+                <option value="f5637046dd50440c9a8b93e6e88aabfe">StandardDaemonCoin</option>
+                <option value="0ae8ec2cf132c4cad9a14ed12ac8dbd9">TabsCoin</option>
+                <option value="0840b4424bcd44b09a9db66967e43df4">TatterCoin</option>
+                <option value="f7f4ea999c91d43b0bdec83278fd811b">TerrenceCoin</option>
+                <option value="68ec21ec7484f4aa388dd6dd058d191e">TheGoldenGriffinCoin</option>
+                <option value="cd9412d551d7048d0a1e23c30ad979d9">ToshiroCoin</option>
+                <option value="d4cf6af4adc0e4012a7cc213c619f726">UmbranuCoin</option>
+                <option value="fbd0b9ff52df944b981a6ae9fdb3a8fb">ValenciaCoin</option>
+                <option value="7d18326934b274e9c88647da4adae1fe">VertexNymphCoin</option>
+                <option value="48d52d95ed55f4fe5957a0d7c8a22cd4">VertexSpriteCoin</option>
+                <option value="7d8e7cee2cf4243f4b9fb42e0ff82062">VertexTitanCoin</option>
+                <option value="2d1f5d0b8ef0f4c01b1ef6c0802ce07a">VigaCoin</option>
+                <option value="1d48998684ca8414c9289d7f18cbb319">ViralCleanserCoin</option>
+                <option value="7552355bd6777483b882bb36d022ea2e">ViralHunterCoin</option>
+                <option value="5e2a99ad830444c7fababb6ec6d788df">ViralProtectorCoin</option>
+                <option value="55503819baf854f29a87918cb4ec8749">VoidMaxineCoin</option>
+                <option value="d1cbe8ac3f6ac4859b4fcdd9730c6653">VolternCoin</option>
+                <option value="d7b584817638847fbb983ec12994818f">WesternWardenCoin</option>
+                <option value="70804bf7f53d14cf7aed8d0794df0013">RealLifeCoin_Clonk</option>
+            </select>
+        </div>
+        <div class="w3-panel">
+            <span id="tx-grant-item-global" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Grant Global Item</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div>
+</div>
+<script>
+    let createGrantPopup = document.querySelector('#tx-global-grant-popup');
+    let globalGrant = document.querySelector('#tx-global-grant');
+    let listBar = document.querySelector('#tx-global-grant-event-list-list');
+
+    populateGrantEvents();
+
+    document.querySelector('#tx-grant-item-global').onclick=()=> {
+        let _itemAmount = document.querySelector('#tx-item-amount').value;
+        let _itemID = document.querySelector('#tx-item-type').value;
+
+        let sel = document.querySelector('#tx-item-type');
+        let _itemName = sel.options[sel.selectedIndex].text;
+
+        let payload ={itemAmount:_itemAmount,itemID:_itemID,itemName:_itemName};
+
+        TARA_API.onSet('role/admin','onCreateGlobalEvent',TARA_API.query().gameClusterId,payload,(resp)=>{
+            document.querySelector('#tx-grant-item-message').innerHTML = resp.message;
+        });
+
+        sleep(100).then(() => {populateGrantEvents();})
+    };
+
+    function sleep(ms){
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function populateGrantEvents(){
+        TARA_API.onGet('role/admin','onGetGlobalGrantEvents',TARA_API.query().gameClusterId,(resp)=>{
+
+            listBar.innerHTML ='';
+            resp.globalGrantEvent.forEach((grantEvent)=>{
+                let tem = [];
+                tem.push('<div class=\'w3-panel w3-padding w3-block w3-green tx-platform-cluster-node\'>');
+                tem.push('<span class=\'w3-left tx-text-16 tx-margin-top-12 tx-margin-left-8\'>');
+                tem.push("Item Name: " + grantEvent.ItemName + " | Amount: "+ grantEvent.Amount + " | Date Created: " + grantEvent.DateCreated + " | Players Granted: " + grantEvent.GrantAmount );
+                tem.push('</span><span tx-grant-event-date=\''+grantEvent.DateCreated+'\'');
+                tem.push(' class=\'w3-right w3-tag w3-red w3-round w3-border w3-border-black tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-global-grant-delete\'>Delete</span>');
+                tem.push('</div>');
+                listBar.innerHTML += tem.join('');
+            });
+            document.querySelectorAll('.tx-global-grant-delete').forEach(a=>{
+                a.onclick=()=>{
+                    let _dateCreated = a.getAttribute('tx-grant-event-date');
+                    let payload ={dateCreated:_dateCreated};
+
+                    TARA_API.onSet('role/admin','onDeleteGlobalGrantEvent',TARA_API.query().gameClusterId,payload,(resp)=>{
+                        sleep(100).then(() => {populateGrantEvents();})
+                    });
+                };
+            });
+        });
+    }
+
+
+    document.querySelector('#tx-global-grant-button').onclick=()=> {
+    createGrantPopup.style.display = 'block';
+    };
+
+    document.querySelector('#tx-global-granter-close').onclick=()=>{
+        tx_close_current_page();
+    };
+
+    document.querySelector('#tx-global-grant-popup-close').onclick =()=>{
+        createGrantPopup.style.display = 'none';
+    }
+
+</script>
