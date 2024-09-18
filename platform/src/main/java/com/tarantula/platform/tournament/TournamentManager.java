@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import java.util.List;
@@ -520,6 +521,17 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         }
         concurrentInstanceSize = tournamentServiceProvider.smallConcurrentInstanceSize;
 
+    }
+
+    void loadPrize(TournamentSchedule tournamentSchedule){
+        this.prizes = new HashMap<>();
+        this.rangedPrizeList = new ArrayList<>();
+        tournamentSchedule.prizeList().forEach(ranged->{
+            this.rangedPrizeList.add(ranged);
+            ranged.prizeList().forEach(pz->{
+                prizes.put(pz.rank(),pz);
+            });
+        });
     }
 
     void loadPrizes(ApplicationPreSetup applicationPreSetup, Descriptor application){

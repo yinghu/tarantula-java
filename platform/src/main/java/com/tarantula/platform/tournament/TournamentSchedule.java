@@ -105,16 +105,10 @@ public class TournamentSchedule extends Application {
         return prizes;
     }
 
-    public List<TournamentPrize> prizeList(){
-        if(!header.has("_prizeSet")) return null;
-        ArrayList<TournamentPrize> prizes = new ArrayList<>();
+    public List<RangedTournamentPrize> prizeList(){
+        List<RangedTournamentPrize> prizes = new ArrayList<>();
         header.get("_prizeSet").getAsJsonArray().forEach(e->{
-            JsonObject pz = e.getAsJsonObject();
-            int min = pz.get("MinRank").getAsInt();
-            int max = pz.get("MaxRank").getAsInt();
-            for(int rank = min;rank<=max;rank++){
-                prizes.add(new TournamentPrize(pz,rank));
-            }
+            prizes.add(new RangedTournamentPrize(e.getAsJsonObject()));
         });
         return prizes;
     }
@@ -123,6 +117,10 @@ public class TournamentSchedule extends Application {
         TournamentScheduleStatus status = new TournamentScheduleStatus();
         status.distributionId(this.distributionId());
         return status;
+    }
+
+    public int publishId(){
+        return header.get("ConfigurationId").getAsInt();
     }
 
 

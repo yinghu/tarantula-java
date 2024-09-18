@@ -106,7 +106,7 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
                         logger.warn("Tournament ["+t.distributionId()+" not assigned service provider");
                         t.tournamentServiceProvider = this;
                     }
-                    t.loadPrizes(applicationPreSetup, application);
+                    this.loadPrizes(t);//loadPrizes(applicationPreSetup, application);
                 }catch (Exception ex){
                     logger.warn("Unexpected exception",ex);
                 }
@@ -117,6 +117,13 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
     }
 
     void loadPrizes(TournamentManager tournamentManager){
+        if(serviceContext.node().homingAgent().enabled()){
+            logger.warn("load prize from homing agent ...");
+            String config = serviceContext.node().homingAgent().onConfigurationRegistered((int)tournamentManager.scheduleId());
+            TournamentSchedule schedule = new TournamentSchedule(JsonUtil.parse(config));
+            tournamentManager.loadPrize(schedule);
+            return;
+        }
         tournamentManager.loadPrizes(applicationPreSetup,application);
     }
 
@@ -306,7 +313,7 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
         logger.warn(tournament.toString());
         listeners.forEach(l->l.tournamentStarted(tournament));
         if(this.application==null) return;
-        tournament.loadPrizes(this.applicationPreSetup,this.application);
+        this.loadPrizes(tournament);
     }
     void sortTournament(TournamentManager tournament){
         tournament.snapshot();
@@ -461,7 +468,11 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
             try{
                 this.scheduleStore.mapLock(lockKey);
                 started.update(Tournament.Status.STARTED);
-                this.distributionItemService.onRegisterItem(gameServiceName,name(),"TournamentSchedule",tournament.distributionKey());
+                if(serviceContext.node().homingAgent().enabled()){
+                    this.distributionItemService.onRegisterItem(gameServiceName,name(),schedule.publishId());
+                }else{
+                    this.distributionItemService.onRegisterItem(gameServiceName,name(),"TournamentSchedule",tournament.distributionKey());
+                }
             }finally {
                 this.scheduleStore.mapUnlock(lockKey);
             }
@@ -589,18 +600,19 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
         String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
         JsonObject payload = JsonUtil.parse(config);
         TournamentSchedule tournamentSchedule = new TournamentSchedule(payload);
-        tournamentSchedule.prizeList().forEach(tournamentPrize -> {
-            logger.warn(">>"+tournamentPrize.rank());
-            tournamentPrize.commodityList().forEach(c->{
-                logger.warn(c.amount()+"::");
+        tournamentSchedule.prizeList().forEach(rangedTournamentPrize -> {
+            rangedTournamentPrize.prizeList().forEach(p->{
+                p.commodityList().forEach(m->{
+                    logger.warn(m.amount()+" :: ");
+                });
             });
+
         });
         logger.warn(tournamentSchedule.status().distributionKey());
         TournamentScheduleStatus status = tournamentSchedule.status();
         //status.ownerKey(SnowflakeKey.from(this.gameCluster.distributionId()));
         dataStore.createIfAbsent(status,true);
-
-        //super.register(publishId);
+        registerTournament(tournamentSchedule);
     }
 
     @Override
@@ -611,6 +623,17 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
 
     public boolean onItemRegistered(int publishId){
         logger.warn("register local tournament : "+publishId);
+        TournamentScheduleStatus status = loadStatus(publishId);
+        logger.warn("tournament id : "+status.tournamentId);
+        TournamentManager tournamentManager = new TournamentManager();
+        tournamentManager.distributionId(status.tournamentId);
+        if(!this.dataStore.load(tournamentManager)){
+            logger.warn("tournament not found : "+publishId+" : "+status.tournamentId);
+            return false;
+        }
+        logger.warn("launching tournament : "+tournamentManager.scheduleId());
+        tournamentManager.dataStore(dataStore);
+        launch(tournamentManager);
         return true;
     }
     public boolean onItemReleased(int publishId){
