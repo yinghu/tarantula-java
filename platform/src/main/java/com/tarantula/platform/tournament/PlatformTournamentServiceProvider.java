@@ -245,7 +245,7 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
             this.logger.warn("Tournament service provider started with homing agent enabled");
             return;
         }
-        dataStore.list(new TournamentScheduleStatusQuery(this.gameCluster.distributionId())).forEach(status->{
+        tournamentScheduleStatus.list(new TournamentScheduleStatusQuery(this.gameCluster.distributionId())).forEach(status->{
             logger.warn("Tournament Status : "+status.tournamentId+" : "+status.status);
             byte[] lockKey = status.key().asBinary();
             try{
