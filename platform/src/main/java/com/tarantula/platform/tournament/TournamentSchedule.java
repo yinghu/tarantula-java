@@ -20,9 +20,8 @@ public class TournamentSchedule extends Application {
 
     }
 
-    public TournamentSchedule(JsonObject payload,int publishId){
+    public TournamentSchedule(JsonObject payload){
         this.header = payload;
-        this.distributionId = publishId;//payload.get("ConfigurationId").getAsInt();
     }
 
     public TournamentSchedule(ConfigurableObject configurableObject){
@@ -119,8 +118,13 @@ public class TournamentSchedule extends Application {
         return status;
     }
 
-    public int publishId(){
-        return (int)distributionId;
+    @Override
+    public long distributionId(){
+        if(this.distributionId>0) return this.distributionId;
+        return configurationId();
+    }
+    public long configurationId(){
+        return header.get("ConfigurationId").getAsInt();
     }
 
 

@@ -2,6 +2,7 @@ package com.tarantula.platform.item;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.StringUtil;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public class ConfigurableEdit extends ConfigurableObject {
     }
     @Override
     public boolean write(DataBuffer buffer) {
-        buffer.writeInt(configurationId);
+        buffer.writeInt(this.configurationId);
         buffer.writeUTF8(this.configurationType);
         buffer.writeUTF8(this.configurationTypeId);
         buffer.writeUTF8(this.configurationName);
@@ -147,6 +148,6 @@ public class ConfigurableEdit extends ConfigurableObject {
         this.configurationVersion = payload.get("ConfigurationVersion").getAsString();
         this.dataStore.create(this);
         list();
-        return this.distributionId;
+        return distributionId;
     }
 }

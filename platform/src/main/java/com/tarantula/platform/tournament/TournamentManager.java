@@ -75,7 +75,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     public TournamentManager(PlatformTournamentServiceProvider platformTournamentServiceProvider){
         this.tournamentServiceProvider = platformTournamentServiceProvider;
         this.distributionTournamentService = platformTournamentServiceProvider.distributionTournamentService;
-        this.dataStore = tournamentServiceProvider.dataStore;
+        this.dataStore = tournamentServiceProvider.dataStore();
     }
     public TournamentManager(TournamentSchedule schedule){
         this();
