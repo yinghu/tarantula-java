@@ -245,7 +245,7 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
             this.logger.warn("Tournament service provider started with homing agent enabled");
             return;
         }
-        tournamentScheduleStatus.list(new TournamentScheduleStatusQuery(this.gameCluster.distributionId())).forEach(status->{
+        tournamentScheduleStatus.list(new TournamentScheduleStatusQuery(SnowflakeKey.from(this.gameCluster.distributionId()))).forEach(status->{
             logger.warn("Tournament Status : "+status.tournamentId+" : "+status.status);
             byte[] lockKey = status.key().asBinary();
             try{
@@ -306,7 +306,7 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
     }
     private void scheduleTournament(){
         LocalDateTime _current = LocalDateTime.now();
-        TournamentScheduleStatusQuery query = new TournamentScheduleStatusQuery(this.gameCluster.distributionId());
+        TournamentScheduleStatusQuery query = new TournamentScheduleStatusQuery(SnowflakeKey.from(this.gameCluster.distributionId()));
         dataStore.list(query).forEach(ts->{
             TournamentSchedule schedule = this.tournamentSchedule(ts.distributionId());
             if(schedule!=null){
@@ -511,6 +511,7 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
     private void clearTournament(TournamentManager tournament){
         TournamentScheduleStatus status = this.loadStatus(tournament.scheduleId());
         status.update(Tournament.Status.PENDING);
+        if(serviceContext.node().homingAgent().enabled()) return;
         TournamentSchedule schedule = this.tournamentSchedule(tournament.scheduleId());
         if(schedule==null){
             logger.warn("Tournament schedule should not be deleted once tournament registered in lifetime");
@@ -614,8 +615,9 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
         JsonObject payload = JsonUtil.parse(config);
         TournamentSchedule tournamentSchedule = new TournamentSchedule(payload);
         TournamentScheduleStatus status = tournamentSchedule.status();
+        status.ownerKey(IntegerKey.from(publishId));
         if(!tournamentScheduleStatus.createIfAbsent(status,true)){
-            logger.warn("Schedule edit already created");
+            logger.warn("Schedule edit already created and relaunch new tournament");
             registerTournament(tournamentSchedule);
             return;
         }
@@ -630,15 +632,21 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
 
     @Override
     public void release(int publishId){
+        for(TournamentScheduleStatus status : tournamentScheduleStatus.list(new TournamentScheduleStatusQuery(IntegerKey.from(publishId)))){
+            logger.warn(status.tournamentId+" : "+status.scheduleEditId+" : "+status.status);
+            if(status.status == Tournament.Status.STARTING) throw new RuntimeException("Tournament cannot be canceled during starting.");
+            if(status.status == Tournament.Status.PENDING) throw new RuntimeException("Tournament already released");
+            byte[] lockKey = status.key().asBinary();
+            try {
+                scheduleStore.mapLock(lockKey);
+                distributionTournamentService.onEndTournament(gameServiceName, status.tournamentId);
 
-        //super.release(publishId);
+            }finally {
+                scheduleStore.mapUnlock(lockKey);
+            }
+        }
     }
 
-
-    public boolean onItemReleased(int publishId){
-        logger.warn("release local tournament : "+publishId);
-        return true;
-    }
 
     DataStore dataStore(){
         return this.dataStore;

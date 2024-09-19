@@ -3,16 +3,16 @@ package com.tarantula.platform.tournament;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.Tournament;
-import com.icodesoftware.util.SnowflakeKey;
+
 
 
 public class TournamentScheduleStatusQuery implements RecoverableFactory<TournamentScheduleStatus> {
 
-    private long bucketId;
+    private Recoverable.Key key;
 
 
-    public TournamentScheduleStatusQuery(long bucketId){
-        this.bucketId = bucketId;
+    public TournamentScheduleStatusQuery(Recoverable.Key key){
+        this.key = key;
 
     }
 
@@ -29,6 +29,6 @@ public class TournamentScheduleStatusQuery implements RecoverableFactory<Tournam
 
     @Override
     public Recoverable.Key key() {
-        return new SnowflakeKey(bucketId);
+        return key;
     }
 }
