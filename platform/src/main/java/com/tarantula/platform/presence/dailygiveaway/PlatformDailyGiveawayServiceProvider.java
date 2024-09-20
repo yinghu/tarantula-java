@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlatformDailyGiveawayServiceProvider extends PlatformItemServiceProvider {
 
-    public static final String NAME = "giveaway";
+    public static final String NAME = "dailylogin";
 
     private int dailyLoginPendingHours;
     private int maxConsecutiveDays;
@@ -102,5 +102,16 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
         });
         return null;
     }
+
+    public boolean onItemRegistered(int publishId){
+        String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
+        logger.warn(config);
+        return true;
+    }
+    public boolean onItemReleased(int publishId){
+        logger.warn("release local resource with ["+publishId+"]");
+        return true;
+    }
+
 
 }

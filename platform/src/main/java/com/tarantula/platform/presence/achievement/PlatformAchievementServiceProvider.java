@@ -134,4 +134,14 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
         }
         return false;
     }
+
+    public boolean onItemRegistered(int publishId){
+        String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
+        logger.warn(config);
+        return true;
+    }
+    public boolean onItemReleased(int publishId){
+        logger.warn("release local resource with ["+publishId+"]");
+        return true;
+    }
 }
