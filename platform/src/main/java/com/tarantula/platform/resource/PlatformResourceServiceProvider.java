@@ -40,6 +40,13 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
         this.logger = JDKLogger.getLogger(PlatformResourceServiceProvider.class);
         this.logger.warn("Resource service provider started on ->"+gameServiceName);
     }
+    @Override
+    public void start() throws Exception{
+        if(serviceContext.node().homingAgent().enabled()){
+            String config = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"Resource");
+            logger.warn(config);
+        }
+    }
 
     public boolean onItemRegistered(String category,String itemId){
         ConfigurableObject configurationObject = new ConfigurableObject();

@@ -33,6 +33,14 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
         this.logger.warn("Achievement service provider started on ->"+gameServiceName);
     }
 
+    @Override
+    public void start() throws Exception{
+        if(serviceContext.node().homingAgent().enabled()){
+            String config = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"Achievement");
+            logger.warn(config);
+        }
+    }
+
     public Achievement achievement(Session session){
         CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);
         AchievementProgress achievementProgress = AchievementProgress.lookup(currentSaveIndex.saveId,dataStore);

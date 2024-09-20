@@ -42,6 +42,14 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
         this.logger.warn("Daily giveaway service provider started on ->"+gameServiceName);
     }
 
+    @Override
+    public void start() throws Exception{
+        if(serviceContext.node().homingAgent().enabled()){
+            String config = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"DailyReward");
+            logger.warn(config);
+        }
+    }
+
     public DailyLoginTrack claim(Session session){
         CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);
         DailyLoginTrack dailyLoginTrack = DailyLoginTrack.lookup(currentSaveIndex.saveId,dataStore);
