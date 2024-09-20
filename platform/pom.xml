@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>com.icodesoftware</groupId>
 		<artifactId>game-cluster</artifactId>
-		<version>2.0</version>
+		<version>3.0</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>com.icodesoftware</groupId>
   <artifactId>gec-platform</artifactId>
-  <version>2.0</version>
+  <version>3.0</version>
   <packaging>jar</packaging>
   <name>Game Cluster Platform</name>
   <description>Game Cluster Platform</description>
