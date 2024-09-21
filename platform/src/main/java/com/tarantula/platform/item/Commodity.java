@@ -104,4 +104,10 @@ public class Commodity extends ConfigurableObject{
         return edits;
     }
 
+    public ConfigurableCategory configurableCategory(){
+        ConfigurableCategory category = new ConfigurableCategory(application.get("template").getAsJsonObject());
+        category.parse();
+        return category;
+    }
+
 }

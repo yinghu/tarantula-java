@@ -8,6 +8,9 @@ import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.item.ConfigurableEdit;
 import com.tarantula.platform.item.PropertyEdit;
 import com.tarantula.platform.item.PropertyEditQuery;
+import com.tarantula.platform.tournament.RangedTournamentPrize;
+import com.tarantula.platform.tournament.TournamentPrize;
+import com.tarantula.platform.tournament.TournamentSchedule;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -107,8 +110,8 @@ public class ConfigurableEditTest extends DataStoreHook{
             JsonObject resp = load.assembly();
             //System.out.println(resp);
             Assert.assertNotNull(resp.get("_prizeSet"));
+
         }
     }
-
 
 }
