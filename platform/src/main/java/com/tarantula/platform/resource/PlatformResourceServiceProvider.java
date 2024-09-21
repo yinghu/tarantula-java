@@ -7,6 +7,7 @@ import com.icodesoftware.logging.JDKLogger;
 
 import com.icodesoftware.service.ServiceContext;
 
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.*;
@@ -158,6 +159,10 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
     public boolean onItemRegistered(int publishId){
         String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
         logger.warn(config);
+        GameResource resource = new GameResource(JsonUtil.parse(config));
+        resource.commodityList().forEach(commodity -> {
+
+        });
         return true;
     }
     public boolean onItemReleased(int publishId){

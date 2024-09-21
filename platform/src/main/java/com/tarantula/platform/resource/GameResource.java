@@ -1,7 +1,9 @@
 package com.tarantula.platform.resource;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.protocol.ApplicationResource;
 import com.tarantula.platform.item.Application;
+import com.tarantula.platform.item.Commodity;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.Item;
 import com.tarantula.platform.presence.PresencePortableRegistry;
@@ -13,6 +15,10 @@ public class GameResource extends Application implements ApplicationResource {
 
     public GameResource(){
 
+    }
+
+    public GameResource(JsonObject payload){
+        this.header = payload;
     }
 
     public GameResource(ConfigurableObject configurableObject){
@@ -40,6 +46,14 @@ public class GameResource extends Application implements ApplicationResource {
             });
         });
         return items;
+    }
+
+    public List<Commodity> commodityList(){
+        ArrayList<Commodity> commodities = new ArrayList<>();
+        header.get("_itemPack").getAsJsonObject().get("_skuList").getAsJsonArray().forEach(e->{
+            commodities.add(new Commodity(e.getAsJsonObject().get("_sku").getAsJsonObject()));
+        });
+        return commodities;
     }
 
 }
