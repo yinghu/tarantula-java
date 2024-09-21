@@ -7,7 +7,6 @@ import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.item.Commodity;
 import com.tarantula.platform.item.ItemPortableRegistry;
-import com.tarantula.platform.item.PropertyEditQuery;
 
 
 import java.util.ArrayList;
