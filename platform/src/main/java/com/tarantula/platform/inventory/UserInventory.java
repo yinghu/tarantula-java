@@ -70,12 +70,6 @@ public class UserInventory extends RecoverableObject implements Inventory {
         inventoryItem.ownerKey(this.key());
         inventoryItem.dataStore(dataStore);
         inventoryItem.build(commodity.application());
-        //dataStore.create(inventoryItem);
-        //List<PropertyEdit> edits = commodity.stock();
-        //for (PropertyEdit edit : edits) {
-            //edit.ownerKey(inventoryItem.key());
-            //dataStore.create(edit);
-        //}
         if(this.rechargeable){
             balance += commodity.amount();
         }
@@ -89,10 +83,6 @@ public class UserInventory extends RecoverableObject implements Inventory {
          dataStore.list(query).forEach(inventoryItem -> {
              itemList.add(inventoryItem);
              inventoryItem.dataStore(dataStore);
-             //PropertyEditQuery query1 = new PropertyEditQuery(inventoryItem.key());
-             //dataStore.list(query1).forEach((edit)->{
-                 //inventoryItem.stock(edit);
-             //});
          });
     }
     @Override
