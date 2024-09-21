@@ -48,8 +48,9 @@ public class GameResource extends Application implements ApplicationResource {
         return items;
     }
 
+    @Override
     public List<Commodity> commodityList(){
-        ArrayList<Commodity> commodities = new ArrayList<>();
+        List<Commodity> commodities = super.commodityList();
         header.get("_itemPack").getAsJsonObject().get("_skuList").getAsJsonArray().forEach(e->{
             commodities.add(new Commodity(e.getAsJsonObject().get("_sku").getAsJsonObject()));
         });

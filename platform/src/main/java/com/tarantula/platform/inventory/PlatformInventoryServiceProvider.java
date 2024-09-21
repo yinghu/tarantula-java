@@ -76,14 +76,18 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
         inventories[0].list();
         return inventories[0];
     }
-    public boolean redeem(long systemId, Application item){
+    public boolean redeem(long systemId, Application application){
+        if(serviceContext.node().homingAgent().enabled()){
+
+            return true;
+        }
         boolean[] suc ={false};
         try(final Transaction t = gameCluster.transaction()){
             suc[0] = t.execute(ctx->{
                 ApplicationPreSetup setup = (ApplicationPreSetup)ctx;
-                Descriptor app = gameCluster.application(item.configurationTypeId());
+                Descriptor app = gameCluster.application(application.configurationTypeId());
                 ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,setup);
-                redeemer.distributionKey(item.distributionKey());
+                redeemer.distributionKey(application.distributionKey());
                 if(!setup.load(app,redeemer)) return false;
                 redeemer.redeem();
                 return true;
@@ -129,8 +133,6 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
     public boolean redeem(long systemId, ShoppingItem shoppingItem){
         if(serviceContext.node().homingAgent().enabled()) {
             shoppingItem.commodityList().forEach(commodity -> {
-                ///logger.warn(commodity.application().toString());
-                //logger.warn(commodity.application().get("template").getAsJsonObject().get("application").toString());
                 String type = commodity.configurationCategory();
                 String typeId = commodity.configurationTypeId();
                 UserInventory inventory = (UserInventory) applicationPreSetup.inventory(systemId, typeId);
@@ -138,7 +140,7 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
                     logger.warn("inventory :" + inventory.typeId());
                     inventory.redeem(shoppingItem.distributionId(), commodity);
                 } else {
-                    inventory = (UserInventory) gameCluster.createInventory(applicationPreSetup, type, typeId);
+                    inventory = (UserInventory) applicationPreSetup.createInventory(type, typeId);
                     logger.warn("in :" + inventory.typeId());
                     inventory.ownerKey(SnowflakeKey.from(systemId));
                     inventoryDataStore.create(inventory);

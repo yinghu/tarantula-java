@@ -6,7 +6,6 @@ import com.icodesoftware.Configurable;
 import com.tarantula.platform.inventory.InventoryItem;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class Commodity extends ConfigurableObject{
@@ -91,6 +90,7 @@ public class Commodity extends ConfigurableObject{
         inventoryItem.configurationTypeId = configurationTypeId;
         return inventoryItem;
     }
+    /**
     public List<PropertyEdit> stock(){
         ArrayList<PropertyEdit> edits = new ArrayList<>();
         for (JsonElement jsonElement : application.get("template").getAsJsonObject().get("application").getAsJsonObject().get("properties").getAsJsonArray()) {
@@ -102,7 +102,7 @@ public class Commodity extends ConfigurableObject{
             edits.add(edit);
         }
         return edits;
-    }
+    }**/
 
     public ConfigurableCategory configurableCategory(){
         ConfigurableCategory category = new ConfigurableCategory(application.get("template").getAsJsonObject());

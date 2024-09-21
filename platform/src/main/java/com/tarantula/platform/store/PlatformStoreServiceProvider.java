@@ -105,7 +105,7 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
             shop.itemList().forEach(shoppingItem -> {
                 List<Commodity> commodities = shoppingItem.commodityList();
                 commodities.forEach(commodity -> {
-                    gameCluster.registerConfigurableCategory(commodity.application().get("template").getAsJsonObject());
+                    gameCluster.registerConfigurableCategory(commodity.configurableCategory());
                 });
                 shoppingItems.put(shoppingItem.distributionKey(),shoppingItem);
             });

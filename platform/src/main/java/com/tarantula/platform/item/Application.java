@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class Application extends ConfigurableObject implements Configurable.Listener<Commodity>{
@@ -67,5 +68,9 @@ public class Application extends ConfigurableObject implements Configurable.List
         String[] comp = this.configurationType.split("\\.");
         if(comp.length != 2) return false; //asset.xxx
         return comp[0].equals(Configurable.APPLICATION_CONFIG_TYPE);
+    }
+
+    public List<Commodity> commodityList(){
+        return new ArrayList<>();
     }
 }

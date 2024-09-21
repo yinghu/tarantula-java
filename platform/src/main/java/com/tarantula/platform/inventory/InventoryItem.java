@@ -78,7 +78,7 @@ public class InventoryItem extends ConfigurableEdit implements Inventory.Stock {
     }
 
     public void stock(Recoverable recoverable){
-        //stock.add((PropertyEdit)recoverable);
+
     }
 
 }

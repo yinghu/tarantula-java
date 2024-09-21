@@ -5,9 +5,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.platform.item.Commodity;
 import com.tarantula.platform.item.ConfigurableEdit;
 import com.tarantula.platform.item.PropertyEdit;
 import com.tarantula.platform.item.PropertyEditQuery;
+import com.tarantula.platform.resource.GameResource;
 import com.tarantula.platform.tournament.RangedTournamentPrize;
 import com.tarantula.platform.tournament.TournamentPrize;
 import com.tarantula.platform.tournament.TournamentSchedule;
@@ -110,6 +112,31 @@ public class ConfigurableEditTest extends DataStoreHook{
             JsonObject resp = load.assembly();
             //System.out.println(resp);
             Assert.assertNotNull(resp.get("_prizeSet"));
+
+        }
+    }
+
+    @Test(groups = { "ConfigurableEdit" })
+    public void testResource() throws Exception{
+        DataStore dataStore = dataStoreProvider.createDataStore("test_configurable_edit_sample");
+        try(InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("sample-resource.json")){
+            JsonObject payload = JsonUtil.parse(inputStream);
+            ConfigurableEdit edit = new ConfigurableEdit();
+            edit.dataStore(dataStore);
+            edit.build(payload);
+            Assert.assertTrue(edit.distributionId()!=0);
+            ConfigurableEdit load = new ConfigurableEdit();
+            load.distributionId(edit.distributionId());
+            load.dataStore(dataStore);
+            JsonObject resp = load.assembly();
+            Assert.assertNotNull(resp.get("_itemPack"));
+            GameResource gameResource = new GameResource(payload);
+            //List<Commodity> list = gameResource.commodityList();
+            //list.forEach(c->{
+                //c.stock().forEach(p->{
+                    //System.out.println(p.name()+" : "+p.edit);
+                //});
+            //});
 
         }
     }

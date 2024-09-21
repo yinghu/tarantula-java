@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ShoppingItem extends Item{
+public class ShoppingItem extends Application{
 
 
     public enum ItemType{HardCurrency,SoftCurrency,Bundle,None};

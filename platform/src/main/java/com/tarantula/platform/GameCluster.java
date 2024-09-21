@@ -491,11 +491,10 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
         return gameServiceProvider;
     }
 
-    public void registerConfigurableCategory(JsonObject template){
-        logger.warn(template.toString());
-        ConfigurableCategory category = new ConfigurableCategory(template);
-        category.parse();
+    public void registerConfigurableCategory(ConfigurableCategory category){
+        //logger.warn(template.toString());
+        //ConfigurableCategory category = new ConfigurableCategory(template);
+        //category.parse();
         categories.put(category.name(),category);
-
     }
 }
