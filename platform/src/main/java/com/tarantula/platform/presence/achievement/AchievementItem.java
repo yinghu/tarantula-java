@@ -1,11 +1,18 @@
 package com.tarantula.platform.presence.achievement;
 
+import com.google.gson.JsonObject;
 import com.tarantula.platform.item.*;
 import com.tarantula.platform.presence.PresencePortableRegistry;
+
+import java.util.List;
 
 public class AchievementItem extends Application{
 
     public AchievementItem(){}
+
+    public AchievementItem(JsonObject payload){
+        super(payload);
+    }
 
     public int getFactoryId() {
         return PresencePortableRegistry.OID;
@@ -35,4 +42,20 @@ public class AchievementItem extends Application{
         return validated;
     }
 
+    @Override
+    public JsonObject toJson() {
+        if(header.has("_award")){
+            return header;
+        }
+        return super.toJson();
+    }
+
+    @Override
+    public List<Commodity> commodityList(){
+        List<Commodity> commodities = super.commodityList();
+        header.get("_award").getAsJsonObject().get("_skuList").getAsJsonArray().forEach(e->{
+            commodities.add(new Commodity(e.getAsJsonObject().get("_sku").getAsJsonObject()));
+        });
+        return commodities;
+    }
 }

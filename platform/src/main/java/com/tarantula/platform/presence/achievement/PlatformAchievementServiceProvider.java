@@ -1,8 +1,10 @@
 package com.tarantula.platform.presence.achievement;
 
+import com.google.gson.JsonArray;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
@@ -38,6 +40,11 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
         if(serviceContext.node().homingAgent().enabled()){
             String config = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"Achievement");
             logger.warn(config);
+            JsonArray list = JsonUtil.parse(config).get("list").getAsJsonArray();
+            list.forEach(e->{
+                AchievementItem achievementItem = new AchievementItem(e.getAsJsonObject());
+                registerAchievement(achievementItem);
+            });
         }
     }
 
@@ -139,11 +146,24 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
     public boolean onItemRegistered(int publishId,int configurationId){
         String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
         logger.warn(config);
+        AchievementItem achievementItem = new AchievementItem(JsonUtil.parse(config));
+        registerAchievement(achievementItem);
         return true;
     }
     @Override
     public boolean onItemReleased(int publishId,int configurationId){
         logger.warn("release local resource with ["+publishId+"]");
+        AchievementItem removed = achievements.remove(Integer.toString(configurationId));
+        if(removed==null) return false;
+        achievements.remove(removed.name());
         return true;
+    }
+
+    private void registerAchievement(AchievementItem achievementItem){
+        achievementItem.commodityList().forEach(commodity -> {
+            gameCluster.registerConfigurableCategory(commodity.configurableCategory());
+        });
+        this.achievements.put(achievementItem.name(),achievementItem);
+        this.achievements.put(achievementItem.configurationKey(),achievementItem);
     }
 }

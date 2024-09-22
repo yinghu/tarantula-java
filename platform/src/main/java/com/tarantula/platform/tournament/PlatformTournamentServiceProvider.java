@@ -128,7 +128,7 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
             ConfigurableEdit edit = new ConfigurableEdit();
             edit.distributionId(status.scheduleEditId);
             edit.dataStore(scheduleEdit);
-            TournamentSchedule schedule = new TournamentSchedule(edit.assembly());
+            TournamentSchedule schedule = new TournamentSchedule(edit);
             tournamentManager.loadPrize(schedule);
             return;
         }

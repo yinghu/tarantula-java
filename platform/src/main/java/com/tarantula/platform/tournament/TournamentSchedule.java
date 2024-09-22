@@ -6,6 +6,7 @@ import com.icodesoftware.Tournament;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.Application;
+import com.tarantula.platform.item.ConfigurableEdit;
 import com.tarantula.platform.item.ConfigurableObject;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,10 @@ public class TournamentSchedule extends Application {
 
     public TournamentSchedule(JsonObject payload){
         super(payload);
+    }
+
+    public TournamentSchedule(ConfigurableEdit edit){
+        this.header = edit.assembly();
     }
 
     public TournamentSchedule(ConfigurableObject configurableObject){

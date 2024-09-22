@@ -1,5 +1,6 @@
 package com.tarantula.platform.presence.dailygiveaway;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
@@ -8,6 +9,7 @@ import com.icodesoftware.Descriptor;
 import com.icodesoftware.Session;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
 import com.tarantula.platform.presence.saves.CurrentSaveIndex;
@@ -24,6 +26,7 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
     private int maxConsecutiveDays;
     private int maxRewardTier;
     private ConcurrentHashMap<String,DailyGiveaway> dailyGiveaways;
+
     public PlatformDailyGiveawayServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
         this.dailyGiveaways = new ConcurrentHashMap<>();
@@ -47,6 +50,11 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
         if(serviceContext.node().homingAgent().enabled()){
             String config = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"DailyReward");
             logger.warn(config);
+            JsonArray list = JsonUtil.parse(config).get("list").getAsJsonArray();
+            list.forEach(e->{
+                DailyGiveaway dailyGiveaway = new DailyGiveaway(e.getAsJsonObject());
+                registerDailyGiveAway(dailyGiveaway);
+            });
         }
     }
 
@@ -106,13 +114,26 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
     @Override
     public boolean onItemRegistered(int publishId,int configurationId){
         String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
-        logger.warn(config);
+        DailyGiveaway dailyGiveaway = new DailyGiveaway(JsonUtil.parse(config));
+        logger.warn(dailyGiveaway.name());
+        registerDailyGiveAway(dailyGiveaway);
         return true;
     }
     @Override
     public boolean onItemReleased(int publishId,int configurationId){
         logger.warn("release local resource with ["+publishId+"]");
+        DailyGiveaway removed = dailyGiveaways.remove(Integer.toString(configurationId));
+        if(removed==null) return false;
+        this.dailyGiveaways.remove(removed.name());
         return true;
+    }
+
+    private void registerDailyGiveAway(DailyGiveaway dailyGiveaway){
+        dailyGiveaway.commodityList().forEach(commodity -> {
+            gameCluster.registerConfigurableCategory(commodity.configurableCategory());
+        });
+        this.dailyGiveaways.put(dailyGiveaway.name(),dailyGiveaway);
+        this.dailyGiveaways.put(dailyGiveaway.configurationKey(),dailyGiveaway);
     }
 
 
