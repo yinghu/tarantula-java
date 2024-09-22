@@ -4,12 +4,15 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.icodesoftware.DataStore;
+import com.icodesoftware.Rating;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.item.Commodity;
 import com.tarantula.platform.item.ConfigurableEdit;
 import com.tarantula.platform.item.PropertyEdit;
 import com.tarantula.platform.item.PropertyEditQuery;
 import com.tarantula.platform.resource.GameResource;
+import com.tarantula.platform.store.Shop;
+import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.tournament.RangedTournamentPrize;
 import com.tarantula.platform.tournament.TournamentPrize;
 import com.tarantula.platform.tournament.TournamentSchedule;
@@ -93,6 +96,14 @@ public class ConfigurableEditTest extends DataStoreHook{
             JsonObject resp = load.assembly();
             //System.out.println(resp);
             Assert.assertNotNull(resp.get("_shoppingItemList"));
+
+            Shop shop = new Shop(payload);
+            List<ShoppingItem> shoppingItems = shop.itemList();
+            Assert.assertTrue(shoppingItems.size()>0);
+            shoppingItems.forEach(shoppingItem -> {
+                List<Commodity> commodities = shoppingItem.commodityList();
+                Assert.assertTrue(commodities.size()>0);
+            });
         }
     }
 
@@ -112,7 +123,17 @@ public class ConfigurableEditTest extends DataStoreHook{
             JsonObject resp = load.assembly();
             //System.out.println(resp);
             Assert.assertNotNull(resp.get("_prizeSet"));
-
+            TournamentSchedule schedule = new TournamentSchedule(payload);
+            List<RangedTournamentPrize> prizes = schedule.prizeList();
+            Assert.assertTrue(prizes.size()>0);
+            prizes.forEach(prize->{
+                List<TournamentPrize> tpz = prize.prizeList();
+                Assert.assertTrue(tpz.size()>0);
+                tpz.forEach(z->{
+                    List<Commodity> cs = z.commodityList();
+                    Assert.assertTrue(cs.size()>0);
+                });
+            });
         }
     }
 
@@ -131,13 +152,8 @@ public class ConfigurableEditTest extends DataStoreHook{
             JsonObject resp = load.assembly();
             Assert.assertNotNull(resp.get("_itemPack"));
             GameResource gameResource = new GameResource(payload);
-            //List<Commodity> list = gameResource.commodityList();
-            //list.forEach(c->{
-                //c.stock().forEach(p->{
-                    //System.out.println(p.name()+" : "+p.edit);
-                //});
-            //});
-
+            List<Commodity> list = gameResource.commodityList();
+            Assert.assertTrue(list.size()>0);
         }
     }
 

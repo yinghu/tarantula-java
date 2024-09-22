@@ -161,7 +161,7 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
         logger.warn(config);
         GameResource resource = new GameResource(JsonUtil.parse(config));
         resource.commodityList().forEach(commodity -> {
-
+            gameCluster.registerConfigurableCategory(commodity.configurableCategory());
         });
         return true;
     }
