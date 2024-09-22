@@ -1,6 +1,8 @@
 package com.tarantula.platform.resource;
 
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.logging.JDKLogger;
@@ -45,7 +47,12 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
     public void start() throws Exception{
         if(serviceContext.node().homingAgent().enabled()){
             String config = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"Resource");
-            logger.warn(config);
+            JsonArray list = JsonUtil.parse(config).get("list").getAsJsonArray();
+            list.forEach(e->{
+                GameResource resource = new GameResource(e.getAsJsonObject());
+                registerResource(resource);
+            });
+
         }
     }
 
@@ -156,18 +163,32 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
     }
 
 
-    public boolean onItemRegistered(int publishId){
+    @Override
+    public boolean onItemRegistered(int publishId,int configurationId){
+        logger.warn("register local resource with ["+publishId+"]["+configurationId+"]");
         String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
         logger.warn(config);
         GameResource resource = new GameResource(JsonUtil.parse(config));
+        registerResource(resource);
+        return true;
+    }
+
+    @Override
+    public boolean onItemReleased(int publishId,int configurationId){
+        logger.warn("release local resource with ["+publishId+"]["+configurationId+"]");
+        GameResource resource = gameResourceIndex.remove(Integer.toString(configurationId));
+        if(resource==null) return false;
+        gameResourceIndex.remove(resource.name());
+        logger.warn("resource removed ["+resource.name());
+        return true;
+    }
+
+    private void registerResource(GameResource resource){
         resource.commodityList().forEach(commodity -> {
             gameCluster.registerConfigurableCategory(commodity.configurableCategory());
         });
-        return true;
-    }
-    public boolean onItemReleased(int publishId){
-        logger.warn("release local resource with ["+publishId+"]");
-        return true;
+        gameResourceIndex.put(resource.name(),resource);
+        gameResourceIndex.put(resource.configurationKey(),resource);
     }
 
 }

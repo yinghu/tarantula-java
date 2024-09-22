@@ -70,21 +70,23 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     public boolean onItemReleased(String category,String itemId){
         return false;
     }
-    public boolean onItemRegistered(int publishId){
+
+
+    public boolean onItemRegistered(int publishId,int configurationId){
         return false;
     }
-    public boolean onItemReleased(int publishId){
+    public boolean onItemReleased(int publishId,int configurationId){
         return false;
     }
 
     @Override
-    public void register(int publishId) {
-        distributionItemService.onRegisterItem(gameServiceName,name(),publishId);
+    public void register(int publishId,int configurationId) {
+        distributionItemService.onRegisterItem(gameServiceName,name(),publishId,configurationId);
     }
 
     @Override
-    public void release(int publishId) {
-        distributionItemService.onReleaseItem(gameServiceName,name(),publishId);
+    public void release(int publishId,int configurationId) {
+        distributionItemService.onReleaseItem(gameServiceName,name(),publishId,configurationId);
     }
 
 

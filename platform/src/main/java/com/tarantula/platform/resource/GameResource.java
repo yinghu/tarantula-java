@@ -18,7 +18,7 @@ public class GameResource extends Application implements ApplicationResource {
     }
 
     public GameResource(JsonObject payload){
-        this.header = payload;
+        super(payload);
     }
 
     public GameResource(ConfigurableObject configurableObject){
@@ -46,6 +46,14 @@ public class GameResource extends Application implements ApplicationResource {
             });
         });
         return items;
+    }
+
+    @Override
+    public JsonObject toJson() {
+        if(header.has("_itemPack")){
+            return header;
+        }
+        return super.toJson();
     }
 
     @Override

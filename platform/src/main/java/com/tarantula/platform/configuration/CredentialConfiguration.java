@@ -13,9 +13,8 @@ public class CredentialConfiguration extends Application{
     protected ServiceContext serviceContext;
     //homing agent
     public CredentialConfiguration(String typeId, JsonObject payload){
+        super(payload);
         this.typeId = typeId;
-        this.header = payload;
-        this.configurationName = payload.get("ConfigurationName").getAsString();
     }
 
     //local

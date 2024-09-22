@@ -103,12 +103,14 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
         return null;
     }
 
-    public boolean onItemRegistered(int publishId){
+    @Override
+    public boolean onItemRegistered(int publishId,int configurationId){
         String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
         logger.warn(config);
         return true;
     }
-    public boolean onItemReleased(int publishId){
+    @Override
+    public boolean onItemReleased(int publishId,int configurationId){
         logger.warn("release local resource with ["+publishId+"]");
         return true;
     }

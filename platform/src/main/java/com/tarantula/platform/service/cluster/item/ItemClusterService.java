@@ -57,13 +57,13 @@ public class ItemClusterService implements ManagedService, RemoteService {
         return gameServiceProvider.clusterConfigurationCallback(serviceName).onItemReleased(category,itemId);
     }
 
-    public boolean onRegister(String gameServiceName,String serviceName,int publishId){
+    public boolean onRegister(String gameServiceName,String serviceName,int publishId,int configurationId){
         //log.warn(gameServiceName+" : "+serviceName+" : "+category+" : "+itemId);
         PlatformGameServiceProvider gameServiceProvider = (PlatformGameServiceProvider) this.tarantulaContext.serviceProvider(gameServiceName);
-        return gameServiceProvider.clusterConfigurationCallback(serviceName).onItemRegistered(publishId);
+        return gameServiceProvider.clusterConfigurationCallback(serviceName).onItemRegistered(publishId,configurationId);
     }
-    public boolean onRelease(String gameServiceName,String serviceName,int publishId){
+    public boolean onRelease(String gameServiceName,String serviceName,int publishId,int configurationId){
         PlatformGameServiceProvider gameServiceProvider = (PlatformGameServiceProvider) this.tarantulaContext.serviceProvider(gameServiceName);
-        return gameServiceProvider.clusterConfigurationCallback(serviceName).onItemReleased(publishId);
+        return gameServiceProvider.clusterConfigurationCallback(serviceName).onItemReleased(publishId,configurationId);
     }
 }

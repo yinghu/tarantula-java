@@ -7,7 +7,6 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.Commodity;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
 
@@ -20,14 +19,11 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
     public static final String NAME = "store";
 
 
-    private final PlatformInventoryServiceProvider inventoryServiceProvider;
-
     private ConcurrentHashMap<String,Shop> shopIndex;
     private ConcurrentHashMap<String,ShoppingItem> shoppingItems;
 
     public PlatformStoreServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
-        this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
     }
     @Override
     public String name() {
@@ -107,8 +103,9 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
                 commodities.forEach(commodity -> {
                     gameCluster.registerConfigurableCategory(commodity.configurableCategory());
                 });
-                shoppingItems.put(shoppingItem.distributionKey(),shoppingItem);
+                shoppingItems.put(shoppingItem.configurationKey(),shoppingItem);
             });
+            shopIndex.put(shop.configurationKey(),shop);
             shopIndex.put(shop.configurationName(),shop);
             return;
         }
@@ -124,19 +121,24 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
 
 
 
-    public boolean onItemRegistered(int publishId){
+    @Override
+    public boolean onItemRegistered(int publishId,int configurationId){
         logger.warn("register shop with publish id : "+publishId);
         String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
         registerShop(new Shop(JsonUtil.parse(config)));
         return true;
     }
-    public boolean onItemReleased(int publishId){
-        logger.warn("release local shop with ["+publishId+"]");
-        Shop removed = shopIndex.remove(Integer.toString(publishId));
+
+    @Override
+    public boolean onItemReleased(int publishId,int configurationId){
+        logger.warn("release local shop with ["+publishId+"]["+configurationId+"]");
+        Shop removed = shopIndex.remove(Integer.toString(configurationId));
         if(removed==null) return false;
+        shopIndex.remove(removed.configurationName());
         //remove items
         removed.itemList().forEach(item->{
-            shoppingItems.remove(item.distributionKey());
+            logger.warn("Remove item ["+item.configurationKey()+"]");
+            shoppingItems.remove(item.configurationKey());
         });
         return true;
     }

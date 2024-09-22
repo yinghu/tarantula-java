@@ -216,18 +216,19 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
 
 
     @Override
-    public void register(int publishId) {
+    public void register(int publishId,int configurationId) {
         logger.warn("register : "+publishId);
-        distributionItemService.onRegisterItem(gameServiceName,name(),publishId);
+        distributionItemService.onRegisterItem(gameServiceName,name(),publishId,configurationId);
     }
 
     @Override
-    public void release(int publishId) {
+    public void release(int publishId,int configurationId) {
         logger.warn("release : "+publishId);
-        distributionItemService.onReleaseItem(gameServiceName,name(),publishId);
+        distributionItemService.onReleaseItem(gameServiceName,name(),publishId,configurationId);
     }
 
-    public boolean onItemRegistered(int publishId){
+    @Override
+    public boolean onItemRegistered(int publishId,int configurationId){
         String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
         logger.warn(config);
         JsonObject load = JsonUtil.parse(config);
@@ -246,7 +247,9 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         return true;
 
     }
-    public boolean onItemReleased(int publishId) {
+
+    @Override
+    public boolean onItemReleased(int publishId,int configurationId) {
         logger.warn("release local resource with [" + publishId + "]");
         CredentialConfiguration removed = vendorCredentials.remove(Integer.toString(publishId));
         if(removed==null) return false;

@@ -7,8 +7,8 @@ public interface DistributionItemService extends ServiceProvider {
     boolean onRegisterItem(String gameServiceName,String serviceName,String category,String itemId);
     boolean onReleaseItem(String gameServiceName,String serviceName,String category,String itemId);
 
-    boolean onRegisterItem(String gameServiceName,String serviceName,int publishId);
-    boolean onReleaseItem(String gameServiceName,String serviceName,int publishId);
+    boolean onRegisterItem(String gameServiceName,String serviceName,int publishId,int configurationId);
+    boolean onReleaseItem(String gameServiceName,String serviceName,int publishId,int configurationId);
 
 
 }

@@ -24,10 +24,8 @@ public class ShoppingItem extends Application{
     }
 
     public ShoppingItem(JsonObject payload){
-        this.header = payload;
-        this.configurationName = payload.get("Name").getAsString();
-        this.distributionId = payload.get("ConfigurationId").getAsInt();
-        this.header.addProperty("ItemId",this.distributionId());
+        super(payload);
+        this.header.addProperty("ItemId",this.configurationId);
     }
 
     public int getFactoryId() {
@@ -39,7 +37,7 @@ public class ShoppingItem extends Application{
     }
 
     public String name(){
-        return configurationName();
+        return this.configurationName;
     }
 
     public String skuName(){

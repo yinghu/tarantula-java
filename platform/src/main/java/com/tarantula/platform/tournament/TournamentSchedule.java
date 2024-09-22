@@ -21,7 +21,7 @@ public class TournamentSchedule extends Application {
     }
 
     public TournamentSchedule(JsonObject payload){
-        this.header = payload;
+        super(payload);
     }
 
     public TournamentSchedule(ConfigurableObject configurableObject){
@@ -124,7 +124,7 @@ public class TournamentSchedule extends Application {
         return configurationId();
     }
     public long configurationId(){
-        return header.get("ConfigurationId").getAsInt();
+        return configurationId;
     }
 
 

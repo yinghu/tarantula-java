@@ -63,10 +63,10 @@ public class DistributionItemServiceProxy extends AbstractDistributedObject<Item
         }
         return true;
     }
-    public boolean onRegisterItem(String gameServiceName,String serviceName,int publishId){
+    public boolean onRegisterItem(String gameServiceName,String serviceName,int publishId,int configurationId){
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        ConfigurationRegisteredOperation operation = new ConfigurationRegisteredOperation(gameServiceName,serviceName,publishId);
+        ConfigurationRegisteredOperation operation = new ConfigurationRegisteredOperation(gameServiceName,serviceName,publishId,configurationId);
         for(Member m : mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionItemService.NAME,operation,m.getAddress());
             ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
@@ -77,10 +77,10 @@ public class DistributionItemServiceProxy extends AbstractDistributedObject<Item
         }
         return true;
     }
-    public boolean onReleaseItem(String gameServiceName,String serviceName,int publishId){
+    public boolean onReleaseItem(String gameServiceName,String serviceName,int publishId,int configurationId){
         NodeEngine nodeEngine = getNodeEngine();
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        ConfigurationReleasedOperation operation = new ConfigurationReleasedOperation(gameServiceName,serviceName,publishId);
+        ConfigurationReleasedOperation operation = new ConfigurationReleasedOperation(gameServiceName,serviceName,publishId,configurationId);
         for(Member m : mlist){
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionItemService.NAME,operation,m.getAddress());
             ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{

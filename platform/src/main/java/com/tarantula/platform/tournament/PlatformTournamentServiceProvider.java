@@ -610,7 +610,7 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
     }
 
     @Override
-    public void register(int publishId){
+    public void register(int publishId,int configurationId){
         String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
         JsonObject payload = JsonUtil.parse(config);
         TournamentSchedule tournamentSchedule = new TournamentSchedule(payload);
@@ -631,7 +631,7 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
     }
 
     @Override
-    public void release(int publishId){
+    public void release(int publishId,int configurationId){
         for(TournamentScheduleStatus status : tournamentScheduleStatus.list(new TournamentScheduleStatusQuery(IntegerKey.from(publishId)))){
             logger.warn(status.tournamentId+" : "+status.scheduleEditId+" : "+status.status);
             if(status.status == Tournament.Status.STARTING) throw new RuntimeException("Tournament cannot be canceled during starting.");

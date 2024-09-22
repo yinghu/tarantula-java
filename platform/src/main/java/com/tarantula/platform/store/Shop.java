@@ -20,9 +20,8 @@ public class Shop extends Application {
     }
 
     public Shop(JsonObject payload){
-        this.application = payload;
-        this.application.addProperty("Successful",true);
-        this.configurationName = payload.get("ConfigurationName").getAsString();
+        super(payload);
+        this.header.addProperty("Successful",true);
     }
 
     public String name(){
@@ -44,17 +43,17 @@ public class Shop extends Application {
 
     @Override
     public JsonObject toJson() {
-        if(application.has("_shoppingItemList")){
-            return application;
+        if(header.has("_shoppingItemList")){
+            return header;
         }
         return super.toJson();
     }
 
 
     public List<ShoppingItem> itemList(){
-        if(!application.has("_shoppingItemList")) return null;
+        if(!header.has("_shoppingItemList")) return null;
         ArrayList<ShoppingItem> items = new ArrayList<>();
-        application.get("_shoppingItemList").getAsJsonArray().forEach(e->{
+        header.get("_shoppingItemList").getAsJsonArray().forEach(e->{
             JsonObject jo = e.getAsJsonObject();
             items.add(new ShoppingItem(jo));
         });

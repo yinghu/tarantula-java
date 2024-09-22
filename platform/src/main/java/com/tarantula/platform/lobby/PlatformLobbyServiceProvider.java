@@ -112,7 +112,8 @@ public class PlatformLobbyServiceProvider extends PlatformItemServiceProvider{
 
 
 
-    public boolean onItemRegistered(int publishId){
+    @Override
+    public boolean onItemRegistered(int publishId,int configurationId){
         String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
         logger.warn(config);
         JsonObject lobby = JsonUtil.parse(config);
@@ -123,7 +124,9 @@ public class PlatformLobbyServiceProvider extends PlatformItemServiceProvider{
         if(lobbyListener!=null && k.equals(lobbyListener.lobby.tag())) lobbyListener.listener.onLoaded(lobbyItem);
         return true;
     }
-    public boolean onItemReleased(int publishId){
+
+    @Override
+    public boolean onItemReleased(int publishId,int configurationId){
         logger.warn("release local resource with ["+publishId+"]");
         lobbyItems.forEach((k,v)->{
             logger.warn("key : "+k+" : "+v.publishId);

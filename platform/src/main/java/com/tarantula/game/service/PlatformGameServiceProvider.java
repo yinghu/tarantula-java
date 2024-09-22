@@ -313,10 +313,10 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
         return gameCluster.typeId();
     }
 
-    public boolean onItemRegistered(int publishId){
+    public boolean onItemRegistered(int publishId,int configurationId){
         return false;
     }
-    public boolean onItemReleased(int publishId){
+    public boolean onItemReleased(int publishId,int configurationId){
         return false;
     }
 }

@@ -6,13 +6,19 @@ import com.icodesoftware.Configurable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class Application extends ConfigurableObject implements Configurable.Listener<Commodity>{
 
     protected boolean validated;
+    public int configurationId;
 
     public Application(){}
+
+    public Application(JsonObject payload){
+        this.header = payload;
+        this.configurationId = payload.get("ConfigurationId").getAsInt();
+        this.configurationName = payload.get("ConfigurationName").getAsString();
+    }
 
     public Application(ConfigurableObject configurableObject){
         super(configurableObject);
@@ -72,5 +78,9 @@ public class Application extends ConfigurableObject implements Configurable.List
 
     public List<Commodity> commodityList(){
         return new ArrayList<>();
+    }
+
+    public String configurationKey(){
+        return Integer.toString(configurationId);
     }
 }
