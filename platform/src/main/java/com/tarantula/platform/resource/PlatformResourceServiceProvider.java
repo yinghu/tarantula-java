@@ -164,8 +164,8 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
 
 
     @Override
-    public boolean onItemRegistered(int publishId,int configurationId){
-        logger.warn("register local resource with ["+publishId+"]["+configurationId+"]");
+    public boolean onItemRegistered(int publishId){
+        logger.warn("register local resource with ["+publishId+"]");
         String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
         logger.warn(config);
         GameResource resource = new GameResource(JsonUtil.parse(config));
@@ -174,9 +174,9 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
     }
 
     @Override
-    public boolean onItemReleased(int publishId,int configurationId){
-        logger.warn("release local resource with ["+publishId+"]["+configurationId+"]");
-        GameResource resource = gameResourceIndex.remove(Integer.toString(configurationId));
+    public boolean onItemReleased(int publishId){
+        logger.warn("release local resource with ["+publishId+"]");
+        GameResource resource = gameResourceIndex.remove(Integer.toString(publishId));
         if(resource==null) return false;
         gameResourceIndex.remove(resource.name());
         logger.warn("resource removed ["+resource.name());
@@ -188,7 +188,7 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
             gameCluster.registerConfigurableCategory(commodity.configurableCategory());
         });
         gameResourceIndex.put(resource.name(),resource);
-        gameResourceIndex.put(resource.configurationKey(),resource);
+        gameResourceIndex.put(resource.publishKey(),resource);
     }
 
 }

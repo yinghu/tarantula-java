@@ -11,6 +11,7 @@ public class Application extends ConfigurableObject implements Configurable.List
 
     protected boolean validated;
     public int configurationId;
+    public int publishId;
 
     public Application(){}
 
@@ -18,6 +19,7 @@ public class Application extends ConfigurableObject implements Configurable.List
         this.header = payload;
         this.configurationId = payload.get("ConfigurationId").getAsInt();
         this.configurationName = payload.get("ConfigurationName").getAsString();
+        if(payload.has("ConfigurationPublishId")) this.publishId = payload.get("ConfigurationPublishId").getAsInt();
     }
 
     public Application(ConfigurableObject configurableObject){
@@ -82,5 +84,8 @@ public class Application extends ConfigurableObject implements Configurable.List
 
     public String configurationKey(){
         return Integer.toString(configurationId);
+    }
+    public String publishKey(){
+        return Integer.toString(publishId);
     }
 }

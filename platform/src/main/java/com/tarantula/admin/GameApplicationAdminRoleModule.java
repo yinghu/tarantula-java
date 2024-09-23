@@ -79,14 +79,14 @@ public class GameApplicationAdminRoleModule implements Module {
             String[] query = session.name().split("#");
             GameCluster gameCluster = deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
             PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider(gameCluster.serviceType());
-            gameServiceProvider.configurationServiceProvider(query[2]).register(Integer.parseInt(query[1]),Integer.parseInt(query[3]));
+            gameServiceProvider.configurationServiceProvider(query[2]).register(Integer.parseInt(query[1]));
             session.write(JsonUtil.toSimpleResponse(true,"onRegistered").getBytes());
         }
         else if(session.action().equals("onReleased")){
             String[] query = session.name().split("#");
             GameCluster gameCluster = deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
             PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider(gameCluster.serviceType());
-            gameServiceProvider.configurationServiceProvider(query[2]).release(Integer.parseInt(query[1]),Integer.parseInt(query[3]));
+            gameServiceProvider.configurationServiceProvider(query[2]).release(Integer.parseInt(query[1]));
             session.write(JsonUtil.toSimpleResponse(true,"onReleased").getBytes());
         }
         else {

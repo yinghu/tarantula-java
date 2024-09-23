@@ -11,24 +11,23 @@ public class ConfigurationRegisteredOperation extends Operation {
     private String gameServiceName;
     private String serviceName;
     private int publishId;
-    private int configurationId;
+
     private boolean ret;
 
     public ConfigurationRegisteredOperation() {
     }
 
 
-    public ConfigurationRegisteredOperation(String gameServiceName, String serviceName, int publishId,int configurationId) {
+    public ConfigurationRegisteredOperation(String gameServiceName, String serviceName, int publishId) {
         this.gameServiceName = gameServiceName;
         this.serviceName = serviceName;
         this.publishId = publishId;
-        this.configurationId = configurationId;
     }
 
     @Override
     public void run() throws Exception {
         ItemClusterService cis = this.getService();
-        this.ret = cis.onRegister(gameServiceName,serviceName,publishId,configurationId);
+        this.ret = cis.onRegister(gameServiceName,serviceName,publishId);
     }
 
     @Override
@@ -42,7 +41,6 @@ public class ConfigurationRegisteredOperation extends Operation {
         out.writeUTF(gameServiceName);
         out.writeUTF(serviceName);
         out.writeInt(publishId);
-        out.writeInt(configurationId);
     }
 
     @Override
@@ -51,6 +49,5 @@ public class ConfigurationRegisteredOperation extends Operation {
         gameServiceName = in.readUTF();
         serviceName = in.readUTF();
         publishId = in.readInt();
-        configurationId = in.readInt();
     }
 }

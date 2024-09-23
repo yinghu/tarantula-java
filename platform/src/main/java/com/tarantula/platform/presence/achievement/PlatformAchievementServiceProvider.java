@@ -143,7 +143,7 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
     }
 
     @Override
-    public boolean onItemRegistered(int publishId,int configurationId){
+    public boolean onItemRegistered(int publishId){
         String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
         logger.warn(config);
         AchievementItem achievementItem = new AchievementItem(JsonUtil.parse(config));
@@ -151,9 +151,9 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
         return true;
     }
     @Override
-    public boolean onItemReleased(int publishId,int configurationId){
+    public boolean onItemReleased(int publishId){
         logger.warn("release local resource with ["+publishId+"]");
-        AchievementItem removed = achievements.remove(Integer.toString(configurationId));
+        AchievementItem removed = achievements.remove(Integer.toString(publishId));
         if(removed==null) return false;
         achievements.remove(removed.name());
         return true;
@@ -164,6 +164,6 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
             gameCluster.registerConfigurableCategory(commodity.configurableCategory());
         });
         this.achievements.put(achievementItem.name(),achievementItem);
-        this.achievements.put(achievementItem.configurationKey(),achievementItem);
+        this.achievements.put(achievementItem.publishKey(),achievementItem);
     }
 }

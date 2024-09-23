@@ -105,7 +105,7 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
                 });
                 shoppingItems.put(shoppingItem.configurationKey(),shoppingItem);
             });
-            shopIndex.put(shop.configurationKey(),shop);
+            shopIndex.put(shop.publishKey(),shop);
             shopIndex.put(shop.configurationName(),shop);
             return;
         }
@@ -122,7 +122,7 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
 
 
     @Override
-    public boolean onItemRegistered(int publishId,int configurationId){
+    public boolean onItemRegistered(int publishId){
         logger.warn("register shop with publish id : "+publishId);
         String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
         registerShop(new Shop(JsonUtil.parse(config)));
@@ -130,9 +130,9 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
     }
 
     @Override
-    public boolean onItemReleased(int publishId,int configurationId){
-        logger.warn("release local shop with ["+publishId+"]["+configurationId+"]");
-        Shop removed = shopIndex.remove(Integer.toString(configurationId));
+    public boolean onItemReleased(int publishId){
+        logger.warn("release local shop with ["+publishId+"]");
+        Shop removed = shopIndex.remove(Integer.toString(publishId));
         if(removed==null) return false;
         shopIndex.remove(removed.configurationName());
         //remove items

@@ -112,7 +112,7 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
     }
 
     @Override
-    public boolean onItemRegistered(int publishId,int configurationId){
+    public boolean onItemRegistered(int publishId){
         String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
         DailyGiveaway dailyGiveaway = new DailyGiveaway(JsonUtil.parse(config));
         logger.warn(dailyGiveaway.name());
@@ -120,9 +120,9 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
         return true;
     }
     @Override
-    public boolean onItemReleased(int publishId,int configurationId){
+    public boolean onItemReleased(int publishId){
         logger.warn("release local resource with ["+publishId+"]");
-        DailyGiveaway removed = dailyGiveaways.remove(Integer.toString(configurationId));
+        DailyGiveaway removed = dailyGiveaways.remove(Integer.toString(publishId));
         if(removed==null) return false;
         this.dailyGiveaways.remove(removed.name());
         return true;
@@ -133,7 +133,7 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
             gameCluster.registerConfigurableCategory(commodity.configurableCategory());
         });
         this.dailyGiveaways.put(dailyGiveaway.name(),dailyGiveaway);
-        this.dailyGiveaways.put(dailyGiveaway.configurationKey(),dailyGiveaway);
+        this.dailyGiveaways.put(dailyGiveaway.publishKey(),dailyGiveaway);
     }
 
 
