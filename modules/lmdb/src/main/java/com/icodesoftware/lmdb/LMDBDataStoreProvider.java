@@ -33,11 +33,11 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     private String baseDir = EnvSetting.ENV_BASE_DIR;
 
-    private final LMDBEnv dataEnv = LMDBEnv.DATA_ENV;
-    private final LMDBEnv integrationEnv = LMDBEnv.INTEGRATION_ENV;
-    private final LMDBEnv indexEnv = LMDBEnv.INDEX_ENV;
-    private final LMDBEnv logEnv = LMDBEnv.LOG_ENV;
-    private final LMDBEnv localEnv = LMDBEnv.LOCAL_ENV;
+    private final LMDBEnv dataEnv = new LMDBEnv(EnvSetting.DataSetting);
+    private final LMDBEnv integrationEnv = new LMDBEnv(EnvSetting.IntegrationSetting);
+    private final LMDBEnv indexEnv = new LMDBEnv(EnvSetting.IndexSetting);
+    private final LMDBEnv logEnv = new LMDBEnv(EnvSetting.LogSetting);
+    private final LMDBEnv localEnv = new LMDBEnv(EnvSetting.LocalSetting);
 
 
     long storeSize = EnvSetting.toBytesFromMb(1); // 1MB = 1,048,576 (1024*1024)

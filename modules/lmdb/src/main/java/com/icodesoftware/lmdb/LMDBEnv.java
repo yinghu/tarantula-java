@@ -18,11 +18,11 @@ public class LMDBEnv implements Serviceable {
 
     private static final TarantulaLogger logger = JDKLogger.getLogger(LMDBEnv.class);
 
-    public static final LMDBEnv DATA_ENV = new LMDBEnv(EnvSetting.DataSetting);
-    public static final LMDBEnv INTEGRATION_ENV = new LMDBEnv(EnvSetting.IntegrationSetting);
-    public static final LMDBEnv INDEX_ENV = new LMDBEnv(EnvSetting.IndexSetting);
-    public static final LMDBEnv LOG_ENV = new LMDBEnv(EnvSetting.LogSetting);
-    public static final LMDBEnv LOCAL_ENV = new LMDBEnv(EnvSetting.LocalSetting);
+    //public static final LMDBEnv DATA_ENV = new LMDBEnv(EnvSetting.DataSetting);
+    //public static final LMDBEnv INTEGRATION_ENV = new LMDBEnv(EnvSetting.IntegrationSetting);
+    //public static final LMDBEnv INDEX_ENV = new LMDBEnv(EnvSetting.IndexSetting);
+    //public static final LMDBEnv LOG_ENV = new LMDBEnv(EnvSetting.LogSetting);
+    //public static final LMDBEnv LOCAL_ENV = new LMDBEnv(EnvSetting.LocalSetting);
 
     public EnvSetting envSetting;
     public Env<ByteBuffer> env;
@@ -35,6 +35,7 @@ public class LMDBEnv implements Serviceable {
     @Override
     public void start() throws Exception {
         if(!envSetting.enabled) return;
+        logger.warn("Starting Env : "+envSetting.name+" : "+envSetting.storePath+" : "+lmdbDataStoreProvider.envNoSyncFlag);
         if(!lmdbDataStoreProvider.envNoSyncFlag){
             env = Env.create().setMapSize(storeSize(this.envSetting)).setMaxDbs(lmdbDataStoreProvider.maxDatabaseNumber).setMaxReaders(lmdbDataStoreProvider.maxReaders).open(path(this.envSetting.storePath).toFile());
             return;
@@ -83,6 +84,7 @@ public class LMDBEnv implements Serviceable {
     @Override
     public void shutdown() throws Exception {
         if(!envSetting.enabled) return;
+        logger.warn("Sync on shutdown : "+envSetting.storePath);
         env.sync(true);
         env.close();
     }
