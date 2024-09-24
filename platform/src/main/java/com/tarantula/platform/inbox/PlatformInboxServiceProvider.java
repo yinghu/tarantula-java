@@ -17,7 +17,9 @@ import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.Application;
 import com.tarantula.platform.tournament.TournamentPrize;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,9 +57,13 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
     }
 
     public void checkGlobalItemGrant(Session session, long gameclusterID){
-        //this.platformGameServiceProvider.gameServiceProvider().checkGlobalItemGrants(session, gameclusterID);
+        String[] payloadSplit = session.name().split("#");
+        int playerLevel = Integer.parseInt(payloadSplit[1]);
 
-        DataStore globalDataStore = gameCluster.applicationPreSetup().onDataStore("global_item_grant");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate accountCreatedDate = LocalDate.parse(payloadSplit[0], formatter);
+
+        DataStore globalDataStore = applicationPreSetup.dataStore(gameCluster,"global_item_grants");
         DataStore playerDataStore = gameCluster.applicationPreSetup().onDataStore("player_inventory_grant");
         List<LocalDateTime> playerEventGlobalTimes = new ArrayList<>();
 
@@ -71,21 +77,25 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         });
 
         globalDataStore.list(new GlobalItemGrantEventQuery(gameclusterID)).forEach(globalGrantEvent -> {
+            if(globalGrantEvent.completed) return;
 
             if(!playerEventGlobalTimes.contains(globalGrantEvent.dateCreated)){
+                boolean shouldComplete = false;
+
+                if(playerLevel < globalGrantEvent.minPlayerLevelFilter || playerLevel > globalGrantEvent.maxPlayerLevelFilter){
+                    shouldComplete = true;
+                }
+
+                if(accountCreatedDate.isBefore(globalGrantEvent.minInstallDateFilter) || accountCreatedDate.isAfter(globalGrantEvent.maxInstallDateFilter)){
+                    shouldComplete = true;
+                }
+
                 PlatformServerEvent serverGrantEvent = new PlatformServerEvent("GlobalGrant"+ EVENTSPLIT + globalGrantEvent.itemID +
-                        EVENTSPLIT + globalGrantEvent.amount + EVENTSPLIT + globalGrantEvent.dateCreated,false);
+                        EVENTSPLIT + globalGrantEvent.amount + EVENTSPLIT + globalGrantEvent.dateCreated, shouldComplete);
 
                 serverGrantEvent.ownerKey(SnowflakeKey.from(session.distributionId()));
                 playerDataStore.create(serverGrantEvent);
-
-                globalGrantEvent.grantCount++;
-                globalDataStore.update(globalGrantEvent);
             }
-        });
-
-        playerDataStore.list(new PlatformServerEventQuery(session.distributionId())).forEach(playerGrantEvent -> {
-            logger.warn(playerGrantEvent.name());
         });
     }
 
