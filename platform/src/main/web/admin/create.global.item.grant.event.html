@@ -355,6 +355,34 @@
                 <option value="70804bf7f53d14cf7aed8d0794df0013">RealLifeCoin_Clonk</option>
             </select>
         </div>
+
+        <div class="w3-row">
+            <div class="w3-quarter w3-container">
+                <label class="tx-text-12">Minimum Player Level:</label>
+                <input id ="tx-min-player-level" class="w3-input w3-round w3-border tx-text-16" type="number"/>
+            </div>
+            <div class="w3-quarter w3-container">
+                <label class="tx-text-12">Maximum Player Level:</label>
+                <input id ="tx-max-player-level" class="w3-input w3-round w3-border tx-text-16" type="number"/>
+            </div>
+        </div>
+
+        <div class="w3-row">
+            <div class="w3-quarter w3-container">
+                <label class="tx-text-12">Minimum Player Install Date:</label>
+                <input id ="tx-min-player-install-date" class="w3-input w3-round w3-border tx-text-16" type="date"/>
+            </div>
+            <div class="w3-quarter w3-container">
+                <label class="tx-text-12">Maximum Player Install Date:</label>
+                <input id ="tx-max-player-install-date" class="w3-input w3-round w3-border tx-text-16" type="date"/>
+            </div>
+        </div>
+
+        <div class="w3-panel">
+            <label class="tx-text-12">Tournament ID</label>
+            <input id ="tx-tournament-id" class="w3-input w3-round w3-border" type="number" placeholder='ID'/>
+        </div>
+
         <div class="w3-panel">
             <span id="tx-grant-item-global" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Grant Global Item</span>
         </div>
@@ -382,7 +410,16 @@
         let sel = document.querySelector('#tx-item-type');
         let _itemName = sel.options[sel.selectedIndex].text;
 
-        let payload ={itemAmount:_itemAmount,itemID:_itemID,itemName:_itemName};
+        let _minPlayerLevel = document.querySelector('#tx-min-player-level').value;
+        let _maxPlayerLevel = document.querySelector('#tx-max-player-level').value;
+
+        let _minPlayerInstallDate = document.querySelector('#tx-min-player-install-date').value;
+        let _maxPlayerInstallDate = document.querySelector('#tx-max-player-install-date').value;
+
+        let _tournamentID = document.querySelector('#tx-tournament-id').value;
+
+        let payload ={itemAmount:_itemAmount,itemID:_itemID,itemName:_itemName,minPlayerLevel:_minPlayerLevel,
+            maxPlayerLevel:_maxPlayerLevel, minPlayerInstallDate:_minPlayerInstallDate,maxPlayerInstallDate:_maxPlayerInstallDate,tournamentID:_tournamentID};
 
         TARA_API.onSet('role/admin','onCreateGlobalEvent',TARA_API.query().gameClusterId,payload,(resp)=>{
             document.querySelector('#tx-grant-item-message').innerHTML = resp.message;
@@ -402,10 +439,33 @@
             resp.globalGrantEvent.forEach((grantEvent)=>{
                 let tem = [];
                 tem.push('<div class=\'w3-panel w3-padding w3-block w3-green tx-platform-cluster-node\'>');
+                tem.push('<div class=\'w3-padding\'>');
                 tem.push('<span class=\'w3-left tx-text-16 tx-margin-top-12 tx-margin-left-8\'>');
-                tem.push("Item Name: " + grantEvent.ItemName + " | Amount: "+ grantEvent.Amount + " | Date Created: " + grantEvent.DateCreated + " | Players Granted: " + grantEvent.GrantAmount );
-                tem.push('</span><span tx-grant-event-date=\''+grantEvent.DateCreated+'\'');
-                tem.push(' class=\'w3-right w3-tag w3-red w3-round w3-border w3-border-black tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-global-grant-delete\'>Delete</span>');
+                tem.push("Item Name: " + grantEvent.ItemName + " | Amount: "+ grantEvent.Amount + " | Date Created: " + grantEvent.DateCreated);
+                tem.push('</span></div><br><div class=\'w3-padding\'><span class=\'w3-left tx-text-16 tx-margin-top-12 tx-margin-left-8\'>');
+                tem.push("Filters: ");
+                if(grantEvent.TournamentIdFilter != 0){
+                    tem.push("Tournament ID: " + grantEvent.TournamentIdFilter + " | ");
+                }
+                if(grantEvent.MinPlayerLevelFilter != -2147483648){
+                    tem.push("Minimum Player Level: " + grantEvent.MinPlayerLevelFilter + " | ");
+                }
+                if(grantEvent.MaxPlayerLevelFilter != 2147483647){
+                    tem.push("Maximum Player Level: " + grantEvent.MaxPlayerLevelFilter + " | ");
+                }
+                if(grantEvent.MinInstallDateFilter != "1000-01-01"){
+                    tem.push("Installed After: " + grantEvent.MinInstallDateFilter + " | ");
+                }
+                if(grantEvent.MaxInstallDateFilter != "5000-01-01"){
+                    tem.push("Installed Before: " + grantEvent.MaxInstallDateFilter + " | ");
+                }
+
+                if(grantEvent.TournamentIdFilter == 0 && grantEvent.MinPlayerLevelFilter == -2147483648 && grantEvent.MaxPlayerLevelFilter == 2147483647 && grantEvent.MinInstallDateFilter == "1000-01-01" && grantEvent.MaxInstallDateFilter == "5000-01-01") {
+                    tem.push("None");
+                }
+
+                tem.push('</span></div><span tx-grant-event-date=\''+grantEvent.DateCreated+'\'');
+                tem.push(' class=\'w3-right w3-tag w3-red w3-round w3-border w3-border-black tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-global-grant-delete\'>End</span>');
                 tem.push('</div>');
                 listBar.innerHTML += tem.join('');
             });

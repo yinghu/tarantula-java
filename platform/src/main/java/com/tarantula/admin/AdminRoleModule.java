@@ -21,6 +21,7 @@ import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -236,11 +237,13 @@ public class AdminRoleModule implements Module{
             long gameclusterID = Long.parseLong(session.name());
 
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameclusterID);
-            DataStore dataStore = gameCluster.applicationPreSetup().onDataStore("global_item_grant");
+            DataStore dataStore = gameCluster.applicationPreSetup().dataStore(gameCluster, "global_item_grants");
             List<GlobalItemGrantEvent> eventList = new ArrayList<>();
 
             dataStore.list(new GlobalItemGrantEventQuery(gameclusterID)).forEach(globalGrantEvent -> {
-                eventList.add(globalGrantEvent);
+                if(!globalGrantEvent.completed){
+                    eventList.add(globalGrantEvent);
+                }
             });
 
             GlobalItemGrantList globalItemGrantList = new GlobalItemGrantList(eventList);
@@ -256,33 +259,63 @@ public class AdminRoleModule implements Module{
             LocalDateTime dateCreated = LocalDateTime.parse(dateCreatedString);
 
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameclusterID);
-            DataStore dataStore = gameCluster.applicationPreSetup().onDataStore("global_item_grant");
+            DataStore dataStore = gameCluster.applicationPreSetup().dataStore(gameCluster, "global_item_grants");
 
            dataStore.list(new GlobalItemGrantEventQuery(gameclusterID)).forEach(globalGrantEvent -> {
                 if(globalGrantEvent.dateCreated.equals(dateCreated)){
-                    dataStore.delete(globalGrantEvent);
-                    session.write(JsonUtil.toSimpleResponse(true, "Deleted").getBytes());
+                    globalGrantEvent.completed = true;
+                    dataStore.update(globalGrantEvent);
+
+                    session.write(JsonUtil.toSimpleResponse(true, "Global Grant Event Ended").getBytes());
                 }
             });
 
-            session.write(JsonUtil.toSimpleResponse(true, "Not Deleted").getBytes());
+           session.write(JsonUtil.toSimpleResponse(true, "No Global Grant Event Found").getBytes());
 
         }
         else if(session.action().equals("onCreateGlobalEvent")) {
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+
             String amount = (String)onAccess.property("itemAmount");
             String itemID = (String)onAccess.property("itemID");
             String itemName = (String)onAccess.property("itemName");
+
+            String minPlayerLevelFilterString =  (String)onAccess.property("minPlayerLevel");
+            String maxPlayerLevelFilterString = (String)onAccess.property("maxPlayerLevel");
+
+            String minInstallDateFilterString = (String)onAccess.property("minPlayerInstallDate");
+            String maxInstallDateFilterString = (String)onAccess.property("maxPlayerInstallDate");
+
+            String tournamentIDString = (String)onAccess.property("tournamentID");
+
             long gameclusterID = Long.parseLong(session.name());
-
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameclusterID);
-
-            DataStore dataStore = gameCluster.applicationPreSetup().onDataStore("global_item_grant");
+            DataStore dataStore = gameCluster.applicationPreSetup().dataStore(gameCluster, "global_item_grants");
 
             LocalDateTime dateCreated = LocalDateTime.now();
 
             GlobalItemGrantEvent globalItemGrantEvent = new GlobalItemGrantEvent(itemName, itemID, Long.parseLong(amount), dateCreated);
             globalItemGrantEvent.ownerKey(SnowflakeKey.from(gameclusterID));
+
+            if(!minPlayerLevelFilterString.isEmpty() && !maxPlayerLevelFilterString.isEmpty()){
+                int minPlayerLevelFilter = Integer.parseInt(minPlayerLevelFilterString);
+                int maxPlayerLevelFilter = Integer.parseInt(maxPlayerLevelFilterString);
+
+                globalItemGrantEvent.setPlayerLevelFilter(minPlayerLevelFilter, maxPlayerLevelFilter);
+            }
+
+            if(!minInstallDateFilterString.isEmpty() && !maxInstallDateFilterString.isEmpty()){
+                LocalDate minInstallDateFilter = LocalDate.parse(minInstallDateFilterString);
+                LocalDate maxInstallDateFilter = LocalDate.parse(maxInstallDateFilterString);
+
+                globalItemGrantEvent.setInstallDateFilter(minInstallDateFilter, maxInstallDateFilter);
+            }
+
+            if(!tournamentIDString.isEmpty()){
+                long tournamentID = Long.parseLong(tournamentIDString);
+
+                globalItemGrantEvent.setTournamentIdFilter(tournamentID);
+            }
 
             if(dataStore.create(globalItemGrantEvent)){
                 session.write(JsonUtil.toSimpleResponse(true, "Global Grant Event Created").getBytes());
