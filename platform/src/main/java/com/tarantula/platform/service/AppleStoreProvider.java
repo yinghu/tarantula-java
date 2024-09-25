@@ -21,7 +21,9 @@ import com.tarantula.platform.configuration.AppleStoreKey;
 import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
 import com.tarantula.platform.inventory.ApplicationRedeemer;
 import com.tarantula.platform.service.metrics.PaymentMetrics;
+import com.tarantula.platform.store.PlatformStoreServiceProvider;
 import com.tarantula.platform.store.ShoppingItem;
+import com.tarantula.platform.store.StoreTransactionLog;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -38,11 +40,13 @@ public class AppleStoreProvider extends AuthObject{
 
     private PlatformConfigurationServiceProvider configurationServiceProvider;
     private PlatformGameServiceProvider gameServiceProvider;
+    private PlatformStoreServiceProvider storeServiceProvider;
 
     public AppleStoreProvider(PlatformGameServiceProvider gameServiceProvider, MetricsListener metricsListener){
         super(gameServiceProvider.gameCluster().typeId(),"");
         this.gameServiceProvider = gameServiceProvider;
         this.configurationServiceProvider = gameServiceProvider.configurationServiceProvider();
+        this.storeServiceProvider = gameServiceProvider.storeServiceProvider();
         this.applicationMetricsListener = metricsListener;
     }
 
@@ -59,6 +63,12 @@ public class AppleStoreProvider extends AuthObject{
             return false;
         }
         try{
+            String pendingTransactionId = (String)params.get("transactionId");
+            StoreTransactionLog logged = storeServiceProvider.transactionLog(pendingTransactionId);
+            if(logged != null){
+                logger.warn(logged.toJson().toString());
+                return false;
+            }
             AppleStoreKey appleStoreKey = credentialConfiguration.appleStoreKey();
             String receipt = (String)params.get("receipt");
             //String serviceTypeId = (String)params.get(OnAccess.TYPE_ID);
@@ -97,7 +107,7 @@ public class AppleStoreProvider extends AuthObject{
                 redeemer.redeem();
                 return true;
             });
-
+            storeServiceProvider.transactionLog(new StoreTransactionLog(Long.parseLong(systemId),OnAccess.APPLE_STORE,pendingTransactionId,shoppingItem.distributionId(),suc));
             if(appleStoreKey.isSandbox()){
                 params.put(OnAccess.IS_SANDBOX, true);
             }
