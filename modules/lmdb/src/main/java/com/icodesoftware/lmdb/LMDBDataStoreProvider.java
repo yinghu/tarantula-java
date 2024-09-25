@@ -52,10 +52,10 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     boolean envNoSyncFlag = EnvSetting.ENV_NO_SYNC_Flag;
     boolean storeReindexing;
-    private final static ConcurrentHashMap<String,DataStore> storeMap = new ConcurrentHashMap<>();
-    private final static ConcurrentHashMap<String,LocalEdgeDataStore> edgMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String,DataStore> storeMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String,LocalEdgeDataStore> edgMap = new ConcurrentHashMap<>();
 
-    final static ArrayBlockingQueue<BufferCache> pendingQueue = new ArrayBlockingQueue<>(PENDING_BUFFER_SIZE);;
+    final ArrayBlockingQueue<BufferCache> pendingQueue = new ArrayBlockingQueue<>(PENDING_BUFFER_SIZE);;
 
 
     private MapStoreListener integrationMapStoreListener;
