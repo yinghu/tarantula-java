@@ -21,28 +21,18 @@ public interface DeployService extends ServiceProvider {
     //distribute the module or view content in cluster
     boolean onUpload(String fileName,byte[] content);
 
-    boolean onLaunchModule(String typeId);
-    boolean onShutdownModule(String typeId);
-    boolean onUpdateModule(Descriptor descriptor);
-    boolean onDeployModule(String context,String moduleFile);
-
-    //boolean onUpdateConfigurable(String key);
-    //boolean onRegisterChannel(String typeId,Channel channel);
     void onVerifyConnection(String typeId,String serverId);
     void onRegisterConnection(Connection connection);
     void onStartConnection(Connection connection);
     void onReleaseConnection(Connection connection);
 
-    byte[] onClusterKey();
 
     void onResetClusterKey();
 
-    byte[] onTokenKey();
+    //void onResetTokenKey();
+    //void onEnablePresenceService(String root,String password,String classNameSuffix,String host);
+    //void onDisablePresenceService(String classNameSuffix);
 
-    void onResetTokenKey();
-
-    void onEnablePresenceService(String root,String password,String classNameSuffix,String host);
-    void onDisablePresenceService(String classNameSuffix);
-
+    void onIssueDataStoreBackup(int scope);
 
 }

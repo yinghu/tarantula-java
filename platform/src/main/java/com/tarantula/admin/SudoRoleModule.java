@@ -3,19 +3,16 @@ package com.tarantula.admin;
 import com.google.gson.*;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
-import com.icodesoftware.util.NaturalKey;
-import com.icodesoftware.util.SnowflakeKey;
-import com.tarantula.platform.*;
-import com.tarantula.platform.bootstrap.TarantulaMain;
-import com.tarantula.platform.presence.PermissionContext;
 
+import com.tarantula.platform.*;
+import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.service.persistence.ClusterNode;
 import com.tarantula.platform.util.OnAccessDeserializer;
-import com.tarantula.platform.util.SystemUtil;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.List;
 
 public class SudoRoleModule implements Module {
@@ -35,24 +32,7 @@ public class SudoRoleModule implements Module {
             Access acc = userService.loadUser(session.distributionId());
             session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes());
         }
-        else if(session.action().equals("onEnablePresenceService")){
-            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-            String root = (String) onAccess.property("user");
-            String password = (String) onAccess.property("password");
-            String host = (String) onAccess.property("host");
-            String suffix = (String) onAccess.property("suffix");
-            String localPassword = (String) onAccess.property("localPassword");
-            boolean suc = this.tokenValidatorProvider.enablePresenceService(root,password,suffix,host);
-            if(suc){
-                this.context.clusterProvider().deployService().onEnablePresenceService(root,password,suffix,host);
-            }
-            session.write(JsonUtil.toSimpleResponse(suc,suc?"remote presence service enabled on ["+host+"]":"failed").getBytes());
-        }
-        else if(session.action().equals("onDisablePresenceService")){
-            this.tokenValidatorProvider.disablePresenceService(session.name());
-            this.context.clusterProvider().deployService().onDisablePresenceService(session.name());
-            session.write(JsonUtil.toSimpleResponse(true,"remote presence service disabled").getBytes());
-        }
+
         else if(session.action().equals("onResetClusterKey")){
             boolean suc = this.tokenValidatorProvider.resetClusterKey();
             if(suc){
@@ -60,11 +40,7 @@ public class SudoRoleModule implements Module {
             }
             session.write(JsonUtil.toSimpleResponse(suc,suc?"Cluster reset":"failed to reset key").getBytes());
         }
-        else if(session.action().equals("onPresenceKey")){
-            byte[] key = this.tokenValidatorProvider.clusterKey(session.name());
-            PermissionContext permissionContext = new PermissionContext(key!=null?SystemUtil.toBase64String(key):null);
-            session.write(permissionContext.toJson().toString().getBytes());
-        }
+
         else if(session.action().equals("onCreateLabeledKey")){
             String key = tokenValidatorProvider.createAccessKey(session.name());
             PermissionContext pc = new PermissionContext(key);
@@ -131,11 +107,19 @@ public class SudoRoleModule implements Module {
         }
         else if(session.action().equals("onClusterShutdown")){
             Access acc = userService.loadUser(session.distributionId());
-            session.write(JsonUtil.toSimpleResponse(true,"shutdown :"+session.name()).getBytes());
+            session.write(JsonUtil.toSimpleResponse(true,"shutdown : "+session.name()).getBytes());
             DeploymentServiceProvider.NodeShutdownOperator shutdownOperator = deploymentServiceProvider.nodeShutdownOperator(acc);
             ClusterNode node = new ClusterNode();
             node.memberId = session.name();
             shutdownOperator.shutdown(node);
+        }
+        else if(session.action().equals("onClusterRestart")){
+            Access acc = userService.loadUser(session.distributionId());
+            session.write(JsonUtil.toSimpleResponse(true,"restart : "+session.name()).getBytes());
+            DeploymentServiceProvider.NodeShutdownOperator shutdownOperator = deploymentServiceProvider.nodeShutdownOperator(acc);
+            ClusterNode node = new ClusterNode();
+            node.memberId = session.name();
+            shutdownOperator.restart(node);
         }
         else{
            throw new UnsupportedOperationException("operation ["+session.action()+"] not supported");

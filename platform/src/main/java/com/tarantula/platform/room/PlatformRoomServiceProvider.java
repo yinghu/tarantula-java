@@ -5,12 +5,13 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.Channel;
-import com.icodesoftware.protocol.PendingReleaseRoom;
-import com.icodesoftware.protocol.GameServerListener;
-import com.icodesoftware.service.*;
 
+import com.icodesoftware.protocol.GameServerListener;
+
+import com.icodesoftware.protocol.Room;
+import com.icodesoftware.service.*;
+import com.icodesoftware.util.BufferUtil;
 import com.icodesoftware.util.SnowflakeKey;
-import com.icodesoftware.util.TimeUtil;
 import com.tarantula.cci.udp.UDPChannel;
 import com.tarantula.cci.udp.UDPEndpoint;
 import com.tarantula.game.*;
@@ -20,15 +21,12 @@ import com.tarantula.platform.OnAccessTrack;
 import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.platform.event.GameClusterSyncEvent;
 
-
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
-public class PlatformRoomServiceProvider implements ConfigurationServiceProvider, GameServerListener, ReloadListener,RoomListener {
+public class PlatformRoomServiceProvider implements ConfigurationServiceProvider, GameServerListener,ReloadListener {
 
     private static final String CONFIG = "game-room-settings";
 
@@ -45,8 +43,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private ClusterProvider.ClusterStore serverClusterStore;
     private DataStore dataStore;
 
-    private ConcurrentHashMap<String,GameZoneIndex> gameZoneIndex;
-    private ConcurrentHashMap<String, GameRoom> gameRoomIndex;
+    private ConcurrentHashMap<Long,GameZoneIndex> gameZoneIndex;
+    private ConcurrentHashMap<Long, GameRoom> gameRoomIndex;
     private ConcurrentHashMap<String,ConnectionStub> connectionIndex;
 
     private String playMode;
@@ -56,22 +54,19 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private String reloadKey;
 
     private int maxDedicatedServerConnections;
-    private int maxRoomPoolSizePerZone;
-    private int minRoomPoolSizePerZone;
+    private int maxRoomPoolSizePerBucket;
+    private int minRoomPoolSizePerBucket;
 
     private boolean pushChannelEnabled = true;
     private boolean dedicated;
 
-
-    private ArrayList<String> kickoff = new ArrayList<>();
-
     private int timer;
     private SchedulingTask schedulingTask;
     private ScheduledFuture scheduledFuture;
-    private boolean started;
+    private volatile boolean started;
 
     private UDPEndpoint udpEndpoint;
-    private ConcurrentHashMap<String, PendingReleaseRoom> pendingReleaseRooms;
+
 
     public PlatformRoomServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameServiceProvider = gameServiceProvider;
@@ -97,31 +92,28 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         Configuration configuration = serviceContext.configuration(CONFIG);
         JsonObject jsonObject = ((JsonElement)configuration.property(playMode)).getAsJsonObject();
         this.maxDedicatedServerConnections = jsonObject.get("maxDedicatedServerConnections").getAsInt();
-        this.maxRoomPoolSizePerZone = jsonObject.get("maxRoomPoolSizePerZone").getAsInt();
-        this.minRoomPoolSizePerZone = jsonObject.get("minRoomPoolSizePerZone").getAsInt();
+        this.maxRoomPoolSizePerBucket = jsonObject.get("maxRoomPoolSizePerBucket").getAsInt();
+        this.minRoomPoolSizePerBucket = jsonObject.get("minRoomPoolSizePerBucket").getAsInt();
         this.pushChannelEnabled = jsonObject.get("pushChannelEnabled").getAsBoolean();
+        this.serverClusterStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,gameCluster.typeId()+"."+NAME);
         if(this.dedicated){
             this.connectionIndex = new ConcurrentHashMap<>();
-            this.serverClusterStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,gameCluster.typeId()+"."+NAME);
         }
         String checkInterval = dedicated? "dedicatedCheckInterval" : "checkInterval";
         this.timer = ((Number)configuration.property(checkInterval)).intValue();
-        this.registerKey = this.serviceContext.deploymentServiceProvider().registerGameServerListener(this);
-        this.reloadKey = this.clusterProvider.registerReloadListener(this);
         this.schedulingTask = new ScheduleRunner(timer,()->{
             onSchedule();
             this.scheduledFuture = this.serviceContext.schedule(this.schedulingTask);
         });
         this.scheduledFuture = this.serviceContext.schedule(schedulingTask);
         this.logger = JDKLogger.getLogger(PlatformRoomServiceProvider.class);
-        this.pendingReleaseRooms = new ConcurrentHashMap<>(this.maxRoomPoolSizePerZone);
+        this.registerKey = this.serviceContext.deploymentServiceProvider().registerGameServerListener(this);
+        this.reloadKey = this.clusterProvider.registerReloadListener(this);
     }
 
     @Override
     public void start() throws Exception {
-        logger.warn("Room service provider started for ["+serviceType+"]["+typeLobby+"]["+this.playMode+"]["+dedicated+"]["+maxRoomPoolSizePerZone+"]["+pushChannelEnabled+"]");
-        this.udpEndpoint = (UDPEndpoint) this.serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
-        this.started = this.udpEndpoint != null;
+        logger.warn("Room service provider started for ["+serviceType+"]["+typeLobby+"]["+this.playMode+"]["+dedicated+"]["+maxRoomPoolSizePerBucket+"]["+pushChannelEnabled+"]["+started+"]");
         if(!dedicated) return;
         Collection<byte[]> cb = serverClusterStore.indexGet(typeLobby);
         cb.forEach(b->{
@@ -139,138 +131,136 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         if(scheduledFuture!=null && !scheduledFuture.isCancelled()) scheduledFuture.cancel(true);
         this.clusterProvider.unregisterReloadListener(reloadKey);
         this.serviceContext.deploymentServiceProvider().unregisterGameServerListener(registerKey);
-        gameRoomIndex.forEach((k,r)->r.close());
+        gameRoomIndex.forEach((k,r)->{
+            udpEndpoint.releaseChannel(r.channelId());
+        });
     }
 
     public Channel registerChannel(Stub stub, Session.TimeoutListener timeoutListener){
-        GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
-        if(this.dedicated){
-            UDPChannel channel = index.pendingPushChannels.poll();
-            if(channel == null){
-                UDPChannel[] channels = udpEndpoint.createChannels(index.gameZone.capacity());
-                if(channels.length == 0) return null;
-                for(int i=0;i<channels.length;i++){
-                    if(i==0){
-                        channel = channels[i];
-                    }
-                    else{
-                        index.pendingPushChannels.offer(channels[i]);
-                    }
-                }
-            }
-            channel.register(stub,this.gameServiceProvider.gameServiceProvider(),this.gameServiceProvider.gameServiceProvider(),this.gameServiceProvider.gameServiceProvider(),timeoutListener);
-            udpEndpoint.registerChannel(channel);
-            return channel;
-        }
-        else{//local join case
-            GameRoom room = gameRoomIndex.get(stub.roomId);
-            if(room==null){
-                room = loadGameRoom(index,stub.roomId);
-            }
-            Channel channel = room.registerChannel(stub,timeoutListener);
-            udpEndpoint.registerChannel((UDPChannel)channel);
-            //logger.warn("Using assigned channel ["+channel.channelId()+"/"+channel.sessionId()+"]");
-            return channel;
-        }
+        //local join only
+        GameRoom room = gameRoomIndex.get(stub.roomId);
+        Channel channel = room.registerChannel(stub.session(),timeoutListener,this.gameServiceProvider.gameServiceProvider());
+        udpEndpoint.registerChannel((UDPChannel)channel);
+        return channel;
     }
 
-    public GameZone gameZoneFromZoneId(String zoneId){
+    public Channel channel(int sessionId){
+        return udpEndpoint.channel(sessionId);
+    }
+    public Room room(long roomId){
+        GameRoom gameRoom = new GameRoomHeader();
+        gameRoom.distributionId(roomId);
+        dataStore.load(gameRoom);
+        gameRoom.dataStore(dataStore);
+        gameRoom.load();
+        return gameRoom;
+    }
+    public GameZone gameZoneFromZoneId(long zoneId){
         return gameZoneIndex.get(zoneId).gameZone;
     }
 
-    public GameRoom join(Stub rating, GameZone gameZone){
-        GameZoneIndex index = gameZoneIndex.get(gameZone.distributionKey());
-        GameRoom gameRoom = dedicated?remoteJoin(rating,index):localJoin(rating,index);
-        return gameRoom;
+    public GameRoom join(Stub stub, GameZone gameZone){
+        GameZoneIndex index = gameZoneIndex.get(gameZone.distributionId());
+        if(dedicated) return remoteJoin(index);
+        RoomStub roomStub = index.pendingRoomStubs.poll();
+        if(roomStub==null){
+            logger.warn("No Stub Available Now");
+            serviceContext.schedule(new ScheduleRunner(100,()->{
+                byte[] lockKey = BufferUtil.fromLong(index.gameZone.distributionId());
+                try{
+                    serverClusterStore.mapLock(lockKey);
+                    OnPartition[] buckets = serviceContext.buckets();
+                    for(int i=0; i<serviceContext.node().bucketNumber();i++){
+                        if(!buckets[i].opening()) continue;
+                        for (int j = 0;j<minRoomPoolSizePerBucket; j++){
+                            this.createGameRoom(index,i);
+                        }
+                    }
+                }finally {
+                    serverClusterStore.mapUnlock(lockKey);
+                }
+            }));
+            return null;
+        }
+        GameRoom gameRoom = gameRoomIndex.get(roomStub.roomId);
+        return gameRoom.join(stub,roomStub);
     }
 
     public void leave(Stub stub){
         gameServiceProvider.presenceServiceProvider().onLeave(stub);
+        gameServiceProvider.gameServiceProvider().onLeft(stub);
         if(dedicated) return; //close from channel close
         GameZoneIndex index = gameZoneIndex.get(stub.zoneId);
         if(pushChannelEnabled){
             Channel channel = udpEndpoint.channel(stub.sessionId);
-            if(channel!=null) channel.close();
+            if(channel!=null){
+                channel.close();
+            }
         }
-        localLeave(stub.distributionId(),index,stub.roomId,(room,entry)->{
-            if(room.totalJoined() != room.totalLeft()) return;
-            resetGameRoom(index,room,true);
-        });
+        GameRoom gameRoom = gameRoomIndex.get(stub.roomId);
+        if(gameRoom==null) return;
+        gameRoom.leave(stub);
+        if(gameRoom.empty()) resetGameRoom(index,gameRoom);
     }
 
     @Override
     public <T extends Configurable> void register(T t) {
-        logger.warn("Game Zone Registered With ["+t.configurationTypeId()+"]["+minRoomPoolSizePerZone+"]");
+        logger.warn("Game Zone Registered With ["+t.configurationTypeId()+"]["+minRoomPoolSizePerBucket+"]["+t.distributionId()+"]["+dedicated+"]["+started+"]");
         GameZone gameZone = (GameZone)t;
         GameZoneIndex index = new GameZoneIndex();
         index.gameZone = gameZone;
-        index.maxRoomPoolSize = new AtomicInteger(maxRoomPoolSizePerZone);
+        index.start(dedicated,serviceContext.node().bucketNumber(),maxRoomPoolSizePerBucket,maxDedicatedServerConnections);
         if(dedicated) {
-            index.pendingPushChannels = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone*gameZone.capacity());
-            index.pendingConnections = new LinkedBlockingDeque<>(maxDedicatedServerConnections);
-            index.gameRoom = this.newGameRoom(gameZone.playMode(),gameZone.capacity());
-            index.gameRoom.setup(gameServiceProvider.gameServiceProvider(),gameZone,dedicated);
-            if(started){
-                for(int i=0;i<minRoomPoolSizePerZone;i++){
-                    UDPChannel[] channels = udpEndpoint.createChannels(index.gameZone.capacity());
-                    for(UDPChannel c : channels){
-                        index.pendingPushChannels.offer(c);
+            gameZoneIndex.put(gameZone.distributionId(),index);
+            logger.warn("Initializing max server connections per node ["+maxDedicatedServerConnections+"]["+dedicated+"]");
+            return;
+        }
+        byte[] lockKey = BufferUtil.fromLong(index.gameZone.distributionId());
+        try{
+            serverClusterStore.mapLock(lockKey);
+            GameRoomQuery query = new GameRoomQuery(index.gameZone.distributionId());
+            OnPartition[] buckets = serviceContext.buckets();
+            this.dataStore.list(query).forEach(r->{
+                if(buckets[r.bucket()].opening()){
+                    loadGameRoom(index,r);
+                    index.rooms[r.bucket()].incrementAndGet();
+                }
+            });
+            for(int i=0; i<serviceContext.node().bucketNumber();i++){
+                if(!buckets[i].opening()) continue;
+                if(index.rooms[i].get() < minRoomPoolSizePerBucket){
+                    int remaining = minRoomPoolSizePerBucket - index.rooms[i].get();
+                    logger.warn("Creating game room on zone/bucket : "+index.gameZone.distributionId()+"/"+i+" : "+remaining);
+                    for(int j=0; j<remaining;j++){
+                        this.createGameRoom(index,i);
                     }
                 }
             }
-            logger.warn("Initializing push channels ["+minRoomPoolSizePerZone+"]");
+        }finally {
+            serverClusterStore.mapUnlock(lockKey);
         }
-        else{
-            index.pendingRooms = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone);
-            index.runningRooms = new LinkedBlockingDeque<>(maxRoomPoolSizePerZone);
-            GameRoomQuery query = new GameRoomQuery(serviceContext.node().nodeId(),gameZone.playMode(),gameZone.capacity());
-            int[] rooms = {0};
-            this.dataStore.list(query).forEach(r->{
-                loadGameRoom(index,r);
-                rooms[0]++;
-            });
-            if(rooms[0] < minRoomPoolSizePerZone){
-                int remaining = minRoomPoolSizePerZone - rooms[0];
-                logger.warn("Creating game room on node->"+serviceContext.node().nodeId()+" : "+remaining);
-                for(int i=0; i<remaining;i++){
-                    GameRoom gameRoom = this.createGameRoom(index,true);
-                    if(gameRoom!=null) rooms[0]++;
-                }
-            }
-            int roomPoolRemaining = index.maxRoomPoolSize.addAndGet((-1)*rooms[0]);
-            logger.warn(gameZone+" Remaining Room Pool Size ["+roomPoolRemaining+"] Capacity ["+gameZone.capacity()+"]");
-            if(started && pushChannelEnabled) {
-                gameRoomIndex.forEach((rk, rv) -> {
-                    rv.setup(udpEndpoint.createChannels(gameZone.capacity()));
-                });
-                logger.warn("Initializing push channels ["+minRoomPoolSizePerZone+"]");
-            }
-        }
-        gameZoneIndex.put(gameZone.distributionKey(),index);
+        gameZoneIndex.put(gameZone.distributionId(),index);
     }
 
     @Override
     public <T extends Configurable> void release(T t) {
-        GameZoneIndex index = gameZoneIndex.remove(t.distributionKey());
-        if(dedicated){
-            UDPChannel udpChannel;
-            do{
-                udpChannel = index.pendingPushChannels.poll();
-                if(udpChannel!=null){
-                    udpChannel.close();
-                }
-            }while (udpChannel!=null);
+        if(dedicated) {
+            gameZoneIndex.remove(t.distributionId());
+            return;
         }
-        else{
-            GameRoom gameRoom;
-            do{
-                gameRoom = index.pendingRooms.poll();
-                if(gameRoom!=null){
-                    gameRoom.close();
-                    gameRoomIndex.remove(gameRoom.roomId());
-                }
-            }while (gameRoom!=null);
-        }
+        GameZoneIndex index = gameZoneIndex.get(t.distributionId());
+        ArrayList<Long> pendingReleased = new ArrayList<>();
+        gameRoomIndex.forEach((k,r)->{
+            if(r.zoneId()==index.gameZone.distributionId()){
+                pendingReleased.add(k);
+                if(pushChannelEnabled()) udpEndpoint.releaseChannel(r.channelId());
+            }
+        });
+        pendingReleased.forEach(roomId->{
+            GameRoom remove = gameRoomIndex.remove(roomId);
+            closeGameRoom(remove);
+        });
+        gameRoomIndex.remove(t.distributionId());
     }
 
 
@@ -281,7 +271,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public OnAccess onConnection(Connection connection) {
-        GameZoneIndex index = gameZoneIndex(connection.configurationName());
+        GameZoneIndex index = fromConfigurationName(connection.configurationName());
         if(index==null) {
             logger.warn("No game lobby available for ["+connection.configurationName()+"]");
             return new OnAccessTrack(false,"game lobby ["+connection.configurationName()+"] not available");
@@ -317,7 +307,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             logger.warn("no server connection ["+channelStub.serverId);
             return false;
         }
-        GameZoneIndex index = gameZoneIndex(connectionStub.configurationName());
+        GameZoneIndex index = fromConfigurationName(connectionStub.configurationName());
         if(index == null) throw new RuntimeException("no lobby available");
         for(int i=0;i<index.gameZone.capacity();i++){
             channelStub.sessionId(channelStub.sessionId()+i);
@@ -353,7 +343,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             return;
         }
         connectionStub.started.set(true);
-        GameZoneIndex index = gameZoneIndex(connectionStub.configurationName());
+        GameZoneIndex index = fromConfigurationName(connectionStub.configurationName());
         if(index==null){
             logger.warn("Game lobby is not available ["+connectionStub.configurationName()+"]");
             return;
@@ -369,7 +359,6 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             return;
         }
         connectionStub.ping();
-        //logger.warn("Connection pinged on ["+connectionStub.configurationName()+"]");
     }
 
     @Override
@@ -386,40 +375,94 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             logger.warn("Connection is not available ["+connection.serverId()+"]");
             return;
         }
-        GameZoneIndex index = gameZoneIndex(connectionStub.configurationName());
+        GameZoneIndex index = fromConfigurationName(connectionStub.configurationName());
         boolean removed = index.pendingConnections.remove(connectionStub);
         logger.warn("Connection released on ["+connection.configurationName()+"]["+removed+"]");
     }
 
     @Override
-    public void reload(int partition, boolean localMember) {
-        gameRoomIndex.clear();
+    public void onReload() {
+        if(!started) return;
+        OnPartition[] buckets = this.serviceContext.buckets();
+        ArrayList<GameRoom> roomsClosed = new ArrayList<>();
+        gameRoomIndex.forEach((k,v)->{
+            if(!buckets[v.bucket()].opening()){
+                roomsClosed.add(v);
+                GameZoneIndex index = gameZoneIndex.get(v.zoneId());
+                if(index.rooms[v.bucket()].get()>0){
+                    index.rooms[v.bucket()].set(0);
+                }
+            }
+        });
+        roomsClosed.forEach(close->{
+            gameRoomIndex.remove(close.roomId());
+            closeGameRoom(close);
+        });
+        logger.warn("Total room closed : "+roomsClosed.size());
+        roomsClosed.clear();
+        HashMap<Integer,Boolean> bucketReload = new HashMap<>();
+        gameZoneIndex.forEach((k,v)->{
+            for(OnPartition onPartition : buckets){
+                if(onPartition.opening()&&v.rooms[onPartition.partition()].get()==0){
+                    bucketReload.put(onPartition.partition(),true);
+                }
+                else{
+                    bucketReload.put(onPartition.partition(),false);
+                }
+            }
+        });
+        gameZoneIndex.forEach((k,v)->{
+            byte[] lockKey = BufferUtil.fromLong(v.gameZone.distributionId());
+            try{
+                serverClusterStore.mapLock(lockKey);
+                GameRoomQuery query = new GameRoomQuery(v.gameZone.distributionId());
+                this.dataStore.list(query).forEach(r->{
+                    if(buckets[r.bucket()].opening() && bucketReload.get(r.bucket)){
+                        loadGameRoom(v,r);
+                        v.rooms[r.bucket()].incrementAndGet();
+                    }
+                });
+
+                for(int i=0; i<serviceContext.node().bucketNumber();i++){
+                    if(!bucketReload.get(i)) continue;
+                    if(v.rooms[i].get() < minRoomPoolSizePerBucket){
+                        int remaining = minRoomPoolSizePerBucket - v.rooms[i].get();
+                        logger.warn("Creating game room on zone/bucket : "+v.gameZone.distributionId()+"/"+i+" : "+remaining);
+                        for(int j=0; j<remaining;j++){
+                            this.createGameRoom(v,i);
+                        }
+                    }
+                }
+            }finally {
+                serverClusterStore.mapUnlock(lockKey);
+            }
+            for(int i=0;i<serviceContext.node().bucketNumber();i++){
+                logger.warn("Rooms on bucket ["+v.rooms[i].get()+"] on ["+k+"]["+i+"]");
+            }
+        });
     }
+
 
     public void onStart(EndPoint endPoint){
         if(endPoint.name().equals(EndPoint.UDP_ENDPOINT)){
             this.udpEndpoint = (UDPEndpoint)endPoint;
             if(pushChannelEnabled){
+                OnPartition[] buckets = serviceContext.buckets();
                 gameZoneIndex.forEach((k,v)->{
-                    if(dedicated){
-                        for(int i=0;i<minRoomPoolSizePerZone;i++){
-                            UDPChannel[] channels = udpEndpoint.createChannels(v.gameZone.capacity());
-                            for(UDPChannel c : channels){
-                                v.pendingPushChannels.offer(c);
-                            }
-                        }
-                    }
-                    else{
+                    if(!dedicated){
+                        int[] roomSize = {0};
                         gameRoomIndex.forEach((rk,rv)->{
-                            rv.setup(udpEndpoint.createChannels(v.gameZone.capacity()));
+                            if(rv.empty() && rv.zoneId()==k && buckets[rv.bucket()].opening()){
+                                rv.setup(udpEndpoint.createChannels(v.gameZone.capacity()));
+                                roomSize[0]++;
+                            }
                         });
-                        logger.warn("Total running/pending rooms ["+v.runningRooms.size()+"/"+v.pendingRooms.size()+"] on ["+typeLobby+"]["+v.gameZone.name()+"]");
+                        logger.warn("Total running/pending rooms ["+"/"+roomSize[0]+"] on ["+typeLobby+"]["+v.gameZone.name()+"]");
                     }
-
                 });
             }
+            started = true;
         }
-        started = true;
     }
 
 
@@ -433,18 +476,8 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
     private void onSchedule() {
-        if(!dedicated) {
-            kickoff.clear();
-            pendingReleaseRooms.forEach((k,p)->{
-                p.room.onCountdown(timer);
-                if(TimeUtil.expired(p.pendingSchedule)) kickoff.add(k);
-            });
-            kickoff.forEach(k->{
-                PendingReleaseRoom pendingReleaseRoom = pendingReleaseRooms.remove(k);
-                if(pendingReleaseRoom!=null) udpEndpoint.releaseChannel(pendingReleaseRoom.room.channelId());
-            });
-            return;
-        }
+        if(!dedicated) return;
+        ArrayList<String> kickoff = new ArrayList<>();
         kickoff.clear();
         connectionIndex.forEach((k,v)->{
             if(v.onTimeout(timer)) kickoff.add(k);
@@ -455,11 +488,9 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         });
     }
 
-    private GameRoom newGameRoom(String type,int roomCapacity){
-        return GameRoom.newGameRoom(type,roomCapacity);
-    }
 
-    private GameZoneIndex gameZoneIndex(String configurationName){
+
+    private GameZoneIndex fromConfigurationName(String configurationName){
         GameZoneIndex[] gameZone ={null};
         gameZoneIndex.forEach((k,v)->{
             if(configurationName.trim().equals(v.gameZone.configurationTypeId()+"/"+v.gameZone.configurationName())){
@@ -469,81 +500,51 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         return gameZone[0];
     }
 
-    private GameRoom loadGameRoom(GameZoneIndex zoneIndex,GameRoom gameRoom){
+    private void loadGameRoom(GameZoneIndex zoneIndex,GameRoom gameRoom){
         gameRoom.dataStore(this.dataStore);
         gameRoom.load();
-        gameRoom.setup(gameServiceProvider.gameServiceProvider(),zoneIndex.gameZone,dedicated);
-        resetGameRoom(zoneIndex,gameRoom,true);
         gameRoomIndex.put(gameRoom.roomId(),gameRoom);
-        return gameRoom;
+        if(!gameRoom.empty()) return;
+        resetGameRoom(zoneIndex,gameRoom);
     }
 
-    private GameRoom loadGameRoom(GameZoneIndex zoneIndex,String roomId){
-        return gameRoomIndex.computeIfAbsent(roomId,(k)->{
-            GameRoom gameRoom = this.newGameRoom(zoneIndex.gameZone.playMode(),zoneIndex.gameZone.capacity());
-            gameRoom.distributionId(Long.parseLong(roomId));
-            if(!this.dataStore.load(gameRoom)) return null;
-            gameRoom.dataStore(this.dataStore);
-            gameRoom.load();
-            gameRoom.setup(gameServiceProvider.gameServiceProvider(),zoneIndex.gameZone,dedicated);
-            resetGameRoom(zoneIndex,gameRoom,true);
-            return gameRoom;
-        });
-    }
-
-    private GameRoom createGameRoom(GameZoneIndex zoneIndex,boolean queued){
-        if(zoneIndex.maxRoomPoolSize.decrementAndGet() < 0) {
-            logger.warn("Max room pool size overflow ->"+maxRoomPoolSizePerZone);
-            return null;
+    private void createGameRoom(GameZoneIndex zoneIndex,int bucket){
+        if(zoneIndex.rooms[bucket].get() >= maxRoomPoolSizePerBucket) {
+            logger.warn("Bucket ["+bucket+"] room overflow with max size ["+maxRoomPoolSizePerBucket+"]");
+            return;
         }
         GameZone gameZone = zoneIndex.gameZone;
-        GameRoom gameRoom = this.newGameRoom(gameZone.playMode(),gameZone.capacity());
-        gameRoom.ownerKey(SnowflakeKey.from(serviceContext.node().nodeId()));
-        if(!this.dataStore.create(gameRoom)) return null;
+        GameRoom gameRoom = new GameRoomHeader(gameZone,dedicated,bucket);
+        gameRoom.ownerKey(SnowflakeKey.from(zoneIndex.gameZone.distributionId()));
+        if(!this.dataStore.create(gameRoom)) return;
         gameRoom.dataStore(this.dataStore);
         gameRoom.load();
-        gameRoom.setup(gameServiceProvider.gameServiceProvider(),zoneIndex.gameZone,dedicated);
         gameRoomIndex.put(gameRoom.roomId(),gameRoom);
-        resetGameRoom(zoneIndex,gameRoom,queued);
-        return gameRoom;
+        zoneIndex.rooms[bucket].incrementAndGet();
+        resetGameRoom(zoneIndex,gameRoom);
     }
 
-    private void resetGameRoom(GameZoneIndex index,GameRoom room,boolean queued){
-        room.reset();
-        if(queued) index.pendingRooms.offer(room);
+    private void resetGameRoom(GameZoneIndex index,GameRoom room){
+        for(int i=0;i<index.gameZone.capacity();i++){
+            RoomStub stub = new RoomStub(room.distributionId(),i);
+            index.pendingRoomStubs.remove(stub);
+            index.pendingRoomStubs.offer(stub);
+        }
         if(!started || !pushChannelEnabled) return;
         room.setup(udpEndpoint.createChannels(index.gameZone.capacity()));
     }
-
-    private void localLeave(long systemId, GameZoneIndex index,String roomId, GameRoom.Listener listener){
-        GameRoom gameRoom = loadGameRoom(index,roomId);
-        if(gameRoom==null) {
-            logger.warn("Room Missed->"+index.gameZone.distributionKey()+">>"+roomId);
-            return;
+    private void closeGameRoom(GameRoom closed){
+        GameZoneIndex index = gameZoneIndex.get(closed.zoneId());
+        for(int i=0;i<closed.capacity();i++){
+            RoomStub stub = new RoomStub(closed.distributionId(),i);
+            index.pendingRoomStubs.remove(stub);
         }
-        gameRoom.leave(systemId,listener);
+        closed.close();
+        udpEndpoint.releaseChannel(closed.channelId());
     }
 
-    private GameRoom joinGameRoom(GameZoneIndex index, GameRoom gameRoom, Stub stub){
-        GameRoom joined = gameRoom.join(stub.distributionId(),(room,entry)->{
-            if(room.available()){
-                index.runningRooms.addFirst(room);
-            }
-        });
-        //joined.setup(index.gameZone,null,rating);
-        return joined;
-    }
-    private GameRoom localJoin(Stub stub, GameZoneIndex index){
-        GameRoom gameRoom = index.runningRooms.poll();
-        if(gameRoom != null) return joinGameRoom(index,gameRoom,stub);
-        gameRoom = index.pendingRooms.poll();
-        if(gameRoom != null) return joinGameRoom(index,gameRoom,stub);
-        gameRoom = createGameRoom(index,false);
-        if(gameRoom == null) return null;
-        return joinGameRoom(index,gameRoom,stub);
-    }
 
-    private GameRoom remoteJoin(Stub stub, GameZoneIndex gameZoneIndex){
+    private GameRoom remoteJoin(GameZoneIndex gameZoneIndex){
         GameZone gameZone = gameZoneIndex.gameZone;
         ConnectionStub connectionStub = gameZoneIndex.pendingConnections.poll();
         if(connectionStub==null){
@@ -561,55 +562,17 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         channelStub.fromBinary(ret);
         Channel channel = channelStub.toChannel(connectionStub.clientConnection(),connectionStub.serverKey,connectionStub.timeout());
         GameRoom joined = gameZoneIndex.gameRoom.view();
-        joined.setup(channel);
+        joined.assign(channel);
         return joined;
     }
-
-    private void releaseRoom(Room room) {
-        GameZoneIndex index = gameZoneIndex.get(room.owner());
-        if(index==null){
-            logger.warn("Game lobby not available ["+room.owner()+"]");
-            return;
-        }
-        if(pushChannelEnabled) udpEndpoint.releaseChannel(room.channelId());
-        index.runningRooms.remove(room);
-        resetGameRoom(index,gameRoomIndex.get(room.distributionKey()),true);
-        //forcefully reset room
-    }
-
 
     private ClusterProvider.ClusterStore channelStore(String serverId){
         return clusterProvider.clusterStore(ClusterProvider.ClusterStore.SMALL,serverId,false,false,true);
     }
 
-
-    @Override
-    public void onStarted(Room room) {
-        //logger.warn("room started->"+room.channelId()+">>"+room.capacity());
-        pendingReleaseRooms.put(room.distributionKey(),new PendingReleaseRoom(room,LocalDateTime.now().plus(room.duration()+room.overtime(), ChronoUnit.MILLIS)));
-    }
-    @Override
-    public void onUpdated(Room room, byte[] payload) {
-        //logger.warn("room updated->"+room.channelId()+">>"+new String(payload));
-        GameRoom gameRoom = (GameRoom)room;
-       //gameRoom.onUpdated(gameUpdateContext.gameServiceProvider(),payload);
-    }
-
-    @Override
-    public void onEnded(Room room) {
-        if(room.dedicated()) return;
-        pendingReleaseRooms.remove(room.distributionKey());
-        releaseRoom(room);
-    }
-
     public boolean pushChannelEnabled(){
         return pushChannelEnabled;
     }
-
-    public void onClosed(Room room){
-
-    }
-
 
     @Override
     public void onGameClusterEvent(String query,byte[] payload){
@@ -628,7 +591,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         //callback on player target bucket node
         String[] params = query.split("#");
         OnAccessTrack onAccessTrack = new OnAccessTrack();
-        onAccessTrack.systemId(params[0]);
+        onAccessTrack.systemId(Long.parseLong(params[0]));
         onAccessTrack.command(params[1]);
         onAccessTrack.property(OnAccess.PAYLOAD,payload);
         gameServiceProvider.gameServiceProvider().onGameEvent(onAccessTrack);

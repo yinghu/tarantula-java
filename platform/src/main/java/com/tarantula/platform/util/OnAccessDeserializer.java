@@ -67,7 +67,7 @@ public class OnAccessDeserializer implements JsonDeserializer<OnAccess> {
     }
     private void _setProperty(OnAccess access,String k,Object v){
         if(k.equals("systemId")){
-            access.systemId((String) v);
+            access.systemId(((Number) v).longValue());
         }
         else if(k.equals("stub")){
             access.stub(((Number)v).intValue());

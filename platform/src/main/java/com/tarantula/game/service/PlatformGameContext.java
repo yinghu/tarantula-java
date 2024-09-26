@@ -103,4 +103,13 @@ public class PlatformGameContext implements GameContext {
         Descriptor item = applicationSchema().application("item");
         return  applicationPreSetup.load(item,distributionId);
     }
+
+    @Override
+    public Channel channel(int sessionId){
+        return platformGameServiceProvider.roomServiceProvider().channel(sessionId);
+    }
+
+    public Room room(long roomId){
+        return platformGameServiceProvider.roomServiceProvider().room(roomId);
+    }
 }

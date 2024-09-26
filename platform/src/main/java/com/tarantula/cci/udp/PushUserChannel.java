@@ -12,9 +12,10 @@ public class PushUserChannel extends UserChannel {
     private UDPEndpointServiceProvider.SessionListener sessionListener;
     private UDPEndpointServiceProvider.ActionListener actionListener;
     private UDPEndpointServiceProvider.CipherListener cipherListener;
-
-    public PushUserChannel(int channelId, Messenger messenger, UDPEndpointServiceProvider.CipherListener cipherListener, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener, UDPEndpointServiceProvider.ActionListener actionListener){
+    private UDPEndpoint udpEndpoint;
+    public PushUserChannel(UDPEndpoint udpEndpoint,int channelId, Messenger messenger, UDPEndpointServiceProvider.CipherListener cipherListener, UDPEndpointServiceProvider.UserSessionValidator userSessionValidator, UDPEndpointServiceProvider.SessionListener sessionListener, UDPEndpointServiceProvider.RequestListener requestListener, UDPEndpointServiceProvider.ActionListener actionListener){
         super(channelId,messenger);
+        this.udpEndpoint = udpEndpoint;
         this.cipherListener = cipherListener;
         this.requestListener = requestListener;
         this.userSessionValidator = userSessionValidator;
@@ -57,12 +58,14 @@ public class PushUserChannel extends UserChannel {
         pendingAckMessage.pendingAck= 1;
         pendingAckMessageIndex.put(messageHeader,pendingAckMessage);
         this.sessionListener.onJoined(messageHeader.channelId,messageHeader.sessionId);
+        udpEndpoint.onChannelState(channelId(),userSessionIndex.size());
     }
 
     @Override
     protected void onLeave(MessageBuffer.MessageHeader messageHeader, MessageBuffer messageBuffer) {
         userSessionIndex.remove(messageHeader.sessionId);
         sessionListener.onLeft(channelId(),messageHeader.sessionId);
+        udpEndpoint.onChannelState(channelId(),userSessionIndex.size());
     }
 
     @Override
@@ -78,6 +81,7 @@ public class PushUserChannel extends UserChannel {
     @Override
     protected void onTimeout(int channelId,int sessionId){
         this.sessionListener.onLeft(channelId,sessionId);
+        udpEndpoint.onChannelState(channelId(),userSessionIndex.size());
     }
 
     @Override

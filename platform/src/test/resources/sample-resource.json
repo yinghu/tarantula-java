@@ -1,0 +1,571 @@
+{
+  "ConfigurationId": 30,
+  "ConfigurationCategory": "Resource",
+  "ConfigurationName": "StartPack2",
+  "ConfigurationType": "SKU",
+  "ConfigurationTypeId": "Player",
+  "ConfigurationVersion": "v1.0",
+  "ConfigurationTemplate": "game-cluster/resources/resource",
+  "template": {
+    "header": {
+      "scope": "resource",
+      "type": "Resource",
+      "editor": "ConfigurationEditor",
+      "version": "1.0",
+      "rechargeable": false,
+      "publishable": true
+    },
+    "application": {
+      "properties": [
+        {
+          "name": "Name",
+          "type": "string",
+          "reference": "String",
+          "nullable": true,
+          "downloadable": false
+        },
+        {
+          "name": "ItemPack",
+          "type": "category",
+          "reference": "category:ItemPack",
+          "nullable": false,
+          "downloadable": false
+        }
+      ]
+    },
+    "configuration": {
+      "header": {
+        "scope": "resource",
+        "type": "Configuration"
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "ConfigurationName",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "ConfigurationType",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "ConfigurationTypeId",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "ConfigurationVersion",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    }
+  },
+  "Name": "StartPack",
+  "_itemPack": {
+    "ConfigurationId": 29,
+    "ConfigurationCategory": "ItemPack",
+    "ConfigurationName": "P200",
+    "ConfigurationType": "SKU",
+    "ConfigurationTypeId": "Resource",
+    "ConfigurationVersion": "v1.0",
+    "ConfigurationTemplate": "game-cluster/items/item.pack",
+    "template": {
+      "header": {
+        "scope": "item",
+        "type": "ItemPack",
+        "editor": "ConfigurationEditor",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "SkuList",
+            "type": "list",
+            "reference": "category:Sku",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      },
+      "configuration": {
+        "header": {
+          "scope": "item",
+          "type": "Configuration"
+        },
+        "application": {
+          "properties": [
+            {
+              "name": "ConfigurationName",
+              "type": "string",
+              "reference": "String",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "ConfigurationType",
+              "type": "string",
+              "reference": "String",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "ConfigurationTypeId",
+              "type": "string",
+              "reference": "String",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "ConfigurationVersion",
+              "type": "string",
+              "reference": "String",
+              "nullable": false,
+              "downloadable": false
+            }
+          ]
+        }
+      }
+    },
+    "_skuList": [
+      {
+        "ConfigurationId": 7,
+        "ConfigurationCategory": "SkuCoin",
+        "ConfigurationName": "SKU1500",
+        "ConfigurationType": "SKU",
+        "ConfigurationTypeId": "Coin",
+        "ConfigurationVersion": "v1.0",
+        "ConfigurationTemplate": "game-cluster/items/sku.coin",
+        "template": {
+          "header": {
+            "scope": "item",
+            "type": "SkuCoin",
+            "editor": "ConfigurationEditor",
+            "version": "1.0",
+            "rechargeable": false
+          },
+          "application": {
+            "properties": [
+              {
+                "name": "Sku",
+                "type": "category",
+                "reference": "category:SoftCurrency",
+                "nullable": false,
+                "downloadable": false
+              }
+            ]
+          },
+          "configuration": {
+            "header": {
+              "scope": "item",
+              "type": "Configuration"
+            },
+            "application": {
+              "properties": [
+                {
+                  "name": "ConfigurationName",
+                  "type": "string",
+                  "reference": "String",
+                  "nullable": false,
+                  "downloadable": false
+                },
+                {
+                  "name": "ConfigurationType",
+                  "type": "string",
+                  "reference": "String",
+                  "nullable": false,
+                  "downloadable": false
+                },
+                {
+                  "name": "ConfigurationTypeId",
+                  "type": "string",
+                  "reference": "String",
+                  "nullable": false,
+                  "downloadable": false
+                },
+                {
+                  "name": "ConfigurationVersion",
+                  "type": "string",
+                  "reference": "String",
+                  "nullable": false,
+                  "downloadable": false
+                }
+              ]
+            }
+          }
+        },
+        "_sku": {
+          "ConfigurationId": 6,
+          "ConfigurationCategory": "SoftCurrency",
+          "ConfigurationName": "COIN1500",
+          "ConfigurationType": "IAP",
+          "ConfigurationTypeId": "Coin",
+          "ConfigurationVersion": "v1.0",
+          "ConfigurationTemplate": "game-cluster/commodities/soft.currency",
+          "template": {
+            "header": {
+              "scope": "commodity",
+              "type": "SoftCurrency",
+              "editor": "ConfigurationEditor",
+              "version": "1.0",
+              "rechargeable": true
+            },
+            "application": {
+              "properties": [
+                {
+                  "name": "Name",
+                  "type": "string",
+                  "reference": "String",
+                  "nullable": false,
+                  "downloadable": false
+                },
+                {
+                  "name": "Amount",
+                  "type": "number",
+                  "reference": "Double",
+                  "nullable": false,
+                  "downloadable": false
+                }
+              ]
+            },
+            "configuration": {
+              "header": {
+                "scope": "commodity",
+                "type": "Configuration"
+              },
+              "application": {
+                "properties": [
+                  {
+                    "name": "ConfigurationName",
+                    "type": "string",
+                    "reference": "String",
+                    "nullable": false,
+                    "downloadable": false
+                  },
+                  {
+                    "name": "ConfigurationType",
+                    "type": "string",
+                    "reference": "String",
+                    "nullable": false,
+                    "downloadable": false
+                  },
+                  {
+                    "name": "ConfigurationTypeId",
+                    "type": "string",
+                    "reference": "String",
+                    "nullable": false,
+                    "downloadable": false
+                  },
+                  {
+                    "name": "ConfigurationVersion",
+                    "type": "string",
+                    "reference": "String",
+                    "nullable": false,
+                    "downloadable": false
+                  }
+                ]
+              }
+            }
+          },
+          "Name": "COIN1500",
+          "Amount": 1500
+        },
+        "Sku": [
+          "6"
+        ]
+      },
+      {
+        "ConfigurationId": 28,
+        "ConfigurationCategory": "SkuGameItem",
+        "ConfigurationName": "VPSsku",
+        "ConfigurationType": "Game",
+        "ConfigurationTypeId": "Hero",
+        "ConfigurationVersion": "v1.0",
+        "ConfigurationTemplate": "game-cluster/items/sku.game.item",
+        "template": {
+          "header": {
+            "scope": "item",
+            "type": "SkuGameItem",
+            "editor": "ConfigurationEditor",
+            "version": "1.0",
+            "rechargeable": false
+          },
+          "application": {
+            "properties": [
+              {
+                "name": "Sku",
+                "type": "category",
+                "reference": "category:GameItem",
+                "nullable": false,
+                "downloadable": false
+              }
+            ]
+          },
+          "configuration": {
+            "header": {
+              "scope": "item",
+              "type": "Configuration"
+            },
+            "application": {
+              "properties": [
+                {
+                  "name": "ConfigurationName",
+                  "type": "string",
+                  "reference": "String",
+                  "nullable": false,
+                  "downloadable": false
+                },
+                {
+                  "name": "ConfigurationType",
+                  "type": "string",
+                  "reference": "String",
+                  "nullable": false,
+                  "downloadable": false
+                },
+                {
+                  "name": "ConfigurationTypeId",
+                  "type": "string",
+                  "reference": "String",
+                  "nullable": false,
+                  "downloadable": false
+                },
+                {
+                  "name": "ConfigurationVersion",
+                  "type": "string",
+                  "reference": "String",
+                  "nullable": false,
+                  "downloadable": false
+                }
+              ]
+            }
+          }
+        },
+        "_sku": {
+          "ConfigurationId": 27,
+          "ConfigurationCategory": "GameItem",
+          "ConfigurationName": "VPS",
+          "ConfigurationType": "Game",
+          "ConfigurationTypeId": "Hero",
+          "ConfigurationVersion": "v1.0",
+          "ConfigurationTemplate": "game-cluster/commodities/game.item",
+          "template": {
+            "header": {
+              "scope": "commodity",
+              "type": "GameItem",
+              "editor": "ConfigurationEditor",
+              "version": "1.0",
+              "rechargeable": false
+            },
+            "application": {
+              "properties": [
+                {
+                  "name": "Name",
+                  "type": "string",
+                  "reference": "String",
+                  "nullable": false,
+                  "downloadable": false
+                },
+                {
+                  "name": "Type",
+                  "type": "string",
+                  "reference": "String",
+                  "nullable": false,
+                  "downloadable": false
+                },
+                {
+                  "name": "Level",
+                  "type": "number",
+                  "reference": "Integer",
+                  "nullable": false,
+                  "downloadable": false
+                },
+                {
+                  "name": "Xp",
+                  "type": "number",
+                  "reference": "Integer",
+                  "nullable": false,
+                  "downloadable": false
+                },
+                {
+                  "name": "Rank",
+                  "type": "number",
+                  "reference": "Integer",
+                  "nullable": false,
+                  "downloadable": false
+                },
+                {
+                  "name": "Stats",
+                  "type": "category",
+                  "reference": "category:GameStatistics",
+                  "nullable": false,
+                  "downloadable": false
+                }
+              ]
+            },
+            "configuration": {
+              "header": {
+                "scope": "commodity",
+                "type": "Configuration"
+              },
+              "application": {
+                "properties": [
+                  {
+                    "name": "ConfigurationName",
+                    "type": "string",
+                    "reference": "String",
+                    "nullable": false,
+                    "downloadable": false
+                  },
+                  {
+                    "name": "ConfigurationType",
+                    "type": "string",
+                    "reference": "String",
+                    "nullable": false,
+                    "downloadable": false
+                  },
+                  {
+                    "name": "ConfigurationTypeId",
+                    "type": "string",
+                    "reference": "String",
+                    "nullable": false,
+                    "downloadable": false
+                  },
+                  {
+                    "name": "ConfigurationVersion",
+                    "type": "string",
+                    "reference": "String",
+                    "nullable": false,
+                    "downloadable": false
+                  }
+                ]
+              }
+            }
+          },
+          "Name": "VPS",
+          "Type": "Hero",
+          "Level": 3,
+          "Xp": 100,
+          "Rank": 1,
+          "_stats": {
+            "ConfigurationId": 26,
+            "ConfigurationCategory": "GameStatistics",
+            "ConfigurationName": "GS01",
+            "ConfigurationType": "Game",
+            "ConfigurationTypeId": "Stat",
+            "ConfigurationVersion": "v1.0",
+            "ConfigurationTemplate": "game-cluster/components/game.statistics",
+            "template": {
+              "header": {
+                "scope": "component",
+                "type": "GameStatistics",
+                "editor": "ConfigurationEditor",
+                "version": "1.0",
+                "rechargeable": false
+              },
+              "application": {
+                "properties": [
+                  {
+                    "name": "MeleeDamage",
+                    "type": "number",
+                    "reference": "Double",
+                    "nullable": false,
+                    "downloadable": false
+                  },
+                  {
+                    "name": "RangedDamage",
+                    "type": "number",
+                    "reference": "Double",
+                    "nullable": false,
+                    "downloadable": false
+                  },
+                  {
+                    "name": "Recovery",
+                    "type": "number",
+                    "reference": "Double",
+                    "nullable": false,
+                    "downloadable": false
+                  },
+                  {
+                    "name": "Speed",
+                    "type": "number",
+                    "reference": "Double",
+                    "nullable": false,
+                    "downloadable": false
+                  }
+                ]
+              },
+              "configuration": {
+                "header": {
+                  "scope": "component",
+                  "type": "Configuration"
+                },
+                "application": {
+                  "properties": [
+                    {
+                      "name": "ConfigurationName",
+                      "type": "string",
+                      "reference": "String",
+                      "nullable": false,
+                      "downloadable": false
+                    },
+                    {
+                      "name": "ConfigurationType",
+                      "type": "string",
+                      "reference": "String",
+                      "nullable": false,
+                      "downloadable": false
+                    },
+                    {
+                      "name": "ConfigurationTypeId",
+                      "type": "string",
+                      "reference": "String",
+                      "nullable": false,
+                      "downloadable": false
+                    },
+                    {
+                      "name": "ConfigurationVersion",
+                      "type": "string",
+                      "reference": "String",
+                      "nullable": false,
+                      "downloadable": false
+                    }
+                  ]
+                }
+              }
+            },
+            "MeleeDamage": 10,
+            "RangedDamage": 100,
+            "Recovery": 10,
+            "Speed": 3
+          },
+          "Stats": [
+            "26"
+          ]
+        },
+        "Sku": [
+          "27"
+        ]
+      }
+    ],
+    "SkuList": [
+      "7",
+      "28"
+    ]
+  },
+  "ItemPack": [
+    "29"
+  ],
+  "ConfigurationPublishId": 29
+}

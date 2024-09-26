@@ -5,13 +5,10 @@
       "maxConsecutiveDays": 7,
       "maxRewardTiers": 7
     },
-  "startingInventory":
-  {
-      "resourceName": "StartingInventory",
-      "grantPolicy":"random",
-      "grantNumber": 1
-  },
-  "savedGame":{
+   "leaderBoard":{
+     "topListSize": 10
+   },
+   "savedGame":{
       "saveSize": 3,
       "saveTimeout": 1,
       "mappingObjectMaxSize": 2000,
@@ -20,7 +17,7 @@
   },
   "inbox": {
       "pendingReward": true
-  },
+   },
 
   "playList":{
     "recentlyListSize" :10,

@@ -8,7 +8,6 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -16,13 +15,15 @@ import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.DiscoveryStrategyConfig;
 import com.icodesoftware.*;
+import com.icodesoftware.lmdb.EnvSetting;
 import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
+import com.icodesoftware.lmdb.MetricsLog;
 import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.util.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.tarantula.cci.udp.UDPEndpoint;
+
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.event.TransactionReplicationEvent;
 import com.tarantula.platform.item.ConfigurableTemplate;
@@ -33,13 +34,14 @@ import com.tarantula.platform.service.cluster.*;
 
 import com.tarantula.platform.service.deployment.*;
 
-import com.tarantula.platform.service.metrics.JVMMonitor;
+import com.tarantula.platform.service.metrics.AbstractMetrics;
+import com.tarantula.platform.service.metrics.MetricsHomingAgent;
 import com.tarantula.platform.service.metrics.MetricsManager;
 import com.tarantula.platform.service.persistence.*;
-import com.tarantula.platform.util.*;
 
 
-public class TarantulaContext implements Serviceable, ServiceContext {
+
+public class TarantulaContext implements Serviceable, ServiceContext, MetricsHomingAgent {
 
 
     private static TarantulaLogger log = JDKLogger.getLogger(TarantulaContext.class);
@@ -123,13 +125,14 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public int[] snowflakeEpochStart = {2020,1,1};// start from 2020 1,1
 
     public int storeSizeMb = 100;
-    public int storeKeySize = 200;
-    public int storeValueSize = 1800;
-    public int storePendingBufferSize = 32;
+    public boolean externalKeyValueBufferUsed;
+    public int storeKeySize = EnvSetting.KEY_SIZE;
+    public int storeValueSize = EnvSetting.VALUE_SIZE;
+    public int storePendingBufferSize = EnvSetting.MAX_PENDING_BUFFER_NUMBER;
 
     public boolean storeNoSync = false;
     public String dataStoreDir;
-
+    public static boolean dataStoreReindexing;
 
     public boolean dataStoreDailyBackup;
 
@@ -146,19 +149,11 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public int maxReplicationNumber = 3;
 
-    public static ScopedMemberDiscovery memberDiscovery;
     public static int operationTimeout = 5;
     public static boolean lobbySubscriptionEnabled = false;
 
     public String authContext = "localhost";
 
-    public boolean runAsMirror;
-    public boolean backupEnabled;
-    public String backupUrl;
-    private static String deploymentIdPath = "backup/deployment";
-    public String backupAccessKey;
-
-    private MirrorClusterBackupProvider mirrorBackupProvider;
 
     public List<String> serviceViewList = new ArrayList<>();
     private PostOfficeSession postOfficeSession;
@@ -168,7 +163,12 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
 
     private DataStoreProvider.DistributionIdGenerator distributionIdGenerator;
- 	private TarantulaContext(){
+
+    public boolean homingAgentEnabled;
+    public String homingAgentHost;
+    public String homingAgentKey;
+
+    private TarantulaContext(){
          this.endpointService = new EndpointService(this);
  	     this.metricsManager = new MetricsManager(this);
     }
@@ -199,23 +199,20 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         this.scheduledExecutorService = TarantulaExecutorServiceFactory.createScheduledExecutorService(this.applicationSchedulingPoolSetting);
         this.httpClientProvider = new HttpCaller();
         this.httpClientProvider.start();
-        this.node = new ClusterNode(this.dataBucketGroup,this.dataBucketNode,this.platformRoutingNumber);
+        this.node = new ClusterNode(this.dataBucketGroup,this.dataBucketNode,this.accessIndexRoutingNumber,this.platformRoutingNumber);
         this.node.clusterNameSuffix = this.clusterNameSuffix;
         this.node.deployDirectory = this.deployDir;
         this.node.servicePushAddress = this.servicePushAddress;
-        this.node.runAsMirror = this.runAsMirror;
-        this.node.backupEnabled = this.backupEnabled;
+
         this.node.dailyBackupEnabled = this.dataStoreDailyBackup;
         this.node.dataStoreDirectory = this.dataStoreDir;
+        this.node.tarantulaAgent.enabled = this.homingAgentEnabled;
+        this.node.tarantulaAgent.host = this.homingAgentHost;
+        this.node.tarantulaAgent.accessKey = this.homingAgentKey;
+        this.onAgent();
         long epochStart = TimeUtil.epochMillisecondsFromMidnight(snowflakeEpochStart[0],snowflakeEpochStart[1],snowflakeEpochStart[2]);
         this.distributionIdGenerator = new LocalDistributionIdGenerator(snowflakeNodeNumber,epochStart);
-        if(backupEnabled){//using backup deployment id
-            String resp = this.httpClientProvider.get(this.backupUrl,deploymentIdPath,new String[]{Session.TARANTULA_ACCESS_KEY,this.backupAccessKey});
-            JsonObject json = JsonUtil.parse(resp);
-            if(!json.get("successful").getAsBoolean()) throw new RuntimeException("failed to fetch remote deployment id");
-            node.deploymentId = json.get("message").getAsLong();
-            log.warn("Using backup deployment id ["+node.deploymentId+"]");
-        }
+
         node_started = new AtomicBoolean(false);
         PortableProviderConfigurationParser pcs = new PortableProviderConfigurationParser("tarantula-platform-portable-provider.xml");
         pcs.parse().forEach((r)->{
@@ -230,16 +227,19 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         HashMap<String,Object> storeAdditions = new HashMap<>();
         storeAdditions.put("storeSizeMb",storeSizeMb);
         storeAdditions.put("envNoSyncFlag",storeNoSync);
+        storeAdditions.put("storeReindexing",dataStoreReindexing);
+        storeAdditions.put("externalKeyValueBufferUsed",externalKeyValueBufferUsed);
+        storeAdditions.put("storeKeySize",storeKeySize);
+        storeAdditions.put("storeValueSize",storeValueSize);
+        storeAdditions.put("storePendingBufferSize",storePendingBufferSize);
         DataStoreConfigurationJsonParser sparser = new DataStoreConfigurationJsonParser(DATA_STORE_CONFIG,this,storeAdditions,dataStoreProvider -> {
             try{
                 this.deploymentDataStoreProvider = dataStoreProvider;
                 this.deploymentDataStoreProvider.registerDistributionIdGenerator(this.distributionIdGenerator);
-                //this.deploymentDataStoreProvider.registerMapStoreListener(Distributable.INDEX_SCOPE,new IndexScopeReplicationProxy());
                 this.deploymentDataStoreProvider.registerMapStoreListener(Distributable.INTEGRATION_SCOPE,integrationScopeReplicationProxy);
                 this.deploymentDataStoreProvider.registerMapStoreListener(Distributable.DATA_SCOPE,dataScopeReplicationProxy);
                 this.deploymentDataStoreProvider.start();
                 this.deploymentDataStoreProvider.setup(this);
-                this._initMirrorClusterBackup();
                 log.warn("Tarantula data store provider started");
             }catch (Exception ex){
                 throw new RuntimeException(ex);
@@ -261,7 +261,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         else{
             DiscoveryStrategyConfig discoveryStrategyConfig = new DiscoveryStrategyConfig("com.tarantula.platform.service.cluster.TarantulaDiscoveryStrategy");
             discoveryStrategyConfig.addProperty("tarantula-port", "5702");
-            discoveryStrategyConfig.addProperty("tarantula-scope", "2");
             hazelcastJoin.getDiscoveryConfig().addDiscoveryStrategyConfig(discoveryStrategyConfig);
         }
         this.integrationCluster = new IntegrationCluster(gcfg,this.dataBucketGroup,this);
@@ -294,17 +293,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         }else{
             return this.scheduledExecutorService.scheduleAtFixedRate(task,task.initialDelay(),task.delay(),TimeUnit.MILLISECONDS);
         }
-    }
-
-
-    public void _initMirrorClusterBackup(){
- 	    this.mirrorBackupProvider = new MirrorClusterBackupProvider(this.deploymentDataStoreProvider);
- 	    Configuration config = this.configuration("mirror-backup-provider-settings");
- 	    Map<String,Object> map = new HashMap<>();
- 	    config.properties().forEach(p-> map.put(p.name(),p.value()));
- 	    this.mirrorBackupProvider.configure(map);
- 	    this.mirrorBackupProvider.enabled(runAsMirror);
- 	    this.mirrorBackupProvider.setup(this);
     }
 
     private void setApplicationManager(DeploymentDescriptor c,Lobby lb) throws Exception{
@@ -347,7 +335,10 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         return _onLobby;
 	}
     public OnPartition[] partitions(){
- 	    return this.integrationCluster.partitionStates;
+ 	    return this.integrationCluster.partitionSet();
+    }
+    public OnPartition[] buckets(){
+        return this.integrationCluster.bucketSet();
     }
 
 	public List<Lobby> lobbyList(){
@@ -411,40 +402,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             log.error("error on _setOnLobby",ex);
         }
     }
-    public synchronized void setOnLobby(LobbyDescriptor lobbyDescriptor,OnLobby.Listener listener){
- 	    if(this._lobbyMapping.containsKey(lobbyDescriptor.typeId())){
- 	        return;
-        }
- 	    this.setLobby(lobbyDescriptor);
-        LobbyConfiguration lc = new LobbyConfiguration();
-        lc.descriptor = lobbyDescriptor;
-        lc.applications = this.masterDataStore().list(new ApplicationQuery(lobbyDescriptor.distributionId()));
-        //this.configureViews(lc);
-        try{
-            OnLobby ob = this.configure(lc);
-            listener.onUpdated(ob);
-        }catch (Exception ex){
-            log.error("Error on setLobby",ex);
-        }
-    }
-    public synchronized void setOnLobby(String typeId,long publishingId,Configurable.Listener listener){
-        if(this._lobbyMapping.containsKey(typeId)){
-            return;
-        }
-        List<LobbyDescriptor> bList = masterDataStore().list(new LobbyQuery(publishingId));
-        bList.forEach((d)->{
-            this.setLobby(d);//
-            LobbyConfiguration lc = new LobbyConfiguration();
-            lc.descriptor = d;
-            lc.applications = masterDataStore().list(new ApplicationQuery(d.distributionId()));
-            try{
-                OnLobby ob = this.configure(lc);
-                listener.onUpdated(ob);
-            }catch (Exception ex){
-                log.error("Error on setLobby",ex);
-            }
-        });
-    }
+
+
     public synchronized void unsetLobby(String typeId,Lobby.Listener listener){
         try{
             Lobby lb = this._lobbyMapping.remove(typeId);
@@ -501,7 +460,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             HashMap<String,Descriptor> _codeBase = new HashMap<>();
             Descriptor lab = null;
             for(Descriptor d : lb.entryList()){
-                if(d.type().equals(Descriptor.TYPE_APPLICATION)&&d.distributionKey().equals(applicationId)){
+                if(d.type().equals(Descriptor.TYPE_APPLICATION) && d.distributionId()==(applicationId)){
                     lb.removeEntry(applicationId);
                     ApplicationProvider app = this.availableApplicationManagers.remove(applicationId);
                     app.shutdown();
@@ -603,16 +562,14 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,AccessIndex.SYSTEM_INDEX);
         node.nodeId = nid.distributionId();
         AccessIndex did = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/deploymentId",AccessIndex.SYSTEM_INDEX);
-        if(!backupEnabled){//using local deployment id
-            node.deploymentId = did.distributionId();
-            log.warn("Using local deployment id ["+node.deploymentId+"]");
-        }
+        node.deploymentId = did.distributionId();
+        log.warn("Using local deployment id ["+node.deploymentId+"]");
         if(bid==null || nid==null || did==null) throw new RuntimeException("Need to restart the server again");
         log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
         log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
         log.info("Backup Development id ["+node.deploymentId+"] is registered on node ["+node.nodeName+"]");
+        log.info("Current directory : "+FileUtil.currentDirectory());
         integrationCluster.registerNode(this.node);//may throw node already registered runtime exception
-        //
 
         initMetricsProvider();
  	    this.serviceProviders.forEach((k,v)->{ //synchronize data and setup
@@ -622,14 +579,11 @@ public class TarantulaContext implements Serviceable, ServiceContext {
  	    this.serviceProviders.put(this.integrationCluster.name(),integrationCluster);
  	    this.serviceProviders.put(this.deploymentDataStoreProvider.name(),this.deploymentDataStoreProvider);
         this.serviceProviders.put(AccessIndexService.NAME,accessIndexService());
-        this.serviceProviders.put(mirrorBackupProvider.name(),mirrorBackupProvider);
-        this.serviceProviders.put(JVMMonitor.NAME,new JVMMonitor());
+        this.serviceProviders.put(DeployService.NAME,integrationCluster.deployService());
+
         ServiceProviderConfigurationParser spc = new ServiceProviderConfigurationParser("tarantula-platform-service-provider-config.xml",serviceProviders);
         spc.start(this);
-        serviceViewList.add(this.deploymentDataStoreProvider.name());
-        serviceViewList.add(JVMMonitor.NAME);
-        serviceViewList.add(UDPEndpoint.UDP_ENDPOINT);
-        serviceViewList.add(this.integrationCluster.name());
+
         this.deploymentDataStoreProvider.registerMetricsListener(this.metrics(Metrics.DATA_STORE));
         this.integrationCluster.registerMetricsListener(this.metrics(Metrics.CLUSTER));
         this.serviceProvider(UserService.NAME).registerMetricsListener(this.metrics(Metrics.SYSTEM));
@@ -685,10 +639,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
          return this.node;
     }
 
-    public static MemberDiscovery memberDiscovery(int scope){
- 	    memberDiscovery.scope(scope);
- 	    return memberDiscovery;
-    }
+
     public void atMidnight() {
  	    try{
             serviceProviders.forEach((k,v)->{
@@ -712,8 +663,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
         if(name.equals(OnAccess.APPLE_STORE)) return new ThirdPartyServiceProvider(OnAccess.APPLE_STORE);
 
- 	    if(name.equals(OnAccess.STRIPE)) return loadStripeCredentials();//system config
-
         if(name.equals(OnAccess.DEVELOPER_STORE)) return new ThirdPartyServiceProvider(OnAccess.DEVELOPER_STORE);
 
         if(name.equals(OnAccess.GAME_CENTER)) return new ThirdPartyServiceProvider(OnAccess.GAME_CENTER);
@@ -735,30 +684,13 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     }
 
-    private AuthVendorRegistry loadStripeCredentials(){
-        try{
-            String config = this.authContext+"-stripe-credentials.json";
-            File f = new File("/etc/tarantula/"+config);
-            InputStream in = f.exists()?new FileInputStream(f):Thread.currentThread().getContextClassLoader().getResourceAsStream(config);
-            byte[] data = new byte[in.available()];
-            in.read(data);
-            in.close();
-            GsonBuilder gb = new GsonBuilder();
-            gb.registerTypeAdapter(AuthVendorRegistry.class,new StripePaymentCredentialsDeserializer());
-            return gb.create().fromJson(new String(data),AuthVendorRegistry.class);
-        }catch (Exception ex){
-            return null;
-        }
-    }
-
     //file name web/[game cluster name]/file.png etc
     public void _writeContent(String fileName,byte[] content){
-        try{
+        try(BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(this.deployDir+"/"+fileName))){
             //write to local deploy dir to be ready for deployment
-            BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(this.deployDir+"/"+fileName));
             fos.write(content);
             fos.flush();
-            fos.close();
+            onUpload(fileName,content);
         }catch (Exception ex){
             log.error("error on content write",ex);
         }
@@ -814,31 +746,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             return response;
         }
     }
-    public Response checkModule(String context,String moduleFile){
-        Response response = new ResponseHeader();
-        try{
-            File checkFile = new File(deployDir+"/"+moduleFile);
-            if(!checkFile.exists()){
-                log.warn("File not existed->"+checkFile);
-                response.message("file not existed->"+checkFile);
-                return response;
-            }
-            File ft = new File(deployDir+"/module/"+context+"/"+moduleFile);
-            if(ft.exists()&&ft.lastModified()>=checkFile.lastModified()){
-                response.message("File already has latest version");
-                return response;
-            }
-            response.successful(true);
-            response.message("module validated->"+moduleFile);
-            return response;
-        }catch (Exception ex){
- 	        response.message(ex.getMessage());
- 	        return response;
-        }
-    }
-    public ModuleClassLoader moduleClassLoader(String moduleId){
- 	    return (ModuleClassLoader)this.deploymentService().classLoader(moduleId);
-    }
 
     public Configuration configuration(String config){
  	    try{
@@ -878,27 +785,9 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             }
  	        return false;
         });
- 	    //alist.addAll(availableServicesUpgraded());
  	    return alist;
     }
-    private List<Descriptor> availableServicesUpgraded(){
-        ArrayList<Descriptor> alist = new ArrayList<>();
-        try{
-            URL url = Thread.currentThread().getContextClassLoader().getResource("application/upgrade");
-            File f = new File(url.getFile());
-            f.list((m,n)->{
-                if(n.endsWith(".json")){
-                    Descriptor app = JsonServiceParser.descriptor("application/upgrade",n);
-                    if(!app.disabled()) alist.add(app);
-                }
-                return false;
-            });
-        }
-        catch (Exception ex){
-            log.error("failed to load upgrade services",ex);
-        }
-        return alist;
-    }
+
 
     public Configuration configuration(GameCluster gameCluster,String config){
         return cMap.computeIfAbsent(config,(k)->{
@@ -969,15 +858,6 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         thirdPartyServiceProvider.releaseAuthVendor(authVendor);
     }
 
-    public void registerBackupProvider(BackupProvider backupProvider){
- 	    this.mirrorBackupProvider.addBackupProvider(backupProvider);
- 	}
-    public void unregisterBackupProvider(BackupProvider backupProvider){
- 	    this.mirrorBackupProvider.removeBackupProvider(backupProvider);
-    }
-    public BackupProvider backupProvider(){
- 	    return this.mirrorBackupProvider;
-    }
 
     public Metrics metrics(String name){
          return metricsManager.metrics(name);
@@ -1001,8 +881,22 @@ public class TarantulaContext implements Serviceable, ServiceContext {
             boolean enabled = e.getAsJsonObject().get("enabled").getAsBoolean();
             if(!enabled) continue;
             Metrics metrics = (Metrics) Class.forName(cln).getConstructor().newInstance();
+            if(metrics instanceof AbstractMetrics){
+                ((AbstractMetrics)metrics).registerMetricsHomeAgent(this);
+            }
             metrics.setup(this);
             metricsManager.addMetrics(metrics);
+        }
+        mlist = json.getAsJsonArray("monitor-list");
+        for(JsonElement e : mlist){
+            String cln = e.getAsJsonObject().get("class-name").getAsString();
+            boolean enabled = e.getAsJsonObject().get("enabled").getAsBoolean();
+            if(!enabled) continue;
+            ServiceProvider monitor = (ServiceProvider)Class.forName(cln).getConstructor().newInstance();
+            monitor.setup(this);
+            monitor.start();
+            serviceProviders.put(monitor.name(),monitor);
+            serviceViewList.add(monitor.name());
         }
  	}
 
@@ -1116,5 +1010,37 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public Recoverable.DataBufferPair dataBufferPair(){
          return deploymentDataStoreProvider.dataBufferPair();
+    }
+
+    @Override
+    public void onMetrics(String name, List<Statistics.Entry> updated) {
+        this.node.tarantulaAgent.onMetrics(name,updated);
+    }
+
+    private void onUpload(String fileName,byte[] payload){
+        if(!node.homingAgent().enabled()) return;
+        schedule(new ScheduleRunner(100,()->{
+            try {
+                String[] headers = new String[]{
+                        Session.TARANTULA_ACCESS_KEY,node().homingAgent().accessKey(),
+                        Session.TARANTULA_DATA_ENCRYPTED,"true",
+                        Session.TARANTULA_NAME,fileName
+                };
+                httpClientProvider().post(node().homingAgent().host(), "content", headers,node.homingAgent().encrypt(payload));
+            }catch (Exception ex){
+                log.warn("error on homing agent content log: "+ex.getMessage());
+            }
+        }));
+    }
+    private void onAgent() throws Exception{
+        if(!node.homingAgent().enabled()) return;
+        log.warn("Homing agent enabled on ["+node.homingAgent().host()+"]");
+        String[] headers = new String[]{
+                Session.TARANTULA_ACCESS_KEY,node().homingAgent().accessKey()
+        };
+        String resp = httpClientProvider().get(node().homingAgent().host(), "agent", headers);
+        JsonObject agent = JsonUtil.parse(resp);
+        node.tarantulaAgent.encryptionKey = agent.get("encryptionKey").getAsString();
+        node.homingAgent().setup(this);
     }
 }

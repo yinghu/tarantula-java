@@ -6,7 +6,6 @@ import com.icodesoftware.Configurable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class Item extends ConfigurableObject{
 
@@ -15,16 +14,6 @@ public class Item extends ConfigurableObject{
 
     public Item(ConfigurableObject configurableObject){
        super(configurableObject);
-    }
-
-    @Override
-    public Map<String,Object> toMap(){
-        super.toMap();
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        super.fromMap(properties);
     }
 
     @Override

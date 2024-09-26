@@ -5,12 +5,12 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Distributable;
 
 import com.icodesoftware.Statistics;
-import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.util.OnApplicationHeader;
 import com.icodesoftware.util.TimeUtil;
 
 import java.time.LocalDateTime;
 
-public class SystemStatisticsEntry extends RecoverableObject implements Statistics.Entry {
+public class SystemStatisticsEntry extends OnApplicationHeader implements Statistics.Entry {
 
     //private String name;
     private double total=0;
@@ -40,6 +40,11 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
         this.timestamp = entry.timestamp();
     }
 
+    private SystemStatisticsEntry(String name,double delta){
+        this.name = name;
+        this.total = delta;
+    }
+
     @Override
     public int scope() {
         return Distributable.LOCAL_SCOPE;
@@ -50,9 +55,10 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
         return name;
     }
     @Override
-    public double total() {
+    public synchronized double total() {
         return this.total;
     }
+
     void total(double total,LocalDateTime update){
         this.total = total;
         this.timestamp = TimeUtil.toUTCMilliseconds(update);
@@ -66,7 +72,7 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
         this.timestamp = TimeUtil.toUTCMilliseconds(update);
     }
     @Override
-    public double daily() {
+    public synchronized double daily() {
         return daily;
     }
 
@@ -75,7 +81,7 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
         this.timestamp = TimeUtil.toUTCMilliseconds(update);
     }
     @Override
-    public double weekly() {
+    public synchronized double weekly() {
         return weekly;
     }
 
@@ -84,7 +90,7 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
         this.timestamp = TimeUtil.toUTCMilliseconds(update);
     }
     @Override
-    public double monthly() {
+    public synchronized double monthly() {
         return monthly;
     }
 
@@ -93,7 +99,7 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
         this.timestamp = TimeUtil.toUTCMilliseconds(update);
     }
     @Override
-    public double yearly() {
+    public synchronized double yearly() {
         return yearly;
     }
 
@@ -161,5 +167,9 @@ public class SystemStatisticsEntry extends RecoverableObject implements Statisti
         resp.addProperty("total",total);
         resp.addProperty("timestamp",timestamp);
         return resp;
+    }
+
+    public static Statistics.Entry delta(String category,double delta){
+        return new SystemStatisticsEntry(category,delta);
     }
 }

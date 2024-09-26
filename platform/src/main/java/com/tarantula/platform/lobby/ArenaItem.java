@@ -1,12 +1,15 @@
 package com.tarantula.platform.lobby;
 
+import com.google.gson.JsonObject;
 import com.tarantula.platform.item.Commodity;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
 public class ArenaItem extends Commodity {
 
     public ArenaItem(){
-
+    }
+    public ArenaItem(JsonObject payload){
+        this.header = payload;
     }
     public int getFactoryId() {
         return PresencePortableRegistry.OID;

@@ -12,7 +12,7 @@ public class MetricsViewOperation extends Operation {
     private String category;
     private String classifier;
 
-    private String ret;
+    private byte[] ret;
 
     public MetricsViewOperation() {
     }

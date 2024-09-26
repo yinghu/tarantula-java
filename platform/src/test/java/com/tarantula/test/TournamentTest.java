@@ -29,14 +29,14 @@ public class TournamentTest extends DataStoreHook{
         Assert.assertTrue(status.status == Tournament.Status.PENDING);
         status.status = Tournament.Status.STARTED;
         Assert.assertTrue(dataStore.update(status));
-        Assert.assertEquals(1,dataStore.list(new TournamentScheduleStatusQuery(100)).size());
+        Assert.assertEquals(1,dataStore.list(new TournamentScheduleStatusQuery(SnowflakeKey.from(100))).size());
         TournamentScheduleStatus load = new TournamentScheduleStatus();
         load.distributionId(5000);
         Assert.assertTrue(dataStore.load(load));
         Assert.assertTrue(load.status == Tournament.Status.STARTED);
         Assert.assertTrue(load.tournamentId==1000);
         Assert.assertTrue(dataStore.delete(load));
-        Assert.assertEquals(0,dataStore.list(new TournamentScheduleStatusQuery(100)).size());
+        Assert.assertEquals(0,dataStore.list(new TournamentScheduleStatusQuery(SnowflakeKey.from(100))).size());
         Assert.assertFalse(dataStore.load(load));
         Assert.assertEquals(1000,BufferUtil.toLong(status.toBinary()));
     }

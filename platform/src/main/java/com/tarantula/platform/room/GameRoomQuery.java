@@ -3,22 +3,18 @@ package com.tarantula.platform.room;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.SnowflakeKey;
-import com.tarantula.game.GameZone;
 
-public class GameRoomQuery implements RecoverableFactory<GameRoom> {
+public class GameRoomQuery implements RecoverableFactory<GameRoomHeader> {
 
-    private long ownerId;
-    private String roomType;
-    private int capacity;
+    private long zoneId;
 
-    public GameRoomQuery(long ownerId,String roomType,int capacity){
-        this.ownerId = ownerId;
-        this.roomType = roomType;
-        this.capacity = capacity;
+    public GameRoomQuery(long zoneId){
+        this.zoneId = zoneId;
+
     }
 
-    public GameRoom create() {
-        return GameRoom.newGameRoom(roomType,capacity);
+    public GameRoomHeader create() {
+        return new GameRoomHeader();
     }
 
 
@@ -28,6 +24,6 @@ public class GameRoomQuery implements RecoverableFactory<GameRoom> {
 
     @Override
     public Recoverable.Key key() {
-        return new SnowflakeKey(ownerId);
+        return new SnowflakeKey(zoneId);
     }
 }

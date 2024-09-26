@@ -1,39 +1,29 @@
 package com.tarantula.platform.store;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.ApplicationPreSetup;
-import com.icodesoftware.service.ConfigurationServiceProvider;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
-import com.tarantula.platform.item.DistributionItemService;
-import com.tarantula.platform.item.ItemDistributionCallback;
+import com.tarantula.platform.item.Commodity;
+import com.tarantula.platform.item.PlatformItemServiceProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PlatformStoreServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback {
+public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
 
     public static final String NAME = "store";
 
-    private TarantulaLogger logger;
-    private final String gameServiceName;
-    private final GameCluster gameCluster;
-    private final PlatformInventoryServiceProvider inventoryServiceProvider;
-    private ServiceContext serviceContext;
-    private DistributionItemService distributionItemService;
-    private ApplicationPreSetup applicationPreSetup;
 
     private ConcurrentHashMap<String,Shop> shopIndex;
     private ConcurrentHashMap<String,ShoppingItem> shoppingItems;
 
     public PlatformStoreServiceProvider(PlatformGameServiceProvider gameServiceProvider){
-        this.gameCluster = gameServiceProvider.gameCluster();
-        this.gameServiceName = gameCluster.gameServiceName;//(String)gameCluster.property(GameCluster.GAME_SERVICE);
-        this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
+        super(gameServiceProvider,NAME);
     }
     @Override
     public String name() {
@@ -42,21 +32,20 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
 
     @Override
     public void start() throws Exception {
-        this.logger.warn("Store service provider started on->"+gameServiceName);
+        if(!serviceContext.node().homingAgent().enabled()) return;
+        String resp = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"Shop");
+        JsonObject configs = JsonUtil.parse(resp);
+        configs.get("list").getAsJsonArray().forEach(e-> registerShop(new Shop(e.getAsJsonObject())));
+        this.logger.warn("Store service provider started with homing agent enabled");
     }
 
-    @Override
-    public void shutdown() throws Exception {
 
-    }
     @Override
     public void setup(ServiceContext serviceContext) {
+        super.setup(serviceContext);
         this.shoppingItems = new ConcurrentHashMap<>();
         this.shopIndex = new ConcurrentHashMap<>();
-        this.serviceContext = serviceContext;
-        this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
         this.logger = JDKLogger.getLogger(PlatformStoreServiceProvider.class);
-        this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
     }
 
     public Shop shop(String name){
@@ -75,14 +64,9 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     @Override
     public <T extends Configurable> void register(T t) {
         if(!t.configurationCategory().equals("Shop")) return;
-        t.registered();
-        distributionItemService.onRegisterItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
+        super.register(t);
     }
-    @Override
-    public <T extends Configurable> void release(T t){
-        t.released();
-        this.distributionItemService.onReleaseItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
-    }
+
     public boolean onItemRegistered(String category,String itemId){
         Shop configurableObject = new Shop();
         configurableObject.distributionKey(itemId);
@@ -99,8 +83,10 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
         shop.list().forEach(item->shoppingItems.remove(item.distributionKey()));
         return true;
     }
+
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
+        if(serviceContext.node().homingAgent().enabled()) return null;
         List<Shop> items = applicationPreSetup.list(descriptor,new ShoppingItemObjectQuery(descriptor.key(),"Shop"));
         items.forEach((a)-> {
             if (!a.disabled()) {
@@ -111,6 +97,18 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
     }
 
     private void registerShop(Shop shop){
+        if(shop.itemList()!=null){
+            shop.itemList().forEach(shoppingItem -> {
+                List<Commodity> commodities = shoppingItem.commodityList();
+                commodities.forEach(commodity -> {
+                    gameCluster.registerConfigurableCategory(commodity.configurableCategory());
+                });
+                shoppingItems.put(shoppingItem.configurationKey(),shoppingItem);
+            });
+            shopIndex.put(shop.publishKey(),shop);
+            shopIndex.put(shop.configurationName(),shop);
+            return;
+        }
         shop.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
         Shop s = shop.setup();
         shopIndex.put(shop.configurationName(),s);
@@ -119,6 +117,30 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
             item.setup();
             shoppingItems.put(item.distributionKey(),new ShoppingItem(item));
         });
+    }
+
+
+
+    @Override
+    public boolean onItemRegistered(int publishId){
+        logger.warn("register shop with publish id : "+publishId);
+        String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
+        registerShop(new Shop(JsonUtil.parse(config)));
+        return true;
+    }
+
+    @Override
+    public boolean onItemReleased(int publishId){
+        logger.warn("release local shop with ["+publishId+"]");
+        Shop removed = shopIndex.remove(Integer.toString(publishId));
+        if(removed==null) return false;
+        shopIndex.remove(removed.configurationName());
+        //remove items
+        removed.itemList().forEach(item->{
+            logger.warn("Remove item ["+item.configurationKey()+"]");
+            shoppingItems.remove(item.configurationKey());
+        });
+        return true;
     }
 
 }

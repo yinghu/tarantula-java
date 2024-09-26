@@ -29,7 +29,6 @@ public class TarantulaDiscoveryStrategyFactory implements DiscoveryStrategyFacto
     public Collection<PropertyDefinition> getConfigurationProperties() {
         Collection<PropertyDefinition> clist =new ArrayList<>();
         clist.add(new SimplePropertyDefinition("tarantula-port",PropertyTypeConverter.INTEGER));
-        clist.add(new SimplePropertyDefinition("tarantula-scope",PropertyTypeConverter.INTEGER));
         return clist;
     }
 }

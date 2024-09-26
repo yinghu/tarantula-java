@@ -8,15 +8,11 @@ public interface Session extends OnApplication {
     String HTTP_CONTENT_TYPE ="Content-type";
 
     //tarantula headers
-
     String TARANTULA_TOURNAMENT_ID ="Tarantula-tournament-id";
     String TARANTULA_TYPE_ID ="Tarantula-type-id";
     String TARANTULA_VIEW_ID ="Tarantula-view-id";
 
     String TARANTULA_SERVER_ID ="Tarantula-server-id";
-    String TARANTULA_CONNECTION_ID ="Tarantula-connection-id";
-    String TARANTULA_ZONE_ID ="Tarantula-zone-id";
-    String TARANTULA_ROOM_ID ="Tarantula-room-id";
 
     String TARANTULA_TOKEN ="Tarantula-token";
     String TARANTULA_ACCESS_KEY ="Tarantula-access-key";
@@ -28,13 +24,11 @@ public interface Session extends OnApplication {
     String TARANTULA_CLIENT_ID ="Tarantula-client-id";
 
     String TARANTULA_PAYLOAD = "Tarantula-payload";
-    //String TARANTULA_SERVICE_ID = "Tarantula-service-id";
+
     String TARANTULA_TRACK_ID ="Tarantula-track-id";
 
-    //int FAST_PLAY_MODE = 2;
-    //int INVITATION_PLAY_MODE = 4;
-    ///int OFF_LINE_MODE = 3;
-    //int GAME_CENTER_PLAY_MODE = 5;
+    String TARANTULA_DATA_ENCRYPTED ="Tarantula-data-encrypted";
+
 
     String source();
     void source(String source);
@@ -75,7 +69,7 @@ public interface Session extends OnApplication {
     void token(String token);
 
     interface TimeoutListener{
-        void timeout(String systemId,long stub);
+        void timeout(long systemId,long stub);
     }
 
     interface Header{

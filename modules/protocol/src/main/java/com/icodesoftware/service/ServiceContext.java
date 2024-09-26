@@ -16,13 +16,12 @@ public interface ServiceContext extends Context{
     ServiceProvider serviceProvider(String name);
     DeploymentServiceProvider deploymentServiceProvider();
     HttpClientProvider httpClientProvider();
-    BackupProvider backupProvider();
 
     OnPartition[] partitions();
-
+    OnPartition[] buckets();
     ClusterProvider.Node node();
     long distributionId();
-    //ServiceEventLogger serviceEventLogger();
+
     <T extends Recoverable> RecoverableRegistry<T> recoverableRegistry(int registryId);
     void recoverableRegistry(RecoverableListener recoverableListener);
 
@@ -31,9 +30,6 @@ public interface ServiceContext extends Context{
 
     void registerAuthVendor(TokenValidatorProvider.AuthVendor authVendor);
     void unregisterAuthVendor(TokenValidatorProvider.AuthVendor authVendor);
-
-    void registerBackupProvider(BackupProvider backupProvider);
-    void unregisterBackupProvider(BackupProvider backupProvider);
 
     Metrics metrics(String name);
     List<String> metricsList();

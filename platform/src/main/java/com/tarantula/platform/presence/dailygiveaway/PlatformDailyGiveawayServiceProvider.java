@@ -1,5 +1,6 @@
 package com.tarantula.platform.presence.dailygiveaway;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
@@ -8,9 +9,10 @@ import com.icodesoftware.Descriptor;
 import com.icodesoftware.Session;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
-import com.tarantula.platform.inbox.PlatformInboxServiceProvider;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
+import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,15 +20,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlatformDailyGiveawayServiceProvider extends PlatformItemServiceProvider {
 
-    public static final String NAME = "giveaway";
+    public static final String NAME = "dailylogin";
 
     private int dailyLoginPendingHours;
     private int maxConsecutiveDays;
     private int maxRewardTier;
     private ConcurrentHashMap<String,DailyGiveaway> dailyGiveaways;
+
     public PlatformDailyGiveawayServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
-       this.dailyGiveaways = new ConcurrentHashMap<>();
+        this.dailyGiveaways = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -37,19 +40,33 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
         dailyLoginPendingHours = dailyReward.get("waitingTimeHours").getAsInt();
         maxConsecutiveDays = dailyReward.get("maxConsecutiveDays").getAsInt();
         maxRewardTier = dailyReward.get("maxRewardTiers").getAsInt();
+        this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
         this.logger = JDKLogger.getLogger(PlatformDailyGiveawayServiceProvider.class);
         this.logger.warn("Daily giveaway service provider started on ->"+gameServiceName);
     }
 
+    @Override
+    public void start() throws Exception{
+        if(serviceContext.node().homingAgent().enabled()){
+            String config = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"DailyReward");
+            logger.warn(config);
+            JsonArray list = JsonUtil.parse(config).get("list").getAsJsonArray();
+            list.forEach(e->{
+                DailyGiveaway dailyGiveaway = new DailyGiveaway(e.getAsJsonObject());
+                registerDailyGiveAway(dailyGiveaway);
+            });
+        }
+    }
+
     public DailyLoginTrack claim(Session session){
-        DailyLoginTrack dailyLoginTrack = new DailyLoginTrack();
-        platformGameServiceProvider.savedGameServiceProvider().createIfAbsent(session,dailyLoginTrack);
+        CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);
+        DailyLoginTrack dailyLoginTrack = DailyLoginTrack.lookup(currentSaveIndex.saveId,dataStore);
         if(dailyLoginTrack.rewardPending) return dailyLoginTrack;
         boolean rewarded = dailyLoginTrack.checkDailyLogin(dailyLoginPendingHours,maxConsecutiveDays,maxRewardTier);
         if(!rewarded) return null;
         DailyGiveaway dailyGiveaway = dailyGiveaways.get(dailyLoginTrack.rewardKey());
         if(dailyGiveaway==null) return null;
-        platformGameServiceProvider.inboxServiceProvider().claim(session.distributionId(),dailyGiveaway);
+        platformGameServiceProvider.inventoryServiceProvider().redeem(session.systemId(),dailyGiveaway);
         dailyLoginTrack.rewardPending = false;
         dailyLoginTrack.update();
         return dailyLoginTrack;
@@ -82,7 +99,7 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
     }
     @Override
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
-        List<DailyGiveaway> items = applicationPreSetup.list(descriptor,new DailygGiveawayObjectQuery(descriptor.key(),"DailyGiveaway"));
+        List<DailyGiveaway> items = applicationPreSetup.list(descriptor,new DailyGiveawayObjectQuery(descriptor.key()));
         items.forEach((a)-> {
             logger.warn("<><><>"+a.name()+"<><>"+a.day());
             if(!a.disabled()) {
@@ -93,5 +110,31 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
         });
         return null;
     }
+
+    @Override
+    public boolean onItemRegistered(int publishId){
+        String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
+        DailyGiveaway dailyGiveaway = new DailyGiveaway(JsonUtil.parse(config));
+        logger.warn(dailyGiveaway.name());
+        registerDailyGiveAway(dailyGiveaway);
+        return true;
+    }
+    @Override
+    public boolean onItemReleased(int publishId){
+        logger.warn("release local resource with ["+publishId+"]");
+        DailyGiveaway removed = dailyGiveaways.remove(Integer.toString(publishId));
+        if(removed==null) return false;
+        this.dailyGiveaways.remove(removed.name());
+        return true;
+    }
+
+    private void registerDailyGiveAway(DailyGiveaway dailyGiveaway){
+        dailyGiveaway.commodityList().forEach(commodity -> {
+            gameCluster.registerConfigurableCategory(commodity.configurableCategory());
+        });
+        this.dailyGiveaways.put(dailyGiveaway.name(),dailyGiveaway);
+        this.dailyGiveaways.put(dailyGiveaway.publishKey(),dailyGiveaway);
+    }
+
 
 }

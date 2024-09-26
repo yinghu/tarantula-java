@@ -46,7 +46,7 @@ public class TransactionLogManagerTest extends DataStoreHook{
         foo.list(query).forEach(p->{
             recovered[0]++;
         });
-        System.out.println(recovered[0]);
+        //System.out.println(recovered[0]);
         Assert.assertTrue(recovered[0]>0);
     }
 

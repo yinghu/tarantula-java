@@ -1,6 +1,7 @@
 package com.tarantula.platform.presence.dailygiveaway;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.DataStore;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.presence.PresencePortableRegistry;
@@ -110,6 +111,7 @@ public class DailyLoginTrack extends RecoverableObject {
     }
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("Successful",true);
         jsonObject.addProperty("LastLoginDay",lastLoginDay);
         jsonObject.addProperty("RewardTier",tier);
         jsonObject.addProperty("RewardKey",rewardKey());
@@ -128,6 +130,14 @@ public class DailyLoginTrack extends RecoverableObject {
     private void nextRewardTime(LocalDateTime current,int pendingHours){
         int remainingSeconds = 24*60*60-current.getSecond();
         nextRewardTimeSeconds = remainingSeconds>pendingHours*60*60?remainingSeconds:pendingHours*60*60;
+    }
+
+    public static DailyLoginTrack lookup(long saveId, DataStore dataStore){
+        DailyLoginTrack dailyLoginTrack = new DailyLoginTrack();
+        dailyLoginTrack.distributionId(saveId);
+        dataStore.createIfAbsent(dailyLoginTrack,true);
+        dailyLoginTrack.dataStore(dataStore);
+        return dailyLoginTrack;
     }
 
 }

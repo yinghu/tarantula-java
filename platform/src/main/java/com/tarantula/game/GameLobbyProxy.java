@@ -27,17 +27,19 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
         if(!started) return new Stub("lobby not started");
         Rating rating = gameServiceProvider.presenceServiceProvider().rating(session);
         GameZone _zone = gameZone(rating);
-        return _zone.join(session);
+        Stub stub = _zone.join(session);
+        if(!stub.joined()) return stub;
+        stub.room.arena(_zone.arena(rating.level()));
+        return stub;
     }
 
     @Override
-    public boolean leave(Session session) {
-        if(!started) return false;
+    public void leave(Session session) {
+        if(!started) return;
         Stub stub = gameServiceProvider.presenceServiceProvider().stub(session,application);
-        if(!stub.joined()) return false;
+        if(!stub.joined()) return;
         GameZone gameZone = this.gameServiceProvider.roomServiceProvider().gameZoneFromZoneId(stub.zoneId);
         gameZone.leave(stub);
-        return true;
     }
 
     public void validate(Session session){
@@ -52,12 +54,11 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
     }
 
     @Override
-    public boolean timeout(String systemId,long stub) {
+    public void timeout(long systemId,long stub) {
         Stub removed = this.gameServiceProvider.presenceServiceProvider().stub(new SimpleStub(systemId,stub),application);
-        if(!removed.joined()) return false;
+        if(!removed.joined()) return ;
         GameZone gameZone = this.gameServiceProvider.roomServiceProvider().gameZoneFromZoneId(removed.zoneId);
         gameZone.leave(removed);
-        return  true;
     }
 
 

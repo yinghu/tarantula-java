@@ -6,7 +6,7 @@ import com.hazelcast.spi.discovery.AbstractDiscoveryStrategy;
 import com.hazelcast.spi.discovery.DiscoveryNode;
 import com.hazelcast.spi.discovery.SimpleDiscoveryNode;
 import com.hazelcast.spi.partitiongroup.PartitionGroupStrategy;
-import com.tarantula.platform.TarantulaContext;
+
 
 import java.net.InetAddress;
 import java.util.*;
@@ -15,12 +15,10 @@ import java.util.*;
 public class TarantulaDiscoveryStrategy extends AbstractDiscoveryStrategy {
 
     private int port;
-    private int scope;
 
     public TarantulaDiscoveryStrategy(ILogger logger, Map<String, Comparable> properties){
         super(logger,properties);
         port = (int)properties.get("tarantula-port");
-        scope = (int)properties.get("tarantula-scope");
     }
 
     @Override
@@ -32,11 +30,9 @@ public class TarantulaDiscoveryStrategy extends AbstractDiscoveryStrategy {
     public Iterable<DiscoveryNode> discoverNodes() {
         try{
             Collection<DiscoveryNode> nlist = new ArrayList<>();
-            List<InetAddress> alist = TarantulaContext.memberDiscovery(this.scope).find();
+            List<InetAddress> alist = new StaticMemberDiscovery().find();
             alist.forEach((a)->{
-                Map<String,Object> props = new HashMap<>();
-                props.put("hostname",a.getHostName());
-                nlist.add(new SimpleDiscoveryNode(new Address(a,port),props));
+                nlist.add(new SimpleDiscoveryNode(new Address(a,port)));
             });
             return nlist;
         }catch (Exception ex){

@@ -35,7 +35,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
 
     private ConcurrentHashMap<String, StatsDelta> pendingUpdates;
 
-    protected long pendingUpdateInterval = 10000;
+    protected long pendingUpdateInterval = 5000;
     protected int metricsTrackingNumber = Metrics.SNAPSHOT_TRACKING_SIZE;
 
     protected DataStore dataStore;
@@ -49,7 +49,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
 
     private ConcurrentHashMap<String, MetricsSnapshot> snapshots;
     private ConcurrentHashMap<String,MetricsHistory> archives;
-
+    private MetricsHomingAgent metricsHomingAgent = (name,updated)->{};
 
     public String name(){
         return name;
@@ -171,11 +171,13 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
         pendingUpdates.forEach((category,v)->{
             pendings.add(v.reset());
         });
+        List<Statistics.Entry> updated = new ArrayList<>();
         pendings.forEach(p->{
             try {
                 if(p.value>0){
                     Statistics.Entry e = statistics.entry(p.name);
                     e.update(p.value).update();
+                    updated.add(SystemStatisticsEntry.delta(e.name(),p.value));
                     metricsSnapshot(e.name(),LeaderBoard.HOURLY).update(e.hourly()).update();
                     metricsSnapshot(e.name(),LeaderBoard.DAILY).update(e.daily()).update();
                     metricsSnapshot(e.name(),LeaderBoard.WEEKLY).update(e.weekly()).update();
@@ -187,6 +189,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
                 logger.error("Error on update",ex);
             }
         });
+        if(!updated.isEmpty()) metricsHomingAgent.onMetrics(name,updated);
         pendings.clear();
     }
 
@@ -425,6 +428,14 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
     }
     @Override
     public void updateSummary(Summary summary){
+        categories.forEach(c->{
+            summary.update(c,statistics.entry(c).total());
+        });
+    }
+
+    public void registerMetricsHomeAgent(MetricsHomingAgent metricsHomingAgent){
+        if(metricsHomingAgent==null) return;
+        this.metricsHomingAgent = metricsHomingAgent;
     }
 
 }

@@ -4,9 +4,11 @@ import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 
 import com.tarantula.platform.item.*;
+import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.tournament.TournamentPrize;
 
 import java.util.List;
@@ -54,6 +56,9 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
         return this.applicationPreSetup.inventoryList(systemId);
     }
 
+    public Inventory inventory(Session session){
+        return applicationPreSetup.inventory(session.distributionId(),session.name());
+    }
     public UserInventory inventory(long systemId, String category, String typeId){
         int cindex = category.indexOf(".");
         String type = cindex<0?category:category.substring(0,cindex);
@@ -71,45 +76,39 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
         inventories[0].list();
         return inventories[0];
     }
-    public boolean redeem(String systemId, Application item){
-        Transaction t = gameCluster.transaction();
-        boolean suc = t.execute(ctx->{
-            ApplicationPreSetup setup = (ApplicationPreSetup)ctx;
-            Descriptor app = gameCluster.application(item.configurationTypeId());
-            ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,setup);
-            redeemer.distributionKey(item.distributionKey());
-            if(!setup.load(app,redeemer)) return false;
-            redeemer.redeem();
-            return true;
-        });
-        return suc;
+    public boolean redeem(long systemId, Application application){
+        if(serviceContext.node().homingAgent().enabled()){
+            return redeemWithHomingAgentEnabled(systemId,application);
+        }
+        return redeemWithLocalConfiguration(systemId,application);
     }
-    public boolean redeem(String systemId, Item item){
-        Transaction t = gameCluster.transaction();
-        boolean suc = t.execute(ctx->{
-            ApplicationPreSetup setup = (ApplicationPreSetup)ctx;
-            Descriptor app = gameCluster.application(item.configurationType());
-            ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,setup);
-            redeemer.distributionKey(item.distributionKey());
-            if(!setup.load(app,redeemer)) return false;
-            redeemer.redeem();
-            return true;
-        });
-        return suc;
+    public boolean redeem(long systemId, Item item){
+        boolean[] suc ={false};
+        try(final Transaction t = gameCluster.transaction()){
+            suc[0] = t.execute(ctx->{
+                ApplicationPreSetup setup = (ApplicationPreSetup)ctx;
+                Descriptor app = gameCluster.application(item.configurationType());
+                ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,setup);
+                redeemer.distributionKey(item.distributionKey());
+                if(!setup.load(app,redeemer)) return false;
+                redeemer.redeem();
+                return true;
+            });
+        }
+        return suc[0];
     }
 
-    public boolean redeem(String systemId, TournamentPrize item){
-        Transaction t = gameCluster.transaction();
-        boolean suc = t.execute(ctx->{
-            ApplicationPreSetup setup =(ApplicationPreSetup)ctx;
-            Descriptor app = gameCluster.application(item.configurationTypeId());
-            ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,setup);
-            redeemer.distributionKey(item.distributionKey());
-            if(!setup.load(app,redeemer)) return false;
-            redeemer.redeem();
-            return true;
-        });
-        return suc;
+    public boolean redeem(long systemId, TournamentPrize item){
+        if(serviceContext.node().homingAgent().enabled()){
+            return redeemWithHomingAgentEnabled(systemId,item);
+        }
+        return redeemWithLocalConfiguration(systemId,item);
+    }
+    public boolean redeem(long systemId, ShoppingItem shoppingItem){
+        if(serviceContext.node().homingAgent().enabled()) {
+            return redeemWithHomingAgentEnabled(systemId,shoppingItem);
+        }
+        return redeemWithLocalConfiguration(systemId,shoppingItem);
     }
 
     public void load(ConfigurableObject configurableObject){
@@ -134,5 +133,41 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
     public void onInventory(ApplicationPreSetup applicationPreSetup,Inventory inventory, Inventory.Stock item) {
         logger.warn("inventory added=>"+inventory.configurationTypeId());
         this.platformGameServiceProvider.gameServiceProvider().onInventory(applicationPreSetup,inventory,item);
+    }
+
+    private boolean redeemWithHomingAgentEnabled(long systemId,Application application){
+        application.commodityList().forEach(commodity -> {
+            String type = commodity.configurationCategory();
+            String typeId = commodity.configurationTypeId();
+            UserInventory inventory = (UserInventory) applicationPreSetup.inventory(systemId, typeId);
+            if (inventory != null) {
+                inventory.redeem(application.distributionId(), commodity);
+            } else {
+                inventory = (UserInventory) applicationPreSetup.createInventory(type, typeId);
+                inventory.ownerKey(SnowflakeKey.from(systemId));
+                inventoryDataStore.create(inventory);
+                inventoryDataStore.createEdge(inventory, typeId);
+                inventoryDataStore.createEdge(inventory, type);
+                inventory.dataStore(inventoryDataStore);
+                inventory.applicationPreSetup(applicationPreSetup);
+                inventory.redeem(application.distributionId(), commodity);
+            }
+        });
+        return true;
+    }
+    private boolean redeemWithLocalConfiguration(long systemId,Application item){
+        boolean[] suc ={false};
+        try(Transaction t = gameCluster.transaction()){
+            suc[0] = t.execute(ctx->{
+                ApplicationPreSetup setup =(ApplicationPreSetup)ctx;
+                Descriptor app = gameCluster.application(item.configurationTypeId());
+                ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,setup);
+                redeemer.distributionKey(item.distributionKey());
+                if(!setup.load(app,redeemer)) return false;
+                redeemer.redeem();
+                return true;
+            });
+        }
+        return suc[0];
     }
 }

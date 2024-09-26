@@ -4,8 +4,6 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.PartitionAwareOperation;
-import com.tarantula.platform.room.GameRoom;
-import com.tarantula.platform.service.cluster.room.RoomClusterService;
 
 import java.io.IOException;
 

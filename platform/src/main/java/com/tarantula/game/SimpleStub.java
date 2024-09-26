@@ -1,17 +1,13 @@
 package com.tarantula.game;
 
 
-public class SimpleStub extends PlayerGameObject{
+import com.icodesoftware.util.OnApplicationHeader;
 
-    public SimpleStub(String systemId,long stub){
+public class SimpleStub extends OnApplicationHeader {
+
+    public SimpleStub(long systemId,long stub){
         this.systemId = systemId;
+        this.distributionId = systemId;
         this.stub = stub;
-    }
-    public SimpleStub(){
-
-    }
-    @Override
-    public String systemId(){
-        return systemId;
     }
 }

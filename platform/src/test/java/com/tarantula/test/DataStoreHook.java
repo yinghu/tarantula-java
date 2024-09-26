@@ -25,7 +25,7 @@ public class DataStoreHook {
         try{
             DataStoreTestEvn.dataStoreProvider.shutdown();
         }catch (Exception ex){
-            //System.out.println(name);
+            System.out.println(name);
             ex.printStackTrace();
         }
     }

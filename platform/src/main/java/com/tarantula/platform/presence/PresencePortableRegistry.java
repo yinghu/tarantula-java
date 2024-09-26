@@ -3,11 +3,12 @@ package com.tarantula.platform.presence;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.AbstractRecoverableListener;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.achievement.AchievementItem;
-import com.tarantula.platform.achievement.AchievementProgress;
+import com.tarantula.platform.presence.achievement.AchievementItem;
+import com.tarantula.platform.presence.achievement.AchievementProgress;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.inbox.PendingReward;
+import com.tarantula.platform.presence.leaderboard.LeaderBoardEntry;
 import com.tarantula.platform.lobby.ArenaItem;
 import com.tarantula.platform.lobby.LobbyItem;
 import com.tarantula.platform.lobby.RoomItem;
@@ -37,7 +38,6 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
     public static final int SAVED_GAME_CID = 8;
 
     public static final int CURRENT_SAVE_INDEX_CID = 9;
-    public static final int SAVE_GAME_INDEX_CID = 10;
 
     public static final int PENDING_REWARD_CID = 11;
 
@@ -59,14 +59,16 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
 
     public static final int PERSONAL_DATA_OBJECT_CID = 20;
 
-    public static final int DEVICE_SAVE_INDEX_CID = 21;
     public static final int MAPPING_OBJECT_CID = 23;
 
     public static final int OVERSIZE_DATA_INDEX_CID = 24;
 
     public static final int BATCHED_MAPPING_OBJECT_CID = 25;
 
-    public static final int PROFILE_NAME_SEQUENCE_CID = 26;
+    public static final int LEADER_BOARD_ENTRY_CID = 26;
+
+    public static final int PROFILE_NAME_SEQUENCE_CID = 27;
+
 
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
@@ -106,9 +108,7 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
             case CURRENT_SAVE_INDEX_CID:
                 pt = new CurrentSaveIndex();
                 break;
-            case SAVE_GAME_INDEX_CID:
-                pt = new SavedGameIndex();
-                break;
+
             case PENDING_REWARD_CID:
                 pt = new PendingReward();
                 break;
@@ -139,9 +139,6 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
             case PERSONAL_DATA_OBJECT_CID:
                 pt = new PersonalDataObject();
                 break;
-            case DEVICE_SAVE_INDEX_CID:
-                pt = new DeviceSaveIndex();
-                break;
             case MAPPING_OBJECT_CID:
                 pt = new MappingObject();
                 break;
@@ -151,8 +148,12 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
             case BATCHED_MAPPING_OBJECT_CID:
                 pt = new BatchedMappingObject();
                 break;
+            case LEADER_BOARD_ENTRY_CID:
+                pt = new LeaderBoardEntry();
+                break;
             case PROFILE_NAME_SEQUENCE_CID:
                 pt = new ProfileNameSequence();
+
                 break;
             default:
         }

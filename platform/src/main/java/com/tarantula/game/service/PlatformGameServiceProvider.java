@@ -9,11 +9,11 @@ import com.icodesoftware.protocol.GameServiceProvider;
 import com.icodesoftware.service.*;
 import com.tarantula.game.module.ErrorModule;
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.achievement.PlatformAchievementServiceProvider;
+import com.tarantula.platform.presence.achievement.PlatformAchievementServiceProvider;
 import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
 import com.tarantula.platform.inbox.PlatformInboxServiceProvider;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
-import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
+import com.tarantula.platform.presence.leaderboard.PlatformLeaderBoardProvider;
 import com.tarantula.platform.lobby.PlatformLobbyServiceProvider;
 import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
 import com.tarantula.platform.presence.dailygiveaway.PlatformDailyGiveawayServiceProvider;
@@ -88,6 +88,7 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
             try{
                 ServiceProvider serviceProvider = (ServiceProvider)Class.forName(e.getAsString()).getConstructor(PlatformGameServiceProvider.class).newInstance(this);
                 gameServiceProviders.put(serviceProvider.name(),serviceProvider);
+                logger.warn(serviceProvider.name()+" : "+e.getAsString());
             }catch (Exception nex){
                 throw new RuntimeException(nex);
             }
@@ -310,5 +311,14 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
     @Override
     public String typeId() {
         return gameCluster.typeId();
+    }
+
+    @Override
+    public boolean onItemRegistered(int publishId){
+        return false;
+    }
+    @Override
+    public boolean onItemReleased(int publishId){
+        return false;
     }
 }

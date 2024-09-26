@@ -4,8 +4,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.tarantula.platform.item.*;
 
+import java.util.ArrayList;
+import java.util.List;
 
-public class ShoppingItem extends Item{
+
+public class ShoppingItem extends Application{
 
 
     public enum ItemType{HardCurrency,SoftCurrency,Bundle,None};
@@ -20,6 +23,11 @@ public class ShoppingItem extends Item{
         super(configurableObject);
     }
 
+    public ShoppingItem(JsonObject payload){
+        super(payload);
+        this.header.addProperty("ItemId",this.configurationId);
+    }
+
     public int getFactoryId() {
         return ItemPortableRegistry.OID;
     }
@@ -29,7 +37,7 @@ public class ShoppingItem extends Item{
     }
 
     public String name(){
-        return configurationName();
+        return this.configurationName;
     }
 
     public String skuName(){
@@ -81,5 +89,14 @@ public class ShoppingItem extends Item{
         if(type==VirtualCurrency.Coin.ordinal()) return VirtualCurrency.Coin;
         if(type==VirtualCurrency.Chip.ordinal()) return VirtualCurrency.Chip;
         return VirtualCurrency.None;
+    }
+
+    public List<Commodity> commodityList(){
+        ArrayList<Commodity> commodities = new ArrayList<>();
+        header.get("_skuList").getAsJsonArray().forEach((e)->{
+            JsonObject sku = e.getAsJsonObject().get("_sku").getAsJsonObject();
+            commodities.add(new Commodity(sku));
+        });
+        return commodities;
     }
 }

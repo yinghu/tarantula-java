@@ -1,5 +1,7 @@
 package com.icodesoftware.util;
 
+import com.icodesoftware.Recoverable;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -26,5 +28,16 @@ public class BufferUtil {
     }
     public static byte[] fromLong(String data){
         return ByteBuffer.allocate(8).order(ByteOrder.nativeOrder()).putLong(Long.parseLong(data)).flip().array();
+    }
+    public static void copy(ByteBuffer src, Recoverable.DataBuffer dest){
+        while (src.hasRemaining()){
+            dest.writeByte(src.get());
+        }
+    }
+
+    public static void copy(Recoverable.DataBuffer src, Recoverable.DataBuffer dest){
+        while (src.hasRemaining()){
+            dest.writeByte(src.readByte());
+        }
     }
 }

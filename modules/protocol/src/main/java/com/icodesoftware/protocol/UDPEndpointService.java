@@ -11,6 +11,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.security.PublicKey;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
@@ -229,13 +230,16 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider, UDP
         this.userChannelIndex.put(userChannel.channelId(),userChannel);
         this.operationSummary.userChannelNumber.incrementAndGet();
     }
-
+    public <T extends UserChannel> T lookup(int channelId){
+        return (T)userChannelIndex.get(channelId);
+    }
     public void registerCipherListener(CipherListener cipherListener){
         this.cipherListener = cipherListener;
     }
-    public UserChannel releaseUserChannel(int channelId){
+
+    public <T extends UserChannel> T releaseUserChannel(int channelId){
         this.operationSummary.userChannelNumber.decrementAndGet();
-        return this.userChannelIndex.remove(channelId);
+        return (T)this.userChannelIndex.remove(channelId);
     }
 
     public void registerPingListener(PingListener pingListener){

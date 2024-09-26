@@ -34,6 +34,8 @@ public interface Configurable extends Recoverable, DataStore.Updatable {
     default void configurationCategory(String configurationCategory){}
     default String configurationVersion(){return null;}
     default void configurationVersion(String configurationVersion){}
+    default String configurationScope(){return null;}
+    default void configurationScope(String configurationVersion){}
 
     default boolean configureAndValidate(byte[] data){ return false;}
     default boolean configureAndValidate(Map<String,Object> data){ return false;}

@@ -80,24 +80,13 @@ public class AppleStoreProvider extends AuthObject{
             onMetrics(PaymentMetrics.PAYMENT_APPLE_STORE_AMOUNT);
             if(!checkResponsePayload(responseData.dataAsString,params)) return false;
             String bundleId = (String)params.get(OnAccess.STORE_BUNDLE_ID);
-            String systemId = (String)params.get(OnAccess.SYSTEM_ID);
+            long systemId = (long)params.get(OnAccess.SYSTEM_ID);
             ShoppingItem shoppingItem = gameServiceProvider.storeServiceProvider().shoppingItem(bundleId);
             if(shoppingItem==null){
                 logger.warn("Shopping Item not existed  : "+bundleId);
                 throw new RuntimeException("Shopping not existed ["+bundleId+"]");
             }
-            GameCluster gameCluster = gameServiceProvider.gameCluster();
-            Transaction t = gameCluster.transaction();
-            boolean suc = t.execute(ctx->{
-                ApplicationPreSetup setup =(ApplicationPreSetup)ctx;
-                Descriptor app = gameCluster.application(shoppingItem.configurationTypeId());
-                ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,setup);
-                redeemer.distributionKey(bundleId);
-                if(!setup.load(app,redeemer)) return false;
-                redeemer.redeem();
-                return true;
-            });
-
+            boolean suc = this.gameServiceProvider.inventoryServiceProvider().redeem(systemId,shoppingItem);
             if(appleStoreKey.isSandbox()){
                 params.put(OnAccess.IS_SANDBOX, true);
             }

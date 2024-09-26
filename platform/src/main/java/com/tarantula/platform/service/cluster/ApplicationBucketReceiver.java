@@ -52,6 +52,5 @@ public class ApplicationBucketReceiver implements BucketReceiver{
     @Override
     public boolean onEvent(Event event) {
         return this.eventListener.onEvent(event);
-
     }
 }

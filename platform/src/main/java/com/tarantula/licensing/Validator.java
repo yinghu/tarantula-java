@@ -1,13 +1,11 @@
 package com.tarantula.licensing;
 
-import com.icodesoftware.service.TokenValidatorProvider;
+
 import com.icodesoftware.logging.JDKLogger;
-import com.tarantula.platform.util.SystemUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.security.MessageDigest;
 
 public class Validator {
 
@@ -15,15 +13,13 @@ public class Validator {
 	
     public static boolean validate(){
         try{
-            File sf = new File("license.txt");
+            File sf = new File("LICENSE");
             if(sf.exists()){
-                BufferedReader reader = new BufferedReader(new FileReader(sf));
-                String key = reader.readLine();
-                log.info("Validating tarantula license key ["+key+"]");
-                return key.equals(SystemUtil.hashPassword(MessageDigest.getInstance(TokenValidatorProvider.MDA),"tarantula"));
+                log.warn("License file is included");
+                return true;
             }
             else{
-                throw new IllegalArgumentException("License key not found");
+                throw new IllegalArgumentException("License not found");
             }
         }catch (Exception ex){
             log.error("error",ex);

@@ -11,6 +11,8 @@ public class TournamentScheduleStatus extends RecoverableObject {
     public Tournament.Status status = Tournament.Status.PENDING;//-> STARTING -> STARTED -> PENDING
 
     public long tournamentId;
+    public long scheduleEditId;
+    public int publishId;
 
     public TournamentScheduleStatus(long tournamentId){
         this();
@@ -23,6 +25,7 @@ public class TournamentScheduleStatus extends RecoverableObject {
     @Override
     public boolean write(DataBuffer buffer) {
         buffer.writeLong(tournamentId);
+        buffer.writeLong(scheduleEditId);
         buffer.writeInt(status.ordinal());
         return true;
     }
@@ -30,6 +33,7 @@ public class TournamentScheduleStatus extends RecoverableObject {
     @Override
     public boolean read(DataBuffer buffer) {
         tournamentId = buffer.readLong();
+        scheduleEditId = buffer.readLong();
         status = Tournament.Status.values()[buffer.readInt()];
         return true;
     }

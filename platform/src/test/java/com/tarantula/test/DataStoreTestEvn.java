@@ -1,6 +1,7 @@
 package com.tarantula.test;
 
 import com.icodesoftware.Distributable;
+import com.icodesoftware.lmdb.EnvSetting;
 import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.DataStoreProvider;
@@ -29,8 +30,13 @@ public class DataStoreTestEvn {
         distributionIdGenerator = new LocalDistributionIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
         serviceContext = new TestServiceContext(distributionIdGenerator);
         HashMap<String,Object> storeAdditions = new HashMap<>();
-        storeAdditions.put("storeSizeMb",3);
+        storeAdditions.put("storeSizeMb",20);
         storeAdditions.put("envNoSyncFlag",true);
+        storeAdditions.put("storeReindexing",false);
+        storeAdditions.put("externalKeyValueBufferUsed",true);
+        storeAdditions.put("storeKeySize", EnvSetting.KEY_SIZE);
+        storeAdditions.put("storeValueSize",EnvSetting.VALUE_SIZE);
+        storeAdditions.put("storePendingBufferSize",EnvSetting.MAX_PENDING_BUFFER_NUMBER);
         DataStoreConfigurationJsonParser parser = new DataStoreConfigurationJsonParser("test-tarantula-platform-data-store-config.json",serviceContext, storeAdditions,dataStoreProvider->{
             try{
                 DataStoreTestEvn.dataStoreProvider = dataStoreProvider;

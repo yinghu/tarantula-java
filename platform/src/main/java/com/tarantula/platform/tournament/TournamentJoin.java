@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Session;
 import com.icodesoftware.util.SnowflakeKey;
-import com.tarantula.platform.OnApplicationHeader;
+import com.icodesoftware.util.OnApplicationHeader;
 
 public class TournamentJoin extends OnApplicationHeader {
 

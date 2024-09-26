@@ -24,14 +24,12 @@ public class TestServiceContext implements ServiceContext {
     DataStoreProvider.DistributionIdGenerator distributionIdGenerator;
     public TestServiceContext(DataStoreProvider.DistributionIdGenerator distributionIdGenerator){
         this.distributionIdGenerator = distributionIdGenerator;
-        this.node = new ClusterNode("BSD","T01",31);
+        this.node = new ClusterNode("BSD","T01",271,31);
         this.node.clusterNameSuffix = "test";
         this.node.nodeId = 100;
         this.node.bucketId = 200;
         //this.node.deployDirectory = "deploy";
         this.node.servicePushAddress = "127.0.0.1";
-        this.node.runAsMirror = false;
-        this.node.backupEnabled = false;
         this.node.dailyBackupEnabled = false;
         this.node.dataStoreDirectory = "target/tld";
         this.node.deployDirectory = "target/deploy";
@@ -109,7 +107,9 @@ public class TestServiceContext implements ServiceContext {
         return new OnPartition[0];
     }
 
-
+    public OnPartition[] buckets(){
+        return new OnPartition[0];
+    }
 
 
     @Override
@@ -161,12 +161,7 @@ public class TestServiceContext implements ServiceContext {
 
     }
 
-    public void registerBackupProvider(BackupProvider backupProvider){}
-    public void unregisterBackupProvider(BackupProvider backupProvider){}
 
-    public BackupProvider backupProvider(){
-        return null;
-    }
 
     public ClusterProvider.Node node(){
         return node;

@@ -11,12 +11,12 @@ import java.util.Base64;
 
 public class JWTUtil {
     //Secret key algorithm
-    private final static String ALG_HMAC = "HmacSHA256";
+    public final static String ALG_HMAC = "HmacSHA256";
 
     //private public key pair algorithm RSA or ECDSA
-    private final static String ALG_RSA = "SHA256WithRSA";
+    public final static String ALG_RSA = "SHA256WithRSA";
     //private final static String ALG_ECDSA = "ECDSA";
-    private final static int KEY_SIZE = 32;
+    public final static int KEY_SIZE = 32;
     private static SecureRandom secureRandom;
 
     static {
@@ -81,14 +81,14 @@ public class JWTUtil {
         private final Signature verifier;
 
         private final String alg;
-        public JWT(Mac mac){
+        private JWT(Mac mac){
             this.mac = mac;
             this.signer = null ;
             this.verifier = null;
             this.alg = "HS256";
         }
 
-        public JWT(Signature signature,boolean signing){
+        private JWT(Signature signature,boolean signing){
             if(signing){
                 this.signer = signature;
                 this.verifier = null;

@@ -6,7 +6,6 @@ import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.OnViewTrack;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.util.OnAccessDeserializer;
@@ -16,8 +15,8 @@ public class ModuleSudoRoleModule implements Module {
 
     private ApplicationContext context;
     private DeploymentServiceProvider deploymentServiceProvider;
-    private TokenValidatorProvider tokenValidatorProvider;
-    private AccessIndexService accessIndexService;
+    //private TokenValidatorProvider tokenValidatorProvider;
+    //private AccessIndexService accessIndexService;
 
     private UserService userService;
     private GsonBuilder builder;
@@ -29,6 +28,7 @@ public class ModuleSudoRoleModule implements Module {
             Access acc = userService.loadUser(session.distributionId());
             session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes());
         }
+        /**
         else if(session.action().equals("onExportModule")){
             OnAccess acc = this.builder.create().fromJson(new String(payload),OnAccess.class);
             DeploymentDescriptor desc = new DeploymentDescriptor();
@@ -70,7 +70,7 @@ public class ModuleSudoRoleModule implements Module {
             OnAccess access = this.builder.create().fromJson(new String(payload),OnAccess.class);
             boolean suc = this.deploymentServiceProvider.shutdownModule(access.typeId());
             session.write(this.toMessage(suc?"module shutdown":"module not shutdown",suc).getBytes());
-        }
+        }**/
         else if(session.action().equals("onDeployView")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             OnView onView = new OnViewTrack();
@@ -98,11 +98,12 @@ public class ModuleSudoRoleModule implements Module {
             Response suc = this.deploymentServiceProvider.deployResource((String)onAccess.property("deployUrl"),(String)onAccess.property("resourceName"));
             session.write(toMessage(suc.message(),suc.successful()).getBytes());
         }
+        /**
         else if(session.action().equals("onDeployModule")){
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             Response suc = this.deploymentServiceProvider.deployModule((String)onAccess.property("deployUrl"),(String)onAccess.property("resourceName"));
             session.write(toMessage(suc.message(),suc.successful()).getBytes());
-        }
+        }**/
         else{
            throw new UnsupportedOperationException("operation ["+session.action()+"] not supported");
         }
@@ -113,8 +114,8 @@ public class ModuleSudoRoleModule implements Module {
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
-        this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
-        this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
+        //this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
+        //this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
         this.userService = this.context.serviceProvider(UserService.NAME);
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());

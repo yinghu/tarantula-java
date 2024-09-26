@@ -5,22 +5,20 @@ import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
 import com.icodesoftware.LeaderBoard;
-import com.icodesoftware.Property;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceProvider;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.TarantulaContext;
-import com.tarantula.platform.service.metrics.MetricsSnapshotRequest;
+
 import com.tarantula.platform.service.metrics.MetricsSnapshotResponse;
 import com.tarantula.platform.service.metrics.ServiceViewRequest;
-
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
-import java.util.Random;
+
 
 public class MetricsClusterService implements ManagedService, RemoteService {
 
@@ -56,20 +54,20 @@ public class MetricsClusterService implements ManagedService, RemoteService {
 
     }
 
-    public String metricsPayload(String serviceName){
-        ServiceViewRequest request = new ServiceViewRequest(nodeEngine.getLocalMember().getUuid());
+    public byte[] metricsPayload(String serviceName){
+        ServiceViewRequest request = ServiceViewRequest.request(nodeEngine.getLocalMember().getUuid());
         ServiceProvider serviceProvider = this.tarantulaContext.serviceProvider(serviceName);
         serviceProvider.updateSummary(request);
-        return request.toJson().toString();
+        return request.toBinary();
     }
-    public String metricsSnapshot(String name,String category,String classifier){
+    public byte[] metricsSnapshot(String name,String category,String classifier){
         Metrics m = this.tarantulaContext.metrics(name);
         Metrics.Spot[] dat = m.snapshot(category,classifier);
         MetricsSnapshotResponse response = new MetricsSnapshotResponse(nodeEngine.getLocalMember().getUuid());
         response.snapshot(dat);
-        return response.toJson().toString();
+        return response.toBinary();
     }
-    public String metricsArchive(String name, String category, String classifier, LocalDateTime end){
+    public byte[] metricsArchive(String name, String category, String classifier, LocalDateTime end){
         Metrics m = this.tarantulaContext.metrics(name);
         MetricsSnapshotResponse response = new MetricsSnapshotResponse(nodeEngine.getLocalMember().getUuid());
         switch (classifier){
@@ -110,7 +108,7 @@ public class MetricsClusterService implements ManagedService, RemoteService {
                 Metrics.History history = m.archive(category,end);
                 response.snapshot(history.hourlyGain());
         }
-        return response.toJson().toString();
+        return response.toBinary();
     }
 
 }

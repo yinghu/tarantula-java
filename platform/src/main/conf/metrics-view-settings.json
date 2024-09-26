@@ -1,7 +1,7 @@
 {
   "metricsSize": 60,
   "nodeSize": 7,
-  "chartSize": 8,
+  "chartSize": 14,
   "timerInterval": 5000,
   "timerLoopCount": 300,
   "charts": [

@@ -2,19 +2,11 @@ package com.tarantula.platform.event;
 import com.hazelcast.nio.serialization.Portable;
 import com.icodesoftware.Session;
 import com.icodesoftware.service.EventService;
-import com.tarantula.platform.OnApplicationHeader;
+import com.icodesoftware.util.OnApplicationHeader;
 
 abstract public class Data extends OnApplicationHeader implements Portable{
 
-    protected transient long sessionId;
-    protected boolean joined;
-
-    protected transient String source;
     protected transient String destination;
-
-    protected transient String contentType ="application/json";
-
-    protected transient byte[] payload;
 
     protected int retries;
 
@@ -23,21 +15,13 @@ abstract public class Data extends OnApplicationHeader implements Portable{
 
     protected transient String tag;
 
-    protected transient String clientId;
-
-    protected transient String action;
-
-    protected transient String trackId;
-
-    protected transient String token;
-
-    protected boolean closed;
 
     protected transient SessionForward forward;
 
     protected transient EventService eventService;
 
     protected transient int routingNumber;
+
     public int routingNumber(){
         return this.routingNumber;
     }
@@ -45,45 +29,20 @@ abstract public class Data extends OnApplicationHeader implements Portable{
         this.routingNumber = routingNumber;
     }
 
-    public boolean closed(){
-        return this.closed;
-    }
-    public void closed(boolean closed){
-        this.closed = closed;
-    }
 
-
-    public long sessionId() {
-        return this.sessionId;
-    }
-
-    public void sessionId(long sessionId) {
-        this.sessionId = sessionId;
-    }
-
-    public void joined(boolean joined){
-        this.joined = joined;
-    }
-    public boolean joined(){
-        return this.joined;
-    }
-
-    public String source() {
-        return this.source;
-    }
-
-    public void source(String source) {
-        this.source = source;
-    }
 
     public String destination() {
         return this.destination;
     }
 
-    public void destination(String  dest) {
-        this.destination  = dest;
+    public void destination(String  destination) {
+        this.destination  = destination;
     }
 
+    @Override
+    public long systemId() {
+        return distributionId;
+    }
     public int retries() {
         return this.retries;
     }
@@ -92,19 +51,6 @@ abstract public class Data extends OnApplicationHeader implements Portable{
         this.retries = retries;
     }
 
-    public byte[] payload() {
-        return this.payload;
-    }
-
-    public void payload(byte[] data) {
-        this.payload = data;
-    }
-    public String contentType(){
-        return this.contentType;
-    }
-    public void contentType(String contentType){
-        this.contentType = contentType;
-    }
 
     public Portable portable(){
         return this.portable;
@@ -118,34 +64,7 @@ abstract public class Data extends OnApplicationHeader implements Portable{
     public void tag(String tag){
         this.tag = tag;
     }
-    public String clientId(){
-        return this.clientId;
-    }
-    public void clientId(String clientId){
-        this.clientId =clientId;
-    }
 
-    public String action(){
-        return this.action;
-    }
-    public void action(String action){
-        this.action =action;
-    }
-
-
-    public String trackId(){
-        return this.trackId;
-    }
-    public void trackId(String trackId){
-        this.trackId = trackId;
-    }
-
-    public String token(){
-        return this.token;
-    }
-    public void token(String token){
-        this.token = token;
-    }
     public void eventService(EventService eventService){
         this.eventService = eventService;
     }

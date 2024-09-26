@@ -5,7 +5,6 @@
     <portable-registry registry-id="3">com.tarantula.platform.presence.PresencePortableRegistry</portable-registry>
     <portable-registry registry-id="4">com.tarantula.platform.tournament.TournamentPortableRegistry</portable-registry>
     <portable-registry registry-id="5">com.tarantula.platform.service.metrics.StatisticsPortableRegistry</portable-registry>
-    <portable-registry registry-id="6">com.tarantula.platform.leaderboard.LeaderBoardPortableRegistry</portable-registry>
     <portable-registry registry-id="7">com.tarantula.platform.item.ItemPortableRegistry</portable-registry>
     <portable-registry registry-id="8">com.icodesoftware.lmdb.PersistencePortableRegistry</portable-registry>
     <portable-registry registry-id="9">com.icodesoftware.protocol.ProtocolPortableRegistry</portable-registry>

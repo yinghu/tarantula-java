@@ -4,17 +4,16 @@ package com.tarantula.platform.inventory;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Inventory;
 import com.icodesoftware.Recoverable;
-import com.tarantula.platform.item.ConfigurableObject;
+import com.tarantula.platform.item.ConfigurableEdit;
 import com.tarantula.platform.item.ItemPortableRegistry;
 
 
-public class InventoryItem extends ConfigurableObject implements Inventory.Stock {
+public class InventoryItem extends ConfigurableEdit implements Inventory.Stock {
 
     public final static String LABEL = "inventory_item";
 
     private long stockId;
     private long itemId;
-    private Recoverable stock;
 
 
     public InventoryItem(){
@@ -28,7 +27,11 @@ public class InventoryItem extends ConfigurableObject implements Inventory.Stock
         this.itemId = commodity.distributionId();
         this.stockId = stockId;
     }
-
+    public InventoryItem(long itemId,long stockId){
+        this();
+        this.itemId = itemId;
+        this.stockId = stockId;
+    }
 
     @Override
     public boolean write(DataBuffer buffer) {
@@ -64,7 +67,6 @@ public class InventoryItem extends ConfigurableObject implements Inventory.Stock
         jsonObject.addProperty("Name",configurationName);
         jsonObject.addProperty("ItemId",Long.toString(itemId));
         jsonObject.addProperty("StockId",Long.toString(stockId));
-        jsonObject.add("_stock",stock!=null?stock.toJson():new JsonObject());
         return jsonObject;
     }
 
@@ -76,8 +78,7 @@ public class InventoryItem extends ConfigurableObject implements Inventory.Stock
     }
 
     public void stock(Recoverable recoverable){
-        this.stock = recoverable;
-    }
 
+    }
 
 }

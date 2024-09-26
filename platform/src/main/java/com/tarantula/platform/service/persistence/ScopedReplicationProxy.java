@@ -23,7 +23,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
     protected TarantulaLogger logger;
 
     private final String name;
-    private final int scope;
+    protected final int scope;
     protected boolean asyncDistributing = true;
     protected boolean broadcasting = true;
     protected long asyncInterval = 100;
@@ -32,6 +32,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
     protected TransactionLogManager transactionLogManager;
     protected DistributionReplicator distributionReplicator;
+
     public ScopedReplicationProxy(String name,int scope){
         this.name = name;
         this.scope = scope;
@@ -115,6 +116,9 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
 
     public TransactionLogManager transactionLogManager(){
         return transactionLogManager;
+    }
+    protected void onHomingAgent(TransactionLog transactionLog){
+        serviceContext.node().homingAgent().onTransactionLog(transactionLog.toBinary());
     }
 
 }

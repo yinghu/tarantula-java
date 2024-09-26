@@ -1,10 +1,12 @@
 package com.tarantula.platform.tournament;
 
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.Application;
+import com.tarantula.platform.item.ConfigurableEdit;
 import com.tarantula.platform.item.ConfigurableObject;
 
 import java.time.LocalDateTime;
@@ -17,6 +19,14 @@ public class TournamentSchedule extends Application {
 
     public TournamentSchedule(){
 
+    }
+
+    public TournamentSchedule(JsonObject payload){
+        super(payload);
+    }
+
+    public TournamentSchedule(ConfigurableEdit edit){
+        this.header = edit.assembly();
     }
 
     public TournamentSchedule(ConfigurableObject configurableObject){
@@ -99,11 +109,27 @@ public class TournamentSchedule extends Application {
         return prizes;
     }
 
+    public List<RangedTournamentPrize> prizeList(){
+        List<RangedTournamentPrize> prizes = new ArrayList<>();
+        header.get("_prizeSet").getAsJsonArray().forEach(e->{
+            prizes.add(new RangedTournamentPrize(e.getAsJsonObject()));
+        });
+        return prizes;
+    }
 
     public TournamentScheduleStatus status(){
         TournamentScheduleStatus status = new TournamentScheduleStatus();
         status.distributionId(this.distributionId());
         return status;
+    }
+
+    @Override
+    public long distributionId(){
+        if(this.distributionId>0) return this.distributionId;
+        return configurationId();
+    }
+    public long configurationId(){
+        return configurationId;
     }
 
 

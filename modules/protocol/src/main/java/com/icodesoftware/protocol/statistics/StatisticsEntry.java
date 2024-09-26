@@ -3,13 +3,13 @@ package com.icodesoftware.protocol.statistics;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.protocol.ProtocolPortableRegistry;
-import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.util.OnApplicationHeader;
 import com.icodesoftware.util.TimeUtil;
 
 import java.time.LocalDateTime;
 
 
-public class StatisticsEntry extends RecoverableObject implements Statistics.Entry {
+public class StatisticsEntry extends OnApplicationHeader implements Statistics.Entry {
 
     public static final String LABEL = "stats";
     //private String name;
@@ -30,13 +30,17 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
         this.ownerKey = ownerKey;
         this.name = name;
     }
-    public StatisticsEntry(Statistics.Entry entry){
+    private StatisticsEntry(Statistics.Entry entry){
         this.name = entry.name();
         this.daily = entry.daily();
         this.weekly = entry.weekly();
         this.monthly = entry.monthly();
         this.yearly = entry.yearly();
         this.total = entry.total();
+    }
+    private StatisticsEntry(String category,double value){
+        this.name = category;
+        this.total = value;
     }
     public void listener(Statistics.Listener listener){
         this.listener = listener;
@@ -80,6 +84,7 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
     public synchronized Statistics.Entry update(double delta) {
         LocalDateTime lastUpdated = TimeUtil.fromUTCMilliseconds(timestamp);
         LocalDateTime _now = LocalDateTime.now();
+        timestamp = TimeUtil.toUTCMilliseconds(_now);
         if(StatisticsUtil.validateDaily(lastUpdated,_now)){
             daily += delta;
             weekly += delta;
@@ -99,9 +104,8 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
             }
         }
         total += delta;
-        //if(listener!=null){
-            //listener.entryUpdated(this);
-        //}
+        if(listener==null) return this;
+        listener.entryUpdated(this,delta);
         return this;
     }
     @Override
@@ -138,6 +142,7 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
         this.monthly = buffer.readDouble();
         this.yearly = buffer.readDouble();
         this.total = buffer.readDouble();
+        this.timestamp = buffer.readLong();
         return true;
     }
     public boolean write(DataBuffer buffer) {
@@ -147,6 +152,11 @@ public class StatisticsEntry extends RecoverableObject implements Statistics.Ent
         buffer.writeDouble(monthly);
         buffer.writeDouble(yearly);
         buffer.writeDouble(total);
+        buffer.writeLong(timestamp);
         return true;
+    }
+
+    public static Statistics.Entry simpleValue(String category,double value){
+        return new StatisticsEntry(category,value);
     }
 }

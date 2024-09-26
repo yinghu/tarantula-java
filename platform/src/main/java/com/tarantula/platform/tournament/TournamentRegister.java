@@ -1,10 +1,9 @@
 package com.tarantula.platform.tournament;
 
 import com.icodesoftware.Tournament;
-import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.platform.OnApplicationHeader;
+import com.icodesoftware.util.OnApplicationHeader;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.ScheduledFuture;
@@ -66,10 +65,10 @@ public class TournamentRegister extends OnApplicationHeader {
         this.timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now().minusMinutes(duration));
         this.totalJoined.set(joins);
         provider.updateTournamentRegister(this);
-        provider.logger.warn("Setup Instance : "+tournamentId);
+        provider.logger().warn("Setup Instance : "+tournamentId);
         if(scheduledFuture!=null) scheduledFuture.cancel(true);
         scheduledFuture = provider.schedule(new ScheduleRunner((duration-provider.endBufferTimeMinutes)*60*1000,()->{
-            provider.logger.warn("Timeout Instance : "+tournamentId);
+            provider.logger().warn("Timeout Instance : "+tournamentId);
             setup(provider,provider.nextInstanceId(),duration,joins);
         }));
     }

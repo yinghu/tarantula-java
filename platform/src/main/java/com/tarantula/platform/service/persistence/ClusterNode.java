@@ -1,13 +1,14 @@
 package com.tarantula.platform.service.persistence;
 
-
 import com.google.gson.JsonObject;
 import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.platform.service.PlatformHomingAgent;
 
 import java.time.format.DateTimeFormatter;
+
 
 
 public class ClusterNode extends RecoverableObject implements ClusterProvider.Node {
@@ -24,26 +25,27 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     public long deploymentId;
     public String clusterNameSuffix;
     public int partitionNumber;
-
+    public int bucketNumber;
     public String deployDirectory;
     public String servicePushAddress;
 
-    public boolean runAsMirror;
-    public boolean backupEnabled;
     public boolean dailyBackupEnabled;
     public String dataStoreDirectory;
 
-
-    public ClusterNode(String bucketName, String nodeName,int partitionNumber){
+    public final PlatformHomingAgent tarantulaAgent;
+    public ClusterNode(String bucketName, String nodeName,int partitionNumber,int bucketNumber){
+        this();
         this.bucketName = bucketName;
         this.nodeName = nodeName;
         this.partitionNumber = partitionNumber;
+        this.bucketNumber = bucketNumber;
     }
     public ClusterNode(){
+        this.tarantulaAgent = new PlatformHomingAgent();
     }
 
     public String toString(){
-        return "Bucket ["+bucketName+"] On Node ["+nodeName+"]";
+        return "Bucket Name ["+bucketName+"] On Node ["+nodeName+"] partitions ["+partitionNumber+"] buckets ["+bucketNumber+"]";
     }
 
     @Override
@@ -88,7 +90,9 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
     public int partitionNumber(){
         return partitionNumber;
     }
-
+    public int bucketNumber(){
+        return bucketNumber;
+    }
     public String clusterNameSuffix(){
         return this.clusterNameSuffix;
     }
@@ -101,11 +105,14 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         return servicePushAddress;
     }
 
-    public boolean runAsMirror(){return runAsMirror;}
-    public boolean backupEnabled(){return backupEnabled;}
     public boolean dailyBackupEnabled(){ return this.dailyBackupEnabled;}
     public String dataStoreDirectory(){
         return this.dataStoreDirectory;
+    }
+
+
+    public ClusterProvider.HomingAgent homingAgent(){
+        return this.tarantulaAgent;
     }
 
     @Override
@@ -127,6 +134,7 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         buffer.writeUTF8(clusterNameSuffix);
         buffer.writeLong(deploymentId);
         buffer.writeInt(partitionNumber);
+        buffer.writeInt(bucketNumber);
         return buffer.array();
     }
 
@@ -143,6 +151,7 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         this.clusterNameSuffix =buffer.readUTF8();
         this.deploymentId = buffer.readLong();
         this.partitionNumber = buffer.readInt();
+        this.bucketNumber = buffer.readInt();
     }
 
     private JsonObject _toJson(boolean toWeb){
@@ -155,6 +164,7 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         jsonObject.addProperty("address",address);
         jsonObject.addProperty("clusterNameSuffix",clusterNameSuffix);
         jsonObject.addProperty("partitionNumber",partitionNumber);
+        jsonObject.addProperty("bucketNumber",bucketNumber);
         jsonObject.addProperty("deploymentId","A_"+deploymentId);
         if(toWeb){
             jsonObject.addProperty("startTime",TimeUtil.fromUTCMilliseconds(startTime).format(DateTimeFormatter.ISO_DATE_TIME));
@@ -176,5 +186,4 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
         if(memberId!=null) return memberId.equals(r.memberId);
         return this.nodeName.equals(r.nodeName());
     }
-
 }

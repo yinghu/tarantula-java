@@ -1,7 +1,7 @@
 package com.tarantula.platform.presence;
 
 import com.icodesoftware.*;
-import com.tarantula.platform.ResponseHeader;
+import com.icodesoftware.util.ResponseHeader;
 
 import java.util.List;
 
@@ -14,8 +14,6 @@ public class PresenceContext extends ResponseHeader {
     public List<Access.Role> roleList;
     public List<Lobby> lobbyList;
     public OnSession presence;
-    public String googleClientId;
-    public String stripeClientId;
 
     public PresenceContext(){
         this.code = 200;

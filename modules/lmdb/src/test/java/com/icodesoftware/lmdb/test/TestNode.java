@@ -36,6 +36,10 @@ public class TestNode implements ClusterProvider.Node {
 
     }
 
+    public int bucketNumber(){
+        return 1;
+    }
+
     @Override
     public int scope() {
         return 0;
@@ -223,15 +227,6 @@ public class TestNode implements ClusterProvider.Node {
         return null;
     }
 
-    @Override
-    public boolean runAsMirror() {
-        return false;
-    }
-
-    @Override
-    public boolean backupEnabled() {
-        return false;
-    }
 
     @Override
     public boolean dailyBackupEnabled() {
@@ -240,6 +235,11 @@ public class TestNode implements ClusterProvider.Node {
 
     @Override
     public String dataStoreDirectory() {
+        return null;
+    }
+
+    @Override
+    public ClusterProvider.HomingAgent homingAgent() {
         return null;
     }
 }

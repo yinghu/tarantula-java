@@ -77,7 +77,7 @@
                 <reset-enabled>true</reset-enabled>
                 <module-name>com.tarantula.game.module.MatchMakingModule</module-name>
             </application>
-            <application><!-- key/value set/get app-->
+            <application><!-- cloud data module-->
                 <type-id>game-data</type-id>
                 <name>PersonalDataStore</name>
                 <type>application</type>

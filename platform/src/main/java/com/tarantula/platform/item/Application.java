@@ -5,26 +5,25 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
 
 public class Application extends ConfigurableObject implements Configurable.Listener<Commodity>{
 
     protected boolean validated;
+    public int configurationId;
+    public int publishId;
 
     public Application(){}
 
-    public Application(ConfigurableObject configurableObject){
-        super(configurableObject);
+    public Application(JsonObject payload){
+        this.header = payload;
+        this.configurationId = payload.get("ConfigurationId").getAsInt();
+        this.configurationName = payload.get("ConfigurationName").getAsString();
+        if(payload.has("ConfigurationPublishId")) this.publishId = payload.get("ConfigurationPublishId").getAsInt();
     }
 
-    @Override
-    public Map<String,Object> toMap(){
-        super.toMap();
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        super.fromMap(properties);
+    public Application(ConfigurableObject configurableObject){
+        super(configurableObject);
     }
 
     @Override
@@ -77,5 +76,16 @@ public class Application extends ConfigurableObject implements Configurable.List
         String[] comp = this.configurationType.split("\\.");
         if(comp.length != 2) return false; //asset.xxx
         return comp[0].equals(Configurable.APPLICATION_CONFIG_TYPE);
+    }
+
+    public List<Commodity> commodityList(){
+        return new ArrayList<>();
+    }
+
+    public String configurationKey(){
+        return Integer.toString(configurationId);
+    }
+    public String publishKey(){
+        return Integer.toString(publishId);
     }
 }

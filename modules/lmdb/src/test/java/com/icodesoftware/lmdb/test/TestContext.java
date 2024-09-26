@@ -68,11 +68,6 @@ public class TestContext implements ServiceContext {
         return null;
     }
 
-    @Override
-    public BackupProvider backupProvider() {
-        return null;
-    }
-
 
 
     @Override
@@ -126,16 +121,6 @@ public class TestContext implements ServiceContext {
     }
 
     @Override
-    public void registerBackupProvider(BackupProvider backupProvider) {
-
-    }
-
-    @Override
-    public void unregisterBackupProvider(BackupProvider backupProvider) {
-
-    }
-
-    @Override
     public Metrics metrics(String name) {
         return null;
     }
@@ -167,4 +152,9 @@ public class TestContext implements ServiceContext {
     public DataStore dataStore(ApplicationSchema applicationSchema,int scope,String name){
         return null;
     }
+
+    public OnPartition[] buckets(){
+        return new OnPartition[0];
+    }
+
 }

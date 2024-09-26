@@ -13,11 +13,18 @@ public class ProtocolPortableRegistry<T extends Recoverable> extends AbstractRec
     public static final int USER_RATION_CID = 2;
     public static final int STATISTICS_CID = 3;
     public static final int STATISTICS_ENTRY_CID = 5;
+
+
     @Override
     public int registryId() {
         return OID;
     }
 
+    public static ProtocolPortableRegistry INS;
+
+    public ProtocolPortableRegistry(){
+        INS = this;
+    }
     @Override
     public T create(int cid) {
         Recoverable _ins;

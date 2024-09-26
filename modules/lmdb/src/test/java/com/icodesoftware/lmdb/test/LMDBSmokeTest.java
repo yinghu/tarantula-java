@@ -1,5 +1,9 @@
 package com.icodesoftware.lmdb.test;
 
+import com.icodesoftware.Recoverable;
+import com.icodesoftware.lmdb.BufferProxy;
+import com.icodesoftware.lmdb.EnvSetting;
+import com.icodesoftware.util.CompressUtil;
 import org.lmdbjava.*;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
@@ -7,6 +11,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,7 +21,7 @@ public class LMDBSmokeTest {
 
 
     private String dir = "target/lmdb/smoke";
-    private long mapSize = 1_048_576L;
+    private long mapSize = EnvSetting.toBytesFromMb(1);
 
     private int maxStores = 100;
     private int maxReader = 100;
@@ -238,6 +243,42 @@ public class LMDBSmokeTest {
             Assert.assertTrue(dbi2.get(r,key.rewind())!=null);
             Assert.assertEquals(r.val().getLong(),100);
         }
+    }
+
+    @Test(groups = { "LMDBSmoke" })
+    public void compressTest() {
+        CompressUtil.LZ4 lz4 = CompressUtil.lz4();
+        ByteBuffer key = ByteBuffer.allocateDirect(env.getMaxKeySize());
+        key.putLong(100).flip();
+        ByteBuffer value = ByteBuffer.allocateDirect(100);
+        for(int i=0;i<10;i++) {
+            value.putLong(100+i);
+        }
+        value.flip();
+        ByteBuffer comp = ByteBuffer.allocateDirect(100);
+        lz4.compress(value,comp);
+        comp.flip();
+        Dbi dbi1 = env.openDbi("comp1",DbiFlags.MDB_CREATE);
+        try(final Txn<ByteBuffer> w = env.txnWrite()){
+            Assert.assertTrue(dbi1.put(w,key,comp));
+            w.commit();
+        }
+        value.clear();
+        try(final Txn<ByteBuffer> r = env.txnRead()){
+            Assert.assertTrue(dbi1.get(r,key.rewind())!=null);
+            lz4.decompress(r.val(),value);
+            value.flip();
+            for(int i=0;i<10;i++){
+                Assert.assertEquals(value.getLong(),100+i);
+            }
+        }
+        TestUser user = new TestUser("test",100);
+        Recoverable.DataBuffer src = BufferProxy.buffer(EnvSetting.VALUE_SIZE,true);
+        user.write(src);
+        //System.out.println(src.flip().remaining());
+        Recoverable.DataBuffer dest = BufferProxy.buffer(EnvSetting.VALUE_SIZE,true);
+        lz4.compress(src.rewind(),dest.clear());
+        //System.out.println(dest.flip().remaining());
     }
 
 

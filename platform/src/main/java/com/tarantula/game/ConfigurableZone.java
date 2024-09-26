@@ -3,7 +3,6 @@ package com.tarantula.game;
 import com.google.gson.JsonObject;
 import com.icodesoftware.ApplicationContext;
 import com.icodesoftware.DataStore;
-import com.icodesoftware.Rating;
 import com.icodesoftware.Session;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.lobby.LobbyItem;
@@ -23,7 +22,6 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
 
     private String configurationTypeId;
 
-    private String gameModule;
 
     public String configurationTypeId() {
         return this.configurationTypeId;
@@ -37,7 +35,6 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
     }
 
     public ConfigurableZone(LobbyItem lobbyItem, ZoneItem zoneItem){
-        this.gameModule = lobbyItem.gameModule();
         this.configurationTypeId = lobbyItem.configurationName()+"_"+zoneItem.configurationName()+"_"+zoneItem.configurationVersion();
         this.zoneItem = zoneItem;
         this.arenaList = new ArrayList<>();
@@ -50,7 +47,6 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
     }
 
     public ConfigurableZone(ZoneItem zoneItem){
-        //this.gameModule = lobbyItem.configurationName();
         this.zoneItem = zoneItem;
         this.arenaList = new ArrayList<>();
         this.arenaIndex = new ConcurrentHashMap<>();
@@ -73,11 +69,6 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
         return zoneItem.playMode();
     }
 
-
-    @Override
-    public String gameModule(){
-        return this.gameModule;
-    }
     @Override
     public int capacity() {
         return this.zoneItem.room().capacity();
@@ -125,7 +116,9 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
 
     @Override
     public GameArena arena(int level) {
-        return arenaIndex.get(level);
+        GameArena arena = arenaIndex.get(level);
+        if(arena!=null) return arena;
+        return arenaIndex.get(1);
     }
 
     @Override
@@ -157,13 +150,8 @@ public class ConfigurableZone extends RecoverableObject implements GameZone {
         return this.zoneItem.toJson();
     }
 
-    public String distributionKey(){
-        return this.zoneItem.distributionKey();
+    public long distributionId(){
+        return this.zoneItem.distributionId();
     }
-
-    //public String bucket(){
-        //return this.zoneItem.bucket();
-    //}
-
 
 }

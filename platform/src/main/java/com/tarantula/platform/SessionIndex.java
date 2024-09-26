@@ -1,6 +1,8 @@
 package com.tarantula.platform;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.protocol.session.OnSessionTrack;
+import com.tarantula.platform.service.cluster.PortableRegistry;
 
 
 public class SessionIndex extends OnSessionTrack {
@@ -25,6 +27,16 @@ public class SessionIndex extends OnSessionTrack {
         jp.addProperty("distributionId",distributionKey());
         jp.addProperty("timestamp",Long.toString(timestamp));
         return jp;
+    }
+
+    @Override
+    public int getFactoryId() {
+        return PortableRegistry.OID;
+    }
+
+    @Override
+    public int getClassId() {
+        return PortableRegistry.ON_SESSION_CID;
     }
 
 }

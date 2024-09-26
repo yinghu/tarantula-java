@@ -6,7 +6,11 @@ import com.icodesoftware.Configuration;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Session;
+
+import com.icodesoftware.lmdb.EnvSetting;
+
 import com.icodesoftware.Transaction;
+
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.ServiceContext;
@@ -17,11 +21,10 @@ import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 
 import com.tarantula.platform.item.PlatformItemServiceProvider;
-import com.tarantula.platform.presence.PresencePortableRegistry;
-import com.tarantula.platform.util.RecoverableQuery;
 
 
 import java.time.LocalDateTime;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -30,7 +33,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
 
     public static final String NAME = "save";
 
-    private int mappingObjectMaxSize = 2000;
+    private final int mappingObjectMaxSize = EnvSetting.VALUE_SIZE;
     private int saveSize = 3;
 
     private long saveTimeout = 1; //1 hour
@@ -45,78 +48,62 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         super.setup(serviceContext);
         Configuration configuration = serviceContext.configuration("game-presence-settings");
         JsonObject saveGame = ((JsonElement)configuration.property("savedGame")).getAsJsonObject();
-        mappingObjectMaxSize = saveGame.get("mappingObjectMaxSize").getAsInt();
+
+        //mappingObjectMaxSize = saveGame.get("mappingObjectMaxSize").getAsInt();
         maxOverSizeBatch = saveGame.get("oversizePayloadMaxBatchSize").getAsInt();
         oversizePayloadReadRetryNumber = saveGame.get("oversizePayloadReadRetryNumber").getAsInt();
+
         saveSize = saveGame.get("saveSize").getAsInt();
         saveTimeout = saveGame.get("saveTimeout").getAsInt()*saveTimeout;
         dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
         this.logger = JDKLogger.getLogger(PlatformSavedGameServiceProvider.class);
-        this.logger.warn("Saved game service provider started on ->"+gameServiceName+" : "+mappingObjectMaxSize);
+        this.logger.warn("Saved game service provider started on ->"+gameServiceName+" : Max mapping object size : "+mappingObjectMaxSize);
     }
 
 
     public <T extends RecoverableObject> void save(Session session,T save){
         CurrentSaveIndex currentSaveIndex = currentSaveIndex(session);
-        PlayerSaveIndex saveIndex = playerSaveIndex(currentSaveIndex.index()==null?session.systemId():currentSaveIndex.index());
+        PlayerSaveIndex saveIndex = playerSaveIndex(currentSaveIndex.saveId==0?session.systemId():currentSaveIndex.saveId);
         save.distributionKey(saveIndex.distributionKey());
         if(!this.dataStore.update(save)) {
             this.dataStore.createIfAbsent(save, false);
         }
         save.dataStore(dataStore);
         //if(saveIndex.addKey(save.key().asString())) saveIndex.update();
-        platformGameServiceProvider.presenceServiceProvider().updateSavedGame(currentSaveIndex);
+        //.presenceServiceProvider().updateSavedGame(currentSaveIndex);
     }
 
-    public <T extends RecoverableObject> void createIfAbsent(Session session, T save){
-        CurrentSaveIndex currentSaveIndex = currentSaveIndex(session);
-        String saveId = currentSaveIndex.index()==null?session.systemId():currentSaveIndex.index();
-        save.distributionKey(saveId);
-        save.dataStore(dataStore);
-        if(!this.dataStore.createIfAbsent(save,true)) return;
-        PlayerSaveIndex saveIndex = playerSaveIndex(saveId);
-        //if(saveIndex.addKey(save.key().asString())) saveIndex.update();
-        platformGameServiceProvider.presenceServiceProvider().updateSavedGame(currentSaveIndex);
-    }
+
 
     public <T extends RecoverableObject> boolean load(Session session, T save){
         CurrentSaveIndex currentSaveIndex = currentSaveIndex(session);
-        String saveId = currentSaveIndex.index()==null?session.systemId():currentSaveIndex.index();
-        save.distributionKey(saveId);
+        long saveId = currentSaveIndex.saveId==0?session.systemId():currentSaveIndex.saveId;
+        save.distributionId(saveId);
         save.dataStore(dataStore);
         return this.dataStore.load(save);
     }
 
-    public CurrentSaveIndex reset(Session session){
+    public boolean reset(Session session){
         CurrentSaveIndex currentSaveIndex = currentSaveIndex(session);
-        //reset or delete saved data associated with the save
-        PlayerSaveIndex saveIndex = playerSaveIndex(currentSaveIndex.index()==null?session.systemId():currentSaveIndex.index());
-        //saveIndex.keySet().forEach(k->{
-            //this.dataStore.delete(k);
-        //});
-        //saveIndex.clear();
-        return currentSaveIndex;
+        SavedGame savedGame = SavedGame.lookup(currentSaveIndex.saveId,dataStore);
+        if(savedGame==null || savedGame.stub != currentSaveIndex.stub) return false;
+        //platformGameServiceProvider.presenceServiceProvider().onResetSavedGame(savedGame);
+        savedGame.version = 1;
+        savedGame.name("New Save");
+        savedGame.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+        savedGame.update();
+        return true;
     }
 
     public CurrentSaveIndex currentSaveIndex(Session session){
-        CurrentSaveIndex currentSaveIndex = new CurrentSaveIndex();
-        RecoverableQuery query = RecoverableQuery.query(session.stub(),currentSaveIndex,PresencePortableRegistry.INS);
-        List<CurrentSaveIndex> list = dataStore.list(query);
-        if(list.size()==0) {
-            currentSaveIndex.ownerKey(query.key());
-            currentSaveIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-            dataStore.create(currentSaveIndex);
-            list.add(currentSaveIndex);
-        }
-        currentSaveIndex = list.get(0);
+        CurrentSaveIndex currentSaveIndex = CurrentSaveIndex.lookup(session,dataStore);
         if(currentSaveIndex.saveId == 0){
             SavedGame savedGame = savedGameList(session).get(0); //select first one always if no selection from players
             savedGame.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
             savedGame.stub = session.stub();
             dataStore.update(savedGame);
             currentSaveIndex.saveId = savedGame.distributionId();
-            currentSaveIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-            dataStore.update(currentSaveIndex);
+            currentSaveIndex.update();
         }
         return currentSaveIndex;
     }
@@ -124,26 +111,26 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
     public CurrentSaveIndex selectSavedGame(Session session){
         long selected = Long.parseLong(session.name());
         CurrentSaveIndex currentSaveIndex = currentSaveIndex(session);
-        if(selected==currentSaveIndex.saveId) return currentSaveIndex;
-        SavedGame savedGame = new SavedGame();
-        savedGame.distributionId(selected);
-        if(!dataStore.load(savedGame)) return currentSaveIndex;
-        SavedGame released = new SavedGame();
-        released.distributionId(currentSaveIndex.saveId);
-        if(!dataStore.load(released)) throw new RuntimeException("save not existed ["+currentSaveIndex.saveId+"]");
+        if(selected == currentSaveIndex.saveId) return currentSaveIndex;
+
+        SavedGame savedGame = SavedGame.lookup(selected,dataStore);
+        if(savedGame==null) return currentSaveIndex;
+
+        SavedGame released = SavedGame.lookup(currentSaveIndex.saveId,dataStore);
+        if(released==null) throw new RuntimeException("save not existed ["+currentSaveIndex.saveId+"]");
+
         currentSaveIndex.saveId = selected;
-        currentSaveIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-        dataStore.update(currentSaveIndex);
+        currentSaveIndex.update();
+
         released.stub = 0;
-        dataStore.update(released);
+        released.update();
+
         savedGame.stub = session.stub();
-        dataStore.update(savedGame);
+        savedGame.update();
         return currentSaveIndex;
     }
 
-    public void checkSavedGame(String systemId){
-    }
-    private PlayerSaveIndex playerSaveIndex(String indexId){
+    private PlayerSaveIndex playerSaveIndex(long indexId){
         PlayerSaveIndex playerSaveIndex = new PlayerSaveIndex(indexId);
         this.dataStore.createIfAbsent(playerSaveIndex,true);
         playerSaveIndex.dataStore(this.dataStore);
@@ -152,21 +139,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
 
 
     public List<SavedGame> savedGameList(Session session){
-        RecoverableQuery<SavedGame> query = new RecoverableQuery<>(session.key(),SavedGame.USER_SAVE,PresencePortableRegistry.SAVED_GAME_CID,PresencePortableRegistry.INS);
-        List<SavedGame> list = dataStore.list(query);
-        if(list.size()==0){
-            for(int i=0;i<saveSize;i++){
-                SavedGame save = new SavedGame();
-                save.name("save"+i);
-                save.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-                save.version = 1;
-                save.label(SavedGame.USER_SAVE);
-                save.ownerKey(session.key());
-                dataStore.create(save);
-                list.add(save);
-            }
-        }
-        return list;
+        return SavedGame.list(session,dataStore,saveSize);
     }
 
     public void saveData(Session session,String key,byte[] data){

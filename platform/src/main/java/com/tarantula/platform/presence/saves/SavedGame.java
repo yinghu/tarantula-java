@@ -2,12 +2,14 @@ package com.tarantula.platform.presence.saves;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Session;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class SavedGame extends RecoverableObject implements Configurable {
 
@@ -24,10 +26,6 @@ public class SavedGame extends RecoverableObject implements Configurable {
     public SavedGame(){
         this.onEdge = true;
         this.label = USER_SAVE;
-    }
-    public SavedGame(String owner,String saveName){
-        this.owner = owner;
-        this.name = saveName;
     }
 
     public boolean read(DataBuffer buffer){
@@ -75,37 +73,29 @@ public class SavedGame extends RecoverableObject implements Configurable {
         return Long.hashCode(distributionId);
     }
 
-    @Override
-    public void update(){
-        this.dataStore.update(this);
-    }
 
-    public void load(){
-        if(loaded) return;
-        loaded = true;
-        this.dataStore.load(this);
-    }
-    public boolean onSession(Session session){
-        if(stub==0){
-            //stub = session.stub();
-            timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
-            this.update();
-            return true;
+    public static List<SavedGame> list(Session session, DataStore dataStore,int saveSize){
+        List<SavedGame> list = dataStore.list(new SavedGameQuery(session));
+        if(list.size()==0){
+            for(int i=0;i<saveSize;i++){
+                SavedGame save = new SavedGame();
+                save.name("save"+i);
+                save.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+                save.version = 1;
+                save.ownerKey(session.key());
+                dataStore.create(save);
+                list.add(save);
+            }
         }
-        return stub == session.stub();
-    }
-    public void offSession(Session session){
-        if(stub != session.stub()) return;
-        stub = 0;
-        timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
-        this.update();
+        return list;
     }
 
-    public void expireSession(int expired){
-        if(stub != expired) return;
-        stub = 0;
-        timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
-        this.update();
+    public static SavedGame lookup(long saveId,DataStore dataStore){
+        SavedGame savedGame = new SavedGame();
+        savedGame.distributionId = saveId;
+        if(!dataStore.load(savedGame)) return null;
+        savedGame.dataStore(dataStore);
+        return savedGame;
     }
 
 }

@@ -78,13 +78,13 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
     }
 
     @Override
-    public String resetCode(String key) {
+    public String resetCode(long key) {
         return null;
     }
 
     @Override
-    public String checkCode(String resetCode) {
-        return null;
+    public long checkCode(String resetCode) {
+        return 0;
     }
 
     @Override
@@ -97,40 +97,6 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
 
     }
 
-    @Override
-    public Response deployModule(String contextUrl, String resourceName) {
-        return null;
-    }
-
-    @Override
-    public Response createModule(Descriptor descriptor) {
-        return null;
-    }
-
-    @Override
-    public Response exportModule(Descriptor descriptor) {
-        return null;
-    }
-
-    @Override
-    public boolean launchModule(String typeId) {
-        return false;
-    }
-
-    @Override
-    public boolean resetModule(Descriptor descriptor) {
-        return false;
-    }
-
-    @Override
-    public boolean shutdownModule(String typeId) {
-        return false;
-    }
-
-    @Override
-    public ClassLoader classLoader(String moduleId) {
-        return null;
-    }
 
     @Override
     public boolean createApplication(Descriptor descriptor, String configName, boolean launching) {
@@ -210,10 +176,15 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
 
     }
 
+    @Override
+    public File dataStoreBackup(int scope) {
+        return null;
+    }
+
 
     @Override
-    public File issueDataStoreBackup(int scope) {
-        return null;
+    public void issueDataStoreBackup(int scope) {
+
     }
 
     @Override

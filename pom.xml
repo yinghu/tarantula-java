@@ -7,7 +7,7 @@
     <groupId>com.icodesoftware</groupId>
     <artifactId>game-cluster</artifactId>
     <packaging>pom</packaging>
-    <version>2.0</version>
+    <version>3.0</version>
     <name>Game Cluster</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -17,9 +17,7 @@
         <module>modules/protocol</module>
         <module>modules/lmdb</module>
         <module>platform</module>
-        <module>modules/agent</module>
         <module>modules/earth8</module>
-        <module>udp-game-server</module>
         <module>load-test</module>
     </modules>
 

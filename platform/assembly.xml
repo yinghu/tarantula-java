@@ -11,6 +11,13 @@
     </dependencySet>
   </dependencySets>
   <fileSets>
+	<fileSet>
+		<directory>..</directory>
+		<outputDirectory>bin</outputDirectory>
+		<includes>
+			<include>../LICENSE</include>
+		</includes>
+	</fileSet>
   	<fileSet>
       	<directory>src/main/bin</directory>
       	<outputDirectory>bin</outputDirectory>
@@ -19,9 +26,8 @@
 			<include>dev_tarantula.sh</include>
 			<include>tarantula.bat</include>
 			<include>bootstrap.sh</include>
-			<include>gec-agent-1.0.jar</include>
-			<include>license.txt</include>
 			<include>version.txt</include>
+			<include>gec-bootstrap.jar</include>
       	</includes>
       	<fileMode>0777</fileMode>
      </fileSet>

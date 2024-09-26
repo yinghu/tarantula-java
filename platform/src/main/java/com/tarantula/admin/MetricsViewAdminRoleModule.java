@@ -7,12 +7,9 @@ import com.icodesoftware.Module;
 import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.service.metrics.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -27,70 +24,14 @@ public class MetricsViewAdminRoleModule implements Module {
     private Configuration chartConfiguration;
     private long timerInterval;
     private int timerLoopCount;
-    private MetricsViewMonitor metricsViewMonitor;
+
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onCheckPermission")){
             Access acc = userService.loadUser(session.distributionId());
             session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes());
         }
-        else if(session.action().equals("onMetricsList")){
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
-            String serviceName = gameCluster.gameServiceName;//(String) gameCluster.property(GameCluster.GAME_SERVICE);
-            Metrics m = this.deploymentServiceProvider.metrics(serviceName);
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("successful",true);
-            JsonArray arr = new JsonArray();
-            arr.add(m.name());
-            jsonObject.add("list",arr);
-            session.write(jsonObject.toString().getBytes());
-        }
-        else if(session.action().equals("onMetricsCategory")){
-            ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();
-            Metrics metrics = deploymentServiceProvider.metrics(session.name());
-            List<String> categories = metrics.categories();
-            JsonObject m = new JsonObject();
-            JsonArray ms = new JsonArray();
-            categories.forEach(category->ms.add(category));
-            m.add("categories",ms);
-            JsonArray nodes = new JsonArray();
-            JsonArray chs = ((JsonElement)chartConfiguration.property("charts")).getAsJsonArray();
-            int[] i = {0};
-            summary.clusterNodes().forEach(n->{
-                JsonObject nd = new JsonObject();
-                nd.addProperty("nodeName",n.nodeName());
-                nd.addProperty("memberId",n.memberId());
-                nd.add("chart",chs.get(i[0]).getAsJsonObject());
-                nodes.add(nd);
-                i[0]++;
-            });
-            m.add("cluster",nodes);
-            session.write(m.toString().getBytes());
-        }
-        else if(session.action().equals("onMetricsRegister")){
-            JsonObject query = JsonUtil.parse(payload);
-            boolean archived = query.get("archive").getAsBoolean();
-            String type = query.get("type").getAsString();
-            String category = query.get("category").getAsString();
-            String classifier = query.get("classifier").getAsString();
-            String queryId;
-            if(archived) {
-                LocalDateTime endTime = LocalDateTime.parse(query.get("endDate").getAsString());
-                queryId = this.metricsViewMonitor.register(new MetricsSnapshotRequest(type,category,classifier,endTime));
-            }
-            else{
-                queryId = this.metricsViewMonitor.register(new MetricsSnapshotRequest(type,category,classifier));
-            }
-            session.write(toMessage(queryId,true).getBytes());
-        }
-        else if(session.action().equals("onMetrics")){
-            JsonObject m = this.metricsViewMonitor.snapshot(session.name());
-            session.write(m.toString().getBytes());
-        }
-        else if(session.action().equals("onMetricsArchive")){
-            JsonObject m = this.metricsViewMonitor.archive(session.name());
-            session.write(m.toString().getBytes());
-        }
+
         else if(session.action().equals("onServiceViewList")){
             ClusterProvider.Summary summary = this.deploymentServiceProvider.clusterSummary();
             JsonObject jsonObject = new JsonObject();
@@ -116,8 +57,11 @@ public class MetricsViewAdminRoleModule implements Module {
             ServiceProvider serviceProvider = context.serviceProvider(session.name());
             if(serviceProvider != null){
                 viewMap.computeIfAbsent(session.name(),k->{
-                    ServiceViewSummary view = new ServiceViewSummary(session.name(),chartConfiguration,()->viewMap.remove(session.name()));
-                    ServiceViewMonitor monitor = new ServiceViewMonitor(context,serviceProvider,timerInterval,timerLoopCount,view);
+                        ServiceViewSummary view = new ServiceViewSummary(session.name(),chartConfiguration,()->{
+                        ServiceViewSummary removed = viewMap.remove(session.name());
+                        this.context.log("Monitor view removed : "+removed.name(),OnLog.WARN);
+                    });
+                    ServiceViewScheduler monitor = new ServiceViewScheduler(context,serviceProvider,timerInterval,timerLoopCount,view);
                     context.schedule(monitor);
                     return view;
                 });
@@ -133,7 +77,7 @@ public class MetricsViewAdminRoleModule implements Module {
             JsonArray nodes = query.get("nodes").getAsJsonArray();
             JsonArray categories = query.get("categories").getAsJsonArray();
             ServiceViewSummary view = viewMap.get(session.name());
-            if(view!=null&&categories.size()>0){
+            if(view!=null && categories.size()>0){
                 session.write(view.toMetricsJson(nodes,categories).toString().getBytes());
             }
             else{
@@ -154,13 +98,8 @@ public class MetricsViewAdminRoleModule implements Module {
         this.chartConfiguration = this.deploymentServiceProvider.configuration("metrics-view-settings");
         this.timerInterval = ((Number)this.chartConfiguration.property("timerInterval")).longValue();
         this.timerLoopCount = ((Number)this.chartConfiguration.property("timerLoopCount")).intValue();
-        this.metricsViewMonitor = new MetricsViewMonitor(this.context,timerInterval);
-        this.context.schedule(this.metricsViewMonitor);
-        this.context.log("Metrics view admin role module started", OnLog.INFO);
+        this.context.log("Monitor view admin role module started", OnLog.INFO);
     }
 
-    private String toMessage(String msg,boolean suc){
-        return JsonUtil.toSimpleResponse(suc,msg);
-    }
 
 }

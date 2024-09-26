@@ -3,7 +3,9 @@ package com.tarantula.platform.tournament;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Tournament;
-import com.tarantula.platform.ResponseHeader;
+
+import com.icodesoftware.util.ResponseHeader;
+
 
 import java.util.List;
 

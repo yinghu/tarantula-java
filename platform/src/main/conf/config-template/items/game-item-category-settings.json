@@ -53,67 +53,7 @@
           {
             "name": "Gold",
             "type": "category",
-            "reference": "category:SoftCurrency",
-            "nullable": false,
-            "downloadable": false
-          }
-        ]
-      }
-    },
-    {
-      "header": {
-        "scope": "item",
-        "type": "Sku.Energy",
-        "description": "energy pack",
-        "version": "1.0",
-        "rechargeable": false
-      },
-      "application": {
-        "properties": [
-          {
-            "name": "Energy",
-            "type": "category",
-            "reference": "category:SoftCurrency",
-            "nullable": false,
-            "downloadable": false
-          }
-        ]
-      }
-    },
-    {
-      "header": {
-        "scope": "item",
-        "type": "Sku.Potion",
-        "description": "potion pack",
-        "version": "1.0",
-        "rechargeable": false
-      },
-      "application": {
-        "properties": [
-          {
-            "name": "Potion",
-            "type": "category",
-            "reference": "category:SoftCurrency",
-            "nullable": false,
-            "downloadable": false
-          }
-        ]
-      }
-    },
-    {
-      "header": {
-        "scope": "item",
-        "type": "Sku.Material",
-        "description": "material pack",
-        "version": "1.0",
-        "rechargeable": false
-      },
-      "application": {
-        "properties": [
-          {
-            "name": "Material",
-            "type": "category",
-            "reference": "category:SoftCurrency",
+            "reference": "category:HardCurrency",
             "nullable": false,
             "downloadable": false
           }
@@ -141,39 +81,19 @@
       }
     },
     {
-        "header": {
-          "scope": "item",
-          "type": "Sku.Unit",
-          "description": "unit sku",
-          "version": "v1.0",
-          "rechargeable": false
-        },
-        "application": {
-          "properties": [
-            {
-              "name": "Unit",
-              "type": "category",
-              "reference": "category:GameItem",
-              "nullable": false,
-              "downloadable": false
-            }
-          ]
-        }
-      },
-    {
       "header": {
         "scope": "item",
-        "type": "Sku.Equipment",
-        "description": "equipment sku",
-        "version": "v1.0",
+        "type": "Sku.Chip",
+        "description": "chip pack",
+        "version": "1.0",
         "rechargeable": false
       },
       "application": {
         "properties": [
           {
-            "name": "Equipment",
+            "name": "Chip",
             "type": "category",
-            "reference": "category:GameItem",
+            "reference": "category:SoftCurrency",
             "nullable": false,
             "downloadable": false
           }

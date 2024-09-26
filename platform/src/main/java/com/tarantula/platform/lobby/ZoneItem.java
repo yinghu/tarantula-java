@@ -18,6 +18,12 @@ public class ZoneItem extends Item {
 
     }
 
+    public ZoneItem(JsonObject payload){
+        this.header = payload;
+        this.configurationName = payload.get("ConfigurationName").getAsString();
+        this.configurationVersion = payload.get("ConfigurationVersion").getAsString();
+    }
+
     public int getFactoryId() {
         return PresencePortableRegistry.OID;
     }
@@ -42,13 +48,22 @@ public class ZoneItem extends Item {
 
 
     public RoomItem room(){
-
-        return room;
+        if(!header.has("_room")) return room;
+        RoomItem roomItem = new RoomItem(header.get("_room").getAsJsonObject());
+        return roomItem;
     }
 
     public List<ArenaItem> arenaList(){
         ArrayList<ArenaItem> alist = new ArrayList<>();
-        _reference.forEach(ref-> alist.add((ArenaItem) ref));
+        if(!header.has("_arenaList")){
+            _reference.forEach(ref-> alist.add((ArenaItem) ref));
+            return alist;
+        }
+        header.get("_arenaList").getAsJsonArray().forEach(a->{
+            JsonObject ao = a.getAsJsonObject();
+            ArenaItem arenaItem = new ArenaItem(ao);
+            alist.add(arenaItem);
+        });
         return alist;
     }
 

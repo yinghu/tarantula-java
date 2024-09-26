@@ -37,7 +37,9 @@ public interface DataStoreSummary {
     void branchPages(long branchPages);
 
     void edgeList(List<String> edgeList);
+
     interface View{
          boolean on(ClusterProvider.Node node,Recoverable.DataHeader h, Recoverable t);
     }
+
 }

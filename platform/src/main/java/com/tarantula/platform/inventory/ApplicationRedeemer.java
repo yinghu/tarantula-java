@@ -7,14 +7,14 @@ import com.tarantula.platform.item.ConfigurableObject;
 
 public class ApplicationRedeemer extends ConfigurableObject{
 
-    protected String systemId;
+    protected long systemId;
     protected ApplicationPreSetup applicationPreSetup;
 
-    public ApplicationRedeemer(String systemId, ApplicationPreSetup applicationPreSetup){
+    public ApplicationRedeemer(long systemId, ApplicationPreSetup applicationPreSetup){
         this.systemId = systemId;
         this.applicationPreSetup = applicationPreSetup;
     }
-    public ApplicationRedeemer(String systemId, ApplicationRedeemer inventoryRedeemer){
+    public ApplicationRedeemer(long systemId, ApplicationRedeemer inventoryRedeemer){
         this.systemId = systemId;
         this.configurationType = inventoryRedeemer.configurationType;
         this.configurationTypeId = inventoryRedeemer.configurationTypeId;
@@ -31,6 +31,7 @@ public class ApplicationRedeemer extends ConfigurableObject{
 
     public  void redeem(){
         //if(!this.configurationType.equals(Configurable.ITEM_CONFIG_TYPE)) return;
+        try{
         reference.forEach((ref)->{
             ApplicationRedeemer inventoryRedeemer = new ApplicationRedeemer(systemId,this.applicationPreSetup);
             inventoryRedeemer.distributionKey(ref.getAsString());
@@ -51,7 +52,9 @@ public class ApplicationRedeemer extends ConfigurableObject{
                     itemRedeemer.redeem();
                 }
             }
-        });
+        });}catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     public double amount() {

@@ -5,7 +5,6 @@ import com.hazelcast.nio.serialization.PortableFactory;
 import com.tarantula.cci.udp.GameChannel;
 import com.tarantula.platform.ClientConnection;
 import com.tarantula.platform.room.*;
-import com.tarantula.game.GameRating;
 import com.tarantula.platform.AccessIndexTrack;
 import com.tarantula.platform.DeploymentDescriptor;
 import com.tarantula.platform.GameCluster;
@@ -31,6 +30,8 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int GAME_CLUSTER_SYNC_EVENT_CID =12;
 
+    public static final int LEADER_BOARD_SYNC_EVENT_CID = 13;
+
     public static final int MODULE_RESET_EVENT_CID = 15;
 
     public static final int SERVER_PUSH_EVENT_CID = 21;
@@ -43,6 +44,7 @@ public class PortableEventRegistry implements PortableFactory {
     public static final int KEY_VALUE_SET_CID = 27;
 
     public static final int CLUSTER_BATCH_CID = 28;
+
 
     //EVENT PORTABLE OBJECTS
     public static final int SINGLETON_FORWARD_CID = 100;
@@ -58,20 +60,10 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int EXPOSED_GAME_SERVICE_CID = 108;
 
-    public static final int RATING_CID = 110;
-
     public static final int TOURNAMENT_CID = 113;
 
     public static final int TOURNAMENT_INSTANCE_CID = 114;
 
-
-    public static final int GAME_ENTRY_CID = 118;
-
-
-    public static final int PVE_ROOM_CID = 120;
-    public static final int PVP_ROOM_CID = 121;
-    public static final int TVE_ROOM_CID = 122;
-    public static final int TVT_ROOM_CID = 123;
 
     public static final int CLIENT_CONNECTION_CID = 124;
 
@@ -108,6 +100,10 @@ public class PortableEventRegistry implements PortableFactory {
 
             case GAME_CLUSTER_SYNC_EVENT_CID:
                 _ins = new GameClusterSyncEvent();
+                break;
+
+            case LEADER_BOARD_SYNC_EVENT_CID:
+                _ins = new LeaderBoardSyncEvent();
                 break;
 
             case SERVER_PUSH_EVENT_CID:
@@ -149,9 +145,6 @@ public class PortableEventRegistry implements PortableFactory {
             case ACCESS_INDEX_CID:
                 _ins = new AccessIndexTrack();
                 break;
-            case RATING_CID:
-                _ins = new GameRating();
-                break;
             case TOURNAMENT_CID:
                 _ins = new TournamentManager();
                 break;
@@ -159,22 +152,6 @@ public class PortableEventRegistry implements PortableFactory {
                 _ins = new TournamentInstance();
                 break;
 
-            case GAME_ENTRY_CID:
-                _ins = new GameEntry();
-                break;
-
-            case PVE_ROOM_CID:
-                _ins = new PVEGameRoom();
-                break;
-            case PVP_ROOM_CID:
-                _ins = new PVPGameRoom();
-                break;
-            case TVE_ROOM_CID:
-                _ins = new TVEGameRoom();
-                break;
-            case TVT_ROOM_CID:
-                _ins = new TVTGameRoom();
-                break;
             case CLIENT_CONNECTION_CID:
                 _ins = new ClientConnection();
                 break;

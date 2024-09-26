@@ -19,6 +19,7 @@ public class TestSetup {
     static LocalDistributionIdGenerator localDistributionIdGenerator;
 
     static boolean started = false;
+
     public static void setUp() throws Exception{
         if(started) return;
         started = true;
@@ -31,6 +32,5 @@ public class TestSetup {
         lmdbDataStoreProvider.registerMapStoreListener(Distributable.INTEGRATION_SCOPE,testMapStoreListener);
 
     }
-
 
 }

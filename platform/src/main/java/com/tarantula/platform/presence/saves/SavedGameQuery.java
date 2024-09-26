@@ -2,19 +2,20 @@ package com.tarantula.platform.presence.saves;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
-import com.tarantula.platform.presence.PresencePortableRegistry;
+import com.icodesoftware.Session;
 
-public class SavedGameQuery<T extends Recoverable> implements RecoverableFactory<T> {
 
-    private Recoverable.Key key;
+public class SavedGameQuery implements RecoverableFactory<SavedGame> {
 
-    public SavedGameQuery(Recoverable.Key key){
-        this.key = key;
+    private Session session;
+
+    public SavedGameQuery(Session session){
+        this.session = session;
     }
 
     @Override
-    public T create() {
-        return new PresencePortableRegistry<T>().create(PresencePortableRegistry.SAVED_GAME_CID);
+    public SavedGame create() {
+        return new SavedGame();
     }
 
 
@@ -25,6 +26,6 @@ public class SavedGameQuery<T extends Recoverable> implements RecoverableFactory
 
     @Override
     public Recoverable.Key key() {
-        return key;
+        return session.key();
     }
 }

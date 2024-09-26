@@ -10,7 +10,7 @@ import com.icodesoftware.*;
 
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.logging.JDKLogger;
-import com.sun.jdi.Bootstrap;
+import com.icodesoftware.util.ResponseHeader;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.bootstrap.TarantulaMain;
@@ -80,8 +80,9 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         }
         log.warn("Bucket receiver updating on member added->["+pt+"/"+sz+"]"+lm.getUuid());
         for(int i=0;i<this.tarantulaContext.platformRoutingNumber;i++){
-            this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt);
+            this.tarantulaContext.integrationCluster().onBucket(i,i%sz==pt);
         }
+        this.tarantulaContext.integrationCluster().onReload();
     }
 
     @Override
@@ -98,8 +99,9 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         }
         log.warn("bucket receiver updating on member removed->["+pt+"/"+sz+"]"+lm.getUuid());
         for(int i=0;i<this.tarantulaContext.platformRoutingNumber;i++){
-            this.tarantulaContext.integrationCluster().onPartition(i,i%sz==pt);
+            this.tarantulaContext.integrationCluster().onBucket(i,i%sz==pt);
         }
+        this.tarantulaContext.integrationCluster().onReload();
     }
 
     @Override
@@ -125,20 +127,9 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
     public void onShutdownApplication(String typeId,long applicationId){
         this.deploymentServiceProvider.distributionCallback().onApplicationShutdown(typeId,applicationId);
     }
-    public void onLaunchModule(String typeId){
-        this.deploymentServiceProvider.distributionCallback().onModuleLaunched(typeId);
-    }
-    public void onShutdownModule(String typeId){
-        this.deploymentServiceProvider.distributionCallback().onModuleShutdown(typeId);
-    }
-    public void onUpdateModule(Descriptor descriptor){
-        this.deploymentServiceProvider.distributionCallback().onModuleUpdated(descriptor);
-    }
+
     public void onUpdateResource(String contentUrl,String resourceName){
         this.deploymentServiceProvider.distributionCallback().onResourceUpdated(contentUrl,resourceName);
-    }
-    public void onDeployModule(String contentUrl,String resourceName){
-        this.deploymentServiceProvider.distributionCallback().onModuleDeployed(contentUrl,resourceName);
     }
 
     public void onStartConnection(String typeId,Connection connection){
@@ -154,20 +145,13 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         this.deploymentServiceProvider.distributionCallback().onConnectionVerified(typeId,serverId);
     }
 
-    public byte[] onClusterKey() {
-        return this.tarantulaContext.tokenValidatorProvider().clusterKey(this.tarantulaContext.node().clusterNameSuffix());
-    }
-    public byte[] onTokenKey() {
-        return this.tarantulaContext.tokenValidatorProvider().tokenKey(this.tarantulaContext.node().clusterNameSuffix());
-    }
     public void onResetClusterKey() {
         this.tarantulaContext.tokenValidatorProvider().reset();
     }
-    public void onEnablePresenceService(String root,String password,String clusterNameSuffix,String host) {
-        this.tarantulaContext.tokenValidatorProvider().enablePresenceService(root,password,clusterNameSuffix,host);
-    }
-    public void onDisablePresenceService(String clusterNameSuffix) {
-        this.tarantulaContext.tokenValidatorProvider().disablePresenceService(clusterNameSuffix);
+   
+
+    public void onIssueDataStoreBackup(int scope){
+        deploymentServiceProvider.issueDataStoreBackup(scope);
     }
     @Override
     public void migrationStarted(MigrationEvent migrationEvent) {
@@ -176,7 +160,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
 
     @Override
     public void migrationCompleted(MigrationEvent migrationEvent) {
-        this.tarantulaContext.integrationCluster().onReload(migrationEvent.getPartitionId(),migrationEvent.getNewOwner().localMember());
+        this.tarantulaContext.integrationCluster().onPartition(migrationEvent.getPartitionId(),migrationEvent.getNewOwner().localMember());
     }
 
     @Override
@@ -189,7 +173,17 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
                 Thread.sleep(3000);
                 TarantulaMain.runtime.shutdown();
             }catch (Exception ex){
-                log.warn("cannot shutdown node");
+                log.error("cannot shutdown node",ex);
+            }
+        }).start();
+    }
+    public void onNodeRestart(){
+        new Thread(()->{
+            try{
+                Thread.sleep(3000);
+                TarantulaMain.runtime.restart();
+            }catch (Exception ex){
+                log.error("cannot restart node",ex);
             }
         }).start();
     }

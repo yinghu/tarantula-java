@@ -7,17 +7,13 @@ import com.icodesoftware.Session;
 import com.icodesoftware.service.Serviceable;
 
 
-public interface GameLobby extends Configurable, Serviceable {
-
+public interface GameLobby extends Configurable, Serviceable, Session.TimeoutListener {
 
     Stub join(Session session);
-    boolean leave(Session session);
+    void leave(Session session);
 
     void validate(Session session);
 
     void setup(ApplicationContext applicationContext) throws Exception;
-    boolean timeout(String systemId,long stub);
-
-    //String gameModule();
 
 }

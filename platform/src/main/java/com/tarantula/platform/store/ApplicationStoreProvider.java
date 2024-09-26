@@ -43,24 +43,26 @@ public class ApplicationStoreProvider extends AuthObject {
             logger.warn("IAP shopping item cannot be here");
             return false;
         }
-        String systemId = (String) params.get(OnAccess.SYSTEM_ID);
+        long systemId = (long) params.get(OnAccess.SYSTEM_ID);
         GameCluster gameCluster = platformGameServiceProvider.gameCluster();
-        Transaction t = gameCluster.transaction();
-        boolean suc = t.execute(ctx->{
-            ApplicationPreSetup setup =(ApplicationPreSetup)ctx;
-            Inventory inventory = setup.inventory(Long.parseLong(systemId), shoppingItem.virtualCurrency().name());
-            if(inventory==null || !inventory.transact(shoppingItem.price()*(-1))){
-                logger.warn("Not enough balance to buy");
-                return false;
-            }
-            Descriptor app = gameCluster.application(shoppingItem.configurationTypeId());
-            ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,setup);
-            redeemer.distributionKey(bundleId);
-            if(!setup.load(app,redeemer)) return false;
-            redeemer.redeem();
-            return true;
-        });
-        if(!suc) return false;
+        boolean[] suc ={false};
+        try(Transaction t = gameCluster.transaction()){
+            suc[0] = t.execute(ctx->{
+                ApplicationPreSetup setup =(ApplicationPreSetup)ctx;
+                Inventory inventory = setup.inventory(systemId, shoppingItem.virtualCurrency().name());
+                if(inventory==null || !inventory.transact(shoppingItem.price()*(-1))){
+                    logger.warn("Not enough balance to buy");
+                    return false;
+                }
+                Descriptor app = gameCluster.application(shoppingItem.configurationTypeId());
+                ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,setup);
+                redeemer.distributionKey(bundleId);
+                if(!setup.load(app,redeemer)) return false;
+                redeemer.redeem();
+                return true;
+            });
+        }
+        if(!suc[0]) return false;
         params.put(OnAccess.STORE_TRANSACTION_ID,serviceContext.distributionId());
         params.put(OnAccess.STORE_QUANTITY,1);
         return true;

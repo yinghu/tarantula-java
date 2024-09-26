@@ -17,4 +17,7 @@ public interface ConfigurationServiceProvider extends ServiceProvider{
 
     default void unregisterConfigurableListener(String registryKey){}
 
+    default void register(int publishId){}
+    default void release(int publishId){}
+
 }

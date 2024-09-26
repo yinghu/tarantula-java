@@ -15,15 +15,6 @@ public class Asset extends ConfigurableObject{
         super(configurableObject);
     }
 
-    @Override
-    public Map<String,Object> toMap(){
-        super.toMap();
-        return this.properties;
-    }
-    @Override
-    public void fromMap(Map<String,Object> properties){
-        super.fromMap(properties);
-    }
 
     @Override
     public int getClassId() {

@@ -3,11 +3,9 @@ package com.tarantula.platform.service.cluster;
 import com.icodesoftware.Recoverable;
 
 import com.icodesoftware.util.AbstractRecoverableListener;
-import com.tarantula.game.GameRating;
 import com.tarantula.platform.*;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.event.SessionForward;
-import com.tarantula.platform.room.*;
 import com.tarantula.platform.service.AccessKey;
 import com.tarantula.platform.service.PresenceKey;
 
@@ -46,19 +44,11 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
     public static final int ACCESS_INDEX_CID = PortableEventRegistry.ACCESS_INDEX_CID;
 
-    public static final int RATING_CID = PortableEventRegistry.RATING_CID;
     public static final int TOURNAMENT_CID = PortableEventRegistry.TOURNAMENT_CID;
 
     public static final int TOURNAMENT_INSTANCE_CID = PortableEventRegistry.TOURNAMENT_INSTANCE_CID;
 
 
-
-    public static final int GAME_ENTRY_CID = PortableEventRegistry.GAME_ENTRY_CID;
-
-    public static final int PVE_ROOM_CID = PortableEventRegistry.PVE_ROOM_CID;
-    public static final int PVP_ROOM_CID = PortableEventRegistry.PVP_ROOM_CID;
-    public static final int TVE_ROOM_CID = PortableEventRegistry.TVE_ROOM_CID;
-    public static final int TVT_ROOM_CID = PortableEventRegistry.TVT_ROOM_CID;
     public static final int CLIENT_CONNECTION_CID = PortableEventRegistry.CLIENT_CONNECTION_CID;
 
 
@@ -119,9 +109,6 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
             case ACCESS_INDEX_CID:
                 _ins = new AccessIndexTrack();
                 break;
-            case RATING_CID:
-                _ins = new GameRating();
-                break;
             case TOURNAMENT_CID:
                 _ins = new TournamentManager();
                 break;
@@ -132,22 +119,6 @@ public class PortableRegistry<T extends Recoverable> extends AbstractRecoverable
 
             case CLIENT_CONNECTION_CID:
                 _ins = new ClientConnection();
-                break;
-            case GAME_ENTRY_CID:
-                _ins = new GameEntry();
-                break;
-
-            case PVE_ROOM_CID:
-                _ins = new PVEGameRoom();
-                break;
-            case PVP_ROOM_CID:
-                _ins = new PVPGameRoom();
-                break;
-            case TVE_ROOM_CID:
-                _ins = new TVEGameRoom();
-                break;
-            case TVT_ROOM_CID:
-                _ins = new TVTGameRoom();
                 break;
             default:
                 throw new IllegalArgumentException("Not supported event type ["+cid+"]");

@@ -2,21 +2,16 @@ package com.icodesoftware.service;
 
 import com.icodesoftware.EventListener;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.Statistics;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public interface ClusterProvider extends ServiceProvider {
+    String PENDING_EVENT_NUMBER = "pendingEventNumber";
 
     String name();
-
-    int maxSize();
-
-    int maxReplicationNumber();
-    int scope();
-    String bucket();
-
     //EventListener Register
     EventService publisher();
     EventService subscribe(String topic, EventListener callback);
@@ -39,10 +34,8 @@ public interface ClusterProvider extends ServiceProvider {
     String registerReloadListener(ReloadListener reloadListener);
     void unregisterReloadListener(String registerKey);
 
-    void registerNodeListener(NodeListener nodeListener);
-
     int partition(byte[] key);
-
+    int bucket(byte[] key);
     Summary summary();
 
     interface ClusterStore{
@@ -102,23 +95,35 @@ public interface ClusterProvider extends ServiceProvider {
         long deploymentId();
 
         int partitionNumber();
-
+        int bucketNumber();
         String clusterNameSuffix();
 
         String deployDirectory();
 
         String servicePushAddress();
 
-        boolean runAsMirror();
-        boolean backupEnabled();
         boolean dailyBackupEnabled();
         String dataStoreDirectory();
+        HomingAgent homingAgent();
 
     }
 
-    interface NodeListener{
-        void nodeAdded(Node node);
-        void nodeRemoved(Node node);
+    interface HomingAgent{
+        boolean enabled();
+        String host();
+        String accessKey();
+        String encryptionKey();
+        byte[] encrypt(byte[] data);
+        byte[] decrypt(byte[] data);
+
+        default void setup(ServiceContext serviceContext){}
+        default void onTransactionLog(byte[] log){}
+        default String onConfiguration(long gameClusterId,String category){ return "{}";}
+        default void onMetrics(String name, List<Statistics.Entry> updates){}
+        default String onConfigurationRegistered(int publishId){ return "{}";}
+        default String onConfigurationReleased(int publishId){ return "{}";}
+        default Content onDownload(String fileName){ return null;}
     }
+
 
 }

@@ -1,15 +1,15 @@
 package com.tarantula.platform.resource;
 
-import com.google.gson.JsonElement;
+
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
-import com.icodesoftware.Configuration;
 import com.icodesoftware.Descriptor;
-
 import com.icodesoftware.logging.JDKLogger;
 
 import com.icodesoftware.service.ServiceContext;
 
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.*;
@@ -27,10 +27,6 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
     private ConcurrentHashMap<String, GameResource> gameResourceIndex;
     private ConcurrentHashMap<String,Item> itemIndex;
 
-    private ArrayList<String> startingInventory;
-
-    private String startingResourceName;
-    private String grantingPolicy;
 
 
 
@@ -39,18 +35,25 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
         this.gameResourceIndex = new ConcurrentHashMap<>();
         this.itemIndex = new ConcurrentHashMap<>();
-        this.startingInventory = new ArrayList<>();
     }
 
     @Override
     public void setup(ServiceContext serviceContext) {
         super.setup(serviceContext);
-        Configuration configuration = serviceContext.configuration("game-presence-settings");
-        JsonObject startingInventory = ((JsonElement)configuration.property("startingInventory")).getAsJsonObject();
-        startingResourceName = startingInventory.get("resourceName").getAsString();
-        grantingPolicy = startingInventory.get("grantPolicy").getAsString();
         this.logger = JDKLogger.getLogger(PlatformResourceServiceProvider.class);
         this.logger.warn("Resource service provider started on ->"+gameServiceName);
+    }
+    @Override
+    public void start() throws Exception{
+        if(serviceContext.node().homingAgent().enabled()){
+            String config = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"Resource");
+            JsonArray list = JsonUtil.parse(config).get("list").getAsJsonArray();
+            list.forEach(e->{
+                GameResource resource = new GameResource(e.getAsJsonObject());
+                registerResource(resource);
+            });
+
+        }
     }
 
     public boolean onItemRegistered(String category,String itemId){
@@ -111,7 +114,7 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
         this.application = descriptor;
         this.platformGameServiceProvider.achievementServiceProvider().registerConfigurableListener(descriptor,listener);
         this.platformGameServiceProvider.dailyGiveawayServiceProvider().registerConfigurableListener(descriptor,listener);
-        this.platformGameServiceProvider.storeServiceProvider().registerConfigurableListener(descriptor,listener);
+        //this.platformGameServiceProvider.storeServiceProvider().registerConfigurableListener(descriptor,listener);
         return null;
     }
 
@@ -136,7 +139,7 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
         return configurable;
     }
 
-    public boolean grant(String systemId,String itemId){
+    public boolean grant(long systemId,String itemId){
         Item item = itemIndex.get(itemId);
         if(item==null){
             logger.warn("Item not existed->"+itemId);
@@ -148,28 +151,44 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
 
     private void setup(GameResource gameResource){
         List<Item> items = gameResource.list();
-        items.forEach(c->{
-            if(gameResource.configurationName().equals(startingResourceName)){
-                synchronized (startingInventory){
-                    startingInventory.add(c.distributionKey());
-                }
-            }
-            itemIndex.put(c.distributionKey(),c);
-        });
+        items.forEach(c-> itemIndex.put(c.distributionKey(),c));
     }
 
     private void clear(GameResource gameResource){
         List<Item> items = gameResource.list();
         items.forEach(c->{
-            if(gameResource.configurationName().equals(startingResourceName)){
-                synchronized (startingInventory){
-                    startingInventory.clear();
-                }
-            }
             itemIndex.remove(c.distributionKey());
             logger.warn("Item removed->"+gameResource.configurationName());
         });
     }
 
+
+    @Override
+    public boolean onItemRegistered(int publishId){
+        logger.warn("register local resource with ["+publishId+"]");
+        String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
+        logger.warn(config);
+        GameResource resource = new GameResource(JsonUtil.parse(config));
+        registerResource(resource);
+        return true;
+    }
+
+    @Override
+    public boolean onItemReleased(int publishId){
+        logger.warn("release local resource with ["+publishId+"]");
+        GameResource resource = gameResourceIndex.remove(Integer.toString(publishId));
+        if(resource==null) return false;
+        gameResourceIndex.remove(resource.name());
+        logger.warn("resource removed ["+resource.name());
+        return true;
+    }
+
+    private void registerResource(GameResource resource){
+        resource.commodityList().forEach(commodity -> {
+            gameCluster.registerConfigurableCategory(commodity.configurableCategory());
+        });
+        gameResourceIndex.put(resource.name(),resource);
+        gameResourceIndex.put(resource.publishKey(),resource);
+    }
 
 }

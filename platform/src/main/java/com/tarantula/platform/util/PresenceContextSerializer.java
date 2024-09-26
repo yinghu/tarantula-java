@@ -43,12 +43,7 @@ public class PresenceContextSerializer implements JsonSerializer<PresenceContext
             presenceContext.gameList.forEach(s->glist.add(s));
             pc.add("gameList",glist);
         }
-        if(presenceContext.googleClientId!=null){
-            pc.addProperty("googleClientId",presenceContext.googleClientId);
-        }
-        if(presenceContext.stripeClientId!=null){
-            pc.addProperty("stripeClientId",presenceContext.stripeClientId);
-        }
+
         if(presenceContext.access!=null){
             pc.add("access",new AccessSerializer().serialize(presenceContext.access,type,jsonSerializationContext));
         }

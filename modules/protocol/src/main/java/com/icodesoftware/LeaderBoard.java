@@ -1,6 +1,6 @@
 package com.icodesoftware;
 
-public interface LeaderBoard {
+public interface LeaderBoard extends JsonSerializable {
 
     String HOURLY = "hourly";
     String DAILY = "daily";
@@ -11,7 +11,6 @@ public interface LeaderBoard {
 
     int size();
     String category(); //The category of statistics eg WonCount, LostCount
-    void addListener(Listener listener);
 
     Board daily();
     Board weekly();
@@ -20,19 +19,19 @@ public interface LeaderBoard {
     Board total();
 
     void onAllBoard(Statistics.Entry entry);
-    interface  Board extends DataStore.Updatable{
-        void onBoard(String systemId,double value);
-        default void rank(Stream ranking){}
+
+    interface Board extends DataStore.Updatable,JsonSerializable{
+        void onBoard(Entry update);
+        default void rank(Listener ranking){}
     }
-    interface Stream{
-        void onRank(int rank,Entry entry);
-    }
-    interface Entry extends Recoverable, DataStore.Updatable{
+
+    interface Entry extends OnApplication, DataStore.Updatable{
         String category();
         String classifier();//board name daily, weekly, total
         double value();
 
         int rank();
+        void rank(int rank);
         Entry update(Entry entry);
     }
     interface Listener{

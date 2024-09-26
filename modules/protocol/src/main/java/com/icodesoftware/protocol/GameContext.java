@@ -25,4 +25,8 @@ public interface GameContext extends Context {
     ApplicationResource.Redeemer redeemer(Session session);
 
     Configurable lookup(long distributionId);
+
+    default Channel channel(int sessionId){return null;}
+
+    Room room(long roomId);
 }

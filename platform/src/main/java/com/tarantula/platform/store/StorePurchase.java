@@ -3,7 +3,7 @@ package com.tarantula.platform.store;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Inventory;
-import com.tarantula.platform.ResponseHeader;
+import com.icodesoftware.util.ResponseHeader;
 import java.util.List;
 import java.util.Map;
 

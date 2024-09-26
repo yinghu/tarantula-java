@@ -1,68 +1,55 @@
 package com.tarantula.platform.lobby;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.Configurable;
 import com.icodesoftware.Descriptor;
 
-import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.ApplicationPreSetup;
-import com.icodesoftware.service.ConfigurationServiceProvider;
+
 import com.icodesoftware.service.ServiceContext;
 
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
-import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.item.DistributionItemService;
-import com.tarantula.platform.item.ItemDistributionCallback;
+import com.tarantula.platform.item.PlatformItemServiceProvider;
 
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class PlatformLobbyServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback {
+public class PlatformLobbyServiceProvider extends PlatformItemServiceProvider{
 
     public static final String NAME = "lobby";
 
-    private ServiceContext serviceContext;
-    private TarantulaLogger logger;
-    private final GameCluster gameCluster;
-    private String gameServiceName;
     private String gameTypeId;
-    private ApplicationPreSetup applicationPreSetup;
-    private DistributionItemService distributionItemService;
     private ConcurrentHashMap<String,ListenerOnLobby> lobbyListeners;
     private ConcurrentHashMap<String,LobbyItem> lobbyItems;
 
     public PlatformLobbyServiceProvider(PlatformGameServiceProvider gameServiceProvider){
-        this.gameCluster = gameServiceProvider.gameCluster();
-        this.gameServiceName = gameCluster.serviceType();
+        super(gameServiceProvider,NAME);
         this.gameTypeId = gameCluster.typeId();
     }
     @Override
     public void setup(ServiceContext serviceContext) {
+        super.setup(serviceContext);
         this.lobbyListeners = new ConcurrentHashMap<>();
         this.lobbyItems = new ConcurrentHashMap<>();
-        this.serviceContext = serviceContext;
-        this.applicationPreSetup = gameCluster.applicationPreSetup();
-        this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.logger = JDKLogger.getLogger(PlatformLobbyServiceProvider.class);
         this.logger.warn("Lobby service provider started on ->"+gameServiceName+"-->"+gameTypeId);
-    }
-    @Override
-    public String name() {
-        return NAME;
     }
 
     @Override
     public void start() throws Exception {
-
+        if(!serviceContext.node().homingAgent().enabled()) return;
+        String resp = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"Map");
+        JsonObject mapList = JsonUtil.parse(resp);
+        mapList.get("list").getAsJsonArray().forEach(e->{
+            JsonObject mo = e.getAsJsonObject();
+            LobbyItem lobbyItem = new LobbyItem(mo);
+            lobbyItems.put(gameTypeId+"/"+mo.get("ConfigurationName").getAsString(),lobbyItem);
+        });
+        this.logger.warn("Lobby service provider started on->"+gameServiceName+" with homing agent enabled");
     }
-
-    @Override
-    public void shutdown() throws Exception {
-
-    }
-
     @Override
     public <T extends Configurable> void register(T t) {
         t.registered();
@@ -102,15 +89,17 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
 
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
         lobbyListeners.put(descriptor.tag(),new ListenerOnLobby(descriptor,listener));
-        List<LobbyItem> items = applicationPreSetup.list(descriptor,new LobbyItemObjectQuery(descriptor.key(),descriptor.category()));
-        items.forEach((a)-> {
-            logger.warn(a.configurationCategory()+""+a.distributionId());
-            if(!a.disabled()){
-                a.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
-                a.setup();
-                lobbyItems.put(gameTypeId+"/"+a.configurationName(),a);
-            }
-        });
+        if(!serviceContext.node().homingAgent().enabled()){
+            List<LobbyItem> items = applicationPreSetup.list(descriptor,new LobbyItemObjectQuery(descriptor.key(),descriptor.category()));
+            items.forEach((a)-> {
+                logger.warn(a.configurationCategory()+""+a.distributionId());
+                if(!a.disabled()){
+                    a.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
+                    a.setup();
+                    lobbyItems.put(gameTypeId+"/"+a.configurationName(),a);
+                }
+            });
+        }
         lobbyItems.forEach((k,v)->{
             ListenerOnLobby lobbyListener = lobbyListeners.get(k);
             if(lobbyListener!=null && k.equals(lobbyListener.lobby.tag())) lobbyListener.listener.onLoaded(v);
@@ -119,5 +108,35 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     }
     public void unregisterConfigurableListener(String registryKey){
         lobbyListeners.remove(registryKey);
+    }
+
+
+
+    @Override
+    public boolean onItemRegistered(int publishId){
+        String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
+        logger.warn(config);
+        JsonObject lobby = JsonUtil.parse(config);
+        LobbyItem lobbyItem = new LobbyItem(lobby);
+        String k = gameTypeId+"/"+lobby.get("ConfigurationName").getAsString();
+        lobbyItems.put(k,lobbyItem);
+        ListenerOnLobby lobbyListener = lobbyListeners.get(k);
+        if(lobbyListener!=null && k.equals(lobbyListener.lobby.tag())) lobbyListener.listener.onLoaded(lobbyItem);
+        return true;
+    }
+
+    @Override
+    public boolean onItemReleased(int publishId){
+        logger.warn("release local resource with ["+publishId+"]");
+        lobbyItems.forEach((k,v)->{
+            logger.warn("key : "+k+" : "+v.publishId);
+            if(v.publishId == publishId){
+                ListenerOnLobby listener = lobbyListeners.get(k);
+                if(listener!=null&& k.equals(listener.lobby.tag())){
+                    listener.listener.onRemoved(v);
+                }
+            }
+        });
+        return true;
     }
 }

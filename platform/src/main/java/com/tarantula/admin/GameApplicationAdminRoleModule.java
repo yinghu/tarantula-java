@@ -74,6 +74,21 @@ public class GameApplicationAdminRoleModule implements Module {
                 session.write(JsonUtil.toSimpleResponse(false,"failed to release item").getBytes());
             }
         }
+        // homing agent enabled
+        else if(session.action().equals("onRegistered")){
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
+            PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider(gameCluster.serviceType());
+            gameServiceProvider.configurationServiceProvider(query[2]).register(Integer.parseInt(query[1]));
+            session.write(JsonUtil.toSimpleResponse(true,"onRegistered").getBytes());
+        }
+        else if(session.action().equals("onReleased")){
+            String[] query = session.name().split("#");
+            GameCluster gameCluster = deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
+            PlatformGameServiceProvider gameServiceProvider = this.context.serviceProvider(gameCluster.serviceType());
+            gameServiceProvider.configurationServiceProvider(query[2]).release(Integer.parseInt(query[1]));
+            session.write(JsonUtil.toSimpleResponse(true,"onReleased").getBytes());
+        }
         else {
             throw new UnsupportedOperationException(session.action()+" not supported");
         }

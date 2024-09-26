@@ -2,6 +2,7 @@ package com.tarantula.platform.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.lmdb.BufferProxy;
+import com.icodesoftware.protocol.session.OnSessionTrack;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.*;
@@ -10,7 +11,6 @@ import com.tarantula.platform.presence.Membership;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;
 import com.tarantula.platform.presence.UserPortableRegistry;
-import com.tarantula.platform.util.PresenceFetcher;
 import com.tarantula.platform.util.RecoverableQuery;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -52,9 +52,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private ConcurrentHashMap<String, OnLobby> oMap;
     private DeploymentServiceProvider deploymentServiceProvider;
 
-    private ConcurrentHashMap<String,PresenceFetcher> fMap;
 
-    private boolean remotePresenceEnabled;
     private PresenceKey presenceKey;
     private Cipher encrypt;
     private Cipher decrypt;
@@ -72,39 +70,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public TokenValidator tokenValidator(){
         return systemValidator.tokenValidator();
     }
+
     public Presence presence(Session session){
         Presence presence = presence(session.distributionId());
-        /**
-        pMap.computeIfAbsent(session.distributionId(),(k)->{
-            PresenceIndex px = new PresenceIndex();
-            px.distributionId(session.distributionId());
-            if(!pdataStore.load(px)) return null;
-            px.dataStore(pdataStore);
-            px.load(5);
-            px.registerEventService(this.serviceContext.eventService());
-            return px;
-        });**/
-        /**
-        if(presence==null&&remotePresenceEnabled){
-            log.warn("Fetching presence from presence service ...");
-            PresenceFetcher httpCaller = fMap.get(session.trackId());
-            OnSession onSession = httpCaller.presence(session.token());
-            PresenceIndex px = new PresenceIndex(onSession.stub(),session.trackId());
-            px.distributionId(onSession.distributionId());
-            pdataStore.update(px);
-            px.dataStore(pdataStore);
-            px.registerEventService(this.serviceContext.eventService());
-            pMap.put(session.distributionId(),px);
-            return px;
-        }**/
         return presence;
     }
-    public OnSession onSession(Session session){
-        SessionIndex onSessionTrack = new SessionIndex();
-        onSessionTrack.distributionId(session.stub());
-        onSessionTrack.dataStore(sdatastore);
-        return sdatastore.load(onSessionTrack)? onSessionTrack: OnSessionTrack.SESSION_NOT_AVAILABLE;
-    }
+
     public Presence presence(long id){
         return pMap.computeIfAbsent(id,(k)->{
             PresenceIndex px = new PresenceIndex(sdatastore);
@@ -117,39 +88,23 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         });
     }
 
-    public byte[] clusterKey(String clusterNameSuffix){
-        if(!clusterNameSuffix.equals(this.serviceContext.node().clusterNameSuffix())) return null;
-        return presenceKey.clusterKey();
-    }
-    public byte[] tokenKey(String clusterNameSuffix){
-        if(!clusterNameSuffix.equals(this.serviceContext.node().clusterNameSuffix())) return null;
-        return presenceKey.tokenKey();
-    }
-    public boolean enablePresenceService(String root,String password,String clusterNameSuffix,String presenceServiceHost){
-        try {
-            PresenceFetcher httpCaller = new PresenceFetcher(presenceServiceHost,this.serviceContext.httpClientProvider());
-            OnSession onSession = httpCaller.login(root,password);
-            byte[] key = httpCaller.presenceKey(onSession.token(),clusterNameSuffix);
-            if(key==null) return false;
-            httpCaller.encrypt = CipherUtil.encrypt(key);
-            this.remotePresenceEnabled = true;
-            fMap.put(clusterNameSuffix,httpCaller);
-            return true;
-        }catch (Exception ex){
-            log.error("error",ex);
-            return false;
-        }
-    }
-    public  void disablePresenceService(String classNameSuffix){
-        fMap.remove(classNameSuffix);
-        this.remotePresenceEnabled = fMap.size()>0;
-    }
-
     public boolean resetClusterKey(){
         try{
-            presenceKey.clusterKey(CipherUtil.toBase64Key());
-            this.deployDataStore.update(presenceKey);
-            this.clusterStore.mapSet(presenceKey.distributionKey().getBytes(),presenceKey.clusterKey());
+            PresenceKey existing = new PresenceKey(presenceKey.distributionId());
+            if(!this.deployDataStore.load(existing)){
+                log.warn("Key not existed");
+                return false;
+            }
+            existing.clusterKey(CipherUtil.toBase64Key());
+            existing.tokenKey(CipherUtil.toBase64Key(JWTUtil.key()));
+            if(!this.deployDataStore.update(existing)){
+                log.warn("Key cannot updated");
+                return false;
+            }
+            byte[] ck = (serviceContext.node().bucketName()+"_ck").getBytes();
+            byte[] jk = (serviceContext.node().bucketName()+"_jk").getBytes();
+            this.clusterStore.mapSet(ck,existing.clusterKey());
+            this.clusterStore.mapSet(jk,existing.tokenKey());
             return true;
         }catch (Exception ex){
             log.error("reset key error",ex);
@@ -159,35 +114,35 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     public void reset(){
         try{
-            byte[] key = this.clusterStore.mapGet(presenceKey.distributionKey().getBytes());
-            if(key==null) return;
-            presenceKey.clusterKey(CipherUtil.toBase64Key(key));
+            byte[] ck = (serviceContext.node().bucketName()+"_ck").getBytes();
+            byte[] jk = (serviceContext.node().bucketName()+"_jk").getBytes();
+            byte[] ckey = this.clusterStore.mapGet(ck);
+            byte[] jkey = this.clusterStore.mapGet(jk);
+            if(ckey == null) {
+                log.warn("Cluster key not set on cluster !");
+                return;
+            }
+            if(jkey == null ) {
+                log.warn("JWT key not set on cluster !");
+                return;
+            }
+            this.presenceKey.clusterKey(CipherUtil.toBase64Key(ckey));
+            this.presenceKey.tokenKey(CipherUtil.toBase64Key(jkey));
             encrypt = CipherUtil.encrypt(presenceKey.clusterKey());
-            log.warn("Cluster key has set!");
+            decrypt = CipherUtil.decrypt(presenceKey.clusterKey());
+            jwt = JWTUtil.init(this.presenceKey.tokenKey());
+            log.warn("Cluster key has been reset!");
         }catch (Exception ex){
             log.error("reset key error",ex);
         }
     }
 
-    public String clusterNameSuffix(){
-        return this.serviceContext.node().clusterNameSuffix();
-    }
+
     public byte[] encrypt(byte[] data){
         try{
             synchronized (encrypt){
                 return encrypt.doFinal(data);
             }
-        }catch (Exception ex){
-            throw new RuntimeException(ex);
-        }
-    }
-    public byte[] encrypt(Presence presence,byte[] data){
-        try{
-            Cipher cipher = fMap.get(presence.index()).encrypt;
-            synchronized (cipher){
-                return cipher.doFinal(data);
-            }
-            //return fMap.get(presence.index()).encrypt.doFinal(data);
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
@@ -289,7 +244,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     }
 
     public String ticket(long key,long stub,int duration){
-        byte[] data = BufferProxy.buffer(200,false).writeLong(key).writeLong(stub).writeInt(duration).array();
+        byte[] data = BufferProxy.buffer(20,false).writeLong(key).writeLong(stub).writeInt(duration).array();
         byte[] mark = encrypt(data);
         return SystemUtil.toBase64String(mark);
     }
@@ -368,11 +323,11 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             if(this.mdatastore.load(subscription)){
                 LocalDateTime end = TimeUtil.fromUTCMilliseconds(subscription.endTimestamp());
                 if(end.isBefore(_curr)){
-                    deploymentServiceProvider.shutdownModule(o.typeId());
+                    //deploymentServiceProvider.shutdownModule(o.typeId());
                     rlist.add(k);
                 }
             }else{
-                deploymentServiceProvider.shutdownModule(o.typeId());
+                //deploymentServiceProvider.shutdownModule(o.typeId());
                 rlist.add(k);
             }
         });
@@ -404,7 +359,6 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.sdatastore = this.serviceContext.dataStore(Distributable.DATA_SCOPE,OnSession.DataStore);
         this.deployDataStore = this.serviceContext.dataStore(Distributable.DATA_SCOPE,DeploymentServiceProvider.DEPLOY_DATA_STORE);
         oMap = new ConcurrentHashMap<>();
-        fMap = new ConcurrentHashMap<>();
 
         AuthVendorRegistry google = TarantulaContext.getInstance().authVendor(OnAccess.GOOGLE);
         if(google!=null){
@@ -436,12 +390,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             developerStore.setup(serviceContext);
             aMap.put(OnAccess.DEVELOPER_STORE,developerStore);
         }
-        AuthVendorRegistry stripe = TarantulaContext.getInstance().authVendor(OnAccess.STRIPE);
-        if(stripe!=null){
-            stripe.registerMetricsLister(serviceContext.metrics(Metrics.PAYMENT));
-            stripe.setup(serviceContext);
-            aMap.put(OnAccess.STRIPE,(stripe));
-        }
+
         AuthVendorRegistry googleStore = TarantulaContext.getInstance().authVendor(OnAccess.GOOGLE_STORE);
         if(googleStore!=null){
             googleStore.registerMetricsLister(serviceContext.metrics(Metrics.PAYMENT));
@@ -605,6 +554,14 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         aMap.get(provider).registerAuthVendor(authVendor);
     }
 
+    public String token(long systemId,long stub){
+        Access acc = new User();
+        acc.distributionId(systemId);
+        udataStore.load(acc);
+        OnSession onSession = new OnSessionTrack();
+        onSession.stub(stub);
+        return jwtToken(acc,onSession);
+    }
     public String jwtToken(Access access,OnSession session){
         return jwt.token((h,p)->{
             long expiry = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusHours(24));

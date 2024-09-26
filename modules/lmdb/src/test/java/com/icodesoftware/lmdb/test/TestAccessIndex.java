@@ -11,7 +11,7 @@ import com.icodesoftware.util.RecoverableObject;
 
 public class TestAccessIndex extends RecoverableObject implements AccessIndex {
 
-    private int referenceId;
+    public int referenceId;
     public TestAccessIndex(){
         this.label = "access";
         this.onEdge = true;

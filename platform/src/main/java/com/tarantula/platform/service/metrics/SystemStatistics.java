@@ -2,7 +2,7 @@ package com.tarantula.platform.service.metrics;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Statistics;
-import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.util.OnApplicationHeader;
 
 import com.tarantula.platform.util.RecoverableQuery;
 
@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class SystemStatistics extends RecoverableObject implements Statistics {
+public class SystemStatistics extends OnApplicationHeader implements Statistics {
 
     private Map<String, SystemStatisticsEntry> mappings = new ConcurrentHashMap<>();
 

@@ -189,8 +189,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             if(gameContext.applicationSchema().transaction().execute(ctx->{
                 var tournamentType = JsonUtil.parse((byte[])event.property(OnAccess.PAYLOAD)).get("tournament_type").getAsString();
                 DataStore playerActionStore = ctx.onDataStore("player_coin_form");
+
                 PlayerAction playerAction = new PlayerAction("ShippingFormCompleted-" + tournamentType,true);
-                playerAction.ownerKey(SnowflakeKey.from(Long.parseLong(event.systemId())));
+                playerAction.ownerKey(SnowflakeKey.from(event.systemId()));
                 return playerActionStore.create(playerAction);
             })){
                 TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);

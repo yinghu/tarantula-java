@@ -71,4 +71,26 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
         return false;
     }
 
+
+    @Override
+    public boolean onItemRegistered(int publishId){
+        return false;
+    }
+
+    @Override
+    public boolean onItemReleased(int publishId){
+        return false;
+    }
+
+    @Override
+    public void register(int publishId) {
+        distributionItemService.onRegisterItem(gameServiceName,name(),publishId);
+    }
+
+    @Override
+    public void release(int publishId) {
+        distributionItemService.onReleaseItem(gameServiceName,name(),publishId);
+    }
+
+
 }

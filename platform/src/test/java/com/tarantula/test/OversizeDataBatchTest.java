@@ -1,16 +1,15 @@
 package com.tarantula.test;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.lmdb.EnvSetting;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.presence.saves.BatchedMappingObject;
 import com.tarantula.platform.presence.saves.OversizeDataBatch;
-import jnr.ffi.annotations.In;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.ArrayDeque;
 import java.util.HashMap;
 
 
@@ -24,7 +23,7 @@ public class OversizeDataBatchTest extends DataStoreHook{
         Assert.assertNotNull(json);
         byte[] data = json.toString().getBytes();
         Assert.assertTrue(data.length>1600);
-        HashMap<Integer,byte[]> batch = OversizeDataBatch.toBatch(data,1600);
+        HashMap<Integer,byte[]> batch = OversizeDataBatch.toBatch(data,EnvSetting.VALUE_SIZE);
         StringBuffer buffer = new StringBuffer();
         HashMap<Integer, BatchedMappingObject> indexed = new HashMap<>();
 
@@ -51,7 +50,7 @@ public class OversizeDataBatchTest extends DataStoreHook{
         Assert.assertNotNull(json);
         byte[] data = json.toString().getBytes();
         Assert.assertTrue(data.length<=1600);
-        HashMap<Integer,byte[]> batch = OversizeDataBatch.toBatch(data,1600);
+        HashMap<Integer,byte[]> batch = OversizeDataBatch.toBatch(data, EnvSetting.VALUE_SIZE);
         HashMap<Integer, BatchedMappingObject> indexed = new HashMap<>();
 
         StringBuffer buffer = new StringBuffer();

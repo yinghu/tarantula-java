@@ -134,7 +134,7 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
             this.dataStore.create(pending);
             return;
         }
-        this.inventoryServiceProvider.redeem(Long.toString(systemId),item);
+        this.inventoryServiceProvider.redeem(systemId,item);
     }
 
     public void pendingTournamentPrize(long systemId,TournamentPrize tournamentPrize){
@@ -144,7 +144,7 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
             this.dataStore.create(pending);
             return;
         }
-        this.inventoryServiceProvider.redeem(Long.toString(systemId),tournamentPrize);
+        this.inventoryServiceProvider.redeem(systemId,tournamentPrize);
     }
 
     public boolean redeem(Session session,String rewardKey){

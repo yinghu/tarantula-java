@@ -1,6 +1,5 @@
 package com.icodesoftware.lmdb;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
@@ -13,7 +12,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,34 +29,33 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     private TarantulaLogger logger = JDKLogger.getLogger(LMDBDataStoreProvider.class);
 
-    private String name;
+    private String name = EnvSetting.ENV_PROVIDER_NAME;
 
-    private String baseDir = "target/lmdb";
-    private String dataPath ="target/lmdb/data";
-    private String integrationPath="target/lmdb/integration";
-    private String indexPath = "target/lmdb/index";
-    private String localPath = "target/lmdb/local";
-    private String logPath = "target/lmdb/log";
+    private String baseDir = EnvSetting.ENV_BASE_DIR;
 
-    private Env<ByteBuffer> data;
-    private Env<ByteBuffer> integration;
-    private Env<ByteBuffer> index;
-    private Env<ByteBuffer> local;
-    private Env<ByteBuffer> log;
-    private long storeSize = 10_048_576L; // 1MB = 1,048,576 (1024*1024)
-    private int maxDatabaseNumber = 1024;
-    private int maxReaders = 100;
+    private final LMDBEnv dataEnv = new LMDBEnv(EnvSetting.DataSetting);
+    private final LMDBEnv integrationEnv = new LMDBEnv(EnvSetting.IntegrationSetting);
+    private final LMDBEnv indexEnv = new LMDBEnv(EnvSetting.IndexSetting);
+    private final LMDBEnv logEnv = new LMDBEnv(EnvSetting.LogSetting);
+    private final LMDBEnv localEnv = new LMDBEnv(EnvSetting.LocalSetting);
 
-    private final static int KEY_SIZE = 200;
-    private final static int VALUE_SIZE = 2000;
 
-    private final static int PENDING_BUFFER_SIZE = 32;
+    long storeSize = EnvSetting.toBytesFromMb(1); // 1MB = 1,048,576 (1024*1024)
 
-    private boolean envNoSyncFlag = true;
-    private final static ConcurrentHashMap<String,DataStore> storeMap = new ConcurrentHashMap<>();
-    private final static ConcurrentHashMap<String,LocalEdgeDataStore> edgMap = new ConcurrentHashMap<>();
+    int maxDatabaseNumber = EnvSetting.MAX_STORE_NUMBER;
+    int maxReaders = EnvSetting.MAX_READER_NUMBER;
 
-    final static ArrayBlockingQueue<BufferCache> pendingQueue = new ArrayBlockingQueue<>(PENDING_BUFFER_SIZE);;
+    static int KEY_SIZE = EnvSetting.KEY_SIZE;
+    private static int VALUE_SIZE = EnvSetting.VALUE_SIZE;
+
+    private static int PENDING_BUFFER_SIZE = EnvSetting.MAX_PENDING_BUFFER_NUMBER;
+
+    boolean envNoSyncFlag = EnvSetting.ENV_NO_SYNC_Flag;
+    boolean storeReindexing;
+    private final ConcurrentHashMap<String,DataStore> storeMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String,LocalEdgeDataStore> edgMap = new ConcurrentHashMap<>();
+
+    final ArrayBlockingQueue<BufferCache> pendingQueue = new ArrayBlockingQueue<>(PENDING_BUFFER_SIZE);;
 
 
     private MapStoreListener integrationMapStoreListener;
@@ -68,23 +65,30 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
 
     MetricsListener metricsListener = (k,v)->{};
     private JsonObject jsonObject;
-
+    private LocalDataMigration migration;
     @Override
     public void configure(Map<String, Object> properties) {
-        this.name = (String)properties.get("name");
-        this.storeSize = storeSize*(int)properties.get("storeSizeMb");
-        this.envNoSyncFlag = (boolean)properties.get("envNoSyncFlag");
-        String _dataPath = ((JsonElement)properties.get("dataPath")).getAsString();
-        String _integrationPath = ((JsonElement)properties.get("integrationPath")).getAsString();
-        String _indexPath = ((JsonElement)properties.get("indexPath")).getAsString();
-        String _localPath = ((JsonElement)properties.get("localPath")).getAsString();
-        String _logPath = ((JsonElement)properties.get("logPath")).getAsString();
-        this.baseDir = (String)properties.get("dir");
-        this.dataPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_dataPath;
-        this.integrationPath =properties.get("dir")+ FileSystems.getDefault().getSeparator()+_integrationPath;
-        this.indexPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_indexPath;
-        this.localPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_localPath;
-        this.logPath = properties.get("dir")+ FileSystems.getDefault().getSeparator()+_logPath;
+        this.name = (String)properties.getOrDefault(EnvSetting.ENV_CONFIG_NAME,EnvSetting.ENV_PROVIDER_NAME);
+        this.storeSize = EnvSetting.toBytesFromMb((int)properties.getOrDefault(EnvSetting.ENV_CONFIG_STORE_SIZE_MB,1));
+        this.envNoSyncFlag = (boolean)properties.getOrDefault(EnvSetting.ENV_CONFIG_NO_SYNC_FLAG,EnvSetting.ENV_NO_SYNC_Flag);
+        this.storeReindexing = (boolean)properties.getOrDefault(EnvSetting.ENV_CONFIG_STORE_REINDEXING,false);
+        boolean externalKeyValueBufferUsed = (boolean)properties.getOrDefault(EnvSetting.ENV_CONFIG_EXTERNAL_KEY_VALUE_BUFFER_USED,false);
+        if(externalKeyValueBufferUsed){
+            logger.warn("External key size, value size and pending buffer size used");
+            int keySizeUsed = (int)properties.getOrDefault(EnvSetting.ENV_CONFIG_STORE_KEY_SIZE,EnvSetting.KEY_SIZE);
+            int valueSizeUsed = (int)properties.getOrDefault(EnvSetting.ENV_CONFIG_STORE_VALUE_SIZE,EnvSetting.VALUE_SIZE);
+            int bufferSizeUsed = (int)properties.getOrDefault(EnvSetting.ENV_CONFIG_STORE_PENDING_BUFFER_SIZE,EnvSetting.MAX_PENDING_BUFFER_NUMBER);
+            if(keySizeUsed>0 && keySizeUsed <= EnvSetting.MAX_LMDB_KEY_SIZE) KEY_SIZE = keySizeUsed;
+            if(valueSizeUsed>0 && valueSizeUsed <= 2032 ) VALUE_SIZE = valueSizeUsed;
+            if(bufferSizeUsed > EnvSetting.MAX_PENDING_BUFFER_NUMBER) PENDING_BUFFER_SIZE = bufferSizeUsed;
+        }
+        dataEnv.envSetting = (EnvSetting) properties.getOrDefault(EnvSetting.data,EnvSetting.DataSetting);
+        integrationEnv.envSetting = (EnvSetting) properties.getOrDefault(EnvSetting.integration,EnvSetting.IntegrationSetting);
+        indexEnv.envSetting = (EnvSetting) properties.getOrDefault(EnvSetting.index,EnvSetting.IndexSetting);
+        logEnv.envSetting = (EnvSetting) properties.getOrDefault(EnvSetting.log,EnvSetting.LogSetting);
+        localEnv.envSetting = (EnvSetting) properties.getOrDefault(EnvSetting.local,EnvSetting.LocalSetting);
+        this.baseDir = (String)properties.getOrDefault(EnvSetting.ENV_CONFIG_BASE_DIR,EnvSetting.ENV_BASE_DIR);
+        this.migration = new LocalDataMigration((JsonObject)properties.get(EnvSetting.ENV_CONFIG_MIGRATION));
     }
 
     @Override
@@ -161,62 +165,56 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     }
 
     public Txn<ByteBuffer> txn(int scope){
-        if(scope==Distributable.DATA_SCOPE) return data.txnWrite();
-        if(scope==Distributable.INTEGRATION_SCOPE) return integration.txnWrite();
-        if(scope==Distributable.INDEX_SCOPE) return index.txnWrite();
-        if(scope==Distributable.LOCAL_SCOPE) return local.txnWrite();
-        if(scope==Distributable.LOG_SCOPE) return log.txnWrite();
+        if(scope==Distributable.DATA_SCOPE) return dataEnv.txnWrite();
+        if(scope==Distributable.INTEGRATION_SCOPE) return integrationEnv.txnWrite();
+        if(scope==Distributable.INDEX_SCOPE) return indexEnv.txnWrite();
+        if(scope==Distributable.LOCAL_SCOPE) return localEnv.txnWrite();
+        if(scope==Distributable.LOG_SCOPE) return logEnv.txnWrite();
+        throw new RuntimeException("Scope ["+scope+"] not supported");
+    }
+
+    public LMDBEnv env(int scope){
+        if(scope==Distributable.DATA_SCOPE) return dataEnv;
+        if(scope==Distributable.INTEGRATION_SCOPE) return integrationEnv;
+        if(scope==Distributable.INDEX_SCOPE) return indexEnv;
+        if(scope==Distributable.LOCAL_SCOPE) return localEnv;
+        if(scope==Distributable.LOG_SCOPE) return logEnv;
         throw new RuntimeException("Scope ["+scope+"] not supported");
     }
 
     public DataStore createDataStore(int scope,String name,Txn<ByteBuffer> txn,long transactionId){
         if(scope==Distributable.DATA_SCOPE){
-            Dbi<ByteBuffer> dbi = txn==null? data.openDbi(name,DbiFlags.MDB_CREATE) : data.openDbi(txn,name.getBytes(),null,false,DbiFlags.MDB_CREATE);
-            return txn==null? new CachedLMDBDataStore(scope,name,dbi,data,this) : new LMDBDataStore(scope,name,dbi,data,this,txn,transactionId);
+            return dataEnv.createDataStore(name,txn,transactionId);
         }
         if(scope==Distributable.INTEGRATION_SCOPE){
-            Dbi<ByteBuffer> dbi = txn==null? integration.openDbi(name,DbiFlags.MDB_CREATE) : integration.openDbi(txn,name.getBytes(),null,false,DbiFlags.MDB_CREATE);
-            return txn==null? new CachedLMDBDataStore(scope,name,dbi,integration,this) : new LMDBDataStore(scope,name,dbi,integration,this,txn,transactionId);
+           return integrationEnv.createDataStore(name,txn,transactionId);
         }
         if(scope==Distributable.INDEX_SCOPE){
-            Dbi<ByteBuffer> dbi = txn==null? index.openDbi(name,DbiFlags.MDB_CREATE) : index.openDbi(txn,name.getBytes(),null,false,DbiFlags.MDB_CREATE);
-            return txn==null? new CachedLMDBDataStore(scope,name,dbi,index,this) : new LMDBDataStore(scope,name,dbi,index,this,txn,transactionId);
+            return indexEnv.createDataStore(name,txn,transactionId);
         }
         if(scope==Distributable.LOCAL_SCOPE){
-            Dbi<ByteBuffer> dbi = txn==null? local.openDbi(name,DbiFlags.MDB_CREATE) : local.openDbi(txn,name.getBytes(),null,false,DbiFlags.MDB_CREATE);
-            return txn==null? new CachedLMDBDataStore(scope,name,dbi,local,this) : new LMDBDataStore(scope,name,dbi,local,this,txn,transactionId);
+           return localEnv.createDataStore(name,txn,transactionId);
         }
         if(scope==Distributable.LOG_SCOPE){
-            Dbi<ByteBuffer> dbi = txn==null? log.openDbi(name,DbiFlags.MDB_CREATE) : log.openDbi(txn,name.getBytes(),null,false,DbiFlags.MDB_CREATE);
-            return txn==null? new CachedLMDBDataStore(scope,name,dbi,log,this) : new LMDBDataStore(scope,name,dbi,log,this,txn,transactionId);
+            return logEnv.createDataStore(name,txn,transactionId);
         }
         throw new RuntimeException("Scope ["+scope+"] not supported");
     }
     public LocalEdgeDataStore localEdgeDataStore(int scope,String source,String label,Txn<ByteBuffer> txn){
         if(scope==Distributable.DATA_SCOPE){
-            String edgeName = source+"#"+label;
-            Dbi<ByteBuffer> dbi = txn==null? data.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : data.openDbi(txn,edgeName.getBytes(),null,false,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
-            return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
+            return dataEnv.localEdgeDataStore(source,label,txn);
         }
         if(scope==Distributable.INTEGRATION_SCOPE){
-            String edgeName = source+"#"+label;
-            Dbi<ByteBuffer> dbi = txn==null? integration.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : integration.openDbi(txn,edgeName.getBytes(),null,false,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
-            return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
+            return integrationEnv.localEdgeDataStore(source,label,txn);
         }
         if(scope==Distributable.INDEX_SCOPE){
-            String edgeName = source+"#"+label;
-            Dbi<ByteBuffer> dbi = txn==null? index.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : index.openDbi(txn,edgeName.getBytes(),null,false,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
-            return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
+            return indexEnv.localEdgeDataStore(source,label,txn);
         }
         if(scope==Distributable.LOCAL_SCOPE){
-            String edgeName = source+"#"+label;
-            Dbi<ByteBuffer> dbi = txn==null? local.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : local.openDbi(txn,edgeName.getBytes(),null,false,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
-            return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
+            return localEnv.localEdgeDataStore(source,label,txn);
         }
         if(scope==Distributable.LOG_SCOPE){
-            String edgeName = source+"#"+label;
-            Dbi<ByteBuffer> dbi = txn==null? log.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : log.openDbi(txn,edgeName.getBytes(),null,false,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
-            return new LocalEdgeDataStore(new LocalMetadata(scope,source,label),dbi);
+            return logEnv.localEdgeDataStore(source,label,txn);
         }
         throw new RuntimeException("Scope ["+scope+"] not supported");
     }
@@ -229,39 +227,34 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     @Override
     public void start() throws Exception {
         if(distributionIdGenerator==null) throw new RuntimeException("DistributionIdGenerator Not Registered");
-        if(envNoSyncFlag){
-            EnvFlags[] flags = new EnvFlags[]{EnvFlags.MDB_NOSYNC};
-            data = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.dataPath).toFile(),flags);
-            integration = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.integrationPath).toFile(),flags);
-            index = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.indexPath).toFile(),flags);
-            local = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(localPath).toFile(),flags);
-            log = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(logPath).toFile(),flags);
-        }
-        else{
-            data = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.dataPath).toFile());
-            integration = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.integrationPath).toFile());
-            index = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(path(this.indexPath).toFile());
-            local = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(localPath).toFile());
-            log = Env.create().setMapSize(storeSize).setMaxDbs(maxDatabaseNumber).setMaxReaders(maxReaders).open(this.path(logPath).toFile());
-        }
+        dataEnv.lmdbDataStoreProvider = this;
+        integrationEnv.lmdbDataStoreProvider = this;
+        indexEnv.lmdbDataStoreProvider = this;
+        logEnv.lmdbDataStoreProvider = this;
+        localEnv.lmdbDataStoreProvider = this;
+        dataEnv.start();
+        integrationEnv.start();
+        indexEnv.start();
+        logEnv.start();
+        localEnv.start();
         for(int i=0;i<PENDING_BUFFER_SIZE;i++){
             pendingQueue.offer(new BufferCache(KEY_SIZE,VALUE_SIZE,pendingQueue));
         }
-        data.getDbiNames().forEach(n->{
+        dataEnv.getDbiNames().forEach(n->{
             String dname = new String(n);
             //logger.warn("DATA : "+dname);
             if(!dname.contains("#")){
                 createDataStore(dname);
             }
         });
-        integration.getDbiNames().forEach(n->{
+        integrationEnv.getDbiNames().forEach(n->{
             String dname = new String(n);
             //logger.warn("ACCESS : "+dname);
             if(!dname.contains("#")){
                 createAccessIndexDataStore(dname);
             }
         });
-        index.getDbiNames().forEach(n->{
+        indexEnv.getDbiNames().forEach(n->{
             String dname = new String(n);
             //logger.warn("INDEX : "+dname);
             if(!dname.contains("#")){
@@ -269,14 +262,14 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
             }
 
         });
-        local.getDbiNames().forEach(n->{
+        localEnv.getDbiNames().forEach(n->{
             String dname = new String(n);
             //logger.warn("LOCAL : "+dname);
             if(!dname.contains("#")){
                 createLocalDataStore(dname);
             }
         });
-        log.getDbiNames().forEach(n->{
+        logEnv.getDbiNames().forEach(n->{
             String dname = new String(n);
             //logger.warn("LOG : "+dname);
             if(!dname.contains("#")){
@@ -287,16 +280,24 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(!backupLog.exists()){
             backupLog.createNewFile();
             jsonObject = new JsonObject();
-            jsonObject.addProperty("data",0);
-            jsonObject.addProperty("integration",0);
-            jsonObject.addProperty("index",0);
-            jsonObject.addProperty("log",0);
-            jsonObject.addProperty("local",0);
+            jsonObject.addProperty(EnvSetting.data,0);
+            jsonObject.addProperty(EnvSetting.integration,0);
+            jsonObject.addProperty(EnvSetting.index,0);
+            jsonObject.addProperty(EnvSetting.log,0);
+            jsonObject.addProperty(EnvSetting.local,0);
             saveJson();
         }
         FileInputStream in = new FileInputStream(backupLog);
         jsonObject = JsonUtil.parse(in);
-        logger.warn("LMDB Provider started with store size ["+storeSize+"] queue side ["+pendingQueue.size()+"] store no sync mode ["+envNoSyncFlag+"]");
+        if(storeReindexing){
+            logger.warn("Starting store reindex from index store");
+        }
+        if(migration!=null && migration.migrating()){
+            migration.migrate(this,storeMap);
+            System.exit(0);
+        }
+        logger.warn("LMDB Provider ["+name+"] started with store size ["+storeSize+"] queue side ["+pendingQueue.size()+"] store no sync mode ["+envNoSyncFlag+"] reindexing ["+storeReindexing+"]");
+        logger.warn("LMDB Provider using key/value size ["+KEY_SIZE+"/"+VALUE_SIZE+"]");
     }
 
     @Override
@@ -347,18 +348,13 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         closeMapStore();
         storeMap.forEach((k,v)->v.close());
         storeMap.clear();
-        edgMap.forEach((k,v)->v.dbi.close());
+        edgMap.forEach((k,v)->v.close());
         edgMap.clear();
-        data.sync(true);
-        data.close();
-        integration.sync(true);
-        integration.close();
-        index.sync(true);
-        index.close();
-        log.sync(true);
-        log.close();
-        local.sync(true);
-        local.close();
+        dataEnv.shutdown();
+        integrationEnv.shutdown();
+        indexEnv.shutdown();
+        logEnv.shutdown();
+        localEnv.shutdown();
         logger.warn("LMDB Shutting down with pending buffer size ["+pendingQueue.size()+"]");
         pendingQueue.clear();
     }
@@ -438,25 +434,25 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
             int ix;
             switch (scope){
                 case Distributable.DATA_SCOPE:
-                    ix = jsonObject.get("data").getAsInt()+1;
-                    jsonObject.addProperty("data",ix);
+                    ix = jsonObject.get(EnvSetting.data).getAsInt()+1;
+                    jsonObject.addProperty(EnvSetting.data,ix);
                     break;
                 case Distributable.INTEGRATION_SCOPE:
-                    ix = jsonObject.get("integration").getAsInt()+1;
-                    jsonObject.addProperty("integration",ix);
+                    ix = jsonObject.get(EnvSetting.integration).getAsInt()+1;
+                    jsonObject.addProperty(EnvSetting.integration,ix);
                     break;
                 case Distributable.INDEX_SCOPE:
-                    ix = jsonObject.get("index").getAsInt()+1;
-                    jsonObject.addProperty("index",ix);
+                    ix = jsonObject.get(EnvSetting.index).getAsInt()+1;
+                    jsonObject.addProperty(EnvSetting.index,ix);
                     break;
                 case Distributable.LOG_SCOPE:
-                    ix = jsonObject.get("log").getAsInt()+1;
-                    jsonObject.addProperty("log",ix);
+                    ix = jsonObject.get(EnvSetting.log).getAsInt()+1;
+                    jsonObject.addProperty(EnvSetting.log,ix);
                     break;
                 case Distributable.LOCAL_SCOPE:
                 default:
-                    ix = jsonObject.get("local").getAsInt()+1;
-                    jsonObject.addProperty("local",ix);
+                    ix = jsonObject.get(EnvSetting.local).getAsInt()+1;
+                    jsonObject.addProperty(EnvSetting.local,ix);
                     break;
             }
             saveJson();
@@ -488,36 +484,31 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         try{
             if(scope==Distributable.DATA_SCOPE){
                 Path copyPath = path(baseDir+"/data_"+sequence);
-                data.sync(true);
-                data.copy(copyPath.toFile());
+                dataEnv.copy(copyPath.toFile());
                 saveJsonCopyDate(copyPath.toFile());
                 return copyPath.toFile();
             }
             if(scope==Distributable.INTEGRATION_SCOPE){
                 Path copyPath = path(baseDir+"/integration_"+sequence);
-                integration.sync(true);
-                integration.copy(copyPath.toFile());
+                integrationEnv.copy(copyPath.toFile());
                 saveJsonCopyDate(copyPath.toFile());
                 return copyPath.toFile();
             }
             if(scope==Distributable.INDEX_SCOPE){
                 Path copyPath = path(baseDir+"/index_"+sequence);
-                index.sync(true);
-                index.copy(copyPath.toFile());
+                indexEnv.copy(copyPath.toFile());
                 saveJsonCopyDate(copyPath.toFile());
                 return copyPath.toFile();
             }
             if(scope==Distributable.LOG_SCOPE){
                 Path copyPath = path(baseDir+"/log_"+sequence);
-                log.sync(true);
-                log.copy(copyPath.toFile());
+                logEnv.copy(copyPath.toFile());
                 saveJsonCopyDate(copyPath.toFile());
                 return copyPath.toFile();
             }
             if(scope==Distributable.LOCAL_SCOPE){
                 Path copyPath = path(baseDir+"/local_"+sequence);
-                local.sync(true);
-                local.copy(copyPath.toFile());
+                localEnv.copy(copyPath.toFile());
                 saveJsonCopyDate(copyPath.toFile());
                 return copyPath.toFile();
             }
@@ -527,6 +518,9 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
             logger.error("Failed to backup data store ["+scope+"]",ex);
             throw new RuntimeException(ex);
         }
+    }
+    public String baseDir(){
+        return baseDir;
     }
     private Path path(String path) throws Exception{
         Path _path = Paths.get(path);
@@ -545,4 +539,5 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(metricsListener==null) return;
         this.metricsListener = metricsListener;
     }
+
 }

@@ -142,21 +142,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
-    public boolean onDeployModule(String contentUrl,String resourceName){
-        NodeEngine nodeEngine = getNodeEngine();
-        DeployModuleOperation operation = new DeployModuleOperation(contentUrl,resourceName);
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        int expected = mlist.size();
-        for(Member m :mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<Void> future = builder.invoke();
-                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            },metricsListener);
-            if(result.successful) expected--;
-        }
-        return expected==0;
-    }
+
     public boolean onShutdownApplication(String typeId,long applicationId){
         NodeEngine nodeEngine = getNodeEngine();
         ShutdownApplicationOperation operation = new ShutdownApplicationOperation(typeId,applicationId);
@@ -187,51 +173,7 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
         return expected==0;
     }
-    public boolean onLaunchModule(String typeId){
-        NodeEngine nodeEngine = getNodeEngine();
-        LaunchModuleOperation operation = new LaunchModuleOperation(typeId);
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        int expected = mlist.size();
-        for(Member m :mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<Void> future = builder.invoke();
-                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            },metricsListener);
-            if(result.successful) expected--;
-        }
-        return expected==0;
-    }
-    public boolean onShutdownModule(String typeId){
-        NodeEngine nodeEngine = getNodeEngine();
-        ShutdownModuleOperation operation = new ShutdownModuleOperation(typeId);
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        int expected = mlist.size();
-        for(Member m :mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<Void> future = builder.invoke();
-                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            },metricsListener);
-            if(result.successful) expected--;
-        }
-        return expected==0;
-    }
-    public boolean onUpdateModule(Descriptor descriptor){
-        NodeEngine nodeEngine = getNodeEngine();
-        UpdateModuleOperation operation = new UpdateModuleOperation(descriptor);
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        int expected = mlist.size();
-        for(Member m :mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<Void> future = builder.invoke();
-                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            },metricsListener);
-            if(result.successful) expected--;
-        }
-        return expected==0;
-    }
+
 
     public boolean onUpload(String fileName,byte[] content){
         NodeEngine nodeEngine = getNodeEngine();
@@ -302,23 +244,6 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
     }
 
-    @Override
-    public byte[] onClusterKey() {
-        NodeEngine nodeEngine = getNodeEngine();
-        if(nodeEngine.getMasterAddress().equals(nodeEngine.getLocalMember().getAddress())){
-            logger.warn("Master node on local node, load key from local disk");
-            return null;
-        }
-        ClusterKeyOperation operation = new ClusterKeyOperation();
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-            Future<byte[]> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        },metricsListener);
-        if(callResult.result == null) throw new RuntimeException("no master key existed");
-        return (byte[]) callResult.result;
-    }
-
     public void onResetClusterKey(){
         NodeEngine nodeEngine = getNodeEngine();
         ResetClusterKeyOperation operation = new ResetClusterKeyOperation();
@@ -333,55 +258,12 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
         }
     }
 
-    public byte[] onTokenKey(){
-        NodeEngine nodeEngine = getNodeEngine();
-        if(nodeEngine.getMasterAddress().equals(nodeEngine.getLocalMember().getAddress())){
-            logger.warn("Master node on local node, load key from local disk");
-            return null;
-        }
-        TokenKeyOperation operation = new TokenKeyOperation();
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,nodeEngine.getMasterAddress());
-        ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-            Future<byte[]> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS); //retry if timeout
-        },metricsListener);
-        if(callResult.result == null) throw new RuntimeException("no master key existed");
-        return (byte[]) callResult.result;
-    }
 
-    public void onResetTokenKey(){
+    public void onIssueDataStoreBackup(int scope){
         NodeEngine nodeEngine = getNodeEngine();
-        ResetClusterKeyOperation operation = new ResetClusterKeyOperation();
+        IssueDataStoreBackupOperation operation = new IssueDataStoreBackupOperation(scope);
         Set<Member> mlist = nodeEngine.getClusterService().getMembers();
         for(Member m :mlist){
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<Void> future = builder.invoke();
-                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            },metricsListener);
-            if(!result.successful) throw new RuntimeException(result.exception);
-        }
-    }
-    public void onEnablePresenceService(String root,String password,String clusterNameSuffix,String host){
-        NodeEngine nodeEngine = getNodeEngine();
-        EnablePresenceServiceOperation operation = new EnablePresenceServiceOperation(root,password,clusterNameSuffix,host);
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        for(Member m :mlist){
-            if(m.localMember()) continue;
-            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
-            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-                Future<Void> future = builder.invoke();
-                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-            },metricsListener);
-            if(!result.successful) throw new RuntimeException(result.exception);
-        }
-    }
-    public void onDisablePresenceService(String clusterNameSuffix){
-        NodeEngine nodeEngine = getNodeEngine();
-        DisablePresenceServiceOperation operation = new DisablePresenceServiceOperation(clusterNameSuffix);
-        Set<Member> mlist = nodeEngine.getClusterService().getMembers();
-        for(Member m :mlist){
-            if(m.localMember()) continue;
             InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,m.getAddress());
             ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
                 Future<Void> future = builder.invoke();
@@ -410,5 +292,17 @@ public class DeployServiceProxy extends AbstractDistributedObject<ClusterDeployS
             return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
         },metricsListener);
         if(!result.successful) throw new RuntimeException("failed to shutdown node : "+removed.memberId());
+    }
+    public void restart(ClusterProvider.Node restarted){
+        logger.warn("Restart node : "+restarted.memberId());
+        NodeEngine nodeEngine = getNodeEngine();
+        Member pending = nodeEngine.getClusterService().getMember(restarted.memberId());
+        NodeRestartOperation operation = new NodeRestartOperation();
+        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DeployService.NAME,operation,pending.getAddress());
+        ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+            Future<Void> future = builder.invoke();
+            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+        },metricsListener);
+        if(!result.successful) throw new RuntimeException("failed to restart node : "+restarted.memberId());
     }
 }

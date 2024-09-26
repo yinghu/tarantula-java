@@ -62,7 +62,6 @@ public class ConfigurableCategory extends RecoverableObject implements Configura
         JsonObject h = JsonUtil.parse(header);
         scope = h.get("scope").getAsString();
         version = h.get("version").getAsString();
-        description = h.get("description").getAsString();
         rechargeable = h.get("rechargeable").getAsBoolean();
         constrained = h.has("constrained")? h.get("constrained").getAsBoolean() : false;
     }
@@ -101,5 +100,4 @@ public class ConfigurableCategory extends RecoverableObject implements Configura
         header = update.get("header").toString();
         application = update.get("application").toString();
     }
-
 }

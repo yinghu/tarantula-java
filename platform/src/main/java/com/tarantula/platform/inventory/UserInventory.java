@@ -3,11 +3,11 @@ package com.tarantula.platform.inventory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Inventory;
-import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.util.RecoverableObject;
-import com.tarantula.platform.item.ConfigurableObject;
+import com.tarantula.platform.item.Commodity;
 import com.tarantula.platform.item.ItemPortableRegistry;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,17 +64,24 @@ public class UserInventory extends RecoverableObject implements Inventory {
         listener.onInventory(this.applicationPreSetup,this,inventoryItem);
     }
 
+    public void redeem(long itemId,Commodity commodity){
+        InventoryItem inventoryItem = commodity.inventoryItem(itemId);
+        inventoryItem.ownerKey(this.key());
+        inventoryItem.dataStore(dataStore);
+        inventoryItem.build(commodity.application());
+        if(this.rechargeable){
+            balance += commodity.amount();
+        }
+        count++;
+        dataStore.update(this);
+        listener.onInventory(this.applicationPreSetup,this,inventoryItem);
+    }
+
     public void list(){
-         InventoryItemQuery query = new InventoryItemQuery(this.distributionId);
+        InventoryItemQuery query = new InventoryItemQuery(this.distributionId);
          dataStore.list(query).forEach(inventoryItem -> {
-             if(!rechargeable){
-                 Recoverable stock = applicationPreSetup.create(stockFactoryId,stockClassId);
-                 stock.distributionId(inventoryItem.stockId());
-                 if(dataStore.load(stock)){
-                     inventoryItem.stock(stock);
-                 }
-             }
              itemList.add(inventoryItem);
+             inventoryItem.dataStore(dataStore);
          });
     }
     @Override
@@ -124,8 +131,9 @@ public class UserInventory extends RecoverableObject implements Inventory {
         jsonObject.addProperty("Rechargeable",rechargeable);
         jsonObject.addProperty("Constrained",constrained);
         jsonObject.addProperty("Count",count);
+        //if(rechargeable) return jsonObject;
         JsonArray items = new JsonArray();
-        itemList.forEach((item)->items.add(item.toJson()));
+        itemList.forEach((item)->items.add(item.assembly()));
         jsonObject.add("_itemList",items);
         return jsonObject;
     }

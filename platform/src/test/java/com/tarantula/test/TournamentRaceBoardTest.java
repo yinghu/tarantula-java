@@ -1,15 +1,19 @@
 package com.tarantula.test;
 
 
-import com.beust.ah.A;
 import com.icodesoftware.DataStore;
+
+import com.tarantula.platform.tournament.TournamentRaceBoard;
+
 
 import com.icodesoftware.Tournament;
 import com.tarantula.platform.tournament.*;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.List;
+
 
 public class TournamentRaceBoardTest extends DataStoreHook{
 

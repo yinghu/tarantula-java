@@ -34,8 +34,8 @@ public interface UDPEndpointServiceProvider extends EndPoint,Messenger{
     void pingClientInterval(int interval);
 
     <T extends UserChannel> void registerUserChannel(T userChannel);
-
-    UserChannel releaseUserChannel(int channelId);
+    <T extends UserChannel> T lookup(int channelId);
+    <T extends UserChannel> T releaseUserChannel(int channelId);
 
     void registerPingListener(PingListener pingListener);
     void registerCipherListener(CipherListener cipherListener);

@@ -1,5 +1,6 @@
 package com.tarantula.platform.service;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.util.CipherUtil;
 import com.tarantula.platform.AssociateObject;
 import com.tarantula.platform.service.cluster.PortableRegistry;
@@ -55,5 +56,12 @@ public class PresenceKey extends AssociateObject {
         return true;
     }
 
-
+    @Override
+    public JsonObject toJson() {
+        JsonObject resp = new JsonObject();
+        resp.addProperty("clusterKey",clusterKey);
+        resp.addProperty("tokenKey",tokenKey);
+        resp.addProperty("distributionId",distributionKey());
+        return resp;
+    }
 }

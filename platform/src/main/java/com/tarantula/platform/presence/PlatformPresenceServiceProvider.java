@@ -6,20 +6,20 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.protocol.statistics.UserRating;
 import com.icodesoftware.protocol.statistics.UserStatistics;
 import com.icodesoftware.service.ServiceContext;
 
 import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.game.GamePortableRegistry;
-import com.tarantula.game.GameRating;
+
 
 import com.tarantula.game.Stub;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceSetup;
 
-import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
+import com.tarantula.platform.presence.leaderboard.PlatformLeaderBoardProvider;
 
 import com.tarantula.platform.presence.saves.*;
 
@@ -111,6 +111,14 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         this.logger = JDKLogger.getLogger(PlatformPresenceServiceProvider.class);
         this.logger.warn("Presence service provider started on ->"+gameServiceName);
     }
+
+
+    public void onPlay(Session session){
+        this.recentlyPlayList.onList(session.distributionId());
+        updates.incrementAndGet();
+    }
+
+
     public void onFriendList(long systemId,long friendSystemId){
         PlayList playList = new PlayList(friendListSize);
         playList.distributionId(systemId);
@@ -171,25 +179,13 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         return new ProfilePayload(playerProfiles);
     }
 
-    public GameRating rating(Session session){
-        GameRating[] loaded  = {new GameRating()};
+    public Rating rating(Session session){
+        UserRating rating  = new UserRating();
         CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);
-        RecoverableQuery<GameRating> query = RecoverableQuery.query(currentSaveIndex.saveId,loaded[0], GamePortableRegistry.INS);
-        mDataStore.list(query,(m)->{
-            if(m.label().equals(loaded[0].label())){
-                loaded[0]=m;
-                return false;
-            }
-            return true;
-        });
-        if(loaded[0].distributionId()==0){
-            loaded[0].ownerKey(query.key());
-            loaded[0].rank = 1;
-            loaded[0].xp = 100;
-            mDataStore.create(loaded[0]);
-        }
-        loaded[0].dataStore(mDataStore);
-        return loaded[0];
+        rating.distributionId(currentSaveIndex.saveId);
+        rating.dataStore(applicationPreSetup.dataStore(gameCluster,NAME+"_rating"));
+        rating.load();
+        return rating;
     }
     public Stub stub(Session session,Descriptor lobby){
         DataStore ds = applicationPreSetup.dataStore(gameCluster,NAME+"_"+lobby.tag().replaceAll(Recoverable.PATH_SEPARATOR,"_"));
@@ -206,7 +202,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         deltaStatistics.distributionId(currentSaveIndex.saveId);
         deltaStatistics.dataStore(applicationPreSetup.dataStore(gameCluster,NAME+"_statistics"));
         deltaStatistics.load();
-        deltaStatistics.registerListener((entry -> {
+        deltaStatistics.registerListener(((entry,delta) -> {
             LeaderBoard leaderBoard = platformLeaderBoardProvider.leaderBoard(entry.name());
             leaderBoard.onAllBoard(entry);
         }));
@@ -265,11 +261,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         savedGame.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
         savedGame.update();
     }
-    public void expireSavedGame(CurrentSaveIndex currentSaveIndex){
-        if(currentSaveIndex.index()==null) return;
-        SavedGame savedGame = savedGame(currentSaveIndex.index());
-        savedGame.expireSession(currentSaveIndex.routingNumber());
-    }
+
 
     public PersonalDataIndex loadPersonalDataIndex(String systemId){
         PersonalDataIndex playerSaveIndex = new PersonalDataIndex();
@@ -279,13 +271,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         return playerSaveIndex;
     }
 
-    private SavedGameIndex savedGameIndex(String systemId){
-        SavedGameIndex savedGameIndex = new SavedGameIndex();
-        savedGameIndex.distributionKey(systemId);
-        savedGameIndex.dataStore(this.dataStore);
-        this.dataStore.createIfAbsent(savedGameIndex,true);
-        return savedGameIndex;
-    }
+
     private SavedGame savedGame(String saveId){
         SavedGame savedGame = new SavedGame();
         savedGame.distributionKey(saveId);
@@ -306,7 +292,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     }
 
     public void onLeave(Session session){
-        platformGameServiceProvider.savedGameServiceProvider().checkSavedGame(session.distributionKey());
+        //platformGameServiceProvider.savedGameServiceProvider().checkSavedGame(session.distributionKey());
     }
 
     public void onLobby(Descriptor onLobby){

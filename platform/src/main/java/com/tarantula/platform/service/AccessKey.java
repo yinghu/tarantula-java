@@ -1,7 +1,7 @@
 package com.tarantula.platform.service;
 
 import com.icodesoftware.OnAccess;
-import com.tarantula.platform.OnApplicationHeader;
+import com.icodesoftware.util.OnApplicationHeader;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.util.Map;

@@ -7,7 +7,7 @@ import com.icodesoftware.service.OnExchange;
 import com.tarantula.platform.event.ResponsiveEvent;
 
 import java.io.File;
-import java.io.FileInputStream;
+
 
 public class DataBackupOperation implements PendingOperation {
 
@@ -17,7 +17,7 @@ public class DataBackupOperation implements PendingOperation {
     }
     @Override
     public void execute(OnExchange exchange) throws Exception{
-        File file = this.deploymentServiceProvider.issueDataStoreBackup(Distributable.INDEX_SCOPE);
+        File file = this.deploymentServiceProvider.dataStoreBackup(Distributable.INDEX_SCOPE);
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("file",file.getAbsolutePath());
         jsonObject.addProperty("size",file.length());

@@ -18,13 +18,13 @@ public class PVPRoomProxy extends RoomProxyHeader{
         stub.joined(room!=null);
         if(!stub.joined()) return stub;
         stub.roomId = room.roomId();
-        stub.zoneId = gameZone.distributionKey();
+        stub.zoneId = gameZone.distributionId();
         stub.room = room;
         stub.zone = gameZone;
         stub.pushChannel = gameServiceProvider.roomServiceProvider().registerChannel(stub,(s,d)->{
             gameLobby.timeout(s,d);
         });
-        stub.tag(application.tag());
+        stub.tag = (application.tag());
         stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));
         this.dataStore.update(stub);
         return stub;

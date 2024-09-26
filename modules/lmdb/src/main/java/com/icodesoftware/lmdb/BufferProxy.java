@@ -7,11 +7,11 @@ import java.nio.ByteOrder;
 
 public class BufferProxy implements Recoverable.DataBuffer {
 
-    private ByteBuffer buffer;
+    private final ByteBuffer buffer;
 
     private BufferProxy(ByteBuffer buffer){
         this.buffer = buffer;
-        this.buffer.order(ByteOrder.nativeOrder());
+        if(buffer.order()!=ByteOrder.nativeOrder()) this.buffer.order(ByteOrder.nativeOrder());
     }
 
     public Recoverable.DataBuffer writeHeader(Recoverable.DataHeader dataHeader){
@@ -116,6 +116,7 @@ public class BufferProxy implements Recoverable.DataBuffer {
         String ret = sb.toString();
         return ret.equals(Recoverable.UTF_NULL)?null:ret;
     }
+
     public static Recoverable.DataBuffer buffer(ByteBuffer buffer){
         return new BufferProxy(buffer);
     }
@@ -123,9 +124,11 @@ public class BufferProxy implements Recoverable.DataBuffer {
     public static Recoverable.DataBuffer buffer(int size,boolean direct){
         return new BufferProxy(direct?ByteBuffer.allocateDirect(size):ByteBuffer.allocate(size));
     }
+
     public static Recoverable.DataBuffer wrap(byte[] data){
         return new BufferProxy(ByteBuffer.wrap(data));
     }
+
     public static Recoverable.DataBuffer wrapDirectly(byte[] data){
         Recoverable.DataBuffer wrap = buffer(data.length,true);
         for(byte b : data){
@@ -143,6 +146,7 @@ public class BufferProxy implements Recoverable.DataBuffer {
         return buffer.array();
     }
 
+
     public ByteBuffer flip(){
         buffer.flip();
         return buffer;
@@ -154,6 +158,17 @@ public class BufferProxy implements Recoverable.DataBuffer {
     public ByteBuffer clear(){
         buffer.clear();
         return buffer;
+    }
+    public boolean hasRemaining(){
+        return buffer.hasRemaining();
+    }
+
+    public int remaining(){
+        return buffer.remaining();
+    }
+
+    public void position(int position){
+        buffer.position(position);
     }
 
 }

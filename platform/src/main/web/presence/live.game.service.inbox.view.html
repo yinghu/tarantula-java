@@ -10,17 +10,30 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
-    <div class="w3-panel"><!-- send form -->
-        <div class="w3-container">
-            <label class="tx-text-12">File Configuration Name</label>
-            <input id ="tx-inbox-find-file-config-name" class="w3-input w3-round w3-border tx-text-16" type="text" placeholder='a name'/>
-        </div>
+    <div class="w3-panel w3-card"><!-- send form -->
+        <fieldset class="w3-border-green tx-text-12 tx-margin-bottom-8">
+            <legend>File Configuration View</legend>
+            <div class="w3-container">
+                <label class="tx-text-12">File Configuration Name</label>
+                <input id ="tx-inbox-find-file-config-name" class="w3-input w3-round w3-border tx-text-12" type="text" placeholder='file name'/>
+            </div>
+            <div class="w3-container">
+                <span id="tx-inbox-download-config-file" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Download</span>     
+            </div>
+        </fieldset>
     </div>
-    <div class="w3-panel">
-        <div class="w3-container  w3-border-bottom w3-border-red">
-            <span id="tx-inbox-download-config-file" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Download</span>     
-        </div>
-    </div>  
+    <div class="w3-panel w3-card"><!-- send form -->
+        <fieldset class="w3-border-green tx-text-12 tx-margin-bottom-8">
+            <legend>Leader Board View</legend>
+            <div class="w3-container">
+                <label class="tx-text-12">Leader Board Name</label>
+                <input id ="tx-inbox-leader-board-name" class="w3-input w3-round w3-border tx-text-12" type="text" placeholder='leader board name'/>
+            </div>
+            <div class="w3-container">
+                <span id="tx-inbox-leader-board-load" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-12 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Load</span>     
+            </div>
+        </fieldset>
+    </div> 
     <div class="w3-panel">
         <div class='w3-bar w3-white w3-border-bottom w3-border-red'>
             <span id='tx-inbox-live-service-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
@@ -60,13 +73,22 @@
     document.querySelector('#tx-inbox-live-service-json-mode-preview').onclick=()=>{
         editor.setMode('preview');
     };
-    
     document.querySelector('#tx-inbox-download-config-file').onclick=()=>{
         tx_download_json_file();
     };
+    document.querySelector('#tx-inbox-leader-board-load').onclick=()=>{
+        tx_leader_board_json();
+    };
+    
     function tx_download_json_file(){
         let cname = document.querySelector('#tx-inbox-find-file-config-name').value;
         TARA_API.onGet(TARA_API.query().serviceTag,'onFile',cname,(resp)=>{
+            editor.set(resp);
+        });
+    }
+    function tx_leader_board_json(){
+        let cname = document.querySelector('#tx-inbox-leader-board-name').value;
+        TARA_API.onGet(TARA_API.query().serviceTag,'onLeaderBoard',cname,(resp)=>{
             editor.set(resp);
         });
     }

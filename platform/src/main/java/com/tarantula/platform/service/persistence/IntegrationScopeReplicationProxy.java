@@ -4,14 +4,15 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.TransactionLog;
+import com.icodesoftware.lmdb.TransactionLogListener;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.event.TransactionReplicationEvent;
-import com.tarantula.platform.service.cluster.DistributionReplicator;
+
 
 import java.util.List;
 
-public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
+public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy implements TransactionLogListener {
 
     public IntegrationScopeReplicationProxy(){
         super("integration", Distributable.INTEGRATION_SCOPE);
@@ -69,5 +70,11 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
     public void setup(ServiceContext serviceContext) {
         logger = JDKLogger.getLogger(IntegrationScopeReplicationProxy.class);
         super.setup(serviceContext);
+        transactionLogManager.registerTransactionLogListener(this);
+    }
+    @Override
+    public void onTransactionLog(TransactionLog transactionLog) {
+        //operations on original data store
+        super.onHomingAgent(transactionLog);
     }
 }

@@ -1,76 +1,45 @@
 package com.tarantula.platform.room;
 
-import com.hazelcast.nio.serialization.Portable;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
-import com.tarantula.game.GameZone;
+import com.tarantula.game.GameArena;
+import com.tarantula.game.Stub;
 
-import java.util.List;
 
-public interface GameRoom extends Room,Resettable,Closable,Configurable,Portable {
+public interface GameRoom extends Room,DataStore.Updatable,Closable {
 
     String LABEL = "gameRoom";
 
     int channelId();
     int sessionId();
 
-    byte[] serverKey();
-    Connection connection();
+    long roomId();
 
-    String roomId();
+    int bucket();
 
-    List<Entry> entries();
-    void setup(Channel channel);
+    void assign(Channel channel);
 
+    boolean empty();
     //Distributed Methods
-    GameRoom join(long stubId,Listener listener);
+    GameRoom join(Stub session,RoomStub roomStub);
     GameRoom view();
-    void leave(long stubId,Listener listener);
+    void leave(Stub stub);
     void load();
-
-
-    void setup(GameServiceProvider gameServiceProvider,GameZone gameZone,boolean dedicated);
+    boolean dedicated();
+    long zoneId();
 
     void setup(Channel[] channels);
+    void arena(GameArena arena);
+    Channel registerChannel(Session session,Session.TimeoutListener timeoutListener,GameServiceProvider gameServiceProvider);
 
-
-    Channel registerChannel(Session session,Session.TimeoutListener timeoutListener);
-
-    interface Entry extends Resettable,Configurable, Portable {
+    interface Entry extends Room.Seat,Resettable {
 
         String LABEL = "roomEntry";
 
-        int seat();
-        long stubId();
-        int team();
-        boolean occupied();
-
-        void seat(int seat);
-        void stubId(long stubId);
+        void systemId(long systemId);
+        void number(int number);
+        void stub(long stubId);
         void team(int team);
         void occupied(boolean occupied);
-    }
-
-    interface Listener{
-        void onUpdated(GameRoom room,Entry entry);
-    }
-
-    static GameRoom newGameRoom(String type,int roomCapacity){
-        GameRoom gameRoom = null;
-        switch (type){
-            case GameZone.PLAY_MODE_PVE:
-                gameRoom = new PVEGameRoom();
-                break;
-            case GameZone.PLAY_MODE_PVP:
-                gameRoom = new PVPGameRoom(roomCapacity);
-                break;
-            case GameZone.PLAY_MODE_TVE:
-                gameRoom = new TVEGameRoom(roomCapacity);
-                break;
-            case GameZone.PLAY_MODE_TVT:
-                gameRoom = new TVTGameRoom(roomCapacity);
-                break;
-        }
-        return gameRoom;
     }
 }

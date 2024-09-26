@@ -40,14 +40,8 @@ public class SavedGameModule extends ModuleHeader {
             ).getBytes());
         }
         else if(session.action().equals("onReset")){
-            CurrentSaveIndex selected = this.savedGameServiceProvider.reset(session);
-            if(selected.index()!=null){
-                SavedGame savedGame = presenceServiceProvider.resetSavedGame(selected);
-                session.write(savedGame.toJson().toString().getBytes());
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(true,"system saved game reset").getBytes());
-            }
+            boolean reset = this.savedGameServiceProvider.reset(session);
+            session.write(JsonUtil.toSimpleResponse(reset,reset?"system saved game reset":"cannot reset save").getBytes());
         }
         else if(session.action().equals("onFetchProfile")){
             session.write(presenceServiceProvider.getProfilePayload(session.name()).toJson().toString().getBytes());

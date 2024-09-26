@@ -3,7 +3,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.protocol.ProtocolPortableRegistry;
-import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.util.OnApplicationHeader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class UserStatistics extends RecoverableObject implements Statistics {
+public class UserStatistics extends OnApplicationHeader implements Statistics {
 
     private Map<String,StatisticsEntry> mappings = new ConcurrentHashMap<>();
 
@@ -31,18 +31,17 @@ public class UserStatistics extends RecoverableObject implements Statistics {
             //new entry
             StatisticsEntry se = new StatisticsEntry(this.key(),ename);
             this.dataStore.create(se);
-            this.dataStore.update(this);
             se.dataStore(this.dataStore);
             return se;
         });
         entry.listener(this.listener);
         return entry;
+
     }
     //memory copy list
     public List<Entry> summary(){
         ArrayList<Entry> elist = new ArrayList<>();
         mappings.forEach((k,v)->{
-            //v.load();
             elist.add(v.duplicate());
         });
         return elist;
@@ -50,7 +49,6 @@ public class UserStatistics extends RecoverableObject implements Statistics {
     //original streaming
     public void summary(Stream query){
         mappings.forEach((k,v)->{
-            //v.load();
             query.onEntry(v);
         });
     }
@@ -75,15 +73,6 @@ public class UserStatistics extends RecoverableObject implements Statistics {
         jo.addProperty("Successful",true);
         jo.add("_categories",ja);
         return jo;
-    }
-
-    public boolean read(DataBuffer buffer){
-        //this.count = buffer.readInt();
-        return true;
-    }
-    public boolean write(DataBuffer buffer) {
-        //buffer.writeInt(count);
-        return true;
     }
 
     public void load(){

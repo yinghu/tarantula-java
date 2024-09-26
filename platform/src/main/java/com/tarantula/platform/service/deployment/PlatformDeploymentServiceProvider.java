@@ -1,13 +1,13 @@
 package com.tarantula.platform.service.deployment;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 
+import com.icodesoftware.util.BufferUtil;
+import com.icodesoftware.util.ResponseHeader;
 import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.admin.GameClusterQuery;
 import com.tarantula.platform.*;
@@ -174,53 +174,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         dyn.loadResource(name,onResource);
     }
 
-    public boolean resetModule(Descriptor descriptor){
-        //update app desc via typeId
-        boolean[] suc ={false};
-        DataStore dataStore = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.tarantulaContext.node().deploymentId(),descriptor.typeId());
-        if(!dataStore.load(lobbyTypeIdIndex)){
-            if(descriptor.index()!=null){
-                //IndexSet indexSet = new IndexSet();
-                //indexSet.distributionKey(descriptor.index());
-                //indexSet.label(ExposedGameService.INDEX_LABEL);
-                //if(dataStore.load(indexSet)){
-                    //indexSet.keySet().forEach((k)->{
-                        //DeploymentDescriptor app = new DeploymentDescriptor();
-                        //app.distributionKey(k);
-                        //if(dataStore.load(app)){
-                            //app.codebase(descriptor.codebase());
-                            //app.moduleArtifact(descriptor.moduleArtifact());
-                            //app.moduleVersion(descriptor.moduleVersion());
-                            //dataStore.update(app);
-                            //suc[0]=true;
-                        //}
-                    //});
-                //}
-            }
-            return suc[0];
-        }
-        /***
-        dataStore.list(new ApplicationQuery(lobbyTypeIdIndex.index()),(a)->{
-            a.codebase(descriptor.codebase());
-            a.moduleArtifact(descriptor.moduleArtifact());
-            a.moduleVersion(descriptor.moduleVersion());
-            dataStore.update(a);
-            suc[0]=true;
-            return true;
-        });**/
-        //return suc[0];
 
-        //DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
-        //boolean suc = deployService.resetModule(descriptor);
-        if(suc[0]){
-            this.integrationCluster.deployService().onUpdateModule(descriptor);
-        }
-        return suc[0];
-    }
-    public ClassLoader classLoader(String moduleId){
-        return cMap.get(moduleId);
-    }
     private Module _internalModule(String mname){
         try{
             return (Module)Class.forName(mname).getConstructor().newInstance();
@@ -229,38 +183,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
             throw new RuntimeException(ex);
         }
     }
-    public Response exportModule(Descriptor descriptor){
-        DynamicModuleClassLoader mc = new DynamicModuleClassLoader(descriptor);
-        Response response = new ResponseHeader();
-        mc.loadResource("export.json",(in)->{
-            try{
-                JsonParser parser = new JsonParser();
-                JsonObject jo = parser.parse(new InputStreamReader(in)).getAsJsonObject();
-                String _moduleId = jo.get(ExposedGameService.MODULE_ID).getAsString();
-                response.message(_moduleId);
-                AccessIndex accessIndex = this.tarantulaContext.clusterProvider().accessIndexService().setIfAbsent(_moduleId,AccessIndex.SYSTEM_INDEX);
-                jo.getAsJsonArray("exposedServiceList").forEach((es)->{
-                    JsonObject je = es.getAsJsonObject();
-                    ExposedGameService egs = new ExposedGameService();
-                    egs.property(ExposedGameService.MODULE_ID,_moduleId);
-                    egs.property(ExposedGameService.MODULE_INDEX,accessIndex.distributionKey());
-                    egs.name(je.get(ExposedGameService.NAME).getAsString());
-                    egs.property(ExposedGameService.DESCRIPTION,je.get(ExposedGameService.DESCRIPTION).getAsString());
-                    egs.property(ExposedGameService.MODULE_CODE_BASE,descriptor.codebase());
-                    egs.property(ExposedGameService.MODULE_ARTIFACT,descriptor.moduleArtifact());
-                    egs.property(ExposedGameService.MODULE_VERSION,descriptor.moduleVersion());
-                    egs.property(ExposedGameService.MODULE_NAME,je.get(ExposedGameService.MODULE_NAME).getAsString());
-                    egs.property(ExposedGameService.DEPLOY_PRIORITY,je.get(ExposedGameService.DEPLOY_PRIORITY).getAsInt());
-                    egs.property(ExposedGameService.ACCESS_CONTROL,je.get(ExposedGameService.ACCESS_CONTROL).getAsInt());
-                    eMap.put(egs.name(),egs);
-                });
-            }catch (Exception ex){
-                log.warn("failed to parse export.json",ex);
-                response.message(ex.getMessage());
-            }
-        });
-        return response;
-    }
+
 
     public <T extends OnAccess> void onGameClusterEvent(T event){
         if(event.typeId()==null) return;
@@ -278,72 +201,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public List<Descriptor> gameServiceList(){
         return this.tarantulaContext.availableServices();
     }
-    public Response deployModule(String contextUrl,String resourceName){
-        Response checked =  this.tarantulaContext.checkModule(contextUrl,resourceName);
-        if(!checked.successful()){
-            return checked;
-        }
-        boolean suc = this.tarantulaContext.integrationCluster().deployService().onDeployModule(contextUrl,resourceName);
-        checked.successful(suc);
-        checked.message(suc?"deployed->"+resourceName:"failed->"+resourceName);
-        return checked;
-    }
 
-    public Response createModule(Descriptor descriptor){
-        DynamicModuleClassLoader mc = new DynamicModuleClassLoader(descriptor);
-        XMLParser xmlParser = new XMLParser();
-        Response response = new ResponseHeader();
-        response.successful(false);
-        mc.loadResource("descriptor.xml",(in)->{
-            try{
-                xmlParser.parse(in);
-                response.successful(true);
-            }catch (Exception ex){
-                log.warn("failed to parse descriptor.xml",ex);
-                response.message(ex.getMessage());
-            }
-        });
-        if(!response.successful()){
-            return response;
-        }
-        LobbyConfiguration a = xmlParser.configurations.get(0);
-        AccessIndex publishId = this.tarantulaContext.clusterProvider().accessIndexService().set(a.descriptor.typeId(),AccessIndex.SYSTEM_INDEX);
-        if(publishId==null){
-            response.successful(false);
-            response.message("module already existed");
-            return response;
-        }
-        DataStore ds = this.tarantulaContext.masterDataStore();
-        LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(tarantulaContext.node().deploymentId(),descriptor.typeId());
-        if(!ds.createIfAbsent(lobbyTypeIdIndex,false)){
-            response.successful(false);
-            response.message("module already existed");
-            return response;
-        }
-        ModuleIndex moduleIndex = new ModuleIndex();
-        moduleIndex.distributionKey(publishId.distributionKey());
-        moduleIndex.index(descriptor.typeId());
-        ds.create(moduleIndex);
-        descriptor.owner(publishId.distributionKey());
-        descriptor.label(LobbyDescriptor.LABEL);
-        descriptor.onEdge(true);
-        descriptor.resetEnabled(true);
-        descriptor.disabled(true);
-        ds.create(descriptor);
-        lobbyTypeIdIndex.index(descriptor.distributionKey());
-        lobbyTypeIdIndex.owner(publishId.distributionKey());
-        ds.update(lobbyTypeIdIndex);
-        a.applications.forEach((b)->{
-            b.codebase(descriptor.codebase());
-            b.moduleArtifact(descriptor.moduleArtifact());
-            b.moduleVersion(descriptor.moduleVersion());
-            b.applicationClassName(this.tarantulaContext.singleModuleApplication);
-            this.createApplication(b,null,false);
-        });
-        response.successful(true);
-        response.message("module created");
-        return response;
-    }
 
     public boolean createApplication(Descriptor descriptor,String configName,boolean launching){
         DataStore ds = this.tarantulaContext.masterDataStore();
@@ -355,18 +213,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         descriptor.label(ApplicationProvider.LABEL);
         descriptor.onEdge(true);
         if(!ds.create(descriptor)) return false;
-        if(!descriptor.typeId().equals(descriptor.moduleId())){
-            //create index for moduleId
-            //IndexSet indexSet = new IndexSet();
-            //indexSet.distributionKey(descriptor.index());
-            //indexSet.label(ExposedGameService.INDEX_LABEL);
-            //indexSet.addKey(descriptor.distributionKey());
-            //if(!ds.createIfAbsent(indexSet,true)){
-                //indexSet.addKey(descriptor.distributionKey());
-                //ds.update(indexSet);
-            //}
-            //log.warn("create index->"+descriptor.moduleId()+"<><><>"+descriptor.index());
-        }
         this.integrationCluster.deployService().onLaunchApplication(descriptor.typeId(),descriptor.distributionId());
         return true;
     }
@@ -401,17 +247,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         ds.update(app);
         DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         return deployService.onShutdownApplication(app.typeId(),applicationId);
-    }
-
-    public boolean launchModule(String typeId){
-        if(!enableLobby(typeId)) return false;
-        this.integrationCluster.deployService().onLaunchModule(typeId);
-        return true;
-    }
-    public boolean shutdownModule(String typeId){
-        if(!disableLobby(typeId)) return false;
-        this.integrationCluster.deployService().onShutdownModule(typeId);
-        return true;
     }
 
     @Override
@@ -461,15 +296,6 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     @Override
     public void waitForData() {
-        /**
-        this.publisher = this.tarantulaContext.integrationCluster().subscribe(NAME,(e)->{
-            String tp = e.trackId();
-            RecoverableListener listener = tMap.get(tp);
-            if(listener!=null){
-                listener.onUpdated(e.stub(),e.trackId(),e.index(),e.payload());
-            }
-            return false;
-        });**/
         this.clusterStore = this.tarantulaContext.integrationCluster().clusterStore(ClusterProvider.ClusterStore.SMALL,DeploymentServiceProvider.NAME,true,false,false);
         log.info("Platform deployment service started on ["+this.tarantulaContext.dataBucketNode+"/"+this.tarantulaContext.dataBucketGroup+"]");
     }
@@ -582,6 +408,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public <T extends OnAccess> boolean launchGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         if(this.enableGameCluster(gameCluster.distributionId()) && deployService.onStartGameService(gameCluster.distributionId())){
+            log.warn("Launching game cluster->"+gameCluster.distributionId());
             return tarantulaContext.integrationCluster().deployService().onLaunchGameCluster(gameCluster.distributionId());
         }
         else{
@@ -591,7 +418,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public <T extends OnAccess> boolean shutdownGameCluster(T gameCluster){
         DeployService deployService = this.tarantulaContext.integrationCluster().deployService();
         if(this.disableGameCluster(gameCluster.distributionId())){
-            log.warn("close game cluster->"+gameCluster.distributionId());
+            log.warn("Shutting down game cluster->"+gameCluster.distributionId());
             return deployService.onShutdownGameCluster(gameCluster.distributionId());
         }
         else{
@@ -618,7 +445,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         return (T)gameCluster;
     }
     public <T extends OnAccess> List<T> gameClusterList(Access access){
-        GameClusterQuery gameClusterQuery = new GameClusterQuery(access.primary()?access.distributionId():access.distributionId());
+        GameClusterQuery gameClusterQuery = new GameClusterQuery(access.primary()?access.distributionId():access.primaryId());
         return (List<T>)this.tarantulaContext.masterDataStore().list(gameClusterQuery);
     }
     public  <T extends OnAccess> T createGameCluster(Account account,String name,OnAccess properties){
@@ -751,14 +578,14 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         });
         return lobby;
     }
-    public String resetCode(String key){
+    public String resetCode(long key){
         String code = UUID.randomUUID().toString();
-        clusterStore.mapSet(code.getBytes(),key.getBytes());
+        clusterStore.mapSet(code.getBytes(), BufferUtil.fromLong(key));
         return code;
     }
-    public String checkCode(String resetCode){
+    public long checkCode(String resetCode){
         byte[] ret = clusterStore.mapRemove(resetCode.getBytes());
-        return (ret!=null?new String(ret):"");
+        return (ret!=null?BufferUtil.toLong(ret):0);
     }
 
     public byte[] serverKey(String typeId){
@@ -771,6 +598,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     public String registerGameServerListener(GameServerListener gameChannelListener){
         String regKey = gameChannelListener.typeId();//UUID.randomUUID().toString();
         cListeners.put(regKey,gameChannelListener);
+        this.tarantulaContext.endpointService().onGameServerListener(gameChannelListener);
         return regKey;
     }
     public GameServerListener gameServerListener(String typeId){
@@ -798,10 +626,15 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
 
-    public File issueDataStoreBackup(int scope){
+    public File dataStoreBackup(int scope){
         return this.tarantulaContext.deploymentDataStoreProvider.backup(scope);
     }
-
+    public void issueDataStoreBackup(int scope){
+        new Thread(()->{
+            File f = this.tarantulaContext.deploymentDataStoreProvider.backup(scope);
+            log.warn("Data store scope ["+scope+"] back finished on file ["+f.getAbsolutePath()+"]");
+        }).start();
+    }
     public List<String> listDataStore(int scope) {
         return this.tarantulaContext.dataStoreProvider().list(scope);
     }
@@ -860,9 +693,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         LobbyDescriptor lobbyDescriptor = new LobbyDescriptor();
         lobbyDescriptor.distributionId(query.lobbyId());
-        if(!ds.load(lobbyDescriptor)||!lobbyDescriptor.disabled()){
-            return false;
-        }
+        //if(!ds.load(lobbyDescriptor) || !lobbyDescriptor.disabled()){
+            //return false;
+        //}
         lobbyDescriptor.disabled(false);
         ds.update(lobbyDescriptor);
         return true;
@@ -876,9 +709,9 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         LobbyDescriptor lobbyDescriptor = new LobbyDescriptor();
         lobbyDescriptor.distributionId(query.lobbyId());
-        if(!ds.load(lobbyDescriptor)||lobbyDescriptor.disabled()){
-            return false;
-        }
+        //if(!ds.load(lobbyDescriptor) || lobbyDescriptor.disabled()){
+            //return false;
+        //}
         lobbyDescriptor.disabled(true);
         ds.update(lobbyDescriptor);
         return true;
@@ -887,35 +720,47 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     boolean enableGameCluster(long gameClusterId){
         GameCluster gameCluster = this.tarantulaContext.loadGameCluster(gameClusterId);
         DataStore mds = this.tarantulaContext.masterDataStore();
+        mds.load(gameCluster);
         if(gameCluster==null){
+            log.warn("Should be a null game cluster");
+            return false;
+        }
+        if(!gameCluster.disabled()){
+            log.warn("Game cluster already running");
             return false;
         }
         String data = gameCluster.gameDataName;//1
         String lobby = gameCluster.gameLobbyName;//2
         String service = gameCluster.gameServiceName;//3
-        boolean suc1 = enableLobby(data);
-        boolean suc2 = enableLobby(lobby);
-        boolean suc3 = enableLobby(service);
+        if(!enableLobby(data)) return false;
+        if(!enableLobby(lobby)) return false;
+        if(!enableLobby(service)) return false;
         gameCluster.disabled(false);
         mds.update(gameCluster);
-        return suc1&&suc2&&suc3;//make sure all enabled
+        return true;//make sure all enabled
     }
 
     boolean disableGameCluster(long gameClusterId){
         GameCluster gameCluster = this.tarantulaContext.loadGameCluster(gameClusterId);
         DataStore mds = this.tarantulaContext.masterDataStore();
+        mds.load(gameCluster);
         if(gameCluster==null){
+            log.warn("Should be a null game cluster");
+            return false;
+        }
+        if(gameCluster.disabled()){
+            log.warn("Game cluster already shut down");
             return false;
         }
         String data = gameCluster.gameDataName;//1
         String lobby = gameCluster.gameLobbyName;//2
         String service = gameCluster.gameServiceName;//3
-        boolean suc1 = disableLobby(data);
-        boolean suc2 = disableLobby(lobby);
-        boolean suc3 = disableLobby(service);
+        if(!disableLobby(data)) return false;
+        if(!disableLobby(lobby)) return false;
+        if(!disableLobby(service)) return false;
         gameCluster.disabled(true);
         mds.update(gameCluster);
-        return suc1&&suc2&&suc3;
+        return true;
     }
 
     public NodeShutdownOperator nodeShutdownOperator(Access access){

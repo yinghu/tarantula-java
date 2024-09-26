@@ -2,6 +2,7 @@ package com.tarantula.platform.service.metrics;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.util.RecoverableObject;
 
@@ -40,4 +41,18 @@ public class MetricsSnapshotResponse extends RecoverableObject{
         jsonObject.add("data",metrics);
         return jsonObject;
     }
+
+    @Override
+    public byte[] toBinary() {
+        DataBuffer dataBuffer = BufferProxy.buffer(1000,false);
+        dataBuffer.writeUTF8(memberId);
+        dataBuffer.writeInt(metrics.size());
+        metrics.forEach(e->{
+            JsonObject m = e.getAsJsonObject();
+            dataBuffer.writeUTF8(m.get("x").getAsString());
+            dataBuffer.writeDouble(m.get("y").getAsDouble());
+        });
+        return dataBuffer.array();
+    }
+
 }

@@ -31,7 +31,6 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private static JDKLogger log = JDKLogger.getLogger(IntegrationCluster.class);
 
-    private static String PENDING_EVENT_NUMBER = "pendingEventNumber";
     private final Config config;
     private final String bucket;
     private final String INDEX_MAP_PREFIX = "tarantula.index.";
@@ -49,8 +48,8 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     private final ConcurrentHashMap<String,BucketReceiver> bMap = new ConcurrentHashMap<>();
 
     private final ConcurrentHashMap<String,IntegrationClusterStore> cMap = new ConcurrentHashMap<>();
-    public PartitionState[] partitionStates;
-
+    private PartitionState[] partitionStates;
+    private PartitionState[] bucketStates;
     private ExecutorService inboundEventPool;
     private int workerSize = 8;
     private final TarantulaContext tarantulaContext;
@@ -68,16 +67,18 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
 
     private ConcurrentHashMap<String, ReloadListener> rMap = new ConcurrentHashMap<>();
-    private CopyOnWriteArrayList<NodeListener> nList = new CopyOnWriteArrayList<>();
-
 
     public IntegrationCluster(final Config config,final String bucket,final TarantulaContext tcx){
         this.tarantulaContext = tcx;
         this.config = config;
         this.bucket = bucket;
-        this.partitionStates = new PartitionState[this.tarantulaContext.platformRoutingNumber];
-        for(int i=0;i<tarantulaContext.platformRoutingNumber;i++){
+        this.partitionStates = new PartitionState[this.tarantulaContext.accessIndexRoutingNumber];
+        for(int i=0;i<tarantulaContext.accessIndexRoutingNumber;i++){
             this.partitionStates[i]=new PartitionState(i,false);
+        }
+        this.bucketStates = new PartitionState[this.tarantulaContext.platformRoutingNumber];
+        for(int i=0;i<tarantulaContext.platformRoutingNumber;i++){
+            this.bucketStates[i]=new PartitionState(i,false);
         }
         _integrationInstanceStarted = new CountDownLatch(1);
         _serviceReady = new CountDownLatch(1);
@@ -86,20 +87,14 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         return "IntegrationCluster";
     }
 
-    public int maxSize(){
-        return tarantulaContext.clusterMaxSize;
+    public OnPartition[] partitionSet(){
+        return partitionStates;
     }
-    public int maxReplicationNumber(){
-        return tarantulaContext.maxReplicationNumber;
-    }
-    public String bucket(){
-        return this.bucket;
+    public OnPartition[] bucketSet(){
+        return bucketStates;
     }
 
     public void waitForData(){}
-    public int scope(){
-        return Distributable.INTEGRATION_SCOPE;
-    }
 
     public void start() throws Exception {
         TarantulaExecutorServiceFactory.createExecutorService("integration-"+this.tarantulaContext.eventThreadPoolSetting,(pool, poolSize, rh)->{
@@ -124,6 +119,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         this.recoverService = this._cluster.getDistributedObject(RecoverService.NAME,RecoverService.NAME);
         this.recoverService.setup(this.tarantulaContext);
         _serviceReady.countDown();
+        for(Partition p : _cluster.getPartitionService().getPartitions()){
+            partitionStates[p.getPartitionId()].opening = p.getOwner().localMember();
+        }
         new ServiceBootstrap(TarantulaContext._cluster_service_ready,TarantulaContext._storageStarted,new StorageServiceBootstrap(this.tarantulaContext),"data-store-starter",true).start();
         new ServiceBootstrap(TarantulaContext._storageStarted,TarantulaContext._systemServiceStarted,new SystemServiceBootstrap(this.tarantulaContext),"system-service-starter",true).start();
     }
@@ -210,7 +208,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
     public void registerBucketReceiver(BucketReceiver bucketReceiver){
         BucketReceiver br = bMap.computeIfAbsent(bucketReceiver.bucket(),(b)->bucketReceiver);
-        PartitionState ps = this.partitionStates[br.partition()];
+        PartitionState ps = this.bucketStates[br.partition()];
         if(ps.opening){
             br.open();
             this.subscribe(br.bucket(),br);
@@ -228,8 +226,8 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
 
 
-    public void onPartition(int pt,boolean opening){
-        this.partitionStates[pt].opening = opening;
+    public void onBucket(int pt,boolean opening){
+        this.bucketStates[pt].opening = opening;
         bMap.forEach((k,v)->{
             if(v.partition()==pt&&opening){//open if closed
                 if(!v.opening()){
@@ -244,6 +242,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
                 }
             }
         });
+        rMap.forEach((k,v)->v.onBucket(pt,opening));
     }
 
     public RoutingKey routingKey(Object magicKey,String tag){
@@ -286,6 +285,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
 
     public String registerReloadListener(ReloadListener listener){
+        listener.onReload();
         String regKey = UUID.randomUUID().toString();
         rMap.put(regKey,listener);
         return regKey;
@@ -293,8 +293,12 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public void unregisterReloadListener(String regKey){
         rMap.remove(regKey);
     }
-    public void onReload(int partition,boolean localMember){
-        rMap.forEach((k,v)->v.reload(partition,localMember));
+    public void onPartition(int partition,boolean localMember){
+        partitionStates[partition].opening = localMember;
+        rMap.forEach((k,v)->v.onPartition(partition,localMember));
+    }
+    public void onReload(){
+        rMap.forEach((k,v)->v.onReload());
     }
 
     public ClusterStore clusterStore(String size,String name,boolean map,boolean index,boolean queue){
@@ -333,6 +337,9 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     public int partition(byte[] key){
         return _cluster.getPartitionService().getPartition(key).getPartitionId();
     }
+    public int bucket(byte[] key){
+        return SystemUtil.partition(key,tarantulaContext.platformRoutingNumber);
+    }
     public void registerNode(Node node){
         ClusterNode cnode = (ClusterNode) node;
         cnode.startTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
@@ -358,7 +365,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
                         String[] pnode = m.getStringAttribute("node").split("#");
                         Node exstingNode = fromCluster(Long.parseLong(pnode[1]));
                         if(exstingNode != null){
-                            nList.forEach(nodeListener -> nodeListener.nodeAdded(exstingNode));
+                            //nList.forEach(nodeListener -> nodeListener.nodeAdded(exstingNode));
                             this.summary.register(exstingNode);
                         }
                     }
@@ -367,7 +374,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             }catch (Exception ex){
                 if(i == 9) {
                     log.warn("Cluster going to shutdown due to member not ready after 10 retries");
-                    _cluster.getCluster().shutdown();
+                    System.exit(0);
                 }else{
                     log.warn("Waiting pending registering nodes ...");
                     try { Thread.sleep(5000); }catch (Exception ignore){}
@@ -380,8 +387,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         String memberId = mEvent.getMember().getUuid();
         String[] node = mEvent.getMember().getStringAttribute("node").split("#");
         log.warn("Member ["+memberId+"] left from node ["+node[0]+":"+node[1]+"]");
-        ClusterNode removed = new ClusterNode("",node[0],tarantulaContext.platformRoutingNumber);
-        nList.forEach(nodeListener -> nodeListener.nodeRemoved(removed));
+        ClusterNode removed = new ClusterNode("",node[0], tarantulaContext.accessIndexRoutingNumber,tarantulaContext.platformRoutingNumber);
         this.summary.unregister(removed);
         this.vMap.remove(BufferUtil.toArray(ByteBuffer.allocate(8).putLong(Long.parseLong(node[1])).flip()));//remove nodeId = > node
         this.vMap.remove(memberId.getBytes()); //remove member =>  nodeId
@@ -399,7 +405,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         String memberId = member.getUuid();
         Node existingNode = fromCluster(nodeId);
         if(existingNode!=null){
-            nList.forEach(nodeListener -> nodeListener.nodeAdded(existingNode));
+            //nList.forEach(nodeListener -> nodeListener.nodeAdded(existingNode));
             this.summary.register(existingNode);
             log.warn("Node is ready : "+nodeName+" : "+memberId+" : "+nodeId);
         }
@@ -412,6 +418,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         n.fromBinary(ret);
         return n;
     }
+
     @Override
     public void registerSummary(ServiceProvider.Summary summary){
         summary.registerCategory(PENDING_EVENT_NUMBER);
@@ -429,8 +436,5 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         }
     }
 
-    public void registerNodeListener(NodeListener nodeListener){
-        nList.add(nodeListener);
-    }
 
 }

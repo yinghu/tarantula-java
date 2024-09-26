@@ -35,21 +35,14 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
     Content resource(String name);
     void deleteResource(String name);
-    String resetCode(String key);
-    String checkCode(String resetCode);
+    String resetCode(long systemId);
+    long checkCode(String resetCode);
     //end
 
     //Module operation APIs
     Module module(Descriptor descriptor);
     void resource(Descriptor descriptor, String name, Module.OnResource onResource);
-    Response deployModule(String contextUrl,String resourceName);
-    Response createModule(Descriptor descriptor);
-    Response exportModule(Descriptor descriptor);
-    boolean launchModule(String typeId);
-    boolean resetModule(Descriptor descriptor);
-    boolean shutdownModule(String typeId);
-    ClassLoader classLoader(String moduleId);
-    //end
+
 
     //game cluster operation APIs
     boolean createApplication(Descriptor descriptor,String configName,boolean launching);
@@ -81,7 +74,8 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     void registerAccessIndexListener(AccessIndexService.Listener listener);
 
     //data store backup operation API
-    File issueDataStoreBackup(int scope);
+    File dataStoreBackup(int scope);
+    void issueDataStoreBackup(int scope);
     List<String> listDataStore(int scope);
     List<String> listServiceView();
     List<String> listMetricsView();
@@ -103,10 +97,6 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
         void onGameClusterLaunched(long gameClusterId);
         void onGameClusterShutdown(long gameClusterId);
 
-        void onModuleLaunched(String typeId);
-        void onModuleShutdown(String typeId);
-        void onModuleUpdated(Descriptor descriptor);
-        void onModuleDeployed(String contentUrl,String resourceName);
 
         void onApplicationLaunched(String typeId,long applicationId);
         void onApplicationShutdown(String typeId,long applicationId);
@@ -134,6 +124,7 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
 
     interface NodeShutdownOperator{
         void shutdown(ClusterProvider.Node node);
+        void restart(ClusterProvider.Node node);
     }
 
 }

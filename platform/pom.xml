@@ -5,21 +5,16 @@
 	<parent>
 		<groupId>com.icodesoftware</groupId>
 		<artifactId>game-cluster</artifactId>
-		<version>2.0</version>
+		<version>3.0</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>com.icodesoftware</groupId>
   <artifactId>gec-platform</artifactId>
-  <version>2.0</version>
+  <version>3.0</version>
   <packaging>jar</packaging>
   <name>Game Cluster Platform</name>
   <description>Game Cluster Platform</description>
   <dependencies>
-	  <dependency>
-		  <groupId>com.stripe</groupId>
-		  <artifactId>stripe-java</artifactId>
-		  <version>8.0.2</version>
-	  </dependency>
    	<dependency>
 		<groupId>com.hazelcast</groupId>
 		<artifactId>hazelcast</artifactId>
@@ -45,6 +40,7 @@
 		  <artifactId>postgresql</artifactId>
 		  <version>42.7.2</version>
 	  </dependency>
+
 	  <dependency>
 		  <groupId>com.hazelcast</groupId>
 		  <artifactId>hazelcast-kubernetes</artifactId>
@@ -53,6 +49,11 @@
 	  <dependency>
 		  <groupId>com.perfectday.games</groupId>
 		  <artifactId>gec-earth8</artifactId>
+		  <version>1.0</version>
+	  </dependency>
+	  <dependency>
+		  <groupId>com.icodesoftware</groupId>
+		  <artifactId>gec-games</artifactId>
 		  <version>1.0</version>
 	  </dependency>
   </dependencies>
@@ -79,7 +80,7 @@
 	            	<id>tarantula-assembly</id>
 	            	<phase>package</phase>
 	            	<goals>
-	              		<goal>attached</goal>
+	              		<goal>single</goal>
 	            	</goals>
 	            	<configuration>
 	        			<outputDirectory>target/release</outputDirectory>

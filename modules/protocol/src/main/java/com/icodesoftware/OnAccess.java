@@ -1,6 +1,6 @@
 package com.icodesoftware;
 
-public interface OnAccess extends OnApplication, DataStore.Updatable {
+public interface OnAccess extends Session, DataStore.Updatable {
 
     String ACCESS_KEY = "accessKey";
     String ACCESS_ID = "accessId";
@@ -17,7 +17,7 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
 
     String APPLE = "apple";
     String GOOGLE = "google";
-    String STRIPE = "stripe";
+
     String FACEBOOK = "facebook";
     String AMAZON = "amazon";
 

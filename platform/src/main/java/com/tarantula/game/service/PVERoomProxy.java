@@ -13,23 +13,26 @@ public class PVERoomProxy extends RoomProxyHeader {
     @Override
     public Stub join(Session session) {
         Stub stub = gameServiceProvider.presenceServiceProvider().stub(session,application);
+        //if(stub.joined()) return stub;
         GameRoom room = this.gameServiceProvider.roomServiceProvider().join(stub,gameZone);
         stub.joined(room!=null);
         if(!stub.joined()) return stub;
+        
         stub.room = room;
         stub.roomId = stub.room.roomId();
         stub.zone = gameZone;
-        stub.zoneId = gameZone.distributionKey();
-        if(!room.dedicated() && gameServiceProvider.roomServiceProvider().pushChannelEnabled()){
-            stub.pushChannel = this.gameServiceProvider.roomServiceProvider().registerChannel(stub,(s,d)->{
-                gameLobby.timeout(s,d);
-            });
-            room.setup(stub.pushChannel);
+        stub.zoneId = gameZone.distributionId();
+        if(room.dedicated()){
+            stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));
+        }
+        else if(!room.dedicated() && gameServiceProvider.roomServiceProvider().pushChannelEnabled()){
+            stub.pushChannel = this.gameServiceProvider.roomServiceProvider().registerChannel(stub,gameLobby);
+            room.assign(stub.pushChannel);
             stub.sessionId = stub.pushChannel.sessionId();
             stub.ticket(this.context.validator().ticket(session.distributionId(),session.stub()));
         }
         stub.offline = true;
-        stub.tag(application.tag());
+        stub.tag = (application.tag());
         stub.update();
         return stub;
     }

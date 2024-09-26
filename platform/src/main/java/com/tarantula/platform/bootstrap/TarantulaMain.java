@@ -2,13 +2,14 @@ package com.tarantula.platform.bootstrap;
 
 import java.io.*;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
 
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.service.EndPoint;
+import com.icodesoftware.util.OSUtil;
 import com.tarantula.licensing.Validator;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.TarantulaContext;
-import com.tarantula.platform.service.cluster.ScopedMemberDiscovery;
 
 public class TarantulaMain {
 	static {
@@ -23,6 +24,10 @@ public class TarantulaMain {
 		try{
 			if(args.length == 3){
 				DataBootstrap.run(args[0],args[1],args[2]);
+				TarantulaContext.dataStoreReindexing = true;
+			}
+			else if(args.length == 1 && args[0].equals("-reindex")){
+				TarantulaContext.dataStoreReindexing = true;
 			}
 			runtime = new TarantulaMain._Runtime();
 			runtime.bootstrap();
@@ -71,23 +76,19 @@ public class TarantulaMain {
 			findEnvironmentOverrides(_user);
 
 			TarantulaContext btx = TarantulaContext.getInstance();
-			TarantulaContext.memberDiscovery = (ScopedMemberDiscovery) Class.forName(override(overriding,"tarantula.member.discovery.name",_user,_config)).getConstructor().newInstance();
 			TarantulaContext.operationTimeout = Integer.parseInt(override(overriding,"tarantula.operation.timeout.seconds",_user,_config));
 			TarantulaContext.lobbySubscriptionEnabled  = Boolean.parseBoolean(override(overriding,"tarantula.lobby.subscription.enabled",_user,_config));
 			TarantulaContext.operationRetries = Integer.parseInt(override(overriding,"tarantula.operation.retries",_user,_config));
 			TarantulaContext.operationRejectInterval = Long.parseLong(override(overriding,"tarantula.operation.reject.interval.ms",_user,_config));
 			btx.snowflakeNodeNumber = Integer.parseInt(override(overriding,"tarantula.snowflake.node.number",_user,_config));
 			btx.storeSizeMb = Integer.parseInt(override(overriding,"tarantula.data.store.size.mb",_user,_config));
+			btx.externalKeyValueBufferUsed = Boolean.parseBoolean(override(overriding,"tarantula.data.store.key.value.buffer.used",_user,_config));
 			btx.storeKeySize = Integer.parseInt(override(overriding,"tarantula.data.store.key.size",_user,_config));
 			btx.storeValueSize = Integer.parseInt(override(overriding,"tarantula.data.store.value.size",_user,_config));
 			btx.storePendingBufferSize = Integer.parseInt(override(overriding,"tarantula.data.store.pending.buffer.size",_user,_config));
 			btx.storeNoSync = Boolean.parseBoolean(override(overriding,"tarantula.data.store.no.sync",_user,_config));
 			String[] epochStart = override(overriding,"tarantula.snowflake.epoch.start",_user,_config).split(",");
 			btx.snowflakeEpochStart = new int[]{Integer.parseInt(epochStart[0]),Integer.parseInt(epochStart[1]),Integer.parseInt(epochStart[2])};
-			btx.runAsMirror = Boolean.parseBoolean(override(overriding,"tarantula.platform.cluster.run.as.mirror",_user,_config));
-			btx.backupEnabled = Boolean.parseBoolean(override(overriding,"tarantula.platform.cluster.backup.enabled",_user,_config));
-			btx.backupUrl = override(overriding,"tarantula.platform.cluster.backup.url",_user,_config);
-			btx.backupAccessKey = override(overriding,"tarantula.platform.cluster.backup.access.key",_user,_config);
 			btx.platformRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.routing.number",_user,_config));
 			btx.accessIndexRoutingNumber = Integer.parseInt(override(overriding,"tarantula.platform.access.index.routing.number",_user,_config));
 			btx.maxReplicationNumber = Integer.parseInt(override(overriding,"tarantula.data.store.replication.max.number",_user,_config));
@@ -115,6 +116,11 @@ public class TarantulaMain {
 		    btx.timeoutOnInstance = 1000*Long.parseLong(override(overriding,"tarantula.instance.session.timeout.s",_user,_config));
 			btx.applicationSchedulingPoolSetting = override(overriding,"tarantula.scheduler.pool.setting",_user,_config);
 			btx.dataStoreDailyBackup = Boolean.parseBoolean(override(overriding,"tarantula.data.store.daily.backup",_user,_config));
+			btx.homingAgentEnabled = Boolean.parseBoolean(override(overriding,"tarantula.homing.agent.enabled",_user,_config));
+			if(btx.homingAgentEnabled){
+				btx.homingAgentHost = override(overriding,"tarantula.homing.agent.host",_user,_config);
+				btx.homingAgentKey = override(overriding,"tarantula.homing.agent.key",_user,_config);
+			}
 			btx.authContext = override(overriding,"tarantula.auth.context",_user,_config);
 			boolean udpEndpointEnabled = Boolean.parseBoolean(override(overriding,"tarantula.endpoint.udp.enable",_user,_config));
 			boolean endpointEnabled = Boolean.parseBoolean(override(overriding,"tarantula.endpoint.http.enable",_user,_config));
@@ -138,9 +144,9 @@ public class TarantulaMain {
 			hook.setName("tarantula-shutdown-hook");
 			Runtime.getRuntime().addShutdownHook(hook);
 			hook.register(btx);
-			FileWriter fw = new FileWriter("tarantula.pid");
-			fw.write(""+ProcessHandle.current().pid());
-			fw.close();
+			try(FileWriter fw = new FileWriter("tarantula.pid")){
+				fw.write(""+ProcessHandle.current().pid());
+			}
 		}
 
 		private void findEnvironmentOverrides(Properties _user) throws Exception {
@@ -189,6 +195,29 @@ public class TarantulaMain {
 			Runtime.getRuntime().removeShutdownHook(hook);
 			hook.run();
 			System.exit(1);
+		}
+		public void restart() throws Exception{
+			CountDownLatch countDownLatch = new CountDownLatch(1);
+			Runtime.getRuntime().removeShutdownHook(hook);
+			hook.run();
+			new Thread(()->{
+				try{
+					ProcessBuilder processBuilder = new ProcessBuilder(command());
+					processBuilder.inheritIO();
+					processBuilder.start();
+				}catch (Exception ex){
+					log.error("Cannot start bootstrap to restart application",ex);
+				}
+				finally {
+					countDownLatch.countDown();
+				}
+			}).start();
+			countDownLatch.await();
+			System.exit(1);
+		}
+		private static String[] command(){
+			if(OSUtil.windows()) return new String[]{"cmd.exe", "/c", "java -jar gec-bootstrap.jar"};
+			return new String[]{"/bin/sh", "-c", "java -jar gec-bootstrap.jar"};
 		}
 	}
 	

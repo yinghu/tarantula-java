@@ -1,6 +1,6 @@
 package com.tarantula.admin;
 
-import com.google.gson.GsonBuilder;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -10,11 +10,11 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.presence.PermissionContext;
 import com.tarantula.platform.service.metrics.MetricsSnapshotRequest;
-import com.tarantula.platform.service.metrics.MetricsViewMonitor;
-import com.tarantula.platform.util.OnAccessDeserializer;
+import com.tarantula.platform.service.metrics.MetricsSnapshotScheduler;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MetricsViewSudoRoleModule implements Module {
 
@@ -22,10 +22,11 @@ public class MetricsViewSudoRoleModule implements Module {
     private DeploymentServiceProvider deploymentServiceProvider;
 
     private UserService userService;
-    private GsonBuilder builder;
-    private MetricsViewMonitor metricsViewMonitor;
-    private Configuration chartConfiguration;
 
+    private Configuration chartConfiguration;
+    private long timerInterval;
+    private int timerLoopCount;
+    private ConcurrentHashMap<String,MetricsSnapshotRequest> metricsRequests = new ConcurrentHashMap<>();
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
         if(session.action().equals("onCheckPermission")){
@@ -69,23 +70,37 @@ public class MetricsViewSudoRoleModule implements Module {
             String type = query.get("type").getAsString();
             String category = query.get("category").getAsString();
             String classifier = query.get("classifier").getAsString();
-            String queryId;
-            if(archived) {
-                LocalDateTime endTime = LocalDateTime.parse(query.get("endDate").getAsString());
-                queryId = this.metricsViewMonitor.register(new MetricsSnapshotRequest(type,category,classifier,endTime));
+            String queryId = MetricsSnapshotRequest.queryId(type,category,classifier,archived);
+            LocalDateTime[] endTime = {null};
+            if(archived){
+                endTime[0] = LocalDateTime.parse(query.get("endDate").getAsString());
             }
-            else{
-                queryId = this.metricsViewMonitor.register(new MetricsSnapshotRequest(type,category,classifier));
-            }
-            session.write(toMessage(queryId,true).getBytes());
+            metricsRequests.computeIfAbsent(queryId,(key)->{
+                MetricsSnapshotRequest request = new MetricsSnapshotRequest(type,category,classifier,endTime[0],()->{
+                    metricsRequests.remove(queryId);
+                });
+                this.context.schedule(new MetricsSnapshotScheduler(context,timerInterval,timerLoopCount,request));
+                return request;
+            });
+            session.write(JsonUtil.toSimpleResponse(true,queryId).getBytes());
         }
         else if(session.action().equals("onMetrics")){
-            JsonObject m = this.metricsViewMonitor.snapshot(session.name());
-            session.write(m.toString().getBytes());
+            MetricsSnapshotRequest request = metricsRequests.get(session.name());
+            if(request!=null){
+                session.write(request.toJson().toString().getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"request not existed ["+session.name()+"]").getBytes());
+            }
         }
         else if(session.action().equals("onMetricsArchive")){
-            JsonObject m = this.metricsViewMonitor.archive(session.name());
-            session.write(m.toString().getBytes());
+            MetricsSnapshotRequest request = metricsRequests.get(session.name());
+            if(request!=null){
+                session.write(request.toJson().toString().getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"request not existed ["+session.name()+"]").getBytes());
+            }
         }
         else{
            throw new UnsupportedOperationException("operation ["+session.action()+"] not supported");
@@ -98,18 +113,10 @@ public class MetricsViewSudoRoleModule implements Module {
         this.context = context;
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.userService = this.context.serviceProvider(UserService.NAME);
-        this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.chartConfiguration = this.deploymentServiceProvider.configuration("metrics-view-settings");
-        long timerInterval = ((Number)this.chartConfiguration.property("timerInterval")).longValue();
-        this.metricsViewMonitor = new MetricsViewMonitor(this.context,timerInterval);
-        this.context.schedule(this.metricsViewMonitor);
+        this.timerInterval = ((Number)this.chartConfiguration.property("timerInterval")).longValue();
+        this.timerLoopCount = ((Number)this.chartConfiguration.property("timerLoopCount")).intValue();
         this.context.log("Metrics view sudo role module started", OnLog.INFO);
     }
-
-    private String toMessage(String msg,boolean suc){
-       return JsonUtil.toSimpleResponse(suc,msg);
-    }
-
 
 }

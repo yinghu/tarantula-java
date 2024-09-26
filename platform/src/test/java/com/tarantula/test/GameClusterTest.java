@@ -71,35 +71,35 @@ public class GameClusterTest extends DataStoreHook{
         types.name(ConfigurableObject.ASSET_CONFIG_TYPE);
         categories.name(ConfigurableObject.ASSET_CONFIG_TYPE);
 
-        Transaction transaction = load.transaction();
-        transaction.execute((ctx)->{
-            ApplicationPreSetup preSetup = (ApplicationPreSetup)ctx;
-            items.forEach(item->{
-                JsonObject jo = item.getAsJsonObject();
-                ConfigurableCategory category = new ConfigurableCategory(jo);
-                category.onEdge(true);
-                category.label("category");
-                category.ownerKey(ConfigurableCategoryQuery.AssetKey);
-                Assert.assertNotNull(category.name());
-                Assert.assertTrue(preSetup.save(load,category));
-                category.ownerKey(ConfigurableCategoryQuery.ComponentKey);
-                Assert.assertTrue(preSetup.edge(load,category,"category"));
-                ConfigurableType type = category.configurableType();
-                type.ownerKey(ConfigurableTypeQuery.AssetKey);
-                type.onEdge(true);
-                type.label("type");
-                preSetup.save(load,type);
-                type.ownerKey(ConfigurableTypeQuery.CommodityKey);
-                Assert.assertTrue(preSetup.edge(load,type,"type"));
-                Assert.assertTrue(categories.addCategory(category));
-                Assert.assertTrue(types.addType(type));
-                ConfigurableCategory aload = new ConfigurableCategory();
-                aload.name(category.name());
-                Assert.assertTrue(preSetup.load(gameCluster,aload));
+        try(final Transaction transaction = load.transaction()){
+            transaction.execute((ctx)->{
+                ApplicationPreSetup preSetup = (ApplicationPreSetup)ctx;
+                items.forEach(item->{
+                    JsonObject jo = item.getAsJsonObject();
+                    ConfigurableCategory category = new ConfigurableCategory(jo);
+                    category.onEdge(true);
+                    category.label("category");
+                    category.ownerKey(ConfigurableCategoryQuery.AssetKey);
+                    Assert.assertNotNull(category.name());
+                    Assert.assertTrue(preSetup.save(load,category));
+                    category.ownerKey(ConfigurableCategoryQuery.ComponentKey);
+                    Assert.assertTrue(preSetup.edge(load,category,"category"));
+                    ConfigurableType type = category.configurableType();
+                    type.ownerKey(ConfigurableTypeQuery.AssetKey);
+                    type.onEdge(true);
+                    type.label("type");
+                    preSetup.save(load,type);
+                    type.ownerKey(ConfigurableTypeQuery.CommodityKey);
+                    Assert.assertTrue(preSetup.edge(load,type,"type"));
+                    Assert.assertTrue(categories.addCategory(category));
+                    Assert.assertTrue(types.addType(type));
+                    ConfigurableCategory aload = new ConfigurableCategory();
+                    aload.name(category.name());
+                    Assert.assertTrue(preSetup.load(gameCluster,aload));
+                });
+                return true;
             });
-            return true;
-        });
-        transaction.close();
+        }
         //load.applicationSetup = "com.tarantula.game.service.GameObjectSetup";
         ApplicationPreSetup ex = load.applicationPreSetup();
         Assert.assertEquals(ex.list(load,new ConfigurableCategoryQuery(ConfigurableCategoryQuery.AssetKey,"category")).size(),2);
@@ -111,7 +111,7 @@ public class GameClusterTest extends DataStoreHook{
         InputStream in = (Thread.currentThread().getContextClassLoader().getResourceAsStream("sample-admin-role-commodity-settings.json"));
         JsonArray commodities = JsonUtil.parse(in).get("list").getAsJsonArray();
         Assert.assertNotNull(commodities);
-        Transaction t1 = load.transaction();
+        try(Transaction t1 = load.transaction()){
         t1.execute(ctx->{
             ApplicationPreSetup preSetup = (ApplicationPreSetup)ctx;
             commodities.forEach(item->{
@@ -122,7 +122,7 @@ public class GameClusterTest extends DataStoreHook{
             });
             return true;
         });
-        t1.close();
+        }
         Assert.assertEquals(ex.list(app,new ConfigurableObjectQuery(app.key(),"commodity")).size(),30);
         Assert.assertEquals(ex.list(app,new ConfigurableObjectQuery(app.key(),"Gem")).size(),6);
         //name
@@ -136,7 +136,7 @@ public class GameClusterTest extends DataStoreHook{
         ConfigurableObject g = g500.get(0);
         g.configurationVersion("v2.0");
         //after update
-        Transaction t2 = load.transaction();
+        try(Transaction t2 = load.transaction()){
         t2.execute(ctx->{
             ApplicationPreSetup preSetup = (ApplicationPreSetup)ctx;
             if(!preSetup.save(app,g)) return false;
@@ -144,30 +144,29 @@ public class GameClusterTest extends DataStoreHook{
             g.onEdge(true);
             return preSetup.edge(app,g,"test");
         });
-        t2.close();
+        }
         Assert.assertEquals(ex.list(app,new VersionedConfigurableObjectQuery(g.distributionId())).size(),2);
         Assert.assertEquals(ex.list(app,new ConfigurableObjectQuery(app.key(),"test")).size(),1);
         //System.out.println(g.application());
-        Transaction t3 = load.transaction();
+        try(Transaction t3 = load.transaction()){
         t3.execute(ctx->{
             ApplicationPreSetup preSetup = (ApplicationPreSetup)ctx;
             g.ownerKey(app.key());
             return preSetup.deleteEdge(app,g,"test");
             //return preSetup.delete(app,g);
         });
-        t3.close();
+        }
 
         //after delete
         Assert.assertEquals(ex.list(app,new ConfigurableObjectQuery(app.key(),"test")).size(),0);
 
-        Transaction t4 = load.transaction();
+        try(Transaction t4 = load.transaction()){
         t4.execute(ctx->{
             ApplicationPreSetup preSetup = (ApplicationPreSetup)ctx;
             g.ownerKey(app.key());
             //return preSetup.deleteEdge(app,g,"test");
             return preSetup.delete(app,g);
-        });
-        t4.close();
+        });}
 
         Assert.assertEquals(ex.list(app,new ConfigurableCategoryQuery(app.key(),"G500")).size(),0);
         Assert.assertEquals(ex.list(app,new ConfigurableObjectQuery(app.key(),"commodity")).size(),29);

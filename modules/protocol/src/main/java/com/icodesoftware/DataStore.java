@@ -49,6 +49,8 @@ public interface DataStore extends Closable{
         void forEach(BufferStream buffer);
 
         void view(DataStoreSummary dataStoreSummary);
+
+        void drop(boolean delete);
     }
 
 
@@ -63,6 +65,9 @@ public interface DataStore extends Closable{
     interface Updatable{
         void dataStore(DataStore dataStore);
         void update();
+    }
+    interface Loadable extends Updatable{
+        void load();
     }
 
 }

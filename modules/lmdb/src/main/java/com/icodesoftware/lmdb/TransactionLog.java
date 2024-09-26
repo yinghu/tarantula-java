@@ -79,6 +79,62 @@ public class TransactionLog extends RecoverableObject {
     }
 
     @Override
+    public void fromBinary(byte[] payload) {
+        DataBuffer buffer = BufferProxy.wrap(payload);
+        deleting = buffer.readBoolean();
+        updatingRevision = buffer.readLong();
+        scope = buffer.readInt();
+        source = buffer.readUTF8();
+        edgeLabel = buffer.readUTF8();
+        key = new byte[buffer.readInt()];
+        for(int i=0;i<key.length;i++){
+            key[i]=buffer.readByte();
+        }
+        int esize = buffer.readInt();
+        if(esize>0){
+            edgeKey = new byte[esize];
+            for(int i=0;i<edgeKey.length;i++){
+                edgeKey[i]=buffer.readByte();
+            }
+        }
+        int vsize = buffer.readInt();
+        if(vsize>0){
+            value = new byte[vsize];
+            for(int i=0;i<value.length;i++){
+                value[i]=buffer.readByte();
+            }
+        }
+    }
+
+    @Override
+    public byte[] toBinary() {
+        DataBuffer buffer = BufferProxy.buffer(2032,true);
+        buffer.writeBoolean(deleting);
+        buffer.writeLong(updatingRevision);
+        buffer.writeInt(scope);
+        buffer.writeUTF8(source);
+        buffer.writeUTF8(edgeLabel);
+        buffer.writeInt(key.length);
+        for(byte b: key){
+            buffer.writeByte(b);
+        }
+        buffer.writeInt(edgeLabel!=null?edgeKey.length:0);
+        if(edgeLabel!=null){
+            for(byte b: edgeKey){
+                buffer.writeByte(b);
+            }
+        }
+        buffer.writeInt(value!=null?value.length:0);
+        if(value!=null){
+            for(byte b: value){
+                buffer.writeByte(b);
+            }
+        }
+        buffer.flip();
+        return buffer.array();
+    }
+
+    @Override
     public int getFactoryId() {
         return PersistencePortableRegistry.OID;
     }

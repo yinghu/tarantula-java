@@ -1,17 +1,20 @@
 package com.tarantula.platform.tournament;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.*;
 import com.tarantula.game.service.PlatformGameServiceProvider;
+
 import com.tarantula.platform.GameCluster;
-import com.tarantula.platform.ResponseHeader;
+import com.icodesoftware.util.ResponseHeader;
+
 import com.tarantula.platform.inbox.PlatformInboxServiceProvider;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
+import com.tarantula.platform.item.ConfigurableEdit;
 import com.tarantula.platform.item.ConfigurableObject;
-import com.tarantula.platform.item.DistributionItemService;
-import com.tarantula.platform.item.ItemDistributionCallback;
+import com.tarantula.platform.item.PlatformItemServiceProvider;
 
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
@@ -21,32 +24,29 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class PlatformTournamentServiceProvider implements TournamentServiceProvider, ReloadListener, ConfigurationServiceProvider, ItemDistributionCallback {
+public class PlatformTournamentServiceProvider extends PlatformItemServiceProvider implements TournamentServiceProvider, ReloadListener{
 
     private static final String CONFIG = "game-tournament-settings";
 
     static final String TOURNAMENT_DATA_STORE = "tournament";
+    static final String TOURNAMENT_SCHEDULE_STATUS_DATA_STORE = "tournament_status";
     static final String RECENTLY_TOURNAMENT_INDEX_DATA_STORE = "tournament_recently_index";
     static final String TOURNAMENT_JOIN_DATA_STORE = "tournament_join";
     static final String TOURNAMENT_ENTRY_DATA_STORE = "tournament_entry";
     static final String TOURNAMENT_RACE_BOARD_DATA_STORE = "tournament_race_board";
     static final String TOURNAMENT_HISTORY_DATA_STORE = "tournament_history";
+    static final String TOURNAMENT_SCHEDULE_EDIT_DATA_STORE = "tournament_schedule_edit";
 
 
     public static final String NAME = "tournament";
 
     final static long SCHEDULE_RUNNER_DELAY = 500;
 
-    TarantulaLogger logger;
-
-    ServiceContext serviceContext;
 
     DistributionTournamentService distributionTournamentService;
 
-    private DistributionItemService distributionItemService;
-    final String gameServiceName;
 
-    DataStore dataStore;
+    DataStore tournamentScheduleStatus;
 
     DataStore recentlyTournamentIndex;
 
@@ -57,6 +57,8 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     DataStore tournamentRaceBoard;
 
     DataStore tournamentHistory;
+
+    DataStore scheduleEdit;
 
     private CopyOnWriteArrayList<Tournament.Listener> listeners = new CopyOnWriteArrayList<>();
 
@@ -83,8 +85,6 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     boolean localOperationEnabled;
     AtomicInteger snapshotTimerInterval = new AtomicInteger(0);
     private String reloadKey;
-    final GameCluster gameCluster;
-    private ApplicationPreSetup applicationPreSetup;
     private Descriptor application;
     PlatformInventoryServiceProvider inventoryServiceProvider;
     PlatformInboxServiceProvider inboxServiceProvider;
@@ -93,8 +93,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private ClusterProvider.ClusterStore scheduleStore;
 
     public PlatformTournamentServiceProvider(PlatformGameServiceProvider gameServiceProvider){
-        this.gameCluster = gameServiceProvider.gameCluster();
-        this.gameServiceName = this.gameCluster.serviceType();
+        super(gameServiceProvider,NAME);
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
         this.inboxServiceProvider = gameServiceProvider.inboxServiceProvider();
     }
@@ -117,7 +116,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
                         logger.warn("Tournament ["+t.distributionId()+" not assigned service provider");
                         t.tournamentServiceProvider = this;
                     }
-                    t.loadPrizes(applicationPreSetup, application);
+                    this.loadPrizes(t);//loadPrizes(applicationPreSetup, application);
                 }catch (Exception ex){
                     logger.warn("Unexpected exception",ex);
                 }
@@ -128,6 +127,16 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
 
     void loadPrizes(TournamentManager tournamentManager){
+        if(serviceContext.node().homingAgent().enabled()){
+            logger.warn("load prize from homing agent from ["+tournamentManager.scheduleId()+"]");
+            TournamentScheduleStatus status = loadStatus(tournamentManager.scheduleId());
+            ConfigurableEdit edit = new ConfigurableEdit();
+            edit.distributionId(status.scheduleEditId);
+            edit.dataStore(scheduleEdit);
+            TournamentSchedule schedule = new TournamentSchedule(edit);
+            tournamentManager.loadPrize(schedule);
+            return;
+        }
         tournamentManager.loadPrizes(applicationPreSetup,application);
     }
 
@@ -175,13 +184,18 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         }
         return _tms;
     }
-    public String name(){
-        return NAME;
+
+
+    public TarantulaLogger logger(){
+        return logger;
+    }
+
+    public String gameServiceName(){
+        return gameServiceName;
     }
     @Override
     public void setup(ServiceContext serviceContext) {
-        this.serviceContext = serviceContext;
-        this.applicationPreSetup = gameCluster.applicationPreSetup();
+        super.setup(serviceContext);
         Configuration configuration = serviceContext.configuration(CONFIG);
         this.smallConcurrentInstanceSize = ((Number)configuration.property("smallConcurrentInstanceSize")).intValue();
         this.mediumConcurrentInstanceSize = ((Number)configuration.property("mediumConcurrentInstanceSize")).intValue();
@@ -198,29 +212,45 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         this.snapshotTimerInterval.set(((Number)configuration.property("snapshotIntervalMinutes")).intValue());
         this.localOperationEnabled = (boolean)configuration.property("localOperationEnabled");
         this.dataStore = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_DATA_STORE);
+        this.tournamentScheduleStatus = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_SCHEDULE_STATUS_DATA_STORE);
         this.recentlyTournamentIndex = applicationPreSetup.dataStore(gameCluster,RECENTLY_TOURNAMENT_INDEX_DATA_STORE);
         this.tournamentJoin = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_JOIN_DATA_STORE);
         this.tournamentEntry = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_ENTRY_DATA_STORE);
         this.tournamentRaceBoard = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_RACE_BOARD_DATA_STORE);
         this.tournamentHistory = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_HISTORY_DATA_STORE);
+        this.scheduleEdit = applicationPreSetup.dataStore(gameCluster,TOURNAMENT_SCHEDULE_EDIT_DATA_STORE);
         this.logger = JDKLogger.getLogger(PlatformTournamentServiceProvider.class);
         this.reloadKey = this.serviceContext.clusterProvider().registerReloadListener(this);
         this.distributionTournamentService = this.serviceContext.clusterProvider().serviceProvider(DistributionTournamentService.NAME);
-        this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.scheduleStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,gameCluster.typeId()+"."+NAME);
         this.systemValidatorProvider = (TokenValidatorProvider)serviceContext.serviceProvider(TokenValidatorProvider.NAME);
     }
 
     @Override
     public void start() throws Exception {
-        //recentlyTournamentIndex.list(new RecentlyTournamentListQuery(gameCluster.distributionId()),list->{
-            //if(list.name()!=null) {
-                //list.dataStore(recentlyTournamentIndex);
-                //typedTournamentIndex.put(list.name(),list);
-            //}
-            //return true;
-        //});
-        dataStore.list(new TournamentScheduleStatusQuery(this.gameCluster.distributionId())).forEach(status->{
+        if(serviceContext.node().homingAgent().enabled()){
+            String resp = serviceContext.node().homingAgent().onConfiguration(gameCluster.distributionId(),"TournamentSchedule");
+            logger.warn(resp);
+            JsonObject scheduleList = JsonUtil.parse(resp);
+            scheduleList.get("list").getAsJsonArray().forEach(e->{
+                TournamentSchedule schedule = new TournamentSchedule(e.getAsJsonObject());
+                logger.warn(schedule.startTime()+" : "+schedule.endTime());
+                logger.warn(schedule.startLevel()+" : "+schedule.endLevel());
+                logger.warn("CONFIG ID : "+schedule.configurationId());
+                TournamentScheduleStatus status = loadStatus(schedule.configurationId());
+                logger.warn("edit id : "+status.scheduleEditId);
+                logger.warn("tournament id : "+status.tournamentId);
+                TournamentManager tournamentManager = new TournamentManager();
+                tournamentManager.distributionId(status.tournamentId);
+                if(dataStore.load(tournamentManager)){
+                    tournamentManager.dataStore(dataStore);
+                    launch(tournamentManager);
+                }
+            });
+            this.logger.warn("Tournament service provider started with homing agent enabled");
+            return;
+        }
+        tournamentScheduleStatus.list(new TournamentScheduleStatusQuery(SnowflakeKey.from(this.gameCluster.distributionId()))).forEach(status->{
             logger.warn("Tournament Status : "+status.tournamentId+" : "+status.status);
             byte[] lockKey = status.key().asBinary();
             try{
@@ -251,7 +281,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
 
     @Override
-    public void reload(int partition,boolean localMember) {
+    public void onReload() {
         //skip for segmented global schedule
     }
     public void atMidnight(){
@@ -281,7 +311,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     private void scheduleTournament(){
         LocalDateTime _current = LocalDateTime.now();
-        TournamentScheduleStatusQuery query = new TournamentScheduleStatusQuery(this.gameCluster.distributionId());
+        TournamentScheduleStatusQuery query = new TournamentScheduleStatusQuery(SnowflakeKey.from(this.gameCluster.distributionId()));
         dataStore.list(query).forEach(ts->{
             TournamentSchedule schedule = this.tournamentSchedule(ts.distributionId());
             if(schedule!=null){
@@ -308,7 +338,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         logger.warn(tournament.toString());
         listeners.forEach(l->l.tournamentStarted(tournament));
         if(this.application==null) return;
-        tournament.loadPrizes(this.applicationPreSetup,this.application);
+        this.loadPrizes(tournament);
     }
     void sortTournament(TournamentManager tournament){
         tournament.snapshot();
@@ -336,6 +366,9 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     }
     void endTournament(TournamentManager tournament){
         logger.warn("Tournament End : "+tournament.distributionId()+" : "+tournament.global());
+        if(serviceContext.node().homingAgent().enabled()){
+            logger.warn(serviceContext.node().homingAgent().onConfigurationReleased((int)tournament.scheduleId()));
+        }
         this.distributionItemService.onReleaseItem(gameServiceName, name(), "TournamentSchedule", tournament.distributionKey());
         TournamentScheduleStatus status = loadStatus(tournament.scheduleId());
         byte[] lockKey = status.key().asBinary();
@@ -361,7 +394,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         TournamentSchedule schedule = new TournamentSchedule((ConfigurableObject) t);
         TournamentScheduleStatus status = schedule.status();
         status.ownerKey(SnowflakeKey.from(this.gameCluster.distributionId()));
-        dataStore.createIfAbsent(status,true);
+        tournamentScheduleStatus.createIfAbsent(status,true);
         byte[] lockKey = status.key().asBinary();
         try{
             scheduleStore.mapLock(lockKey);
@@ -483,6 +516,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private void clearTournament(TournamentManager tournament){
         TournamentScheduleStatus status = this.loadStatus(tournament.scheduleId());
         status.update(Tournament.Status.PENDING);
+        if(serviceContext.node().homingAgent().enabled()) return;
         TournamentSchedule schedule = this.tournamentSchedule(tournament.scheduleId());
         if(schedule==null){
             logger.warn("Tournament schedule should not be deleted once tournament registered in lifetime");
@@ -508,11 +542,12 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     void updateTournamentRegister(TournamentRegister register){
         this.dataStore.update(register);
     }
+
     private TournamentScheduleStatus loadStatus(long scheduleId){
         TournamentScheduleStatus status = new TournamentScheduleStatus();
         status.distributionId(scheduleId);
-        status.dataStore(dataStore);
-        return dataStore.load(status)?status:null;
+        status.dataStore(tournamentScheduleStatus);
+        return tournamentScheduleStatus.load(status)?status:null;
     }
 
     //distributed operation callbacks
@@ -579,6 +614,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     }
 
+
     public byte[] onTournamentScanned(){
         List<Long> scheduled = new ArrayList<>();
         tournamentIndex.forEach((i,t)->{
@@ -598,6 +634,47 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         return new TournamentScanResponse(scanned);
     }
 
+    @Override
+    public void register(int publishId){
+        String config = serviceContext.node().homingAgent().onConfigurationRegistered(publishId);
+        JsonObject payload = JsonUtil.parse(config);
+        TournamentSchedule tournamentSchedule = new TournamentSchedule(payload);
+        TournamentScheduleStatus status = tournamentSchedule.status();
+        status.ownerKey(IntegerKey.from(publishId));
+        if(!tournamentScheduleStatus.createIfAbsent(status,true)){
+            logger.warn("Schedule edit already created and relaunch new tournament");
+            registerTournament(tournamentSchedule);
+            return;
+        }
 
+        ConfigurableEdit edit = new ConfigurableEdit();
+        edit.dataStore(scheduleEdit);
+        long editId = edit.build(payload);
+        status.scheduleEditId = editId;
+        this.tournamentScheduleStatus.update(status);
+        registerTournament(tournamentSchedule);
+    }
+
+    @Override
+    public void release(int publishId){
+        for(TournamentScheduleStatus status : tournamentScheduleStatus.list(new TournamentScheduleStatusQuery(IntegerKey.from(publishId)))){
+            logger.warn(status.tournamentId+" : "+status.scheduleEditId+" : "+status.status);
+            if(status.status == Tournament.Status.STARTING) throw new RuntimeException("Tournament cannot be canceled during starting.");
+            if(status.status == Tournament.Status.PENDING) throw new RuntimeException("Tournament already released");
+            byte[] lockKey = status.key().asBinary();
+            try {
+                scheduleStore.mapLock(lockKey);
+                distributionTournamentService.onEndTournament(gameServiceName, status.tournamentId);
+
+            }finally {
+                scheduleStore.mapUnlock(lockKey);
+            }
+        }
+    }
+
+
+    DataStore dataStore(){
+        return this.dataStore;
+    }
 
 }

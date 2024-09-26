@@ -1,8 +1,8 @@
 package com.tarantula.platform.configuration;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.DataStore;
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.service.Content;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.item.ConfigurableObject;
@@ -14,20 +14,13 @@ public class WebHookCredentialConfiguration extends CredentialConfiguration {
 
     private ConcurrentHashMap<String,WebClient> webClients = new ConcurrentHashMap<>();
 
-    public WebHookCredentialConfiguration(String typeId, ConfigurableObject configurableObject){
-        super(typeId,OnAccess.WEB_HOOK,configurableObject);
+    public WebHookCredentialConfiguration(String typeId, JsonObject configurableObject){
+        super(typeId,configurableObject);
+        this.name = OnAccess.WEB_HOOK;
     }
 
-    @Override
-    public boolean setup(ServiceContext serviceContext, DataStore dataStore){
-        ConfigurationObject configurationObject = saveConfigurationObject("Endpoint",serviceContext.deploymentServiceProvider(),dataStore);
-        JsonObject endpoint = JsonUtil.parse(configurationObject.value());
-        endpoint.entrySet().forEach(e->{
-            JsonObject config = e.getValue().getAsJsonObject();
-            WebClient wc = toWebClient(config);
-            if(wc!=null) webClients.put(e.getKey(),wc);
-        });
-        return endpoint.size()>0;
+    public WebHookCredentialConfiguration(String typeId, ConfigurableObject configurableObject){
+        super(typeId,OnAccess.WEB_HOOK,configurableObject);
     }
 
     public WebClient webClient(String name){
@@ -45,5 +38,21 @@ public class WebHookCredentialConfiguration extends CredentialConfiguration {
             return null;
         }
     }
+
+    @Override
+    public boolean setup(ServiceContext serviceContext) {
+        super.setup(serviceContext);
+        Content content = super.content("Endpoint");
+        if(!content.existed()) return false;
+        JsonObject endpoint = JsonUtil.parse(content.data());
+        endpoint.entrySet().forEach(e->{
+            JsonObject config = e.getValue().getAsJsonObject();
+            WebClient wc = toWebClient(config);
+            if(wc!=null) webClients.put(e.getKey(),wc);
+        });
+        return endpoint.size()>0;
+    }
+
+
 
 }

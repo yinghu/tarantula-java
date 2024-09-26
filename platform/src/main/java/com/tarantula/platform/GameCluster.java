@@ -10,6 +10,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ApplicationSchema;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.OnApplicationHeader;
 import com.tarantula.game.service.GameConfigurationSetup;
 import com.tarantula.game.service.GameObjectSetup;
 import com.tarantula.platform.event.PortableEventRegistry;
@@ -24,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 
@@ -56,6 +58,8 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
     protected CopyOnWriteArrayList<Inventory.Listener> onInventory = new CopyOnWriteArrayList<>();
 
     protected CopyOnWriteArrayList<ApplicationPreSetup.Listener> listeners = new CopyOnWriteArrayList<>();
+
+    protected ConcurrentHashMap<String,ConfigurableCategory> categories = new ConcurrentHashMap<>();
 
 
     public String mode;
@@ -463,12 +467,20 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
     }
 
     public Inventory createInventory(ApplicationPreSetup applicationPreSetup,String category,String typeId){
+        ConfigurableCategory conf = categories.get(category);
+        if(conf!=null){
+            Inventory inventory = new UserInventory(conf.name(),typeId,conf.rechargeable,conf.constrained,this);
+            return inventory;
+        }
         ConfigurableCategories categories = this.configurableCategories(applicationPreSetup,Configurable.COMMODITY_CONFIG_TYPE);
-        ConfigurableCategory conf = categories.configurableSetting(category);
+        conf = categories.configurableSetting(category);
         conf.parse();
         Inventory inventory = new UserInventory(conf.name(),typeId,conf.rechargeable,conf.constrained,this);
         return inventory;
+
     }
+
+
 
     @Override
     public void onInventory(ApplicationPreSetup applicationPreSetup,Inventory inventory, Inventory.Stock inventoryItem) {
@@ -477,5 +489,12 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
 
     public String gameServiceProvider(){
         return gameServiceProvider;
+    }
+
+    public void registerConfigurableCategory(ConfigurableCategory category){
+        //logger.warn(template.toString());
+        //ConfigurableCategory category = new ConfigurableCategory(template);
+        //category.parse();
+        categories.put(category.name(),category);
     }
 }

@@ -1,12 +1,13 @@
 package com.tarantula.platform.presence;
 
 import com.icodesoftware.*;
+import com.icodesoftware.protocol.session.OnSessionTrack;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
+import com.icodesoftware.util.ResponseHeader;
 import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.*;
-import com.tarantula.platform.service.metrics.AccessMetrics;
 import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -127,7 +128,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 AccessIndex _query = accessIndexService.get((String) acc.property("login"));
                 if(_query!=null){
                     ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin(typeId+"#"+params.get("provider"),SystemUtil.oid(),"");
-                    thirdPartyLogin.distributionKey(session.systemId());
+                    thirdPartyLogin.distributionId(session.systemId());
                     userService.createLoginProvider(thirdPartyLogin);
                     acc.property(OnAccess.PASSWORD,thirdPartyLogin.password());
                     acc.typeId(typeId);
@@ -169,7 +170,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             }
             else{
                 ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin("device",SystemUtil.oid(),deviceId);
-                thirdPartyLogin.distributionKey(session.systemId());
+                thirdPartyLogin.distributionId(session.systemId());
                 userService.createLoginProvider(thirdPartyLogin);
                 acc.property("login",deviceId);
                 acc.property("password",thirdPartyLogin.password());
@@ -183,7 +184,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             AccessIndex accessIndex = this.accessIndexService.get(deviceId);
             if(accessIndex!=null){
                 ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin("device",SystemUtil.oid(),deviceId);
-                thirdPartyLogin.distributionKey(session.systemId());
+                thirdPartyLogin.distributionId(session.systemId());
                 userService.createLoginProvider(thirdPartyLogin);
                 acc.property("login",deviceId);
                 acc.property("password",thirdPartyLogin.password());
@@ -196,7 +197,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             }
         }
         else if(session.action().equals("onResetCode")){
-            String code = this.deploymentServiceProvider.resetCode(session.trackId());
+            String code = this.deploymentServiceProvider.resetCode(session.systemId());
             if(this.context.postOffice().onEmail(session.trackId()).send(code)){
                 session.write(JsonUtil.toSimpleResponse(true,"check email for code").getBytes());
             }
@@ -211,7 +212,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 session.write(JsonUtil.toSimpleResponse(false,"wrong user name").getBytes());
             }
             else{
-                if(user.activated()&&this.deploymentServiceProvider.checkCode(code).equals(user.emailAddress())){
+                if(user.activated()&&this.deploymentServiceProvider.checkCode(code)==(user.distributionId())){
                     user.password(this.context.validator().hashPassword((String) acc.property(OnAccess.PASSWORD)));
                     user.update();
                     OnSession onSession = this.login(session.distributionId(),(String) acc.property(OnAccess.PASSWORD),session);
@@ -257,7 +258,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         long owner = gameCluster.accountId;
         String deviceId = (String) acc.property(OnAccess.DEVICE_ID);
         ThirdPartyLogin developerLogin = new ThirdPartyLogin(gameCluster.typeId()+"#developer",SystemUtil.oid(),deviceId);
-        developerLogin.distributionKey(session.systemId());
+        developerLogin.distributionId(session.systemId());
         acc.property("login",deviceId);
         acc.property("password",developerLogin.password());
         this.createLogin(owner,acc,session.systemId(),AccessControl.admin.name(),true,"key",false);
@@ -287,7 +288,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         return _onSession;
     }
 
-    private Access createLogin(long accountId,OnAccess payload,String systemId,String roleName,boolean validated,String validator,boolean primary){
+    private Access createLogin(long accountId,OnAccess payload,long systemId,String roleName,boolean validated,String validator,boolean primary){
         payload.property(OnAccess.SYSTEM_ID,systemId);
         payload.property(OnAccess.ACCESS_CONTROL,roleName);
         payload.property(OnAccess.VALIDATOR,validator);
