@@ -22,6 +22,7 @@ public class ZoneItem extends Item {
         this.header = payload;
         this.configurationName = payload.get("ConfigurationName").getAsString();
         this.configurationVersion = payload.get("ConfigurationVersion").getAsString();
+        this.distributionId = payload.get("ConfigurationId").getAsInt();
     }
 
     public int getFactoryId() {
