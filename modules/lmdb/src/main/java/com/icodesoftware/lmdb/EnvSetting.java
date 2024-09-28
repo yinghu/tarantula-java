@@ -17,7 +17,7 @@ public class EnvSetting {
     public static final String ENV_CONFIG_MIGRATION = "migration";
 
 
-    private static final long MB_1 = 1_048_576L;
+    public static final long MB_1 = 1_048_576L;
 
     public static final String ENV_PROVIDER_NAME ="tarantula";
     public static final String ENV_BASE_DIR ="target/lmdb";
