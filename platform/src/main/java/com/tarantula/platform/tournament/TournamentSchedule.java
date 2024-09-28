@@ -126,11 +126,7 @@ public class TournamentSchedule extends Application {
     @Override
     public long distributionId(){
         if(this.distributionId>0) return this.distributionId;
-        return configurationId();
+        return publishId;
     }
-    public long configurationId(){
-        return configurationId;
-    }
-
 
 }

@@ -231,8 +231,8 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
                 TournamentSchedule schedule = new TournamentSchedule(e.getAsJsonObject());
                 logger.warn(schedule.startTime()+" : "+schedule.endTime());
                 logger.warn(schedule.startLevel()+" : "+schedule.endLevel());
-                logger.warn("CONFIG ID : "+schedule.configurationId());
-                TournamentScheduleStatus status = loadStatus(schedule.configurationId());
+                logger.warn("CONFIG ID : "+schedule.configurationId);
+                TournamentScheduleStatus status = loadStatus(schedule.publishId);
                 logger.warn("edit id : "+status.scheduleEditId);
                 logger.warn("tournament id : "+status.tournamentId);
                 TournamentManager tournamentManager = new TournamentManager();
@@ -615,7 +615,6 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
         JsonObject payload = JsonUtil.parse(config);
         TournamentSchedule tournamentSchedule = new TournamentSchedule(payload);
         TournamentScheduleStatus status = tournamentSchedule.status();
-        status.ownerKey(IntegerKey.from(publishId));
         if(!tournamentScheduleStatus.createIfAbsent(status,true)){
             logger.warn("Schedule edit already created and relaunch new tournament");
             registerTournament(tournamentSchedule);
@@ -632,19 +631,19 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
 
     @Override
     public void release(int publishId){
-        for(TournamentScheduleStatus status : tournamentScheduleStatus.list(new TournamentScheduleStatusQuery(IntegerKey.from(publishId)))){
-            logger.warn(status.tournamentId+" : "+status.scheduleEditId+" : "+status.status);
-            if(status.status == Tournament.Status.STARTING) throw new RuntimeException("Tournament cannot be canceled during starting.");
-            if(status.status == Tournament.Status.PENDING) throw new RuntimeException("Tournament already released");
-            byte[] lockKey = status.key().asBinary();
-            try {
-                scheduleStore.mapLock(lockKey);
-                distributionTournamentService.onEndTournament(gameServiceName, status.tournamentId);
+        TournamentScheduleStatus status = loadStatus(publishId);
+        logger.warn(status.tournamentId+" : "+status.scheduleEditId+" : "+status.status);
+        if(status.status == Tournament.Status.STARTING) throw new RuntimeException("Tournament cannot be canceled during starting.");
+        if(status.status == Tournament.Status.PENDING) throw new RuntimeException("Tournament already released");
+        byte[] lockKey = status.key().asBinary();
+        try {
+            scheduleStore.mapLock(lockKey);
+            distributionTournamentService.onEndTournament(gameServiceName, status.tournamentId);
 
-            }finally {
-                scheduleStore.mapUnlock(lockKey);
-            }
+        }finally {
+            scheduleStore.mapUnlock(lockKey);
         }
+
     }
 
 

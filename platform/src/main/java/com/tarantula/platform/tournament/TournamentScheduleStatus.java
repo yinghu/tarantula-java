@@ -12,7 +12,7 @@ public class TournamentScheduleStatus extends RecoverableObject {
 
     public long tournamentId;
     public long scheduleEditId;
-    public int publishId;
+
 
     public TournamentScheduleStatus(long tournamentId){
         this();
