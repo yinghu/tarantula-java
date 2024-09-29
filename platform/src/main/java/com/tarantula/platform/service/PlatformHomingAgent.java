@@ -131,4 +131,17 @@ public class PlatformHomingAgent extends TarantulaAgent {
             return ContentMapping.NOT_EXISTED;
         }
     }
+
+    public String onBootstrap(){
+        try {
+            String[] headers = new String[]{
+                    Session.TARANTULA_ACCESS_KEY, serviceContext.node().homingAgent().accessKey(),
+            };
+            String resp = serviceContext.httpClientProvider().get(serviceContext.node().homingAgent().host(), "configuration/bootstrap", headers);
+            return resp;
+        }catch (Exception ex){
+            logger.error("Homing Error",ex);
+            return "{}";
+        }
+    }
 }
