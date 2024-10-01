@@ -3,6 +3,8 @@ package com.icodesoftware.service;
 
 import com.icodesoftware.AccessIndex;
 
+import java.util.List;
+
 public interface AccessIndexService extends ServiceProvider {
 
     String NAME = "AccessIndexService";
@@ -11,7 +13,7 @@ public interface AccessIndexService extends ServiceProvider {
     AccessIndex setIfAbsent(String accessKey,int referenceId);
 
     AccessIndex get(String accessKey);
-    boolean delete(String accessKey);
+    List<Boolean> delete(String accessKey);
 
     boolean onEnable();
     boolean onDisable();

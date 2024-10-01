@@ -37,6 +37,8 @@ public class AdminRoleModule implements Module{
     private DeploymentServiceProvider deploymentServiceProvider;
     private TokenValidatorProvider tokenValidatorProvider;
     private UserService userService;
+
+    private UserService userServiceProxy;
     private AccessIndexService accessIndexService;
 
     private int maxGameClusterCount;
@@ -214,24 +216,43 @@ public class AdminRoleModule implements Module{
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             String playerID = (String)onAccess.property("playerID");
 
-            Access user = userService.loadUser(Long.parseLong(playerID));
+            User user = (User) userService.loadUser(Long.parseLong(playerID));
 
-            if(user.login() != null) {
+            if(user != null && user.login() != null) {
 
                 AccessIndex acc = accessIndexService.get(user.login());
+
                 if (acc != null) {
 
-                    boolean accessIndexDelete = accessIndexService.delete(user.login());
+                    List<Boolean> accessIndexDeleteList = accessIndexService.delete(user.login());
+                    boolean accessIndexDeleteSuccessful = false;
 
-                    boolean userServiceDelete = userService.deleteUser(Long.parseLong(playerID));
+                    for(Boolean accessIndexDelete: accessIndexDeleteList){
+                        if (accessIndexDelete) {
+                            accessIndexDeleteSuccessful = true;
+                        }
+                    }
 
-                    session.write(JsonUtil.toSimpleResponse(true, "Access Index Delete: " + accessIndexDelete + " | User Service Delete: " + userServiceDelete).getBytes());
-                    return true;
+                    List<Boolean> userServiceDeleteList = userServiceProxy.deleteUser(Long.parseLong(playerID));
+                    boolean userDeleteSuccessful = false;
+
+                    for(Boolean userDelete: userServiceDeleteList){
+                        if (userDelete) {
+                            userDeleteSuccessful = true;
+                        }
+                    }
+
+                    if(accessIndexDeleteSuccessful && userDeleteSuccessful){
+                        session.write(JsonUtil.toSimpleResponse(true, "Data Deleted for Player " + playerID).getBytes());
+                        return true;
+                    }
+                    else{
+                        session.write(JsonUtil.toSimpleResponse(false, "Failed to Delete Data for Player " + playerID).getBytes());
+                        return false;
+                    }
                 }
-
             }
-
-            session.write(JsonUtil.toSimpleResponse(false, "No Data for Player " + playerID + " Deleted").getBytes());
+            session.write(JsonUtil.toSimpleResponse(false, "Failed to Find Player " + playerID).getBytes());
         }
         else if(session.action().equals("onGetGlobalGrantEvents")) {
             long gameclusterID = Long.parseLong(session.name());
@@ -339,6 +360,7 @@ public class AdminRoleModule implements Module{
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.userService = this.context.serviceProvider(UserService.NAME);
+        this.userServiceProxy = this.context.clusterProvider().serviceProvider(UserService.NAME);
         this.accessIndexService = this.context.clusterProvider().accessIndexService();
         this.gameClusterConfiguration = this.context.configuration("cluster");
         this.maxGameClusterCount = ((Number)this.gameClusterConfiguration.property("maxGameClusterCount")).intValue();

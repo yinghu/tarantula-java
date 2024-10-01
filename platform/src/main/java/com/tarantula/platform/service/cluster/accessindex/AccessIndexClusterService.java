@@ -17,6 +17,8 @@ import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 
 import com.tarantula.platform.event.TransactionReplicationEvent;
+import com.tarantula.platform.presence.ThirdPartyLogin;
+import com.tarantula.platform.presence.User;
 
 
 import java.util.Properties;
@@ -85,9 +87,11 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
     public boolean delete(String accessKey){
         DataStore dataStore = this.dataStore();
         AccessIndex accessIndex = new AccessIndexTrack(accessKey);
-        if(!dataStore.load(accessIndex)) return false;
+        boolean accessIndexDelete = dataStore.delete(accessIndex);
 
-        return dataStore.delete(accessIndex);
+        log.warn("accessIndexDelete: " + accessIndexDelete);
+
+        return accessIndexDelete;
     }
     public void enable(){
         if(deploymentServiceProvider==null) return;

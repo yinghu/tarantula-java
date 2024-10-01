@@ -2,8 +2,9 @@ package com.tarantula.test;
 
 import com.icodesoftware.AccessIndex;
 import com.icodesoftware.service.AccessIndexService;
-import com.icodesoftware.service.ClusterProvider;
-import com.icodesoftware.service.OnReplication;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestAccessIndexService implements AccessIndexService {
 
@@ -24,8 +25,8 @@ public class TestAccessIndexService implements AccessIndexService {
     }
 
     @Override
-    public boolean delete(String accessKey) {
-        return false;
+    public List<Boolean> delete(String accessKey) {
+        return new ArrayList<Boolean>();
     }
 
     @Override

@@ -6,9 +6,7 @@ import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.icodesoftware.AccessIndex;
-import com.icodesoftware.DataStore;
 import com.icodesoftware.TarantulaLogger;
-import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 
@@ -19,6 +17,8 @@ import com.tarantula.platform.service.cluster.ClusterDataView;
 import com.tarantula.platform.service.cluster.ClusterUtil;
 import com.tarantula.platform.service.cluster.DistributionReplicator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -61,17 +61,26 @@ public class AccessIndexServiceProxy extends AbstractDistributedObject<AccessInd
         return (AccessIndex)callResult.result;
     }
 
-    public boolean delete(String accessKey){
+    public List<Boolean> delete(String accessKey){
         NodeEngine nodeEngine = getNodeEngine();
+        Set<Member> members = nodeEngine.getClusterService().getMembers();
         AccessIndexDeleteOperation operation = new AccessIndexDeleteOperation(accessKey);
-        int partitionId = nodeEngine.getPartitionService().getPartitionId(accessKey);
-        InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,partitionId);
-        ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
-            Future<AccessIndex> future = builder.invoke();
-            return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
-        },metricsListener);
-        if(!callResult.successful) throw new RuntimeException(callResult.exception);
-        return (boolean)callResult.result;
+        List<Boolean> succsessfullDeleteList = new ArrayList<>();
+
+        for(Member member : members) {
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(AccessIndexService.NAME,operation,member.getAddress());
+
+            ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<AccessIndex> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            },metricsListener);
+
+            if(!callResult.successful) throw new RuntimeException(callResult.exception);
+
+            succsessfullDeleteList.add((Boolean) callResult.result);
+        }
+
+        return succsessfullDeleteList;
     }
 
     @Override
