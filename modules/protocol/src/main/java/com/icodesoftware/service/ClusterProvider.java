@@ -123,7 +123,7 @@ public interface ClusterProvider extends ServiceProvider {
         default String onConfigurationRegistered(int publishId){ return "{}";}
         default String onConfigurationReleased(int publishId){ return "{}";}
         default Content onDownload(String fileName){ return null;}
-        default String onBootstrap(){return "{}";}
+        default String onBootstrap(String category){return "{}";}
     }
 
 

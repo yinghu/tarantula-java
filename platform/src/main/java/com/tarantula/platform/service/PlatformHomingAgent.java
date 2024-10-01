@@ -132,10 +132,11 @@ public class PlatformHomingAgent extends TarantulaAgent {
         }
     }
 
-    public String onBootstrap(){
+    public String onBootstrap(String category){
         try {
             String[] headers = new String[]{
                     Session.TARANTULA_ACCESS_KEY, serviceContext.node().homingAgent().accessKey(),
+                    Session.TARANTULA_NAME,category,
             };
             String resp = serviceContext.httpClientProvider().get(serviceContext.node().homingAgent().host(), "configuration/bootstrap", headers);
             return resp;
