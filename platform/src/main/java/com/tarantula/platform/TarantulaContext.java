@@ -1042,6 +1042,6 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
         JsonObject agent = JsonUtil.parse(resp);
         node.tarantulaAgent.encryptionKey = agent.get("encryptionKey").getAsString();
         node.homingAgent().setup(this);
-        log.warn(node.homingAgent().onBootstrap("StoreSizeMb"));
+        log.warn(node.homingAgent().onBootstrap("LMDB"));
     }
 }
