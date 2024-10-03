@@ -166,10 +166,6 @@ public class PlatformUserService implements UserService {
         return null;
     }
 
-    public List<Boolean> deleteUser(long systemId){
-        return new ArrayList<Boolean>();
-    }
-
     public Account loadAccount(Access access){
         Account account = new UserAccount();
         account.distributionId(access.primary()?access.distributionId():access.primaryId());

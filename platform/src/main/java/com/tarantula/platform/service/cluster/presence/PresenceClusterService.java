@@ -4,10 +4,15 @@ import com.hazelcast.core.DistributedObject;
 import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
+import com.icodesoftware.DataStore;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.LoginProvider;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.TarantulaContext;
+import com.tarantula.platform.presence.ThirdPartyLogin;
+import com.tarantula.platform.presence.User;
 
 
 import java.util.Properties;
@@ -25,6 +30,22 @@ public class PresenceClusterService implements ManagedService, RemoteService {
         this.nodeEngine = nodeEngine;
         this.tarantulaContext = TarantulaContext.getInstance();
         log.warn("Start presence cluster service");
+    }
+
+    public boolean delete(long systemId){
+        DataStore userDataStore = this.userDataStore();
+        User user = new User();
+        user.distributionId(systemId);
+        boolean userDelete = userDataStore.delete(user);
+
+        DataStore loginDataStore = this.loginDataStore();
+        ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin();
+        thirdPartyLogin.distributionId(systemId);
+        boolean loginDelete = loginDataStore.delete(thirdPartyLogin);
+
+        log.warn("USER DELETE: " + userDelete + " | LOGIN DELETE: " + loginDelete);
+
+        return userDelete || loginDelete;
     }
 
     @Override
@@ -50,6 +71,14 @@ public class PresenceClusterService implements ManagedService, RemoteService {
     public int onProfileSequence(String gameServiceName,String profileName){
         PlatformGameServiceProvider gameServiceProvider = (PlatformGameServiceProvider) this.tarantulaContext.serviceProvider(gameServiceName);
         return gameServiceProvider.presenceServiceProvider().onProfileSequence(profileName);
+    }
+
+    private DataStore userDataStore(){
+        return this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,User.DataStore);
+    }
+
+    private DataStore loginDataStore(){
+        return this.tarantulaContext.dataStore(Distributable.DATA_SCOPE, LoginProvider.DataStore);
     }
 
 }

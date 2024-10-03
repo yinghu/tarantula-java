@@ -1,14 +1,19 @@
 package com.tarantula.platform.service.cluster.presence;
 
+import com.hazelcast.core.Member;
 import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
+import com.icodesoftware.AccessIndex;
 import com.icodesoftware.service.MetricsListener;
 
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.presence.DistributionPresenceService;
 import com.tarantula.platform.service.cluster.ClusterUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -49,6 +54,28 @@ public class DistributionPresenceServiceProxy extends AbstractDistributedObject<
         },metricsListener);
         if(!result.successful) throw new RuntimeException(result.exception);
         return (int)result.result;
+    }
+
+    public List<Boolean> deleteUserLoginData(long systemId) {
+        NodeEngine nodeEngine = getNodeEngine();
+        Set<Member> members = nodeEngine.getClusterService().getMembers();
+        DeleteUserLoginDataOperation operation = new DeleteUserLoginDataOperation(systemId);
+        List<Boolean> succsessfullDeleteList = new ArrayList<>();
+
+        for(Member member : members) {
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionPresenceService.NAME,operation,member.getAddress());
+
+            ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<AccessIndex> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+            },metricsListener);
+
+            if(!callResult.successful) throw new RuntimeException(callResult.exception);
+
+            succsessfullDeleteList.add((Boolean) callResult.result);
+        }
+
+        return succsessfullDeleteList;
     }
 
     public void registerMetricsListener(MetricsListener metricsListener){

@@ -1,29 +1,28 @@
-package com.tarantula.platform.service.cluster.user;
+package com.tarantula.platform.service.cluster.presence;
 
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.PartitionAwareOperation;
-import com.tarantula.platform.service.cluster.user.UserClusterService;
 
 import java.io.IOException;
 
-public class UserDeleteOperation extends Operation implements PartitionAwareOperation {
+public class DeleteUserLoginDataOperation extends Operation implements PartitionAwareOperation {
     private long playerID;
 
     private boolean successful;
 
-    public UserDeleteOperation(){
+    public DeleteUserLoginDataOperation(){
 
     }
 
-    public UserDeleteOperation(long playerID) {
+    public DeleteUserLoginDataOperation(long playerID) {
         this.playerID = playerID;
     }
 
     @Override
     public void run() throws Exception {
-        UserClusterService ais = this.getService();
+        PresenceClusterService ais = this.getService();
         successful = ais.delete(playerID);
     }
 

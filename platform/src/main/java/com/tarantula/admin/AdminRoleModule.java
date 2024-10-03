@@ -38,7 +38,7 @@ public class AdminRoleModule implements Module{
     private TokenValidatorProvider tokenValidatorProvider;
     private UserService userService;
 
-    private UserService userServiceProxy;
+    private DistributionPresenceService distributionPresenceService;
     private AccessIndexService accessIndexService;
 
     private int maxGameClusterCount;
@@ -233,7 +233,7 @@ public class AdminRoleModule implements Module{
                         }
                     }
 
-                    List<Boolean> userServiceDeleteList = userServiceProxy.deleteUser(Long.parseLong(playerID));
+                    List<Boolean> userServiceDeleteList = distributionPresenceService.deleteUserLoginData(Long.parseLong(playerID));
                     boolean userDeleteSuccessful = false;
 
                     for(Boolean userDelete: userServiceDeleteList){
@@ -360,7 +360,7 @@ public class AdminRoleModule implements Module{
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.userService = this.context.serviceProvider(UserService.NAME);
-        this.userServiceProxy = this.context.clusterProvider().serviceProvider(UserService.NAME);
+        this.distributionPresenceService = this.context.clusterProvider().serviceProvider(DistributionPresenceService.NAME);
         this.accessIndexService = this.context.clusterProvider().accessIndexService();
         this.gameClusterConfiguration = this.context.configuration("cluster");
         this.maxGameClusterCount = ((Number)this.gameClusterConfiguration.property("maxGameClusterCount")).intValue();
