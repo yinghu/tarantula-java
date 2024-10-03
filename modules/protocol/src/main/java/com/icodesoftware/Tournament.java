@@ -40,6 +40,7 @@ public interface Tournament extends Configurable {
     int durationMinutesPerInstance();
     long startLevel();
     long endLevel();
+    String realLifeCoinType();
     long scheduleId();
 
     Instance register(Session session);

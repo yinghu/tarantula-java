@@ -54,6 +54,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     private long startLevel;
     private long endLevel;
 
+    private String realLifeCoinType;
+
     private int concurrentInstanceSize;
 
     private TournamentRegister[] pendingInstances;
@@ -115,6 +117,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.credit = schedule.credit();
         this.startLevel = schedule.startLevel();
         this.endLevel = schedule.endLevel();
+        this.realLifeCoinType = schedule.realLifeCoinType();
         this.scheduleId = schedule.distributionId();
     }
 
@@ -151,6 +154,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return startTime;
     }
 
+    public String realLifeCoinType() { return realLifeCoinType; }
+
 
     @Override
     public boolean write(DataBuffer buffer) {
@@ -172,6 +177,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         buffer.writeLong(startLevel);
         buffer.writeLong(endLevel);
         buffer.writeInt(segmentsPerSchedule);
+        buffer.writeUTF8(realLifeCoinType);
         return true;
     }
 
@@ -195,6 +201,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         startLevel = buffer.readLong();
         endLevel = buffer.readLong();
         segmentsPerSchedule = buffer.readInt();
+        realLifeCoinType = buffer.readUTF8();
 
         if(global) {
             tournamentSegments = new TournamentSegment[this.segmentsPerSchedule];
@@ -417,6 +424,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         jsonObject.addProperty("ScheduleId",Long.toString(this.scheduleId));
         jsonObject.addProperty("StartLevel",startLevel);
         jsonObject.addProperty("EndLevel",endLevel);
+        jsonObject.addProperty("RealLifeCoinType", realLifeCoinType);
         jsonObject.addProperty("Status",status.name());
         JsonArray prizeList = new JsonArray();
         if(rangedPrizeList==null||tournamentServiceProvider==null){

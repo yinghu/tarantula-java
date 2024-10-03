@@ -74,6 +74,10 @@ public class TournamentSchedule extends Application {
         return header.get("EndLevel").getAsLong();
     }
 
+    public String realLifeCoinType(){
+        return header.get("RealLifeCoinType").getAsString();
+    }
+
     @Override
     public int getFactoryId() {
         return TournamentPortableRegistry.OID;
