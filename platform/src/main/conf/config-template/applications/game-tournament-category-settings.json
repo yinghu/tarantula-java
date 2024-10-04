@@ -122,6 +122,13 @@
             "downloadable": false
           },
           {
+            "name": "RealLifeCoinType",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
             "name": "PrizeSet",
             "type": "set",
             "reference": "category:TournamentPrize",
