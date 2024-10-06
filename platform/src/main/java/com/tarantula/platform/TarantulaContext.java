@@ -1035,13 +1035,24 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
     private void onAgent() throws Exception{
         if(!node.homingAgent().enabled()) return;
         log.warn("Homing agent enabled on ["+node.homingAgent().host()+"]");
-        String[] headers = new String[]{
-                Session.TARANTULA_ACCESS_KEY,node().homingAgent().accessKey()
-        };
-        String resp = httpClientProvider().get(node().homingAgent().host(), "agent", headers);
-        JsonObject agent = JsonUtil.parse(resp);
-        node.tarantulaAgent.encryptionKey = agent.get("encryptionKey").getAsString();
-        node.homingAgent().setup(this);
-        log.warn(node.homingAgent().onBootstrap("LMDB"));
+        int retries = 10;
+        while(true){
+            try{
+                String[] headers = new String[]{
+                        Session.TARANTULA_ACCESS_KEY,node().homingAgent().accessKey()
+                };
+                String resp = httpClientProvider().get(node().homingAgent().host(), "agent", headers);
+                JsonObject agent = JsonUtil.parse(resp);
+                node.tarantulaAgent.encryptionKey = agent.get("encryptionKey").getAsString();
+                node.homingAgent().setup(this);
+                log.warn(node.homingAgent().onBootstrap("LMDB"));
+                break;
+            }catch (Exception ex){
+                retries--;
+                if(retries<=0) throw new RuntimeException("Stop bootstrap after retry");
+                log.warn("Waiting and trying again ...");
+                Thread.sleep(1000);
+            }
+        }
     }
 }
