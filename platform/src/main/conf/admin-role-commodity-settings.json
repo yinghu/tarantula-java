@@ -4,6 +4,500 @@
   [
     {
       "header": {
+        "Name": "SoftCurrency7500",
+        "Amount": "7500"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "7e806f168e5d14678bdf200347b5ee9d",
+      "configurationName": "SoftCurrency7500",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "SoftCurrency15000",
+        "Amount": "15000"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "7e806f168e5d14678bdf200347b5ee9d",
+      "configurationName": "SoftCurrency15000",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "SoftCurrency50000",
+        "Amount": "50000"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "7e806f168e5d14678bdf200347b5ee9d",
+      "configurationName": "SoftCurrency50000",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "Energy60",
+        "Amount": "60"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "82f0de4a322e64b9eae1000cf4f1def0",
+      "configurationName": "Energy60",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "EarthPotion15",
+        "Amount": "15"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "65a0e64b8af534d23b8014c989e1fb96",
+      "configurationName": "EarthPotion15",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "SunPotion15",
+        "Amount": "15"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "e5faf22750c604162b52073b7d5b719b",
+      "configurationName": "SunPotion15",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "MoonPotion15",
+        "Amount": "15"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "aaf2ac61d0827423c809c4c81ff09561",
+      "configurationName": "MoonPotion15",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "MultiBattleTicket40",
+        "Amount": "40"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "f298107c034b749f3ac8cf162a260b94",
+      "configurationName": "MultiBattleTicket40",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "TournamentUnitCoin15",
+        "Amount": "15"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "96a0fe35b9479424192a66c289932f05",
+      "configurationName": "TournamentUnitCoin15",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "TournamentUnitCoin25",
+        "Amount": "25"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "96a0fe35b9479424192a66c289932f05",
+      "configurationName": "TournamentUnitCoin25",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "TournamentUnitCoin30",
+        "Amount": "30"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "96a0fe35b9479424192a66c289932f05",
+      "configurationName": "TournamentUnitCoin30",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "TournamentUnitCoin50",
+        "Amount": "50"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "96a0fe35b9479424192a66c289932f05",
+      "configurationName": "TournamentUnitCoin50",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "TournamentUnitCoin70",
+        "Amount": "70"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "96a0fe35b9479424192a66c289932f05",
+      "configurationName": "TournamentUnitCoin70",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "TournamentUnitCoin75",
+        "Amount": "75"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "96a0fe35b9479424192a66c289932f05",
+      "configurationName": "TournamentUnitCoin75",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "TournamentUnitCoin90",
+        "Amount": "90"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "96a0fe35b9479424192a66c289932f05",
+      "configurationName": "TournamentUnitCoin90",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "TournamentUnitCoin100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "96a0fe35b9479424192a66c289932f05",
+      "configurationName": "TournamentUnitCoin100",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "TournamentUnitCoin160",
+        "Amount": "160"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "96a0fe35b9479424192a66c289932f05",
+      "configurationName": "TournamentUnitCoin160",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "EpicRankMod2",
+        "Amount": "2"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "fd0c167b6244c4dbbaa90e848382460b",
+      "configurationName": "EpicRankMod2",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "EpicRankMod4",
+        "Amount": "4"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "fd0c167b6244c4dbbaa90e848382460b",
+      "configurationName": "EpicRankMod4",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "EpicRankMod6",
+        "Amount": "6"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "fd0c167b6244c4dbbaa90e848382460b",
+      "configurationName": "EpicRankMod6",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "EpicRankMod8",
+        "Amount": "8"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "fd0c167b6244c4dbbaa90e848382460b",
+      "configurationName": "EpicRankMod8",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "EpicRankMod10",
+        "Amount": "10"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "fd0c167b6244c4dbbaa90e848382460b",
+      "configurationName": "EpicRankMod10",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "EpicRankMod12",
+        "Amount": "12"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "fd0c167b6244c4dbbaa90e848382460b",
+      "configurationName": "EpicRankMod12",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "EpicRankMod15",
+        "Amount": "15"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "fd0c167b6244c4dbbaa90e848382460b",
+      "configurationName": "EpicRankMod15",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "EpicRankMod20",
+        "Amount": "20"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "fd0c167b6244c4dbbaa90e848382460b",
+      "configurationName": "EpicRankMod20",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "EpicRankMod24",
+        "Amount": "24"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "fd0c167b6244c4dbbaa90e848382460b",
+      "configurationName": "EpicRankMod24",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "EpicRankMod30",
+        "Amount": "30"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "fd0c167b6244c4dbbaa90e848382460b",
+      "configurationName": "EpicRankMod30",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "HardCurrency50",
+        "Amount": "50"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "83699f2672c114915a732b32714ff10e",
+      "configurationName": "HardCurrency50",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "HardCurrency100",
+        "Amount": "100"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "83699f2672c114915a732b32714ff10e",
+      "configurationName": "HardCurrency100",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "HardCurrency150",
+        "Amount": "150"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "83699f2672c114915a732b32714ff10e",
+      "configurationName": "HardCurrency150",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "HardCurrency200",
+        "Amount": "200"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "83699f2672c114915a732b32714ff10e",
+      "configurationName": "HardCurrency200",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "HardCurrency300",
+        "Amount": "300"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "83699f2672c114915a732b32714ff10e",
+      "configurationName": "HardCurrency300",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "HardCurrency400",
+        "Amount": "400"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "83699f2672c114915a732b32714ff10e",
+      "configurationName": "HardCurrency400",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "HardCurrency600",
+        "Amount": "600"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "83699f2672c114915a732b32714ff10e",
+      "configurationName": "HardCurrency600",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "HardCurrency800",
+        "Amount": "800"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "83699f2672c114915a732b32714ff10e",
+      "configurationName": "HardCurrency800",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "ColorizedRLC1",
+        "Amount": "1"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "3ce713cedd1a14f6cbdde423d5e292eb",
+      "configurationName": "ColorizedRLC1",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "SilverRLC1",
+        "Amount": "1"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "7769a6f43de964d5b9b5d5de7123e37d",
+      "configurationName": "SilverRLC1",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
+        "Name": "GoldRLC1",
+        "Amount": "1"
+      },
+      "application": {},
+      "reference": [],
+      "configurationType": "commodity",
+      "configurationTypeId": "2490cd8dcc280424fb8877881f79a4d6",
+      "configurationName": "GoldRLC1",
+      "configurationCategory": "SoftCurrency",
+      "configurationVersion": "v1.0"
+    },
+    {
+      "header": {
         "Name": "Gold100",
         "Amount": "100"
       },
