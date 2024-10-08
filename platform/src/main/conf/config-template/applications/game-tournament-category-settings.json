@@ -134,6 +134,13 @@
             "reference": "category:TournamentPrize",
             "nullable": false,
             "downloadable": false
+          },
+          {
+            "name": "MilestoneList",
+            "type": "set",
+            "reference": "category:TournamentMilestone",
+            "nullable": false,
+            "downloadable": false
           }
         ]
       }
@@ -157,6 +164,33 @@
           },
           {
             "name": "MaxRank",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "SkuList",
+            "type": "list",
+            "reference": "category:Sku",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "application.tournament",
+        "type": "TournamentMilestone",
+        "description": "application category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Score",
             "type": "number",
             "reference": "Integer",
             "nullable": false,
