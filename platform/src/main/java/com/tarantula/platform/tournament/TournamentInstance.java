@@ -7,6 +7,7 @@ import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Session;
 import com.icodesoftware.Tournament;
+import com.icodesoftware.Transaction;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.event.PortableEventRegistry;
@@ -40,6 +41,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
 
     public DataStore entryDataStore;
     public DataStore raceBoardDataStore;
+    public PlatformTournamentServiceProvider platformTournamentServiceProvider;
 
     private TournamentEntryComparator entryComparator;
 
@@ -77,6 +79,23 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         var totalScore = entry.score(credits,score);
         this.tournamentRaceBoard.onBoard(entry);
         return totalScore;
+    }
+
+    public double scoreSegmentSync(long entryId,long systemId,double score){
+        if(!global) return 0;
+        Transaction transaction = platformTournamentServiceProvider.gameCluster.transaction();
+        double[] scored ={0};
+        transaction.execute(ctx->{
+            DataStore tds = ctx.onDataStore(PlatformTournamentServiceProvider.TOURNAMENT_ENTRY_DATA_STORE);
+            TournamentEntry entry = new TournamentEntry();
+            entry.distributionId(entryId);
+            if(!tds.load(entry) || entry.systemId()!= systemId) return false;
+            entry.score(score);
+            if(!tds.update(entry)) return false;
+            scored[0] = entry.score();
+            return true;
+        });
+        return scored[0];
     }
 
     public long enterSegment(long systemId,double score){
