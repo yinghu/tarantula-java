@@ -1,5 +1,7 @@
 package com.tarantula.platform.presence;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.session.OnSessionTrack;
 import com.icodesoftware.service.DeploymentServiceProvider;
@@ -12,6 +14,7 @@ import com.tarantula.platform.*;
 import com.tarantula.platform.util.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class PresenceApplication extends TarantulaApplicationHeader implements Configurable.Listener<OnLobby>{
 
@@ -69,6 +72,21 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
                 session.write(JsonUtil.toSimpleResponse(false,"no lobby data").getBytes());
             }
         }
+        else if(session.action().equals("onGameLobbyList")){
+            List<LiveGame> liveGames = liveGameContext.list();
+            JsonArray list = new JsonArray();
+            for(LiveGame liveGame : liveGames){
+                liveGame.lobbyList = new ArrayList<>();
+                liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-lobby"));
+                liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-service"));
+                liveGame.lobbyList.add(this.context.lobby(liveGame.name+"-data"));
+                list.add(liveGame.toJson());
+            }
+            JsonObject resp = new JsonObject();
+            resp.add("list",list);
+            session.write(resp.toString().getBytes());
+        }
+
         else if(session.action().equals("onLobby")){
             if(liveGameContext.onIndex(session.name())){
                 LiveGame liveGame = new LiveGame(0,session.name());

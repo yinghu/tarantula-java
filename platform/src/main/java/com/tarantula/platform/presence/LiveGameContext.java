@@ -1,6 +1,7 @@
 package com.tarantula.platform.presence;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class LiveGameContext {
@@ -52,5 +53,10 @@ public class LiveGameContext {
             }
         }
         return indexed;
+    }
+    public synchronized List<LiveGame> list(){
+        ArrayList<LiveGame> liveGames = new ArrayList<>();
+        gameIndex.forEach(name-> liveGames.add(new LiveGame(0,name)));
+        return liveGames;
     }
 }
