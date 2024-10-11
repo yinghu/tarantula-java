@@ -41,7 +41,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
 
     public DataStore entryDataStore;
     public DataStore raceBoardDataStore;
-    public PlatformTournamentServiceProvider platformTournamentServiceProvider;
+    //public PlatformTournamentServiceProvider platformTournamentServiceProvider;
 
     private TournamentEntryComparator entryComparator;
 
@@ -81,9 +81,8 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
         return totalScore;
     }
 
-    public double scoreSegmentSync(long entryId,long systemId,double score){
+    public double scoreSegmentSync(Transaction transaction,long entryId,long systemId,double score){
         if(!global) return 0;
-        Transaction transaction = platformTournamentServiceProvider.gameCluster.transaction();
         double[] scored ={0};
         transaction.execute(ctx->{
             DataStore tds = ctx.onDataStore(PlatformTournamentServiceProvider.TOURNAMENT_ENTRY_DATA_STORE);
