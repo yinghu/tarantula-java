@@ -57,7 +57,6 @@ public class TournamentScoreSyncTest extends DataStoreHook{
         Assert.assertTrue(dataStore.load(finalScore));
         Assert.assertEquals(finalScore.score(),110);
 
-
     }
 
 
