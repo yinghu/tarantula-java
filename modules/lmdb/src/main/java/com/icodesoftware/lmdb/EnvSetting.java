@@ -1,5 +1,6 @@
 package com.icodesoftware.lmdb;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.Distributable;
 
 public class EnvSetting {
@@ -16,7 +17,7 @@ public class EnvSetting {
     public static final String ENV_CONFIG_MIGRATION = "migration";
 
 
-    private static final long MB_1 = 1_048_576L;
+    public static final long MB_1 = 1_048_576L;
 
     public static final String ENV_PROVIDER_NAME ="tarantula";
     public static final String ENV_BASE_DIR ="target/lmdb";
@@ -65,5 +66,15 @@ public class EnvSetting {
 
     public static long toBytesFromMb(int mbSize){
         return MB_1*mbSize;
+    }
+
+    public JsonObject toJson(){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("name",name);
+        jsonObject.addProperty("scope",scope);
+        jsonObject.addProperty("storePath",storePath);
+        jsonObject.addProperty("mdSize",mbSize);
+        jsonObject.addProperty("enabled",enabled);
+        return jsonObject;
     }
 }
