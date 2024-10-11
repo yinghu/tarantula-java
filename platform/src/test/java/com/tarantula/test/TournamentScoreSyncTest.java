@@ -27,6 +27,10 @@ public class TournamentScoreSyncTest extends DataStoreHook{
         DataStore dataStore = dataStoreProvider.createDataStore(storeName);
         Assert.assertTrue(dataStore.create(entry));
         TournamentInstance tournamentInstance = TournamentInstance.global(0,100);
+        tournamentInstance.entryDataStore = dataStore;
+        tournamentInstance.raceBoardDataStore = dataStoreProvider.createDataStore("tournament_race_board");
+        tournamentInstance.distributionId(instanceId);
+        tournamentInstance.load();
         tournamentInstance.scoreSegmentSync(transaction,entry.distributionId(),systemId,10);
         TournamentEntry loaded = new TournamentEntry();
         loaded.distributionId(entry.distributionId());
