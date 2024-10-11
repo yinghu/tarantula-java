@@ -38,7 +38,7 @@ public class TournamentScoreSyncTest extends DataStoreHook{
             new Thread(()->{
                 try{
                     Transaction tx = dataStoreProvider.transaction(Distributable.DATA_SCOPE);
-                    tournamentInstance.scoreSegmentSync(tx,entry.distributionId(),100,10);
+                    tournamentInstance.scoreSegmentSync(tx,entry.distributionId(),systemId,10);
                     waiting.countDown();
                 }catch (Exception ex){
                     exception[0]=ex;
