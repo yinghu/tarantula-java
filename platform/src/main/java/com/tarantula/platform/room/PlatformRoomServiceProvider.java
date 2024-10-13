@@ -179,9 +179,10 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     }
 
     public GameRoom join(Stub rating, GameZone gameZone){
-        GameZoneIndex index = gameZoneIndex.get(gameZone.distributionKey());
-        GameRoom gameRoom = dedicated?remoteJoin(rating,index):localJoin(rating,index);
-        return gameRoom;
+        return new PVEGameRoom();
+        //GameZoneIndex index = gameZoneIndex.get(gameZone.distributionKey());
+        //GameRoom gameRoom = dedicated?remoteJoin(rating,index):localJoin(rating,index);
+        //return gameRoom;
     }
 
     public void leave(Stub stub){
@@ -518,7 +519,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
     private void localLeave(long systemId, GameZoneIndex index,String roomId, GameRoom.Listener listener){
         GameRoom gameRoom = loadGameRoom(index,roomId);
         if(gameRoom==null) {
-            logger.warn("Room Missed->"+index.gameZone.distributionKey()+">>"+roomId);
+            //logger.warn("Room Missed->"+index.gameZone.distributionKey()+">>"+roomId);
             return;
         }
         gameRoom.leave(systemId,listener);
