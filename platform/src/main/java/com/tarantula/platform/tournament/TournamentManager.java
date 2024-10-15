@@ -653,7 +653,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         if(!global) return 0;
         TournamentInstance instance = lookupSegmentInstance(instanceId).tournamentInstance;
         //logger.warn(distributionId+" : "+instanceId+" : "+systemId+" : scored");
-        return instance.scoreSegment(entryId,systemId,credits,score);
+        Transaction transaction = this.tournamentServiceProvider.gameCluster.transaction();
+        return instance.scoreSegmentSync(transaction,entryId,systemId,score);
     }
 
 
