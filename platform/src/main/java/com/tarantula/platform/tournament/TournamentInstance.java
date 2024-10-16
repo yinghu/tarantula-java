@@ -83,7 +83,7 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
     public double scoreSegmentSync(Transaction transaction,long entryId,long systemId,double score){
         if(!global) return 0;
         double[] scored ={0};
-        if(transaction.execute(ctx->{
+        transaction.execute(ctx->{
             DataStore tds = ctx.onDataStore(PlatformTournamentServiceProvider.TOURNAMENT_ENTRY_DATA_STORE);
             TournamentEntry entry = new TournamentEntry();
             entry.distributionId(entryId);
@@ -92,14 +92,16 @@ public class TournamentInstance extends RecoverableObject implements Tournament.
             if(!tds.update(entry)) return false;
             scored[0] = entry.score();
             return true;
-        })){
-            TournamentEntry entry = new TournamentEntry();
-            entry.distributionId(entryId);
-            entry.dataStore(entryDataStore);
-            entryDataStore.load(entry);
-            this.tournamentRaceBoard.onBoard(entry);
-        }
+        });
         return scored[0];
+    }
+
+    public void onBoardSync(long entryId){
+        TournamentEntry entry = new TournamentEntry();
+        entry.distributionId(entryId);
+        entry.dataStore(entryDataStore);
+        entryDataStore.load(entry);
+        this.tournamentRaceBoard.onBoard(entry);
     }
 
     public long enterSegment(long systemId,double score){
