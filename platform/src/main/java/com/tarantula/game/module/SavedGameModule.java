@@ -28,20 +28,18 @@ public class SavedGameModule extends ModuleHeader {
             CurrentSaveIndex savedGame = this.savedGameServiceProvider.selectSavedGame(session);
             session.write(savedGame!=null?savedGame.toJson().toString().getBytes():JsonUtil.toSimpleResponse(false,"save in use").getBytes());
         }
+
         else if(session.action().equals("onRevision")){
             session.write(savedGameServiceProvider.saveRevisionInfo(session).toBinary());
         }
         else if(session.action().equals("onSet")){
-            session.write(JsonUtil.toSimpleResponse(true,"data saved ["+session.name()+"]").getBytes());
-            this.savedGameServiceProvider.saveData(session,session.name(),bytes);
+            boolean saved = this.savedGameServiceProvider.saveDataOnRevision(session,bytes);
+            session.write(JsonUtil.toSimpleResponse(saved,"onSet").getBytes()); //if false need to resend it.
         }
         else if(session.action().equals("onGet")){
-            byte[] data = this.savedGameServiceProvider.loadData(session,session.name());
-            session.write(JsonUtil.toSimpleResponse(
-                    data != null,
-                    data == null ? session.name() : new String(data)//need to use byte array directly down to wire
-            ).getBytes());
+            session.write(this.savedGameServiceProvider.loadDataOnRevision(session));
         }
+        
         else if(session.action().equals("onReset")){
             CurrentSaveIndex selected = this.savedGameServiceProvider.reset(session);
             if(selected.index()!=null){

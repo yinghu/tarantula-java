@@ -236,6 +236,14 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         return saveRevisionInfo;
     }
 
+    public boolean saveDataOnRevision(Session session,byte[] save){
+        return true;
+    }
+
+    public byte[] loadDataOnRevision(Session session){
+        return new byte[0];
+    }
+
 
 
 }
