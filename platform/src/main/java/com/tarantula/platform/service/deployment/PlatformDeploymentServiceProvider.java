@@ -8,6 +8,7 @@ import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 
+import com.icodesoftware.util.FileUtil;
 import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.admin.GameClusterQuery;
 import com.tarantula.platform.*;
@@ -100,6 +101,35 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
         else{
             return _internalModule(descriptor.moduleName());
+        }
+    }
+
+    public <T extends OnAccess> boolean saveContent(T gameCluster,Session session,Content content){
+        String dir = tarantulaContext.deployDir+"/web/"+gameCluster.name()+"/"+session.distributionKey();
+        FileUtil.createDirectory(dir);
+        String save = "/"+content.fileName()+"."+content.revisionNumber()+"."+content.type();
+        try(BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(dir+save))){
+            bufferedOutputStream.write(content.data());
+            bufferedOutputStream.flush();
+            return true;
+        }
+        catch (Exception ex){
+            log.error("Error on save content :"+session.distributionKey(),ex);
+            return false;
+        }
+    }
+
+    public <T extends OnAccess> Content loadContent(T gameCluster,Session session,Content content){
+        String dir = tarantulaContext.deployDir+"/web/"+gameCluster.name()+"/"+session.distributionKey();
+        FileUtil.createDirectory(dir);
+        String save = "/"+content.fileName()+"."+content.revisionNumber()+"."+content.type();
+        try(BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(dir+save))){
+            byte[] data = bufferedInputStream.readAllBytes();
+            return ContentMapping.forSave(data,content.fileName(),content.revisionNumber());
+        }
+        catch (Exception ex){
+            log.error("Error on load content :"+session.distributionKey(),ex);
+            return content;
         }
     }
 

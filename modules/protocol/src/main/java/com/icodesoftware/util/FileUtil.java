@@ -30,4 +30,14 @@ public class FileUtil {
             return false;
         }
     }
+
+    public static void createDirectory(String dir){
+        Path directory = Paths.get(dir);
+        if(Files.exists(directory)) return;
+        try{
+            Files.createDirectories(directory);
+        }catch (Exception ex){
+            throw new RuntimeException("cannot create directory",ex);
+        }
+    }
 }

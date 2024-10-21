@@ -64,6 +64,10 @@ public interface DeploymentServiceProvider extends ConfigurationServiceProvider,
     <T extends OnAccess> T updateGameCluster(long gameClusterId,OnAccess properties);
 
 
+    <T extends OnAccess> boolean saveContent(T gameCluster,Session session,Content content);
+    <T extends OnAccess> Content loadContent(T gameCluster,Session session,Content content);
+
+
     <T extends OnAccess> boolean launchGameCluster(T gameCluster);
     <T extends OnAccess> boolean shutdownGameCluster(T gameCluster);
     <T extends OnAccess> T gameCluster(long key);

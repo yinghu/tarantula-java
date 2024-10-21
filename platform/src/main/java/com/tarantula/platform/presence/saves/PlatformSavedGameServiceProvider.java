@@ -9,6 +9,7 @@ import com.icodesoftware.Session;
 import com.icodesoftware.Transaction;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ApplicationPreSetup;
+import com.icodesoftware.service.Content;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.SnowflakeKey;
@@ -18,6 +19,7 @@ import com.tarantula.game.service.PlatformGameServiceProvider;
 
 import com.tarantula.platform.item.PlatformItemServiceProvider;
 import com.tarantula.platform.presence.PresencePortableRegistry;
+import com.tarantula.platform.service.deployment.ContentMapping;
 import com.tarantula.platform.util.RecoverableQuery;
 
 
@@ -237,11 +239,34 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
     }
 
     public boolean saveDataOnRevision(Session session,byte[] save){
+        String[] parts = session.name().split("#");
+        if(!validate(parts[2],save)) return false;
+        SaveRevisionInfo saveRevisionInfo = new SaveRevisionInfo();
+        saveRevisionInfo.distributionId(session.distributionId());
+        saveRevisionInfo.name(parts[0]);
+        dataStore.createIfAbsent(saveRevisionInfo,true);
+        if(Integer.parseInt(parts[1]) != saveRevisionInfo.clientRevisionNumber+1){
+            logger.warn("Save revision number not matched");
+            return false;
+        }
+        saveRevisionInfo.clientRevisionNumber++;
+        dataStore.update(saveRevisionInfo);
+        Content content = ContentMapping.forSave(save,saveRevisionInfo.name(),saveRevisionInfo.clientRevisionNumber);
+        this.serviceContext.deploymentServiceProvider().saveContent(gameCluster,session,content);
         return true;
     }
 
-    public byte[] loadDataOnRevision(Session session){
-        return new byte[0];
+    public Content loadDataOnRevision(Session session){
+        SaveRevisionInfo saveRevisionInfo = new SaveRevisionInfo();
+        saveRevisionInfo.distributionId(session.distributionId());
+        saveRevisionInfo.name(session.name());
+        dataStore.createIfAbsent(saveRevisionInfo,true);
+        return serviceContext.deploymentServiceProvider().loadContent(gameCluster,session,ContentMapping.forLoad(saveRevisionInfo.name(),saveRevisionInfo.clientRevisionNumber));
+    }
+
+    private boolean validate(String checkSum,byte[] data){
+        //hash check
+        return true;
     }
 
 

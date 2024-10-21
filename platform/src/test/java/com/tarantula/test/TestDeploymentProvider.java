@@ -52,6 +52,13 @@ public class TestDeploymentProvider implements DeploymentServiceProvider {
 
     }
 
+    public <T extends OnAccess> boolean saveContent(T gameCluster,Session session,Content content){
+        return false;
+    }
+    public <T extends OnAccess> Content loadContent(T gameCluster,Session session,Content content){
+        return content;
+    }
+
     @Override
     public OnView view(String viewId) {
         return null;

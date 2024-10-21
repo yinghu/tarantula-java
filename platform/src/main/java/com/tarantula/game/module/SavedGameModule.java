@@ -2,6 +2,7 @@ package com.tarantula.game.module;
 
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
+import com.icodesoftware.service.Content;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.presence.*;
 
@@ -37,9 +38,15 @@ public class SavedGameModule extends ModuleHeader {
             session.write(JsonUtil.toSimpleResponse(saved,"onSet").getBytes()); //if false need to resend it.
         }
         else if(session.action().equals("onGet")){
-            session.write(this.savedGameServiceProvider.loadDataOnRevision(session));
+            Content content = this.savedGameServiceProvider.loadDataOnRevision(session);
+            if(content.existed()){
+                session.write(content.data());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,"save not existed").getBytes());
+            }
         }
-        
+
         else if(session.action().equals("onReset")){
             CurrentSaveIndex selected = this.savedGameServiceProvider.reset(session);
             if(selected.index()!=null){
