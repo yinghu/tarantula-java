@@ -228,6 +228,14 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         return loaded? OversizeDataBatch.fromBatch(batchData):null;
     }
 
+    public SaveRevisionInfo saveRevisionInfo(Session session){
+        SaveRevisionInfo saveRevisionInfo = new SaveRevisionInfo();
+        saveRevisionInfo.distributionId(session.distributionId());
+        saveRevisionInfo.name(session.name());
+        dataStore.createIfAbsent(saveRevisionInfo,true);
+        return saveRevisionInfo;
+    }
+
 
 
 }
