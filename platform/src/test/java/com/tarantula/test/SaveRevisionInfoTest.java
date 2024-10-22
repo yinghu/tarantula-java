@@ -42,6 +42,13 @@ public class SaveRevisionInfoTest extends DataStoreHook{
         reload.name("inventory");
         dataStore.createIfAbsent(reload,true);
         Assert.assertEquals(reload.clientRevisionNumber,11);
+
+        SaveRevisionInfo tournament = new SaveRevisionInfo();
+        tournament.distributionId(presenceId);
+        tournament.name("tournament");
+
+        dataStore.createIfAbsent(tournament,true);
+        Assert.assertEquals(tournament.clientRevisionNumber,0);
     }
 
 }

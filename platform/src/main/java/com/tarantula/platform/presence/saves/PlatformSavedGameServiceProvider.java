@@ -237,6 +237,16 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         dataStore.createIfAbsent(saveRevisionInfo,true);
         return saveRevisionInfo;
     }
+    public boolean saveRevisionInfo(Session session,SaveRevisionInfo pending){
+        SaveRevisionInfo saveRevisionInfo = new SaveRevisionInfo();
+        saveRevisionInfo.distributionId(session.distributionId());
+        saveRevisionInfo.name(pending.name());
+        dataStore.createIfAbsent(saveRevisionInfo,true);
+        if(pending.clientRevisionNumber != saveRevisionInfo.clientRevisionNumber+1) return false;
+        saveRevisionInfo.clientRevisionNumber++;
+        saveRevisionInfo.deviceId = pending.deviceId;
+        return dataStore.update(saveRevisionInfo);
+    }
 
     public boolean saveDataOnRevision(Session session,byte[] save){
         String[] parts = session.name().split("#");
@@ -252,7 +262,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         saveRevisionInfo.clientRevisionNumber++;
         dataStore.update(saveRevisionInfo);
         Content content = ContentMapping.forSave(save,saveRevisionInfo.name(),saveRevisionInfo.clientRevisionNumber);
-        this.serviceContext.deploymentServiceProvider().saveContent(gameCluster,session,content);
+        this.serviceContext.deploymentServiceProvider().saveContent(gameCluster.typeId(),session,content);
         return true;
     }
 
@@ -261,7 +271,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         saveRevisionInfo.distributionId(session.distributionId());
         saveRevisionInfo.name(session.name());
         dataStore.createIfAbsent(saveRevisionInfo,true);
-        return serviceContext.deploymentServiceProvider().loadContent(gameCluster,session,ContentMapping.forLoad(saveRevisionInfo.name(),saveRevisionInfo.clientRevisionNumber));
+        return serviceContext.deploymentServiceProvider().loadContent(gameCluster.typeId(),session,ContentMapping.forLoad(saveRevisionInfo.name(),saveRevisionInfo.clientRevisionNumber));
     }
 
     private boolean validate(String checkSum,byte[] data){

@@ -5,9 +5,10 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.game.SimpleStub;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServiceActionEvent;
-
+import com.tarantula.platform.service.deployment.ContentMapping;
 
 
 public class ServiceEventHandler extends AbstractRequestHandler {
@@ -55,6 +56,24 @@ public class ServiceEventHandler extends AbstractRequestHandler {
             actionEvent.name(name);
             actionEvent.clientId(clientId);
             this.eventService.publish(actionEvent);
+        }
+        else if(path.startsWith("/service/save")){
+            OnSession id = auth.validateToken(token);
+            if(!id.successful()) throw new IllegalAccessException(id.message());
+            String[] parts = name.split("#");
+            boolean saved = serviceContext.deploymentServiceProvider().saveContent(tag.split("/")[0],new SimpleStub(id.distributionId()), ContentMapping.forSave(_payload,parts[0],Integer.parseInt(parts[1])));
+            super.onEvent(ResponsiveEvent.create(exchange.id(),JsonUtil.toSimpleResponse(saved,name).getBytes()));
+        }
+        else if(path.startsWith("/service/load")){
+            OnSession id = auth.validateToken(token);
+            if(!id.successful()) throw new IllegalAccessException(id.message());
+            String[] parts = name.split("#");
+            Content saved = serviceContext.deploymentServiceProvider().loadContent(tag.split("/")[0],new SimpleStub(id.distributionId()), ContentMapping.forLoad(parts[0],Integer.parseInt(parts[1])));
+            if(saved.existed()){
+                super.onEvent(ResponsiveEvent.create(exchange.id(),saved.data()));
+            }else{
+                super.onEvent(ResponsiveEvent.create(exchange.id(),JsonUtil.toSimpleResponse(false,name).getBytes()));
+            }
         }
         else{
             throw new UnsupportedOperationException("HTTP ["+exchange.method()+"] request ["+path+"] not supported");

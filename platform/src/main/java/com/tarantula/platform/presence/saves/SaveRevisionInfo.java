@@ -1,6 +1,7 @@
 package com.tarantula.platform.presence.saves;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.Recoverable;
 import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.OnApplicationHeader;
 import com.tarantula.platform.presence.PresencePortableRegistry;
@@ -37,14 +38,30 @@ public class SaveRevisionInfo extends OnApplicationHeader {
     @Override
     public JsonObject toJson() {
         JsonObject resp = new JsonObject();
-        resp.addProperty("revisionNumber",clientRevisionNumber);
-        resp.addProperty("deviceId",deviceId);
+        resp.addProperty("Successful",true);
+        resp.addProperty("RevisionNumber",clientRevisionNumber);
+        resp.addProperty("DeviceId",deviceId);
+        resp.addProperty("Name",name);
         return resp;
     }
 
     @Override
     public byte[] toBinary() {
         return toJson().toString().getBytes();
+    }
+
+    @Override
+    public boolean readKey(Recoverable.DataBuffer buffer){
+        distributionId = buffer.readLong();
+        name = buffer.readUTF8();
+        return true;
+    }
+    @Override
+    public boolean writeKey(Recoverable.DataBuffer buffer){
+        if(distributionId==0 && name ==null) return false;
+        buffer.writeLong(distributionId);
+        buffer.writeUTF8(name);
+        return true;
     }
 
     @Override

@@ -104,8 +104,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
 
-    public <T extends OnAccess> boolean saveContent(T gameCluster,Session session,Content content){
-        String dir = tarantulaContext.deployDir+"/web/"+gameCluster.name()+"/"+session.distributionKey();
+    public boolean saveContent(String typeId,Session session,Content content){
+        String dir = tarantulaContext.deployDir+"/web/"+typeId+"/"+session.distributionKey();
         FileUtil.createDirectory(dir);
         String save = "/"+content.fileName()+"."+content.revisionNumber()+"."+content.type();
         try(BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(dir+save))){
@@ -119,8 +119,8 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         }
     }
 
-    public <T extends OnAccess> Content loadContent(T gameCluster,Session session,Content content){
-        String dir = tarantulaContext.deployDir+"/web/"+gameCluster.name()+"/"+session.distributionKey();
+    public Content loadContent(String typeId,Session session,Content content){
+        String dir = tarantulaContext.deployDir+"/web/"+typeId+"/"+session.distributionKey();
         FileUtil.createDirectory(dir);
         String save = "/"+content.fileName()+"."+content.revisionNumber()+"."+content.type();
         try(BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(dir+save))){

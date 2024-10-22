@@ -1,6 +1,7 @@
 package com.tarantula.game.module;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.Content;
 import com.icodesoftware.util.JsonUtil;
@@ -10,6 +11,7 @@ import com.tarantula.game.PlayerSavedGames;
 import com.tarantula.game.util.SavedGameDeserializer;
 import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 import com.tarantula.platform.presence.saves.PlatformSavedGameServiceProvider;
+import com.tarantula.platform.presence.saves.SaveRevisionInfo;
 import com.tarantula.platform.presence.saves.SavedGame;
 
 
@@ -30,8 +32,16 @@ public class SavedGameModule extends ModuleHeader {
             session.write(savedGame!=null?savedGame.toJson().toString().getBytes():JsonUtil.toSimpleResponse(false,"save in use").getBytes());
         }
 
-        else if(session.action().equals("onRevision")){
+        else if(session.action().equals("onGetRevision")){
             session.write(savedGameServiceProvider.saveRevisionInfo(session).toBinary());
+        }
+        else if(session.action().equals("onSetRevision")){
+            SaveRevisionInfo saveRevisionInfo = new SaveRevisionInfo();
+            JsonObject data = JsonUtil.parse(session.payload());
+            saveRevisionInfo.clientRevisionNumber = data.get("RevisionNumber").getAsInt();
+            if(data.has("DeviceId")) saveRevisionInfo.deviceId = data.get("DeviceId").getAsString();
+            saveRevisionInfo.name(data.get("Name").getAsString());
+            session.write(JsonUtil.toSimpleResponse(savedGameServiceProvider.saveRevisionInfo(session,saveRevisionInfo),session.action()).getBytes());
         }
         else if(session.action().equals("onSet")){
             boolean saved = this.savedGameServiceProvider.saveDataOnRevision(session,bytes);
