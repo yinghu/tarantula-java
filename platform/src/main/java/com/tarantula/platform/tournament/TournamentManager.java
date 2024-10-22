@@ -157,6 +157,9 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
 
     public String realLifeCoinType() { return realLifeCoinType; }
+    public void realLifeCoinType(String realLifeCoinType) {
+        this.realLifeCoinType = realLifeCoinType;
+    }
 
 
     @Override
