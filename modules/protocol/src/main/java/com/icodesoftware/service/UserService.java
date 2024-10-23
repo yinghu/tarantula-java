@@ -26,4 +26,6 @@ public interface UserService extends ServiceProvider{
 
     LoginProvider loginProvider(long systemId);
     void createLoginProvider(LoginProvider loginProvider);
+
+    boolean deleteUser(long systemId);
 }

@@ -82,6 +82,13 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
         if(!dataStore.load(accessIndex)) return null;
         return accessIndex;
     }
+    public boolean delete(String accessKey){
+        DataStore dataStore = this.dataStore();
+        AccessIndex accessIndex = new AccessIndexTrack(accessKey);
+        if(!dataStore.load(accessIndex)) return false;
+
+        return dataStore.delete(accessIndex);
+    }
     public void enable(){
         if(deploymentServiceProvider==null) return;
         this.deploymentServiceProvider.distributionCallback().onAccessIndexEnabled();

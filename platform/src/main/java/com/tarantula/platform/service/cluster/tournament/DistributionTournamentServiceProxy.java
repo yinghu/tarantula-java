@@ -10,8 +10,12 @@ import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.service.cluster.ClusterUtil;
 import com.tarantula.platform.tournament.DistributionTournamentService;
+import com.tarantula.platform.tournament.TournamentOnNode;
 import com.tarantula.platform.tournament.TournamentRegisterStatus;
 
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -175,6 +179,32 @@ public class DistributionTournamentServiceProxy extends AbstractDistributedObjec
             },metricsListener);
             if(!result.successful) throw new RuntimeException(result.exception);
         }
+    }
+
+    public List<TournamentOnNode> onScan(String serviceName){
+        NodeEngine nodeEngine = getNodeEngine();
+        ScanTournamentOperation operation = new ScanTournamentOperation(serviceName);
+        Set<Member> members = nodeEngine.getClusterService().getMembers();
+        List<TournamentOnNode> tournamentOnNodes = new ArrayList<>();
+        for(Member member : members){
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionTournamentService.NAME,operation,member.getAddress());
+            ClusterUtil.CallResult result = ClusterUtil.call(TarantulaContext.operationRetries,TarantulaContext.operationRejectInterval,()->{
+                Future<byte[]> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout,TimeUnit.SECONDS);
+            },metricsListener);
+            if(!result.successful) throw new RuntimeException(result.exception);
+            byte[] ret = (byte[])result.result;
+            ByteBuffer byteBuffer = ByteBuffer.wrap(ret);
+            TournamentOnNode tournamentOnNode = new TournamentOnNode();
+            tournamentOnNode.nodeId = member.getAddress().getHost();
+            int sz = byteBuffer.getInt();
+            tournamentOnNode.onScheduled = new long[sz];
+            for(int i=0;i<sz;i++){
+                tournamentOnNode.onScheduled[i]=byteBuffer.getLong();
+            }
+            tournamentOnNodes.add(tournamentOnNode);
+        }
+        return tournamentOnNodes;
     }
 
     public void registerMetricsListener(MetricsListener metricsListener){

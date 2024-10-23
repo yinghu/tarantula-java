@@ -2,6 +2,7 @@ package com.perfectday.games.earth8;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.TokenValidatorProvider;
@@ -30,7 +31,11 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
     private ConcurrentHashMap<Long,Tournament> tournamentIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,ApplicationResource> resourceIndex = new ConcurrentHashMap<>();
+
     ConcurrentHashMap<Long, ScoreRunner> scoreRunners = new ConcurrentHashMap<>();
+
+    private TarantulaLogger logger = JDKLogger.getLogger(Earth8GameServiceProvider.class);
+
     public void setup(GameContext gameContext){
         this.gameContext = gameContext;
         this.gameContext.registerTournamentListener(this);
@@ -92,7 +97,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     }
 
     public void updateGame(Session session,byte[] payload) throws Exception{
-        if (session.name() != null && session.name().startsWith("GrantCurrency")){
+        if (session.name() != null && (session.name().startsWith("ItemGrant") || session.name().startsWith("GlobalGrant"))){
             Transaction transaction = gameContext.applicationSchema().transaction();
 
             transaction.execute(ctx->{
@@ -229,7 +234,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         gameContext.applicationSchema().transaction().execute(ctx->{
             DataStore dataStore = ctx.onDataStore("player_inventory_grant");
             dataStore.list(new PlayerActionQuery(session.distributionId())).forEach(playerAction -> {
-                playerCurrencyGrantEvents.add(playerAction);
+                if(!playerAction.completed){
+                    playerCurrencyGrantEvents.add(playerAction);
+                }
             });
             return true;
         });

@@ -4,17 +4,22 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceSetup;
 
+import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.configuration.MailboxCredentialConfiguration;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.Application;
 import com.tarantula.platform.tournament.TournamentPrize;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +27,8 @@ import java.util.Map;
 public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
 
     public static final String NAME = "inbox";
+
+    private final String EVENTSPLIT = "--";
 
     @Override
     public void registerSummary(Summary summary) {
@@ -47,6 +54,49 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         inbox.dailyGiveawayList = this.platformGameServiceProvider.dailyGiveawayServiceProvider().list();
         inbox.inboxList = this.platformGameServiceProvider.gameServiceProvider().inbox(session);
         return inbox;
+    }
+
+    public void checkGlobalItemGrant(Session session, long gameclusterID){
+        String[] payloadSplit = session.name().split("#");
+        int playerLevel = Integer.parseInt(payloadSplit[1]);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate accountCreatedDate = LocalDate.parse(payloadSplit[0], formatter);
+
+        DataStore globalDataStore = applicationPreSetup.dataStore(gameCluster,"global_item_grants");
+        DataStore playerDataStore = gameCluster.applicationPreSetup().onDataStore("player_inventory_grant");
+        List<LocalDateTime> playerEventGlobalTimes = new ArrayList<>();
+
+        playerDataStore.list(new PlatformServerEventQuery(session.distributionId())).forEach(playerGrantEvent -> {
+            if(playerGrantEvent.name().startsWith("GlobalGrant")){
+                String[] playerEventNameSplit = playerGrantEvent.name().split(EVENTSPLIT);
+                if(playerEventNameSplit.length == 4){
+                    playerEventGlobalTimes.add(LocalDateTime.parse(playerEventNameSplit[3]));
+                }
+            }
+        });
+
+        globalDataStore.list(new GlobalItemGrantEventQuery(gameclusterID)).forEach(globalGrantEvent -> {
+            if(globalGrantEvent.completed) return;
+
+            if(!playerEventGlobalTimes.contains(globalGrantEvent.dateCreated)){
+                boolean shouldComplete = false;
+
+                if(playerLevel < globalGrantEvent.minPlayerLevelFilter || playerLevel > globalGrantEvent.maxPlayerLevelFilter){
+                    shouldComplete = true;
+                }
+
+                if(accountCreatedDate.isBefore(globalGrantEvent.minInstallDateFilter) || accountCreatedDate.isAfter(globalGrantEvent.maxInstallDateFilter)){
+                    shouldComplete = true;
+                }
+
+                PlatformServerEvent serverGrantEvent = new PlatformServerEvent("GlobalGrant"+ EVENTSPLIT + globalGrantEvent.itemID +
+                        EVENTSPLIT + globalGrantEvent.amount + EVENTSPLIT + globalGrantEvent.dateCreated, shouldComplete);
+
+                serverGrantEvent.ownerKey(SnowflakeKey.from(session.distributionId()));
+                playerDataStore.create(serverGrantEvent);
+            }
+        });
     }
 
     public Mailbox mailbox(Session session){
