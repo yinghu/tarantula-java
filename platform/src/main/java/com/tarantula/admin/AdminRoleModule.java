@@ -6,21 +6,24 @@ import com.google.gson.JsonObject;
 
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.service.DeploymentServiceProvider;
-import com.icodesoftware.service.TokenValidatorProvider;
-import com.icodesoftware.service.UserService;
+import com.icodesoftware.lmdb.LMDBDataStoreProvider;
+import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 
+import com.perfectday.games.earth8.inbox.PlayerActionQuery;
 import com.tarantula.platform.*;
-import com.tarantula.platform.inbox.ItemGrantEvent;
+import com.tarantula.platform.inbox.*;
 import com.tarantula.platform.presence.*;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,12 +36,16 @@ public class AdminRoleModule implements Module{
 
     private DeploymentServiceProvider deploymentServiceProvider;
     private TokenValidatorProvider tokenValidatorProvider;
-
     private UserService userService;
+    private AccessIndexService accessIndexService;
+
     private int maxGameClusterCount;
     private Configuration gameClusterConfiguration;
 
     private ConcurrentHashMap<String,Descriptor> pendingGameServices;
+
+    private TarantulaLogger logger = JDKLogger.getLogger(LMDBDataStoreProvider.class);
+
 
     @Override
     public boolean onRequest(Session session, byte[] payload) throws Exception {
@@ -181,26 +188,141 @@ public class AdminRoleModule implements Module{
             boolean suc = this.deploymentServiceProvider.shutdownGameCluster(gc);
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"operation successfully":"operation failed",suc)).getBytes());
         }
-        else if(session.action().equals("onCurrencyGrantEvent")){
+        else if(session.action().equals("onItemGrantEvent")){
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
 
             DataStore dataStore = gameCluster.applicationPreSetup().onDataStore("player_inventory_grant");
 
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             String playerID = (String)onAccess.property("playerID");
-            String amount = (String)onAccess.property("currencyAmount");
-            String currencyType = (String)onAccess.property("currencyType");
+            String amount = (String)onAccess.property("itemAmount");
+            String itemID = (String)onAccess.property("itemID");
+            String itemName = (String)onAccess.property("itemName");
 
-            ItemGrantEvent serverGrantEvent = new ItemGrantEvent("GrantCurrency-" + currencyType + "-" + amount,false);
+            PlatformServerEvent serverGrantEvent = new PlatformServerEvent("ItemGrant--" + itemID + "--" + amount,false);
             serverGrantEvent.ownerKey(SnowflakeKey.from(Long.parseLong(playerID)));
 
             if(dataStore.create(serverGrantEvent)){
-                session.write(JsonUtil.toSimpleResponse(true, amount + " " + currencyType + " Granted to Player " + playerID).getBytes());
+                session.write(JsonUtil.toSimpleResponse(true, amount + " " + itemName + " Granted to Player " + playerID).getBytes());
             }
             else{
                 session.write(JsonUtil.toSimpleResponse(false, "Failed To Create Grant Event For Player " + playerID).getBytes());
             }
 
+        }
+        else if(session.action().equals("onDeletePlayerData")){
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            String playerID = (String)onAccess.property("playerID");
+
+            Access user = userService.loadUser(Long.parseLong(playerID));
+
+            if(user.login() != null) {
+
+                AccessIndex acc = accessIndexService.get(user.login());
+                if (acc != null) {
+
+                    boolean accessIndexDelete = accessIndexService.delete(user.login());
+
+                    boolean userServiceDelete = userService.deleteUser(Long.parseLong(playerID));
+
+                    session.write(JsonUtil.toSimpleResponse(true, "Access Index Delete: " + accessIndexDelete + " | User Service Delete: " + userServiceDelete).getBytes());
+                    return true;
+                }
+
+            }
+
+            session.write(JsonUtil.toSimpleResponse(false, "No Data for Player " + playerID + " Deleted").getBytes());
+        }
+        else if(session.action().equals("onGetGlobalGrantEvents")) {
+            long gameclusterID = Long.parseLong(session.name());
+
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameclusterID);
+            DataStore dataStore = gameCluster.applicationPreSetup().dataStore(gameCluster, "global_item_grants");
+            List<GlobalItemGrantEvent> eventList = new ArrayList<>();
+
+            dataStore.list(new GlobalItemGrantEventQuery(gameclusterID)).forEach(globalGrantEvent -> {
+                if(!globalGrantEvent.completed){
+                    eventList.add(globalGrantEvent);
+                }
+            });
+
+            GlobalItemGrantList globalItemGrantList = new GlobalItemGrantList(eventList);
+
+            session.write(globalItemGrantList.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onDeleteGlobalGrantEvent")) {
+            long gameclusterID = Long.parseLong(session.name());
+
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            String dateCreatedString = (String)onAccess.property("dateCreated");
+
+            LocalDateTime dateCreated = LocalDateTime.parse(dateCreatedString);
+
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameclusterID);
+            DataStore dataStore = gameCluster.applicationPreSetup().dataStore(gameCluster, "global_item_grants");
+
+           dataStore.list(new GlobalItemGrantEventQuery(gameclusterID)).forEach(globalGrantEvent -> {
+                if(globalGrantEvent.dateCreated.equals(dateCreated)){
+                    globalGrantEvent.completed = true;
+                    dataStore.update(globalGrantEvent);
+
+                    session.write(JsonUtil.toSimpleResponse(true, "Global Grant Event Ended").getBytes());
+                }
+            });
+
+           session.write(JsonUtil.toSimpleResponse(true, "No Global Grant Event Found").getBytes());
+
+        }
+        else if(session.action().equals("onCreateGlobalEvent")) {
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+
+            String amount = (String)onAccess.property("itemAmount");
+            String itemID = (String)onAccess.property("itemID");
+            String itemName = (String)onAccess.property("itemName");
+
+            String minPlayerLevelFilterString =  (String)onAccess.property("minPlayerLevel");
+            String maxPlayerLevelFilterString = (String)onAccess.property("maxPlayerLevel");
+
+            String minInstallDateFilterString = (String)onAccess.property("minPlayerInstallDate");
+            String maxInstallDateFilterString = (String)onAccess.property("maxPlayerInstallDate");
+
+            String tournamentIDString = (String)onAccess.property("tournamentID");
+
+            long gameclusterID = Long.parseLong(session.name());
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameclusterID);
+            DataStore dataStore = gameCluster.applicationPreSetup().dataStore(gameCluster, "global_item_grants");
+
+            LocalDateTime dateCreated = LocalDateTime.now();
+
+            GlobalItemGrantEvent globalItemGrantEvent = new GlobalItemGrantEvent(itemName, itemID, Long.parseLong(amount), dateCreated);
+            globalItemGrantEvent.ownerKey(SnowflakeKey.from(gameclusterID));
+
+            if(!minPlayerLevelFilterString.isEmpty() && !maxPlayerLevelFilterString.isEmpty()){
+                int minPlayerLevelFilter = Integer.parseInt(minPlayerLevelFilterString);
+                int maxPlayerLevelFilter = Integer.parseInt(maxPlayerLevelFilterString);
+
+                globalItemGrantEvent.setPlayerLevelFilter(minPlayerLevelFilter, maxPlayerLevelFilter);
+            }
+
+            if(!minInstallDateFilterString.isEmpty() && !maxInstallDateFilterString.isEmpty()){
+                LocalDate minInstallDateFilter = LocalDate.parse(minInstallDateFilterString);
+                LocalDate maxInstallDateFilter = LocalDate.parse(maxInstallDateFilterString);
+
+                globalItemGrantEvent.setInstallDateFilter(minInstallDateFilter, maxInstallDateFilter);
+            }
+
+            if(!tournamentIDString.isEmpty()){
+                long tournamentID = Long.parseLong(tournamentIDString);
+
+                globalItemGrantEvent.setTournamentIdFilter(tournamentID);
+            }
+
+            if(dataStore.create(globalItemGrantEvent)){
+                session.write(JsonUtil.toSimpleResponse(true, "Global Grant Event Created").getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(true, "Error Creating Global Grant Event").getBytes());
+            }
         }
         else{
             session.write(this.builder.create().toJson(new ResponseHeader("onError", session.action()+" operation not supported", false)).getBytes());
@@ -217,6 +339,7 @@ public class AdminRoleModule implements Module{
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
         this.userService = this.context.serviceProvider(UserService.NAME);
+        this.accessIndexService = this.context.clusterProvider().accessIndexService();
         this.gameClusterConfiguration = this.context.configuration("cluster");
         this.maxGameClusterCount = ((Number)this.gameClusterConfiguration.property("maxGameClusterCount")).intValue();
         this.pendingGameServices = new ConcurrentHashMap<>();

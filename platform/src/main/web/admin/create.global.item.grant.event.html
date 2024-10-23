@@ -1,11 +1,42 @@
-<div class="w3-modal-content">
+<div class="w3-modal-content" id="tx-global-grant">
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
         <div class="w3-display-topright w3-padding">
-            <span id="tx-grant-item-close"><i class="fa fa-close" style="font-size:12px"></i></span>
+            <span id="tx-global-granter-close"><i class="fa fa-close" style="font-size:12px"></i></span>
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">Item Granter</span>
+            <span class="tx-margin-left-8 tx-text-24">Global Grant List</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
+    <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel w3-border-bottom w3-border-white">
+        <div class='w3-panel' id="tx-global-grant-event-list-list">
+        </div>
+        <div class="w3-panel">
+            <span id="tx-global-grant-button" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Create New Global Grant</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div>
+</div>
+
+<!-- Create Event Popup -->
+
+<div class="w3-modal-content" id="tx-global-grant-popup" style="display: none">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-global-grant-popup-close"><i class="fa fa-close" style="font-size:12px"></i></span>
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">Create Global Item Grant</span>
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
@@ -13,16 +44,12 @@
     <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-grant-item-message"></div>
     <div class="w3-panel w3-border-bottom w3-border-white">
         <div class="w3-panel">
-            <label class="tx-text-12">PlayerID</label>
-            <input id ="tx-player-id" class="w3-input w3-round w3-border" type="number" placeholder='playerID'/>
-        </div>
-        <div class="w3-panel">
             <label class="tx-text-12">Item Amount</label>
-            <input id ="tx-currency-amount" class="w3-input w3-round w3-border" type="number" placeholder='amount'/>
+            <input id ="tx-item-amount" class="w3-input w3-round w3-border" type="number" placeholder='amount'/>
         </div>
         <div class="w3-third w3-container">
             <label class="tx-text-12 tx-margin-right-4">Item Type</label>
-            <select id='tx-currency-type' class="w3-select w3-border w3-round tx-text-12" name='currencyType'>
+            <select id='tx-item-type' class="w3-select w3-border w3-round tx-text-12" name='itemType'>
                 <option value="83699f2672c114915a732b32714ff10e" selected>HardCurrency</option>
                 <option value="7e806f168e5d14678bdf200347b5ee9d">SoftCurrency</option>
                 <option value="fe9ecdbf2560d47cfbf6b8f9735635d0">GwenUnitReward</option>
@@ -328,8 +355,36 @@
                 <option value="70804bf7f53d14cf7aed8d0794df0013">RealLifeCoin_Clonk</option>
             </select>
         </div>
+
+        <div class="w3-row">
+            <div class="w3-quarter w3-container">
+                <label class="tx-text-12">Minimum Player Level:</label>
+                <input id ="tx-min-player-level" class="w3-input w3-round w3-border tx-text-16" type="number"/>
+            </div>
+            <div class="w3-quarter w3-container">
+                <label class="tx-text-12">Maximum Player Level:</label>
+                <input id ="tx-max-player-level" class="w3-input w3-round w3-border tx-text-16" type="number"/>
+            </div>
+        </div>
+
+        <div class="w3-row">
+            <div class="w3-quarter w3-container">
+                <label class="tx-text-12">Minimum Player Install Date:</label>
+                <input id ="tx-min-player-install-date" class="w3-input w3-round w3-border tx-text-16" type="date"/>
+            </div>
+            <div class="w3-quarter w3-container">
+                <label class="tx-text-12">Maximum Player Install Date:</label>
+                <input id ="tx-max-player-install-date" class="w3-input w3-round w3-border tx-text-16" type="date"/>
+            </div>
+        </div>
+
         <div class="w3-panel">
-            <span id="tx-grant-currency" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Grant Item</span>
+            <label class="tx-text-12">Tournament ID</label>
+            <input id ="tx-tournament-id" class="w3-input w3-round w3-border" type="number" placeholder='ID'/>
+        </div>
+
+        <div class="w3-panel">
+            <span id="tx-grant-item-global" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Grant Global Item</span>
         </div>
     </div>
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
@@ -342,32 +397,102 @@
     </div>
 </div>
 <script>
-    document.querySelector('#tx-grant-currency').onclick=()=>{
-        let _playerID = document.querySelector('#tx-player-id').value;
-        let _itemAmount = document.querySelector('#tx-currency-amount').value;
-        let _itemID = document.querySelector('#tx-currency-type').value;
+    let createGrantPopup = document.querySelector('#tx-global-grant-popup');
+    let globalGrant = document.querySelector('#tx-global-grant');
+    let listBar = document.querySelector('#tx-global-grant-event-list-list');
 
-        let sel = document.querySelector('#tx-currency-type');
+    populateGrantEvents();
+
+    document.querySelector('#tx-grant-item-global').onclick=()=> {
+        let _itemAmount = document.querySelector('#tx-item-amount').value;
+        let _itemID = document.querySelector('#tx-item-type').value;
+
+        let sel = document.querySelector('#tx-item-type');
         let _itemName = sel.options[sel.selectedIndex].text;
 
-        if(_playerID==''){
-            document.querySelector('#tx-grant-item-message').innerHTML = "PlayerID Field Cannot Be Empty";
-            return;
-        }
+        let _minPlayerLevel = document.querySelector('#tx-min-player-level').value;
+        let _maxPlayerLevel = document.querySelector('#tx-max-player-level').value;
 
-        if(_itemAmount==''){
-            document.querySelector('#tx-grant-item-message').innerHTML = "Item Amount Field Cannot Be Empty";
-            return;
-        }
+        let _minPlayerInstallDate = document.querySelector('#tx-min-player-install-date').value;
+        let _maxPlayerInstallDate = document.querySelector('#tx-max-player-install-date').value;
 
-        let payload ={playerID:_playerID,itemAmount:_itemAmount,itemID:_itemID,itemName:_itemName};
+        let _tournamentID = document.querySelector('#tx-tournament-id').value;
 
-        TARA_API.onSet('role/admin','onItemGrantEvent',TARA_API.query().gameClusterId,payload,(resp)=>{
+        let payload ={itemAmount:_itemAmount,itemID:_itemID,itemName:_itemName,minPlayerLevel:_minPlayerLevel,
+            maxPlayerLevel:_maxPlayerLevel, minPlayerInstallDate:_minPlayerInstallDate,maxPlayerInstallDate:_maxPlayerInstallDate,tournamentID:_tournamentID};
+
+        TARA_API.onSet('role/admin','onCreateGlobalEvent',TARA_API.query().gameClusterId,payload,(resp)=>{
             document.querySelector('#tx-grant-item-message').innerHTML = resp.message;
         });
+
+        sleep(100).then(() => {populateGrantEvents();})
     };
 
-    document.querySelector('#tx-grant-item-close').onclick=()=>{
+    function sleep(ms){
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function populateGrantEvents(){
+        TARA_API.onGet('role/admin','onGetGlobalGrantEvents',TARA_API.query().gameClusterId,(resp)=>{
+
+            listBar.innerHTML ='';
+            resp.globalGrantEvent.forEach((grantEvent)=>{
+                let tem = [];
+                tem.push('<div class=\'w3-panel w3-padding w3-block w3-green tx-platform-cluster-node\'>');
+                tem.push('<div class=\'w3-padding\'>');
+                tem.push('<span class=\'w3-left tx-text-16 tx-margin-top-12 tx-margin-left-8\'>');
+                tem.push("Item Name: " + grantEvent.ItemName + " | Amount: "+ grantEvent.Amount + " | Date Created: " + grantEvent.DateCreated);
+                tem.push('</span></div><br><div class=\'w3-padding\'><span class=\'w3-left tx-text-16 tx-margin-top-12 tx-margin-left-8\'>');
+                tem.push("Filters: ");
+                if(grantEvent.TournamentIdFilter != 0){
+                    tem.push("Tournament ID: " + grantEvent.TournamentIdFilter + " | ");
+                }
+                if(grantEvent.MinPlayerLevelFilter != -2147483648){
+                    tem.push("Minimum Player Level: " + grantEvent.MinPlayerLevelFilter + " | ");
+                }
+                if(grantEvent.MaxPlayerLevelFilter != 2147483647){
+                    tem.push("Maximum Player Level: " + grantEvent.MaxPlayerLevelFilter + " | ");
+                }
+                if(grantEvent.MinInstallDateFilter != "1000-01-01"){
+                    tem.push("Installed After: " + grantEvent.MinInstallDateFilter + " | ");
+                }
+                if(grantEvent.MaxInstallDateFilter != "5000-01-01"){
+                    tem.push("Installed Before: " + grantEvent.MaxInstallDateFilter + " | ");
+                }
+
+                if(grantEvent.TournamentIdFilter == 0 && grantEvent.MinPlayerLevelFilter == -2147483648 && grantEvent.MaxPlayerLevelFilter == 2147483647 && grantEvent.MinInstallDateFilter == "1000-01-01" && grantEvent.MaxInstallDateFilter == "5000-01-01") {
+                    tem.push("None");
+                }
+
+                tem.push('</span></div><span tx-grant-event-date=\''+grantEvent.DateCreated+'\'');
+                tem.push(' class=\'w3-right w3-tag w3-red w3-round w3-border w3-border-black tx-text-16 tx-padding-button tx-margin-top-8 tx-margin-bottom-8 tx-global-grant-delete\'>End</span>');
+                tem.push('</div>');
+                listBar.innerHTML += tem.join('');
+            });
+            document.querySelectorAll('.tx-global-grant-delete').forEach(a=>{
+                a.onclick=()=>{
+                    let _dateCreated = a.getAttribute('tx-grant-event-date');
+                    let payload ={dateCreated:_dateCreated};
+
+                    TARA_API.onSet('role/admin','onDeleteGlobalGrantEvent',TARA_API.query().gameClusterId,payload,(resp)=>{
+                        sleep(100).then(() => {populateGrantEvents();})
+                    });
+                };
+            });
+        });
+    }
+
+
+    document.querySelector('#tx-global-grant-button').onclick=()=> {
+    createGrantPopup.style.display = 'block';
+    };
+
+    document.querySelector('#tx-global-granter-close').onclick=()=>{
         tx_close_current_page();
     };
+
+    document.querySelector('#tx-global-grant-popup-close').onclick =()=>{
+        createGrantPopup.style.display = 'none';
+    }
+
 </script>

@@ -3,6 +3,8 @@ package com.tarantula.platform.tournament;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.service.ServiceProvider;
 
+import java.util.List;
+
 public interface DistributionTournamentService extends ServiceProvider {
 
     String NAME = "DistributionTournamentService";
@@ -28,5 +30,7 @@ public interface DistributionTournamentService extends ServiceProvider {
 
     //management
     void onEndTournament(String serviceName,long tournamentId);
+
+    List<TournamentOnNode> onScan(String serviceName);
 
 }
