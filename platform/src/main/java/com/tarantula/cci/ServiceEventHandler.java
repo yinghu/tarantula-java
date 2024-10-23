@@ -61,8 +61,13 @@ public class ServiceEventHandler extends AbstractRequestHandler {
             OnSession id = auth.validateToken(token);
             if(!id.successful()) throw new IllegalAccessException(id.message());
             String[] parts = name.split("#");
-            boolean saved = serviceContext.deploymentServiceProvider().saveContent(tag.split("/")[0],new SimpleStub(id.distributionId()), ContentMapping.forSave(_payload,parts[0],Integer.parseInt(parts[1])));
-            super.onEvent(ResponsiveEvent.create(exchange.id(),JsonUtil.toSimpleResponse(saved,name).getBytes()));
+            if(!checksum(_payload,parts[2])){
+                log.warn("Checksum not matched from player ["+id.distributionId()+"]");
+                super.onEvent(ResponsiveEvent.create(exchange.id(),JsonUtil.toSimpleResponse(false,name).getBytes()));
+            }else {
+                boolean saved = serviceContext.deploymentServiceProvider().saveContent(tag.split("/")[0], new SimpleStub(id.distributionId()), ContentMapping.forSave(_payload, parts[0], Integer.parseInt(parts[1])));
+                super.onEvent(ResponsiveEvent.create(exchange.id(), JsonUtil.toSimpleResponse(saved, name).getBytes()));
+            }
         }
         else if(path.startsWith("/service/load")){
             OnSession id = auth.validateToken(token);
@@ -96,5 +101,15 @@ public class ServiceEventHandler extends AbstractRequestHandler {
 
     public String metricsCategory(){
         return METRICS_CATEGORY;
+    }
+
+    private boolean checksum(byte[] payload,String checksum){
+        String update = tokenValidator.checksum(payload);
+        boolean valid = update.equals(checksum);
+        if(valid) return true;
+        log.warn("Server Checksum : "+update);
+        log.warn("Client Checksum : "+checksum);
+        return false;
+
     }
 }
