@@ -74,8 +74,8 @@ public class TournamentSchedule extends Application {
         return header.get("EndLevel").getAsLong();
     }
 
-    public String realLifeCoinType(){
-        return header.get("RealLifeCoinType").getAsString();
+    public String typeId(){
+        return header.get("TypeId").getAsString();
     }
 
     @Override

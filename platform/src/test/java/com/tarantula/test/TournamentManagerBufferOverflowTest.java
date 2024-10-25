@@ -38,7 +38,7 @@ public class TournamentManagerBufferOverflowTest extends DataStoreHook{
                 "    \"SegmentsPerSchedule\": \"3\",\n" +
                 "    \"StartLevel\": \"6\",\n" +
                 "    \"EndLevel\": \"20\",\n" +
-                "    \"RealLifeCoinType\": \"Hero\"\n" +
+                "    \"TypeId\": \"Hero\"\n" +
                 "  }");
         scheduleProxy.writeUTF8("{}");
         scheduleProxy.writeUTF8("[]");
@@ -49,10 +49,10 @@ public class TournamentManagerBufferOverflowTest extends DataStoreHook{
         configurableObject.read(scheduleProxy);
         TournamentSchedule tournamentSchedule = new TournamentSchedule(configurableObject);
 
-        Assert.assertEquals(tournamentSchedule.realLifeCoinType(), "Hero");
+        Assert.assertEquals(tournamentSchedule.typeId(), "Hero");
 
         TournamentManager tournamentManager = new TournamentManager(tournamentSchedule);
-        tournamentManager.realLifeCoinType("hero");
+        tournamentManager.typeId("hero");
 
         ByteBuffer buffer = ByteBuffer.allocateDirect(700);
         Recoverable.DataBuffer proxy = BufferProxy.buffer(buffer);
@@ -64,6 +64,6 @@ public class TournamentManagerBufferOverflowTest extends DataStoreHook{
         TournamentManager tournamentManager2 = new TournamentManager();
         Assert.assertTrue(tournamentManager2.read(proxy));
 
-        Assert.assertEquals(tournamentManager2.realLifeCoinType(), "hero");
+        Assert.assertEquals(tournamentManager2.typeId(), "hero");
     }
 }
