@@ -105,18 +105,24 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
     }
 
     public boolean saveContent(String typeId,Session session,Content content){
-        String dir = tarantulaContext.deployDir+"/web/"+typeId+"/"+session.distributionKey();
-        FileUtil.createDirectory(dir);
-        String save = "/"+content.fileName()+"."+content.revisionNumber()+"."+content.type();
-        try(BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(dir+save))){
-            bufferedOutputStream.write(content.data());
-            bufferedOutputStream.flush();
-            return true;
-        }
-        catch (Exception ex){
-            log.error("Error on save content :"+session.distributionKey(),ex);
-            return false;
-        }
+        String dir = "web/"+typeId+"/"+session.distributionKey();
+        String save = "#"+content.fileName()+"."+content.revisionNumber()+"."+content.type();
+        integrationCluster.deployService().onUpload(dir+save,content.data());
+        return true;
+
+        //String dir = tarantulaContext.deployDir+"/web/"+typeId+"/"+session.distributionKey();
+        //FileUtil.createDirectory(dir);
+        //String save = "/"+content.fileName()+"."+content.revisionNumber()+"."+content.type();
+
+        //try(BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(dir+save))){
+            //bufferedOutputStream.write(content.data());
+            //bufferedOutputStream.flush();
+            //return true;
+        //}
+        //catch (Exception ex){
+            //log.error("Error on save content :"+session.distributionKey(),ex);
+            //return false;
+        //}
     }
 
     public Content loadContent(String typeId,Session session,Content content){

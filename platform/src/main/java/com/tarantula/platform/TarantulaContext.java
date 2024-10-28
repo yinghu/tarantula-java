@@ -752,8 +752,15 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
 
     //file name web/[game cluster name]/file.png etc
-    public void _writeContent(String fileName,byte[] content){
+    public void _writeContent(String path,byte[] content){
         try{
+            String fileName = path;
+            if(path.contains("#")){
+                String[] parts = path.split("#");
+                FileUtil.createDirectory(parts[0]);
+                fileName = parts[0]+"/"+parts[1];
+            }
+            //FileUtil.createDirectory();
             //write to local deploy dir to be ready for deployment
             BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(this.deployDir+"/"+fileName));
             fos.write(content);
