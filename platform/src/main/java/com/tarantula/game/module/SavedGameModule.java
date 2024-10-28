@@ -44,6 +44,10 @@ public class SavedGameModule extends ModuleHeader {
             session.write(JsonUtil.toSimpleResponse(savedGameServiceProvider.saveRevisionInfo(session,saveRevisionInfo),session.action()).getBytes());
         }
 
+        else if(session.action().equals("onSet")){
+            session.write(JsonUtil.toSimpleResponse(true,"data saved ["+session.name()+"]").getBytes());
+            this.savedGameServiceProvider.saveData(session,session.name(),bytes);
+        }
         else if(session.action().equals("onGet")){
             byte[] data = this.savedGameServiceProvider.loadData(session,session.name());
             session.write(JsonUtil.toSimpleResponse(
@@ -51,16 +55,7 @@ public class SavedGameModule extends ModuleHeader {
                     data == null ? session.name() : new String(data)//need to use byte array directly down to wire
             ).getBytes());
         }
-        else if(session.action().equals("onReset")){
-            CurrentSaveIndex selected = this.savedGameServiceProvider.reset(session);
-            if(selected.index()!=null){
-                SavedGame savedGame = presenceServiceProvider.resetSavedGame(selected);
-                session.write(savedGame.toJson().toString().getBytes());
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(true,"system saved game reset").getBytes());
-            }
-        }
+
 
         else if(session.action().equals("onReset")){
             CurrentSaveIndex selected = this.savedGameServiceProvider.reset(session);

@@ -106,7 +106,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
 
     public boolean saveContent(String typeId,Session session,Content content){
         String dir = "web/"+typeId+"/"+session.distributionKey();
-        String save = "#"+content.fileName()+"."+content.revisionNumber()+"."+content.type();
+        String save = "#"+content.fileName()+"#"+content.revisionNumber()+"#"+content.type();
         integrationCluster.deployService().onUpload(dir+save,content.data());
         return true;
 

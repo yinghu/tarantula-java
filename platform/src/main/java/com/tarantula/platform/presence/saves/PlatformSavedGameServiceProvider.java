@@ -237,6 +237,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         dataStore.createIfAbsent(saveRevisionInfo,true);
         return saveRevisionInfo;
     }
+
     public boolean saveRevisionInfo(Session session,SaveRevisionInfo pending){
         SaveRevisionInfo saveRevisionInfo = new SaveRevisionInfo();
         saveRevisionInfo.distributionId(session.distributionId());
@@ -247,38 +248,6 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         saveRevisionInfo.deviceId = pending.deviceId;
         return dataStore.update(saveRevisionInfo);
     }
-
-    public boolean saveDataOnRevision(Session session,byte[] save){
-        String[] parts = session.name().split("#");
-        if(!validate(parts[2],save)) return false;
-        SaveRevisionInfo saveRevisionInfo = new SaveRevisionInfo();
-        saveRevisionInfo.distributionId(session.distributionId());
-        saveRevisionInfo.name(parts[0]);
-        dataStore.createIfAbsent(saveRevisionInfo,true);
-        if(Integer.parseInt(parts[1]) != saveRevisionInfo.clientRevisionNumber+1){
-            logger.warn("Save revision number not matched");
-            return false;
-        }
-        saveRevisionInfo.clientRevisionNumber++;
-        dataStore.update(saveRevisionInfo);
-        Content content = ContentMapping.forSave(save,saveRevisionInfo.name(),saveRevisionInfo.clientRevisionNumber);
-        this.serviceContext.deploymentServiceProvider().saveContent(gameCluster.typeId(),session,content);
-        return true;
-    }
-
-    public Content loadDataOnRevision(Session session){
-        SaveRevisionInfo saveRevisionInfo = new SaveRevisionInfo();
-        saveRevisionInfo.distributionId(session.distributionId());
-        saveRevisionInfo.name(session.name());
-        dataStore.createIfAbsent(saveRevisionInfo,true);
-        return serviceContext.deploymentServiceProvider().loadContent(gameCluster.typeId(),session,ContentMapping.forLoad(saveRevisionInfo.name(),saveRevisionInfo.clientRevisionNumber));
-    }
-
-    private boolean validate(String checkSum,byte[] data){
-        //hash check
-        return true;
-    }
-
 
 
 }

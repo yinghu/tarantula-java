@@ -1,5 +1,6 @@
 package com.icodesoftware.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -38,6 +39,16 @@ public class FileUtil {
             Files.createDirectories(directory);
         }catch (Exception ex){
             throw new RuntimeException("cannot create directory",ex);
+        }
+    }
+
+    public static boolean deleteFileIfExist(String fileName){
+        File file = new File(fileName);
+        if(!Files.exists(file.toPath())) return false;
+        try{
+            return Files.deleteIfExists(file.toPath());
+        }catch (Exception ex){
+            return false;
         }
     }
 }
