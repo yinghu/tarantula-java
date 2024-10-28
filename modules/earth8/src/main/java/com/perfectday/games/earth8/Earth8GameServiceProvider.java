@@ -32,10 +32,10 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     private ConcurrentHashMap<Long,Tournament> tournamentIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,ApplicationResource> resourceIndex = new ConcurrentHashMap<>();
 
+
     ConcurrentHashMap<Long, ScoreRunner> scoreRunners = new ConcurrentHashMap<>();
 
     private TarantulaLogger logger = JDKLogger.getLogger(Earth8GameServiceProvider.class);
-
 
     public void setup(GameContext gameContext){
         this.gameContext = gameContext;
