@@ -43,6 +43,7 @@ public interface Tournament extends Configurable {
     long scheduleId();
 
     Instance register(Session session);
+    void ban(Session session);
 
     interface Entry extends Configurable {
         long systemId();

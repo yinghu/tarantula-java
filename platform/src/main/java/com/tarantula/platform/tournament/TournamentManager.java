@@ -704,4 +704,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         if(instance==null) return new TournamentRaceBoard();
         return instance.myRaceBoard(entryId,systemId,7);
     }
+
+    public void ban(Session session){
+        //TO DO ban
+    }
 }

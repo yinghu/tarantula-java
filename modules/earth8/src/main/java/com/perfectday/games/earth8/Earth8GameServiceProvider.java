@@ -189,7 +189,6 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                 ));
             }
         } else if (event.command().equals("BanPlayer")) {
-            logger.warn("EARTH8 BAN");
             long systemID = Long.parseLong(event.systemId());
             bannedPlayerList.putIfAbsent(systemID, true);
 
