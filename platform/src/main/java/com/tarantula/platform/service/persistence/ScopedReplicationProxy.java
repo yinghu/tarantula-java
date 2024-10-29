@@ -6,6 +6,7 @@ import com.hazelcast.nio.serialization.Portable;
 import com.icodesoftware.*;
 
 import com.icodesoftware.lmdb.TransactionLog;
+import com.icodesoftware.lmdb.TransactionLogListener;
 import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.event.TransactionReplicationEvent;
@@ -14,7 +15,7 @@ import com.tarantula.platform.service.cluster.DistributionReplicator;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
+public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider, TransactionLogListener {
 
     private final static String CONFIG = "replication-service-settings";
 
@@ -117,4 +118,31 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider{
         return transactionLogManager;
     }
 
+    @Override
+    public void onTransactionLog(TransactionLog transactionLog) {
+        //super.onHomingAgent(transactionLog);
+        if(!transactionLog.deleting) return;
+        logger.warn("Deleting from : "+transactionLog.source+" : "+transactionLog.edgeLabel+" : "+transactionLog.updatingRevision);
+        DataStore dataStore = serviceContext.dataStore(scope,transactionLog.source);
+        if(transactionLog.edgeLabel==null){
+            dataStore.backup().unset((k,v)->{
+                for(byte b : transactionLog.key){
+                    k.writeByte(b);
+                }
+                return true;
+            });
+            return;
+        }
+        dataStore.backup().unsetEdge(transactionLog.edgeLabel,(k,v)->{
+            for (byte b : transactionLog.key) {
+                k.writeByte(b);
+            }
+            if (transactionLog.edgeKey == null) return true;
+            for (byte b : transactionLog.edgeKey) {
+                v.writeByte(b);
+            }
+            return true;
+        },transactionLog.edgeLabel==null);
+
+    }
 }
