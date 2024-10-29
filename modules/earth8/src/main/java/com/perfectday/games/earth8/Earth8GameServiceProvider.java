@@ -2,7 +2,6 @@ package com.perfectday.games.earth8;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
-import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.TokenValidatorProvider;
@@ -32,9 +31,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     private ConcurrentHashMap<Long,Tournament> tournamentIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,ApplicationResource> resourceIndex = new ConcurrentHashMap<>();
 
+
     ConcurrentHashMap<Long, ScoreRunner> scoreRunners = new ConcurrentHashMap<>();
 
-    private TarantulaLogger logger = JDKLogger.getLogger(Earth8GameServiceProvider.class);
 
     public void setup(GameContext gameContext){
         this.gameContext = gameContext;

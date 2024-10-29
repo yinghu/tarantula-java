@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -647,6 +648,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         onSession.ticket(ticket(onSession.distributionId(),onSession.stub(),timeoutInSeconds));
         onSession.successful(true);
         return onSession;
+    }
+
+    public String checksum(byte[] payload){
+        MessageDigest messageDigest = messageDigest();
+        messageDigest.update(payload);
+        return HexFormat.of().formatHex(messageDigest.digest()).toUpperCase();
     }
 
 }
