@@ -22,7 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Earth8GameServiceProvider implements GameServiceProvider {
-
     GameContext gameContext;
     private final static String ANALYTICS_QUERY_HEADER = "#Analytics";
     private final static long EVENT_DISPATCH_DELAY = 100; //100ms
@@ -189,16 +188,33 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                 ));
             }
         } else if (event.command().equals("BanPlayer")) {
+            //Get player ID
             long systemID = Long.parseLong(event.systemId());
+
+            //Add ban to cache
             tournamentBannedPlayersList.putIfAbsent(systemID, true);
 
+            //Add ban to persistent data
+            DataStore tournamentBlacklist = gameContext.applicationSchema().applicationPreSetup().onDataStore("tournament_blacklist");
+            BannedPlayer bannedPlayer = new BannedPlayer(systemID);
+            bannedPlayer.ownerKey(SnowflakeKey.from(gameContext.applicationSchema().distributionId()));
+            tournamentBlacklist.create(bannedPlayer);
+
+            //Remove from active tournament
             var playerDataTrack = PlayerDataTrack.lookup(gameContext,systemID,PlayerDataTrack.Type.Tournament);
             Tournament existing = tournamentIndex.get(playerDataTrack.trackId);
-
             if(existing!=null) {
                 existing.ban(systemID);
             }
         }
+    }
+
+    private void reloadTournamentBannedPlayerListCache(){
+        DataStore dataStore = gameContext.applicationSchema().applicationPreSetup().onDataStore("tournament_blacklist");
+
+        dataStore.list(new BannedPlayerQuery(gameContext.applicationSchema().distributionId())).forEach(bannedPlayer -> {
+            tournamentBannedPlayersList.putIfAbsent(bannedPlayer.systemId, true);
+        });
     }
 
     public void onInventory(ApplicationPreSetup applicationPreSetup,Inventory inventory, Inventory.Stock stock){
@@ -272,7 +288,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             }
             tournamentIndex.put(start,tournament);
         }
-        tournamentBannedPlayersList = new ConcurrentHashMap<>();
+
+        reloadTournamentBannedPlayerListCache();
 
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
