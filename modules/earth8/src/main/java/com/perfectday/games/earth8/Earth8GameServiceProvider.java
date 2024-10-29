@@ -29,7 +29,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     private String ANALYTICS_QUERY;
 
     private ConcurrentHashMap<Long,Tournament> tournamentIndex = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<Long,Boolean> bannedPlayerList = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Long,Boolean> tournamentBannedPlayersList = new ConcurrentHashMap<>();
 
     private ConcurrentHashMap<String,ApplicationResource> resourceIndex = new ConcurrentHashMap<>();
 
@@ -117,7 +117,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             return;
         }
 
-        if(!bannedPlayerList.containsKey(session.distributionId())) {
+        if(!tournamentBannedPlayersList.containsKey(session.distributionId())) {
             BattleUpdate update = BattleUpdate.fromJson(payload);
             PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext, session.distributionId(), PlayerDataTrack.Type.Analytics);
             if (update.score > 0 && update.playerLevel > 0) {
@@ -190,7 +190,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             }
         } else if (event.command().equals("BanPlayer")) {
             long systemID = Long.parseLong(event.systemId());
-            bannedPlayerList.putIfAbsent(systemID, true);
+            tournamentBannedPlayersList.putIfAbsent(systemID, true);
 
             var playerDataTrack = PlayerDataTrack.lookup(gameContext,systemID,PlayerDataTrack.Type.Tournament);
             Tournament existing = tournamentIndex.get(playerDataTrack.trackId);
@@ -272,6 +272,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             }
             tournamentIndex.put(start,tournament);
         }
+        tournamentBannedPlayersList = new ConcurrentHashMap<>();
+
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
                 webhook.upload(ANALYTICS_QUERY, new RLCTournamentStartTransaction(tournament.distributionId(), tournament.name()).toBytes())
@@ -285,6 +287,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
             tournamentIndex.remove(start);
         }
+        tournamentBannedPlayersList.clear();
+
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
                 webhook.upload(ANALYTICS_QUERY, new RLCTournamentEndTransaction(tournament.distributionId()).toBytes())
@@ -310,6 +314,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
             tournamentIndex.remove(start);
         }
+        tournamentBannedPlayersList.clear();
+
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
                 webhook.upload(ANALYTICS_QUERY, new RLCTournamentEndTransaction(tournament.distributionId()).toBytes())
