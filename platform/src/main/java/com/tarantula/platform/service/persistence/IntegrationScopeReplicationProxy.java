@@ -69,5 +69,6 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy {
     public void setup(ServiceContext serviceContext) {
         logger = JDKLogger.getLogger(IntegrationScopeReplicationProxy.class);
         super.setup(serviceContext);
+        super.transactionLogManager.registerTransactionListener(this);
     }
 }
