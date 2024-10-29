@@ -30,6 +30,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     private String ANALYTICS_QUERY;
 
     private ConcurrentHashMap<Long,Tournament> tournamentIndex = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Long,Boolean> bannedPlayerList = new ConcurrentHashMap<>();
+
     private ConcurrentHashMap<String,ApplicationResource> resourceIndex = new ConcurrentHashMap<>();
 
     ConcurrentHashMap<Long, ScoreRunner> scoreRunners = new ConcurrentHashMap<>();
@@ -115,19 +117,22 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
             return;
         }
-        BattleUpdate update = BattleUpdate.fromJson(payload);
-        PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext,session.distributionId(), PlayerDataTrack.Type.Analytics);
-        if (update.score > 0 && update.playerLevel > 0) {
-            scoreRunner(session).add(new PendingScore(session,serverSession,update));
+
+        if(!bannedPlayerList.containsKey(session.distributionId())) {
+            BattleUpdate update = BattleUpdate.fromJson(payload);
+            PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext, session.distributionId(), PlayerDataTrack.Type.Analytics);
+            if (update.score > 0 && update.playerLevel > 0) {
+                scoreRunner(session).add(new PendingScore(session, serverSession, update));
+            }
+
+            if (update.update(gameContext.applicationSchema().applicationPreSetup(), session, serverSession.trackId, gameContext.applicationSchema().applicationPreSetup().distributionId())) {
+                TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+                gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY, () ->
+                        update.publishAnalytics(webhook, ANALYTICS_QUERY))
+                );
+            }
         }
 
-        if(update.update(gameContext.applicationSchema().applicationPreSetup(), session,serverSession.trackId,gameContext.applicationSchema().applicationPreSetup().distributionId()))
-        {
-            TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
-            gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
-                    update.publishAnalytics(webhook,ANALYTICS_QUERY))
-            );
-        }
         session.write(JsonUtil.toSimpleResponse(true,"battle updated").getBytes());
     }
 
@@ -184,6 +189,12 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                         webhook.upload(ANALYTICS_QUERY, new ServerMetadataTransaction(event).toBytes())
                 ));
             }
+        } else if (event.command().equals("BanPlayer")) {
+            logger.warn("EARTH8 BAN");
+            long systemID = Long.parseLong(event.systemId());
+            bannedPlayerList.putIfAbsent(systemID, true);
+
+
         }
 
     }
