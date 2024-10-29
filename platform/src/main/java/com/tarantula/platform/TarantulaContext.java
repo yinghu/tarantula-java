@@ -146,6 +146,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
 
     public int maxReplicationNumber = 3;
 
+    public int maxPlayerSavePerCategory = 3;
     public static ScopedMemberDiscovery memberDiscovery;
     public static int operationTimeout = 5;
     public static boolean lobbySubscriptionEnabled = false;
@@ -752,8 +753,23 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     }
 
     //file name web/[game cluster name]/file.png etc
-    public void _writeContent(String fileName,byte[] content){
+    public void _writeContent(String path,byte[] content){
         try{
+            String fileName = path;
+            if(path.contains("#")){
+                String[] parts = path.split("#");
+                FileUtil.createDirectory(parts[0]);
+                fileName = parts[0]+"/"+parts[1]+"."+parts[2]+"."+parts[3];
+                    schedule(new ScheduleRunner(100,()->{
+                        int startDelete = Integer.parseInt(parts[2])-maxPlayerSavePerCategory;
+                        for(int i=startDelete;i>0;i--){
+                            if(!FileUtil.deleteFileIfExist(this.deployDir+"/"+parts[0]+"/"+parts[1]+"."+i+"."+parts[3])){
+                                break;
+                            }
+                        }
+                    }));
+            }
+
             //write to local deploy dir to be ready for deployment
             BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(this.deployDir+"/"+fileName));
             fos.write(content);

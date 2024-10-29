@@ -111,6 +111,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy {
     public void setup(ServiceContext serviceContext) {
         logger = JDKLogger.getLogger(DataScopeReplicationProxy.class);
         super.setup(serviceContext);
+        super.transactionLogManager.registerTransactionListener(this);
     }
 }
 

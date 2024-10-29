@@ -10,6 +10,10 @@ public class SimpleStub extends PlayerGameObject{
     public SimpleStub(){
 
     }
+
+    public SimpleStub(long distributionId){
+        this.distributionId = distributionId;
+    }
     @Override
     public String systemId(){
         return systemId;
