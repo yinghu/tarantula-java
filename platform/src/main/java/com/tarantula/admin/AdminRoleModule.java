@@ -341,7 +341,6 @@ public class AdminRoleModule implements Module{
                 gameServerListener.onGameClusterEvent(name, new byte[0]);
             }
 
-
             session.write(JsonUtil.toSimpleResponse(true, "Player " + playerID + " is now banned").getBytes());
         }
         else{

@@ -705,7 +705,15 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return instance.myRaceBoard(entryId,systemId,7);
     }
 
-    public void ban(Session session){
-        //TO DO ban
+    public void ban(long systemId){
+        TournamentJoin join = TournamentJoin.lookup(tournamentServiceProvider.tournamentJoin,systemId,distributionId);
+
+        TournamentSegment segment = lookupSegmentInstance(join.instanceId);
+        if (segment==null) return;
+
+        TournamentEntry bannedPlayer = new TournamentEntry();
+        bannedPlayer.distributionId(join.entryId);
+
+        segment.tournamentInstance.entryDataStore.delete(bannedPlayer);
     }
 }

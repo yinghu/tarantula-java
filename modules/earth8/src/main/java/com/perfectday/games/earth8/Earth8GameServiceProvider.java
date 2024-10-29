@@ -192,9 +192,13 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             long systemID = Long.parseLong(event.systemId());
             bannedPlayerList.putIfAbsent(systemID, true);
 
+            var playerDataTrack = PlayerDataTrack.lookup(gameContext,systemID,PlayerDataTrack.Type.Tournament);
+            Tournament existing = tournamentIndex.get(playerDataTrack.trackId);
 
+            if(existing!=null) {
+                existing.ban(systemID);
+            }
         }
-
     }
 
     public void onInventory(ApplicationPreSetup applicationPreSetup,Inventory inventory, Inventory.Stock stock){
