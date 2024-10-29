@@ -22,13 +22,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Earth8GameServiceProvider implements GameServiceProvider {
-
     GameContext gameContext;
     private final static String ANALYTICS_QUERY_HEADER = "#Analytics";
     private final static long EVENT_DISPATCH_DELAY = 100; //100ms
     private String ANALYTICS_QUERY;
 
     private ConcurrentHashMap<Long,Tournament> tournamentIndex = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Long,Boolean> tournamentBannedPlayersList = new ConcurrentHashMap<>();
+
     private ConcurrentHashMap<String,ApplicationResource> resourceIndex = new ConcurrentHashMap<>();
 
 
@@ -114,19 +115,22 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
             return;
         }
-        BattleUpdate update = BattleUpdate.fromJson(payload);
-        PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext,session.distributionId(), PlayerDataTrack.Type.Analytics);
-        if (update.score > 0 && update.playerLevel > 0) {
-            scoreRunner(session).add(new PendingScore(session,serverSession,update));
+
+        if(!tournamentBannedPlayersList.containsKey(session.distributionId())) {
+            BattleUpdate update = BattleUpdate.fromJson(payload);
+            PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext, session.distributionId(), PlayerDataTrack.Type.Analytics);
+            if (update.score > 0 && update.playerLevel > 0) {
+                scoreRunner(session).add(new PendingScore(session, serverSession, update));
+            }
+
+            if (update.update(gameContext.applicationSchema().applicationPreSetup(), session, serverSession.trackId, gameContext.applicationSchema().applicationPreSetup().distributionId())) {
+                TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+                gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY, () ->
+                        update.publishAnalytics(webhook, ANALYTICS_QUERY))
+                );
+            }
         }
 
-        if(update.update(gameContext.applicationSchema().applicationPreSetup(), session,serverSession.trackId,gameContext.applicationSchema().applicationPreSetup().distributionId()))
-        {
-            TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
-            gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
-                    update.publishAnalytics(webhook,ANALYTICS_QUERY))
-            );
-        }
         session.write(JsonUtil.toSimpleResponse(true,"battle updated").getBytes());
     }
 
@@ -183,8 +187,34 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                         webhook.upload(ANALYTICS_QUERY, new ServerMetadataTransaction(event).toBytes())
                 ));
             }
-        }
+        } else if (event.command().equals("BanPlayer")) {
+            //Get player ID
+            long systemID = Long.parseLong(event.systemId());
 
+            //Add ban to cache
+            tournamentBannedPlayersList.putIfAbsent(systemID, true);
+
+            //Add ban to persistent data
+            DataStore tournamentBlacklist = gameContext.applicationSchema().applicationPreSetup().onDataStore("tournament_blacklist");
+            BannedPlayer bannedPlayer = new BannedPlayer(systemID);
+            bannedPlayer.ownerKey(SnowflakeKey.from(gameContext.applicationSchema().distributionId()));
+            tournamentBlacklist.create(bannedPlayer);
+
+            //Remove from active tournament
+            var playerDataTrack = PlayerDataTrack.lookup(gameContext,systemID,PlayerDataTrack.Type.Tournament);
+            Tournament existing = tournamentIndex.get(playerDataTrack.trackId);
+            if(existing!=null) {
+                existing.ban(systemID);
+            }
+        }
+    }
+
+    private void reloadTournamentBannedPlayerListCache(){
+        DataStore dataStore = gameContext.applicationSchema().applicationPreSetup().onDataStore("tournament_blacklist");
+
+        dataStore.list(new BannedPlayerQuery(gameContext.applicationSchema().distributionId())).forEach(bannedPlayer -> {
+            tournamentBannedPlayersList.putIfAbsent(bannedPlayer.systemId, true);
+        });
     }
 
     public void onInventory(ApplicationPreSetup applicationPreSetup,Inventory inventory, Inventory.Stock stock){
@@ -258,6 +288,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             }
             tournamentIndex.put(start,tournament);
         }
+
+        reloadTournamentBannedPlayerListCache();
+
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
                 webhook.upload(ANALYTICS_QUERY, new RLCTournamentStartTransaction(tournament.distributionId(), tournament.name()).toBytes())
@@ -271,6 +304,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
             tournamentIndex.remove(start);
         }
+        tournamentBannedPlayersList.clear();
+
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
                 webhook.upload(ANALYTICS_QUERY, new RLCTournamentEndTransaction(tournament.distributionId()).toBytes())
@@ -296,6 +331,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
             tournamentIndex.remove(start);
         }
+        tournamentBannedPlayersList.clear();
+
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
                 webhook.upload(ANALYTICS_QUERY, new RLCTournamentEndTransaction(tournament.distributionId()).toBytes())

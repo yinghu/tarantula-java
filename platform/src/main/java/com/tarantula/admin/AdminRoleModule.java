@@ -8,6 +8,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.lmdb.LMDBDataStoreProvider;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.SnowflakeKey;
@@ -323,6 +324,24 @@ public class AdminRoleModule implements Module{
             else{
                 session.write(JsonUtil.toSimpleResponse(true, "Error Creating Global Grant Event").getBytes());
             }
+
+        }
+        else if(session.action().equals("onBanPlayer")) {
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            String playerID = (String)onAccess.property("playerID");
+
+            long gameclusterID = Long.parseLong(session.name());
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameclusterID);
+
+            GameServerListener gameServerListener = deploymentServiceProvider.gameServerListener(gameCluster.gameLobbyName);
+
+            if(gameServerListener!=null){
+                String name = playerID + "#BanPlayer";
+
+                gameServerListener.onGameClusterEvent(name, new byte[0]);
+            }
+
+            session.write(JsonUtil.toSimpleResponse(true, "Player " + playerID + " is now banned").getBytes());
         }
         else{
             session.write(this.builder.create().toJson(new ResponseHeader("onError", session.action()+" operation not supported", false)).getBytes());
