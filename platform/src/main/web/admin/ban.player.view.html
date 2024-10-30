@@ -5,7 +5,7 @@
         </div>
         <div class="w3-display-topleft w3-padding">
             <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
-            <span class="tx-margin-left-8 tx-text-24">Ban Player</span>
+            <span class="tx-margin-left-8 tx-text-24">Ban Player Tool</span>
         </div>
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
@@ -17,8 +17,22 @@
             <input id ="tx-player-id" class="w3-input w3-round w3-border" type="number" placeholder='playerID'/>
         </div>
         <div class="w3-panel">
-            <span id="tx-ban-player" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Ban Player</span>
+            <div class="w3-bar w3-white w3-border-bottom w3-border-red">
+                <span id="tx-ban-player" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Ban Player</span>
+                <span id="tx-unban-player" class="w3-left w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Unban Player</span>
+            </div>
         </div>
+    </div>
+    <div class="w3-panel">
+        <div class='w3-bar w3-white'>
+            <span id='tx-find-user-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
+            <span id='tx-find-user-json-mode-code' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Code</span>
+            <span id='tx-find-user-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span>
+            <span class="w3-bar-item w3-right tx-text-18 tx-margin-bottom-8 tx-margin-left-4">Banned Players List</span>
+        </div>
+    </div>
+    <div class="w3-panel w3-center tx-text-14">
+        <div id="jsoneditor-game-service" style="width: 100%;"></div>
     </div>
     <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
         <div class="w3-display-topleft w3-padding">
@@ -61,6 +75,9 @@
 </div>
 <script>
     let confirmPopup = document.querySelector('#tx-confirm-ban-player-popup');
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-game-service"),{mode:'tree'},{});
+
+    reloadBannedPlayersList();
 
     document.querySelector('#tx-ban-player').onclick=()=>{
         let _playerID = document.querySelector('#tx-player-id').value;
@@ -72,8 +89,64 @@
 
         document.querySelector('#tx-confirm-popup-message').innerHTML = "Ban Player with ID: " + _playerID + "?";
 
+        document.querySelector('#tx-confirm-popup-confirm-button').onclick =()=>{
+            //let _playerID = document.querySelector('#tx-player-id').value;
+
+            let payload ={playerID:_playerID};
+
+            TARA_API.onSet('role/admin','onBanPlayer',TARA_API.query().gameClusterId,payload,(resp)=>{
+                document.querySelector('#tx-ban-player-message').innerHTML = resp.message;
+            });
+
+            document.querySelector('#tx-player-id').value = '';
+
+            confirmPopup.style.display = 'none';
+
+            sleep(500).then(() => {reloadBannedPlayersList();})
+
+        }
+
         confirmPopup.style.display = 'block';
+
     };
+
+    document.querySelector('#tx-unban-player').onclick=()=>{
+        let _playerID = document.querySelector('#tx-player-id').value;
+
+        if(_playerID==''){
+            document.querySelector('#tx-ban-player-message').innerHTML = "PlayerID Field Cannot Be Empty";
+            return;
+        }
+
+        document.querySelector('#tx-confirm-popup-message').innerHTML = "Remove Player with ID: " + _playerID + " from the ban list?";
+
+        document.querySelector('#tx-confirm-popup-confirm-button').onclick =()=>{
+            //let _playerID = document.querySelector('#tx-player-id').value;
+
+            let payload ={playerID:_playerID};
+
+            TARA_API.onSet('role/admin','onUnbanPlayer',TARA_API.query().gameClusterId,payload,(resp)=>{
+                document.querySelector('#tx-ban-player-message').innerHTML = resp.message;
+            });
+
+            document.querySelector('#tx-player-id').value = '';
+
+            confirmPopup.style.display = 'none';
+
+            sleep(500).then(() => {reloadBannedPlayersList();})
+        }
+
+        confirmPopup.style.display = 'block';
+
+    };
+
+    function reloadBannedPlayersList(){
+        //editor.destroy();
+        //editor = new JSONEditor(document.querySelector("#jsoneditor-game-service"),{mode:'tree'},{});
+        TARA_API.onGet('role/admin',"onLoadBanList",TARA_API.query().gameClusterId,(resp)=>{
+            editor.set(resp);
+        });
+    }
 
     document.querySelector('#tx-ban-player-close').onclick=()=>{
         tx_close_current_page();
@@ -87,18 +160,18 @@
         confirmPopup.style.display = 'none';
     }
 
-    document.querySelector('#tx-confirm-popup-confirm-button').onclick =()=>{
-        let _playerID = document.querySelector('#tx-player-id').value;
+    document.querySelector('#tx-find-user-json-mode-tree').onclick=()=>{
+        editor.setMode('tree');
+    };
+    document.querySelector('#tx-find-user-json-mode-code').onclick=()=>{
+        editor.setMode('code');
+    };
+    document.querySelector('#tx-find-user-json-mode-preview').onclick=()=>{
+        editor.setMode('preview');
+    };
 
-        let payload ={playerID:_playerID};
-
-        TARA_API.onSet('role/admin','onBanPlayer',TARA_API.query().gameClusterId,payload,(resp)=>{
-            document.querySelector('#tx-ban-player-message').innerHTML = resp.message;
-        });
-
-        document.querySelector('#tx-player-id').value = '';
-
-        confirmPopup.style.display = 'none';
+    function sleep(ms){
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
 </script>

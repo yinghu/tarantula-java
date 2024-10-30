@@ -1,22 +1,23 @@
-package com.perfectday.games.earth8;
+package com.tarantula.platform.lobby;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.SnowflakeKey;
+import com.perfectday.games.earth8.BannedPlayer;
 
-public class BannedPlayerQuery implements RecoverableFactory<BannedPlayer> {
+public class PlatformBannedPlayerQuery implements RecoverableFactory<PlatformBannedPlayer> {
     private long systemId;
-    public BannedPlayerQuery(long systemId){
+    public PlatformBannedPlayerQuery(long systemId){
         this.systemId = systemId;
     }
     @Override
-    public BannedPlayer create() {
-        return new BannedPlayer();
+    public PlatformBannedPlayer create() {
+        return new PlatformBannedPlayer();
     }
 
     @Override
     public String label() {
-        return BannedPlayer.LABEL;
+        return PlatformBannedPlayer.LABEL;
     }
 
     @Override

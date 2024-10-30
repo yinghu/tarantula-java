@@ -206,6 +206,21 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             if(existing!=null) {
                 existing.ban(systemID);
             }
+
+        }else if (event.command().equals("UnbanPlayer")) {
+            //Get player ID
+            long systemID = Long.parseLong(event.systemId());
+
+            //Remove banned player from persistent data
+            DataStore tournamentBlacklist = gameContext.applicationSchema().applicationPreSetup().onDataStore("tournament_blacklist");
+            tournamentBlacklist.list(new BannedPlayerQuery(gameContext.applicationSchema().distributionId())).forEach(bannedPlayer -> {
+                if(bannedPlayer.systemId == systemID){
+                    tournamentBlacklist.delete(bannedPlayer);
+                }
+            });
+
+            //Remove banned player from cache
+            tournamentBannedPlayersList.remove(systemID, true);
         }
     }
 
