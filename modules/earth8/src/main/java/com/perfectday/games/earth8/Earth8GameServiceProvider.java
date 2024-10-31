@@ -189,48 +189,26 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             }
         } else if (event.command().equals("BanPlayer")) {
             //Get player ID
-            long systemID = Long.parseLong(event.systemId());
-
-            //Add ban to cache
-            tournamentBannedPlayersList.putIfAbsent(systemID, true);
-
-            //Add ban to persistent data
-            DataStore tournamentBlacklist = gameContext.applicationSchema().applicationPreSetup().onDataStore("tournament_blacklist");
-            BannedPlayer bannedPlayer = new BannedPlayer(systemID);
-            bannedPlayer.ownerKey(SnowflakeKey.from(gameContext.applicationSchema().distributionId()));
-            tournamentBlacklist.create(bannedPlayer);
-
-            //Remove from active tournament
-            var playerDataTrack = PlayerDataTrack.lookup(gameContext,systemID,PlayerDataTrack.Type.Tournament);
-            Tournament existing = tournamentIndex.get(playerDataTrack.trackId);
-            if(existing!=null) {
-                existing.ban(systemID);
-            }
-
-        }else if (event.command().equals("UnbanPlayer")) {
-            //Get player ID
-            long systemID = Long.parseLong(event.systemId());
-
-            //Remove banned player from persistent data
-            DataStore tournamentBlacklist = gameContext.applicationSchema().applicationPreSetup().onDataStore("tournament_blacklist");
-            tournamentBlacklist.list(new BannedPlayerQuery(gameContext.applicationSchema().distributionId())).forEach(bannedPlayer -> {
-                if(bannedPlayer.systemId == systemID){
-                    tournamentBlacklist.delete(bannedPlayer);
+            this.gameContext.log("Ban player : "+event.message(),OnLog.WARN);
+            String[] query = event.message().split("#");
+            long systemID = Long.parseLong(query[0]);
+            boolean banned = Boolean.parseBoolean(query[1]);
+            if(banned){
+                //Add ban to cache
+                if(tournamentIndex.size()>0) tournamentBannedPlayersList.putIfAbsent(systemID, true);
+                //Remove from active tournament
+                var playerDataTrack = PlayerDataTrack.lookup(gameContext,systemID,PlayerDataTrack.Type.Tournament);
+                Tournament existing = tournamentIndex.get(playerDataTrack.trackId);
+                if(existing!=null) {
+                    existing.ban(systemID);
                 }
-            });
-
-            //Remove banned player from cache
-            tournamentBannedPlayersList.remove(systemID, true);
+            }
+            else{
+                tournamentBannedPlayersList.remove(systemID);
+            }
         }
     }
 
-    private void reloadTournamentBannedPlayerListCache(){
-        DataStore dataStore = gameContext.applicationSchema().applicationPreSetup().onDataStore("tournament_blacklist");
-
-        dataStore.list(new BannedPlayerQuery(gameContext.applicationSchema().distributionId())).forEach(bannedPlayer -> {
-            tournamentBannedPlayersList.putIfAbsent(bannedPlayer.systemId, true);
-        });
-    }
 
     public void onInventory(ApplicationPreSetup applicationPreSetup,Inventory inventory, Inventory.Stock stock){
         if(inventory.rechargeable()) return;
@@ -303,8 +281,6 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             }
             tournamentIndex.put(start,tournament);
         }
-
-        reloadTournamentBannedPlayerListCache();
 
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->

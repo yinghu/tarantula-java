@@ -70,6 +70,8 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
 
     public static final int SAVE_REVISION_INFO_CID = 27;
 
+    public static final int BANNED_PLAYER_CID = 28;
+
 
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
@@ -159,6 +161,9 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
                 break;
             case SAVE_REVISION_INFO_CID:
                 pt = new SaveRevisionInfo();
+                break;
+            case BANNED_PLAYER_CID:
+                pt = new PlatformBannedPlayer();
                 break;
             default:
         }

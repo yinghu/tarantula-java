@@ -14,11 +14,11 @@ import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 
-import com.perfectday.games.earth8.inbox.PlayerActionQuery;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.*;
 import com.tarantula.platform.inbox.*;
-import com.tarantula.platform.lobby.PlatformBannedPlayer;
-import com.tarantula.platform.lobby.PlatformBannedPlayerQuery;
+import com.tarantula.platform.presence.PlatformBannedPlayer;
+import com.tarantula.platform.presence.PlatformBannedPlayerQuery;
 import com.tarantula.platform.presence.*;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
@@ -334,15 +334,8 @@ public class AdminRoleModule implements Module{
 
             long gameclusterID = Long.parseLong(session.name());
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameclusterID);
-
-            GameServerListener gameServerListener = deploymentServiceProvider.gameServerListener(gameCluster.gameLobbyName);
-
-            if(gameServerListener!=null){
-                String name = playerID + "#BanPlayer";
-
-                gameServerListener.onGameClusterEvent(name, new byte[0]);
-            }
-
+            PlatformGameServiceProvider platformGameServiceProvider = gameCluster.platformGameServiceProvider();
+            platformGameServiceProvider.presenceServiceProvider().ban(Long.parseLong(playerID),"tournament");
             session.write(JsonUtil.toSimpleResponse(true, "Player " + playerID + " is now banned").getBytes());
         }
         else if(session.action().equals("onUnbanPlayer")) {
@@ -351,28 +344,17 @@ public class AdminRoleModule implements Module{
 
             long gameclusterID = Long.parseLong(session.name());
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameclusterID);
-
-            GameServerListener gameServerListener = deploymentServiceProvider.gameServerListener(gameCluster.gameLobbyName);
-
-            if(gameServerListener!=null){
-                String name = playerID + "#UnbanPlayer";
-
-                gameServerListener.onGameClusterEvent(name, new byte[0]);
-            }
-
+            PlatformGameServiceProvider platformGameServiceProvider = gameCluster.platformGameServiceProvider();
+            platformGameServiceProvider.presenceServiceProvider().unban(Long.parseLong(playerID),"tournament");
             session.write(JsonUtil.toSimpleResponse(true, "Player " + playerID + " is now unbanned").getBytes());
         }
         else if(session.action().equals("onLoadBanList")) {
             long gameclusterID = Long.parseLong(session.name());
             GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameclusterID);
 
-            DataStore dataStore = gameCluster.applicationPreSetup().onDataStore("tournament_blacklist");
+            PlatformGameServiceProvider platformGameServiceProvider = gameCluster.platformGameServiceProvider();
 
-            List<PlatformBannedPlayer> bannedPlayerList = new ArrayList<>();
-
-            dataStore.list(new PlatformBannedPlayerQuery(gameclusterID)).forEach(bannedPlayer -> {
-                bannedPlayerList.add(bannedPlayer);
-            });
+            List<PlatformBannedPlayer> bannedPlayerList = platformGameServiceProvider.presenceServiceProvider().blacklist("tournament");
 
             JsonArray bannedPlayerListJson = new JsonArray();
             bannedPlayerList.forEach(k->bannedPlayerListJson.add(k.toJson()));

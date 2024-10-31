@@ -1,4 +1,4 @@
-package com.tarantula.platform.lobby;
+package com.tarantula.platform.presence;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Recoverable;
@@ -20,6 +20,17 @@ public class PlatformBannedPlayer extends RecoverableObject {
     }
 
     @Override
+    public int getClassId() {
+        return PresencePortableRegistry.BANNED_PLAYER_CID;
+    }
+
+    @Override
+    public int getFactoryId() {
+        return PresencePortableRegistry.OID;
+    }
+
+
+    @Override
     public boolean write(Recoverable.DataBuffer buffer) {
         buffer.writeLong(systemId);
         return true;
@@ -35,7 +46,7 @@ public class PlatformBannedPlayer extends RecoverableObject {
     @Override
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("PlayerID",systemId);
+        jsonObject.addProperty("PlayerID",Long.toString(systemId));
         return jsonObject;
     }
 }
