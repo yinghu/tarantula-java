@@ -295,7 +295,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
             tournamentIndex.remove(start);
         }
-        tournamentBannedPlayersList.clear();
+        if(tournamentIndex.size()==0) tournamentBannedPlayersList.clear();
 
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
@@ -322,7 +322,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         for(long start = tournament.startLevel();start<=tournament.endLevel();start++){
             tournamentIndex.remove(start);
         }
-        tournamentBannedPlayersList.clear();
+        if(tournamentIndex.size()==0) tournamentBannedPlayersList.clear();
 
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
