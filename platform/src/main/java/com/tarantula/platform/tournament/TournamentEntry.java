@@ -65,6 +65,10 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
     }
 
+    public void reset(){
+        this.score = 0;
+    }
+
     public double score(){
         return score;
     }

@@ -713,7 +713,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
         TournamentEntry bannedPlayer = new TournamentEntry();
         bannedPlayer.distributionId(join.entryId);
-
-        segment.tournamentInstance.entryDataStore.delete(bannedPlayer);
+        segment.tournamentInstance.entryDataStore.load(bannedPlayer);
+        bannedPlayer.reset();
+        segment.tournamentInstance.entryDataStore.update(bannedPlayer);
     }
 }

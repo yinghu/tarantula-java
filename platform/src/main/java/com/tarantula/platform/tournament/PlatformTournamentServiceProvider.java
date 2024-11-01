@@ -6,12 +6,14 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.*;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.OnAccessTrack;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.inbox.PlatformInboxServiceProvider;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.item.ItemDistributionCallback;
+import com.tarantula.platform.presence.PlatformBannedPlayer;
 
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
@@ -306,7 +308,16 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             tournament.pendingSchedule = this.serviceContext.schedule(new TournamentCloseMonitor(tournament,this));
         }
         logger.warn(tournament.toString());
-        listeners.forEach(l->l.tournamentStarted(tournament));
+        listeners.forEach(l->{
+            l.tournamentStarted(tournament);
+            List<PlatformBannedPlayer> bannedPlayers = gameCluster.platformGameServiceProvider().presenceServiceProvider().blacklist("tournament");
+            bannedPlayers.forEach(p->{
+                OnAccessTrack onAccessTrack = new OnAccessTrack();
+                onAccessTrack.command("BanPlayer");
+                onAccessTrack.message(p.systemId+"#true");
+                gameCluster.platformGameServiceProvider().gameServiceProvider().onGameEvent(onAccessTrack);
+            });
+        });
         if(this.application==null) return;
         tournament.loadPrizes(this.applicationPreSetup,this.application);
     }
