@@ -133,6 +133,31 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         tournamentManager.loadPrizes(applicationPreSetup,application);
     }
 
+    public void deleteTournamentFromIndex(String query){
+        logger.warn(query);
+        String[] parts = query.split("#");
+        if(parts.length!=3) throw new RuntimeException("invalid query");
+        TokenValidatorProvider tokenValidator = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
+        GameCluster gc = tokenValidator.validateGameClusterAccessKey(parts[0]);
+        if(gc==null || gc.distributionId()!=gameCluster.distributionId()) throw new RuntimeException("invalid access key");
+        if(parts[1]==null || parts[1].trim().length() < 4) throw new RuntimeException("query type cannot be null or less than 4 chars");
+        RecentlyTournamentList list = RecentlyTournamentList.lookup(recentlyTournamentIndex,parts[1],recentlyTournamentListSize);
+        Long[] tournaments = list.pop();
+        list.fill();
+        long deleted = Long.parseLong(parts[2]);
+        Tournament pending = tournament(deleted);
+        if(pending.status() != Tournament.Status.ENDED){
+            logger.warn("Cannot delete tournament not ended");
+            return;
+        }
+        for(Long id : tournaments){
+            if(id!=deleted){
+                list.push(id);
+            }
+        }
+        list.update();
+    }
+
     public Tournament tournament(long tournamentId){
         TournamentManager indexed = tournamentIndex.get(tournamentId);
         if(indexed!=null) return indexed;
