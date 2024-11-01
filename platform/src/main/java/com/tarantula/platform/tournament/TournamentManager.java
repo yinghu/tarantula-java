@@ -704,4 +704,17 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         if(instance==null) return new TournamentRaceBoard();
         return instance.myRaceBoard(entryId,systemId,7);
     }
+
+    public void ban(long systemId){
+        TournamentJoin join = TournamentJoin.lookup(tournamentServiceProvider.tournamentJoin,systemId,distributionId);
+
+        TournamentSegment segment = lookupSegmentInstance(join.instanceId);
+        if (segment==null) return;
+
+        TournamentEntry bannedPlayer = new TournamentEntry();
+        bannedPlayer.distributionId(join.entryId);
+        segment.tournamentInstance.entryDataStore.load(bannedPlayer);
+        bannedPlayer.reset();
+        segment.tournamentInstance.entryDataStore.update(bannedPlayer);
+    }
 }

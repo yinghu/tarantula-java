@@ -33,7 +33,7 @@ public interface TokenValidatorProvider extends ServiceProvider,Resettable {
     String createGameClusterAccessKey(long gameClusterId);
     List<String> gameClusterAccessKeyList(long gameClusterId);
 
-
+    String checksum(byte[] payload);
     void timeout(int minutes,int seconds);
 
     Presence presence(Session session);

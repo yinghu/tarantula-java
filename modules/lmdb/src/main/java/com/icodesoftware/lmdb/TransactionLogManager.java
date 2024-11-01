@@ -27,10 +27,16 @@ public class TransactionLogManager implements Closable {
     private static final String DATA_TRANSACTION_LOG = "log_tarantula_transaction_1";
     private static final String INTEGRATION_TRANSACTION_LOG = "log_tarantula_transaction_2";
 
+    private TransactionLogListener transactionLogListener = transactionLog -> {};
     private ServiceContext serviceContext;
 
     public void setup(ServiceContext serviceContext){
         this.serviceContext = serviceContext;
+    }
+
+    public void registerTransactionListener(TransactionLogListener transactionLogListener){
+        if(transactionLogListener==null) return;
+        this.transactionLogListener = transactionLogListener;
     }
     public List<TransactionLog> committed(int scope,long transactionId){
         DataStore ts = transactionLogStore(scope);
@@ -264,6 +270,7 @@ public class TransactionLogManager implements Closable {
                     });
                 }
             }
+            transactionLogListener.onTransactionLog(log);
         }
     }
     public void close(){

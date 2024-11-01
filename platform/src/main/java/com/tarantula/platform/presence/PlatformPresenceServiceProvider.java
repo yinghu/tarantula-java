@@ -19,6 +19,8 @@ import com.tarantula.game.Stub;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceSetup;
 
+import com.tarantula.platform.OnAccessTrack;
+import com.tarantula.platform.event.GameClusterSyncEvent;
 import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 
 import com.tarantula.platform.presence.saves.*;
@@ -51,7 +53,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
 
     private DistributionPresenceService distributionPresenceService;
     private ConcurrentHashMap<String,ProfileNameSequence> profileNameSequenceMapping;
-
+    private String topic;
     public PlatformPresenceServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
         updates = new AtomicInteger(0);
@@ -110,6 +112,16 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         this.distributionPresenceService = this.serviceContext.clusterProvider().serviceProvider(DistributionPresenceService.NAME);
         this.logger = JDKLogger.getLogger(PlatformPresenceServiceProvider.class);
         this.logger.warn("Presence service provider started on ->"+gameServiceName);
+        topic = platformGameServiceProvider.registerEventListener(NAME,e->{
+            if(e instanceof GameClusterSyncEvent){
+                GameClusterSyncEvent gameClusterSyncEvent = (GameClusterSyncEvent)e;
+                OnAccessTrack onAccessTrack = new OnAccessTrack();
+                onAccessTrack.command("BanPlayer");
+                onAccessTrack.message(gameClusterSyncEvent.name());
+                platformGameServiceProvider.gameServiceProvider().onGameEvent(onAccessTrack);
+            }
+            return true;
+        });
     }
     public void onFriendList(long systemId,long friendSystemId){
         PlayList playList = new PlayList(friendListSize);
@@ -324,6 +336,53 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
             return notCached;
         });
         return profileNameSequence.sequence();
+    }
+
+    public void ban(long systemId,String service){
+        if(service.equals("tournament")) {
+            DataStore banStore = applicationPreSetup.dataStore(gameCluster,service+"_blacklist");
+            boolean[] alreadBanned = {false};
+            banStore.list(new PlatformBannedPlayerQuery(gameCluster.distributionId()),p->{
+                if(p.systemId==systemId){
+                    alreadBanned[0]=true;
+                    return false;
+                }
+                return true;
+            });
+            if(alreadBanned[0]) return;
+            PlatformBannedPlayer bannedPlayer = new PlatformBannedPlayer(systemId);
+            bannedPlayer.ownerKey(gameCluster.key());
+            banStore.create(bannedPlayer);
+            sendBanMessage(systemId+"#true");
+        }
+    }
+
+    public void unban(long systemId,String service){
+        if(service.equals("tournament")){
+            DataStore banStore = applicationPreSetup.dataStore(gameCluster,service+"_blacklist");
+            PlatformBannedPlayer[] banned = {null};
+            banStore.list(new PlatformBannedPlayerQuery(gameCluster.distributionId()),p->{
+                if(p.systemId==systemId){
+                    banned[0]=p;
+                    return false;
+                }
+                return true;
+            });
+            if(banned[0]==null) return;
+            banStore.delete(banned[0]);
+            sendBanMessage(systemId+"#false");
+        }
+    }
+
+    public List<PlatformBannedPlayer> blacklist(String service){
+        DataStore banStore = applicationPreSetup.dataStore(gameCluster,service+"_blacklist");
+        return banStore.list(new PlatformBannedPlayerQuery(gameCluster.distributionId()));
+    }
+
+    private void sendBanMessage(String query){
+        GameClusterSyncEvent gameClusterSyncEvent = new GameClusterSyncEvent(NAME,query,"{}".getBytes());
+        gameClusterSyncEvent.destination(topic);
+        serviceContext.clusterProvider().publisher().publish(gameClusterSyncEvent);
     }
 
 }
