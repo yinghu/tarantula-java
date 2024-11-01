@@ -133,8 +133,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         tournamentManager.loadPrizes(applicationPreSetup,application);
     }
 
-    public void deleteTournamentFromIndex(String query){
-        logger.warn(query);
+    public boolean deleteTournamentFromIndex(String query){
         String[] parts = query.split("#");
         if(parts.length!=3) throw new RuntimeException("invalid query");
         TokenValidatorProvider tokenValidator = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
@@ -148,7 +147,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         Tournament pending = tournament(deleted);
         if(pending.status() != Tournament.Status.ENDED){
             logger.warn("Cannot delete tournament not ended");
-            return;
+            return false;
         }
         for(Long id : tournaments){
             if(id!=deleted){
@@ -156,6 +155,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             }
         }
         list.update();
+        return true;
     }
 
     public Tournament tournament(long tournamentId){

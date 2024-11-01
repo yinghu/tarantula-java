@@ -43,8 +43,8 @@ public class TournamentModule extends ModuleHeader implements Configurable.Liste
             session.write(response.toBinary());
         }
         else if(session.action().equals("onDelete")){
-            tournamentServiceProvider.deleteTournamentFromIndex(session.name());
-            session.write(JsonUtil.toSimpleResponse(true,session.name()).getBytes());
+            boolean deleted = tournamentServiceProvider.deleteTournamentFromIndex(session.name());
+            session.write(JsonUtil.toSimpleResponse(deleted,deleted?"deleted":"cannot delete").getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action()+" not supported");
