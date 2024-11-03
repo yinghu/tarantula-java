@@ -18,12 +18,6 @@ public class LMDBEnv implements Serviceable {
 
     private static final TarantulaLogger logger = JDKLogger.getLogger(LMDBEnv.class);
 
-    //public static final LMDBEnv DATA_ENV = new LMDBEnv(EnvSetting.DataSetting);
-    //public static final LMDBEnv INTEGRATION_ENV = new LMDBEnv(EnvSetting.IntegrationSetting);
-    //public static final LMDBEnv INDEX_ENV = new LMDBEnv(EnvSetting.IndexSetting);
-    //public static final LMDBEnv LOG_ENV = new LMDBEnv(EnvSetting.LogSetting);
-    //public static final LMDBEnv LOCAL_ENV = new LMDBEnv(EnvSetting.LocalSetting);
-
     public EnvSetting envSetting;
     public Env<ByteBuffer> env;
     public LMDBDataStoreProvider lmdbDataStoreProvider;

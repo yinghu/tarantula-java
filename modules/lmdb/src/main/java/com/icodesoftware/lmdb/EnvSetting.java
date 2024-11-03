@@ -36,24 +36,26 @@ public class EnvSetting {
     public static final String log ="log";
     public static final String local ="local";
 
-    public static final EnvSetting DataSetting = new EnvSetting(data,ENV_BASE_DIR+"/data",0,true);
-    public static final EnvSetting IntegrationSetting = new EnvSetting(integration,ENV_BASE_DIR+"/integration",0,true);
-    public static final EnvSetting IndexSetting = new EnvSetting(index,ENV_BASE_DIR+"/index",0,true);
-    public static final EnvSetting LogSetting = new EnvSetting(log,ENV_BASE_DIR+"/log",0,true);
-    public static final EnvSetting LocalSetting = new EnvSetting(local,ENV_BASE_DIR+"/local",0,true);
+    public static final EnvSetting DataSetting = new EnvSetting(data,ENV_BASE_DIR+"/data",0,1,true);
+    public static final EnvSetting IntegrationSetting = new EnvSetting(integration,ENV_BASE_DIR+"/integration",0,1,true);
+    public static final EnvSetting IndexSetting = new EnvSetting(index,ENV_BASE_DIR+"/index",0,1,true);
+    public static final EnvSetting LogSetting = new EnvSetting(log,ENV_BASE_DIR+"/log",0,1,true);
+    public static final EnvSetting LocalSetting = new EnvSetting(local,ENV_BASE_DIR+"/local",0,1,true);
 
-    public EnvSetting(String name,String storePath,int mbSize,boolean enabled){
+    public EnvSetting(String name,String storePath,int mbSize,int partition,boolean enabled){
         this.name = name;
         this.storePath = storePath;
         this.mbSize = mbSize;
+        this.partition = partition;
         this.enabled = enabled;
         this.scope = scope();
     }
-    public int scope;
-    public String name;
-    public String storePath;
-    public int mbSize;
-    public boolean enabled;
+    public final int scope;
+    public final String name;
+    public final String storePath;
+    public final int mbSize;
+    public final int partition;
+    public final boolean enabled;
 
     private int scope(){
         if(name.equals(data)) return Distributable.DATA_SCOPE;
@@ -74,6 +76,7 @@ public class EnvSetting {
         jsonObject.addProperty("scope",scope);
         jsonObject.addProperty("storePath",storePath);
         jsonObject.addProperty("mdSize",mbSize);
+        jsonObject.addProperty("partition",partition);
         jsonObject.addProperty("enabled",enabled);
         return jsonObject;
     }

@@ -17,7 +17,6 @@ import com.hazelcast.config.DiscoveryStrategyConfig;
 import com.icodesoftware.*;
 import com.icodesoftware.lmdb.EnvSetting;
 import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
-import com.icodesoftware.lmdb.MetricsLog;
 import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
 import com.icodesoftware.service.Metrics;

@@ -1,6 +1,7 @@
 package com.tarantula.platform.presence;
 
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.Access;
 import com.icodesoftware.util.RecoverableObject;
 
@@ -113,5 +114,13 @@ public class User extends RecoverableObject implements Access {
     @Override
     public boolean validate() {
         return primary? primaryId>0 : true;
+    }
+
+    @Override
+    public JsonObject toJson() {
+        JsonObject resp = new JsonObject();
+        resp.addProperty("login",login);
+        resp.addProperty("role",role);
+        return  resp;
     }
 }
