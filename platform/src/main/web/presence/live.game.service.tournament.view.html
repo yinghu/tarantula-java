@@ -37,6 +37,7 @@
             <span id='tx-tournament-live-service-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
             <span id='tx-tournament-live-service-json-mode-code' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Code</span>
             <span id='tx-tournament-live-service-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span> 
+            <span id='tx-tournament-live-service-reset' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Reset</span>
             <span id='tx-tournament-live-service-reload' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Reload</span>    
         </div>            
     </div>
@@ -76,6 +77,11 @@
     document.querySelector('#tx-tournament-live-service-reload').onclick =()=>{
         tournamentList.innerHTML = '';
         tx_live_tournament_setup();
+    };
+
+    document.querySelector('#tx-tournament-live-service-reset').onclick = ()=>{
+        TARA_API.query().popup='#tx-popup-api';
+        tx_view({viewId:'live.game.service.tournament.reset',containerId:'#tx-popup-api'});
     };
     
     document.querySelector('#tx-tournament-listing-scan').onclick =()=>{
