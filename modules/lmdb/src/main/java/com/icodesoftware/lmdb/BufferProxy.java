@@ -129,6 +129,15 @@ public class BufferProxy implements Recoverable.DataBuffer {
         return new BufferProxy(ByteBuffer.wrap(data));
     }
 
+    public static Recoverable.DataBuffer copy(ByteBuffer src){
+        Recoverable.DataBuffer dest = BufferProxy.buffer(src.remaining(),false);
+        while (src.hasRemaining()){
+            dest.writeByte(src.get());
+        }
+        dest.flip();
+        return dest;
+    }
+
     public static Recoverable.DataBuffer wrapDirectly(byte[] data){
         Recoverable.DataBuffer wrap = buffer(data.length,true);
         for(byte b : data){
@@ -146,7 +155,9 @@ public class BufferProxy implements Recoverable.DataBuffer {
         return buffer.array();
     }
 
-
+    public ByteBuffer src(){
+        return buffer;
+    }
     public ByteBuffer flip(){
         buffer.flip();
         return buffer;
