@@ -1,7 +1,5 @@
 package com.icodesoftware.lmdb.partition;
 
-
-import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.lmdb.EnvSetting;
 import com.icodesoftware.service.Serviceable;
