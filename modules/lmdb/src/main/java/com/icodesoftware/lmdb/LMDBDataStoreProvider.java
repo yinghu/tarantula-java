@@ -545,4 +545,8 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(metricsListener==null) return;
         this.metricsListener = metricsListener;
     }
+
+    public long snowflakeId(){
+        return distributionIdGenerator.id();
+    }
 }

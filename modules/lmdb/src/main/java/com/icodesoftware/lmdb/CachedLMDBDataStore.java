@@ -344,7 +344,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         }
 
         final Txn<ByteBuffer> txn = env.txnWrite();
-        final long transactionId = txn.getId();
+        final long transactionId = lmdbDataStoreProvider.snowflakeId();//txn.getId();
         try{
             if(!dbi.delete(txn, key.flip())) return false;
             txn.commit();
