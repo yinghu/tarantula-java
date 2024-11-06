@@ -7,6 +7,8 @@ import com.tarantula.game.GameLobbyProxy;
 import com.tarantula.game.GameRating;
 import com.tarantula.game.Stub;
 import com.tarantula.platform.AccessControl;
+import com.tarantula.platform.presence.Profile;
+import com.tarantula.platform.presence.ProfilePayload;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
 public class GameLobbyModule extends ModuleHeader{
@@ -26,7 +28,16 @@ public class GameLobbyModule extends ModuleHeader{
         session.write(stub.toJson().toString().getBytes());
         if(!stub.joined()) return;
         gameServiceProvider.presenceServiceProvider().onPlay(session.distributionId());
-        gameServiceProvider.gameServiceProvider().onJoined(session, stub.room);
+
+        ProfilePayload profilePayload = gameServiceProvider.presenceServiceProvider().getProfilePayload(Long.toString(session.distributionId()));
+        String displayName = "NoDisplayName";
+
+        if(!profilePayload.profileList.isEmpty()){
+            Profile profile = profilePayload.profileList.get(0);
+            displayName = profile.displayName + profile.profileSequence;
+        }
+
+        gameServiceProvider.gameServiceProvider().onJoined(session, stub.room, displayName);
     }
 
     @Override
@@ -59,7 +70,7 @@ public class GameLobbyModule extends ModuleHeader{
             session.write(stub.toJson().toString().getBytes());
             if(stub.joined()) {
                 gameServiceProvider.presenceServiceProvider().onPlay(session.distributionId());
-                this.gameServiceProvider.gameServiceProvider().onJoined(session,stub.room);
+                this.gameServiceProvider.gameServiceProvider().onJoined(session,stub.room, "displayName1");
             }
         }
         else if(session.action().equals("onTestScore")){

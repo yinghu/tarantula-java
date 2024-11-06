@@ -46,13 +46,13 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
     //callbacks from HTTP
     @Override
-    public void onJoined(Session session,Room room) {
+    public void onJoined(Session session,Room room, String displayName) {
 
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         PlayerDataTrack analyticsSession = PlayerDataTrack.lookup(gameContext,session.distributionId(), PlayerDataTrack.Type.Analytics);
         analyticsSession.trackId = gameContext.applicationSchema().applicationPreSetup().distributionId();
         analyticsSession.update();
-        ServerConnectTransaction serverConnectTransaction = new ServerConnectTransaction(session,analyticsSession.trackId);
+        ServerConnectTransaction serverConnectTransaction = new ServerConnectTransaction(session,analyticsSession.trackId, displayName);
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
                 webhook.upload(ANALYTICS_QUERY,serverConnectTransaction.toString().getBytes()))
         );
