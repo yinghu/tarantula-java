@@ -206,8 +206,11 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         startLevel = buffer.readLong();
         endLevel = buffer.readLong();
         segmentsPerSchedule = buffer.readInt();
-        typeId = buffer.readUTF8();
-
+        try {
+            typeId = buffer.readUTF8();
+        }catch(Exception ex){
+            //ignore
+        }
         if(global) {
             tournamentSegments = new TournamentSegment[this.segmentsPerSchedule];
             segmentSlot = new AtomicInteger(0);
@@ -422,10 +425,10 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         jsonObject.addProperty("CloseTime",closeTime.format(DateTimeFormatter.ISO_DATE_TIME));
         jsonObject.addProperty("EndTime",endTime.format(DateTimeFormatter.ISO_DATE_TIME));
         if(nextSortingTime!=null) jsonObject.addProperty("NextRefreshTime",nextSortingTime.format(DateTimeFormatter.ISO_DATE_TIME));
-        jsonObject.addProperty("DurationMinutes",durationMinutes);
-        jsonObject.addProperty("MaxEntries",maxEntriesPerInstance);
-        jsonObject.addProperty("EnterCost",enterCost);
-        jsonObject.addProperty("Credit",credit);
+        //jsonObject.addProperty("DurationMinutes",durationMinutes);
+        //jsonObject.addProperty("MaxEntries",maxEntriesPerInstance);
+        //jsonObject.addProperty("EnterCost",enterCost);
+        //jsonObject.addProperty("Credit",credit);
         jsonObject.addProperty("ScheduleId",Long.toString(this.scheduleId));
         jsonObject.addProperty("StartLevel",startLevel);
         jsonObject.addProperty("EndLevel",endLevel);
