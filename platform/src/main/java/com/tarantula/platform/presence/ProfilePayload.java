@@ -8,7 +8,7 @@ import java.util.List;
 
 public class ProfilePayload {
 
-    private List<Profile> profileList;
+    public List<Profile> profileList;
 
     public ProfilePayload(List<Profile> profileList){
         this.profileList = profileList;

@@ -6,12 +6,14 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.*;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.OnAccessTrack;
 import com.tarantula.platform.ResponseHeader;
 import com.tarantula.platform.inbox.PlatformInboxServiceProvider;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.DistributionItemService;
 import com.tarantula.platform.item.ItemDistributionCallback;
+import com.tarantula.platform.presence.PlatformBannedPlayer;
 
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
@@ -129,6 +131,31 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
 
     void loadPrizes(TournamentManager tournamentManager){
         tournamentManager.loadPrizes(applicationPreSetup,application);
+    }
+
+    public boolean deleteTournamentFromIndex(String query){
+        String[] parts = query.split("#");
+        if(parts.length!=3) throw new RuntimeException("invalid query");
+        TokenValidatorProvider tokenValidator = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
+        GameCluster gc = tokenValidator.validateGameClusterAccessKey(parts[0]);
+        if(gc==null || gc.distributionId()!=gameCluster.distributionId()) throw new RuntimeException("invalid access key");
+        if(parts[1]==null || parts[1].trim().length() < 4) throw new RuntimeException("query type cannot be null or less than 4 chars");
+        RecentlyTournamentList list = RecentlyTournamentList.lookup(recentlyTournamentIndex,parts[1],recentlyTournamentListSize);
+        Long[] tournaments = list.pop();
+        list.fill();
+        long deleted = Long.parseLong(parts[2]);
+        Tournament pending = tournament(deleted);
+        if(pending.status() != Tournament.Status.ENDED){
+            logger.warn("Cannot delete tournament not ended");
+            return false;
+        }
+        for(Long id : tournaments){
+            if(id!=deleted){
+                list.push(id);
+            }
+        }
+        list.update();
+        return true;
     }
 
     public Tournament tournament(long tournamentId){
@@ -306,7 +333,16 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             tournament.pendingSchedule = this.serviceContext.schedule(new TournamentCloseMonitor(tournament,this));
         }
         logger.warn(tournament.toString());
-        listeners.forEach(l->l.tournamentStarted(tournament));
+        listeners.forEach(l->{
+            l.tournamentStarted(tournament);
+            List<PlatformBannedPlayer> bannedPlayers = gameCluster.platformGameServiceProvider().presenceServiceProvider().blacklist("tournament");
+            bannedPlayers.forEach(p->{
+                OnAccessTrack onAccessTrack = new OnAccessTrack();
+                onAccessTrack.command("BanPlayer");
+                onAccessTrack.message(p.systemId+"#true");
+                gameCluster.platformGameServiceProvider().gameServiceProvider().onGameEvent(onAccessTrack);
+            });
+        });
         if(this.application==null) return;
         tournament.loadPrizes(this.applicationPreSetup,this.application);
     }

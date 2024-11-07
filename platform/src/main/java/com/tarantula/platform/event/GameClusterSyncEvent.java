@@ -13,6 +13,11 @@ public class GameClusterSyncEvent extends Data implements Event {
     public GameClusterSyncEvent(){
 
     }
+
+    @Override
+    public String trackId(){
+        return trackId!=null?trackId:typeId;
+    }
     public GameClusterSyncEvent(String typeId,String query,byte[] payload){
         this.typeId = typeId;
         this.name = query;

@@ -23,6 +23,7 @@
     {"type":"game.cluster.environment","moduleResourceFile":"admin/game.cluster.environment.edit.view.html"},
     {"type":"create.currency.grant.event","moduleResourceFile":"admin/create.currency.grant.event.view.html"},
     {"type":"create.global.item.grant.event","moduleResourceFile":"admin/create.global.item.grant.event.html"},
-    {"type":"player.data.delete","moduleResourceFile":"admin/player.data.delete.view.html"}
+    {"type":"player.data.delete","moduleResourceFile":"admin/player.data.delete.view.html"},
+    {"type":"ban.player","moduleResourceFile":"admin/ban.player.view.html"}
   ]
 }

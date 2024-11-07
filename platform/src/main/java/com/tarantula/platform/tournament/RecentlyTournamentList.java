@@ -70,6 +70,10 @@ public class RecentlyTournamentList extends RecoverableObject {
         tournamentIndex.push(tournamentManager.distributionId());
     }
 
+    public void push(long tournamentId){
+        tournamentIndex.push(tournamentId);
+    }
+
 
     public static RecentlyTournamentList lookup(DataStore dataStore,String type,int size){
         RecentlyTournamentList recentlyTournamentList = new RecentlyTournamentList(type,size);
@@ -107,7 +111,7 @@ public class RecentlyTournamentList extends RecoverableObject {
         return new NaturalKey(this.name);
     }
 
-    private void fill(){
+    public void fill(){
         for(int i=0;i<size;i++){
             tournamentIndex.push(0L);
         }
