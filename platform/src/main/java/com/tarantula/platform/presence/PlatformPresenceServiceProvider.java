@@ -195,13 +195,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
 
     public void getDisplayName(Session session){
         Profile profile = loadProfile(session.distributionId());
-        String displayName = "NoDisplayName";
-
-        if(profile != null){
-            displayName = profile.displayName + profile.profileSequence;
-        }
-
-        session.name(displayName);
+        session.name(profile==null?"NoDisplayName":profile.displayName+profile.profileSequence);
     }
 
     public GameRating rating(Session session){
