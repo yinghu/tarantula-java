@@ -52,7 +52,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         PlayerDataTrack analyticsSession = PlayerDataTrack.lookup(gameContext,session.distributionId(), PlayerDataTrack.Type.Analytics);
         analyticsSession.trackId = gameContext.applicationSchema().applicationPreSetup().distributionId();
         analyticsSession.update();
-        ServerConnectTransaction serverConnectTransaction = new ServerConnectTransaction(session,analyticsSession.trackId);
+        ServerConnectTransaction serverConnectTransaction = new ServerConnectTransaction(session,analyticsSession.trackId, session.name());
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
                 webhook.upload(ANALYTICS_QUERY,serverConnectTransaction.toString().getBytes()))
         );

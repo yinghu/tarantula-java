@@ -183,6 +183,21 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         return new ProfilePayload(playerProfiles);
     }
 
+    public Profile loadProfile(long playerId){
+        DataStore profileDataStore = applicationPreSetup.onDataStore("profile");
+
+        Profile profileLoaded = new Profile();
+        profileLoaded.distributionId(playerId);
+        if(!profileDataStore.load(profileLoaded)) return null;
+
+        return profileLoaded;
+    }
+
+    public void getDisplayName(Session session){
+        Profile profile = loadProfile(session.distributionId());
+        session.name(profile==null?"NoDisplayName":profile.displayName+profile.profileSequence);
+    }
+
     public GameRating rating(Session session){
         GameRating[] loaded  = {new GameRating()};
         CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);
