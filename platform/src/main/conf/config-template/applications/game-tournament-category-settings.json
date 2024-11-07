@@ -58,13 +58,7 @@
             "nullable": false,
             "downloadable": false
           },
-          {
-            "name": "Schedule",
-            "type": "enum",
-            "reference": "Schedule",
-            "nullable": false,
-            "downloadable": false
-          },
+
           {
             "name": "StartTime",
             "type": "dateTime",
@@ -80,30 +74,9 @@
             "downloadable": false
           },
           {
-            "name": "DurationMinutesPerInstance",
-            "type": "number",
-            "reference": "Integer",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
             "name": "MaxEntriesPerInstance",
             "type": "number",
             "reference": "Integer",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "EnterCost",
-            "type": "number",
-            "reference": "Double",
-            "nullable": false,
-            "downloadable": false
-          },
-          {
-            "name": "Credit",
-            "type": "number",
-            "reference": "Double",
             "nullable": false,
             "downloadable": false
           },
@@ -122,9 +95,23 @@
             "downloadable": false
           },
           {
+            "name": "TypeId",
+            "type": "string",
+            "reference": "String",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
             "name": "PrizeSet",
             "type": "set",
             "reference": "category:TournamentPrize",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "MilestoneList",
+            "type": "set",
+            "reference": "category:TournamentMilestone",
             "nullable": false,
             "downloadable": false
           }
@@ -150,6 +137,33 @@
           },
           {
             "name": "MaxRank",
+            "type": "number",
+            "reference": "Integer",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "SkuList",
+            "type": "list",
+            "reference": "category:Sku",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "application.tournament",
+        "type": "TournamentMilestone",
+        "description": "application category",
+        "version": "1.0",
+        "rechargeable": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Score",
             "type": "number",
             "reference": "Integer",
             "nullable": false,

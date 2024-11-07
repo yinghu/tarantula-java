@@ -31,11 +31,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     private ConcurrentHashMap<Long,Boolean> tournamentBannedPlayersList = new ConcurrentHashMap<>();
 
     private ConcurrentHashMap<String,ApplicationResource> resourceIndex = new ConcurrentHashMap<>();
-
-
     ConcurrentHashMap<Long, ScoreRunner> scoreRunners = new ConcurrentHashMap<>();
-
-
     public void setup(GameContext gameContext){
         this.gameContext = gameContext;
         this.gameContext.registerTournamentListener(this);
