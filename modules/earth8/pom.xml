@@ -14,16 +14,7 @@
     <version>1.0</version>
     <packaging>jar</packaging>
     <name>Game Cluster Earth8 Module</name>
-    <build>
-        <plugins>
-            <plugin>
-                <inherited>true</inherited>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-            </plugin>
-        </plugins>
-    </build>
+
     <dependencies>
         <dependency>
             <groupId>com.icodesoftware</groupId>
