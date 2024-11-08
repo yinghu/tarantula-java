@@ -13,4 +13,14 @@ public class LMDBPartitionProxy implements LMDBPartition {
     public ByteBuffer get(String dbiName, ByteBuffer key) {
         return null;
     }
+
+    @Override
+    public void start() throws Exception {
+
+    }
+
+    @Override
+    public void shutdown() throws Exception {
+
+    }
 }
