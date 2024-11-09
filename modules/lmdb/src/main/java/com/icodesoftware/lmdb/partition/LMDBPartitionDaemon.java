@@ -18,7 +18,8 @@ public class LMDBPartitionDaemon implements LMDBPartition,Serviceable {
     private final EnvSetting envSetting;
     private Env<ByteBuffer> env;
 
-    public final int partition;
+    private final int partition;
+
 
     public LMDBPartitionDaemon(EnvSetting envSetting){
         this.envSetting = envSetting;
@@ -35,6 +36,10 @@ public class LMDBPartitionDaemon implements LMDBPartition,Serviceable {
     public void shutdown() throws Exception {
         env.sync(true);
         env.close();
+    }
+
+    public int partition(){
+        return partition;
     }
 
     public boolean put(String dbiName,ByteBuffer key,ByteBuffer value){

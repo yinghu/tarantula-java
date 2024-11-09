@@ -24,7 +24,6 @@ public class LMDBPartitionProvider implements Serviceable {
     public void start() throws Exception {
         for(int i=1;i<maxPartitionNumber;i++){
             Files.createDirectories(Paths.get(basePath+"/"+i));
-
             Files.createDirectories(Paths.get(basePath+"/"+i+"/back"));
         }
         Files.createDirectories(Paths.get(basePath+"/index"));
@@ -33,7 +32,7 @@ public class LMDBPartitionProvider implements Serviceable {
         keyIndex.start();
         LMDBPartitionDaemon partition1 = new LMDBPartitionDaemon(envSetting(storeMbSize,basePath+"/1",1));
         partition1.start();
-        partitionMap.put(partition1.partition,partition1);
+        partitionMap.put(partition1.partition(),partition1);
         currentPartition = partition1;
     }
 
@@ -49,13 +48,13 @@ public class LMDBPartitionProvider implements Serviceable {
         });
     }
 
-    public LMDBPartitionDaemon partition(ByteBuffer key){
+    public LMDBPartition partition(ByteBuffer key){
         ByteBuffer partition = keyIndex.get(keyIndexStoreName,key);
         if(partition==null) return currentPartition;
         return partitionMap.get(partition.getInt());
     }
-    public void onMapFull(LMDBPartitionDaemon lmdbPartition, ByteBuffer key){
-        partitionMap.computeIfAbsent(lmdbPartition.partition+1,k->{
+    public void onMapFull(LMDBPartition lmdbPartition, ByteBuffer key){
+        partitionMap.computeIfAbsent(lmdbPartition.partition()+1,k->{
             LMDBPartitionDaemon next = new LMDBPartitionDaemon(envSetting(storeMbSize,basePath+"/"+k,k));
             try{
                 next.start();
@@ -66,11 +65,11 @@ public class LMDBPartitionProvider implements Serviceable {
             return next;
         });
     }
-    public void onPut(LMDBPartitionDaemon lmdbPartition, ByteBuffer key){
+    public void onPut(LMDBPartition lmdbPartition, ByteBuffer key){
         Recoverable.DataBuffer partition = BufferProxy.buffer(4,true);
-        keyIndex.put(keyIndexStoreName,key,partition.writeInt(lmdbPartition.partition).flip());
+        keyIndex.put(keyIndexStoreName,key,partition.writeInt(lmdbPartition.partition()).flip());
     }
-    public void onDelete(LMDBPartitionDaemon lmdbPartition, ByteBuffer key){
+    public void onDelete(LMDBPartition lmdbPartition, ByteBuffer key){
         keyIndex.delete(keyIndexStoreName,key);
     }
 

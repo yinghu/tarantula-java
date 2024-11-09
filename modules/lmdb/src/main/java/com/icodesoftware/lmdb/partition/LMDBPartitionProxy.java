@@ -4,6 +4,12 @@ import java.nio.ByteBuffer;
 
 public class LMDBPartitionProxy implements LMDBPartition {
 
+    private int partition;
+
+    public int partition(){
+        return partition;
+    }
+
     @Override
     public boolean put(String dbiName, ByteBuffer key, ByteBuffer value) {
         return false;
