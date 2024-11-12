@@ -1,72 +1,79 @@
 package com.icodesoftware.lmdb.partition;
 
-import com.icodesoftware.lmdb.BufferProxy;
-import com.icodesoftware.lmdb.EnvSetting;
-import com.icodesoftware.service.Serviceable;
-import org.lmdbjava.*;
-
+import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.logging.JDKLogger;
+import java.net.StandardProtocolFamily;
+import java.net.UnixDomainSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
-public class LMDBPartitionDaemon implements LMDBPartition,Serviceable {
+public class LMDBPartitionDaemon {
 
-    private static EnvFlags[] flags = new EnvFlags[]{EnvFlags.MDB_NOSYNC};
-    private static int maxStores = 10;
-    private static int maxReaders = 10;
+    private static boolean running = true;
+    private static ServerSocketChannel serverSocketChannel;
+    private static TarantulaLogger logger = JDKLogger.getLogger(LMDBPartitionDaemon.class);
 
-    private final EnvSetting envSetting;
-    private Env<ByteBuffer> env;
+    private static LMDBPartitionProvider lmdbPartitionProvider;
 
-    private final int partition;
-
-
-    public LMDBPartitionDaemon(EnvSetting envSetting){
-        this.envSetting = envSetting;
-        this.partition = envSetting.partition;
-    }
-
-    @Override
-    public void start() throws Exception {
-        Path path = Paths.get(envSetting.storePath);
-        env = Env.create().setMapSize(EnvSetting.toBytesFromMb(envSetting.mbSize)).setMaxDbs(maxStores).setMaxReaders(maxReaders).open(path.toFile(),flags);
-    }
-
-    @Override
-    public void shutdown() throws Exception {
-        env.sync(true);
-        env.close();
-    }
-
-    public int partition(){
-        return partition;
-    }
-
-    public boolean put(String dbiName,ByteBuffer key,ByteBuffer value){
-        Dbi<ByteBuffer> dbi = env.openDbi(dbiName, DbiFlags.MDB_CREATE);
-        try(Txn<ByteBuffer> txn = env.txnWrite()){
-            if(!dbi.put(txn,key,value)) return false;
-            txn.commit();
-            return true;
-        }
-    }
-
-    public ByteBuffer get(String dbiName, ByteBuffer key){
-        Dbi<ByteBuffer> dbi = env.openDbi(dbiName, DbiFlags.MDB_CREATE);
-        try(Txn<ByteBuffer> txn = env.txnRead()){
-            if(dbi.get(txn,key)==null){
-                return null;
+    public static void main(String[] args) throws Exception{
+        lmdbPartitionProvider = LMDBPartitionProvider.create(false);
+        LMDBPartitionDaemon.start();
+        Thread shutdown = new Thread(()->{
+            try{
+                LMDBPartitionDaemon.shutdown();
+            }catch(Exception ex){
+                ex.printStackTrace();
             }
-            return BufferProxy.copy(txn.val()).src();
-        }
+        },"lmdb-partition-daemon-shutdown-hook");
+        Runtime.getRuntime().addShutdownHook(shutdown);
     }
 
-    public boolean delete(String dbiName,ByteBuffer key){
-        Dbi<ByteBuffer> dbi = env.openDbi(dbiName, DbiFlags.MDB_CREATE);
-        try(Txn<ByteBuffer> txn = env.txnWrite()){
-            if(!dbi.delete(txn,key)) return false;
-            txn.commit();
-            return true;
+    public static void start() throws Exception{
+        Path socketFile = Path.of(System.getProperty("user.home")).resolve("server.socket");
+        Files.deleteIfExists(socketFile);
+        UnixDomainSocketAddress address = UnixDomainSocketAddress.of(socketFile);
+        serverSocketChannel = ServerSocketChannel.open(StandardProtocolFamily.UNIX);
+        serverSocketChannel.bind(address);
+        ByteBuffer buffer = ByteBuffer.allocate(100);
+        new Thread(()->{
+            try{
+                logger.warn("Unit daemon is listening on ["+socketFile+"]");
+                while (running){
+                    buffer.clear();
+                    SocketChannel socketChannel = serverSocketChannel.accept();
+                    int num = socketChannel.read(buffer);
+                    if(num>0){
+                        buffer.flip();
+                        logger.warn(new String(buffer.array()));
+                        buffer.rewind();
+                        socketChannel.write(buffer);
+                    }
+                    Thread.sleep(100);
+                }
+                logger.warn("Unix socket daemon is closed");
+            }catch (Exception ex){
+                logger.error("Error on Socket",ex);
+            }
+        },"lmdb-partition-daemon").start();
+    }
+
+    public static void shutdown() throws Exception{
+        logger.warn("Unix socket daemon is going to shutdown");
+        running = false;
+        serverSocketChannel.close();
+    }
+
+    private void save(String dbiName,ByteBuffer key,ByteBuffer value){
+        LMDBPartition partition = lmdbPartitionProvider.partition(key);
+        try{
+            if(partition.put(dbiName,key,value)){
+                lmdbPartitionProvider.onPut(partition,key.rewind());
+            }
+        }catch (Throwable throwable){
+
         }
     }
 

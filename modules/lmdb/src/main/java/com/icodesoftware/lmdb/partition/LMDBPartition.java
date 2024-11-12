@@ -11,4 +11,6 @@ public interface LMDBPartition extends Serviceable {
     boolean put(String dbiName, ByteBuffer key, ByteBuffer value);
 
     ByteBuffer get(String dbiName, ByteBuffer key);
+
+    boolean delete(String dbiName,ByteBuffer key);
 }

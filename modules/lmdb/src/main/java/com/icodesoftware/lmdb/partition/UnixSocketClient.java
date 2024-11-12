@@ -25,23 +25,27 @@ public class UnixSocketClient {
         countDownLatch.await();
     }
 
-    public void send(String message) throws Exception{
-        Path socketFile = Path.of(System.getProperty("user.home")).resolve("server.socket");
-        UnixDomainSocketAddress address = UnixDomainSocketAddress.of(socketFile);
-        ByteBuffer buffer = ByteBuffer.allocate(100);
-        SocketChannel socketChannel = SocketChannel.open(StandardProtocolFamily.UNIX);
-        socketChannel.connect(address);
-        buffer.put(message.getBytes());
-        buffer.flip();
-        socketChannel.write(buffer);
-        buffer.rewind();
-        int num = socketChannel.read(buffer);
-        if (num > 0) {
+    public void send(String message){
+        try {
+            Path socketFile = Path.of(System.getProperty("user.home")).resolve("server.socket");
+            UnixDomainSocketAddress address = UnixDomainSocketAddress.of(socketFile);
+            ByteBuffer buffer = ByteBuffer.allocate(100);
+            SocketChannel socketChannel = SocketChannel.open(StandardProtocolFamily.UNIX);
+            socketChannel.connect(address);
+            buffer.put(message.getBytes());
             buffer.flip();
-            System.out.println(new String(buffer.array()));
-        }
+            socketChannel.write(buffer);
+            buffer.rewind();
+            int num = socketChannel.read(buffer);
+            if (num > 0) {
+                buffer.flip();
+                System.out.println(new String(buffer.array()));
+            }
 
-        socketChannel.close();
+            socketChannel.close();
+        }catch (Exception ex){
+
+        }
     }
 
 

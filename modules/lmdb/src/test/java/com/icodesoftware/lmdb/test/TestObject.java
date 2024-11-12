@@ -7,6 +7,13 @@ public class TestObject extends RecoverableObject {
     public String type;
     public String name;
 
+    public TestObject(){}
+
+    public TestObject(String type,String name){
+        this.type = type;
+        this.name = name;
+    }
+
     @Override
     public int getClassId() {
         return 113;
