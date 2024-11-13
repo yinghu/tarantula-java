@@ -38,6 +38,7 @@ public class AdminRoleModule implements Module{
     private GsonBuilder builder;
 
     private DeploymentServiceProvider deploymentServiceProvider;
+    private DistributionPresenceService distributionPresenceService;
     private TokenValidatorProvider tokenValidatorProvider;
     private UserService userService;
     private AccessIndexService accessIndexService;
@@ -218,23 +219,24 @@ public class AdminRoleModule implements Module{
             String playerID = (String)onAccess.property("playerID");
 
             Access user = userService.loadUser(Long.parseLong(playerID));
-
-            if(user.login() != null) {
+            if(user != null && user.login() != null) {
 
                 AccessIndex acc = accessIndexService.get(user.login());
                 if (acc != null) {
 
-                    boolean accessIndexDelete = accessIndexService.delete(user.login());
+                    accessIndexService.delete(user.login());
+                    distributionPresenceService.deleteUserLoginData(Long.parseLong(playerID));
 
-                    boolean userServiceDelete = userService.deleteUser(Long.parseLong(playerID));
-
-                    session.write(JsonUtil.toSimpleResponse(true, "Access Index Delete: " + accessIndexDelete + " | User Service Delete: " + userServiceDelete).getBytes());
-                    return true;
+                    session.write(JsonUtil.toSimpleResponse(true, "Data Deleted for Player with ID: " + playerID).getBytes());
                 }
-
+                else {
+                    session.write(JsonUtil.toSimpleResponse(false, "No AccessIndex Found with ID: " + playerID).getBytes());
+                }
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false, "No User Found with ID: " + playerID).getBytes());
             }
 
-            session.write(JsonUtil.toSimpleResponse(false, "No Data for Player " + playerID + " Deleted").getBytes());
         }
         else if(session.action().equals("onGetGlobalGrantEvents")) {
             long gameclusterID = Long.parseLong(session.name());
@@ -377,6 +379,7 @@ public class AdminRoleModule implements Module{
         this.userService = this.context.serviceProvider(UserService.NAME);
         this.accessIndexService = this.context.clusterProvider().accessIndexService();
         this.gameClusterConfiguration = this.context.configuration("cluster");
+        this.distributionPresenceService = this.context.clusterProvider().serviceProvider(DistributionPresenceService.NAME);
         this.maxGameClusterCount = ((Number)this.gameClusterConfiguration.property("maxGameClusterCount")).intValue();
         this.pendingGameServices = new ConcurrentHashMap<>();
         this.context.log("Admin role module started with max game cluster count ["+maxGameClusterCount+"]", OnLog.INFO);
