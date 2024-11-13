@@ -435,6 +435,9 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         jsonObject.addProperty("TypeId", typeId);
         jsonObject.addProperty("Status",status.name());
         JsonArray prizeList = new JsonArray();
+        if (tournamentServiceProvider==null) {
+            logger.warn("tournamentServiceProvider is null when adding prizes!");
+        }
         if(rangedPrizeList==null||tournamentServiceProvider==null){
             //should not be return no prize set/ need to local why
             logger.warn("SHOULD BE A NONE PRIZE HERE AND SHOULD BE SHUTDOWN");
@@ -550,6 +553,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     void loadPrizes(ApplicationPreSetup applicationPreSetup, Descriptor application){
         try{
+            logger.warn("start loadPrizes for " + this.name);
             this.prizes = new HashMap<>();
             TournamentSchedule schedule = new TournamentSchedule();
             schedule.distributionId(this.scheduleId);
@@ -561,6 +565,11 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
             var schedulePrizeList = schedule.prizeList(this.tournamentServiceProvider.inventoryServiceProvider);
             this.rangedPrizeList = new ArrayList<>();
             this.rangedMilestoneList = new ArrayList<>();
+            if (schedulePrizeList.isEmpty()) {
+                logger.warn("schedulePrizeList is empty for " + this.name);
+            } else {
+                logger.warn("schedulePrizeList contains " + schedulePrizeList.size() + " for " + this.name);
+            }
             schedulePrizeList.forEach(c->{
                 if (c.header().get("MinRank")!=null) {
                     int from = c.header().get("MinRank").getAsInt();
@@ -578,8 +587,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
                 }
             });
         }catch (Exception ex){
-            if(this.status == Status.ENDED) return;
             logger.error("Prize load issues ",ex);
+            if(this.status == Status.ENDED) return;
             this.tournamentServiceProvider.endTournament(this);
         }
     }

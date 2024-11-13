@@ -197,6 +197,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             tournamentManager.distributionId(id);
             if(!dataStore.load(tournamentManager)) continue;
             tournamentManager.tournamentServiceProvider = this;
+            logger.warn("Loading prizes for " + tournamentManager.name());
             this.loadPrizes(tournamentManager);
             _tms.add(tournamentManager);
         }
