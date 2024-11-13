@@ -165,6 +165,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         indexed.distributionId(tournamentId);
         if(!dataStore.load(indexed)) throw new RuntimeException("Tournament ["+tournamentId+"] not existed");
         tournamentIndex.putIfAbsent(tournamentId,indexed);
+        this.loadPrizes(indexed);
         return indexed;
     }
     @Override
