@@ -2,5 +2,6 @@
   "activated":false,
   "trialDays":30,
   "root":"root",
-  "password":"root"
+  "password":"root",
+  "sessionTimeoutSeconds": 10
 }

@@ -12,7 +12,6 @@ public interface Presence extends Recoverable,DataStore.Updatable{
 
     boolean local();
 
-    //long stub();
     OnSession stub();
-    boolean offSession(long stub);
+
 }
