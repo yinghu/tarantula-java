@@ -358,6 +358,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                 return true;
             });
             update.pendingAnalytics.add(new RLCPointsEarnedTransaction(session, serverSession.trackId, existing.distributionId(), update.objectiveType, update.score, totalScore));
+            TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+            update.publishAnalytics(webhook, ANALYTICS_QUERY);
             return totalScore;
         }
         return  scoreTournamentWithSameLevel(session,update,playerDataTrack,serverSession);
@@ -376,6 +378,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         update.pendingAnalytics.add(new RLCPointsEarnedTransaction(session, serverSession.trackId, nextLevel.distributionId(), update.objectiveType, update.score, totalScore));
         playerDataTrack.trackId = nextLevel.distributionId();
         playerDataTrack.update();
+        TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+        update.publishAnalytics(webhook, ANALYTICS_QUERY);
         return totalScore;
     }
 
@@ -386,4 +390,5 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             return scoreRunner;
         });
     }
+
 }
