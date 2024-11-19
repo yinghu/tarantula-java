@@ -44,6 +44,7 @@ public class SystemValidator{
                 Presence presence = systemValidatorProvider.presence(access.distributionId());
                 OnSession _ox = presence.stub();
                 if(!_ox.successful()) return _ox;
+                //_ox.stub();
                 _ox.login(access.login());
                 _ox.routingNumber(access.routingNumber());
                 _ox.token(systemValidatorProvider.jwtToken(access,_ox));
