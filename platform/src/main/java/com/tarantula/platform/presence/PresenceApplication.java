@@ -38,7 +38,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             session.write(new PermissionContext(acc.role(),true).toJson().toString().getBytes());
         }
         else if (session.action().equals("onSession")) {
-            session.write(JsonUtil.toSimpleResponse(true,"onSession").getBytes());
+            session.write(JsonUtil.toSimpleResponse(true,"cannot play").getBytes());
             tokenValidatorProvider.presence(session);
         }
         else if (session.action().equals("onPresence")) {

@@ -99,13 +99,25 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         else if(session.action().equals("onToken")){//exchange token
             Map<String,Object> params = acc.toMap();
             params.put(OnAccess.SYSTEM_ID,session.systemId());
+            String typeId = (String) params.get(OnAccess.TYPE_ID);
             String deviceId = acc.property("deviceId")!=null?acc.property("deviceId").toString():"device-id-assigned";
             boolean suc = this.context.validator().validateToken(params);
             LoginProvider _ox = userService.loginProvider(session.distributionId());
             if(suc && _ox!=null ){
                 OnSession onSession = this.login(session.distributionId(),_ox.password(),session);
                 onPlatformProvider(onSession,session,_ox,deviceId);
-            }else{
+            }
+            else if(suc && _ox == null){
+                ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin(typeId+"#"+params.get("provider"),SystemUtil.oid(),deviceId);
+                thirdPartyLogin.distributionKey(session.systemId());
+                userService.createLoginProvider(thirdPartyLogin);
+                acc.property(OnAccess.PASSWORD,thirdPartyLogin.password());
+                acc.typeId(typeId);
+                createLogin(acc,session.distributionId(),AccessControl.player.name(),true,acc.name(),true);
+                OnSession onSession = login(session.distributionId(),thirdPartyLogin.password(),session);
+                onPlatformProvider(onSession,session,thirdPartyLogin,deviceId);
+            }
+            else{
                 session.write(this.builder.create().toJson(new ResponseHeader("onToken", "invalid token", false)).getBytes());
             }
         }
