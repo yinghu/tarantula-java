@@ -302,7 +302,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         }
         //this.context.log("DeviceId : "+loginProvider.deviceId()+" ; "+deviceId+" Access :"+access.successful(),OnLog.WARN);
         //this.context.log("Session not expired : "+lastPing.format(DateTimeFormatter.ISO_DATE_TIME),OnLog.WARN);
-        session.write(JsonUtil.toSimpleResponse(false,"cannot play").getBytes());
+        session.write(JsonUtil.toSimpleResponse(false,"Session not expired on another device").getBytes());
         return false;
     }
 
