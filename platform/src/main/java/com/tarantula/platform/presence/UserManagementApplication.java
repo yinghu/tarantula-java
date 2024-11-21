@@ -275,8 +275,9 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             session.write(JsonUtil.toSimpleResponse(false,"wrong provider token").getBytes());
             return false;
         }
-        if(loginProvider.deviceId().equals(deviceId)){
+        if(loginProvider.deviceId()==null || loginProvider.deviceId().equals(deviceId)){
             loginProvider.stub(access.stub());
+            loginProvider.deviceId(deviceId);
             loginProvider.update();
             return onSession(access,session);
         }
