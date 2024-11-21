@@ -305,7 +305,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         LoginProvider provider = this.loginProvider(key);
         if(provider!=null && provider.stub() !=0 && provider.stub() != stub){
             log.warn("Current session stub not matched with latest ["+provider.stub()+"]["+stub+"]");
-            return false;
+            throw new RuntimeException("Session not expired on another device");
+            //return false;
         }
         byte[] mark = decrypt(SystemUtil.fromBase64String(ticket));
         Recoverable.DataBuffer buffer = BufferProxy.wrap(mark);
