@@ -283,7 +283,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
 
     private boolean onPlatformProvider(OnSession access, Session session,LoginProvider loginProvider,String deviceId){
         if(!access.successful()){
-            this.context.log("Wrong token :",OnLog.WARN);
+            //this.context.log("Wrong token :",OnLog.WARN);
             session.write(JsonUtil.toSimpleResponse(false,"wrong provider token").getBytes());
             return false;
         }
@@ -300,9 +300,9 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             loginProvider.update();
             return onSession(access,session);
         }
-        this.context.log("DeviceId : "+loginProvider.deviceId()+" ; "+deviceId+" Access :"+access.successful(),OnLog.WARN);
-        this.context.log("Session not expired : "+lastPing.format(DateTimeFormatter.ISO_DATE_TIME),OnLog.WARN);
-        session.write(JsonUtil.toSimpleResponse(false,"Session not expired on another device").getBytes());
+        //this.context.log("DeviceId : "+loginProvider.deviceId()+" ; "+deviceId+" Access :"+access.successful(),OnLog.WARN);
+        //this.context.log("Session not expired : "+lastPing.format(DateTimeFormatter.ISO_DATE_TIME),OnLog.WARN);
+        session.write(JsonUtil.toSimpleResponse(false,"cannot play").getBytes());
         return false;
     }
 
