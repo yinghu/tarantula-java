@@ -1,9 +1,7 @@
 package com.tarantula.platform.service;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
+
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.icodesoftware.Descriptor;
 import com.icodesoftware.OnAccess;
 import com.icodesoftware.TarantulaLogger;
@@ -14,6 +12,7 @@ import com.icodesoftware.service.MetricsListener;
 
 import com.icodesoftware.util.HttpCaller;
 
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.configuration.AppleCredentialConfiguration;
@@ -26,7 +25,6 @@ import com.tarantula.platform.store.ShoppingItem;
 import com.tarantula.platform.store.StoreTransactionLog;
 
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
@@ -35,8 +33,6 @@ import java.util.Map;
 public class AppleStoreProvider extends AuthObject{
 
     private static final TarantulaLogger logger = JDKLogger.getLogger(AppleStoreProvider.class);
-    private final static String  SANDBOX_VERIFY_URI = "https://sandbox.itunes.apple.com/verifyReceipt";
-    private final static String  PRODUCTION_VERIFY_URI = "https://buy.itunes.apple.com/verifyReceipt";
 
     private PlatformConfigurationServiceProvider configurationServiceProvider;
     private PlatformGameServiceProvider gameServiceProvider;
@@ -60,6 +56,7 @@ public class AppleStoreProvider extends AuthObject{
         AppleCredentialConfiguration credentialConfiguration = configurationServiceProvider.credentialConfiguration(OnAccess.APPLE);
         if(credentialConfiguration==null){
             logger.warn("no apple credential available ["+typeId+"]");
+            params.put(OnAccess.STORE_MESSAGE,"No apple store credential available ["+typeId+"]");
             return false;
         }
         try{
@@ -67,18 +64,16 @@ public class AppleStoreProvider extends AuthObject{
             StoreTransactionLog logged = storeServiceProvider.transactionLog(pendingTransactionId);
             if(logged != null){
                 logger.warn(logged.toJson().toString());
+                params.put(OnAccess.STORE_MESSAGE,logged.toJson().toString());
                 return false;
             }
             AppleStoreKey appleStoreKey = credentialConfiguration.appleStoreKey();
-            String receipt = (String)params.get("receipt");
-            //String serviceTypeId = (String)params.get(OnAccess.TYPE_ID);
+            String token = appleStoreKey.token();
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(appleStoreKey.isSandbox()?SANDBOX_VERIFY_URI:PRODUCTION_VERIFY_URI))
-                    .version(HttpClient.Version.HTTP_2)
+                    .uri(URI.create(AppleStoreKey.production_transaction_url+pendingTransactionId))
                     .timeout(Duration.ofSeconds(TIMEOUT))
-                    .header(ACCEPT, ACCEPT_JSON)
-                    .header(CONTENT_TYPE,ACCEPT_JSON)
-                    .POST(HttpRequest.BodyPublishers.ofByteArray(toRequestPayload(appleStoreKey,receipt).toString().getBytes()))
+                    .header(AUTHORIZATION,"Bearer "+token)
+                    .GET()
                     .build();
             HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
             int code = serviceContext.httpClientProvider().request(client->{
@@ -86,80 +81,98 @@ public class AppleStoreProvider extends AuthObject{
                 responseData.dataAsString = response.body();
                 return response.statusCode();
             });
-            if(code!=200) throw new RuntimeException("apple store gateway none 200 response");
-            onMetrics(PaymentMetrics.PAYMENT_APPLE_STORE_AMOUNT);
-            if(!checkResponsePayload(responseData.dataAsString,params)) return false;
-            String bundleId = (String)params.get(OnAccess.STORE_BUNDLE_ID);
-            String systemId = (String)params.get(OnAccess.SYSTEM_ID);
-            ShoppingItem shoppingItem = gameServiceProvider.storeServiceProvider().shoppingItem(bundleId);
-            if(shoppingItem==null){
-                logger.warn("Shopping Item not existed  : "+bundleId);
-                throw new RuntimeException("Shopping not existed ["+bundleId+"]");
+            if(code==200){
+                return postValidation(appleStoreKey,responseData.dataAsString,params);
             }
-            GameCluster gameCluster = gameServiceProvider.gameCluster();
-            Transaction t = gameCluster.transaction();
-            boolean suc = t.execute(ctx->{
-                ApplicationPreSetup setup =(ApplicationPreSetup)ctx;
-                Descriptor app = gameCluster.application(shoppingItem.configurationTypeId());
-                ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,setup);
-                redeemer.distributionKey(bundleId);
-                if(!setup.load(app,redeemer)) return false;
-                redeemer.redeem();
-                return true;
-            });
-            storeServiceProvider.transactionLog(new StoreTransactionLog(Long.parseLong(systemId),OnAccess.APPLE_STORE,pendingTransactionId,shoppingItem.distributionId(),suc));
-            if(appleStoreKey.isSandbox()){
-                params.put(OnAccess.IS_SANDBOX, true);
+            if(code == 4040010){
+                HttpRequest sandBoxRequest = HttpRequest.newBuilder()
+                        .uri(URI.create(AppleStoreKey.sandbox_transaction_url+pendingTransactionId))
+                        .timeout(Duration.ofSeconds(TIMEOUT))
+                        .header(AUTHORIZATION,"Bearer "+token)
+                        .GET()
+                        .build();
+                HttpCaller.ResponseData sandBoxResponseData = new HttpCaller.ResponseData();
+                if(serviceContext.httpClientProvider().request(client->{
+                    HttpResponse<String> response = client.send(sandBoxRequest, HttpResponse.BodyHandlers.ofString());
+                    sandBoxResponseData.dataAsString = response.body();
+                    return response.statusCode();
+                }) != 200){
+                    throw new RuntimeException(sandBoxResponseData.dataAsString);
+                }
+                return postValidation(appleStoreKey,sandBoxResponseData.dataAsString,params);
             }
             else{
-                params.put(OnAccess.IS_SANDBOX, false);
+                throw new RuntimeException(responseData.dataAsString);
             }
-
-            if(suc)return true;
-            logger.warn("Item : "+bundleId+" cannot be redeemed");
-            throw new RuntimeException("Item : "+bundleId+" cannot be redeemed");
         }catch (Exception ex){
             logger.error("apple store error ["+typeId+"]",ex);
+            params.put(OnAccess.STORE_MESSAGE,"Error on validation ["+ex.getMessage()+"]");
             return false;
         }
     }
-    private boolean checkResponsePayload(String resp,Map<String,Object> params){
-        String pendingTransactionId = (String)params.get("transactionId");
-        JsonObject receipt = JsonParser.parseString(resp).getAsJsonObject();
-        int status = receipt.get("status").getAsInt();
-        //in_app array
-        boolean validated = false;
-        if(status==0){
-            JsonArray inApps = receipt.get("receipt").getAsJsonObject().get("in_app").getAsJsonArray();
-            for(JsonElement inApp : inApps){
-                JsonObject transaction = inApp.getAsJsonObject();
-                String transactionId = transaction.get("transaction_id").getAsString();
-                if(transactionId.equals(pendingTransactionId)){
-                    String sku = transaction.get("product_id").getAsString();
-                    int quantity  = transaction.get("quantity").getAsInt();
-                    params.put(OnAccess.STORE_TRANSACTION_ID,transactionId);
-                    params.put(OnAccess.STORE_PRODUCT_ID,sku);
-                    params.put(OnAccess.STORE_QUANTITY,quantity);
-                    validated = true;
-                    break;
-                }
-            }
+
+    //{"transactionId":"2000000736584713",
+    // "originalTransactionId":"2000000736584713",
+    // "bundleId":"com.nicegang.eighthera",
+    // "productId":"gems001",
+    // "purchaseDate":1728414177000,"originalPurchaseDate":1728414177000,
+    // "quantity":1,"type":"Consumable","inAppOwnershipType":"PURCHASED",
+    // "signedDate":1732567844005,"environment":"Sandbox",
+    // "transactionReason":"PURCHASE",
+    // "storefront":"USA",
+    // "storefrontId":"143441",
+    // "price":1990,"currency":"USD"}
+    private boolean postValidation(AppleStoreKey appleStoreKey,String response,Map<String,Object> params){
+        JsonObject payload = JsonUtil.parse(response);
+        String requestedSku = (String)params.get(OnAccess.STORE_BUNDLE_ID);
+        String requestedTransactionId = (String)params.get("transactionId");
+        String systemId = (String)params.get(OnAccess.SYSTEM_ID);
+        String transactionId = payload.get("transactionId").getAsString();
+        String sku = payload.get("productId").getAsString();
+        int quantity  = payload.get("quantity").getAsInt();
+        String bundleId = payload.get("bundleId").getAsString();
+        if(!transactionId.equals(requestedTransactionId)){
+            logger.warn("Transaction Id not matched ["+transactionId+" : " +requestedTransactionId+ " : playerId : "+systemId);
+            params.put(OnAccess.STORE_MESSAGE,"transaction not matched ["+transactionId+" : "+requestedTransactionId);
+            return false;
         }
-        else{
-            logger.warn("failure apple store response ["+status+"]");
-            logger.warn(receipt.toString());
-            //to do send out a system message
+        if(!sku.equals(requestedSku)){
+            logger.warn("Sku/ProductId not matched ["+sku+" : " +requestedSku+ " : playerId : "+systemId);
+            params.put(OnAccess.STORE_MESSAGE,"sku/ProductID not matched ["+sku+" : "+requestedSku);
+            return false;
         }
-        if(!validated){
-            params.put(OnAccess.STORE_MESSAGE,"transaction cannot be validated");
+        if(!bundleId.equals(appleStoreKey.bundleId())){
+            logger.warn("Bundle Id not matched ["+bundleId+" : " +appleStoreKey.bundleId()+ " : playerId : "+systemId);
+            params.put(OnAccess.STORE_MESSAGE,"bundleId not matched ["+bundleId+" : "+appleStoreKey.bundleId());
+            return false;
         }
-        return validated;
+        ShoppingItem shoppingItem = gameServiceProvider.storeServiceProvider().shoppingItem(sku);
+        if(shoppingItem==null){
+            logger.warn("Shopping Item not existed  : "+sku+ " : playerId : "+systemId);
+            params.put(OnAccess.STORE_MESSAGE,"Sku not existed ["+sku+" : "+requestedSku);
+            return false;
+        }
+        GameCluster gameCluster = gameServiceProvider.gameCluster();
+        Transaction t = gameCluster.transaction();
+        boolean granted = t.execute(ctx->{
+            ApplicationPreSetup setup =(ApplicationPreSetup)ctx;
+            Descriptor app = gameCluster.application(shoppingItem.configurationTypeId());
+            ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,setup);
+            redeemer.distributionKey(bundleId);
+            if(!setup.load(app,redeemer)) return false;
+            redeemer.redeem();
+            return true;
+        });
+        storeServiceProvider.transactionLog(new StoreTransactionLog(Long.parseLong(systemId),OnAccess.APPLE_STORE,transactionId,shoppingItem.distributionId(),granted));
+        onMetrics(PaymentMetrics.PAYMENT_APPLE_STORE_AMOUNT);
+        boolean isSandbox = payload.get("environment").getAsString().equals("Sandbox");
+        params.put(OnAccess.STORE_TRANSACTION_ID,transactionId);
+        params.put(OnAccess.STORE_PRODUCT_ID,sku);
+        params.put(OnAccess.STORE_QUANTITY,quantity);
+        params.put(OnAccess.IS_SANDBOX,isSandbox);
+        params.put(OnAccess.STORE_MESSAGE,"Sku granted  ["+sku+":"+granted+"]");
+        return true;
     }
-    private JsonObject toRequestPayload(AppleStoreKey appleStoreKey,String receipt){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("receipt-data",receipt);
-        jsonObject.addProperty("password",appleStoreKey.secureKey());
-        jsonObject.addProperty("exclude-old-transactions",true);
-        return jsonObject;
-    }
+
+
 }
