@@ -32,7 +32,7 @@ public class GameInboxModule extends ModuleHeader{
             session.write(JsonUtil.toSimpleResponse(true, "Player event " + session.name() + " completed").getBytes());
         }
         else if(session.action().equals("onCheckGlobalItemGrants")){
-            this.gameServiceProvider.inboxServiceProvider().checkGlobalItemGrant(session, gameServiceProvider.gameCluster().distributionId());
+            this.gameServiceProvider.inboxServiceProvider().checkGlobalItemGrant(session);
             session.write(JsonUtil.toSimpleResponse(true, "Done").getBytes());
         }
         else{

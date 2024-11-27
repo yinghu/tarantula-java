@@ -4,17 +4,16 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceSetup;
 
-import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.configuration.MailboxCredentialConfiguration;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.Application;
+import com.tarantula.platform.tournament.PlatformTournamentServiceProvider;
 import com.tarantula.platform.tournament.TournamentPrize;
 
 import java.time.LocalDate;
@@ -27,15 +26,13 @@ import java.util.Map;
 public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
 
     public static final String NAME = "inbox";
-
-    private final String EVENTSPLIT = "--";
-
     @Override
     public void registerSummary(Summary summary) {
         super.registerSummary(summary);
     }
 
     private final PlatformInventoryServiceProvider inventoryServiceProvider;
+    private PlatformTournamentServiceProvider tournamentServiceProvider;
 
     private boolean pendingReward;
     public PlatformInboxServiceProvider(PlatformGameServiceProvider gameServiceProvider){
@@ -56,45 +53,53 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         return inbox;
     }
 
-    public void checkGlobalItemGrant(Session session, long gameclusterID){
+    public void checkGlobalItemGrant(Session session){
+        //Get Player Level and Account Creation Date
         String[] payloadSplit = session.name().split("#");
         int playerLevel = Integer.parseInt(payloadSplit[1]);
+        LocalDate accountCreatedDate = LocalDate.parse(payloadSplit[0], DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate accountCreatedDate = LocalDate.parse(payloadSplit[0], formatter);
+        //Date Stores
+        DataStore globalDataStore = applicationPreSetup.dataStore(gameCluster,"global_item_grant_events");
+        DataStore playerDataStore = gameCluster.applicationPreSetup().onDataStore("player_item_grant_events");
+        List<LocalDateTime> playerGlobalGrantList = new ArrayList<>();
 
-        DataStore globalDataStore = applicationPreSetup.dataStore(gameCluster,"global_item_grants");
-        DataStore playerDataStore = gameCluster.applicationPreSetup().onDataStore("player_inventory_grant");
-        List<LocalDateTime> playerEventGlobalTimes = new ArrayList<>();
-
-        playerDataStore.list(new PlatformServerEventQuery(session.distributionId())).forEach(playerGrantEvent -> {
-            if(playerGrantEvent.name().startsWith("GlobalGrant")){
-                String[] playerEventNameSplit = playerGrantEvent.name().split(EVENTSPLIT);
-                if(playerEventNameSplit.length == 4){
-                    playerEventGlobalTimes.add(LocalDateTime.parse(playerEventNameSplit[3]));
-                }
+        //Get All Global Item Grants From Player
+        playerDataStore.list(new PlatformItemGrantEventQuery(session.distributionId())).forEach(itemGrantEvent -> {
+            if(itemGrantEvent.type.equals("Global")){
+                playerGlobalGrantList.add(itemGrantEvent.dateCreated);
             }
         });
 
-        globalDataStore.list(new GlobalItemGrantEventQuery(gameclusterID)).forEach(globalGrantEvent -> {
+        //Check For New Global Item Grant Events Not In Players List
+        globalDataStore.list(new GlobalItemGrantEventQuery(gameCluster.distributionId())).forEach(globalGrantEvent -> {
             if(globalGrantEvent.completed) return;
 
-            if(!playerEventGlobalTimes.contains(globalGrantEvent.dateCreated)){
+            if(!playerGlobalGrantList.contains(globalGrantEvent.dateCreated)){
                 boolean shouldComplete = false;
 
+                //Player Level Filter
                 if(playerLevel < globalGrantEvent.minPlayerLevelFilter || playerLevel > globalGrantEvent.maxPlayerLevelFilter){
                     shouldComplete = true;
                 }
 
+                //Account Creation Date Filter
                 if(accountCreatedDate.isBefore(globalGrantEvent.minInstallDateFilter) || accountCreatedDate.isAfter(globalGrantEvent.maxInstallDateFilter)){
                     shouldComplete = true;
                 }
 
-                PlatformServerEvent serverGrantEvent = new PlatformServerEvent("GlobalGrant"+ EVENTSPLIT + globalGrantEvent.itemID +
-                        EVENTSPLIT + globalGrantEvent.amount + EVENTSPLIT + globalGrantEvent.dateCreated, shouldComplete);
+                //Tournament Filter
+                if(globalGrantEvent.tournamentIdFilter != 0){
+                    Tournament tournament = tournamentServiceProvider.tournament(globalGrantEvent.tournamentIdFilter);
+                    if(!tournament.isPlayerEnteredInTournament(session)){
+                        shouldComplete = true;
+                    }
+                }
 
-                serverGrantEvent.ownerKey(SnowflakeKey.from(session.distributionId()));
-                playerDataStore.create(serverGrantEvent);
+                //Create New ItemGrantEvent For Player
+                PlatformItemGrantEvent itemGrantEvent = new PlatformItemGrantEvent("Global", globalGrantEvent.itemID, globalGrantEvent.itemName, globalGrantEvent.amount, shouldComplete, globalGrantEvent.dateCreated);
+                itemGrantEvent.ownerKey(SnowflakeKey.from(session.distributionId()));
+                playerDataStore.create(itemGrantEvent);
             }
         });
     }
@@ -124,6 +129,7 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         JsonObject inbox = ((JsonElement)configuration.property("inbox")).getAsJsonObject();
         pendingReward = inbox.get("pendingReward").getAsBoolean();
         this.logger = JDKLogger.getLogger(PlatformInboxServiceProvider.class);
+        this.tournamentServiceProvider = platformGameServiceProvider.tournamentServiceProvider();
         logger.warn("Platform inbox started->"+gameServiceName);
     }
 

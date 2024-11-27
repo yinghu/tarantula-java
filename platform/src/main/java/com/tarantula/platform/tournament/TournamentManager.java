@@ -609,6 +609,11 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         });
     }
 
+    public boolean isPlayerEnteredInTournament(Session session){
+        TournamentJoin join = TournamentJoin.lookup(tournamentServiceProvider.tournamentJoin,session,distributionId);
+        return join.tournamentId == this.distributionId && join.instanceId > 0 && join.entryId > 0;
+    }
+
     public Instance register(Session session){
         TournamentJoin join = TournamentJoin.lookup(tournamentServiceProvider.tournamentJoin,session,distributionId);
         if(status == Status.ENDED) return new TournamentInstanceProxy(this,join);

@@ -14,7 +14,7 @@ public class GlobalItemGrantEvent extends RecoverableObject {
     public boolean completed;
     public String itemName;
     public String itemID;
-    public long amount;
+    public int amount;
     public LocalDateTime dateCreated;
 
     public int minPlayerLevelFilter;
@@ -28,7 +28,7 @@ public class GlobalItemGrantEvent extends RecoverableObject {
         this.label = LABEL;
     }
 
-    public GlobalItemGrantEvent(String itemName, String itemID, long amount, LocalDateTime dateCreated){
+    public GlobalItemGrantEvent(String itemName, String itemID, int amount, LocalDateTime dateCreated){
         this();
         this.completed = false;
         this.itemName = itemName;
@@ -66,7 +66,7 @@ public class GlobalItemGrantEvent extends RecoverableObject {
         buffer.writeUTF8(name);
         buffer.writeUTF8(itemName);
         buffer.writeUTF8(itemID);
-        buffer.writeLong(amount);
+        buffer.writeInt(amount);
         buffer.writeLong(TimeUtil.toUTCMilliseconds(dateCreated));
         buffer.writeInt(minPlayerLevelFilter);
         buffer.writeInt(maxPlayerLevelFilter);
@@ -83,7 +83,7 @@ public class GlobalItemGrantEvent extends RecoverableObject {
         name = buffer.readUTF8();
         itemName = buffer.readUTF8();
         itemID = buffer.readUTF8();
-        amount = buffer.readLong();
+        amount = buffer.readInt();
         dateCreated = TimeUtil.fromUTCMilliseconds(buffer.readLong());
         minPlayerLevelFilter = buffer.readInt();
         maxPlayerLevelFilter = buffer.readInt();
