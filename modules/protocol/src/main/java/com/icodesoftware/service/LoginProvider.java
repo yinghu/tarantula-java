@@ -1,12 +1,15 @@
 package com.icodesoftware.service;
 
-import com.icodesoftware.Recoverable;
+import com.icodesoftware.DataStore;
+import com.icodesoftware.OnApplication;
 
-public interface LoginProvider extends Recoverable {
+
+public interface LoginProvider extends OnApplication, DataStore.Updatable {
 
     String DataStore = "tarantula_login_provider";
 
     String provider();
     String password();
-    String clientId();
+    String deviceId();
+    void deviceId(String deviceId);
 }

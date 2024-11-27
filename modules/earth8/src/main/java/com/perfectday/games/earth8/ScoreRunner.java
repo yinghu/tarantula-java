@@ -53,7 +53,6 @@ public class ScoreRunner implements SchedulingTask {
             return;
         }
         double scored = earth8GameServiceProvider.scoreTournamentWithJoined(pendingScore.session,pendingScore.battleUpdate,pendingScore.serverSession);
-        //earth8GameServiceProvider.gameContext.log("Total : " + scored+" Delta :"+pendingScore.battleUpdate.score, OnLog.WARN);
         if(scored == 0){
             earth8GameServiceProvider.scoreRunners.remove(systemId);
             return;

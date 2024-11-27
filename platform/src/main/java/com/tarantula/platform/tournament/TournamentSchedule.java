@@ -42,11 +42,9 @@ public class TournamentSchedule extends Application {
         return header.get("Type").getAsString();
     }
 
-    public Tournament.Schedule schedule(){ return Tournament.Schedule.values()[header.get("Schedule").getAsInt()];}
-
-    public double enterCost(){ return header.get("EnterCost").getAsDouble();}
-
-    public double credit(){ return header.get("Credit").getAsDouble();}
+    public Tournament.Schedule schedule(){ return Tournament.Schedule.ON_DEMAND_SCHEDULE;}
+    public double enterCost(){ return 0;}
+    public double credit(){ return 0;}
     public LocalDateTime startTime() {
         return TimeUtil.fromString("yyyy-MM-dd'T'HH:mm",header.get("StartTime").getAsString());
     }
@@ -55,23 +53,24 @@ public class TournamentSchedule extends Application {
     }
 
 
-    public int maxEntriesPerInstance() {
-        return header.get("MaxEntriesPerInstance").getAsInt();
-    }
+    public int maxEntriesPerInstance() {return header.get("MaxEntriesPerInstance").getAsInt();}
 
     public void maxEntriesPerInstance(int maxEntriesPerInstance){
         header.addProperty("MaxEntriesPerInstance",maxEntriesPerInstance);
     }
 
     public int durationMinutesPerInstance() {
-        return header.get("DurationMinutesPerInstance").getAsInt();
-    }
+        return 0;}
 
     public long startLevel(){
         return header.get("StartLevel").getAsLong();
     }
     public long endLevel(){
         return header.get("EndLevel").getAsLong();
+    }
+
+    public String typeId(){
+        return header.get("TypeId").getAsString();
     }
 
     @Override

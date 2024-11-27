@@ -7,6 +7,8 @@ import com.tarantula.game.GameLobbyProxy;
 import com.tarantula.game.GameRating;
 import com.tarantula.game.Stub;
 import com.tarantula.platform.AccessControl;
+import com.tarantula.platform.presence.Profile;
+import com.tarantula.platform.presence.ProfilePayload;
 import com.tarantula.platform.util.OnAccessDeserializer;
 
 public class GameLobbyModule extends ModuleHeader{
@@ -26,6 +28,7 @@ public class GameLobbyModule extends ModuleHeader{
         session.write(stub.toJson().toString().getBytes());
         if(!stub.joined()) return;
         gameServiceProvider.presenceServiceProvider().onPlay(session.distributionId());
+        gameServiceProvider.presenceServiceProvider().getDisplayName(session);
         gameServiceProvider.gameServiceProvider().onJoined(session, stub.room);
     }
 

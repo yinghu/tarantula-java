@@ -11,6 +11,7 @@
     {"type":"create.asset","moduleResourceFile":"admin/create.asset.view.html"},
     {"type":"register.application","moduleResourceFile":"admin/register.application.view.html"},
     {"type":"edit.category","moduleResourceFile":"admin/edit.category.view.html"},
+    {"type":"batch.category","moduleResourceFile":"admin/batch.category.view.html"},
     {"type":"create.category","moduleResourceFile":"admin/create.category.view.html"},
     {"type":"create.enum","moduleResourceFile":"admin/create.enum.view.html"},
     {"type":"create.primitive","moduleResourceFile":"admin/create.primitive.view.html"},

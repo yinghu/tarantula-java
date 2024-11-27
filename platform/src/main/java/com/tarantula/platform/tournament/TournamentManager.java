@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import java.util.List;
@@ -54,6 +55,8 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     private long startLevel;
     private long endLevel;
 
+    private String typeId;
+
     private int concurrentInstanceSize;
 
     private TournamentRegister[] pendingInstances;
@@ -61,6 +64,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     private DistributionTournamentService distributionTournamentService;
     private HashMap<Integer,TournamentPrize> prizes;
     private List<ConfigurableObject> rangedPrizeList;
+    private List<ConfigurableObject> rangedMilestoneList;
     ScheduledFuture<?> pendingSchedule;
 
     private ConcurrentHashMap<Long,ScheduledFuture<?>> pendingSchedules = new ConcurrentHashMap<>();
@@ -115,6 +119,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         this.credit = schedule.credit();
         this.startLevel = schedule.startLevel();
         this.endLevel = schedule.endLevel();
+        this.typeId = schedule.typeId();
         this.scheduleId = schedule.distributionId();
     }
 
@@ -151,6 +156,11 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return startTime;
     }
 
+    public String typeId() { return typeId; }
+    public void typeId(String typeId) {
+        this.typeId = typeId;
+    }
+
 
     @Override
     public boolean write(DataBuffer buffer) {
@@ -172,6 +182,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         buffer.writeLong(startLevel);
         buffer.writeLong(endLevel);
         buffer.writeInt(segmentsPerSchedule);
+        buffer.writeUTF8(typeId);
         return true;
     }
 
@@ -195,7 +206,11 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         startLevel = buffer.readLong();
         endLevel = buffer.readLong();
         segmentsPerSchedule = buffer.readInt();
-
+        try {
+            typeId = buffer.readUTF8();
+        }catch(Exception ex){
+            //ignore
+        }
         if(global) {
             tournamentSegments = new TournamentSegment[this.segmentsPerSchedule];
             segmentSlot = new AtomicInteger(0);
@@ -410,13 +425,14 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         jsonObject.addProperty("CloseTime",closeTime.format(DateTimeFormatter.ISO_DATE_TIME));
         jsonObject.addProperty("EndTime",endTime.format(DateTimeFormatter.ISO_DATE_TIME));
         if(nextSortingTime!=null) jsonObject.addProperty("NextRefreshTime",nextSortingTime.format(DateTimeFormatter.ISO_DATE_TIME));
-        jsonObject.addProperty("DurationMinutes",durationMinutes);
-        jsonObject.addProperty("MaxEntries",maxEntriesPerInstance);
-        jsonObject.addProperty("EnterCost",enterCost);
-        jsonObject.addProperty("Credit",credit);
+        //jsonObject.addProperty("DurationMinutes",durationMinutes);
+        //jsonObject.addProperty("MaxEntries",maxEntriesPerInstance);
+        //jsonObject.addProperty("EnterCost",enterCost);
+        //jsonObject.addProperty("Credit",credit);
         jsonObject.addProperty("ScheduleId",Long.toString(this.scheduleId));
         jsonObject.addProperty("StartLevel",startLevel);
         jsonObject.addProperty("EndLevel",endLevel);
+        jsonObject.addProperty("TypeId", typeId);
         jsonObject.addProperty("Status",status.name());
         JsonArray prizeList = new JsonArray();
         if(rangedPrizeList==null||tournamentServiceProvider==null){
@@ -427,7 +443,17 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         for(ConfigurableObject p : rangedPrizeList){
             prizeList.add(p.toJson());
         }
-        jsonObject.add("_prizes",prizeList);
+        jsonObject.add("Prizes",prizeList);
+        JsonArray milestoneList = new JsonArray();
+        if (rangedMilestoneList==null) {
+            //should not be return no milestone/ need to local why
+            logger.warn("SHOULD BE A NONE MILESTONE HERE AND SHOULD BE SHUTDOWN");
+            return jsonObject;
+        }
+        for(ConfigurableObject p : rangedMilestoneList){
+            milestoneList.add(p.toJson());
+        }
+        jsonObject.add("Milestones",milestoneList);
         return jsonObject;
     }
 
@@ -532,13 +558,23 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
                 //return;
             }
             schedule.setup();
-            this.rangedPrizeList = schedule.prizeList(this.tournamentServiceProvider.inventoryServiceProvider);
-            this.rangedPrizeList.forEach(c->{
-                int from = c.header().get("MinRank").getAsInt();
-                int to = c.header().get("MaxRank").getAsInt();
-                for(int i = from;i<=to;i++){
-                    TournamentPrize prize = new TournamentPrize(c,i);
-                    prizes.put(prize.rank(),prize);
+            var schedulePrizeList = schedule.prizeList(this.tournamentServiceProvider.inventoryServiceProvider);
+            this.rangedPrizeList = new ArrayList<>();
+            this.rangedMilestoneList = new ArrayList<>();
+            schedulePrizeList.forEach(c->{
+                if (c.header().get("MinRank")!=null) {
+                    int from = c.header().get("MinRank").getAsInt();
+                    int to = c.header().get("MaxRank").getAsInt();
+                    rangedPrizeList.add(c);
+
+                    for (int i = from; i <= to; i++) {
+                        TournamentPrize prize = new TournamentPrize(c, i);
+                        prizes.put(prize.rank(), prize);
+                    }
+                }
+
+                if (c.header().get("Score")!=null) {
+                    rangedMilestoneList.add(c);
                 }
             });
         }catch (Exception ex){

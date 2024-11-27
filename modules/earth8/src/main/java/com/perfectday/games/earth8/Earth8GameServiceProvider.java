@@ -31,11 +31,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     private ConcurrentHashMap<Long,Boolean> tournamentBannedPlayersList = new ConcurrentHashMap<>();
 
     private ConcurrentHashMap<String,ApplicationResource> resourceIndex = new ConcurrentHashMap<>();
-
-
     ConcurrentHashMap<Long, ScoreRunner> scoreRunners = new ConcurrentHashMap<>();
-
-
     public void setup(GameContext gameContext){
         this.gameContext = gameContext;
         this.gameContext.registerTournamentListener(this);
@@ -52,7 +48,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         PlayerDataTrack analyticsSession = PlayerDataTrack.lookup(gameContext,session.distributionId(), PlayerDataTrack.Type.Analytics);
         analyticsSession.trackId = gameContext.applicationSchema().applicationPreSetup().distributionId();
         analyticsSession.update();
-        ServerConnectTransaction serverConnectTransaction = new ServerConnectTransaction(session,analyticsSession.trackId);
+        ServerConnectTransaction serverConnectTransaction = new ServerConnectTransaction(session,analyticsSession.trackId, session.name());
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
                 webhook.upload(ANALYTICS_QUERY,serverConnectTransaction.toString().getBytes()))
         );
@@ -362,6 +358,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                 return true;
             });
             update.pendingAnalytics.add(new RLCPointsEarnedTransaction(session, serverSession.trackId, existing.distributionId(), update.objectiveType, update.score, totalScore));
+            TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+            update.publishAnalytics(webhook, ANALYTICS_QUERY);
             return totalScore;
         }
         return  scoreTournamentWithSameLevel(session,update,playerDataTrack,serverSession);
@@ -380,6 +378,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         update.pendingAnalytics.add(new RLCPointsEarnedTransaction(session, serverSession.trackId, nextLevel.distributionId(), update.objectiveType, update.score, totalScore));
         playerDataTrack.trackId = nextLevel.distributionId();
         playerDataTrack.update();
+        TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+        update.publishAnalytics(webhook, ANALYTICS_QUERY);
         return totalScore;
     }
 
@@ -390,4 +390,5 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             return scoreRunner;
         });
     }
+
 }
