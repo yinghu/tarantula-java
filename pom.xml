@@ -18,7 +18,6 @@
         <module>modules/lmdb</module>
         <module>platform</module>
         <module>modules/earth8</module>
-        <module>lmdb-partition</module>
         <module>load-test</module>
     </modules>
 

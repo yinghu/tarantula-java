@@ -2,7 +2,6 @@ package com.tarantula.platform.item;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.StringUtil;
 
 import java.util.List;
