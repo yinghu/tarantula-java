@@ -32,7 +32,6 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
     }
 
     private final PlatformInventoryServiceProvider inventoryServiceProvider;
-    private PlatformTournamentServiceProvider tournamentServiceProvider;
 
     private boolean pendingReward;
     public PlatformInboxServiceProvider(PlatformGameServiceProvider gameServiceProvider){
@@ -53,56 +52,7 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         return inbox;
     }
 
-    public void checkGlobalItemGrant(Session session){
-        //Get Player Level and Account Creation Date
-        String[] payloadSplit = session.name().split("#");
-        int playerLevel = Integer.parseInt(payloadSplit[1]);
-        LocalDate accountCreatedDate = LocalDate.parse(payloadSplit[0], DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        //Date Stores
-        DataStore globalDataStore = applicationPreSetup.dataStore(gameCluster,"global_item_grant_events");
-        DataStore playerDataStore = gameCluster.applicationPreSetup().onDataStore("player_item_grant_events");
-        List<LocalDateTime> playerGlobalGrantList = new ArrayList<>();
-
-        //Get All Global Item Grants From Player
-        playerDataStore.list(new PlatformItemGrantEventQuery(session.distributionId())).forEach(itemGrantEvent -> {
-            if(itemGrantEvent.type.equals("Global")){
-                playerGlobalGrantList.add(itemGrantEvent.dateCreated);
-            }
-        });
-
-        //Check For New Global Item Grant Events Not In Players List
-        globalDataStore.list(new GlobalItemGrantEventQuery(gameCluster.distributionId())).forEach(globalGrantEvent -> {
-            if(globalGrantEvent.completed) return;
-
-            if(!playerGlobalGrantList.contains(globalGrantEvent.dateCreated)){
-                boolean shouldComplete = false;
-
-                //Player Level Filter
-                if(playerLevel < globalGrantEvent.minPlayerLevelFilter || playerLevel > globalGrantEvent.maxPlayerLevelFilter){
-                    shouldComplete = true;
-                }
-
-                //Account Creation Date Filter
-                if(accountCreatedDate.isBefore(globalGrantEvent.minInstallDateFilter) || accountCreatedDate.isAfter(globalGrantEvent.maxInstallDateFilter)){
-                    shouldComplete = true;
-                }
-
-                //Tournament Filter
-                if(globalGrantEvent.tournamentIdFilter != 0){
-                    Tournament tournament = tournamentServiceProvider.tournament(globalGrantEvent.tournamentIdFilter);
-                    if(!tournament.isPlayerEnteredInTournament(session)){
-                        shouldComplete = true;
-                    }
-                }
-
-                //Create New ItemGrantEvent For Player
-                PlatformItemGrantEvent itemGrantEvent = new PlatformItemGrantEvent("Global", globalGrantEvent.itemID, globalGrantEvent.itemName, globalGrantEvent.amount, shouldComplete, globalGrantEvent.dateCreated);
-                itemGrantEvent.ownerKey(SnowflakeKey.from(session.distributionId()));
-                playerDataStore.create(itemGrantEvent);
-            }
-        });
-    }
 
     public Mailbox mailbox(Session session){
         Map<Long,MailboxCredentialConfiguration> inbox = this.platformGameServiceProvider.configurationServiceProvider().inbox();
@@ -129,7 +79,6 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         JsonObject inbox = ((JsonElement)configuration.property("inbox")).getAsJsonObject();
         pendingReward = inbox.get("pendingReward").getAsBoolean();
         this.logger = JDKLogger.getLogger(PlatformInboxServiceProvider.class);
-        this.tournamentServiceProvider = platformGameServiceProvider.tournamentServiceProvider();
         logger.warn("Platform inbox started->"+gameServiceName);
     }
 

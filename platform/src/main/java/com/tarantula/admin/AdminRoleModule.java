@@ -194,10 +194,6 @@ public class AdminRoleModule implements Module{
             session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"operation successfully":"operation failed",suc)).getBytes());
         }
         else if(session.action().equals("onItemGrantEvent")){
-            //Get DataStore
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
-            DataStore dataStore = gameCluster.applicationPreSetup().onDataStore("player_item_grant_events");
-
             //Parse Data From UI
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             String playerID = (String)onAccess.property("playerID");
@@ -205,106 +201,52 @@ public class AdminRoleModule implements Module{
             String itemID = (String)onAccess.property("itemID");
             String itemName = (String)onAccess.property("itemName");
 
-            //Create New ItemGrantEvent For Player
-            PlatformItemGrantEvent itemGrantEvent = new PlatformItemGrantEvent("Individual", itemID, itemName, Integer.parseInt(amount), false, LocalDateTime.now());
-            itemGrantEvent.ownerKey(SnowflakeKey.from(Long.parseLong(playerID)));
-            dataStore.create(itemGrantEvent);
+            //Create Item Grant Event
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
+            gameCluster.platformGameServiceProvider().presenceServiceProvider().createItemGrantEvent(Long.parseLong(playerID), itemID, itemName, Integer.parseInt(amount), false);
 
             //Return Message To Web UI
             session.write(JsonUtil.toSimpleResponse(true, amount + " " + itemName + " Granted to Player " + playerID).getBytes());
         }
         else if(session.action().equals("onGetGlobalGrantEvents")) {
-            //Get DataStore
-            long gameclusterID = Long.parseLong(session.name());
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameclusterID);
-            DataStore dataStore = gameCluster.applicationPreSetup().dataStore(gameCluster, "global_item_grant_events");
-            List<GlobalItemGrantEvent> eventList = new ArrayList<>();
-
-            //Get All Active Global Grants
-            dataStore.list(new GlobalItemGrantEventQuery(gameclusterID)).forEach(globalGrantEvent -> {
-                if(!globalGrantEvent.completed){
-                    eventList.add(globalGrantEvent);
-                }
-            });
+            //Get Active Global Item Grant Events
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
+            List<GlobalItemGrantEvent> globalItemGrantEvents = gameCluster.platformGameServiceProvider().presenceServiceProvider().getActiveGlobalItemGrants();
 
             //Return Global Grant List To Web UI
-            GlobalItemGrantList globalItemGrantList = new GlobalItemGrantList(eventList);
+            GlobalItemGrantList globalItemGrantList = new GlobalItemGrantList(globalItemGrantEvents);
             session.write(globalItemGrantList.toJson().toString().getBytes());
         }
         else if(session.action().equals("onDeleteGlobalGrantEvent")) {
-            long gameclusterID = Long.parseLong(session.name());
-
+            //Parse Data From UI
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
             String dateCreatedString = (String)onAccess.property("dateCreated");
-
             LocalDateTime dateCreated = LocalDateTime.parse(dateCreatedString);
 
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameclusterID);
-            DataStore dataStore = gameCluster.applicationPreSetup().dataStore(gameCluster, "global_item_grant_events");
+            //Complete Global Item Grant Event
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
+            gameCluster.platformGameServiceProvider().presenceServiceProvider().completeGlobalItemGrantEvent(dateCreated);
 
-           dataStore.list(new GlobalItemGrantEventQuery(gameclusterID)).forEach(globalGrantEvent -> {
-                if(globalGrantEvent.dateCreated.equals(dateCreated)){
-                    globalGrantEvent.completed = true;
-                    dataStore.update(globalGrantEvent);
-
-                    session.write(JsonUtil.toSimpleResponse(true, "Global Grant Event Ended").getBytes());
-                }
-            });
-
-           session.write(JsonUtil.toSimpleResponse(true, "No Global Grant Event Found").getBytes());
-
+            session.write(JsonUtil.toSimpleResponse(true, "Global Item Grant Event Ended").getBytes());
         }
         else if(session.action().equals("onCreateGlobalEvent")) {
+            //Parse Data From UI
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
-
-            String amount = (String)onAccess.property("itemAmount");
-            String itemID = (String)onAccess.property("itemID");
             String itemName = (String)onAccess.property("itemName");
-
+            String itemID = (String)onAccess.property("itemID");
+            String amount = (String)onAccess.property("itemAmount");
             String minPlayerLevelFilterString =  (String)onAccess.property("minPlayerLevel");
             String maxPlayerLevelFilterString = (String)onAccess.property("maxPlayerLevel");
-
             String minInstallDateFilterString = (String)onAccess.property("minPlayerInstallDate");
             String maxInstallDateFilterString = (String)onAccess.property("maxPlayerInstallDate");
-
             String tournamentIDString = (String)onAccess.property("tournamentID");
 
-            long gameclusterID = Long.parseLong(session.name());
-            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(gameclusterID);
-            DataStore dataStore = gameCluster.applicationPreSetup().dataStore(gameCluster, "global_item_grant_events");
+            //Create Global Item Grant Event
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
+            gameCluster.platformGameServiceProvider().presenceServiceProvider().createGlobalItemGrant(itemName,
+                    itemID, Integer.parseInt(amount), minPlayerLevelFilterString, maxPlayerLevelFilterString, minInstallDateFilterString, maxInstallDateFilterString, tournamentIDString);
 
-            LocalDateTime dateCreated = LocalDateTime.now();
-
-            GlobalItemGrantEvent globalItemGrantEvent = new GlobalItemGrantEvent(itemName, itemID, Integer.parseInt(amount), dateCreated);
-            globalItemGrantEvent.ownerKey(SnowflakeKey.from(gameclusterID));
-
-            if(!minPlayerLevelFilterString.isEmpty() && !maxPlayerLevelFilterString.isEmpty()){
-                int minPlayerLevelFilter = Integer.parseInt(minPlayerLevelFilterString);
-                int maxPlayerLevelFilter = Integer.parseInt(maxPlayerLevelFilterString);
-
-                globalItemGrantEvent.setPlayerLevelFilter(minPlayerLevelFilter, maxPlayerLevelFilter);
-            }
-
-            if(!minInstallDateFilterString.isEmpty() && !maxInstallDateFilterString.isEmpty()){
-                LocalDate minInstallDateFilter = LocalDate.parse(minInstallDateFilterString);
-                LocalDate maxInstallDateFilter = LocalDate.parse(maxInstallDateFilterString);
-
-                globalItemGrantEvent.setInstallDateFilter(minInstallDateFilter, maxInstallDateFilter);
-            }
-
-            if(!tournamentIDString.isEmpty()){
-                long tournamentID = Long.parseLong(tournamentIDString);
-
-                globalItemGrantEvent.setTournamentIdFilter(tournamentID);
-            }
-
-            if(dataStore.create(globalItemGrantEvent)){
-                session.write(JsonUtil.toSimpleResponse(true, "Global Grant Event Created").getBytes());
-            }
-            else{
-                session.write(JsonUtil.toSimpleResponse(true, "Error Creating Global Grant Event").getBytes());
-            }
-
+            session.write(JsonUtil.toSimpleResponse(true, "Global Grant Event Created").getBytes());
         }
         else if(session.action().equals("onBanPlayer")) {
             OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);

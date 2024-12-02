@@ -42,7 +42,7 @@ public interface Tournament extends Configurable {
     long endLevel();
     String typeId();
     long scheduleId();
-    boolean isPlayerEnteredInTournament(Session session);
+    boolean joined(Session session);
     Instance register(Session session);
     void ban(long systemId);
 
