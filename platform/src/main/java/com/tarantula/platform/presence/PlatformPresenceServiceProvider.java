@@ -9,6 +9,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.statistics.UserStatistics;
 import com.icodesoftware.service.ServiceContext;
 
+import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
@@ -19,15 +20,23 @@ import com.tarantula.game.Stub;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.game.service.PlatformGameServiceSetup;
 
+import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.OnAccessTrack;
 import com.tarantula.platform.event.GameClusterSyncEvent;
+import com.tarantula.platform.inbox.GlobalItemGrantEvent;
+import com.tarantula.platform.inbox.GlobalItemGrantEventQuery;
+import com.tarantula.platform.inbox.PlatformItemGrantEvent;
+import com.tarantula.platform.inbox.PlatformItemGrantEventQuery;
 import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 
 import com.tarantula.platform.presence.saves.*;
 
+import com.tarantula.platform.tournament.PlatformTournamentServiceProvider;
 import com.tarantula.platform.util.RecoverableQuery;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,6 +55,8 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     private AtomicInteger updates;
     private ScheduleRunner scheduleRunner;
     private PlatformLeaderBoardProvider platformLeaderBoardProvider;
+
+    private PlatformTournamentServiceProvider tournamentServiceProvider;
 
     private DataStore mDataStore;
     private DataStore profileDataStore;
@@ -109,6 +120,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         this.mDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_mapping_object");
         this.profileDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_profile");
         this.playListDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_play_list");
+        this.tournamentServiceProvider = platformGameServiceProvider.tournamentServiceProvider();
         this.distributionPresenceService = this.serviceContext.clusterProvider().serviceProvider(DistributionPresenceService.NAME);
         this.logger = JDKLogger.getLogger(PlatformPresenceServiceProvider.class);
         this.logger.warn("Presence service provider started on ->"+gameServiceName);
@@ -398,6 +410,121 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         GameClusterSyncEvent gameClusterSyncEvent = new GameClusterSyncEvent(NAME,query,"{}".getBytes());
         gameClusterSyncEvent.destination(topic);
         serviceContext.clusterProvider().publisher().publish(gameClusterSyncEvent);
+    }
+
+    public void createItemGrantEvent(long playerID, String itemID, String itemName, int amount, boolean completed){
+        //Get DataStore
+        DataStore dataStore = gameCluster.applicationPreSetup().onDataStore("player_item_grant_events");
+
+        //Create New ItemGrantEvent For Player
+        PlatformItemGrantEvent itemGrantEvent = new PlatformItemGrantEvent("Individual", itemID, itemName, amount, false, LocalDateTime.now());
+        itemGrantEvent.ownerKey(SnowflakeKey.from(playerID));
+        dataStore.create(itemGrantEvent);
+    }
+
+    public List<GlobalItemGrantEvent> getActiveGlobalItemGrants(){
+        DataStore dataStore = gameCluster.applicationPreSetup().dataStore(gameCluster, "global_item_grant_events");
+        List<GlobalItemGrantEvent> activeGlobalItemGrants = new ArrayList<>();
+
+        //Get All Active Global Grants
+        dataStore.list(new GlobalItemGrantEventQuery(gameCluster.distributionId())).forEach(globalGrantEvent -> {
+            if(!globalGrantEvent.completed){
+                activeGlobalItemGrants.add(globalGrantEvent);
+            }
+        });
+
+        return activeGlobalItemGrants;
+    }
+
+    public void completeGlobalItemGrantEvent(LocalDateTime dateCreated){
+        DataStore dataStore = gameCluster.applicationPreSetup().dataStore(gameCluster, "global_item_grant_events");
+
+        dataStore.list(new GlobalItemGrantEventQuery(gameCluster.distributionId())).forEach(globalGrantEvent -> {
+            if(globalGrantEvent.dateCreated.equals(dateCreated)){
+                globalGrantEvent.completed = true;
+                dataStore.update(globalGrantEvent);
+            }
+        });
+    }
+
+    public void createGlobalItemGrant(String itemName, String itemID, int amount, String minPlayerLevelFilterString, String maxPlayerLevelFilterString, String minInstallDateFilterString, String maxInstallDateFilterString, String tournamentIDString){
+        DataStore dataStore = gameCluster.applicationPreSetup().dataStore(gameCluster, "global_item_grant_events");
+
+        GlobalItemGrantEvent globalItemGrantEvent = new GlobalItemGrantEvent(itemName, itemID, amount, LocalDateTime.now());
+        globalItemGrantEvent.ownerKey(SnowflakeKey.from(gameCluster.distributionId()));
+
+        if(!minPlayerLevelFilterString.isEmpty() && !maxPlayerLevelFilterString.isEmpty()){
+            int minPlayerLevelFilter = Integer.parseInt(minPlayerLevelFilterString);
+            int maxPlayerLevelFilter = Integer.parseInt(maxPlayerLevelFilterString);
+
+            globalItemGrantEvent.setPlayerLevelFilter(minPlayerLevelFilter, maxPlayerLevelFilter);
+        }
+
+        if(!minInstallDateFilterString.isEmpty() && !maxInstallDateFilterString.isEmpty()){
+            LocalDate minInstallDateFilter = LocalDate.parse(minInstallDateFilterString);
+            LocalDate maxInstallDateFilter = LocalDate.parse(maxInstallDateFilterString);
+
+            globalItemGrantEvent.setInstallDateFilter(minInstallDateFilter, maxInstallDateFilter);
+        }
+
+        if(!tournamentIDString.isEmpty()){
+            long tournamentID = Long.parseLong(tournamentIDString);
+
+            globalItemGrantEvent.setTournamentIdFilter(tournamentID);
+        }
+
+        dataStore.create(globalItemGrantEvent);
+    }
+
+    public void checkGlobalItemGrant(Session session){
+        //Get Player Level and Account Creation Date
+        String[] payloadSplit = session.name().split("#");
+        int playerLevel = Integer.parseInt(payloadSplit[1]);
+        LocalDate accountCreatedDate = LocalDate.parse(payloadSplit[0], DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        //Date Stores
+        DataStore globalDataStore = applicationPreSetup.dataStore(gameCluster,"global_item_grant_events");
+        DataStore playerDataStore = applicationPreSetup.dataStore(gameCluster,"player_item_grant_events");
+        List<LocalDateTime> playerGlobalGrantList = new ArrayList<>();
+
+        //Get All Global Item Grants From Player
+        playerDataStore.list(new PlatformItemGrantEventQuery(session.distributionId())).forEach(itemGrantEvent -> {
+            if(itemGrantEvent.type.equals("Global")){
+                playerGlobalGrantList.add(itemGrantEvent.dateCreated);
+            }
+        });
+
+        //Check For New Global Item Grant Events Not In Players List
+        globalDataStore.list(new GlobalItemGrantEventQuery(gameCluster.distributionId())).forEach(globalGrantEvent -> {
+            if(globalGrantEvent.completed) return;
+
+            if(!playerGlobalGrantList.contains(globalGrantEvent.dateCreated)){
+                boolean shouldComplete = false;
+
+                //Player Level Filter
+                if(playerLevel < globalGrantEvent.minPlayerLevelFilter || playerLevel > globalGrantEvent.maxPlayerLevelFilter){
+                    shouldComplete = true;
+                }
+
+                //Account Creation Date Filter
+                if(accountCreatedDate.isBefore(globalGrantEvent.minInstallDateFilter) || accountCreatedDate.isAfter(globalGrantEvent.maxInstallDateFilter)){
+                    shouldComplete = true;
+                }
+
+                //Tournament Filter
+                if(globalGrantEvent.tournamentIdFilter != 0){
+                    Tournament tournament = tournamentServiceProvider.tournament(globalGrantEvent.tournamentIdFilter);
+                    if(!tournament.joined(session)){
+                        shouldComplete = true;
+                    }
+                }
+
+                //Create New ItemGrantEvent For Player
+                PlatformItemGrantEvent itemGrantEvent = new PlatformItemGrantEvent("Global", globalGrantEvent.itemID, globalGrantEvent.itemName, globalGrantEvent.amount, shouldComplete, globalGrantEvent.dateCreated);
+                itemGrantEvent.ownerKey(SnowflakeKey.from(session.distributionId()));
+                playerDataStore.create(itemGrantEvent);
+            }
+        });
     }
 
 }
