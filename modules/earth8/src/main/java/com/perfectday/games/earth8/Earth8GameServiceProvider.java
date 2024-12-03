@@ -118,24 +118,6 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
     public void updateGame(Session session,byte[] payload) throws Exception{
         this.gamePlayCounts.get(GamePlayCount.ON_UPDATE_GAME).success(session.distributionId());
-        if (session.name() != null && (session.name().startsWith("ItemGrant") || session.name().startsWith("GlobalGrant"))){
-            Transaction transaction = gameContext.applicationSchema().transaction();
-
-            transaction.execute(ctx->{
-                DataStore playerActionStore = ctx.onDataStore("player_inventory_grant");
-
-                playerActionStore.list(new PlayerActionQuery(session.distributionId())).forEach(playerAction -> {
-                    if(playerAction.name().equals(session.name())){
-                        playerAction.completed = true;
-                        playerActionStore.update(playerAction);
-                    }
-                });
-
-                return true;
-            });
-
-            return;
-        }
         BattleUpdate update = BattleUpdate.fromJson(payload);
         PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext, session.distributionId(), PlayerDataTrack.Type.Analytics);
 
