@@ -121,6 +121,21 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         if (session.name() != null && (session.name().startsWith("ItemGrant") || session.name().startsWith("GlobalGrant"))){
             Transaction transaction = gameContext.applicationSchema().transaction();
 
+            transaction.execute(ctx->{
+                DataStore playerActionStore = ctx.onDataStore("player_inventory_grant");
+
+                playerActionStore.list(new PlayerActionQuery(session.distributionId())).forEach(playerAction -> {
+                    if(playerAction.name().equals(session.name())){
+                        playerAction.completed = true;
+                        playerActionStore.update(playerAction);
+                    }
+                });
+
+                return true;
+            });
+
+            return;
+        }
         BattleUpdate update = BattleUpdate.fromJson(payload);
         PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext, session.distributionId(), PlayerDataTrack.Type.Analytics);
 
@@ -129,8 +144,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                 scoreRunner(session).add(new PendingScore(session, serverSession, update));
             }
         }
-
-
+        
         if(update.updateId == BattleUpdate.UpdateId.ItemGrantEventCompleted){
             gameContext.applicationSchema().transaction().execute(ctx->{
                 DataStore itemGrantEventDataStore = ctx.onDataStore("player_item_grant_events");
