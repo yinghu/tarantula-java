@@ -311,4 +311,8 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
     public String typeId() {
         return gameCluster.typeId();
     }
+
+    public Metrics metrics(){
+        return metrics;
+    }
 }
