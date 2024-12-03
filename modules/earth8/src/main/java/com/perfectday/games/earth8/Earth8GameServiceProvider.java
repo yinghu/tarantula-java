@@ -10,8 +10,12 @@ import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.SnowflakeKey;
 import com.perfectday.games.earth8.analytics.*;
+
 import com.perfectday.games.earth8.data.GamePlayCount;
 import com.perfectday.games.earth8.data.GamePlayEventRunner;
+
+import com.perfectday.games.earth8.inbox.ItemGrantEventQuery;
+
 import com.perfectday.games.earth8.inbox.PlayerAction;
 import com.perfectday.games.earth8.inbox.PlayerActionQuery;
 import com.perfectday.games.earth8.inbox.PlayerEventInbox;
@@ -35,6 +39,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
     private ConcurrentHashMap<String,ApplicationResource> resourceIndex = new ConcurrentHashMap<>();
     ConcurrentHashMap<Long, ScoreRunner> scoreRunners = new ConcurrentHashMap<>();
+
     public void setup(GameContext gameContext){
         this.gameContext = gameContext;
         this.gameContext.registerTournamentListener(this);
@@ -116,35 +121,35 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         if (session.name() != null && (session.name().startsWith("ItemGrant") || session.name().startsWith("GlobalGrant"))){
             Transaction transaction = gameContext.applicationSchema().transaction();
 
-            transaction.execute(ctx->{
-                DataStore playerActionStore = ctx.onDataStore("player_inventory_grant");
-
-                playerActionStore.list(new PlayerActionQuery(session.distributionId())).forEach(playerAction -> {
-                    if(playerAction.name().equals(session.name())){
-                        playerAction.completed = true;
-                        playerActionStore.update(playerAction);
-                    }
-                });
-
-                return true;
-            });
-
-            return;
-        }
+        BattleUpdate update = BattleUpdate.fromJson(payload);
+        PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext, session.distributionId(), PlayerDataTrack.Type.Analytics);
 
         if(!tournamentBannedPlayersList.containsKey(session.distributionId())) {
-            BattleUpdate update = BattleUpdate.fromJson(payload);
-            PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext, session.distributionId(), PlayerDataTrack.Type.Analytics);
             if (update.score > 0 && update.playerLevel > 0) {
                 scoreRunner(session).add(new PendingScore(session, serverSession, update));
             }
+        }
 
-            if (update.update(gameContext.applicationSchema().applicationPreSetup(), session, serverSession.trackId, gameContext.applicationSchema().applicationPreSetup().distributionId())) {
-                TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
-                gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY, () ->
-                        update.publishAnalytics(webhook, ANALYTICS_QUERY))
-                );
-            }
+
+        if(update.updateId == BattleUpdate.UpdateId.ItemGrantEventCompleted){
+            gameContext.applicationSchema().transaction().execute(ctx->{
+                DataStore itemGrantEventDataStore = ctx.onDataStore("player_item_grant_events");
+
+                itemGrantEventDataStore.list(new ItemGrantEventQuery(session.distributionId())).forEach(itemGrantEvent -> {
+                    if(itemGrantEvent.dateCreated.equals(((ItemGrantEventCompleted)update).dateCreated)){
+                        itemGrantEvent.completed = true;
+                        itemGrantEventDataStore.update(itemGrantEvent);
+                    }
+                });
+                return true;
+            });
+        }
+
+        if (update.update(gameContext.applicationSchema().applicationPreSetup(), session, serverSession.trackId, gameContext.applicationSchema().applicationPreSetup().distributionId())) {
+            TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+            gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY, () ->
+                    update.publishAnalytics(webhook, ANALYTICS_QUERY))
+            );
         }
 
         session.write(JsonUtil.toSimpleResponse(true,"battle updated").getBytes());
@@ -261,8 +266,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     public List<OnInbox> inbox(Session session){
         List<OnInbox> inbox = new ArrayList<>();
         List<OnAccess> playerEvents = new ArrayList<>();
-        List<OnAccess> playerCurrencyGrantEvents = new ArrayList<>();
-
+        List<OnAccess> itemGrantEvents = new ArrayList<>();
 
         gameContext.applicationSchema().transaction().execute(ctx->{
             DataStore dataStore = ctx.onDataStore("player_coin_form");
@@ -273,17 +277,17 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         });
 
         gameContext.applicationSchema().transaction().execute(ctx->{
-            DataStore dataStore = ctx.onDataStore("player_inventory_grant");
-            dataStore.list(new PlayerActionQuery(session.distributionId())).forEach(playerAction -> {
-                if(!playerAction.completed){
-                    playerCurrencyGrantEvents.add(playerAction);
+            DataStore dataStore = ctx.onDataStore("player_item_grant_events");
+            dataStore.list(new ItemGrantEventQuery(session.distributionId())).forEach(itemGrantEvent -> {
+                if(!itemGrantEvent.completed){
+                    itemGrantEvents.add(itemGrantEvent);
                 }
             });
             return true;
         });
 
         inbox.add(new PlayerEventInbox("coinForm","tournament",playerEvents));
-        inbox.add(new PlayerEventInbox("inventoryGrant", "inventory", playerCurrencyGrantEvents));
+        inbox.add(new PlayerEventInbox("itemGrant", "inventory", itemGrantEvents));
 
         return inbox;
     }
