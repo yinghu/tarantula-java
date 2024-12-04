@@ -19,6 +19,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
 
     public static final String NAME = "store";
 
+    public static final String STORE_TRANSACTION_DATA_STORE = "store_transaction_log";
     private TarantulaLogger logger;
     private final String gameServiceName;
     private final GameCluster gameCluster;
@@ -29,6 +30,8 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
 
     private ConcurrentHashMap<String,Shop> shopIndex;
     private ConcurrentHashMap<String,ShoppingItem> shoppingItems;
+
+    private DataStore transactionLogStore;
 
     public PlatformStoreServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         this.gameCluster = gameServiceProvider.gameCluster();
@@ -55,6 +58,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
         this.shopIndex = new ConcurrentHashMap<>();
         this.serviceContext = serviceContext;
         this.applicationPreSetup = gameCluster.applicationPreSetup();//SystemUtil.applicationPreSetup((String)gameCluster.property(GameCluster.LOBBY_PRE_SETUP_NAME));
+        this.transactionLogStore = applicationPreSetup.dataStore(gameCluster,STORE_TRANSACTION_DATA_STORE);
         this.logger = JDKLogger.getLogger(PlatformStoreServiceProvider.class);
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
     }
@@ -119,6 +123,20 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
             item.setup();
             shoppingItems.put(item.distributionKey(),new ShoppingItem(item));
         });
+    }
+
+    //store IAP tracking methods
+    public List<StoreTransactionLog> transactionLogList(Session session){
+        return transactionLogStore.list(new StoreTransactionQuery(session.distributionId()));
+    }
+
+    public StoreTransactionLog transactionLog(String transactionId){
+        StoreTransactionLog transactionLog = new StoreTransactionLog(transactionId);
+        if(transactionLogStore.load(transactionLog)) return transactionLog;
+        return null;
+    }
+    public void transactionLog(StoreTransactionLog transactionLog){
+        transactionLogStore.createIfAbsent(transactionLog,false);
     }
 
 }
