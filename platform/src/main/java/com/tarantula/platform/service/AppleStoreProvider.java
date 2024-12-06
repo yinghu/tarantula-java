@@ -10,6 +10,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.MetricsListener;
 
+import com.icodesoftware.util.Base64Util;
 import com.icodesoftware.util.HttpCaller;
 
 import com.icodesoftware.util.JsonUtil;
@@ -64,7 +65,7 @@ public class AppleStoreProvider extends AuthObject{
             StoreTransactionLog logged = storeServiceProvider.transactionLog(pendingTransactionId);
             if(logged != null){
                 logger.warn(logged.toJson().toString());
-                params.put(OnAccess.STORE_MESSAGE,logged.toJson().toString());
+                params.put(OnAccess.STORE_MESSAGE,"Item associated with transaction ["+pendingTransactionId+"] already has granted");
                 return false;
             }
             AppleStoreKey appleStoreKey = credentialConfiguration.appleStoreKey();
@@ -84,7 +85,8 @@ public class AppleStoreProvider extends AuthObject{
             if(code==200){
                 return postValidation(appleStoreKey,responseData.dataAsString,params);
             }
-            if(code == 4040010){
+            JsonObject productionResponse = JsonUtil.parse(responseData.dataAsString);
+            if(productionResponse.get("errorCode").getAsInt() == 4040010){
                 HttpRequest sandBoxRequest = HttpRequest.newBuilder()
                         .uri(URI.create(AppleStoreKey.sandbox_transaction_url+pendingTransactionId))
                         .timeout(Duration.ofSeconds(TIMEOUT))
@@ -124,21 +126,17 @@ public class AppleStoreProvider extends AuthObject{
     // "price":1990,"currency":"USD"}
     private boolean postValidation(AppleStoreKey appleStoreKey,String response,Map<String,Object> params){
         JsonObject payload = JsonUtil.parse(response);
+        String[] parts = payload.get("signedTransactionInfo").getAsString().split("\\.");
+        JsonObject transactionInfo = JsonUtil.parse(Base64Util.fromBase64String(parts[1]));
         String requestedSku = (String)params.get(OnAccess.STORE_BUNDLE_ID);
         String requestedTransactionId = (String)params.get("transactionId");
         String systemId = (String)params.get(OnAccess.SYSTEM_ID);
-        String transactionId = payload.get("transactionId").getAsString();
-        String sku = payload.get("productId").getAsString();
-        int quantity  = payload.get("quantity").getAsInt();
-        String bundleId = payload.get("bundleId").getAsString();
+        String transactionId = transactionInfo.get("transactionId").getAsString();
+        int quantity  = transactionInfo.get("quantity").getAsInt();
+        String bundleId = transactionInfo.get("bundleId").getAsString();
         if(!transactionId.equals(requestedTransactionId)){
             logger.warn("Transaction Id not matched ["+transactionId+" : " +requestedTransactionId+ " : playerId : "+systemId);
             params.put(OnAccess.STORE_MESSAGE,"transaction not matched ["+transactionId+" : "+requestedTransactionId);
-            return false;
-        }
-        if(!sku.equals(requestedSku)){
-            logger.warn("Sku/ProductId not matched ["+sku+" : " +requestedSku+ " : playerId : "+systemId);
-            params.put(OnAccess.STORE_MESSAGE,"sku/ProductID not matched ["+sku+" : "+requestedSku);
             return false;
         }
         if(!bundleId.equals(appleStoreKey.bundleId())){
@@ -146,10 +144,10 @@ public class AppleStoreProvider extends AuthObject{
             params.put(OnAccess.STORE_MESSAGE,"bundleId not matched ["+bundleId+" : "+appleStoreKey.bundleId());
             return false;
         }
-        ShoppingItem shoppingItem = gameServiceProvider.storeServiceProvider().shoppingItem(sku);
+        ShoppingItem shoppingItem = gameServiceProvider.storeServiceProvider().shoppingItem(requestedSku);
         if(shoppingItem==null){
-            logger.warn("Shopping Item not existed  : "+sku+ " : playerId : "+systemId);
-            params.put(OnAccess.STORE_MESSAGE,"Sku not existed ["+sku+" : "+requestedSku);
+            logger.warn("Shopping Item not existed  : "+requestedSku+ " : playerId : "+systemId);
+            params.put(OnAccess.STORE_MESSAGE,"Sku not existed ["+requestedSku+"]");
             return false;
         }
         GameCluster gameCluster = gameServiceProvider.gameCluster();
@@ -158,19 +156,24 @@ public class AppleStoreProvider extends AuthObject{
             ApplicationPreSetup setup =(ApplicationPreSetup)ctx;
             Descriptor app = gameCluster.application(shoppingItem.configurationTypeId());
             ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId,setup);
-            redeemer.distributionKey(bundleId);
+            redeemer.distributionKey(requestedSku);
             if(!setup.load(app,redeemer)) return false;
             redeemer.redeem();
             return true;
         });
-        storeServiceProvider.transactionLog(new StoreTransactionLog(Long.parseLong(systemId),OnAccess.APPLE_STORE,transactionId,shoppingItem.distributionId(),granted));
         onMetrics(PaymentMetrics.PAYMENT_APPLE_STORE_AMOUNT);
-        boolean isSandbox = payload.get("environment").getAsString().equals("Sandbox");
+        if(!granted){
+            logger.warn("Item failed to grant  : "+requestedSku+ " : playerId : "+systemId);
+            params.put(OnAccess.STORE_MESSAGE,"Item failed to grant  :  ["+requestedSku+"]");
+            return false;
+        }
+        storeServiceProvider.transactionLog(new StoreTransactionLog(Long.parseLong(systemId),OnAccess.APPLE_STORE,transactionId,shoppingItem.distributionId(),true));
+        boolean isSandbox = transactionInfo.get("environment").getAsString().equals("Sandbox");
         params.put(OnAccess.STORE_TRANSACTION_ID,transactionId);
-        params.put(OnAccess.STORE_PRODUCT_ID,sku);
+        params.put(OnAccess.STORE_PRODUCT_ID,shoppingItem.skuName());
         params.put(OnAccess.STORE_QUANTITY,quantity);
         params.put(OnAccess.IS_SANDBOX,isSandbox);
-        params.put(OnAccess.STORE_MESSAGE,"Sku granted  ["+sku+":"+granted+"]");
+        params.put(OnAccess.STORE_MESSAGE,"Sku granted  ["+shoppingItem.skuName()+":"+true+"]");
         return true;
     }
 
