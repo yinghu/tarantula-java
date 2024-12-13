@@ -70,41 +70,18 @@ public class AppleStoreProvider extends AuthObject{
             }
             AppleStoreKey appleStoreKey = credentialConfiguration.appleStoreKey();
             String token = appleStoreKey.token();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(AppleStoreKey.production_transaction_url+pendingTransactionId))
-                    .timeout(Duration.ofSeconds(TIMEOUT))
-                    .header(AUTHORIZATION,"Bearer "+token)
-                    .GET()
-                    .build();
-            HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
-            int code = serviceContext.httpClientProvider().request(client->{
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                responseData.dataAsString = response.body();
-                return response.statusCode();
-            });
-            if(code==200){
-                return postValidation(appleStoreKey,responseData.dataAsString,params);
+            StoreResponse productionResponse = validate(true,token,pendingTransactionId);
+
+            if(productionResponse.code==200){
+                return postValidation(appleStoreKey,productionResponse.responseData.dataAsString,params);
             }
-            JsonObject productionResponse = JsonUtil.parse(responseData.dataAsString);
-            if(productionResponse.get("errorCode").getAsInt() == 4040010){
-                HttpRequest sandBoxRequest = HttpRequest.newBuilder()
-                        .uri(URI.create(AppleStoreKey.sandbox_transaction_url+pendingTransactionId))
-                        .timeout(Duration.ofSeconds(TIMEOUT))
-                        .header(AUTHORIZATION,"Bearer "+token)
-                        .GET()
-                        .build();
-                HttpCaller.ResponseData sandBoxResponseData = new HttpCaller.ResponseData();
-                if(serviceContext.httpClientProvider().request(client->{
-                    HttpResponse<String> response = client.send(sandBoxRequest, HttpResponse.BodyHandlers.ofString());
-                    sandBoxResponseData.dataAsString = response.body();
-                    return response.statusCode();
-                }) != 200){
-                    throw new RuntimeException(sandBoxResponseData.dataAsString);
-                }
-                return postValidation(appleStoreKey,sandBoxResponseData.dataAsString,params);
+            if(productionResponse.code == 4040010){
+                StoreResponse sandboxResponse = validate(false,token,pendingTransactionId);
+                if(sandboxResponse.code != 200) throw new RuntimeException(sandboxResponse.responseData.dataAsString);
+                return postValidation(appleStoreKey,sandboxResponse.responseData.dataAsString,params);
             }
             else{
-                throw new RuntimeException(responseData.dataAsString);
+                throw new RuntimeException(productionResponse.responseData.dataAsString);
             }
         }catch (Exception ex){
             logger.error("apple store error ["+typeId+"]",ex);
@@ -176,6 +153,51 @@ public class AppleStoreProvider extends AuthObject{
         params.put(OnAccess.STORE_MESSAGE,"Sku granted  ["+shoppingItem.skuName()+":"+true+"]");
         return true;
     }
+
+    private StoreResponse validate(boolean onProduction,String token,String pendingTransactionId){
+        String validationUrl = onProduction?AppleStoreKey.production_transaction_url:AppleStoreKey.sandbox_transaction_url;
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(validationUrl+pendingTransactionId))
+                .timeout(Duration.ofSeconds(TIMEOUT))
+                .header(AUTHORIZATION,"Bearer "+token)
+                .GET()
+                .build();
+        HttpCaller.ResponseData responseData = new HttpCaller.ResponseData();
+        for(int retry = 0; retry<3; retry++){
+            try{
+                int code = serviceContext.httpClientProvider().request(client->{
+                    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                    responseData.dataAsString = response.body();
+                    return response.statusCode();
+                });
+                if(code==200) return new StoreResponse(code,responseData);
+                JsonObject errorResponse = JsonUtil.parse(responseData.dataAsString);
+                int errorCode = errorResponse.get("errorCode").getAsInt();
+                responseData.dataAsString = errorResponse.get("errorMessage").getAsString();
+                if(errorCode== 4040010) return new StoreResponse(errorCode,responseData);
+                //anything else retry
+                logger.warn("Apple store response ["+responseData.dataAsString+"]");
+                logger.warn("Retrying ["+retry+"] on production ["+onProduction+"] pending transactionId ["+pendingTransactionId+"]");
+                Thread.sleep(500);
+            }catch (Exception ex){
+                logger.error("Error on retrying ["+retry+"]",ex);
+            }
+        }
+        //failed after retries
+        throw new RuntimeException("["+pendingTransactionId+"] cannot be validated on apple store after 3 retries");
+    }
+
+
+    private static class StoreResponse{
+        final HttpCaller.ResponseData responseData;
+        final int code;
+        public StoreResponse(int code,HttpCaller.ResponseData responseData){
+            this.code = code;
+            this.responseData = responseData;
+        }
+    }
+
+
 
 
 }
