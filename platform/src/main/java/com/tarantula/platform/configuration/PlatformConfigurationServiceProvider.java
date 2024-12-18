@@ -14,6 +14,7 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.util.ScheduleRunner;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.OnAccessTrack;
 import com.tarantula.platform.item.*;
 import com.tarantula.platform.util.RecoverableQuery;
 
@@ -117,6 +118,12 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
                 vendorCredentials.put(credentialConfiguration.name(), credentialConfiguration);
                 vendorCredentials.put(credentialConfiguration.distributionKey(),credentialConfiguration);
                 logger.warn(credentialConfiguration.name()+" : "+credentialConfiguration.distributionKey());
+
+                if (credentialConfiguration.name().equals("CheatDetection")){
+                    OnAccess access = new OnAccessTrack();
+                    access.command("CheatDetectionConfigUpdated");
+                    platformGameServiceProvider.onGameClusterEvent(access);
+                }
             }
             return true;
         }catch (Exception ex){

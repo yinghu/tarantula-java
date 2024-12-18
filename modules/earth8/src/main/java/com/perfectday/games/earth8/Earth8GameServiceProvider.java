@@ -18,6 +18,7 @@ import com.perfectday.games.earth8.data.PlayerDataTrack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -32,7 +33,11 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     private ConcurrentHashMap<Long,Boolean> tournamentBannedPlayersList = new ConcurrentHashMap<>();
 
     private ConcurrentHashMap<String,ApplicationResource> resourceIndex = new ConcurrentHashMap<>();
+
+    private ConcurrentHashMap<String,Integer> cheatDetectionMap = new ConcurrentHashMap<>();
+
     ConcurrentHashMap<Long, ScoreRunner> scoreRunners = new ConcurrentHashMap<>();
+
 
     public void setup(GameContext gameContext){
         this.gameContext = gameContext;
@@ -116,6 +121,24 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                 });
                 return true;
             });
+        } else if (update.updateId == BattleUpdate.UpdateId.ManualAnalyticsBatch && !cheatDetectionMap.isEmpty()) {
+            List<AnalyticsBatchUtils.AnalyticsData> cheatDetectedAnalytics = new ArrayList<>();
+            for(AnalyticsBatchUtils.AnalyticsData analytic: ((ManualAnalyticsBatch)update).analytics){
+                if(analytic.messageType.equals("currencyUpdate")){
+                    String currencyId = analytic.clientData.get("currencyId").getAsString();
+                    int currencyDelta = analytic.clientData.get("currencyDelta").getAsInt();
+
+                    if((cheatDetectionMap.containsKey(currencyId) && cheatDetectionMap.get(currencyId) < currencyDelta) ||
+                            (currencyId.contains("Coin") && cheatDetectionMap.get("Coin") < currencyDelta) ||
+                            (currencyId.contains("Potion") && cheatDetectionMap.get("Potion") < currencyDelta)){
+
+                        AnalyticsBatchUtils.AnalyticsData cheatDetectedAnalytic = new AnalyticsBatchUtils.AnalyticsData("inventory", "currencyUpdateCheatDetected", analytic.clientData.deepCopy());
+                        cheatDetectedAnalytic.clientData.addProperty("currencyUpdateMaxValue" , cheatDetectionMap.get(currencyId));
+                        cheatDetectedAnalytics.add(cheatDetectedAnalytic);
+                    }
+                }
+            }
+            ((ManualAnalyticsBatch)update).analytics.addAll(cheatDetectedAnalytics);
         }
 
         if (update.update(gameContext.applicationSchema().applicationPreSetup(), session, serverSession.trackId, gameContext.applicationSchema().applicationPreSetup().distributionId())) {
@@ -200,6 +223,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             else{
                 tournamentBannedPlayersList.remove(systemID);
             }
+        } else if (event.command().equals("CheatDetectionConfigUpdated")) {
+            configureCheatDetection();
         }
     }
 
@@ -388,4 +413,17 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         });
     }
 
+    private void configureCheatDetection(){
+        cheatDetectionMap.clear();
+
+        TokenValidatorProvider.AuthVendor download = gameContext.authorVendor(OnAccess.DOWNLOAD_CENTER);
+        byte[] payload = download.download(gameContext.applicationSchema().typeId()+"#CheatDetection");
+
+        JsonObject cheatDetectionConfig = JsonUtil.parse(payload);
+        Set<String> keys = cheatDetectionConfig.keySet();
+
+        keys.forEach(key ->{
+            cheatDetectionMap.put(key, cheatDetectionConfig.get(key).getAsInt());
+        });
+    }
 }
