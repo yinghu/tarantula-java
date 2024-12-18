@@ -2,20 +2,29 @@ package com.tarantula.platform.configuration;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.OnAccess;
+import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.Content;
 import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.item.ConfigurableObject;
 
 public class AppleCredentialConfiguration extends CredentialConfiguration {
 
+    private TarantulaLogger logger = JDKLogger.getLogger(AppleCredentialConfiguration.class);
+
     private AppleStoreKey appleStoreKey;
+
     public AppleCredentialConfiguration(String typeId, ConfigurableObject configurableObject){
         super(typeId,OnAccess.APPLE,configurableObject);
     }
 
     public boolean setup(ServiceContext serviceContext, DataStore dataStore){
-        ConfigurationObject configurationObject = saveConfigurationObject("StoreKey",serviceContext.deploymentServiceProvider(),dataStore);
-        appleStoreKey = new AppleStoreKey(JsonUtil.parse(configurationObject.value()));
+        Content content = serviceContext.deploymentServiceProvider().resource(header.get("StoreKey").getAsString());
+        if(!content.existed()){
+            logger.warn("No apple store key loaded : "+header.get("StoreKey").getAsString());
+            return false;
+        }
+        appleStoreKey = new AppleStoreKey(this.header,content);
         return appleStoreKey.validate(serviceContext);
     }
 
