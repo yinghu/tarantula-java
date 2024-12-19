@@ -64,6 +64,7 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
                 Announcement announcement = v.announcement(locId);
                 if(announcement!=null){
                     announcement.startTime = v.startTime();
+                    announcement.distributionId(k);
                     mailbox.announcementList.add(announcement);
                 }
             }
