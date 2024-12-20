@@ -3,7 +3,7 @@ package com.tarantula.platform.presence.saves;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Recoverable;
 import com.tarantula.platform.AssociateKey;
-import com.tarantula.platform.OnApplicationHeader;
+import com.icodesoftware.util.OnApplicationHeader;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
 public class SaveRevisionInfo extends OnApplicationHeader {

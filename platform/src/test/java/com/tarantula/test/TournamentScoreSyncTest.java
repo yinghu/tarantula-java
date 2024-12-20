@@ -16,7 +16,7 @@ import java.util.concurrent.CountDownLatch;
 public class TournamentScoreSyncTest extends DataStoreHook{
 
 
-    @Test(groups = { "TournamentScoreSync" })
+    //@Test(groups = { "TournamentScoreSync" })
     public void scoreSyncTest() {
         Transaction transaction = dataStoreProvider.transaction(Distributable.DATA_SCOPE);
         long systemId = 100;

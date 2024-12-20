@@ -2,7 +2,7 @@ package com.tarantula.platform.inbox;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.tarantula.platform.ResponseHeader;
+import com.icodesoftware.util.ResponseHeader;
 
 import java.util.Comparator;
 import java.util.List;
