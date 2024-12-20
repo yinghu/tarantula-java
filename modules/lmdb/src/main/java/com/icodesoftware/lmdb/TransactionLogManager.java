@@ -28,11 +28,13 @@ public class TransactionLogManager implements Closable {
     public static final String DATA_TRANSACTION_LOG = "log_tarantula_transaction_1";
     public static final String INTEGRATION_TRANSACTION_LOG = "log_tarantula_transaction_2";
 
-    private ServiceContext serviceContext;
     private TransactionLogListener transactionLogListener = transactionLog -> {};
+    private ServiceContext serviceContext;
+
     public void setup(ServiceContext serviceContext){
         this.serviceContext = serviceContext;
     }
+
     public void registerTransactionLogListener(TransactionLogListener listener){
         if(listener==null) return;
         this.transactionLogListener = listener;

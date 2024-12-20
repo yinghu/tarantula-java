@@ -11,4 +11,7 @@ public interface DistributionPresenceService extends ServiceProvider {
 
     void onUpdateLeaderBoard(String serviceName, LeaderBoard.Entry leaderBoardEntry);
     byte[] onLeaderBoard(String serviceName,String category,String classifier);
+
+    boolean deleteUserLoginData(long playerID);
+
 }

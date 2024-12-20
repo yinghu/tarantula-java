@@ -6,12 +6,24 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.*;
 import com.tarantula.game.service.PlatformGameServiceProvider;
+
+import com.tarantula.platform.GameCluster;
+import com.tarantula.platform.OnAccessTrack;
+import com.icodesoftware.util.ResponseHeader;
+
 import com.tarantula.platform.inbox.PlatformInboxServiceProvider;
 import com.tarantula.platform.inventory.PlatformInventoryServiceProvider;
 import com.tarantula.platform.item.ConfigurableEdit;
 import com.tarantula.platform.item.ConfigurableObject;
+
 import com.tarantula.platform.item.PlatformItemServiceProvider;
 
+import com.tarantula.platform.item.DistributionItemService;
+import com.tarantula.platform.item.ItemDistributionCallback;
+import com.tarantula.platform.presence.PlatformBannedPlayer;
+
+
+import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -135,6 +147,31 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
         tournamentManager.loadPrizes(applicationPreSetup,application);
     }
 
+    public boolean deleteTournamentFromIndex(String query){
+        String[] parts = query.split("#");
+        if(parts.length!=3) throw new RuntimeException("invalid query");
+        TokenValidatorProvider tokenValidator = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
+        GameCluster gc = tokenValidator.validateGameClusterAccessKey(parts[0]);
+        if(gc==null || gc.distributionId()!=gameCluster.distributionId()) throw new RuntimeException("invalid access key");
+        if(parts[1]==null || parts[1].trim().length() < 4) throw new RuntimeException("query type cannot be null or less than 4 chars");
+        RecentlyTournamentList list = RecentlyTournamentList.lookup(recentlyTournamentIndex,parts[1],recentlyTournamentListSize);
+        Long[] tournaments = list.pop();
+        list.fill();
+        long deleted = Long.parseLong(parts[2]);
+        Tournament pending = tournament(deleted);
+        if(pending.status() != Tournament.Status.ENDED){
+            logger.warn("Cannot delete tournament not ended");
+            return false;
+        }
+        for(Long id : tournaments){
+            if(id!=deleted){
+                list.push(id);
+            }
+        }
+        list.update();
+        return true;
+    }
+
     public Tournament tournament(long tournamentId){
         TournamentManager indexed = tournamentIndex.get(tournamentId);
         if(indexed!=null) return indexed;
@@ -142,6 +179,7 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
         indexed.distributionId(tournamentId);
         if(!dataStore.load(indexed)) throw new RuntimeException("Tournament ["+tournamentId+"] not existed");
         tournamentIndex.putIfAbsent(tournamentId,indexed);
+        this.loadPrizes(indexed);
         return indexed;
     }
     @Override
@@ -153,7 +191,7 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
         ArrayList<Tournament> _tms = new ArrayList<>();
         tournamentIndex.forEach((k,v)->
         {
-            if(v.status() == Tournament.Status.STARTED) _tms.add(v);
+            if(v.status() == Tournament.Status.STARTED || v.status() == Tournament.Status.STARTING) _tms.add(v);
         });
         return _tms;
     }
@@ -331,7 +369,16 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
             tournament.pendingSchedule = this.serviceContext.schedule(new TournamentCloseMonitor(tournament,this));
         }
         logger.warn(tournament.toString());
-        listeners.forEach(l->l.tournamentStarted(tournament));
+        listeners.forEach(l->{
+            l.tournamentStarted(tournament);
+            List<PlatformBannedPlayer> bannedPlayers = gameCluster.platformGameServiceProvider().presenceServiceProvider().blacklist("tournament");
+            bannedPlayers.forEach(p->{
+                OnAccessTrack onAccessTrack = new OnAccessTrack();
+                onAccessTrack.command("BanPlayer");
+                onAccessTrack.message(p.systemId+"#true");
+                gameCluster.platformGameServiceProvider().gameServiceProvider().onGameEvent(onAccessTrack);
+            });
+        });
         if(this.application==null) return;
         this.loadPrizes(tournament);
     }
@@ -650,5 +697,26 @@ public class PlatformTournamentServiceProvider extends PlatformItemServiceProvid
     DataStore dataStore(){
         return this.dataStore;
     }
+
+    public byte[] onTournamentScanned(){
+        List<Long> scheduled = new ArrayList<>();
+        tournamentIndex.forEach((i,t)->{
+            scheduled.add(i);
+        });
+        ByteBuffer byteBuffer = ByteBuffer.allocate(scheduled.size()*8+4);
+        int sz = scheduled.size();
+        byteBuffer.putInt(sz);
+        scheduled.forEach(id->byteBuffer.putLong(id));
+        return byteBuffer.array();
+    }
+    public Response verifyTournamentStatusOnCluster(String accessKey){
+        TokenValidatorProvider tokenValidator = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
+        GameCluster valid = tokenValidator.validateGameClusterAccessKey(accessKey);
+        if(valid==null || valid.distributionId() != gameCluster.distributionId()) new RuntimeException("Illegal access");
+        List<TournamentOnNode> scanned = distributionTournamentService.onScan(gameServiceName);
+        return new TournamentScanResponse(scanned);
+    }
+
+
 
 }

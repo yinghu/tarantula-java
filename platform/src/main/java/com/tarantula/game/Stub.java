@@ -44,7 +44,7 @@ public class Stub extends OnApplicationHeader{
             return jo;
         }
         jo.add("_zone",zone!=null?zone.toJson():new JsonObject());
-        jo.add("_arena",room!=null?room.arena().toJson():new JsonObject());
+        //jo.add("_arena",room!=null?room.arena().toJson():new JsonObject());
         jo.add("_room",room!=null?room.toJson():new JsonObject());
         if(tournament!=null) jo.add("_tournament",tournament.toJson());
         jo.addProperty("Tag",tag);

@@ -70,6 +70,11 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
     public static final int PROFILE_NAME_SEQUENCE_CID = 27;
 
 
+    public static final int SAVE_REVISION_INFO_CID = 27;
+
+    public static final int BANNED_PLAYER_CID = 28;
+
+
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
     public static PresencePortableRegistry INS;
@@ -154,6 +159,12 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
             case PROFILE_NAME_SEQUENCE_CID:
                 pt = new ProfileNameSequence();
 
+                break;
+            case SAVE_REVISION_INFO_CID:
+                pt = new SaveRevisionInfo();
+                break;
+            case BANNED_PLAYER_CID:
+                pt = new PlatformBannedPlayer();
                 break;
             default:
         }

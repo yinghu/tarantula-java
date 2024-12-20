@@ -4,12 +4,14 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.service.TournamentServiceProvider;
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.platform.AccessControl;
+import com.tarantula.platform.tournament.PlatformTournamentServiceProvider;
 import com.tarantula.platform.tournament.TournamentContext;
 
 
 public class TournamentModule extends ModuleHeader implements Configurable.Listener {
 
-    private TournamentServiceProvider tournamentServiceProvider;
+    private PlatformTournamentServiceProvider tournamentServiceProvider;
     private TokenValidatorProvider tokenValidatorProvider;
     @Override
     public boolean onRequest(Session session, byte[] bytes) throws Exception {
@@ -32,6 +34,17 @@ public class TournamentModule extends ModuleHeader implements Configurable.Liste
             TokenValidatorProvider.AuthVendor download = tokenValidatorProvider.authVendor(OnAccess.DOWNLOAD_CENTER);
             byte[] payload = download.download(gameServiceProvider.gameCluster().typeId()+"#"+session.name());
             session.write(payload);
+        }
+        else if(session.action().equals("onScan")){
+            if(this.context.validator().role(session.distributionId()).accessControl() < AccessControl.admin.accessControl()){
+                throw new RuntimeException("no permission");
+            }
+            Response response = tournamentServiceProvider.verifyTournamentStatusOnCluster(session.name());
+            session.write(response.toBinary());
+        }
+        else if(session.action().equals("onDelete")){
+            boolean deleted = tournamentServiceProvider.deleteTournamentFromIndex(session.name());
+            session.write(JsonUtil.toSimpleResponse(deleted,deleted?"deleted":"cannot delete").getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action()+" not supported");

@@ -12,6 +12,7 @@ import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,7 +22,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
     private final static String METRICS_LOGIN_COUNT = "applicationLoginCount";
     private boolean activated;
     private int trialDays;
-
+    private int sessionTimeoutSeconds;
     //private double initialBalance;
     private AccessIndexService accessIndexService;
     private UserService userService;
@@ -38,6 +39,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         Configuration configuration = this.context.configuration("account");
         this.activated = (boolean)configuration.property("activated");
         this.trialDays = ((Number)configuration.property("trialDays")).intValue();
+        this.sessionTimeoutSeconds = ((Number)configuration.property("sessionTimeoutSeconds")).intValue();
         builder.registerTypeAdapter(PresenceContext.class,new PresenceContextSerializer());
         this.accessIndexService = this.context.serviceProvider(AccessIndexService.NAME);
         deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);
@@ -99,12 +101,25 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         else if(session.action().equals("onToken")){//exchange token
             Map<String,Object> params = acc.toMap();
             params.put(OnAccess.SYSTEM_ID,session.systemId());
+            String typeId = (String) params.get(OnAccess.TYPE_ID);
+            String deviceId = acc.property("deviceId")!=null?acc.property("deviceId").toString():"device-id-assigned";
             boolean suc = this.context.validator().validateToken(params);
             LoginProvider _ox = userService.loginProvider(session.distributionId());
             if(suc && _ox!=null ){
                 OnSession onSession = this.login(session.distributionId(),_ox.password(),session);
-                onSession(onSession,session);
-            }else{
+                onPlatformProvider(onSession,session,_ox,deviceId);
+            }
+            else if(suc && _ox == null){
+                ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin(typeId+"#"+params.get("provider"),SystemUtil.oid(),deviceId);
+                thirdPartyLogin.distributionId(session.systemId());
+                userService.createLoginProvider(thirdPartyLogin);
+                acc.property(OnAccess.PASSWORD,thirdPartyLogin.password());
+                acc.typeId(typeId);
+                createLogin(acc,session.distributionId(),AccessControl.player.name(),true,acc.name(),true);
+                OnSession onSession = login(session.distributionId(),thirdPartyLogin.password(),session);
+                onPlatformProvider(onSession,session,thirdPartyLogin,deviceId);
+            }
+            else{
                 session.write(this.builder.create().toJson(new ResponseHeader("onToken", "invalid token", false)).getBytes());
             }
         }
@@ -124,17 +139,21 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             Map<String,Object> params = acc.toMap();
             params.put(OnAccess.SYSTEM_ID,session.systemId());
             String typeId = (String) params.get(OnAccess.TYPE_ID);
-            if(this.context.validator().validateToken(params)){
+            String deviceId = acc.property("deviceId")!=null?acc.property("deviceId").toString():"device-id-assigned";
+            boolean valid = this.context.validator().validateToken(params);
+            if(valid){
                 AccessIndex _query = accessIndexService.get((String) acc.property("login"));
                 if(_query!=null){
-                    ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin(typeId+"#"+params.get("provider"),SystemUtil.oid(),"");
+
+                    ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin(typeId+"#"+params.get("provider"),SystemUtil.oid(),deviceId);
                     thirdPartyLogin.distributionId(session.systemId());
+
                     userService.createLoginProvider(thirdPartyLogin);
                     acc.property(OnAccess.PASSWORD,thirdPartyLogin.password());
                     acc.typeId(typeId);
                     createLogin(acc,session.distributionId(),AccessControl.player.name(),true,acc.name(),true);
                     OnSession onSession = login(session.distributionId(),thirdPartyLogin.password(),session);
-                    onSession(onSession,session);
+                    onPlatformProvider(onSession,session,thirdPartyLogin,deviceId);
                 }
                 else{
                     session.write(builder.create().toJson(new ResponseHeader(session.action(),false,0,"login [" + acc.property("login") + "] cannot be registered","error")).getBytes());
@@ -164,7 +183,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         else if(session.action().equals("onDevice")){
             String deviceId = (String) acc.property(OnAccess.DEVICE_ID);
             LoginProvider _ox = userService.loginProvider(session.distributionId());
-            if(_ox!=null && _ox.clientId().equals(deviceId)){
+            if(_ox!=null && _ox.deviceId().equals(deviceId)){
                 OnSession access = this.login(session.distributionId(),_ox.password(),session);
                 onSession(access,session);
             }
@@ -226,7 +245,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         else if(session.action().equals("onDeveloper")){
             String deviceId = (String) acc.property(OnAccess.DEVICE_ID);
             LoginProvider _ox = userService.loginProvider(session.distributionId());
-            if(_ox!=null && _ox.clientId().equals(deviceId)){
+            if(_ox!=null && _ox.deviceId().equals(deviceId)){
                 OnSession access = this.login(session.distributionId(),_ox.password(),session);
                 onSession(access,session);
             }
@@ -265,6 +284,32 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         userService.createLoginProvider(developerLogin);
         return developerLogin;
     }
+
+    private boolean onPlatformProvider(OnSession access, Session session,LoginProvider loginProvider,String deviceId){
+        if(!access.successful()){
+            //this.context.log("Wrong token :",OnLog.WARN);
+            session.write(JsonUtil.toSimpleResponse(false,"wrong provider token").getBytes());
+            return false;
+        }
+        if(loginProvider.deviceId()==null || loginProvider.deviceId().equals(deviceId)){
+            loginProvider.stub(access.stub());
+            loginProvider.deviceId(deviceId);
+            loginProvider.update();
+            return onSession(access,session);
+        }
+        LocalDateTime lastPing = TimeUtil.fromUTCMilliseconds(loginProvider.timestamp());
+        if(TimeUtil.expired(lastPing.plusSeconds(sessionTimeoutSeconds))){
+            loginProvider.deviceId(deviceId);
+            loginProvider.stub(access.stub());
+            loginProvider.update();
+            return onSession(access,session);
+        }
+        //this.context.log("DeviceId : "+loginProvider.deviceId()+" ; "+deviceId+" Access :"+access.successful(),OnLog.WARN);
+        //this.context.log("Session not expired : "+lastPing.format(DateTimeFormatter.ISO_DATE_TIME),OnLog.WARN);
+        session.write(JsonUtil.toSimpleResponse(false,"Session not expired on another device").getBytes());
+        return false;
+    }
+
     private boolean onSession(OnSession access, Session session){
         if(access.successful()){
             session.write(access.toJson().toString().getBytes());
@@ -277,6 +322,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         }
         return access.successful();
     }
+
     private OnSession login(long systemId, String password, Session session){
         Access access = this.userService.loadUser(systemId);
         OnSession _onSession = OnSessionTrack.PASSWORD_NOT_MATCHED;

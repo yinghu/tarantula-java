@@ -10,4 +10,14 @@ public class SimpleStub extends OnApplicationHeader {
         this.distributionId = systemId;
         this.stub = stub;
     }
+
+    public SimpleStub(){
+
+    }
+
+    public SimpleStub(long distributionId){
+        this.distributionId = distributionId;
+    }
+
+
 }

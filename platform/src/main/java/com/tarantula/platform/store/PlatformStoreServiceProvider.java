@@ -19,8 +19,20 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
     public static final String NAME = "store";
 
 
+    public static final String STORE_TRANSACTION_DATA_STORE = "store_transaction_log";
+    private TarantulaLogger logger;
+    //private final String gameServiceName;
+    //private final GameCluster gameCluster;
+    //private final PlatformInventoryServiceProvider inventoryServiceProvider;
+    //private ServiceContext serviceContext;
+    //private DistributionItemService distributionItemService;
+    //private ApplicationPreSetup applicationPreSetup;
+
+
     private ConcurrentHashMap<String,Shop> shopIndex;
     private ConcurrentHashMap<String,ShoppingItem> shoppingItems;
+
+    private DataStore transactionLogStore;
 
     public PlatformStoreServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
@@ -120,7 +132,6 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
     }
 
 
-
     @Override
     public boolean onItemRegistered(int publishId){
         logger.warn("register shop with publish id : "+publishId);
@@ -130,17 +141,30 @@ public class PlatformStoreServiceProvider extends PlatformItemServiceProvider {
     }
 
     @Override
-    public boolean onItemReleased(int publishId){
-        logger.warn("release local shop with ["+publishId+"]");
+    public boolean onItemReleased(int publishId) {
+        logger.warn("release local shop with [" + publishId + "]");
         Shop removed = shopIndex.remove(Integer.toString(publishId));
-        if(removed==null) return false;
+        if (removed == null) return false;
         shopIndex.remove(removed.configurationName());
         //remove items
-        removed.itemList().forEach(item->{
-            logger.warn("Remove item ["+item.configurationKey()+"]");
+        removed.itemList().forEach(item -> {
+            logger.warn("Remove item [" + item.configurationKey() + "]");
             shoppingItems.remove(item.configurationKey());
         });
         return true;
+    }
+    //store IAP tracking methods
+    public List<StoreTransactionLog> transactionLogList(Session session){
+        return transactionLogStore.list(new StoreTransactionQuery(session.distributionId()));
+    }
+
+    public StoreTransactionLog transactionLog(String transactionId){
+        StoreTransactionLog transactionLog = new StoreTransactionLog(transactionId);
+        if(transactionLogStore.load(transactionLog)) return transactionLog;
+        return null;
+    }
+    public void transactionLog(StoreTransactionLog transactionLog){
+        transactionLogStore.createIfAbsent(transactionLog,false);
     }
 
 }

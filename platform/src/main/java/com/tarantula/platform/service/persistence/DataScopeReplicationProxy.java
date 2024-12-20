@@ -141,7 +141,6 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy implements
             }
             return true;
         },transactionLog.edgeLabel==null);
-
     }
 }
 

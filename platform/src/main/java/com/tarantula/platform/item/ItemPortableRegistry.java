@@ -8,6 +8,7 @@ import com.tarantula.platform.inventory.UserInventory;
 import com.tarantula.platform.inventory.InventoryItem;
 import com.tarantula.platform.store.Shop;
 import com.tarantula.platform.store.ShoppingItem;
+import com.tarantula.platform.store.StoreTransactionLog;
 
 public class ItemPortableRegistry<T extends Recoverable> extends AbstractRecoverableListener {
 
@@ -46,9 +47,13 @@ public class ItemPortableRegistry<T extends Recoverable> extends AbstractRecover
 
     public static final int VERSIONED_CONFIGURABLE_OBJECT_CID = 23;
 
+
     public static final int CONFIGURABLE_EDIT_CID = 24;
 
     public static final int PROPERTY_EDIT_CID = 25;
+
+    public static final int STORE_TRANSACTION_LOG_CID = 26;
+
 
     public static ItemPortableRegistry INS;
     public ItemPortableRegistry(){
@@ -116,6 +121,9 @@ public class ItemPortableRegistry<T extends Recoverable> extends AbstractRecover
                 break;
             case VERSIONED_CONFIGURABLE_OBJECT_CID:
                 pt = new VersionedConfigurableObject();
+                break;
+            case STORE_TRANSACTION_LOG_CID:
+                pt = new StoreTransactionLog();
                 break;
             default:
         }

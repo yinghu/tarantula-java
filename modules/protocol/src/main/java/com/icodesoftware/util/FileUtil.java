@@ -32,6 +32,7 @@ public class FileUtil {
         }
     }
 
+
     public static File createFileIfNotExisted(String path){
         try {
             Path _path = Paths.get(path);
@@ -42,7 +43,26 @@ public class FileUtil {
         }
     }
 
-    public static String currentDirectory(){
+    public static String currentDirectory() {
         return Paths.get(".").toAbsolutePath().normalize().toString();
+    }
+    public static void createDirectory(String dir){
+        Path directory = Paths.get(dir);
+        if(Files.exists(directory)) return;
+        try{
+            Files.createDirectories(directory);
+        }catch (Exception ex){
+            throw new RuntimeException("cannot create directory",ex);
+        }
+    }
+
+    public static boolean deleteFileIfExist(String fileName){
+        File file = new File(fileName);
+        if(!Files.exists(file.toPath())) return false;
+        try{
+            return Files.deleteIfExists(file.toPath());
+        }catch (Exception ex){
+            return false;
+        }
     }
 }

@@ -14,23 +14,24 @@ import com.icodesoftware.service.ApplicationPreSetup;
 import com.icodesoftware.service.MetricsListener;
 
 import com.icodesoftware.util.HttpCaller;
-import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.configuration.GoogleCredentialConfiguration;
 import com.tarantula.platform.configuration.GoogleServiceAccount;
 import com.tarantula.platform.configuration.PlatformConfigurationServiceProvider;
 import com.tarantula.platform.inventory.ApplicationRedeemer;
-import com.tarantula.platform.service.metrics.GameClusterMetrics;
+
 import com.tarantula.platform.service.metrics.PaymentMetrics;
+import com.tarantula.platform.store.PlatformStoreServiceProvider;
 import com.tarantula.platform.store.ShoppingItem;
+import com.tarantula.platform.store.StoreTransactionLog;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Map;
-import java.util.logging.Logger;
+
 
 
 public class GoogleStorePurchaseValidator extends AuthObject {
@@ -43,12 +44,13 @@ public class GoogleStorePurchaseValidator extends AuthObject {
 
     private PlatformConfigurationServiceProvider configurationServiceProvider;
     private PlatformGameServiceProvider gameServiceProvider;
-
+    private PlatformStoreServiceProvider storeServiceProvider;
 
     public GoogleStorePurchaseValidator(PlatformGameServiceProvider gameServiceProvider, MetricsListener metricsListener) {
         super(gameServiceProvider.gameCluster().typeId(), "");
         this.gameServiceProvider = gameServiceProvider;
         this.configurationServiceProvider = gameServiceProvider.configurationServiceProvider();
+        this.storeServiceProvider = gameServiceProvider.storeServiceProvider();
         this.applicationMetricsListener = metricsListener;
     }
 
@@ -65,7 +67,12 @@ public class GoogleStorePurchaseValidator extends AuthObject {
                 logger.warn("No credential available [" + typeId + "]");
                 return false;
             }
-
+            String pendingTransactionId = (String)params.get("transactionId");
+            StoreTransactionLog logged = storeServiceProvider.transactionLog(pendingTransactionId);
+            if(logged != null){
+                logger.warn(logged.toJson().toString());
+                return false;
+            }
             GoogleServiceAccount serviceAccount = googleCredentialConfiguration.serviceAccount();
             String _tk = serviceAccount.token(serviceContext);
             String sku = (String) params.get(OnAccess.STORE_PRODUCT_ID);
@@ -104,7 +111,21 @@ public class GoogleStorePurchaseValidator extends AuthObject {
                 logger.warn("Shopping Item not existed  : " + bundleId);
                 throw new RuntimeException("Shopping not existed [" + bundleId + "]");
             }
-            boolean suc = this.gameServiceProvider.inventoryServiceProvider().redeem(systemId,shoppingItem);
+
+
+            GameCluster gameCluster = gameServiceProvider.gameCluster();
+            Transaction t = gameCluster.transaction();
+
+            boolean suc = t.execute(ctx -> {
+                ApplicationPreSetup setup = (ApplicationPreSetup) ctx;
+                Descriptor app = gameCluster.application(shoppingItem.configurationTypeId());
+                ApplicationRedeemer redeemer = new ApplicationRedeemer(systemId, setup);
+                redeemer.distributionKey(bundleId);
+                if (!setup.load(app, redeemer)) return false;
+                redeemer.redeem();
+                return true;
+            });
+            storeServiceProvider.transactionLog(new StoreTransactionLog((systemId),OnAccess.GOOGLE_STORE,pendingTransactionId,shoppingItem.distributionId(),suc));
 
             if (suc) return true;
 

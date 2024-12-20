@@ -11,7 +11,11 @@
     {"type": "upgrade.role.admin","moduleResourceFile": "presence/upgrade.admin.view.html"},
     {"type": "live.game.lobby.test","moduleResourceFile": "presence/live.game.lobby.test.view.html"},
     {"type": "live.game.service.tournament","moduleResourceFile": "presence/live.game.service.tournament.view.html"},
+
     {"type": "live.game.service.item","moduleResourceFile": "presence/live.game.service.item.view.html"},
+
+    {"type": "live.game.service.tournament.reset","moduleResourceFile": "presence/live.game.service.tournament.reset.view.html"},
+
     {"type": "live.game.service.inbox","moduleResourceFile": "presence/live.game.service.inbox.view.html"},
     {"type": "live.game.service.store","moduleResourceFile": "presence/live.game.service.store.view.html"},
     {"type": "live.game.service.save","moduleResourceFile": "presence/live.game.service.save.view.html"},

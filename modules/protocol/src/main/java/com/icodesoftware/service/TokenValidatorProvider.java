@@ -28,12 +28,17 @@ public interface TokenValidatorProvider extends ServiceProvider,Resettable {
     String createGameClusterAccessKey(long gameClusterId);
     List<String> gameClusterAccessKeyList(long gameClusterId);
 
-
+    String checksum(byte[] payload);
     void timeout(int minutes,int seconds);
 
     Presence presence(Session session);
    
     String token(long systemId,long stub);
+
+    //OnSession onSession(Session session);
+    //void updateVendorAccessToken(String systemId,String accessToken);
+
+
     Access.Role role(long systemId);
     boolean checkRole(Access access,String role);
     boolean upgradeRole(Access access,String role);

@@ -4,6 +4,8 @@
   "pve": {
     "maxRoomPoolSizePerBucket": 100,
     "minRoomPoolSizePerBucket": 10,
+    "maxRoomPoolSizePerZone": 50000,
+    "minRoomPoolSizePerZone": 500,
     "maxDedicatedServerConnections": 10,
     "pushChannelEnabled": true
   },

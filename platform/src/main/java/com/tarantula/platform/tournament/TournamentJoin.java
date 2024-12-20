@@ -125,4 +125,24 @@ public class TournamentJoin extends OnApplicationHeader {
         dataStore.create(tournamentJoin);
         return tournamentJoin;
     }
+
+    public static TournamentJoin lookup(DataStore dataStore,long systemId,long tournamentId){
+        TournamentJoin[] joined = new TournamentJoin[]{null};
+        dataStore.list(new TournamentJoinQuery(SnowflakeKey.from(systemId),TournamentJoin.PLAYER_JOIN_LABEL),join->{
+            if(join.tournamentId == tournamentId){
+                join.dataStore(dataStore);
+                joined[0]=join;
+                return false;
+            }
+            return true;
+        });
+        if(joined[0]!=null) return joined[0];
+        TournamentJoin tournamentJoin = new TournamentJoin(systemId,0);
+        tournamentJoin.tournamentId = tournamentId;
+        tournamentJoin.closed = true;
+        tournamentJoin.ownerKey(SnowflakeKey.from(systemId));
+        tournamentJoin.dataStore(dataStore);
+        dataStore.create(tournamentJoin);
+        return tournamentJoin;
+    }
 }

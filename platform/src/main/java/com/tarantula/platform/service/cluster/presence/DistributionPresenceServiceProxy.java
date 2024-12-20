@@ -1,5 +1,6 @@
 package com.tarantula.platform.service.cluster.presence;
 
+import com.hazelcast.core.Member;
 import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
@@ -10,6 +11,7 @@ import com.tarantula.platform.TarantulaContext;
 import com.tarantula.platform.presence.DistributionPresenceService;
 import com.tarantula.platform.service.cluster.ClusterUtil;
 
+import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -52,6 +54,7 @@ public class DistributionPresenceServiceProxy extends AbstractDistributedObject<
         return (int)result.result;
     }
 
+
     public void onUpdateLeaderBoard(String serviceName, LeaderBoard.Entry leaderBoardEntry){
         NodeEngine nodeEngine = getNodeEngine();
         int partitionId = nodeEngine.getPartitionService().getPartitionId(leaderBoardEntry.category());
@@ -77,6 +80,22 @@ public class DistributionPresenceServiceProxy extends AbstractDistributedObject<
         return (byte[]) result.result;
     }
 
+
+    @Override
+    public boolean deleteUserLoginData(long playerID) {
+        NodeEngine nodeEngine = getNodeEngine();
+        Set<Member> members = nodeEngine.getClusterService().getMembers();
+        DeleteUserLoginDataOperation operation = new DeleteUserLoginDataOperation(playerID);
+        for(Member member : members) {
+            InvocationBuilder builder = nodeEngine.getOperationService().createInvocationBuilder(DistributionPresenceService.NAME, operation, member.getAddress());
+            ClusterUtil.CallResult callResult = ClusterUtil.call(TarantulaContext.operationRetries, TarantulaContext.operationRejectInterval, () -> {
+                Future<Boolean> future = builder.invoke();
+                return future.get(TarantulaContext.operationTimeout, TimeUnit.SECONDS);
+            }, metricsListener);
+            if (!callResult.successful) throw new RuntimeException(callResult.exception);
+        }
+        return true;
+    }
 
     public void registerMetricsListener(MetricsListener metricsListener){
         this.metricsListener = metricsListener;

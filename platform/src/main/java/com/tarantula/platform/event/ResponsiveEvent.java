@@ -57,4 +57,8 @@ public class ResponsiveEvent extends Data implements Event {
 		return "Responsive ["+this.sessionId+","+closed+","+retries+"]=>"+new String(payload);
 	}
 
+    public static ResponsiveEvent create(long sessionId,byte[] payload){
+        return new ResponsiveEvent("",sessionId,payload,true);
+    }
+
 }

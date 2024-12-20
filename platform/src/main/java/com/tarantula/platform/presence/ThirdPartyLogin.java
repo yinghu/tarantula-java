@@ -1,10 +1,10 @@
 package com.tarantula.platform.presence;
 
 import com.icodesoftware.service.LoginProvider;
-import com.icodesoftware.util.RecoverableObject;
+import com.tarantula.platform.OnApplicationHeader;
 
 
-public class ThirdPartyLogin extends RecoverableObject implements LoginProvider {
+public class ThirdPartyLogin extends OnApplicationHeader implements LoginProvider {
 
 
     public ThirdPartyLogin(){
@@ -30,6 +30,8 @@ public class ThirdPartyLogin extends RecoverableObject implements LoginProvider 
         buffer.writeUTF8(owner);
         buffer.writeUTF8(index);
         buffer.writeUTF8(name);
+        buffer.writeLong(stub);
+        buffer.writeLong(timestamp);
         return true;
     }
 
@@ -38,6 +40,12 @@ public class ThirdPartyLogin extends RecoverableObject implements LoginProvider 
         owner = buffer.readUTF8();
         index = buffer.readUTF8();
         name = buffer.readUTF8();
+        try{
+            stub = buffer.readLong();
+            timestamp = buffer.readLong();
+        }catch (Exception ex){
+            //ignore
+        }
         return true;
     }
 
@@ -49,7 +57,10 @@ public class ThirdPartyLogin extends RecoverableObject implements LoginProvider 
     }
 
     @Override
-    public String clientId() {
+    public String deviceId() {
         return name;
+    }
+    public void deviceId(String deviceId){
+        this.name = deviceId;
     }
 }

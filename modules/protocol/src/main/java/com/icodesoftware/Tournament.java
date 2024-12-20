@@ -40,9 +40,11 @@ public interface Tournament extends Configurable {
     int durationMinutesPerInstance();
     long startLevel();
     long endLevel();
+    String typeId();
     long scheduleId();
-
+    boolean joined(Session session);
     Instance register(Session session);
+    void ban(long systemId);
 
     interface Entry extends Configurable {
         long systemId();

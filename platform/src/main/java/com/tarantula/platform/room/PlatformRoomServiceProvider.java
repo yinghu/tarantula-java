@@ -533,6 +533,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
         if(!started || !pushChannelEnabled) return;
         room.setup(udpEndpoint.createChannels(index.gameZone.capacity()));
     }
+
     private void closeGameRoom(GameRoom closed){
         GameZoneIndex index = gameZoneIndex.get(closed.zoneId());
         for(int i=0;i<closed.capacity();i++){

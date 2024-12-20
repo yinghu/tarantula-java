@@ -60,6 +60,15 @@ public class TournamentEntry extends RecoverableObject implements Tournament.Ent
         return score;
     }
 
+    public void score(double delta){
+        score += delta;
+        timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
+    }
+
+    public void reset(){
+        this.score = 0;
+    }
+
     public double score(){
         return score;
     }

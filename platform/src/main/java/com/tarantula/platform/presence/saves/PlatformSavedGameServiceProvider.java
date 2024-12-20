@@ -13,6 +13,7 @@ import com.icodesoftware.Transaction;
 
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ApplicationPreSetup;
+import com.icodesoftware.service.Content;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.SnowflakeKey;
@@ -21,6 +22,11 @@ import com.icodesoftware.util.TimeUtil;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 
 import com.tarantula.platform.item.PlatformItemServiceProvider;
+
+import com.tarantula.platform.presence.PresencePortableRegistry;
+import com.tarantula.platform.service.deployment.ContentMapping;
+import com.tarantula.platform.util.RecoverableQuery;
+
 
 
 import java.time.LocalDateTime;
@@ -201,6 +207,24 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         return loaded? OversizeDataBatch.fromBatch(batchData):null;
     }
 
+    public SaveRevisionInfo saveRevisionInfo(Session session){
+        SaveRevisionInfo saveRevisionInfo = new SaveRevisionInfo();
+        saveRevisionInfo.distributionId(session.distributionId());
+        saveRevisionInfo.name(session.name());
+        dataStore.createIfAbsent(saveRevisionInfo,true);
+        return saveRevisionInfo;
+    }
+
+    public boolean saveRevisionInfo(Session session,SaveRevisionInfo pending){
+        SaveRevisionInfo saveRevisionInfo = new SaveRevisionInfo();
+        saveRevisionInfo.distributionId(session.distributionId());
+        saveRevisionInfo.name(pending.name());
+        dataStore.createIfAbsent(saveRevisionInfo,true);
+        if(pending.clientRevisionNumber != saveRevisionInfo.clientRevisionNumber+1) return false;
+        saveRevisionInfo.clientRevisionNumber++;
+        saveRevisionInfo.deviceId = pending.deviceId;
+        return dataStore.update(saveRevisionInfo);
+    }
 
 
 }

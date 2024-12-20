@@ -7,10 +7,12 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.*;
 import com.tarantula.platform.*;
+
 import com.tarantula.platform.presence.Membership;
 import com.tarantula.platform.presence.User;
 import com.tarantula.platform.presence.UserAccount;
 import com.tarantula.platform.presence.UserPortableRegistry;
+
 import com.tarantula.platform.util.RecoverableQuery;
 import com.tarantula.platform.util.SystemUtil;
 
@@ -21,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -42,7 +45,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private DataStore adataStore;//account
     private DataStore mdatastore;//membership
 
-    private DataStore sdatastore;//onsession
+    //private DataStore sdatastore;//onsession
 
     private DataStore deployDataStore;
 
@@ -57,6 +60,8 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     private Cipher encrypt;
     private Cipher decrypt;
     private ClusterProvider.ClusterStore clusterStore;
+
+    private UserService userService;
 
     private JWTUtil.JWT jwt;
     public MessageDigest messageDigest(){
@@ -73,16 +78,46 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
 
     public Presence presence(Session session){
         Presence presence = presence(session.distributionId());
+        if(presence!=null){
+            LoginProvider loginProvider = loginProvider(session.distributionId());
+            if(loginProvider!=null && loginProvider.stub() !=0 ){
+                loginProvider.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+                loginProvider.update();
+            }
+        }
+        /**
+        pMap.computeIfAbsent(session.distributionId(),(k)->{
+            PresenceIndex px = new PresenceIndex();
+            px.distributionId(session.distributionId());
+            if(!pdataStore.load(px)) return null;
+            px.dataStore(pdataStore);
+            px.load(5);
+            px.registerEventService(this.serviceContext.eventService());
+            return px;
+        });**/
+        /**
+        if(presence==null&&remotePresenceEnabled){
+            log.warn("Fetching presence from presence service ...");
+            PresenceFetcher httpCaller = fMap.get(session.trackId());
+            OnSession onSession = httpCaller.presence(session.token());
+            PresenceIndex px = new PresenceIndex(onSession.stub(),session.trackId());
+            px.distributionId(onSession.distributionId());
+            pdataStore.update(px);
+            px.dataStore(pdataStore);
+            px.registerEventService(this.serviceContext.eventService());
+            pMap.put(session.distributionId(),px);
+            return px;
+        }**/
+
         return presence;
     }
 
     public Presence presence(long id){
         return pMap.computeIfAbsent(id,(k)->{
-            PresenceIndex px = new PresenceIndex(sdatastore);
+            PresenceIndex px = new PresenceIndex(this.serviceContext);
             px.distributionId(id);
             if(!pdataStore.load(px)) return null;
             px.dataStore(pdataStore);
-            px.load(maxOnSessionCount);
             px.registerEventService(this.serviceContext.eventService());
             return px;
         });
@@ -160,7 +195,6 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
     public void offSession(long systemId,long stub){
         Presence presence = pMap.get(systemId);
         if(presence==null) return;
-        if(presence.offSession(stub)) return;
         pMap.remove(systemId);
         presence.disabled(true);
         presence.update();
@@ -248,7 +282,21 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         byte[] mark = encrypt(data);
         return SystemUtil.toBase64String(mark);
     }
+
+    private LoginProvider loginProvider(long systemId){
+        if(userService==null){
+            userService = (UserService)serviceContext.serviceProvider(UserService.NAME);
+        }
+        return userService.loginProvider(systemId);
+
+    }
     public boolean validateTicket(long key,long stub,String ticket){
+        LoginProvider provider = this.loginProvider(key);
+        if(provider!=null && provider.stub() !=0 && provider.stub() != stub){
+            log.warn("Current session stub not matched with latest ["+provider.stub()+"]["+stub+"]");
+            throw new RuntimeException("Session not expired on another device");
+            //return false;
+        }
         byte[] mark = decrypt(SystemUtil.fromBase64String(ticket));
         Recoverable.DataBuffer buffer = BufferProxy.wrap(mark);
         return buffer.readLong()==(key) && buffer.readLong() == stub;
@@ -356,7 +404,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         this.udataStore =  this.serviceContext.dataStore(Distributable.DATA_SCOPE,Access.DataStore);
         this.adataStore =  this.serviceContext.dataStore(Distributable.DATA_SCOPE,Account.DataStore);
         this.mdatastore =  this.serviceContext.dataStore(Distributable.DATA_SCOPE,Subscription.DataStore);
-        this.sdatastore = this.serviceContext.dataStore(Distributable.DATA_SCOPE,OnSession.DataStore);
+        //this.sdatastore = this.serviceContext.dataStore(Distributable.DATA_SCOPE, OnSession.DataStore);
         this.deployDataStore = this.serviceContext.dataStore(Distributable.DATA_SCOPE,DeploymentServiceProvider.DEPLOY_DATA_STORE);
         oMap = new ConcurrentHashMap<>();
 
@@ -604,6 +652,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         onSession.ticket(ticket(onSession.distributionId(),onSession.stub(),timeoutInSeconds));
         onSession.successful(true);
         return onSession;
+    }
+
+    public String checksum(byte[] payload){
+        MessageDigest messageDigest = messageDigest();
+        messageDigest.update(payload);
+        return HexFormat.of().formatHex(messageDigest.digest()).toUpperCase();
     }
 
 }

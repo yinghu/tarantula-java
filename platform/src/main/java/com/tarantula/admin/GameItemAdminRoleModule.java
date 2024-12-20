@@ -213,6 +213,28 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
                 session.write(JsonUtil.toSimpleResponse(false,"item not existed ["+query[1]+"]").getBytes());
             }
         }
+
+        else if (session.action().equals("onBatchCreate")){
+            String[] query = session.name().split("#");
+            if(query[1].equals(Commodity.COMMODITY_CONFIG_TYPE)){
+                GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(query[0]));
+                ApplicationPreSetup applicationPreSetup = gameCluster.applicationPreSetup();
+                JsonObject batch = JsonUtil.parse(payload);
+                JsonArray created = new JsonArray();
+                batch.get("list").getAsJsonArray().forEach(item->{
+                    created.add(JsonUtil.parse(createCommodity(new Commodity(),item.getAsJsonObject(),gameCluster,applicationPreSetup)));
+                });
+                JsonObject resp = new JsonObject();
+                resp.add("list",created);
+                resp.addProperty("successful",true);
+                resp.addProperty("message","check json payload");
+                session.write(resp.toString().getBytes());
+            }
+            else{
+                session.write(JsonUtil.toSimpleResponse(false,query[1]+" batch create not supported").getBytes());
+            }
+        }
+
         else {
             throw new UnsupportedOperationException(session.action()+" not supported");
         }

@@ -10,6 +10,18 @@
     </div>
     <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>   
     <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel">
+        <fieldset class="w3-border-blue tx-text-12">
+            <legend class="tx-text-14 w3-text-blue">Tournament Listing Debug</legend>
+            <div class="w3-container">
+                <label class="tx-text-14 tx-margin-right-4">Use Access Key To Scan :</label>
+                <input id='tx-tournament-listing-access-key' class="w3-input w3-border w3-round tx-text-14 tx-margin-bottom-8" value="use developer key">
+                <div class='w3-bar w3-white  w3-border-bottom w3-border-red'>
+                    <span id='tx-tournament-listing-scan' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Scan</span>    
+                </div> 
+            </div>
+        </fieldset>
+    </div>
     <div class="w3-panel"><!-- send form -->
         <div class="w3-container">
             <label class="tx-text-12">Tournament Type</label>
@@ -25,6 +37,7 @@
             <span id='tx-tournament-live-service-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
             <span id='tx-tournament-live-service-json-mode-code' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Code</span>
             <span id='tx-tournament-live-service-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span> 
+            <span id='tx-tournament-live-service-reset' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Reset</span>
             <span id='tx-tournament-live-service-reload' class='w3-bar-item w3-right w3-tag w3-round w3-border w3-border-red w3-green tx-text-12 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Reload</span>    
         </div>            
     </div>
@@ -65,7 +78,19 @@
         tournamentList.innerHTML = '';
         tx_live_tournament_setup();
     };
+
+    document.querySelector('#tx-tournament-live-service-reset').onclick = ()=>{
+        TARA_API.query().popup='#tx-popup-api';
+        tx_view({viewId:'live.game.service.tournament.reset',containerId:'#tx-popup-api'});
+    };
     
+    document.querySelector('#tx-tournament-listing-scan').onclick =()=>{
+        let key = document.querySelector('#tx-tournament-listing-access-key').value;
+        TARA_API.onGet(TARA_API.query().serviceTag,'onScan',key,(resp)=>{
+            editor.set(resp);
+        });    
+    };
+
     function tx_live_tournament_setup(){
         let mtype = document.querySelector('#tx-tournament-live-service-type').value;
         TARA_API.onGet(TARA_API.query().serviceTag,'onList',mtype,(resp)=>{

@@ -17,7 +17,8 @@ public class GameLobbyModule extends ModuleHeader{
         Stub stub = gameLobby.join(session);
         session.write(stub.toJson().toString().getBytes());
         if(!stub.joined()) return;
-        gameServiceProvider.presenceServiceProvider().onPlay(session);
+        gameServiceProvider.presenceServiceProvider().onPlay(session.distributionId());
+        gameServiceProvider.presenceServiceProvider().getDisplayName(session);
 
         gameServiceProvider.gameServiceProvider().onJoined(session, stub.room);
     }

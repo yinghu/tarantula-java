@@ -13,6 +13,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.OnApplicationHeader;
 import com.tarantula.game.service.GameConfigurationSetup;
 import com.tarantula.game.service.GameObjectSetup;
+import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.inventory.UserInventory;
 import com.tarantula.platform.item.*;
@@ -490,11 +491,17 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
     public String gameServiceProvider(){
         return gameServiceProvider;
     }
-
+    
     public void registerConfigurableCategory(ConfigurableCategory category){
         //logger.warn(template.toString());
         //ConfigurableCategory category = new ConfigurableCategory(template);
         //category.parse();
         categories.put(category.name(),category);
     }
+
+    public PlatformGameServiceProvider platformGameServiceProvider(){
+        return (PlatformGameServiceProvider)serviceContext.serviceProvider(serviceType());
+    }
+
+
 }

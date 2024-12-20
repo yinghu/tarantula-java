@@ -17,6 +17,12 @@ public class JWTUtil {
     public final static String ALG_RSA = "SHA256WithRSA";
     //private final static String ALG_ECDSA = "ECDSA";
     public final static int KEY_SIZE = 32;
+
+    //private final static String ALG_RSA = "SHA256WithRSA";
+    private final static String ALG_DSA = "SHA256withECDSAinP1363Format";
+    //public final static String ALG_ECDSA = "ECDSA256";
+    //private final static int KEY_SIZE = 32;
+
     private static SecureRandom secureRandom;
 
     static {
@@ -64,6 +70,16 @@ public class JWTUtil {
         }
     }
 
+    public static JWT initWithES256(PrivateKey privateKey) {
+        try{
+            Signature sig = Signature.getInstance(ALG_DSA);
+            sig.initSign(privateKey);
+            return new JWT(sig,true,"ES256");
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+    }
+
     public static JWT init(PublicKey publicKey) {
         try{
             Signature sig = Signature.getInstance(ALG_RSA);
@@ -98,6 +114,19 @@ public class JWTUtil {
                 this.verifier = signature;
             }
             this.alg = "RS256";
+            this.mac = null ;
+        }
+
+        public JWT(Signature signature,boolean signing,String alg){
+            if(signing){
+                this.signer = signature;
+                this.verifier = null;
+            }
+            else{
+                this.signer = null;
+                this.verifier = signature;
+            }
+            this.alg = alg;
             this.mac = null ;
         }
 

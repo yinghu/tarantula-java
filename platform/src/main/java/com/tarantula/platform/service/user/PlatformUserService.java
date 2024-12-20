@@ -19,7 +19,7 @@ public class PlatformUserService implements UserService {
     private DataStore userDataStore;
     private DataStore presenceDataStore;
 
-    private DataStore sessionDataStore;
+    //private DataStore sessionDataStore;
     private DataStore accountDataStore;
     private DataStore membershipDataStore;
 
@@ -67,11 +67,11 @@ public class PlatformUserService implements UserService {
         PresenceIndex px = new PresenceIndex();
         px.distributionId(access.distributionId());
         presenceDataStore.createIfAbsent(px,false);
-        for(int i=0;i<maxOnSessionCount;i++){
-            SessionIndex onSessionTrack = new SessionIndex();
-            onSessionTrack.ownerKey(px.key());
-            sessionDataStore.create(onSessionTrack);
-        }
+        //for(int i=0;i<maxOnSessionCount;i++){
+            //SessionIndex onSessionTrack = new SessionIndex();
+            //onSessionTrack.ownerKey(px.key());
+            //sessionDataStore.create(onSessionTrack);
+        //}
     }
     public Access createUser(Account account,Access access){
         if(!accountDataStore.load(account)) throw new RuntimeException("Account not existed");
@@ -207,9 +207,11 @@ public class PlatformUserService implements UserService {
     public LoginProvider loginProvider(long systemId){
         ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin();
         thirdPartyLogin.distributionId(systemId);
+        thirdPartyLogin.dataStore(loginProviderDataStore);
         return loginProviderDataStore.load(thirdPartyLogin)?thirdPartyLogin:null;
     }
     public void createLoginProvider(LoginProvider loginProvider){
+        loginProvider.dataStore(loginProviderDataStore);
         this.loginProviderDataStore.createIfAbsent(loginProvider,false);
     }
 
@@ -226,7 +228,7 @@ public class PlatformUserService implements UserService {
         presenceDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,Presence.DataStore);
         accountDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,Account.DataStore);
         membershipDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,Subscription.DataStore);
-        sessionDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,OnSession.DataStore);
+        //sessionDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,OnSession.DataStore);
         loginProviderDataStore = serviceContext.dataStore(Distributable.DATA_SCOPE,LoginProvider.DataStore);
         Configuration configuration = serviceContext.configuration("account-role-user-settings");
         trialMaxUsersPerAccount = ((Number)configuration.property("trialMaxUserCount")).intValue();

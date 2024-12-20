@@ -54,6 +54,12 @@ public class Inbox extends RecoverableObject {
             JsonArray content = new JsonArray();
             inbox.content().forEach((v)->content.add(v.toJson()));
             data.add("_content",content);
+
+            if(inbox.name().equals("itemGrant")){
+                jsonObject.add("_onItemGrantInbox",data);
+                return;
+            }
+
             dataList.add(data);
         });
         jsonObject.add("_onInbox",dataList);

@@ -3,7 +3,7 @@ package com.tarantula.platform;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.session.OnSessionTrack;
 import com.icodesoftware.service.EventService;
-import com.icodesoftware.util.FIFOBuffer;
+import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 import com.tarantula.platform.event.*;
 import com.icodesoftware.util.RecoverableObject;
@@ -14,15 +14,13 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     private boolean local = true;
     private EventService eventService;
 
-    private FIFOBuffer<SessionIndex> sessions;
-
-    private DataStore sessionDataStore;
+    private ServiceContext serviceContext;
     public PresenceIndex(){
 
     }
 
-    public PresenceIndex(DataStore sessionDataStore){
-        this.sessionDataStore = sessionDataStore;
+    public PresenceIndex(ServiceContext serviceContext){
+        this.serviceContext = serviceContext;
     }
 
     public void registerEventService(EventService eventService){
@@ -83,31 +81,14 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     }
 
     public OnSession stub(){
-        SessionIndex onSessionTrack = sessions.pop();
-        if(onSessionTrack==null) return OnSessionTrack.SESSION_NOT_AVAILABLE;
         counter++;
         this.update();
-        return new OnSessionTrack(distributionId,onSessionTrack.distributionId());
+        return new OnSessionTrack(distributionId,serviceContext.distributionId());
     }
 
-    public boolean offSession(long stub){
-        SessionIndex onSessionTrack = new SessionIndex();
-        onSessionTrack.distributionId(stub);
-        if(this.sessionDataStore.load(onSessionTrack)){
-            sessions.push(onSessionTrack);
-        }
-        return true;
-    }
     @Override
     public String toString(){
         return "On Presence ["+this.distributionId()+"/"+timestamp+"/"+counter+"/"+disabled+"]";
     }
 
-    public void load(int max){
-        sessions = new FIFOBuffer<>(max,new SessionIndex[max]);
-        sessionDataStore.list(new OnSessionQuery(key()),t->{
-            sessions.push(t);
-            return true;
-        });
-    }
 }
