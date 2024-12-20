@@ -24,12 +24,17 @@ final public class HttpCaller implements HttpClientProvider {
 
     public static String AUTHORIZATION = "Authorization";
     private HttpClient client;
-    protected String host;
-
+    private String host;
+    private String poolSetting;
     public HttpCaller(){}
 
     public HttpCaller(String host){
         this.host = host;
+    }
+
+    public HttpCaller(String host,String poolSetting){
+        this.host = host;
+        this.poolSetting = poolSetting;
     }
     public void _init() throws Exception{
         SSLContext sct = SSLContext.getInstance("TLS");
