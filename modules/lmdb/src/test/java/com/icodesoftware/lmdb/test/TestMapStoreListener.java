@@ -4,18 +4,19 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.LMDBDataStoreProvider;
 import com.icodesoftware.lmdb.TransactionLogManager;
+import com.icodesoftware.service.DataStoreProvider;
 import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
 
 
 public class TestMapStoreListener implements MapStoreListener {
 
-    LMDBDataStoreProvider provider;
+    DataStoreProvider provider;
     TransactionLogManager transactionLogManager;
 
     TestVerifier verifier;
     TestVerifier abort;
-    public TestMapStoreListener(LMDBDataStoreProvider provider){
+    public TestMapStoreListener(DataStoreProvider provider){
         this.provider = provider;
         transactionLogManager = new TransactionLogManager();
         TestContext context = new TestContext();

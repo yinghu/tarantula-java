@@ -5,11 +5,9 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 
-import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.lmdb.LocalHeader;
 import com.icodesoftware.service.DataStoreSummary;
 
-import java.nio.ByteBuffer;
 import java.util.List;
 
 public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Closable {
@@ -31,20 +29,19 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
 
     @Override
     public <T extends Recoverable> boolean create(T t) {
-        Recoverable.DataBuffer key = BufferProxy.buffer(100,true);
-        Recoverable.DataBuffer value = BufferProxy.buffer(1840,true);
-        lmdbPartitionProvider.assign(key);
-        if(!t.readKey(key)){
-            return false;
+        try(Recoverable.DataBufferPair cache = lmdbPartitionProvider.dataBufferPair()){
+            Recoverable.DataBuffer  key = cache.key();
+            Recoverable.DataBuffer value = cache.value();
+            lmdbPartitionProvider.assign(key);
+            if(!t.readKey(key)){
+                return false;
+            }
+            value.writeHeader(new LocalHeader(Long.MIN_VALUE,t.getFactoryId(),t.getClassId()));
+            if(!t.write(value)){
+                return false;
+            }
+            return true;
         }
-        value.writeHeader(new LocalHeader(Long.MIN_VALUE,t.getFactoryId(),t.getClassId()));
-        if(!t.write(value)){
-            return false;
-        }
-        LMDBPartition partition = lmdbPartitionProvider.partition(key.rewind());
-        if(!partition.put(name(),key.rewind(),value.flip())) return false;
-        lmdbPartitionProvider.onPut(partition,key.rewind());
-        return true;
     }
 
     @Override
@@ -60,25 +57,13 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
 
     @Override
     public <T extends Recoverable> boolean load(T t) {
-        Recoverable.DataBuffer key = BufferProxy.buffer(100,true);
-        t.writeKey(key);
-        LMDBPartition partition = lmdbPartitionProvider.partition(key.flip());
-        ByteBuffer value = partition.get(name(),key.rewind());
-        if(value==null) return false;
-        Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(value);
-        Recoverable.DataHeader header = dataBuffer.readHeader();
-        t.read(dataBuffer);
-        t.revision(header.revision());
+
         return true;
     }
 
     @Override
     public <T extends Recoverable> boolean delete(T t) {
-        Recoverable.DataBuffer key = BufferProxy.buffer(100,true);
-        t.writeKey(key);
-        LMDBPartition partition = lmdbPartitionProvider.partition(key.flip());
-        if(!partition.delete(name(),key.rewind())) return false;
-        lmdbPartitionProvider.onDelete(partition,key.rewind());
+
         return true;
     }
 

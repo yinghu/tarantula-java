@@ -63,7 +63,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     private MapStoreListener dataMapStoreListener;
     private DistributionIdGenerator distributionIdGenerator;
 
-    MetricsListener metricsListener = (k,v)->{};
+    private MetricsListener metricsListener = (k,v)->{};
     private JsonObject jsonObject;
     private LocalDataMigration migration;
     @Override
@@ -538,6 +538,23 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
     public void registerMetricsListener(MetricsListener metricsListener) {
         if(metricsListener==null) return;
         this.metricsListener = metricsListener;
+    }
+
+    public long storeSize(){
+        return storeSize;
+    }
+    public int maxReaderNumber(){
+        return maxReaders;
+    }
+    public int maxDatabaseNumber(){
+        return maxDatabaseNumber;
+    }
+    public boolean diskSync(){
+        return envNoSyncFlag;
+    }
+
+    public void onUpdated(String category,double delta){
+        this.metricsListener.onUpdated(category,delta);
     }
 
 }

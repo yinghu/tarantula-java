@@ -42,6 +42,7 @@ public class EnvSetting {
     public static final EnvSetting LogSetting = new EnvSetting(log,ENV_BASE_DIR+"/log",0,1,true);
     public static final EnvSetting LocalSetting = new EnvSetting(local,ENV_BASE_DIR+"/local",0,1,true);
 
+
     public EnvSetting(String name,String storePath,int mbSize,int partition,boolean enabled){
         this.name = name;
         this.storePath = storePath;

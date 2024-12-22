@@ -3,6 +3,7 @@ package com.icodesoftware.lmdb;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.DataStoreProvider;
 import com.icodesoftware.service.Serviceable;
 import org.lmdbjava.*;
 
@@ -20,7 +21,7 @@ public class LMDBEnv implements Serviceable {
 
     public EnvSetting envSetting;
     public Env<ByteBuffer> env;
-    public LMDBDataStoreProvider lmdbDataStoreProvider;
+    public DataStoreProvider lmdbDataStoreProvider;
 
     public LMDBEnv(EnvSetting envSetting){
         this.envSetting = envSetting;
@@ -29,13 +30,13 @@ public class LMDBEnv implements Serviceable {
     @Override
     public void start() throws Exception {
         if(!envSetting.enabled) return;
-        logger.warn("Starting Env : "+envSetting.name+" : "+envSetting.storePath+" : "+lmdbDataStoreProvider.envNoSyncFlag);
-        if(!lmdbDataStoreProvider.envNoSyncFlag){
-            env = Env.create().setMapSize(storeSize(this.envSetting)).setMaxDbs(lmdbDataStoreProvider.maxDatabaseNumber).setMaxReaders(lmdbDataStoreProvider.maxReaders).open(path(this.envSetting.storePath).toFile());
+        logger.warn("Starting Env : "+envSetting.name+" : "+envSetting.storePath+" : "+lmdbDataStoreProvider.diskSync());
+        if(!lmdbDataStoreProvider.diskSync()){
+            env = Env.create().setMapSize(storeSize(this.envSetting)).setMaxDbs(lmdbDataStoreProvider.maxDatabaseNumber()).setMaxReaders(lmdbDataStoreProvider.maxReaderNumber()).open(path(this.envSetting.storePath).toFile());
             return;
         }
         EnvFlags[] flags = new EnvFlags[]{EnvFlags.MDB_NOSYNC};
-        env = Env.create().setMapSize(storeSize(this.envSetting)).setMaxDbs(lmdbDataStoreProvider.maxDatabaseNumber).setMaxReaders(lmdbDataStoreProvider.maxReaders).open(path(this.envSetting.storePath).toFile(),flags);
+        env = Env.create().setMapSize(storeSize(this.envSetting)).setMaxDbs(lmdbDataStoreProvider.maxDatabaseNumber()).setMaxReaders(lmdbDataStoreProvider.maxReaderNumber()).open(path(this.envSetting.storePath).toFile(),flags);
     }
 
     public DataStore createDataStore(String name,Txn<ByteBuffer> txn,long transactionId){
@@ -88,7 +89,7 @@ public class LMDBEnv implements Serviceable {
         return _path;
     }
     private long storeSize(EnvSetting envSetting){
-        if(envSetting.mbSize==0) return lmdbDataStoreProvider.storeSize;
+        if(envSetting.mbSize==0) return lmdbDataStoreProvider.storeSize();
         logger.warn("Env ["+envSetting.name+"] starting with store size :"+envSetting.mbSize+"MB");
         return EnvSetting.toBytesFromMb(envSetting.mbSize);
     }

@@ -1,58 +1,77 @@
 package com.icodesoftware.lmdb.partition;
 
+import com.icodesoftware.DataStore;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.lmdb.BufferProxy;
-import com.icodesoftware.lmdb.EnvSetting;
-import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
-import com.icodesoftware.service.Serviceable;
-import com.icodesoftware.util.TimeUtil;
+import com.icodesoftware.Transaction;
+import com.icodesoftware.lmdb.BufferCache;
 
-import java.nio.ByteBuffer;
+import com.icodesoftware.lmdb.EnvSetting;
+
+import com.icodesoftware.lmdb.LMDBEnv;
+import com.icodesoftware.service.DataStoreProvider;
+import com.icodesoftware.service.MapStoreListener;
+import com.icodesoftware.service.Metadata;
+
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class LMDBPartitionProvider implements Serviceable {
+public class LMDBPartitionProvider implements DataStoreProvider {
 
-    private int maxPartitionNumber = 10;
+    private String name = EnvSetting.ENV_PROVIDER_NAME;
+    private static int PENDING_BUFFER_SIZE = EnvSetting.MAX_PENDING_BUFFER_NUMBER;
+    private static int KEY_SIZE = EnvSetting.KEY_SIZE;
+    private static int VALUE_SIZE = EnvSetting.VALUE_SIZE;
+
+    private int maxPartitionNumber = 3;
     private int storeMbSize = 1000; //1G
     private String basePath ="target/lmdb/partition";
     private String keyIndexStoreName = "partition_key_index";
-    private final ConcurrentHashMap<Integer, LMDBPartition> partitionMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, LMDBEnv> partitionMap = new ConcurrentHashMap<>();
 
-    private LMDBPartitionEnv keyIndex;
-    private LMDBPartition currentPartition;
-    private LocalDistributionIdGenerator localDistributionIdGenerator;
+
+    private LMDBEnv keyIndex;
+
+    private DistributionIdGenerator distributionIdGenerator;
+    private MapStoreListener integrationMapStoreListener;
+    private MapStoreListener dataMapStoreListener;
+
+    final ArrayBlockingQueue<BufferCache> pendingQueue = new ArrayBlockingQueue<>(PENDING_BUFFER_SIZE);;
+
 
     private final boolean isProxy;
 
-    private LMDBPartitionProvider(){
-        this.isProxy = true;
-    }
-    private LMDBPartitionProvider(boolean isProxy){
-        this.isProxy = isProxy;
+    public LMDBPartitionProvider(){
+        this.isProxy = false;
     }
 
     @Override
     public void start() throws Exception {
-        for(int i=1;i<maxPartitionNumber;i++){
-            Files.createDirectories(Paths.get(basePath+"/"+i));
-            Files.createDirectories(Paths.get(basePath+"/"+i+"/back"));
+        if(distributionIdGenerator==null) throw new RuntimeException("DistributionIdGenerator Not Registered");
+        for(int i=0;i<maxPartitionNumber;i++){
+            String path =basePath +"/"+i;
+            Files.createDirectories(Paths.get(path));
+            Files.createDirectories(Paths.get(path+"/"+i+"/back"));
+            LMDBEnv env = new LMDBEnv(new EnvSetting(EnvSetting.data,path,storeMbSize,i,true));
+            //env.start();
         }
-        localDistributionIdGenerator = new LocalDistributionIdGenerator(1, TimeUtil.epochMillisecondsFromMidnight(2020,1,1));
-        Files.createDirectories(Paths.get(basePath+"/index"));
-        Files.createDirectories(Paths.get(basePath+"/index/back"));
-        keyIndex = new LMDBPartitionEnv(envSetting(storeMbSize,basePath+"/index",1));
-        keyIndex.start();
-        LMDBPartition partition1 = isProxy? new LMDBPartitionProxy(1) : new LMDBPartitionEnv(envSetting(storeMbSize,basePath,1));
-        partition1.start();
-        partitionMap.put(partition1.partition(),partition1);
-        currentPartition = partition1;
+        //Files.createDirectories(Paths.get(basePath+"/index"));
+        //Files.createDirectories(Paths.get(basePath+"/index/back"));
+        //keyIndex = new LMDBPartitionEnv(envSetting(storeMbSize,basePath+"/index",1));
+        //keyIndex.start();
+        //LMDBPartition partition1 = isProxy? new LMDBPartitionProxy(1) : new LMDBPartitionEnv(envSetting(storeMbSize,basePath,1));
+        //partition1.start();
+        //partitionMap.put(partition1.partition(),partition1);
+        //currentPartition = partition1;
     }
 
     @Override
     public void shutdown() throws Exception {
-        keyIndex.shutdown();
         partitionMap.forEach((k,p)->{
             try {
                 p.shutdown();
@@ -62,45 +81,146 @@ public class LMDBPartitionProvider implements Serviceable {
         });
     }
 
-    public LMDBPartition partition(ByteBuffer key){
-        ByteBuffer partition = keyIndex.get(keyIndexStoreName,key);
-        if(partition==null) return currentPartition;
-        return partitionMap.get(partition.getInt());
-    }
-    public void onMapFull(LMDBPartition lmdbPartition, ByteBuffer key){
-        partitionMap.computeIfAbsent(lmdbPartition.partition()+1,k->{
-            LMDBPartitionEnv next = new LMDBPartitionEnv(envSetting(storeMbSize,basePath+"/"+k,k));
-            try{
-                next.start();
-            }catch (Exception ex){
-                throw new RuntimeException(ex);
-            }
-            currentPartition = next;
-            return next;
-        });
-    }
-    public void onPut(LMDBPartition lmdbPartition, ByteBuffer key){
-        Recoverable.DataBuffer partition = BufferProxy.buffer(4,true);
-        keyIndex.put(keyIndexStoreName,key,partition.writeInt(lmdbPartition.partition()).flip());
-    }
-    public void onDelete(LMDBPartition lmdbPartition, ByteBuffer key){
-        keyIndex.delete(keyIndexStoreName,key);
-    }
 
     public void assign(Recoverable.DataBuffer key){
-        key.writeLong(localDistributionIdGenerator.id());
-        key.flip();
+        distributionIdGenerator.assign(key);
     }
 
     private EnvSetting envSetting(int mbSize,String storePath,int partition){
         return new EnvSetting(EnvSetting.data,storePath,mbSize,partition,true);
     }
 
-    public static LMDBPartitionProvider create(boolean isProxy){
-        return new LMDBPartitionProvider(isProxy);
+
+    @Override
+    public void configure(Map<String, Object> properties) {
+
     }
 
-    public static LMDBPartitionProvider create(){
-        return new LMDBPartitionProvider();
+    @Override
+    public void registerDistributionIdGenerator(DistributionIdGenerator distributionIdGenerator) {
+        this.distributionIdGenerator = distributionIdGenerator;
     }
+
+    @Override
+    public void registerMapStoreListener(int scope, MapStoreListener mapStoreListener) {
+        if(scope== Distributable.DATA_SCOPE){
+            this.dataMapStoreListener = mapStoreListener;
+            return;
+        }
+        if(scope== Distributable.INTEGRATION_SCOPE){
+            this.integrationMapStoreListener = mapStoreListener;
+        }
+
+    }
+
+    @Override
+    public File backup(int scope) {
+        return null;
+    }
+
+    @Override
+    public DataStore createAccessIndexDataStore(String name) {
+        return null;
+    }
+
+    @Override
+    public DataStore createKeyIndexDataStore(String name) {
+        return null;
+    }
+
+    @Override
+    public DataStore createDataStore(String name) {
+        LMDBPartitionDataStore partitionDataStore = new LMDBPartitionDataStore(this);
+        return partitionDataStore;
+    }
+
+    @Override
+    public DataStore createLocalDataStore(String name) {
+        return null;
+    }
+
+    @Override
+    public DataStore createLogDataStore(String name) {
+        return null;
+    }
+
+    @Override
+    public List<String> list() {
+        return List.of();
+    }
+
+    @Override
+    public List<String> list(int scope) {
+        return List.of();
+    }
+
+    @Override
+    public DataStore lookup(String name) {
+        return null;
+    }
+
+    @Override
+    public Transaction transaction(int scope) {
+        return null;
+    }
+
+    @Override
+    public Recoverable.DataBufferPair dataBufferPair(){
+        BufferCache cache = pendingQueue.poll();
+        if(cache!=null) return cache;
+        return new BufferCache(KEY_SIZE,VALUE_SIZE,pendingQueue);
+    }
+
+    @Override
+    public String name() {
+        return name;
+    }
+
+    public long storeSize(){
+        return EnvSetting.toBytesFromMb(storeMbSize);
+    }
+    public int maxReaderNumber(){
+        return EnvSetting.MAX_READER_NUMBER;
+    }
+    public int maxDatabaseNumber(){
+        return EnvSetting.MAX_STORE_NUMBER;
+    }
+    public boolean diskSync(){
+        return EnvSetting.ENV_NO_SYNC_Flag;
+    }
+
+    @Override
+    public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value, long transactionId) {
+
+    }
+
+    @Override
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
+        return false;
+    }
+
+    @Override
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, DataStore.BufferStream bufferStream) {
+        return false;
+    }
+
+    @Override
+    public boolean onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value, long transactionId) {
+        return false;
+    }
+
+    @Override
+    public void onCommit(int scope, long transactionId) {
+
+    }
+
+    @Override
+    public void onAbort(int scope, long transactionId) {
+
+    }
+
+    public void onUpdated(String category,double delta){
+
+    }
+
 }

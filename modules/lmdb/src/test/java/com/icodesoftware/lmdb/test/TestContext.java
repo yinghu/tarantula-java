@@ -9,7 +9,7 @@ import java.util.concurrent.ScheduledFuture;
 
 public class TestContext implements ServiceContext {
 
-    public LMDBDataStoreProvider lmdbDataStoreProvider;
+    public DataStoreProvider lmdbDataStoreProvider;
     public TestNode testNode = new TestNode();
     @Override
     public ScheduledFuture<?> schedule(SchedulingTask task) {

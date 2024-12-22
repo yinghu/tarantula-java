@@ -33,7 +33,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
         this.name = name;
         this.dbi = dbi;
         this.env = env;
-        this.lmdbDataStoreProvider = env.lmdbDataStoreProvider;
+        this.lmdbDataStoreProvider = (LMDBDataStoreProvider)env.lmdbDataStoreProvider;
         this.ptxn = ptxn;
         this.transactionId = transactionId;
     }
@@ -91,7 +91,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             }
         }
         finally {
-            lmdbDataStoreProvider.metricsListener.onUpdated(METRICS_CREATE,1);
+            lmdbDataStoreProvider.onUpdated(METRICS_CREATE,1);
         }
     }
 
@@ -143,7 +143,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             }
             return true;
         }finally {
-            lmdbDataStoreProvider.metricsListener.onUpdated(METRICS_UPDATE,1);
+            lmdbDataStoreProvider.onUpdated(METRICS_UPDATE,1);
         }
     }
 
@@ -195,7 +195,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             }
             return false;
         }finally {
-            lmdbDataStoreProvider.metricsListener.onUpdated(METRICS_CREATE_IF_ABSENT,1);
+            lmdbDataStoreProvider.onUpdated(METRICS_CREATE_IF_ABSENT,1);
         }
     }
 
@@ -229,7 +229,7 @@ public class LMDBDataStore implements DataStore,DataStore.Backup ,Closable {
             return true;
         }
         finally {
-            lmdbDataStoreProvider.metricsListener.onUpdated(METRICS_LOAD,1);
+            lmdbDataStoreProvider.onUpdated(METRICS_LOAD,1);
         }
     }
 

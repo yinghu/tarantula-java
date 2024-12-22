@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public interface DataStoreProvider extends ServiceProvider {
+public interface DataStoreProvider extends MapStoreListener,MetricsListener {
 
     String NAME = "tarantula";
 
@@ -43,6 +43,11 @@ public interface DataStoreProvider extends ServiceProvider {
     Transaction transaction(int scope);
 
     Recoverable.DataBufferPair dataBufferPair();
+    void assign(Recoverable.DataBuffer dataBuffer);
+    long storeSize();
+    int maxReaderNumber();
+    int maxDatabaseNumber();
+    boolean diskSync();
 
     interface OnStart{
         void on(DataStoreProvider dataStoreProvider);
