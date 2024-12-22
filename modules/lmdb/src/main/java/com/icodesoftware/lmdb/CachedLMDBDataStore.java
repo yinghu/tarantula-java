@@ -25,7 +25,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
 
     //NOTES : key+value < 2032 bytes ( 511 bytes for key ; value <= 1521 bytes (2032 - 511 - 8)
 
-    private final LMDBDataStoreProvider lmdbDataStoreProvider;
+    private final LocalLMDBProvider lmdbDataStoreProvider;
 
     public CachedLMDBDataStore(String name, Dbi<ByteBuffer> dbi, LMDBEnv env){
         this.metadata = new LocalMetadata(env.envSetting.scope,name);
@@ -33,7 +33,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         this.name = name;
         this.dbi = dbi;
         this.env = env;
-        this.lmdbDataStoreProvider = (LMDBDataStoreProvider) env.lmdbDataStoreProvider;
+        this.lmdbDataStoreProvider =  env.lmdbDataStoreProvider;
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.icodesoftware.lmdb;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.DataStoreProvider;
 import com.icodesoftware.service.Serviceable;
 import org.lmdbjava.*;
 
@@ -21,7 +20,7 @@ public class LMDBEnv implements Serviceable {
 
     public EnvSetting envSetting;
     public Env<ByteBuffer> env;
-    public DataStoreProvider lmdbDataStoreProvider;
+    public LocalLMDBProvider lmdbDataStoreProvider;
 
     public LMDBEnv(EnvSetting envSetting){
         this.envSetting = envSetting;

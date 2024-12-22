@@ -4,16 +4,14 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Transaction;
-import com.icodesoftware.lmdb.BufferCache;
+import com.icodesoftware.lmdb.*;
 
-import com.icodesoftware.lmdb.EnvSetting;
-
-import com.icodesoftware.lmdb.LMDBEnv;
-import com.icodesoftware.service.DataStoreProvider;
 import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
+import org.lmdbjava.Txn;
 
 import java.io.File;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -21,7 +19,7 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class LMDBPartitionProvider implements DataStoreProvider {
+public class LMDBPartitionProvider implements LocalLMDBProvider {
 
     private String name = EnvSetting.ENV_PROVIDER_NAME;
     private static int PENDING_BUFFER_SIZE = EnvSetting.MAX_PENDING_BUFFER_NUMBER;
@@ -56,9 +54,10 @@ public class LMDBPartitionProvider implements DataStoreProvider {
         for(int i=0;i<maxPartitionNumber;i++){
             String path =basePath +"/"+i;
             Files.createDirectories(Paths.get(path));
-            Files.createDirectories(Paths.get(path+"/"+i+"/back"));
+            Files.createDirectories(Paths.get(path+"/back"));
             LMDBEnv env = new LMDBEnv(new EnvSetting(EnvSetting.data,path,storeMbSize,i,true));
-            //env.start();
+            env.lmdbDataStoreProvider = this;
+            env.start();
         }
         //Files.createDirectories(Paths.get(basePath+"/index"));
         //Files.createDirectories(Paths.get(basePath+"/index/back"));
@@ -85,11 +84,6 @@ public class LMDBPartitionProvider implements DataStoreProvider {
     public void assign(Recoverable.DataBuffer key){
         distributionIdGenerator.assign(key);
     }
-
-    private EnvSetting envSetting(int mbSize,String storePath,int partition){
-        return new EnvSetting(EnvSetting.data,storePath,mbSize,partition,true);
-    }
-
 
     @Override
     public void configure(Map<String, Object> properties) {
@@ -221,6 +215,16 @@ public class LMDBPartitionProvider implements DataStoreProvider {
 
     public void onUpdated(String category,double delta){
 
+    }
+
+    public LocalEdgeDataStore createEdgeDB(int scope, String source, String label){
+        final String edgeName = source+"#"+label;
+        return null;
+        //return edgMap.computeIfAbsent(edgeName,k->localEdgeDataStore(scope,source,label,null));
+    }
+
+    public  LocalEdgeDataStore localEdgeDataStore(int scope, String source, String label, Txn<ByteBuffer> txn){
+        return null;
     }
 
 }

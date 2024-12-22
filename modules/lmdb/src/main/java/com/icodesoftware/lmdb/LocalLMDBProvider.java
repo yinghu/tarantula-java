@@ -1,0 +1,12 @@
+package com.icodesoftware.lmdb;
+
+import com.icodesoftware.service.DataStoreProvider;
+import org.lmdbjava.Txn;
+
+import java.nio.ByteBuffer;
+
+public interface LocalLMDBProvider  extends DataStoreProvider {
+
+     LocalEdgeDataStore createEdgeDB(int scope,String source,String label);
+     LocalEdgeDataStore localEdgeDataStore(int scope, String source, String label, Txn<ByteBuffer> txn);
+}

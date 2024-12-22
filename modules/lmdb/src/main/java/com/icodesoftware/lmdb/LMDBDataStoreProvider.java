@@ -25,7 +25,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener{
+public class LMDBDataStoreProvider implements LocalLMDBProvider{
 
     private TarantulaLogger logger = JDKLogger.getLogger(LMDBDataStoreProvider.class);
 
