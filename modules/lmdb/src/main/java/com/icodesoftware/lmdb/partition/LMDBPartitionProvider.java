@@ -103,12 +103,14 @@ public class LMDBPartitionProvider implements LocalLMDBProvider {
 
     @Override
     public DataStore createAccessIndexDataStore(String name) {
-        return null;
+        LMDBPartitionDataStore partitionDataStore = new LMDBPartitionDataStore(Distributable.INTEGRATION_SCOPE,name,this);
+        return partitionDataStore;
     }
 
     @Override
     public DataStore createKeyIndexDataStore(String name) {
-        return null;
+        LMDBPartitionDataStore partitionDataStore = new LMDBPartitionDataStore(Distributable.INDEX_SCOPE,name,this);
+        return partitionDataStore;
     }
 
     @Override
@@ -119,12 +121,14 @@ public class LMDBPartitionProvider implements LocalLMDBProvider {
 
     @Override
     public DataStore createLocalDataStore(String name) {
-        return null;
+        LMDBPartitionDataStore partitionDataStore = new LMDBPartitionDataStore(Distributable.LOCAL_SCOPE,name,this);
+        return partitionDataStore;
     }
 
     @Override
     public DataStore createLogDataStore(String name) {
-        return null;
+        LMDBPartitionDataStore partitionDataStore = new LMDBPartitionDataStore(Distributable.LOG_SCOPE,name,this);
+        return partitionDataStore;
     }
 
     @Override

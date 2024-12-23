@@ -3,6 +3,7 @@ package com.icodesoftware.lmdb.partition;
 import com.icodesoftware.*;
 
 import com.icodesoftware.lmdb.LocalDataStore;
+import com.icodesoftware.lmdb.LocalEdgeDataStore;
 import com.icodesoftware.lmdb.LocalHeader;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DataStoreSummary;
@@ -50,8 +51,9 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
             LocalDataStore dataStore = lmdbPartitionProvider.partition(scope,name,key);
             key.rewind();
             value.flip();
+            if(!dataStore.put(key,value)) return false;
             t.revision(REVISION_START_NUMBER);
-            return dataStore.put(key,value);
+            return true;
         } catch (Exception ex){
             logger.error("Error on create : ",ex);
             throw ex;
@@ -84,8 +86,9 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
             }
             key.rewind();
             value.flip();
+            if(!dataStore.put(key,value)) return false;
             t.revision(header.revision()+1);
-            return dataStore.put(key,value);
+            return true;
         } catch (Exception ex){
             logger.error("Error on update : ",ex);
             throw ex;
@@ -169,6 +172,7 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
 
     @Override
     public <T extends Recoverable> boolean createEdge(T t, String label) {
+        //LocalEdgeDataStore dataStore = lmdbPartitionProvider.localEdgeDataStore(scope,name,label);
         return false;
     }
 

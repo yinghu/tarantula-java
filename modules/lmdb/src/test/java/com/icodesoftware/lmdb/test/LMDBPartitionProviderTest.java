@@ -19,7 +19,7 @@ public class LMDBPartitionProviderTest {
     }
 
     @Test(groups = { "LMDBPartitionProviderTest" })
-    public void initialTest(){
+    public void createTest(){
         DataStore dataStore = lmdbPartitionProvider.createDataStore("users");
         Assert.assertNotNull(dataStore);
         TestObject testObject = new TestObject("type","name");
@@ -63,11 +63,35 @@ public class LMDBPartitionProviderTest {
 
         exception = null;
         try {
-            DataStore badName = lmdbPartitionProvider.createDataStore("x-users");
+            DataStore badName = lmdbPartitionProvider.createDataStore("x#users");
             badName.create(new TestObject("bad", "bad"));
         }catch (Exception ex){
             exception = ex;
         }
         Assert.assertNotNull(exception);
+    }
+
+    @Test(groups = { "LMDBPartitionProviderTest" })
+    public void createIfAbsentTest(){
+        DataStore dataStore = lmdbPartitionProvider.createDataStore("users");
+        Assert.assertNotNull(dataStore);
+        long id = 1000;
+        TestObject testObject = new TestObject("type","name");
+        testObject.distributionId(id);
+        Assert.assertTrue(dataStore.createIfAbsent(testObject,false));
+        Assert.assertEquals(testObject.revision(),1);
+        TestObject load = new TestObject();
+        load.distributionId(testObject.distributionId());
+
+        Assert.assertTrue(dataStore.load(load));
+        Assert.assertEquals(testObject.name,load.name);
+        Assert.assertEquals(testObject.type,load.type);
+        Assert.assertEquals(load.revision(),1);
+
+        TestObject  existed = new TestObject("type1","name1");
+        existed.distributionId(id);
+        Assert.assertFalse(dataStore.createIfAbsent(existed,true));
+        Assert.assertEquals(existed.type,"type");
+        Assert.assertEquals(existed.name,"name");
     }
 }
