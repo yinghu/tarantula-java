@@ -10,10 +10,14 @@ public class LocalEdgeDataStore {
 
     private final Metadata metadata;
     private final Dbi<ByteBuffer> dbi;
-
+    private final LMDBEnv env;
     public LocalEdgeDataStore(final Metadata metadata,final Dbi<ByteBuffer> dbi){
+        this(metadata,dbi,null);
+    }
+    public LocalEdgeDataStore(final Metadata metadata,final Dbi<ByteBuffer> dbi,LMDBEnv env){
         this.metadata = metadata;
         this.dbi = dbi;
+        this.env = env;
     }
     public Metadata metadata(){
         return metadata;
@@ -58,6 +62,12 @@ public class LocalEdgeDataStore {
 
     private void check(){
         if(dbi==null) throw new RuntimeException("lmdb not opened");
+    }
+
+    public boolean addEdge(ByteBuffer key,ByteBuffer value){
+        try(final Txn<ByteBuffer> txn = env.txnWrite()){
+            return addEdge(txn,key,value);
+        }
     }
 
 }

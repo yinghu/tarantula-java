@@ -220,6 +220,12 @@ public class LMDBPartitionProvider implements LocalLMDBProvider {
         return null;
     }
 
+    public LocalEdgeDataStore partition(int scope,String name,String label,Recoverable.DataBuffer key){
+        LMDBEnv lmdb = partitionMap.get(partition(key));
+        Dbi<ByteBuffer> dbi = lmdb.env.openDbi(store(scope,name,label),DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
+        LocalMetadata metadata = new LocalMetadata(scope,name,label);
+        return new LocalEdgeDataStore(metadata,dbi,lmdb);
+    }
     public LocalDataStore partition(int scope,String name,Recoverable.DataBuffer key){
         LMDBEnv lmdb = partitionMap.get(partition(key));
         Dbi<ByteBuffer> dbi = lmdb.env.openDbi(store(scope,name), DbiFlags.MDB_CREATE);
@@ -230,7 +236,27 @@ public class LMDBPartitionProvider implements LocalLMDBProvider {
     private int partition(Recoverable.DataBuffer key){
         return Math.abs(Arrays.hashCode(key.array())) % maxPartitionNumber;
     }
-
+    private String store(int scope,String name,String label){
+        if(name.contains("@") || name.contains("#") || name.contains("-")) throw new RuntimeException("store cannot have @ , #, or -");
+        switch (scope){
+            case Distributable.DATA_SCOPE -> {
+                return EnvSetting.data+"@"+name+"#"+label;
+            }
+            case Distributable.INTEGRATION_SCOPE -> {
+                return EnvSetting.integration+"@"+name+"#"+label;
+            }
+            case Distributable.INDEX_SCOPE -> {
+                return EnvSetting.index+"@"+name+"#"+label;
+            }
+            case Distributable.LOG_SCOPE -> {
+                return EnvSetting.log+"@"+name+"#"+label;
+            }
+            case Distributable.LOCAL_SCOPE -> {
+                return EnvSetting.local+"@"+name+"#"+label;
+            }
+            default -> throw new RuntimeException("Scope ["+scope+"] not supported");
+        }
+    }
     private String store(int scope,String name){
         if(name.contains("@") || name.contains("#") || name.contains("-")) throw new RuntimeException("store cannot have @ , #, or -");
         switch (scope){

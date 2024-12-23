@@ -172,8 +172,26 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
 
     @Override
     public <T extends Recoverable> boolean createEdge(T t, String label) {
-        //LocalEdgeDataStore dataStore = lmdbPartitionProvider.localEdgeDataStore(scope,name,label);
-        return false;
+        Recoverable.Key okey = t.ownerKey();
+        if(okey==null) return false;
+        try(Recoverable.DataBufferPair cache = lmdbPartitionProvider.dataBufferPair()){
+            Recoverable.DataBuffer  key = cache.key();
+            Recoverable.DataBuffer value = cache.value();
+            if(!okey.write(key)){
+                return false;
+            }
+            if(!t.writeKey(value)){
+                return false;
+            }
+            key.flip();
+            LocalEdgeDataStore dataStore = lmdbPartitionProvider.partition(scope,name,label,key);
+            key.rewind();
+            value.flip();
+            return dataStore.addEdge(key.src(),value.src());
+        }catch (Exception ex){
+            logger.error("Error on delete : ",ex);
+            throw ex;
+        }
     }
 
     @Override
