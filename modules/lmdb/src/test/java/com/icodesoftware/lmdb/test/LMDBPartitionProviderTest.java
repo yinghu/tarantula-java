@@ -4,6 +4,7 @@ import com.icodesoftware.DataStore;
 
 import com.icodesoftware.lmdb.partition.LMDBPartitionProvider;
 
+import com.icodesoftware.util.SnowflakeKey;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -20,7 +21,7 @@ public class LMDBPartitionProviderTest {
 
     @Test(groups = { "LMDBPartitionProviderTest" })
     public void createTest(){
-        DataStore dataStore = lmdbPartitionProvider.createDataStore("users");
+        DataStore dataStore = lmdbPartitionProvider.createDataStore("create_users");
         Assert.assertNotNull(dataStore);
         TestObject testObject = new TestObject("type","name");
         Assert.assertTrue(dataStore.create(testObject));
@@ -73,7 +74,7 @@ public class LMDBPartitionProviderTest {
 
     @Test(groups = { "LMDBPartitionProviderTest" })
     public void createIfAbsentTest(){
-        DataStore dataStore = lmdbPartitionProvider.createDataStore("users");
+        DataStore dataStore = lmdbPartitionProvider.createDataStore("if_users");
         Assert.assertNotNull(dataStore);
         long id = 1000;
         TestObject testObject = new TestObject("type","name");
@@ -94,4 +95,38 @@ public class LMDBPartitionProviderTest {
         Assert.assertEquals(existed.type,"type");
         Assert.assertEquals(existed.name,"name");
     }
+
+    @Test(groups = { "LMDBPartitionProviderTest" })
+    public void createEdgeTest(){
+        DataStore dataStore = lmdbPartitionProvider.createDataStore("edge_users");
+        Assert.assertNotNull(dataStore);
+        TestObject testObject = new TestObject("type","name");
+        Assert.assertTrue(dataStore.create(testObject));
+        Assert.assertEquals(testObject.revision(),1);
+        testObject.ownerKey(SnowflakeKey.from(100));
+        Assert.assertTrue(dataStore.createEdge(testObject,"friends"));
+        long[] id = {0};
+        dataStore.backup().forEachEdgeKey(SnowflakeKey.from(100),"friends",(k,v)->{
+            id[0] = k.readLong();
+            Assert.assertEquals(id[0],testObject.distributionId());
+            return true;
+        });
+        Assert.assertTrue(id[0]>0);
+        TestObject load = new TestObject();
+        load.distributionId(id[0]);
+        Assert.assertTrue(dataStore.load(load));
+
+        Assert.assertTrue(dataStore.deleteEdge(SnowflakeKey.from(100),"friends"));
+         
+        //TestObject load = new TestObject();
+        //load.distributionId(testObject.distributionId());
+
+        //Assert.assertTrue(dataStore.load(load));
+        //Assert.assertEquals(testObject.name,load.name);
+        //Assert.assertEquals(testObject.type,load.type);
+        //Assert.assertEquals(load.revision(),1);
+
+    }
+
+
 }

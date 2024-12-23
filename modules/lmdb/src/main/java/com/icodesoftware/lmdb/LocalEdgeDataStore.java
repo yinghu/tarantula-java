@@ -66,8 +66,42 @@ public class LocalEdgeDataStore {
 
     public boolean addEdge(ByteBuffer key,ByteBuffer value){
         try(final Txn<ByteBuffer> txn = env.txnWrite()){
-            return addEdge(txn,key,value);
+            if(!dbi.put(txn,key,value, PutFlags.MDB_NODUPDATA)) return false;
+            txn.commit();
+            return true;
         }
+    }
+    public boolean deleteEdge(ByteBuffer key){
+        try(final Txn<ByteBuffer> txn = env.txnWrite()){
+            if(!dbi.delete(txn,key)) return false;
+            txn.commit();
+            return true;
+        }
+    }
+    public boolean deleteEdge(ByteBuffer key,ByteBuffer value){
+        try(final Txn<ByteBuffer> txn = env.txnWrite()){
+            if(!dbi.delete(txn,key,value)) return false;
+            txn.commit();
+            return true;
+        }
+    }
+    public void onEdge(ByteBuffer key, DataStore.BufferStream stream){
+        try(final Txn<ByteBuffer> txn = env.txnRead(); final Cursor<ByteBuffer> cursor = dbi.openCursor(txn)){
+            if(!cursor.get(key, GetOp.MDB_SET)) return;
+            if(!cursor.seek(SeekOp.MDB_FIRST_DUP)) return;
+            if(!stream.on(BufferProxy.buffer(cursor.val()),null)) return;
+            while (cursor.seek(SeekOp.MDB_NEXT_DUP)){
+                if(!stream.on(BufferProxy.buffer(cursor.val()),null)) break;
+            }
+        }
+    }
+
+    public String name(){
+        return new String(dbi.getName());
+    }
+
+    public int partition(){
+        return env.envSetting.partition;
     }
 
 }

@@ -237,7 +237,8 @@ public class LMDBPartitionProvider implements LocalLMDBProvider {
         return Math.abs(Arrays.hashCode(key.array())) % maxPartitionNumber;
     }
     private String store(int scope,String name,String label){
-        if(name.contains("@") || name.contains("#") || name.contains("-")) throw new RuntimeException("store cannot have @ , #, or -");
+        if(name.contains("@") || name.contains("#") || name.contains("-")) throw new RuntimeException("store name cannot have @ , #, or -");
+        if(label.contains("@") || label.contains("#") || label.contains("-")) throw new RuntimeException("store label cannot have @ , #, or -");
         switch (scope){
             case Distributable.DATA_SCOPE -> {
                 return EnvSetting.data+"@"+name+"#"+label;
@@ -258,7 +259,7 @@ public class LMDBPartitionProvider implements LocalLMDBProvider {
         }
     }
     private String store(int scope,String name){
-        if(name.contains("@") || name.contains("#") || name.contains("-")) throw new RuntimeException("store cannot have @ , #, or -");
+        if(name.contains("@") || name.contains("#") || name.contains("-")) throw new RuntimeException("store name cannot have @ , #, or -");
         switch (scope){
             case Distributable.DATA_SCOPE -> {
                 return EnvSetting.data+"@"+name;

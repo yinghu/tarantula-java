@@ -189,19 +189,48 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
             value.flip();
             return dataStore.addEdge(key.src(),value.src());
         }catch (Exception ex){
-            logger.error("Error on delete : ",ex);
+            logger.error("Error on create edge : ",ex);
             throw ex;
         }
     }
 
     @Override
-    public boolean deleteEdge(Recoverable.Key key, Recoverable.Key edge, String label) {
-        return false;
+    public boolean deleteEdge(Recoverable.Key okey, Recoverable.Key edge, String label) {
+        try(Recoverable.DataBufferPair cache = lmdbPartitionProvider.dataBufferPair()){
+            Recoverable.DataBuffer  key = cache.key();
+            Recoverable.DataBuffer value = cache.value();
+            if(!okey.write(key)){
+                return false;
+            }
+            if(edge.write(value));
+            key.flip();
+            LocalEdgeDataStore dataStore = lmdbPartitionProvider.partition(scope,name,label,key);
+            key.rewind();
+            value.flip();
+            return dataStore.deleteEdge(key.src(),value.src());
+        }catch (Exception ex){
+            logger.error("Error on delete edge: ",ex);
+            throw ex;
+        }
     }
 
     @Override
-    public boolean deleteEdge(Recoverable.Key key, String label) {
-        return false;
+    public boolean deleteEdge(Recoverable.Key okey, String label) {
+        try(Recoverable.DataBufferPair cache = lmdbPartitionProvider.dataBufferPair()){
+            Recoverable.DataBuffer  key = cache.key();
+            Recoverable.DataBuffer value = cache.value();
+            if(!okey.write(key)){
+                return false;
+            }
+            key.flip();
+            LocalEdgeDataStore dataStore = lmdbPartitionProvider.partition(scope,name,label,key);
+            key.rewind();
+            value.flip();
+            return dataStore.deleteEdge(key.src());
+        }catch (Exception ex){
+            logger.error("Error on delete edge: ",ex);
+            throw ex;
+        }
     }
 
     @Override
@@ -216,7 +245,7 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
 
     @Override
     public Backup backup() {
-        return null;
+        return this;
     }
 
     @Override
@@ -230,13 +259,25 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
     }
 
     @Override
-    public void forEachEdgeKey(Recoverable.Key key, String label, BufferStream bufferStream) {
-
+    public void forEachEdgeKey(Recoverable.Key okey, String label, BufferStream bufferStream) {
+        try(Recoverable.DataBufferPair cache = lmdbPartitionProvider.dataBufferPair()){
+            Recoverable.DataBuffer  key = cache.key();
+            if(!okey.write(key)){
+                return;
+            }
+            key.flip();
+            LocalEdgeDataStore dataStore = lmdbPartitionProvider.partition(scope,name,label,key);
+            key.rewind();
+            dataStore.onEdge(key.src(),bufferStream);
+        }catch (Exception ex){
+            logger.error("Error on forEachEdgeKey : ",ex);
+            throw ex;
+        }
     }
 
     @Override
     public void forEachEdgeKeyValue(Recoverable.Key key, String label, BufferStream bufferStream) {
-
+        throw new RuntimeException("operation not supported");
     }
 
     @Override
