@@ -1,18 +1,18 @@
 package com.icodesoftware.lmdb.partition;
 
-import com.icodesoftware.Closable;
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Recoverable;
-import com.icodesoftware.RecoverableFactory;
+import com.icodesoftware.*;
 
 import com.icodesoftware.lmdb.LocalDataStore;
 import com.icodesoftware.lmdb.LocalHeader;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DataStoreSummary;
 
 import java.util.List;
 
 public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Closable {
 
+    private static final TarantulaLogger logger = JDKLogger.getLogger(LMDBPartitionDataStore.class);
+    private static final long REVISION_START_NUMBER = 1L;
     private final LMDBPartitionProvider lmdbPartitionProvider;
     private final int scope;
     private final String name;
@@ -34,7 +34,7 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
 
     @Override
     public <T extends Recoverable> boolean create(T t) {
-        try(Recoverable.DataBufferPair cache = lmdbPartitionProvider.dataBufferPair()){
+        try(final Recoverable.DataBufferPair cache = lmdbPartitionProvider.dataBufferPair()){
             Recoverable.DataBuffer  key = cache.key();
             Recoverable.DataBuffer value = cache.value();
             lmdbPartitionProvider.assign(key);
@@ -42,7 +42,7 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
             if(!t.readKey(key)){
                 return false;
             }
-            value.writeHeader(new LocalHeader(Long.MIN_VALUE,t.getFactoryId(),t.getClassId()));
+            value.writeHeader(new LocalHeader(REVISION_START_NUMBER,t.getFactoryId(),t.getClassId()));
             if(!t.write(value)){
                 return false;
             }
@@ -50,19 +50,80 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
             LocalDataStore dataStore = lmdbPartitionProvider.partition(scope,name,key);
             key.rewind();
             value.flip();
+            t.revision(REVISION_START_NUMBER);
             return dataStore.put(key,value);
+        } catch (Exception ex){
+            logger.error("Error on create : ",ex);
+            throw ex;
         }
     }
 
     @Override
     public <T extends Recoverable> boolean update(T t) {
-
-        return false;
+        try(final Recoverable.DataBufferPair cache = lmdbPartitionProvider.dataBufferPair()){
+            Recoverable.DataBuffer  key = cache.key();
+            Recoverable.DataBuffer value = cache.value();
+            if(!t.writeKey(key)){
+                return false;
+            }
+            key.flip();
+            LocalDataStore dataStore = lmdbPartitionProvider.partition(scope,name,key);
+            key.rewind();
+            if(!dataStore.get(key,value)){
+                return false;
+            }
+            value.flip();
+            Recoverable.DataHeader header = value.readHeader();
+            if(t.revision() != header.revision()) {
+                return false;
+            }
+            value.clear();
+            value.writeHeader(new LocalHeader(header.revision()+1,t.getFactoryId(),t.getClassId()));
+            if(!t.write(value)){
+                return false;
+            }
+            key.rewind();
+            value.flip();
+            t.revision(header.revision()+1);
+            return dataStore.put(key,value);
+        } catch (Exception ex){
+            logger.error("Error on update : ",ex);
+            throw ex;
+        }
     }
 
     @Override
     public <T extends Recoverable> boolean createIfAbsent(T t, boolean loading) {
-        return false;
+        try(final Recoverable.DataBufferPair cache = lmdbPartitionProvider.dataBufferPair()){
+            Recoverable.DataBuffer  key = cache.key();
+            Recoverable.DataBuffer value = cache.value();
+            if(!t.writeKey(key)){
+                throw new RuntimeException("Key must be assigned first");
+            }
+            key.flip();
+            LocalDataStore dataStore = lmdbPartitionProvider.partition(scope,name,key);
+            key.rewind();
+            if(dataStore.get(key,value)){
+                if(!loading) return false;
+                value.flip();
+                Recoverable.DataHeader header = value.readHeader();
+                t.read(value);
+                t.revision(header.revision());
+                return false;
+            }
+            value.clear();
+            value.writeHeader(new LocalHeader(REVISION_START_NUMBER,t.getFactoryId(),t.getClassId()));
+            if(!t.write(value)){
+                throw new RuntimeException("Error on write value");
+            }
+            key.rewind();
+            value.flip();
+            t.revision(REVISION_START_NUMBER);
+            return dataStore.put(key,value);
+        } catch (Exception ex){
+            logger.error("Error on createIfAbsent : ",ex);
+            throw ex;
+        }
     }
 
     @Override
@@ -78,9 +139,13 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
             key.rewind();
             if(!dataStore.get(key,value)) return false;
             value.flip();
-            value.readHeader();
+            Recoverable.DataHeader header = value.readHeader();
             t.read(value);
+            t.revision(header.revision());
             return true;
+        }catch (Exception ex){
+            logger.error("Error on load : ",ex);
+            throw ex;
         }
     }
 
@@ -96,6 +161,9 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
             key.rewind();
             if(!dataStore.delete(key)) return false;
             return true;
+        }catch (Exception ex){
+            logger.error("Error on delete : ",ex);
+            throw ex;
         }
     }
 

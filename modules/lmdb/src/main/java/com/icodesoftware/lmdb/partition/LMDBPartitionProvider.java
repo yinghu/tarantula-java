@@ -1,11 +1,9 @@
 package com.icodesoftware.lmdb.partition;
 
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Distributable;
-import com.icodesoftware.Recoverable;
-import com.icodesoftware.Transaction;
+import com.icodesoftware.*;
 import com.icodesoftware.lmdb.*;
 
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
 import org.lmdbjava.Dbi;
@@ -16,6 +14,7 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -23,19 +22,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class LMDBPartitionProvider implements LocalLMDBProvider {
 
+    private static final TarantulaLogger logger = JDKLogger.getLogger(LMDBPartitionProvider.class);
+
     private String name = EnvSetting.ENV_PROVIDER_NAME;
     private static int PENDING_BUFFER_SIZE = EnvSetting.MAX_PENDING_BUFFER_NUMBER;
     private static int KEY_SIZE = EnvSetting.KEY_SIZE;
     private static int VALUE_SIZE = EnvSetting.VALUE_SIZE;
 
-    private int maxPartitionNumber = 3;
+    private final int maxPartitionNumber = 3;
     private int storeMbSize = 1000; //1G
     private String basePath ="target/lmdb/partition";
-    private String keyIndexStoreName = "partition_key_index";
+
     private final ConcurrentHashMap<Integer, LMDBEnv> partitionMap = new ConcurrentHashMap<>();
-
-
-    private LMDBEnv keyIndex;
 
     private DistributionIdGenerator distributionIdGenerator;
     private MapStoreListener integrationMapStoreListener;
@@ -43,13 +41,8 @@ public class LMDBPartitionProvider implements LocalLMDBProvider {
 
     final ArrayBlockingQueue<BufferCache> pendingQueue = new ArrayBlockingQueue<>(PENDING_BUFFER_SIZE);;
 
-
-    private final boolean isProxy;
-
     public LMDBPartitionProvider(){
-        this.isProxy = false;
     }
-
     @Override
     public void start() throws Exception {
         if(distributionIdGenerator==null) throw new RuntimeException("DistributionIdGenerator Not Registered");
@@ -62,14 +55,7 @@ public class LMDBPartitionProvider implements LocalLMDBProvider {
             env.start();
             partitionMap.put(i,env);
         }
-        //Files.createDirectories(Paths.get(basePath+"/index"));
-        //Files.createDirectories(Paths.get(basePath+"/index/back"));
-        //keyIndex = new LMDBPartitionEnv(envSetting(storeMbSize,basePath+"/index",1));
-        //keyIndex.start();
-        //LMDBPartition partition1 = isProxy? new LMDBPartitionProxy(1) : new LMDBPartitionEnv(envSetting(storeMbSize,basePath,1));
-        //partition1.start();
-        //partitionMap.put(partition1.partition(),partition1);
-        //currentPartition = partition1;
+        logger.warn("LMDB partition provider started with partitions ["+maxPartitionNumber+"]");
     }
 
     @Override
@@ -231,10 +217,36 @@ public class LMDBPartitionProvider implements LocalLMDBProvider {
     }
 
     public LocalDataStore partition(int scope,String name,Recoverable.DataBuffer key){
-        LMDBEnv lmdb = partitionMap.get(0);
-        Dbi<ByteBuffer> dbi = lmdb.env.openDbi(name, DbiFlags.MDB_CREATE);
+        LMDBEnv lmdb = partitionMap.get(partition(key));
+        Dbi<ByteBuffer> dbi = lmdb.env.openDbi(store(scope,name), DbiFlags.MDB_CREATE);
         LocalMetadata metadata = new LocalMetadata(scope,name);
-        return new LocalDataStore(metadata,dbi,lmdb.env);
+        return new LocalDataStore(metadata,dbi,lmdb);
+    }
+
+    private int partition(Recoverable.DataBuffer key){
+        return Math.abs(Arrays.hashCode(key.array())) % maxPartitionNumber;
+    }
+
+    private String store(int scope,String name){
+        if(name.contains("@") || name.contains("#") || name.contains("-")) throw new RuntimeException("store cannot have @ , #, or -");
+        switch (scope){
+            case Distributable.DATA_SCOPE -> {
+                return EnvSetting.data+"@"+name;
+            }
+            case Distributable.INTEGRATION_SCOPE -> {
+                return EnvSetting.integration+"@"+name;
+            }
+            case Distributable.INDEX_SCOPE -> {
+                return EnvSetting.index+"@"+name;
+            }
+            case Distributable.LOG_SCOPE -> {
+                return EnvSetting.log+"@"+name;
+            }
+            case Distributable.LOCAL_SCOPE -> {
+                return EnvSetting.local+"@"+name;
+            }
+            default -> throw new RuntimeException("Scope ["+scope+"] not supported");
+        }
     }
 
 }

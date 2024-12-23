@@ -1,6 +1,5 @@
 package com.icodesoftware.lmdb;
 
-import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.DataStoreProvider;
 import org.lmdbjava.Txn;

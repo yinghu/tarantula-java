@@ -6,7 +6,6 @@ import com.icodesoftware.service.Metadata;
 public class LocalMetadata  implements Metadata {
     private int scope;
     private String name;
-
     private String label;
     public LocalMetadata(int scope,String name){
         this.name = name;

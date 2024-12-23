@@ -3,7 +3,6 @@ package com.icodesoftware.lmdb;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.Metadata;
 import org.lmdbjava.Dbi;
-import org.lmdbjava.Env;
 import org.lmdbjava.Txn;
 
 import java.nio.ByteBuffer;
@@ -12,9 +11,9 @@ public class LocalDataStore {
 
     private final Metadata metadata;
     private final Dbi<ByteBuffer> dbi;
-    private final Env<ByteBuffer> env;
+    private final LMDBEnv env;
 
-    public LocalDataStore(Metadata metadata, Dbi<ByteBuffer> dbi, Env<ByteBuffer> env){
+    public LocalDataStore(Metadata metadata, Dbi<ByteBuffer> dbi, LMDBEnv env){
         this.metadata = metadata;
         this.dbi = dbi;
         this.env = env;
@@ -46,6 +45,17 @@ public class LocalDataStore {
             txn.commit();
             return true;
         }
+    }
+    public Metadata metadata(){
+        return metadata;
+    }
+
+    public String name(){
+        return new String(dbi.getName());
+    }
+
+    public int partition(){
+        return env.envSetting.partition;
     }
 
 }
