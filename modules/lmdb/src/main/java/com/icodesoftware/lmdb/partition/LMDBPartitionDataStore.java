@@ -5,6 +5,7 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 
+import com.icodesoftware.lmdb.LocalDataStore;
 import com.icodesoftware.lmdb.LocalHeader;
 import com.icodesoftware.service.DataStoreSummary;
 
@@ -13,18 +14,22 @@ import java.util.List;
 public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Closable {
 
     private final LMDBPartitionProvider lmdbPartitionProvider;
+    private final int scope;
+    private final String name;
 
-    public LMDBPartitionDataStore(LMDBPartitionProvider lmdbPartitionProvider){
+    public LMDBPartitionDataStore(int scope,String name,LMDBPartitionProvider lmdbPartitionProvider){
+        this.scope = scope;
+        this.name = name;
         this.lmdbPartitionProvider = lmdbPartitionProvider;
     }
     @Override
     public int scope() {
-        return 0;
+        return scope;
     }
 
     @Override
     public String name() {
-        return "test_partition_user";
+        return name;
     }
 
     @Override
@@ -33,6 +38,7 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
             Recoverable.DataBuffer  key = cache.key();
             Recoverable.DataBuffer value = cache.value();
             lmdbPartitionProvider.assign(key);
+            key.flip();
             if(!t.readKey(key)){
                 return false;
             }
@@ -40,7 +46,11 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
             if(!t.write(value)){
                 return false;
             }
-            return true;
+            key.rewind();
+            LocalDataStore dataStore = lmdbPartitionProvider.partition(scope,name,key);
+            key.rewind();
+            value.flip();
+            return dataStore.put(key,value);
         }
     }
 
@@ -57,14 +67,36 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
 
     @Override
     public <T extends Recoverable> boolean load(T t) {
-
-        return true;
+        try(Recoverable.DataBufferPair cache = lmdbPartitionProvider.dataBufferPair()){
+            Recoverable.DataBuffer  key = cache.key();
+            Recoverable.DataBuffer value = cache.value();
+            if(!t.writeKey(key)){
+                return false;
+            }
+            key.flip();
+            LocalDataStore dataStore = lmdbPartitionProvider.partition(scope,name,key);
+            key.rewind();
+            if(!dataStore.get(key,value)) return false;
+            value.flip();
+            value.readHeader();
+            t.read(value);
+            return true;
+        }
     }
 
     @Override
     public <T extends Recoverable> boolean delete(T t) {
-
-        return true;
+        try(Recoverable.DataBufferPair cache = lmdbPartitionProvider.dataBufferPair()){
+            Recoverable.DataBuffer  key = cache.key();
+            if(!t.writeKey(key)){
+                return false;
+            }
+            key.flip();
+            LocalDataStore dataStore = lmdbPartitionProvider.partition(scope,name,key);
+            key.rewind();
+            if(!dataStore.delete(key)) return false;
+            return true;
+        }
     }
 
     @Override

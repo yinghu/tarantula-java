@@ -549,8 +549,8 @@ public class LMDBDataStoreProvider implements LocalLMDBProvider{
     public int maxDatabaseNumber(){
         return maxDatabaseNumber;
     }
-    public boolean diskSync(){
-        return envNoSyncFlag;
+    public boolean diskSyncOnCommit(){
+        return !envNoSyncFlag;
     }
 
     public void onUpdated(String category,double delta){

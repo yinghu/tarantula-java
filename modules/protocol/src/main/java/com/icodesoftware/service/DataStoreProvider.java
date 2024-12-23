@@ -47,7 +47,7 @@ public interface DataStoreProvider extends MapStoreListener,MetricsListener {
     long storeSize();
     int maxReaderNumber();
     int maxDatabaseNumber();
-    boolean diskSync();
+    boolean diskSyncOnCommit();
 
     interface OnStart{
         void on(DataStoreProvider dataStoreProvider);

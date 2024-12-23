@@ -8,6 +8,8 @@ import com.icodesoftware.lmdb.*;
 
 import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.service.Metadata;
+import org.lmdbjava.Dbi;
+import org.lmdbjava.DbiFlags;
 import org.lmdbjava.Txn;
 
 import java.io.File;
@@ -58,6 +60,7 @@ public class LMDBPartitionProvider implements LocalLMDBProvider {
             LMDBEnv env = new LMDBEnv(new EnvSetting(EnvSetting.data,path,storeMbSize,i,true));
             env.lmdbDataStoreProvider = this;
             env.start();
+            partitionMap.put(i,env);
         }
         //Files.createDirectories(Paths.get(basePath+"/index"));
         //Files.createDirectories(Paths.get(basePath+"/index/back"));
@@ -124,7 +127,7 @@ public class LMDBPartitionProvider implements LocalLMDBProvider {
 
     @Override
     public DataStore createDataStore(String name) {
-        LMDBPartitionDataStore partitionDataStore = new LMDBPartitionDataStore(this);
+        LMDBPartitionDataStore partitionDataStore = new LMDBPartitionDataStore(Distributable.DATA_SCOPE,name,this);
         return partitionDataStore;
     }
 
@@ -179,8 +182,8 @@ public class LMDBPartitionProvider implements LocalLMDBProvider {
     public int maxDatabaseNumber(){
         return EnvSetting.MAX_STORE_NUMBER;
     }
-    public boolean diskSync(){
-        return EnvSetting.ENV_NO_SYNC_Flag;
+    public boolean diskSyncOnCommit(){
+        return !EnvSetting.ENV_NO_SYNC_Flag;
     }
 
     @Override
@@ -225,6 +228,13 @@ public class LMDBPartitionProvider implements LocalLMDBProvider {
 
     public  LocalEdgeDataStore localEdgeDataStore(int scope, String source, String label, Txn<ByteBuffer> txn){
         return null;
+    }
+
+    public LocalDataStore partition(int scope,String name,Recoverable.DataBuffer key){
+        LMDBEnv lmdb = partitionMap.get(0);
+        Dbi<ByteBuffer> dbi = lmdb.env.openDbi(name, DbiFlags.MDB_CREATE);
+        LocalMetadata metadata = new LocalMetadata(scope,name);
+        return new LocalDataStore(metadata,dbi,lmdb.env);
     }
 
 }

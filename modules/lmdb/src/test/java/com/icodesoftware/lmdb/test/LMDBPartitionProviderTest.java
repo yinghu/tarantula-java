@@ -23,14 +23,16 @@ public class LMDBPartitionProviderTest {
         lmdbPartitionProvider.start();
         DataStore dataStore = lmdbPartitionProvider.createDataStore("users");
         Assert.assertNotNull(dataStore);
-        //TestObject testObject = new TestObject("type","name");
-        //Assert.assertTrue(lmdbPartitionDataStore.create(testObject));
-        //Assert.assertTrue(testObject.distributionId() >0);
-        //TestObject loaded = new TestObject();
-        //loaded.distributionId(testObject.distributionId());
-        //Assert.assertTrue(lmdbPartitionDataStore.load(loaded));
-        //Assert.assertTrue(lmdbPartitionDataStore.delete(loaded));
-        //Assert.assertFalse(lmdbPartitionDataStore.load(loaded));
+        TestObject testObject = new TestObject("type","name");
+        Assert.assertTrue(dataStore.create(testObject));
+        TestObject load = new TestObject();
+        load.distributionId(testObject.distributionId());
+        Assert.assertTrue(load.distributionId() >0);
+        Assert.assertTrue(dataStore.load(load));
+        Assert.assertEquals(testObject.name,load.name);
+        Assert.assertEquals(testObject.type,load.type);
+        Assert.assertTrue(dataStore.delete(load));
+        Assert.assertFalse(dataStore.load(load));
         lmdbPartitionProvider.shutdown();
     }
 }
