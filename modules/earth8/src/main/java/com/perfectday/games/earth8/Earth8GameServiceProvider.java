@@ -226,6 +226,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         } else if (event.command().equals("CheatDetectionConfigUpdated")) {
             configureCheatDetection();
         }
+        else if (event.command().equals("CheatDetectionConfigReleased")) {
+            cheatDetectionMap.clear();
+        }
     }
 
 
