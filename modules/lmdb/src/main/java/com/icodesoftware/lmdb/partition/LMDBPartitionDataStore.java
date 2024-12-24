@@ -7,7 +7,9 @@ import com.icodesoftware.lmdb.LocalEdgeDataStore;
 import com.icodesoftware.lmdb.LocalHeader;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DataStoreSummary;
+import com.icodesoftware.util.BinaryKey;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Closable {
@@ -235,12 +237,46 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
 
     @Override
     public <T extends Recoverable> List<T> list(RecoverableFactory<T> query) {
-        return List.of();
+        ArrayList<Recoverable.Key> keys = new ArrayList<>();
+        forEachEdgeKey(query.key(),query.label(),(k,v)->{
+            keys.add(BinaryKey.from(k.array()));
+            return true;
+        });
+        ArrayList<T> values = new ArrayList<>();
+        keys.forEach((ak)->{
+            get(ak,(k,v)->{
+                T t = query.create();
+                Recoverable.DataHeader header = v.readHeader();
+                t.readKey(k);
+                t.read(v);
+                t.revision(header.revision());
+                values.add(t);
+                return true;
+            });
+        });
+        return values;
     }
 
     @Override
     public <T extends Recoverable> void list(RecoverableFactory<T> query, Stream<T> stream) {
-
+        ArrayList<Recoverable.Key> keys = new ArrayList<>();
+        forEachEdgeKey(query.key(),query.label(),(k,v)->{
+            keys.add(BinaryKey.from(k.array()));
+            return true;
+        });
+        for(Recoverable.Key akey : keys){
+            boolean[] next ={false};
+            get(akey,(k,v)->{
+                T t = query.create();
+                Recoverable.DataHeader header = v.readHeader();
+                t.readKey(k);
+                t.read(v);
+                t.revision(header.revision());
+                next[0] = stream.on(t);
+                return true;
+            });
+            if(!next[0]) break;
+        }
     }
 
     @Override
@@ -249,8 +285,25 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
     }
 
     @Override
-    public boolean get(Recoverable.Key key, BufferStream buffer) {
-        return false;
+    public boolean get(Recoverable.Key akey, BufferStream buffer) {
+        try(Recoverable.DataBufferPair cache = lmdbPartitionProvider.dataBufferPair()){
+            Recoverable.DataBuffer  key = cache.key();
+            Recoverable.DataBuffer value = cache.value();
+            if(!akey.write(key)){
+                return false;
+            }
+            key.flip();
+            LocalDataStore dataStore = lmdbPartitionProvider.partition(scope,name,key);
+            key.rewind();
+            if(!dataStore.get(key,value)) return false;
+            key.rewind();
+            value.flip();
+            buffer.on(key,value);
+            return true;
+        }catch (Exception ex){
+            logger.error("Error on forEachEdgeKey : ",ex);
+            throw ex;
+        }
     }
 
     @Override
@@ -277,7 +330,7 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
 
     @Override
     public void forEachEdgeKeyValue(Recoverable.Key key, String label, BufferStream bufferStream) {
-        throw new RuntimeException("operation not supported");
+
     }
 
     @Override
