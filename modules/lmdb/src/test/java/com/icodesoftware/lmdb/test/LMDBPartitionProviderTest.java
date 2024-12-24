@@ -2,6 +2,8 @@ package com.icodesoftware.lmdb.test;
 
 import com.icodesoftware.DataStore;
 
+import com.icodesoftware.Recoverable;
+import com.icodesoftware.lmdb.LocalHeader;
 import com.icodesoftware.lmdb.partition.LMDBPartitionProvider;
 
 import com.icodesoftware.util.SnowflakeKey;
@@ -157,5 +159,96 @@ public class LMDBPartitionProviderTest {
 
     }
 
+    @Test(groups = { "LMDBPartitionProviderTest" })
+    public void setTest(){
+        DataStore dataStore = lmdbPartitionProvider.createDataStore("set_users");
+        Assert.assertNotNull(dataStore);
+        TestObject testObject = new TestObject("type","name");
+        testObject.distributionId(100);
+
+        Assert.assertTrue(dataStore.backup().set((k,v)->{
+            testObject.writeKey(k);
+            v.writeHeader(new LocalHeader(testObject.revision(),testObject.getFactoryId(),testObject.getClassId()));
+            testObject.write(v);
+            return true;
+        }));
+        TestObject testObject3 = new TestObject();
+        Assert.assertTrue(dataStore.backup().get(SnowflakeKey.from(testObject.distributionId()),(k,v)->{
+            Recoverable.DataHeader h = v.readHeader();
+            testObject3.readKey(k);
+            testObject3.read(v);
+            testObject3.revision(h.revision());
+            return true;
+        }));
+        Assert.assertEquals(testObject3.distributionId(),testObject.distributionId());
+        Assert.assertEquals(testObject3.type,testObject.type);
+        Assert.assertEquals(testObject3.name,testObject.name);
+
+        Assert.assertTrue(dataStore.backup().unset((k,v)->{
+            testObject3.writeKey(k);
+            return true;
+        }));
+        Assert.assertFalse(dataStore.backup().get(SnowflakeKey.from(testObject.distributionId()),(k,v)->{
+            Recoverable.DataHeader h = v.readHeader();
+            testObject3.readKey(k);
+            testObject3.read(v);
+            testObject3.revision(h.revision());
+            return true;
+        }));
+    }
+
+    @Test(groups = { "LMDBPartitionProviderTest" })
+    public void setEdgeTest(){
+        DataStore dataStore = lmdbPartitionProvider.createDataStore("set_edge_users");
+        Assert.assertNotNull(dataStore);
+        TestObject testObject = new TestObject("type","name");
+        Assert.assertTrue(dataStore.create(testObject));
+        Assert.assertEquals(testObject.revision(),1);
+        testObject.ownerKey(SnowflakeKey.from(100));
+
+        TestObject testObject1 = new TestObject("type","name");
+        Assert.assertTrue(dataStore.create(testObject1));
+        Assert.assertEquals(testObject1.revision(),1);
+        testObject1.ownerKey(SnowflakeKey.from(100));
+
+        TestObject testObject2 = new TestObject("type","name");
+        Assert.assertTrue(dataStore.create(testObject2));
+        Assert.assertEquals(testObject2.revision(),1);
+        testObject2.ownerKey(SnowflakeKey.from(100));
+
+        Assert.assertTrue(dataStore.backup().setEdge("friends",(k,v)->{
+            k.writeLong(100);
+            v.writeLong(testObject.distributionId());
+            return true;
+        }));
+        Assert.assertTrue(dataStore.backup().setEdge("friends",(k,v)->{
+            k.writeLong(100);
+            v.writeLong(testObject1.distributionId());
+            return true;
+        }));
+        Assert.assertTrue(dataStore.backup().setEdge("friends",(k,v)->{
+            k.writeLong(100);
+            v.writeLong(testObject2.distributionId());
+            return true;
+        }));
+        List<TestObject> list = dataStore.list(new TestObjectQuery(100,"friends"));
+        Assert.assertEquals(list.size(),3);
+
+        Assert.assertTrue(dataStore.backup().unsetEdge("friends",(k,v)->{
+            k.writeLong(100);
+            v.writeLong(testObject2.distributionId());
+            return true;
+        },false));
+        list = dataStore.list(new TestObjectQuery(100,"friends"));
+        Assert.assertEquals(list.size(),2);
+
+        Assert.assertTrue(dataStore.backup().unsetEdge("friends",(k,v)->{
+            k.writeLong(100);
+            //v.writeLong(testObject2.distributionId());
+            return true;
+        },true));
+        list = dataStore.list(new TestObjectQuery(100,"friends"));
+        Assert.assertEquals(list.size(),0);
+    }
 
 }

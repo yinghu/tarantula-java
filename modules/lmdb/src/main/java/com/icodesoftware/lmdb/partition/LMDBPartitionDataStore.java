@@ -301,14 +301,26 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
             buffer.on(key,value);
             return true;
         }catch (Exception ex){
-            logger.error("Error on forEachEdgeKey : ",ex);
+            logger.error("Error on get : ",ex);
             throw ex;
         }
     }
 
     @Override
     public boolean set(BufferStream bufferStream) {
-        return false;
+        try(Recoverable.DataBufferPair cache = lmdbPartitionProvider.dataBufferPair()){
+            Recoverable.DataBuffer  key = cache.key();
+            Recoverable.DataBuffer value = cache.value();
+            bufferStream.on(key,value);
+            key.flip();
+            LocalDataStore dataStore = lmdbPartitionProvider.partition(scope,name,key);
+            key.rewind();
+            value.flip();
+            return dataStore.put(key,value);
+        }catch (Exception ex){
+            logger.error("Error on set: ",ex);
+            throw ex;
+        }
     }
 
     @Override
@@ -335,17 +347,55 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
 
     @Override
     public boolean setEdge(String label, BufferStream bufferStream) {
-        return false;
+        try(Recoverable.DataBufferPair cache = lmdbPartitionProvider.dataBufferPair()){
+            Recoverable.DataBuffer  key = cache.key();
+            Recoverable.DataBuffer value = cache.value();
+            bufferStream.on(key,value);
+            key.flip();
+            LocalEdgeDataStore dataStore = lmdbPartitionProvider.partition(scope,name,label,key);
+            key.rewind();
+            value.flip();
+            return dataStore.addEdge(key.src(),value.src());
+        }catch (Exception ex){
+            logger.error("Error on set edge: ",ex);
+            throw ex;
+        }
     }
 
     @Override
     public boolean unsetEdge(String label, BufferStream bufferStream, boolean fromLabel) {
-        return false;
+        try(Recoverable.DataBufferPair cache = lmdbPartitionProvider.dataBufferPair()){
+            Recoverable.DataBuffer  key = cache.key();
+            Recoverable.DataBuffer value = cache.value();
+            bufferStream.on(key,value);
+            key.flip();
+            LocalEdgeDataStore dataStore = lmdbPartitionProvider.partition(scope,name,label,key);
+            key.rewind();
+            value.flip();
+            if(fromLabel){
+                return dataStore.deleteEdge(key.src());
+            }
+            return dataStore.deleteEdge(key.src(),value.src());
+        }catch (Exception ex){
+            logger.error("Error on unset edge: ",ex);
+            throw ex;
+        }
     }
 
     @Override
     public boolean unset(BufferStream bufferStream) {
-        return false;
+        try(Recoverable.DataBufferPair cache = lmdbPartitionProvider.dataBufferPair()){
+            Recoverable.DataBuffer  key = cache.key();
+            Recoverable.DataBuffer value = cache.value();
+            bufferStream.on(key,value);
+            key.flip();
+            LocalDataStore dataStore = lmdbPartitionProvider.partition(scope,name,key);
+            key.rewind();
+            return dataStore.delete(key);
+        }catch (Exception ex){
+            logger.error("Error on unset: ",ex);
+            throw ex;
+        }
     }
 
     @Override
