@@ -14,9 +14,7 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -228,6 +226,44 @@ public class LMDBPartitionProvider implements LocalLMDBProvider {
     }
     public LocalDataStore partition(int scope,String name,Recoverable.DataBuffer key){
         LMDBEnv lmdb = partitionMap.get(partition(key));
+        return localDataStore(scope,name,lmdb);
+    }
+
+    public void forEach(int scope, String name, DataStore.BufferStream bufferStream){
+        ArrayList<LocalDataStore> list = new ArrayList<>();
+        partitionMap.forEach((k,v)->{
+            list.add(localDataStore(scope,name,v));
+        });
+        list.forEach(ds->{
+            ds.forEach(bufferStream);
+        });
+    }
+
+    public void drop(int scope,String name,boolean deleted){
+        HashMap<Integer,LocalDataStore> list = new HashMap<>();
+        HashMap<Integer,List<LocalEdgeDataStore>> edges = new HashMap<>();
+        partitionMap.forEach((k,v)->{
+            list.put(k,localDataStore(scope,name,v));
+            ArrayList<LocalEdgeDataStore> sts = new ArrayList<>();
+            v.getDbiNames().forEach(db->{
+                String dname = new String(db);
+                if(dname.startsWith(store(scope,name)+"#")){
+                    String[] parts = dname.split("#");
+                    sts.add(localEdgeDataStore(scope,name,parts[1],v));
+                }
+            });
+            edges.put(k,sts);
+        });
+        list.forEach((ix,ds)->{
+            ds.drop(deleted,edges.get(ix));
+        });
+    }
+    private LocalEdgeDataStore localEdgeDataStore(int scope,String name,String label,LMDBEnv lmdb){
+        Dbi<ByteBuffer> dbi = lmdb.env.openDbi(store(scope,name,label),DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);
+        LocalMetadata metadata = new LocalMetadata(scope,name,label);
+        return new LocalEdgeDataStore(metadata,dbi,lmdb);
+    }
+    private LocalDataStore localDataStore(int scope,String name,LMDBEnv lmdb){
         Dbi<ByteBuffer> dbi = lmdb.env.openDbi(store(scope,name), DbiFlags.MDB_CREATE);
         LocalMetadata metadata = new LocalMetadata(scope,name);
         return new LocalDataStore(metadata,dbi,lmdb);
@@ -236,7 +272,7 @@ public class LMDBPartitionProvider implements LocalLMDBProvider {
     private int partition(Recoverable.DataBuffer key){
         return Math.abs(Arrays.hashCode(key.array())) % maxPartitionNumber;
     }
-    private String store(int scope,String name,String label){
+    public static String store(int scope,String name,String label){
         if(name.contains("@") || name.contains("#") || name.contains("-")) throw new RuntimeException("store name cannot have @ , #, or -");
         if(label.contains("@") || label.contains("#") || label.contains("-")) throw new RuntimeException("store label cannot have @ , #, or -");
         switch (scope){
@@ -258,7 +294,7 @@ public class LMDBPartitionProvider implements LocalLMDBProvider {
             default -> throw new RuntimeException("Scope ["+scope+"] not supported");
         }
     }
-    private String store(int scope,String name){
+    public static String store(int scope,String name){
         if(name.contains("@") || name.contains("#") || name.contains("-")) throw new RuntimeException("store name cannot have @ , #, or -");
         switch (scope){
             case Distributable.DATA_SCOPE -> {

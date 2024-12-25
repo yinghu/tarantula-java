@@ -251,4 +251,54 @@ public class LMDBPartitionProviderTest {
         Assert.assertEquals(list.size(),0);
     }
 
+    @Test(groups = { "LMDBPartitionProviderTest" })
+    public void forEachTest(){
+        DataStore dataStore = lmdbPartitionProvider.createDataStore("for_each_users");
+        Assert.assertNotNull(dataStore);
+        TestObject testObject = new TestObject("type","name");
+        Assert.assertTrue(dataStore.create(testObject));
+        Assert.assertEquals(testObject.revision(),1);
+        testObject.ownerKey(SnowflakeKey.from(100));
+
+        TestObject testObject1 = new TestObject("type","name");
+        Assert.assertTrue(dataStore.create(testObject1));
+        Assert.assertEquals(testObject1.revision(),1);
+        testObject1.ownerKey(SnowflakeKey.from(100));
+
+        TestObject testObject2 = new TestObject("type","name");
+        Assert.assertTrue(dataStore.create(testObject2));
+        Assert.assertEquals(testObject2.revision(),1);
+        testObject2.ownerKey(SnowflakeKey.from(100));
+
+        Assert.assertTrue(dataStore.createEdge(testObject,"friends"));
+        Assert.assertTrue(dataStore.createEdge(testObject1,"friends"));
+        Assert.assertTrue(dataStore.createEdge(testObject2,"friends"));
+
+        int[] ct={0};
+        dataStore.backup().forEach((k,v)->{
+            ct[0]++;
+            return true;
+        });
+        Assert.assertEquals(ct[0],3);
+        ct[0]= 0;
+        dataStore.backup().forEachEdgeKey(SnowflakeKey.from(100),"friends",(k,v)->{
+            ct[0]++;
+            return true;
+        });
+        Assert.assertEquals(ct[0],3);
+        dataStore.backup().drop(false);
+        ct[0]=0;
+        dataStore.backup().forEach((k,v)->{
+            ct[0]++;
+            return true;
+        });
+        Assert.assertEquals(ct[0],0);
+        ct[0]= 0;
+        dataStore.backup().forEachEdgeKey(SnowflakeKey.from(100),"friends",(k,v)->{
+            ct[0]++;
+            return true;
+        });
+        Assert.assertEquals(ct[0],0);
+    }
+
 }

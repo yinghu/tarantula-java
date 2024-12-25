@@ -1,11 +1,15 @@
 package com.icodesoftware.lmdb;
 
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.lmdb.partition.LMDBPartitionProvider;
 import com.icodesoftware.service.Metadata;
+import org.lmdbjava.Cursor;
 import org.lmdbjava.Dbi;
 import org.lmdbjava.Txn;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 public class LocalDataStore {
 
@@ -44,6 +48,24 @@ public class LocalDataStore {
             if(!suc)  return false;
             txn.commit();
             return true;
+        }
+    }
+
+    public void forEach(DataStore.BufferStream stream) {
+        try(final Txn<ByteBuffer> txn = env.txnRead();final Cursor<ByteBuffer> cursor = dbi.openCursor(txn)){
+            while (cursor.next()){
+                Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(cursor.val());
+                if(!stream.on(BufferProxy.buffer(cursor.key()),dataBuffer)) break;
+            }
+        }
+    }
+    public void drop(boolean deleted,List<LocalEdgeDataStore> edges){
+        try(final Txn<ByteBuffer> txn = env.txnWrite()){
+            dbi.drop(txn,deleted);
+            edges.forEach(edge->{
+                edge.drop(txn,deleted);
+            });
+            txn.commit();
         }
     }
     public Metadata metadata(){
