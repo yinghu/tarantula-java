@@ -2,17 +2,12 @@ package com.icodesoftware.lmdb.partition;
 
 import com.icodesoftware.*;
 
-import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.lmdb.LocalDataStore;
 import com.icodesoftware.lmdb.LocalEdgeDataStore;
 import com.icodesoftware.lmdb.LocalHeader;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DataStoreSummary;
 import com.icodesoftware.util.BinaryKey;
-import org.lmdbjava.Cursor;
-import org.lmdbjava.Txn;
-
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -346,7 +341,7 @@ public class LMDBPartitionDataStore implements DataStore,DataStore.Backup , Clos
 
     @Override
     public void forEachEdgeKeyValue(Recoverable.Key key, String label, BufferStream bufferStream) {
-        
+
     }
 
     @Override

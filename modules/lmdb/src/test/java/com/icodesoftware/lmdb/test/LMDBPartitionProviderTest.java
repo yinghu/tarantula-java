@@ -2,7 +2,9 @@ package com.icodesoftware.lmdb.test;
 
 import com.icodesoftware.DataStore;
 
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.Transaction;
 import com.icodesoftware.lmdb.LocalHeader;
 import com.icodesoftware.lmdb.partition.LMDBPartitionProvider;
 
@@ -300,5 +302,18 @@ public class LMDBPartitionProviderTest {
         });
         Assert.assertEquals(ct[0],0);
     }
+
+    @Test(groups = { "LMDBPartitionProviderTest" })
+    public void transactionTest(){
+        try(Transaction transaction = lmdbPartitionProvider.transaction(Distributable.DATA_SCOPE)){
+            boolean suc = transaction.execute((ctx)->{
+                DataStore dataStore = ctx.onDataStore("transaction_users");
+                System.out.println(dataStore.name());
+                return true;
+            });
+            Assert.assertTrue(suc);
+        }
+    }
+
 
 }

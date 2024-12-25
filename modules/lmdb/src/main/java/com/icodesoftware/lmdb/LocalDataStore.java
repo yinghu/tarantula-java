@@ -2,7 +2,6 @@ package com.icodesoftware.lmdb;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.lmdb.partition.LMDBPartitionProvider;
 import com.icodesoftware.service.Metadata;
 import org.lmdbjava.Cursor;
 import org.lmdbjava.Dbi;

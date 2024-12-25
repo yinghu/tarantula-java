@@ -129,6 +129,27 @@ public class LMDBPartitionProvider implements LocalLMDBProvider {
         return partitionDataStore;
     }
 
+    public DataStore createDataStore(int scope,String name) {
+        switch (scope){
+            case Distributable.DATA_SCOPE -> {
+                return createDataStore(name);
+            }
+            case Distributable.INTEGRATION_SCOPE -> {
+                return createAccessIndexDataStore(name);
+            }
+            case Distributable.INDEX_SCOPE ->  {
+                return createKeyIndexDataStore(name);
+            }
+            case Distributable.LOG_SCOPE -> {
+                return createLogDataStore(name);
+            }
+            case Distributable.LOCAL_SCOPE -> {
+                return createLocalDataStore(name);
+            }
+            default -> throw new RuntimeException("Scope ["+scope+"] not supported");
+        }
+    }
+
     @Override
     public List<String> list() {
         return List.of();
@@ -146,7 +167,7 @@ public class LMDBPartitionProvider implements LocalLMDBProvider {
 
     @Override
     public Transaction transaction(int scope) {
-        return null;
+        return new PartitionTransaction(scope,this);
     }
 
     @Override
@@ -209,9 +230,7 @@ public class LMDBPartitionProvider implements LocalLMDBProvider {
     }
 
     public LocalEdgeDataStore createEdgeDB(int scope, String source, String label){
-        final String edgeName = source+"#"+label;
         return null;
-        //return edgMap.computeIfAbsent(edgeName,k->localEdgeDataStore(scope,source,label,null));
     }
 
     public  LocalEdgeDataStore localEdgeDataStore(int scope, String source, String label, Txn<ByteBuffer> txn){
