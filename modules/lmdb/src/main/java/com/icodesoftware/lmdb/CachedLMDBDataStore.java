@@ -13,7 +13,6 @@ import java.util.List;
 public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable {
 
 
-
     private final LMDBEnv env;
     private final Dbi<ByteBuffer> dbi;
 
@@ -108,6 +107,9 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
                 lmdbDataStoreProvider.onUpdated(METRICS_CREATE,1);
             }
         }
+        catch (Exception ex){
+            throw ex;
+        }
     }
 
     @Override
@@ -172,6 +174,8 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             finally {
                 lmdbDataStoreProvider.onUpdated(METRICS_UPDATE,1);
             }
+        }catch (Exception ex){
+            throw ex;
         }
     }
 
@@ -224,6 +228,8 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
                 }
             }
             return false;
+        }catch (Exception ex){
+            throw ex;
         }
         finally {
             lmdbDataStoreProvider.onUpdated(METRICS_CREATE_IF_ABSENT,1);
@@ -258,6 +264,8 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             t.revision(header.revision());
             set(key.rewind(),value.rewind());
             return true;
+        }catch (Exception ex){
+            throw ex;
         }
         finally {
             lmdbDataStoreProvider.onUpdated(METRICS_LOAD,1);
@@ -273,6 +281,8 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             txn.commit();
             lmdbDataStoreProvider.onCommit(metadata.scope(),transactionId);
             return true;
+        }catch (Exception ex){
+            throw ex;
         }
     }
 
@@ -283,6 +293,8 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             txn.commit();
             lmdbDataStoreProvider.onCommit(metadata.scope(),transactionId);
             return true;
+        }catch (Exception ex){
+            throw ex;
         }
     }
 
@@ -293,6 +305,8 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             txn.commit();
             lmdbDataStoreProvider.onCommit(metadata.scope(),transactionId);
             return true;
+        }catch (Exception ex){
+            throw ex;
         }
     }
 
@@ -311,6 +325,8 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
                 lmdbDataStoreProvider.onCommit(metadata.scope(),transactionId);
                 return true;
             }
+        }catch (Exception ex){
+            throw ex;
         }
     }
 
@@ -350,6 +366,8 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             else{
                 list(key.rewind(),localEdgeDataStore,query,stream);
             }
+        }catch (Exception ex){
+            throw ex;
         }
     }
     @Override
@@ -368,6 +386,8 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             Recoverable.DataBuffer akey = cache.key();
             if(!key.write(akey)) return false;
             return get(akey.flip(),buffer);
+        }catch (Exception ex){
+            throw ex;
         }
     }
 
