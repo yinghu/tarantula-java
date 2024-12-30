@@ -143,11 +143,6 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         if(credentialConfiguration==null) return true;
         CredentialConfiguration cx = vendorCredentials.remove(credentialConfiguration.name());
         cx.release();
-        if (credentialConfiguration.name().equals("CheatDetection")){
-            OnAccess access = new OnAccessTrack();
-            access.command("CheatDetectionConfigReleased");
-            platformGameServiceProvider.onGameClusterEvent(access);
-        }
         return true;
     }
 

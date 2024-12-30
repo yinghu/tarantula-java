@@ -18,7 +18,6 @@ import com.perfectday.games.earth8.data.PlayerDataTrack;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -34,10 +33,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
     private ConcurrentHashMap<String,ApplicationResource> resourceIndex = new ConcurrentHashMap<>();
 
-    private ConcurrentHashMap<String,Integer> cheatDetectionMap = new ConcurrentHashMap<>();
-
     ConcurrentHashMap<Long, ScoreRunner> scoreRunners = new ConcurrentHashMap<>();
 
+    private CheatDetectionRule cheatDetectionRule = new CheatDetectionRule(this);
 
     public void setup(GameContext gameContext){
         this.gameContext = gameContext;
@@ -101,6 +99,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
     public void updateGame(Session session,byte[] payload) throws Exception{
         BattleUpdate update = BattleUpdate.fromJson(payload);
+        cheatDetectionRule.detect(update, session);
         PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext, session.distributionId(), PlayerDataTrack.Type.Analytics);
 
         if(!tournamentBannedPlayersList.containsKey(session.distributionId())) {
@@ -121,24 +120,6 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                 });
                 return true;
             });
-        } else if (update.updateId == BattleUpdate.UpdateId.ManualAnalyticsBatch && !cheatDetectionMap.isEmpty()) {
-            List<AnalyticsBatchUtils.AnalyticsData> cheatDetectedAnalytics = new ArrayList<>();
-            for(AnalyticsBatchUtils.AnalyticsData analytic: ((ManualAnalyticsBatch)update).analytics){
-                if(analytic.messageType.equals("currencyUpdate")){
-                    String currencyId = analytic.clientData.get("currencyId").getAsString();
-                    int currencyDelta = analytic.clientData.get("currencyDelta").getAsInt();
-
-                    if((cheatDetectionMap.containsKey(currencyId) && cheatDetectionMap.get(currencyId) < currencyDelta) ||
-                            (currencyId.contains("Coin") && cheatDetectionMap.get("Coin") < currencyDelta) ||
-                            (currencyId.contains("Potion") && cheatDetectionMap.get("Potion") < currencyDelta)){
-
-                        AnalyticsBatchUtils.AnalyticsData cheatDetectedAnalytic = new AnalyticsBatchUtils.AnalyticsData("inventory", "currencyUpdateCheatDetected", analytic.clientData.deepCopy());
-                        cheatDetectedAnalytic.clientData.addProperty("currencyUpdateMaxValue" , cheatDetectionMap.get(currencyId));
-                        cheatDetectedAnalytics.add(cheatDetectedAnalytic);
-                    }
-                }
-            }
-            ((ManualAnalyticsBatch)update).analytics.addAll(cheatDetectedAnalytics);
         }
 
         if (update.update(gameContext.applicationSchema().applicationPreSetup(), session, serverSession.trackId, gameContext.applicationSchema().applicationPreSetup().distributionId())) {
@@ -224,10 +205,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                 tournamentBannedPlayersList.remove(systemID);
             }
         } else if (event.command().equals("CheatDetectionConfigUpdated")) {
-            configureCheatDetection();
-        }
-        else if (event.command().equals("CheatDetectionConfigReleased")) {
-            cheatDetectionMap.clear();
+            updateCheatDetectionRule();
         }
     }
 
@@ -416,17 +394,17 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         });
     }
 
-    private void configureCheatDetection(){
-        cheatDetectionMap.clear();
-
+    private void updateCheatDetectionRule(){
         TokenValidatorProvider.AuthVendor download = gameContext.authorVendor(OnAccess.DOWNLOAD_CENTER);
         byte[] payload = download.download(gameContext.applicationSchema().typeId()+"#CheatDetection");
 
-        JsonObject cheatDetectionConfig = JsonUtil.parse(payload);
-        Set<String> keys = cheatDetectionConfig.keySet();
+        cheatDetectionRule.configure(payload);
+    }
 
-        keys.forEach(key ->{
-            cheatDetectionMap.put(key, cheatDetectionConfig.get(key).getAsInt());
-        });
+    public void sendCheatDetectedAnalytic(Session session, int maxValueExceeded, AnalyticsBatchUtils.AnalyticsData analyticsData){
+        PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext, session.distributionId(), PlayerDataTrack.Type.Analytics);
+        TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+        gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
+                webhook.upload(ANALYTICS_QUERY, new CheatDetectedTransaction(session, serverSession.trackId, maxValueExceeded, analyticsData))));
     }
 }
