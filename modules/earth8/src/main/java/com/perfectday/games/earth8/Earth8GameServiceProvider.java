@@ -32,7 +32,10 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     private ConcurrentHashMap<Long,Boolean> tournamentBannedPlayersList = new ConcurrentHashMap<>();
 
     private ConcurrentHashMap<String,ApplicationResource> resourceIndex = new ConcurrentHashMap<>();
+
     ConcurrentHashMap<Long, ScoreRunner> scoreRunners = new ConcurrentHashMap<>();
+
+    private CheatDetectionRule cheatDetectionRule = new CheatDetectionRule(this);
 
     public void setup(GameContext gameContext){
         this.gameContext = gameContext;
@@ -96,6 +99,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
     public void updateGame(Session session,byte[] payload) throws Exception{
         BattleUpdate update = BattleUpdate.fromJson(payload);
+        cheatDetectionRule.detect(update, session);
         PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext, session.distributionId(), PlayerDataTrack.Type.Analytics);
 
         if(!tournamentBannedPlayersList.containsKey(session.distributionId())) {
@@ -200,6 +204,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             else{
                 tournamentBannedPlayersList.remove(systemID);
             }
+        } else if (event.command().equals("CheatDetectionConfigUpdated")) {
+            updateCheatDetectionRule();
         }
     }
 
@@ -388,4 +394,17 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         });
     }
 
+    private void updateCheatDetectionRule(){
+        TokenValidatorProvider.AuthVendor download = gameContext.authorVendor(OnAccess.DOWNLOAD_CENTER);
+        byte[] payload = download.download(gameContext.applicationSchema().typeId()+"#CheatDetection");
+
+        cheatDetectionRule.configure(payload);
+    }
+
+    public void sendCheatDetectedAnalytic(Session session, int maxValueExceeded, AnalyticsBatchUtils.AnalyticsData analyticsData){
+        PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext, session.distributionId(), PlayerDataTrack.Type.Analytics);
+        TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+        gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
+                webhook.upload(ANALYTICS_QUERY, new CheatDetectedTransaction(session, serverSession.trackId, maxValueExceeded, analyticsData))));
+    }
 }
