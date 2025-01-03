@@ -107,6 +107,11 @@ final public class HttpCaller implements HttpClientProvider {
     }
 
     @Override
+    public void requestAsync(OnRequestAsync requestAsync) {
+        requestAsync.onClient(client);
+    }
+
+    @Override
     public String name() {
         return HttpClientProvider.NAME;
     }
