@@ -14,4 +14,6 @@ public interface EventService extends EventListener, Serviceable {
     void unregisterEventListener(String topic);
     RoutingKey routingKey(Object magicKey,String tag);
     RoutingKey routingKey(Object magicKey,String tag,int routingNumber);
+
+    default void publish(Event out,EventListener callback){}
 }
