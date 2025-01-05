@@ -1,9 +1,9 @@
 package com.tarantula.platform.service.persistence;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.util.AbstractClusterNode;
 import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.service.ClusterProvider;
-import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.service.PlatformHomingAgent;
 
@@ -11,26 +11,8 @@ import java.time.format.DateTimeFormatter;
 
 
 
-public class ClusterNode extends RecoverableObject implements ClusterProvider.Node {
+public class ClusterNode extends AbstractClusterNode {
 
-    public String bucketName;
-    public String nodeName;
-
-    public long bucketId;
-    public long nodeId;
-    public String memberId;
-    public String address;
-    public long startTime;
-
-    public long deploymentId;
-    public String clusterNameSuffix;
-    public int partitionNumber;
-    public int bucketNumber;
-    public String deployDirectory;
-    public String servicePushAddress;
-
-    public boolean dailyBackupEnabled;
-    public String dataStoreDirectory;
 
     public final PlatformHomingAgent tarantulaAgent;
     public ClusterNode(String bucketName, String nodeName,int partitionNumber,int bucketNumber){
@@ -46,68 +28,6 @@ public class ClusterNode extends RecoverableObject implements ClusterProvider.No
 
     public String toString(){
         return "Bucket Name ["+bucketName+"] On Node ["+nodeName+"] partitions ["+partitionNumber+"] buckets ["+bucketNumber+"]";
-    }
-
-    @Override
-    public String bucketName() {
-        return bucketName;
-    }
-
-    @Override
-    public String nodeName() {
-        return nodeName;
-    }
-
-    @Override
-    public long bucketId() {
-        return bucketId;
-    }
-
-    @Override
-    public long nodeId() {
-        return nodeId;
-    }
-
-    @Override
-    public String memberId() {
-        return memberId;
-    }
-
-    @Override
-    public String address(){
-        return address;
-    }
-
-    @Override
-    public long startTime() {
-        return startTime;
-    }
-
-    public long deploymentId(){
-        return this.deploymentId;
-    }
-
-    public int partitionNumber(){
-        return partitionNumber;
-    }
-    public int bucketNumber(){
-        return bucketNumber;
-    }
-    public String clusterNameSuffix(){
-        return this.clusterNameSuffix;
-    }
-
-
-    public String deployDirectory(){
-        return deployDirectory;
-    }
-    public String servicePushAddress(){
-        return servicePushAddress;
-    }
-
-    public boolean dailyBackupEnabled(){ return this.dailyBackupEnabled;}
-    public String dataStoreDirectory(){
-        return this.dataStoreDirectory;
     }
 
 

@@ -110,7 +110,7 @@ public class SudoRoleModule implements Module {
             session.write(JsonUtil.toSimpleResponse(true,"shutdown : "+session.name()).getBytes());
             DeploymentServiceProvider.NodeShutdownOperator shutdownOperator = deploymentServiceProvider.nodeShutdownOperator(acc);
             ClusterNode node = new ClusterNode();
-            node.memberId = session.name();
+            node.memberId(session.name());
             shutdownOperator.shutdown(node);
         }
         else if(session.action().equals("onClusterRestart")){
@@ -118,7 +118,7 @@ public class SudoRoleModule implements Module {
             session.write(JsonUtil.toSimpleResponse(true,"restart : "+session.name()).getBytes());
             DeploymentServiceProvider.NodeShutdownOperator shutdownOperator = deploymentServiceProvider.nodeShutdownOperator(acc);
             ClusterNode node = new ClusterNode();
-            node.memberId = session.name();
+            node.memberId(session.name());
             shutdownOperator.restart(node);
         }
         else{

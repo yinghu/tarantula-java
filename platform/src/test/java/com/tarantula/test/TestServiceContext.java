@@ -25,14 +25,14 @@ public class TestServiceContext implements ServiceContext {
     public TestServiceContext(DataStoreProvider.DistributionIdGenerator distributionIdGenerator){
         this.distributionIdGenerator = distributionIdGenerator;
         this.node = new ClusterNode("BSD","T01",271,31);
-        this.node.clusterNameSuffix = "test";
-        this.node.nodeId = 100;
-        this.node.bucketId = 200;
+        this.node.clusterNameSuffix("test");
+        this.node.nodeId(100);
+        this.node.bucketId(200);
         //this.node.deployDirectory = "deploy";
-        this.node.servicePushAddress = "127.0.0.1";
-        this.node.dailyBackupEnabled = false;
-        this.node.dataStoreDirectory = "target/tld";
-        this.node.deployDirectory = "target/deploy";
+        this.node.servicePushAddress("127.0.0.1");
+        this.node.dailyBackupEnabled(false);
+        this.node.dataStoreDirectory("target/tld");
+        this.node.deployDirectory("target/deploy");
         PresencePortableRegistry registry = new PresencePortableRegistry<>();
         GamePortableRegistry gamePortableRegistry = new GamePortableRegistry();
         StatisticsPortableRegistry statisticsPortableRegistry = new StatisticsPortableRegistry();

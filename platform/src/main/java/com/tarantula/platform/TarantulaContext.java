@@ -203,12 +203,12 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
         this.httpClientProvider = new HttpCaller();
         this.httpClientProvider.start();
         this.node = new ClusterNode(this.dataBucketGroup,this.dataBucketNode,this.accessIndexRoutingNumber,this.platformRoutingNumber);
-        this.node.clusterNameSuffix = this.clusterNameSuffix;
-        this.node.deployDirectory = this.deployDir;
-        this.node.servicePushAddress = this.servicePushAddress;
+        this.node.clusterNameSuffix(this.clusterNameSuffix);
+        this.node.deployDirectory(this.deployDir);
+        this.node.servicePushAddress(this.servicePushAddress);
 
-        this.node.dailyBackupEnabled = this.dataStoreDailyBackup;
-        this.node.dataStoreDirectory = this.dataStoreDir;
+        this.node.dailyBackupEnabled(this.dataStoreDailyBackup);
+        this.node.dataStoreDirectory(this.dataStoreDir);
         this.node.tarantulaAgent.enabled = this.homingAgentEnabled;
         this.node.tarantulaAgent.host = this.homingAgentHost;
         this.node.tarantulaAgent.accessKey = this.homingAgentKey;
@@ -315,7 +315,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
 		DefaultLobby lb = this.setLobby(conf.descriptor);
         LobbyTypeIdIndex lobbyTypeIdIndex = new LobbyTypeIdIndex(this.node.deploymentId(),lb.descriptor().typeId());
         if(!masterDataStore().load(lobbyTypeIdIndex)) {
-            lobbyTypeIdIndex = new LobbyTypeIdIndex(this.node.bucketId,lb.descriptor().typeId());
+            lobbyTypeIdIndex = new LobbyTypeIdIndex(this.node.bucketId(),lb.descriptor().typeId());
             if(!masterDataStore().load(lobbyTypeIdIndex)) throw new RuntimeException("no lobby config data");
         }
         GameCluster gameCluster = new GameCluster();
@@ -560,17 +560,17 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
  	    this.serviceProviders.put(serviceProvider.name(),serviceProvider);
     }
     public void _setup() throws Exception{
-        AccessIndex bid = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/"+node.bucketName,AccessIndex.SYSTEM_INDEX);
-        node.bucketId = bid.distributionId();
-        AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName,AccessIndex.SYSTEM_INDEX);
-        node.nodeId = nid.distributionId();
+        AccessIndex bid = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/"+node.bucketName(),AccessIndex.SYSTEM_INDEX);
+        node.bucketId(bid.distributionId());
+        AccessIndex nid = this.accessIndexService().setIfAbsent(node.nodeName(),AccessIndex.SYSTEM_INDEX);
+        node.nodeId(nid.distributionId());
         AccessIndex did = this.accessIndexService().setIfAbsent(this.clusterNameSuffix+"/deploymentId",AccessIndex.SYSTEM_INDEX);
-        node.deploymentId = did.distributionId();
-        log.warn("Using local deployment id ["+node.deploymentId+"]");
+        node.deploymentId(did.distributionId());
+        log.warn("Using local deployment id ["+node.deploymentId()+"]");
         if(bid==null || nid==null || did==null) throw new RuntimeException("Need to restart the server again");
-        log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId+"]");
-        log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId+"]");
-        log.info("Backup Development id ["+node.deploymentId+"] is registered on node ["+node.nodeName+"]");
+        log.info("Bucket->"+dataBucketGroup+" is registered on ["+node.bucketId()+"]");
+        log.info("Node->"+dataBucketNode+" is registered on ["+node.nodeId()+"]");
+        log.info("Backup Development id ["+node.deploymentId()+"] is registered on node ["+node.nodeName()+"]");
         log.info("Current directory : "+FileUtil.currentDirectory());
         integrationCluster.registerNode(this.node);//may throw node already registered runtime exception
 

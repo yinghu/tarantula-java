@@ -106,6 +106,9 @@ public interface ClusterProvider extends ServiceProvider {
         String dataStoreDirectory();
         HomingAgent homingAgent();
 
+        int clusterSize();
+        int pingCount();
+        String etcdHost();
     }
 
     interface HomingAgent{

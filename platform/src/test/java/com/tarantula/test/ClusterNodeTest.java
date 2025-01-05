@@ -24,9 +24,9 @@ public class ClusterNodeTest extends DataStoreHook{
         Assert.assertTrue(dataStore.createIfAbsent(abucket,false));
         Assert.assertTrue(dataStore.createIfAbsent(anode,false));
         Assert.assertTrue(dataStore.createIfAbsent(adevelop,false));
-        node.bucketId = abucket.distributionId();
-        node.nodeId = anode.distributionId();
-        node.deploymentId = adevelop.distributionId();
+        node.bucketId(abucket.distributionId());
+        node.nodeId(anode.distributionId());
+        node.deploymentId(adevelop.distributionId());
         Assert.assertEquals(node.bucketId(),bucketId);
         Assert.assertEquals(node.nodeId(),nodeId);
         Assert.assertEquals(node.deploymentId(),developmentId);

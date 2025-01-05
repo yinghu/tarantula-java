@@ -4,7 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.HttpClientProvider;
+import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.Base64Util;
@@ -61,8 +63,18 @@ public class EtcdManager {
     public static void registerETCDWatchListener(ETCDWatchListener listener){
         watcherIndex.put(listener.watchKey(),listener);
     }
-
+    public static void setup(ServiceContext serviceContext) throws Exception{
+        ClusterProvider.Node node = serviceContext.node();
+        EtcdNode etcdNode = EtcdNode.create(node.nodeName(),node.address());
+        etcdNode.httpClientProvider = serviceContext.httpClientProvider();
+        etcdNode.etcdHost = node.etcdHost();
+        start(etcdNode,node.partitionNumber(),node.clusterSize(),node.pingCount(),node.clusterNameSuffix());
+    }
     public static void start(EtcdNode localNode,int partitionNumber,int clusterSize,int pingCount,String clusterName) throws Exception{
+        EtcdManager.registerETCDWatchListener(new NodeJoinListener());
+        EtcdManager.registerETCDWatchListener(new NodePingListener());
+        EtcdManager.registerETCDWatchListener(new NodeJoinedListener());
+        EtcdManager.registerETCDWatchListener(new NodeClaimListener());
         EtcdManager.localNode = localNode;
         EtcdManager.partitionNumber = partitionNumber;
         EtcdManager.clusterSize = clusterSize;

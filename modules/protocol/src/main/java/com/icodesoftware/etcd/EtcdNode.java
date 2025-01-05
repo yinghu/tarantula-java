@@ -15,6 +15,7 @@ public class EtcdNode extends RecoverableObject {
 
     public HttpClientProvider httpClientProvider;
     public String etcdHost;
+
     private EtcdNode(){
 
     }

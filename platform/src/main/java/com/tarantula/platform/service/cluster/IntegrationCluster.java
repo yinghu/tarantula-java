@@ -342,11 +342,11 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     }
     public void registerNode(Node node){
         ClusterNode cnode = (ClusterNode) node;
-        cnode.startTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
-        cnode.memberId = _cluster.getCluster().getLocalMember().getUuid();
-        cnode.address = _cluster.getCluster().getLocalMember().getAddress().getHost();
-        byte[] ret = this.vMap.putIfAbsent(BufferUtil.toArray(ByteBuffer.allocate(8).putLong(cnode.nodeId).flip()),cnode.toBinary());
-        if(ret != null) throw new RuntimeException("Node ["+node.nodeName()+"] already has been registered ["+cnode.nodeId+"]");
+        cnode.startTime(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+        cnode.memberId(_cluster.getCluster().getLocalMember().getUuid());
+        cnode.address(_cluster.getCluster().getLocalMember().getAddress().getHost());
+        byte[] ret = this.vMap.putIfAbsent(BufferUtil.toArray(ByteBuffer.allocate(8).putLong(cnode.nodeId()).flip()),cnode.toBinary());
+        if(ret != null) throw new RuntimeException("Node ["+node.nodeName()+"] already has been registered ["+cnode.nodeId()+"]");
         _cluster.getCluster().getLocalMember().setStringAttribute("node",node.nodeName()+"#"+node.nodeId());
     }
     public void onNodeRegistered(MemberAttributeServiceEvent mEvent){
