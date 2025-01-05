@@ -68,7 +68,7 @@ public class EtcdManager {
         EtcdNode etcdNode = EtcdNode.create(node.nodeName(),node.address());
         etcdNode.httpClientProvider = serviceContext.httpClientProvider();
         etcdNode.etcdHost = node.etcdHost();
-        start(etcdNode,node.partitionNumber(),node.clusterSize(),node.pingCount(),node.clusterNameSuffix());
+        start(etcdNode,node.bucketNumber(),node.clusterSize(),node.pingCount(),node.clusterNameSuffix());
     }
     public static void start(EtcdNode localNode,int partitionNumber,int clusterSize,int pingCount,String clusterName) throws Exception{
         EtcdManager.registerETCDWatchListener(new NodeJoinListener());

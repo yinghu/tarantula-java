@@ -204,6 +204,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
         this.httpClientProvider.start();
         this.node = new ClusterNode(this.dataBucketGroup,this.dataBucketNode,this.accessIndexRoutingNumber,this.platformRoutingNumber);
         this.node.clusterNameSuffix(this.clusterNameSuffix);
+
         this.node.deployDirectory(this.deployDir);
         this.node.servicePushAddress(this.servicePushAddress);
 
