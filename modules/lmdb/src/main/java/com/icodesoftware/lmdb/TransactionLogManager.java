@@ -8,6 +8,7 @@ import com.icodesoftware.service.Batchable;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.BinaryKey;
+import com.icodesoftware.util.BufferProxy;
 
 import java.util.ArrayList;
 import java.util.List;

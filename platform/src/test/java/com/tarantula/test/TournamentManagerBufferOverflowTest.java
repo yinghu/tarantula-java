@@ -1,7 +1,7 @@
 package com.tarantula.test;
 
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.lmdb.BufferProxy;
+import com.icodesoftware.util.BufferProxy;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.tournament.TournamentManager;
 import com.tarantula.platform.tournament.TournamentSchedule;

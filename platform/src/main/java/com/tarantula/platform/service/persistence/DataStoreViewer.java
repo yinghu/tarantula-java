@@ -2,7 +2,7 @@ package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.*;
 
-import com.icodesoftware.lmdb.BufferProxy;
+import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.DataStoreSummary;
 import com.icodesoftware.util.BinaryKey;

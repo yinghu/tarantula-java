@@ -3,6 +3,8 @@ package com.icodesoftware.lmdb;
 import com.icodesoftware.*;
 import com.icodesoftware.service.DataStoreSummary;
 import com.icodesoftware.service.Metadata;
+import com.icodesoftware.util.BufferProxy;
+import com.icodesoftware.util.LocalHeader;
 import org.lmdbjava.*;
 
 import java.nio.ByteBuffer;
@@ -122,7 +124,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             try(final Txn<ByteBuffer> txn = env.txnWrite()){
                 final long transactionId = txn.getId();
                 if (dbi.get(txn, key.flip()) != null){
-                    Recoverable.DataBuffer proxy = BufferProxy.buffer(txn.val());
+                    Recoverable.DataBuffer proxy = com.icodesoftware.util.BufferProxy.buffer(txn.val());
                     Recoverable.DataHeader header = proxy.readHeader();
                     if(header.revision() == t.revision()){
                         Recoverable.DataBuffer update = cache.value();
@@ -403,7 +405,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
                     txn.commit();
                     return true;
                 }
-                Recoverable.DataBuffer existed = BufferProxy.buffer(txn.val());
+                Recoverable.DataBuffer existed = com.icodesoftware.util.BufferProxy.buffer(txn.val());
                 Recoverable.DataHeader existingHeader = existed.readHeader();
                 value.flip();
                 Recoverable.DataHeader header = value.readHeader();
@@ -426,9 +428,9 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             try(final Txn<ByteBuffer> txn = env.txnRead();Cursor<ByteBuffer> cursor = localEdgeDataStore.openCursor(txn)){
 
                 if(cursor.get(cache.key().flip(),GetOp.MDB_SET)){
-                    if(cursor.seek(SeekOp.MDB_FIRST_DUP)) bufferStream.on(cache.key(),BufferProxy.buffer(cursor.val()));
+                    if(cursor.seek(SeekOp.MDB_FIRST_DUP)) bufferStream.on(cache.key(), com.icodesoftware.util.BufferProxy.buffer(cursor.val()));
                     while (cursor.seek(SeekOp.MDB_NEXT_DUP)){
-                        bufferStream.on(cache.key(),BufferProxy.buffer(cursor.val()));
+                        bufferStream.on(cache.key(), com.icodesoftware.util.BufferProxy.buffer(cursor.val()));
                     }
                 }
 
@@ -446,11 +448,11 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
 
                 if(cursor.get(cache.key().flip(),GetOp.MDB_SET)){
                     if(cursor.seek(SeekOp.MDB_FIRST_DUP)){
-                        if(dbi.get(txn,cursor.val()) !=null) bufferStream.on(BufferProxy.buffer(cursor.val().rewind()),BufferProxy.buffer(txn.val()));
+                        if(dbi.get(txn,cursor.val()) !=null) bufferStream.on(com.icodesoftware.util.BufferProxy.buffer(cursor.val().rewind()), com.icodesoftware.util.BufferProxy.buffer(txn.val()));
                     }
                     while (cursor.seek(SeekOp.MDB_NEXT_DUP)){
                         if(dbi.get(txn,cursor.val()) ==null) continue;
-                        bufferStream.on(BufferProxy.buffer(cursor.val().rewind()),BufferProxy.buffer(txn.val()));
+                        bufferStream.on(com.icodesoftware.util.BufferProxy.buffer(cursor.val().rewind()), com.icodesoftware.util.BufferProxy.buffer(txn.val()));
                     }
                 }
 
@@ -462,8 +464,8 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
     public void forEach(BufferStream stream) {
         try(final Txn<ByteBuffer> txn = env.txnRead();final Cursor<ByteBuffer> cursor = dbi.openCursor(txn)){
             while (cursor.next()){
-                Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(cursor.val());
-                if(!stream.on(BufferProxy.buffer(cursor.key()),dataBuffer)) break;
+                Recoverable.DataBuffer dataBuffer = com.icodesoftware.util.BufferProxy.buffer(cursor.val());
+                if(!stream.on(com.icodesoftware.util.BufferProxy.buffer(cursor.key()),dataBuffer)) break;
             }
         }
     }
@@ -530,11 +532,11 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
                 if(cursor.seek(SeekOp.MDB_FIRST_DUP)) {
                     if (dbi.get(txn, cursor.val()) != null) {
                         T t = query.create();
-                        Recoverable.DataBuffer proxy = BufferProxy.buffer(txn.val());
+                        Recoverable.DataBuffer proxy = com.icodesoftware.util.BufferProxy.buffer(txn.val());
                         Recoverable.DataHeader local = proxy.readHeader();
                         t.read(proxy);
                         t.revision(local.revision());
-                        t.readKey(BufferProxy.buffer(cursor.val().rewind()));
+                        t.readKey(com.icodesoftware.util.BufferProxy.buffer(cursor.val().rewind()));
                         t.label(query.label());
                         keepGoing = stream.on(t);
                     }
@@ -542,11 +544,11 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
                 while (keepGoing && cursor.seek(SeekOp.MDB_NEXT_DUP)){
                     if(dbi.get(txn,cursor.val())!=null){
                         T t = query.create();
-                        Recoverable.DataBuffer proxy = BufferProxy.buffer(txn.val());
+                        Recoverable.DataBuffer proxy = com.icodesoftware.util.BufferProxy.buffer(txn.val());
                         Recoverable.DataHeader local = proxy.readHeader();
                         t.read(proxy);
                         t.revision(local.revision());
-                        t.readKey(BufferProxy.buffer(cursor.val().rewind()));
+                        t.readKey(com.icodesoftware.util.BufferProxy.buffer(cursor.val().rewind()));
                         t.label(query.label());
                         keepGoing = stream.on(t);
                     }
@@ -614,7 +616,7 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
     private boolean get(ByteBuffer key, BufferStream buffer) {
         try(final Txn<ByteBuffer> txn = env.txnRead()){
             if (dbi.get(txn,key) == null) return false;
-            Recoverable.DataBuffer data = BufferProxy.buffer(txn.val());
+            Recoverable.DataBuffer data = com.icodesoftware.util.BufferProxy.buffer(txn.val());
             return buffer.on(BufferProxy.buffer(key.rewind()),data);
         }
     }

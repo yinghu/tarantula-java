@@ -1,6 +1,7 @@
 package com.icodesoftware.lmdb;
 
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.util.BufferProxy;
 
 import java.util.concurrent.ArrayBlockingQueue;
 

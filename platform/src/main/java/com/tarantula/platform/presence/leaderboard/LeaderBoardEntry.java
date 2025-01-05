@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.LeaderBoard;
 
 import com.icodesoftware.Statistics;
-import com.icodesoftware.lmdb.BufferProxy;
+import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.util.OnApplicationHeader;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 

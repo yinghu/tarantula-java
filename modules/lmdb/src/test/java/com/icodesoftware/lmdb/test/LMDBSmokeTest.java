@@ -1,7 +1,7 @@
 package com.icodesoftware.lmdb.test;
 
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.lmdb.BufferProxy;
+import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.lmdb.EnvSetting;
 import com.icodesoftware.util.CompressUtil;
 import org.lmdbjava.*;
@@ -11,7 +11,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;

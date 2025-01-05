@@ -5,7 +5,7 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Transaction;
-import com.icodesoftware.lmdb.LocalHeader;
+import com.icodesoftware.util.LocalHeader;
 import com.icodesoftware.lmdb.partition.LMDBPartitionProvider;
 
 import com.icodesoftware.util.SnowflakeKey;

@@ -1,4 +1,4 @@
-package com.icodesoftware.lmdb;
+package com.icodesoftware.util;
 
 import com.icodesoftware.Recoverable;
 

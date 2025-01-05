@@ -6,9 +6,7 @@ import com.hazelcast.spi.AbstractDistributedObject;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.NodeEngine;
 import com.icodesoftware.AccessIndex;
-import com.icodesoftware.DataStore;
 import com.icodesoftware.TarantulaLogger;
-import com.icodesoftware.lmdb.BufferProxy;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 

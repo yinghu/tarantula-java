@@ -1,7 +1,7 @@
 package com.tarantula.platform.service.persistence;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.lmdb.BufferProxy;
+import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;

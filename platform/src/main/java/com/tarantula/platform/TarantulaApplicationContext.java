@@ -3,7 +3,7 @@ package com.tarantula.platform;
 import com.icodesoftware.*;
 import com.icodesoftware.EventListener;
 import com.icodesoftware.Module;
-import com.icodesoftware.lmdb.BufferProxy;
+import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceProvider;

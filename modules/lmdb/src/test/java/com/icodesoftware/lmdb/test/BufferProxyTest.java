@@ -1,9 +1,9 @@
 package com.icodesoftware.lmdb.test;
 
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.lmdb.BufferProxy;
+import com.icodesoftware.util.BufferProxy;
 
-import com.icodesoftware.lmdb.LocalHeader;
+import com.icodesoftware.util.LocalHeader;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

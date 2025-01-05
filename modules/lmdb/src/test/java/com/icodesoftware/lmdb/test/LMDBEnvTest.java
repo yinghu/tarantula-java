@@ -4,7 +4,7 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.*;
-import com.icodesoftware.lmdb.BufferProxy;
+import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.util.BufferUtil;
 import com.icodesoftware.util.FileUtil;
 import com.icodesoftware.util.SnowflakeKey;

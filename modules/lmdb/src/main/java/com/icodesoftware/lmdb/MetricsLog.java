@@ -2,6 +2,7 @@ package com.icodesoftware.lmdb;
 
 import com.icodesoftware.Statistics;
 import com.icodesoftware.protocol.statistics.StatisticsEntry;
+import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.util.RecoverableObject;
 
 import java.util.ArrayList;

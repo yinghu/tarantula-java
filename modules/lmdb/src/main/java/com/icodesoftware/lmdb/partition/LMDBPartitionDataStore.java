@@ -4,7 +4,7 @@ import com.icodesoftware.*;
 
 import com.icodesoftware.lmdb.LocalDataStore;
 import com.icodesoftware.lmdb.LocalEdgeDataStore;
-import com.icodesoftware.lmdb.LocalHeader;
+import com.icodesoftware.util.LocalHeader;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DataStoreSummary;
 import com.icodesoftware.util.BinaryKey;

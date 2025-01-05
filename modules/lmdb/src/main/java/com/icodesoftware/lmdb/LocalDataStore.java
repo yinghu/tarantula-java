@@ -3,6 +3,7 @@ package com.icodesoftware.lmdb;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.service.Metadata;
+import com.icodesoftware.util.BufferProxy;
 import org.lmdbjava.Cursor;
 import org.lmdbjava.Dbi;
 import org.lmdbjava.Txn;

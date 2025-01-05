@@ -2,7 +2,7 @@ package com.tarantula.platform.service.metrics;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.icodesoftware.lmdb.BufferProxy;
+import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.util.FIFOBuffer;
 import com.icodesoftware.util.RecoverableObject;
 

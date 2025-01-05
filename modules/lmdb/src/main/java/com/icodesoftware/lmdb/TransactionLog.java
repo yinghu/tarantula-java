@@ -1,5 +1,6 @@
 package com.icodesoftware.lmdb;
 
+import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.SnowflakeKey;
 

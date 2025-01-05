@@ -6,6 +6,7 @@ import com.icodesoftware.lmdb.*;
 
 import com.icodesoftware.service.Batchable;
 import com.icodesoftware.service.Metadata;
+import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.util.SnowflakeKey;
 
 import org.testng.Assert;

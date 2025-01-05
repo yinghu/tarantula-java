@@ -4,7 +4,7 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Event;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.lmdb.BufferProxy;
+import com.icodesoftware.util.BufferProxy;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

@@ -5,8 +5,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.lmdb.BufferProxy;
-import com.icodesoftware.lmdb.LocalHeader;
+import com.icodesoftware.util.BufferProxy;
+import com.icodesoftware.util.LocalHeader;
 import com.icodesoftware.util.Base64Util;
 import com.icodesoftware.util.CompressUtil;
 import com.icodesoftware.util.JsonUtil;

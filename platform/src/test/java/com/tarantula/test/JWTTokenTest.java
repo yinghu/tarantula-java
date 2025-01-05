@@ -3,7 +3,7 @@ package com.tarantula.test;
 import com.icodesoftware.Access;
 import com.icodesoftware.OnSession;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.lmdb.BufferProxy;
+import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.JWTUtil;
 import com.icodesoftware.util.TimeUtil;
