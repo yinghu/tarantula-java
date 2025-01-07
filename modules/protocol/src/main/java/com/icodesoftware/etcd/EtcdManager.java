@@ -49,10 +49,12 @@ public class EtcdManager {
     //EtcdManager.watch("\0","\0");
 
     private static Thread watcher;
-    private static Thread starter;
-    private static ConcurrentHashMap<String,ETCDWatchListener> watcherIndex = new ConcurrentHashMap<>();
+
+    private final static ConcurrentHashMap<String,ETCDWatchListener> watcherIndex = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<String, EtcdNode> nodeIndexByName = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<Integer, EtcdPartition> nodeIndexByPartition = new ConcurrentHashMap<>();
+    private final static ConcurrentHashMap<String,EtcdTopic> topicIndex = new ConcurrentHashMap<>();
+
     private static EtcdNode localNode;
     private static EtcdConfiguration configuration;
 
@@ -92,6 +94,8 @@ public class EtcdManager {
         EtcdManager.registerETCDWatchListener(new NodePingListener());
         EtcdManager.registerETCDWatchListener(new NodeJoinedListener());
         EtcdManager.registerETCDWatchListener(new NodeClaimListener());
+        EtcdManager.registerETCDWatchListener(new TopicCreateListener());
+        EtcdManager.registerETCDWatchListener(new TopicSubscribeListener());
         EtcdManager.localNode = localNode;
         EtcdManager.watchStart = clusterName+"#";
         WatchKey.PREFIX = EtcdManager.watchStart;//overriding default
@@ -104,7 +108,7 @@ public class EtcdManager {
         },"tarantula-homing-agent-watcher");
         watcher.start();
         EtcdManager.register(WatchEvent.join(localNode.name()));
-        starter = new Thread(()->{
+        new Thread(()->{
             for(int i=0;i<configuration.joinTimer;i++){
                 try{
                     logger.warn("Waiting for join process ...");
@@ -131,8 +135,7 @@ public class EtcdManager {
                     loop=0;
                 }
             }
-        },"tarantula-homing-agent-join");
-        starter.start();
+        },"tarantula-homing-agent-join").start();
     }
 
     public static void shutdown() throws Exception{
@@ -180,7 +183,7 @@ public class EtcdManager {
         delete(key);
     }
     //event callbacks
-    public static boolean register(){
+    private static boolean register(){
         boolean available;
         try {
             lock.lock();
@@ -214,10 +217,25 @@ public class EtcdManager {
         pending.nextPing.decrementAndGet();
     }
 
-    public static List<EtcdNode> view(){
+    public static void topic(TopicEvent topicEvent){
+        topicIndex.putIfAbsent(topicEvent.topic,EtcdTopic.create(topicEvent.topic));
+    }
+    public static void subscribe(SubscribeEvent subscribeEvent){
+        topicIndex.compute(subscribeEvent.topic,(k,v)->{
+            if(v==null) v = EtcdTopic.create(k);
+            v.subscribers.add(EtcdSubscribe.create(subscribeEvent.topic,subscribeEvent.nodeName));
+            return v;
+        });
+    }
+    public static List<EtcdNode> nodeView(){
         List<EtcdNode> view = new ArrayList<>();
         nodeIndexByName.forEach((k,v)->view.add(v));
         Collections.sort(view,new NodeComparator());
+        return view;
+    }
+    public static List<EtcdTopic> topicView(){
+        List<EtcdTopic> view = new ArrayList<>();
+        topicIndex.forEach((k,v)->view.add(v));
         return view;
     }
 
@@ -241,7 +259,7 @@ public class EtcdManager {
             }
         }
     }
-    public static void check(){
+    private static void check(){
         try{
             lock.lock();
             pending.clear();

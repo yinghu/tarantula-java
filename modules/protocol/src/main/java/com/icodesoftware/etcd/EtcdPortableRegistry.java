@@ -15,10 +15,10 @@ public class EtcdPortableRegistry{
                 _ins = WatchEvent.fromKey(key);
                 break;
             case TOPIC_EVENT_CID:
-                _ins = EtcdTopic.create();
+                _ins = TopicEvent.create();
                 break;
             case SUBSCRIBE_EVENT_CID:
-                _ins = EtcdSubscribe.create();
+                _ins = SubscribeEvent.create();
                 break;
             case CLAIM_EVENT_CID:
                 _ins = ClaimEvent.create();

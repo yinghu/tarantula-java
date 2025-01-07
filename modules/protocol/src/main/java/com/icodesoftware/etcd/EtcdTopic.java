@@ -1,45 +1,38 @@
 package com.icodesoftware.etcd;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-public class EtcdTopic extends EtcdEvent{
+public class EtcdTopic extends RecoverableObject {
 
-    public static final String TOPIC = "topic";
+    public String topic;
+    public final CopyOnWriteArrayList<EtcdSubscribe> subscribers = new CopyOnWriteArrayList<>();
 
-    private String topic;
-
-    private EtcdTopic(){
-        this.key = TOPIC;
-    }
     private EtcdTopic(String topic){
-        this();
         this.topic = topic;
-    }
-    @Override
-    public int getClassId() {
-        return EtcdPortableRegistry.TOPIC_EVENT_CID;
-    }
-    @Override
-    public boolean read(DataBuffer buffer) {
-        topic = buffer.readUTF8();
-        timestamp = buffer.readLong();
-        return true;
-    }
-
-    @Override
-    public boolean write(DataBuffer buffer) {
-        buffer.writeUTF8(topic);
-        buffer.writeLong(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
-        return true;
-    }
-
-    public static EtcdTopic create(){
-        return new EtcdTopic();
+        this.timestamp = TimeUtil.toUTCMilliseconds(LocalDateTime.now());
     }
 
     public static EtcdTopic create(String topic){
         return new EtcdTopic(topic);
+    }
+
+    @Override
+    public JsonObject toJson() {
+        JsonObject resp = new JsonObject();
+        resp.addProperty("topic",topic);
+        resp.addProperty("startTime",TimeUtil.fromUTCMilliseconds(timestamp).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        JsonArray subs = new JsonArray();
+        for (EtcdSubscribe subscriber : subscribers) {
+            subs.add(subscriber.toJson());
+        }
+        resp.add("subscribers",subs);
+        return resp;
     }
 }
