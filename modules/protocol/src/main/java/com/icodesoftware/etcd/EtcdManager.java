@@ -199,6 +199,12 @@ public class EtcdManager {
     public static void joined(EtcdEvent event){
         if(event.nodeName.equals(localNode.name())) return;
         EtcdManager.register(JoinedEvent.create(localNode.name(),localNode.httpEndpoint));
+        topicIndex.forEach((k,v)->{
+            EtcdManager.register(TopicEvent.create(k));
+            v.subscribers.forEach((sk,sv)->{
+                EtcdManager.register(SubscribeEvent.create(k,sv.nodeName));
+            });
+        });
     }
     public static void claim(EtcdNode node){
         try{
@@ -223,7 +229,7 @@ public class EtcdManager {
     public static void subscribe(SubscribeEvent subscribeEvent){
         topicIndex.compute(subscribeEvent.topic,(k,v)->{
             if(v==null) v = EtcdTopic.create(k);
-            v.subscribers.add(EtcdSubscribe.create(subscribeEvent.topic,subscribeEvent.nodeName));
+            v.subscribers.put(subscribeEvent.nodeName,EtcdSubscribe.create(subscribeEvent.topic,subscribeEvent.nodeName));
             return v;
         });
     }

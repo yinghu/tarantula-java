@@ -7,12 +7,12 @@ import com.icodesoftware.util.TimeUtil;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EtcdTopic extends RecoverableObject {
 
     public String topic;
-    public final CopyOnWriteArrayList<EtcdSubscribe> subscribers = new CopyOnWriteArrayList<>();
+    public final ConcurrentHashMap<String,EtcdSubscribe> subscribers = new ConcurrentHashMap<>();
 
     private EtcdTopic(String topic){
         this.topic = topic;
@@ -29,9 +29,9 @@ public class EtcdTopic extends RecoverableObject {
         resp.addProperty("topic",topic);
         resp.addProperty("startTime",TimeUtil.fromUTCMilliseconds(timestamp).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         JsonArray subs = new JsonArray();
-        for (EtcdSubscribe subscriber : subscribers) {
-            subs.add(subscriber.toJson());
-        }
+        subscribers.forEach((k,v)->{
+            subs.add(v.toJson());
+        });
         resp.add("subscribers",subs);
         return resp;
     }
