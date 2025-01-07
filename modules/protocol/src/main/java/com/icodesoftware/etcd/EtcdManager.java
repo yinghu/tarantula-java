@@ -54,9 +54,8 @@ public class EtcdManager {
     private final static ConcurrentHashMap<String, EtcdNode> nodeIndexByName = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<Integer, EtcdPartition> nodeIndexByPartition = new ConcurrentHashMap<>();
     private static EtcdNode localNode;
-    private static int partitionNumber;
-    private static int clusterSize;
-    private static int pingCount;
+    private static EtcdConfiguration configuration;
+
     private static String watchStart;
     private static String watchEnd;
     private final static ArrayList<EtcdNode> pending = new ArrayList<>();
@@ -64,7 +63,9 @@ public class EtcdManager {
     private final static CountDownLatch joined = new CountDownLatch(1);
     private static boolean running;
     private EtcdManager(){}
-
+    public static void optional(EtcdConfiguration etcdConfiguration){
+        configuration = etcdConfiguration;
+    }
     public static EtcdNode localNode(){
         return localNode;
     }
@@ -72,7 +73,7 @@ public class EtcdManager {
         try{
             joined.await();
         }catch (Exception ex){
-
+            throw new RuntimeException(ex);
         }
         return running;
     }
@@ -84,21 +85,18 @@ public class EtcdManager {
         EtcdNode etcdNode = EtcdNode.create(node.nodeName(),node.address());
         etcdNode.httpClientProvider = serviceContext.httpClientProvider();
         etcdNode.etcdHost = node.etcdHost();
-        start(etcdNode,node.bucketNumber(),node.clusterSize(),node.pingCount(),node.clusterNameSuffix());
+        start(etcdNode,node.clusterNameSuffix());
     }
-    public static void start(EtcdNode localNode,int partitionNumber,int clusterSize,int pingCount,String clusterName) throws Exception{
+    public static void start(EtcdNode localNode,String clusterName) throws Exception{
         EtcdManager.registerETCDWatchListener(new NodeJoinListener());
         EtcdManager.registerETCDWatchListener(new NodePingListener());
         EtcdManager.registerETCDWatchListener(new NodeJoinedListener());
         EtcdManager.registerETCDWatchListener(new NodeClaimListener());
         EtcdManager.localNode = localNode;
-        EtcdManager.partitionNumber = partitionNumber;
-        EtcdManager.clusterSize = clusterSize;
-        EtcdManager.pingCount = pingCount;
         EtcdManager.watchStart = clusterName+"#";
         WatchKey.PREFIX = EtcdManager.watchStart;//overriding default
         EtcdManager.watchEnd = clusterName+"$";
-        for(int i=0;i<partitionNumber;i++){
+        for(int i=0;i<configuration.partitionNumber;i++){
             nodeIndexByPartition.put(i,new EtcdPartition(i));
         }
         watcher = new Thread(()->{
@@ -107,7 +105,7 @@ public class EtcdManager {
         watcher.start();
         EtcdManager.register(WatchEvent.join(localNode.name()));
         starter = new Thread(()->{
-            for(int i=0;i<10;i++){
+            for(int i=0;i<configuration.joinTimer;i++){
                 try{
                     logger.warn("Waiting for join process ...");
                     Thread.sleep(500);
@@ -120,10 +118,10 @@ public class EtcdManager {
             int loop = 0;
             while(running){
                 try{
-                    Thread.sleep(1*1000);
+                    Thread.sleep(configuration.pingTimer*1000);
                     EtcdManager.register(WatchEvent.ping(localNode.name()));
                     loop++;
-                    if(loop>=2){
+                    if(loop >= 2){
                         EtcdManager.check();
                         loop = 0;
                     }
@@ -186,7 +184,7 @@ public class EtcdManager {
         boolean available;
         try {
             lock.lock();
-            available = nodeIndexByName.size() < clusterSize;
+            available = nodeIndexByName.size() < configuration.clusterSize;
         }finally {
             lock.unlock();
         }
@@ -231,7 +229,7 @@ public class EtcdManager {
         return view;
     }
     public static EtcdPartition partition(byte[] key){
-        int p = Math.abs(Arrays.hashCode(key))%partitionNumber;
+        int p = Math.abs(Arrays.hashCode(key)) % configuration.partitionNumber;
         for(;;){
             try{
                 EtcdPartition pending =  nodeIndexByPartition.get(p);
@@ -248,7 +246,7 @@ public class EtcdManager {
             lock.lock();
             pending.clear();
             nodeIndexByName.forEach((k,check)->{
-                if(!check.name().equals(localNode.name()) && check.nextPing.getAndSet(pingCount) == pingCount){
+                if(!check.name().equals(localNode.name()) && check.nextPing.getAndSet(configuration.pingCount) == configuration.pingCount){
                     pending.add(check);
                 }
             });
@@ -265,7 +263,7 @@ public class EtcdManager {
         nodeIndexByName.forEach((k,n)->pending.add(n));
         Collections.sort(pending,new NodeComparator());
         int sz = pending.size();
-        for(int i=0;i<partitionNumber;i++){
+        for(int i=0;i<configuration.partitionNumber;i++){
             int p =  i % sz;
             EtcdNode node = pending.get(p);
             nodeIndexByPartition.get(i).onPartition(node);
