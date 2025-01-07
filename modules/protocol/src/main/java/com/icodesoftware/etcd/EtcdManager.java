@@ -24,12 +24,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Flow;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.icodesoftware.util.HttpCaller.*;
 
 public class EtcdManager {
+
     private static final String PUT = "v3/kv/put";
     private static final String GET = "v3/kv/range";
     private static final String WATCH = "v3/watch";
@@ -47,10 +49,11 @@ public class EtcdManager {
     //EtcdManager.watch("\0","\0");
 
     private static Thread watcher;
+    private static Thread starter;
     private static ConcurrentHashMap<String,ETCDWatchListener> watcherIndex = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<String, EtcdNode> nodeIndexByName = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<Integer, EtcdPartition> nodeIndexByPartition = new ConcurrentHashMap<>();
-    public static EtcdNode localNode;
+    private static EtcdNode localNode;
     private static int partitionNumber;
     private static int clusterSize;
     private static int pingCount;
@@ -58,8 +61,21 @@ public class EtcdManager {
     private static String watchEnd;
     private final static ArrayList<EtcdNode> pending = new ArrayList<>();
     private static ReentrantLock lock = new ReentrantLock(true);
+    private final static CountDownLatch joined = new CountDownLatch(1);
+    private static boolean running;
     private EtcdManager(){}
 
+    public static EtcdNode localNode(){
+        return localNode;
+    }
+    public static boolean await(){
+        try{
+            joined.await();
+        }catch (Exception ex){
+
+        }
+        return running;
+    }
     public static void registerETCDWatchListener(ETCDWatchListener listener){
         watcherIndex.put(listener.watchKey(),listener);
     }
@@ -89,9 +105,40 @@ public class EtcdManager {
             EtcdManager.watch(watchStart,watchEnd);
         },"tarantula-homing-agent-watcher");
         watcher.start();
+        EtcdManager.register(WatchEvent.join(localNode.name()));
+        starter = new Thread(()->{
+            for(int i=0;i<10;i++){
+                try{
+                    logger.warn("Waiting for join process ...");
+                    Thread.sleep(500);
+                }catch (Exception ex){
+                    //ignore
+                }
+            }
+            running = EtcdManager.register();
+            joined.countDown();
+            int loop = 0;
+            while(running){
+                try{
+                    Thread.sleep(1*1000);
+                    EtcdManager.register(WatchEvent.ping(localNode.name()));
+                    loop++;
+                    if(loop>=2){
+                        EtcdManager.check();
+                        loop = 0;
+                    }
+                }catch (Exception ex){
+                    //ignore
+                    logger.warn("Error : ",ex);
+                    loop=0;
+                }
+            }
+        },"tarantula-homing-agent-join");
+        starter.start();
     }
 
     public static void shutdown() throws Exception{
+        running = false;
         watcher.interrupt();
     }
 
