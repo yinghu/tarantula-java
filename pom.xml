@@ -16,6 +16,7 @@
     <modules>
         <module>modules/protocol</module>
         <module>modules/lmdb</module>
+        <module>modules/presence</module>
         <module>platform</module>
         <module>modules/earth8</module>
         <module>load-test</module>
@@ -70,7 +71,7 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.10.1</version>
+            <version>2.11.0</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>

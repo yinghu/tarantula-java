@@ -30,6 +30,7 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
     protected transient String contentType ="application/json";
 
     protected transient byte[] payload;
+    protected transient DataBuffer dataBuffer;
 
     protected boolean joined;
     protected boolean closed;
@@ -184,5 +185,12 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
     @Override
     public void token(String token) {
         this.token = token;
+    }
+
+    public DataBuffer dataBuffer(){
+        return dataBuffer;
+    }
+    public void dataBuffer(DataBuffer dataBuffer){
+        this.dataBuffer = dataBuffer;
     }
 }

@@ -62,6 +62,9 @@ public interface Session extends OnApplication {
     byte[] payload();
     void payload(byte[] data);
 
+    default DataBuffer dataBuffer(){ return null;}
+    default void dataBuffer(DataBuffer dataBuffer){}
+
     String trackId();
     void trackId(String trackId);
 

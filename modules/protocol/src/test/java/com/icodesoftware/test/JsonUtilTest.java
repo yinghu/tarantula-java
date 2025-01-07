@@ -3,12 +3,16 @@ package com.icodesoftware.test;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.icodesoftware.Recoverable;
+import com.icodesoftware.util.BufferProxy;
+import com.icodesoftware.util.DataBufferInputStream;
 import com.icodesoftware.util.JsonUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 
+import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -107,4 +111,25 @@ public class JsonUtilTest {
         Assert.assertEquals(((JsonElement)map.get("jo")).getAsJsonObject().toString(),"{}");
         Assert.assertEquals(((JsonElement)map.get("ja")).getAsJsonArray().toString(),"[]");
     }
+
+    @Test(groups = { "json util" })
+    public void inputStreamJsonObjectTest() {
+        JsonObject props = new JsonObject();
+        props.addProperty("name","aname");
+        props.addProperty("age",1);
+        props.addProperty("foo",12);
+        props.addProperty("valid",true);
+        Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(100,true);
+        for(byte b : props.toString().getBytes()){
+            dataBuffer.writeByte(b);
+        }
+        dataBuffer.flip();
+        JsonObject cp = JsonUtil.parse(new DataBufferInputStream(dataBuffer));
+        Assert.assertEquals(cp.get("name").getAsString(),"aname");
+        Assert.assertEquals(cp.get("age").getAsInt(),1);
+        Assert.assertEquals(cp.get("foo").getAsLong(),12);
+        Assert.assertEquals(cp.get("valid").getAsBoolean(),true);
+
+    }
+
 }

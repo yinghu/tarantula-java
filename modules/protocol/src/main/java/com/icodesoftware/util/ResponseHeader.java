@@ -1,5 +1,6 @@
 package com.icodesoftware.util;
 
+import com.google.gson.JsonObject;
 import com.icodesoftware.Response;
 
 public class ResponseHeader extends RecoverableObject implements Response {
@@ -67,5 +68,15 @@ public class ResponseHeader extends RecoverableObject implements Response {
         this.successful = successful;
     }
 
-
+    @Override
+    public JsonObject toJson() {
+        JsonObject jo = new JsonObject();
+        jo.addProperty("command",command);
+        jo.addProperty("label",label);
+        jo.addProperty("message",message);
+        jo.addProperty("successful",successful);
+        jo.addProperty("Successful",successful);
+        jo.addProperty("Message",message);
+        return jo;
+    }
 }
