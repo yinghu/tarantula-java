@@ -431,6 +431,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext, session.distributionId(), PlayerDataTrack.Type.Analytics);
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
-                webhook.upload(ANALYTICS_QUERY, new CheatDetectedTransaction(session, serverSession.trackId, maxValueExceeded, analyticsData))));
+                webhook.upload(ANALYTICS_QUERY, new CheatDetectedTransaction(session, serverSession.trackId, maxValueExceeded, analyticsData).toBytes())
+        ));
     }
 }
