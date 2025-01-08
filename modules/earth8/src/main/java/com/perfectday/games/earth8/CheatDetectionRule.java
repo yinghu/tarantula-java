@@ -2,8 +2,6 @@ package com.perfectday.games.earth8;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
-import com.icodesoftware.TarantulaLogger;
-import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.JsonUtil;
 
 import java.util.concurrent.atomic.AtomicInteger;
