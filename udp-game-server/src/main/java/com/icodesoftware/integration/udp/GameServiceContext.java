@@ -5,6 +5,8 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.protocol.ApplicationResource;
 import com.icodesoftware.protocol.GameContext;
 import com.icodesoftware.service.ApplicationSchema;
+import com.icodesoftware.service.ClusterProvider;
+import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.TokenValidatorProvider;
 
 import java.util.concurrent.ScheduledFuture;
@@ -96,6 +98,16 @@ public class GameServiceContext implements GameContext {
     }
 
     public Configurable lookup(long distributionId){
+        return null;
+    }
+
+    @Override
+    public ClusterProvider.Node node() {
+        return null;
+    }
+
+    @Override
+    public Metrics metrics() {
         return null;
     }
 }

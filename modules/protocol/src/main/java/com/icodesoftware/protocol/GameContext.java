@@ -3,6 +3,8 @@ package com.icodesoftware.protocol;
 import com.icodesoftware.*;
 
 import com.icodesoftware.service.ApplicationSchema;
+import com.icodesoftware.service.ClusterProvider;
+import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.TokenValidatorProvider;
 
 public interface GameContext extends Context {
@@ -25,4 +27,7 @@ public interface GameContext extends Context {
     ApplicationResource.Redeemer redeemer(Session session);
 
     Configurable lookup(long distributionId);
+
+    ClusterProvider.Node node();
+    Metrics metrics();
 }

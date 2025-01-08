@@ -2,10 +2,7 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
-import com.icodesoftware.service.ApplicationPreSetup;
-import com.icodesoftware.service.ApplicationSchema;
-import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.TokenValidatorProvider;
+import com.icodesoftware.service.*;
 import com.tarantula.platform.item.ConfigurableObject;
 
 import java.util.concurrent.ScheduledFuture;
@@ -102,5 +99,13 @@ public class PlatformGameContext implements GameContext {
         ApplicationPreSetup applicationPreSetup = applicationSchema().applicationPreSetup();
         Descriptor item = applicationSchema().application("item");
         return  applicationPreSetup.load(item,distributionId);
+    }
+
+    public ClusterProvider.Node node(){
+        return serviceContext.node();
+    }
+
+    public Metrics metrics(){
+        return this.platformGameServiceProvider.metrics();
     }
 }
