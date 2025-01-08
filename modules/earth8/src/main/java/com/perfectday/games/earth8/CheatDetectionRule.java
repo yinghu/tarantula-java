@@ -10,7 +10,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class CheatDetectionRule {
     private final Earth8GameServiceProvider earth8GameServiceProvider;
-    private TarantulaLogger logger = JDKLogger.getLogger(CheatDetectionRule.class);
     private AtomicInteger HardCurrency = new AtomicInteger(300000);
     private AtomicInteger SoftCurrency = new AtomicInteger(300000);
     private AtomicInteger Energy = new AtomicInteger(300000);
@@ -69,7 +68,6 @@ public class CheatDetectionRule {
                     else
                         return;
 
-                    logger.warn("Sending Cheat Detected Analytic");
                     earth8GameServiceProvider.sendCheatDetectedAnalytic(session, maxValueExceeded, analytic);
                 }
             }
