@@ -10,6 +10,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.Base64Util;
+import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.JsonUtil;
 
 import java.net.URI;
@@ -56,7 +57,7 @@ public class EtcdManager {
     private final static ConcurrentHashMap<String,EtcdTopic> topicIndex = new ConcurrentHashMap<>();
 
     private static EtcdNode localNode;
-    private static EtcdConfiguration configuration;
+    private static EtcdConfiguration configuration = new EtcdConfiguration();
 
     private static String watchStart;
     private static String watchEnd;
@@ -97,6 +98,10 @@ public class EtcdManager {
         EtcdManager.registerETCDWatchListener(new TopicCreateListener());
         EtcdManager.registerETCDWatchListener(new TopicSubscribeListener());
         EtcdManager.localNode = localNode;
+        if(EtcdManager.localNode.httpClientProvider==null){
+            EtcdManager.localNode.httpClientProvider = new HttpCaller();
+            EtcdManager.localNode.httpClientProvider.start();
+        }
         EtcdManager.watchStart = clusterName+"#";
         WatchKey.PREFIX = EtcdManager.watchStart;//overriding default
         EtcdManager.watchEnd = clusterName+"$";
@@ -105,7 +110,7 @@ public class EtcdManager {
         }
         watcher = new Thread(()->{
             EtcdManager.watch(watchStart,watchEnd);
-        },"tarantula-homing-agent-watcher");
+        },"tarantula-"+clusterName+"-watcher");
         watcher.start();
         EtcdManager.register(WatchEvent.join(localNode.name()));
         new Thread(()->{
@@ -135,7 +140,7 @@ public class EtcdManager {
                     loop=0;
                 }
             }
-        },"tarantula-homing-agent-join").start();
+        },"tarantula-"+clusterName+"-join").start();
     }
 
     public static void shutdown() throws Exception{

@@ -14,6 +14,7 @@ public interface EndPoint extends ServiceProvider {
     default void backlog(int backlog){}
     void port(int port);
     void inboundThreadPoolSetting(String inboundThreadPoolSetting);
+    default void resource(String resource){}
     default void resource(Resource resource){}
     default Channel register(Session session, UDPEndpointServiceProvider.RequestListener requestListener, Session.TimeoutListener timeoutListener){return  null;}
 

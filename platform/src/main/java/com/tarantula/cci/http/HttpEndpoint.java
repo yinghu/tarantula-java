@@ -16,56 +16,56 @@ public class HttpEndpoint extends HttpEndpointService{
 
 		HttpRootHandler root = new HttpRootHandler(metricsListener);
 		root.resource(this.resource);
-		this.hserver.createContext(root.path(),root);
+		this.server.createContext(root.path(),root);
 
 		HttpUploadHandler upload = new HttpUploadHandler(metricsListener);
 		upload.resource(this.resource);
-		this.hserver.createContext(upload.path(),upload);
+		this.server.createContext(upload.path(),upload);
 
 		HttpResourceHandler httpResourceHandler = new HttpResourceHandler(metricsListener);
 		httpResourceHandler.resource(this.resource);
-		this.hserver.createContext(httpResourceHandler.path(),httpResourceHandler);
+		this.server.createContext(httpResourceHandler.path(),httpResourceHandler);
 
 		HttpHealthCheckHandler healthCheckHandler = new HttpHealthCheckHandler(metricsListener);
 		healthCheckHandler.resource(this.resource);
-		this.hserver.createContext(healthCheckHandler.path(),healthCheckHandler);
+		this.server.createContext(healthCheckHandler.path(),healthCheckHandler);
 
 		HttpUserHandler httpUserHandler = new HttpUserHandler(metricsListener);
 		httpUserHandler.resource(this.resource);
-		this.hserver.createContext(httpUserHandler.path(), httpUserHandler);
+		this.server.createContext(httpUserHandler.path(), httpUserHandler);
 
 		HttpServiceHandler httpServiceHandler = new HttpServiceHandler(metricsListener);
 		httpServiceHandler.resource(this.resource);
-		this.hserver.createContext(httpServiceHandler.path(),httpServiceHandler);
+		this.server.createContext(httpServiceHandler.path(),httpServiceHandler);
 
 		HttpAdminHandler httpAdminHandler = new HttpAdminHandler(metricsListener);
 		httpAdminHandler.resource(this.resource);
-		this.hserver.createContext(httpAdminHandler.path(),httpAdminHandler);
+		this.server.createContext(httpAdminHandler.path(),httpAdminHandler);
 
 		HttpPresenceHandler httpPresenceHandler = new HttpPresenceHandler(metricsListener);
 		httpPresenceHandler.resource(this.resource);
-		this.hserver.createContext(httpPresenceHandler.path(),httpPresenceHandler);
+		this.server.createContext(httpPresenceHandler.path(),httpPresenceHandler);
 
 		HttpAccountHandler httpAccountHandler = new HttpAccountHandler(metricsListener);
 		httpAccountHandler.resource(this.resource);
-		this.hserver.createContext(httpAccountHandler.path(),httpAccountHandler);
+		this.server.createContext(httpAccountHandler.path(),httpAccountHandler);
 
 		HttpSudoHandler httpSudoHandler = new HttpSudoHandler(metricsListener);
 		httpSudoHandler.resource(this.resource);
-		this.hserver.createContext(httpSudoHandler.path(),httpSudoHandler);
+		this.server.createContext(httpSudoHandler.path(),httpSudoHandler);
 
 		HttpViewHandler httpViewHandler = new HttpViewHandler(metricsListener);
 		httpViewHandler.resource(this.resource);
-		this.hserver.createContext(httpViewHandler.path(),httpViewHandler);
+		this.server.createContext(httpViewHandler.path(),httpViewHandler);
 
 		HttpGameServerHandler httpGameServerHandler = new HttpGameServerHandler(metricsListener);
 		httpGameServerHandler.resource(this.resource);
-		this.hserver.createContext(httpGameServerHandler.path(),httpGameServerHandler);
+		this.server.createContext(httpGameServerHandler.path(),httpGameServerHandler);
 
 
 		HttpDevelopmentHandler httpDevelopmentHandler = new HttpDevelopmentHandler(metricsListener);
 		httpDevelopmentHandler.resource(this.resource);
-		this.hserver.createContext(httpDevelopmentHandler.path(),httpDevelopmentHandler);
+		this.server.createContext(httpDevelopmentHandler.path(),httpDevelopmentHandler);
 
         log.info("Tarantula HTTP Endpoint is listening on ["+address+"]");
 	}
