@@ -44,7 +44,6 @@ public interface Session extends OnApplication {
     void write(byte[] payload);
     void write(byte[] payload,boolean closed);
     void write(Session.Header messageHeader,byte[] payload);
-
     boolean closed();
     void closed(boolean closed);
 

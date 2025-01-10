@@ -13,4 +13,6 @@ public interface TarantulaApplication extends Initializer, EventListener, Bucket
 
     default void clear(){}
 
+    default void execute(Session session,EventListener eventListener) throws Exception{}
+
 }
