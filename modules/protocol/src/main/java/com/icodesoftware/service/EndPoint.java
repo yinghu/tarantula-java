@@ -13,6 +13,7 @@ public interface EndPoint extends ServiceProvider {
     void address(String address);
     default void backlog(int backlog){}
     void port(int port);
+    int port();
     void inboundThreadPoolSetting(String inboundThreadPoolSetting);
     default void resource(String resource){}
     default void resource(Resource resource){}

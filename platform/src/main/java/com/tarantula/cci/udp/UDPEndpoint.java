@@ -154,6 +154,9 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
         this.connection.port(port);
     }
 
+    public int port(){
+        return this.connection.port();
+    }
     @Override
     public void inboundThreadPoolSetting(String poolSetting) {
         this.threadPoolSetting = poolSetting;

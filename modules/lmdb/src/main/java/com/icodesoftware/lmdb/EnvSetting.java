@@ -51,12 +51,14 @@ public class EnvSetting {
         this.enabled = enabled;
         this.scope = scope();
     }
+
     public final int scope;
     public final String name;
     public final String storePath;
     public final int mbSize;
     public final int partition;
     public final boolean enabled;
+
 
     private int scope(){
         if(name.equals(data)) return Distributable.DATA_SCOPE;
@@ -65,6 +67,47 @@ public class EnvSetting {
         if(name.equals(log)) return Distributable.LOG_SCOPE;
         if(name.equals(local)) return Distributable.LOCAL_SCOPE;
         throw new UnsupportedOperationException("named LMDB env ["+name+"] not supported");
+    }
+
+    public static EnvSetting disable(int scope){
+        switch (scope){
+            case Distributable.DATA_SCOPE -> {
+                return new EnvSetting(data,ENV_BASE_DIR+"/data",0,1,false);
+            }
+            case Distributable.INTEGRATION_SCOPE -> {
+                return new EnvSetting(integration,ENV_BASE_DIR+"/integration",0,1,false);
+            }
+            case Distributable.INDEX_SCOPE -> {
+                return new EnvSetting(index,ENV_BASE_DIR+"/index",0,1,false);
+            }
+            case Distributable.LOG_SCOPE -> {
+                return new EnvSetting(log,ENV_BASE_DIR+"/log",0,1,false);
+            }
+            case Distributable.LOCAL_SCOPE -> {
+                return new EnvSetting(local,ENV_BASE_DIR+"/local",0,1,false);
+            }
+            default -> throw new UnsupportedOperationException("scope not supported ["+scope+"]");
+        }
+    }
+    public static EnvSetting setting(int scope,String baseDir,int mbSize){
+        switch (scope){
+            case Distributable.DATA_SCOPE -> {
+                return new EnvSetting(data,baseDir+"/data",mbSize,1,true);
+            }
+            case Distributable.INTEGRATION_SCOPE -> {
+                return new EnvSetting(integration,baseDir+"/integration",mbSize,1,true);
+            }
+            case Distributable.INDEX_SCOPE -> {
+                return new EnvSetting(index,baseDir+"/index",mbSize,1,true);
+            }
+            case Distributable.LOG_SCOPE -> {
+                return new EnvSetting(log,baseDir+"/log",mbSize,1,true);
+            }
+            case Distributable.LOCAL_SCOPE -> {
+                return new EnvSetting(local,baseDir+"/local",mbSize,1,true);
+            }
+            default -> throw new UnsupportedOperationException("scope not supported ["+scope+"]");
+        }
     }
 
     public static long toBytesFromMb(int mbSize){

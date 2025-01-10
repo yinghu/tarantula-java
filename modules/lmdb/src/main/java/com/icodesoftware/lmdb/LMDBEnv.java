@@ -29,7 +29,7 @@ public class LMDBEnv implements Serviceable {
     @Override
     public void start() throws Exception {
         if(!envSetting.enabled) return;
-        logger.warn("Starting Env : "+envSetting.name+" : "+envSetting.storePath+" : "+lmdbDataStoreProvider.diskSyncOnCommit());
+        logger.warn("Starting Env Name : ["+envSetting.name+"] Location : ["+envSetting.storePath+"] Disk Sync On Commit : ["+lmdbDataStoreProvider.diskSyncOnCommit()+"]");
         if(lmdbDataStoreProvider.diskSyncOnCommit()){
             env = Env.create().setMapSize(storeSize(this.envSetting)).setMaxDbs(lmdbDataStoreProvider.maxDatabaseNumber()).setMaxReaders(lmdbDataStoreProvider.maxReaderNumber()).open(path(this.envSetting.storePath).toFile());
             return;

@@ -66,6 +66,7 @@ public class LMDBDataStoreProvider implements LocalLMDBProvider{
     private MetricsListener metricsListener = (k,v)->{};
     private JsonObject jsonObject;
     private LocalDataMigration migration;
+
     @Override
     public void configure(Map<String, Object> properties) {
         this.name = (String)properties.getOrDefault(EnvSetting.ENV_CONFIG_NAME,EnvSetting.ENV_PROVIDER_NAME);
@@ -296,7 +297,7 @@ public class LMDBDataStoreProvider implements LocalLMDBProvider{
             migration.migrate(this,storeMap);
             System.exit(0);
         }
-        logger.warn("LMDB Provider ["+name+"] started with store size ["+storeSize+"] queue side ["+pendingQueue.size()+"] store no sync mode ["+envNoSyncFlag+"] reindexing ["+storeReindexing+"]");
+        logger.warn("LMDB Provider ["+name+"] started with store size ["+storeSize+"] queue side ["+pendingQueue.size()+"] store disk sync on commit mode ["+diskSyncOnCommit()+"] reindexing ["+storeReindexing+"]");
         logger.warn("LMDB Provider using key/value size ["+KEY_SIZE+"/"+VALUE_SIZE+"]");
     }
 

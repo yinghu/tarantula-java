@@ -228,14 +228,15 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
         });
         this.dataScopeReplicationProxy = new DataScopeReplicationProxy();
         this.integrationScopeReplicationProxy = new IntegrationScopeReplicationProxy();
-        HashMap<String,Object> storeAdditions = new HashMap<>();
-        storeAdditions.put("storeSizeMb",storeSizeMb);
-        storeAdditions.put("envNoSyncFlag",storeNoSync);
-        storeAdditions.put("storeReindexing",dataStoreReindexing);
-        storeAdditions.put("externalKeyValueBufferUsed",externalKeyValueBufferUsed);
-        storeAdditions.put("storeKeySize",storeKeySize);
-        storeAdditions.put("storeValueSize",storeValueSize);
-        storeAdditions.put("storePendingBufferSize",storePendingBufferSize);
+        HashMap<String,Object> storeAdditions = new HashMap<>(){{
+            put("storeSizeMb",storeSizeMb);
+            put("envNoSyncFlag",storeNoSync);
+            put("storeReindexing",dataStoreReindexing);
+            put("externalKeyValueBufferUsed",externalKeyValueBufferUsed);
+            put("storeKeySize",storeKeySize);
+            put("storeValueSize",storeValueSize);
+            put("storePendingBufferSize",storePendingBufferSize);
+        }};
         DataStoreConfigurationJsonParser sparser = new DataStoreConfigurationJsonParser(DATA_STORE_CONFIG,this,storeAdditions,dataStoreProvider -> {
             try{
                 this.deploymentDataStoreProvider = dataStoreProvider;

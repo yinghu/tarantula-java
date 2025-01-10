@@ -199,6 +199,9 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider, UDP
         this.port = port;
     }
 
+    public int port(){
+        return port;
+    }
     @Override
     public void inboundThreadPoolSetting(String inboundThreadPoolSetting) {
         this.inboundThreadPoolSetting = inboundThreadPoolSetting;

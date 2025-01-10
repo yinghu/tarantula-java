@@ -91,6 +91,7 @@ public class EtcdManager {
         start(etcdNode,node.clusterNameSuffix());
     }
     public static void start(EtcdNode localNode,String clusterName) throws Exception{
+        if(running) return;
         EtcdManager.registerETCDWatchListener(new NodeJoinListener());
         EtcdManager.registerETCDWatchListener(new NodePingListener());
         EtcdManager.registerETCDWatchListener(new NodeJoinedListener());
@@ -116,7 +117,7 @@ public class EtcdManager {
         new Thread(()->{
             for(int i=0;i<configuration.joinTimer;i++){
                 try{
-                    logger.warn("Waiting for join process ...");
+                    logger.warn("Waiting to join ["+clusterName+"] ...");
                     Thread.sleep(500);
                 }catch (Exception ex){
                     //ignore

@@ -54,6 +54,10 @@ public class HttpEndpointService implements EndPoint {
     }
 
     @Override
+    public int port(){
+        return port;
+    }
+    @Override
     public void backlog(int backlog) {
         this.backlog = backlog;
     }
