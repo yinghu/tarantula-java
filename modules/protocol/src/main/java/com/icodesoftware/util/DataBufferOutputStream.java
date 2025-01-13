@@ -18,6 +18,10 @@ public class DataBufferOutputStream extends OutputStream {
         this.dataBuffer.writeByte((byte)b);
     }
 
+    @Override
+    public void flush() throws IOException{
+        this.dataBuffer.flip();
+    }
     public Recoverable.DataBuffer src(){
         return dataBuffer;
     }

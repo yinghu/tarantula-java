@@ -20,4 +20,8 @@ public class DataBufferInputStream extends InputStream {
         if(!dataBuffer.hasRemaining()) return -1;
         return dataBuffer.readByte();
     }
+
+    public Recoverable.DataBuffer src(){
+        return dataBuffer;
+    }
 }

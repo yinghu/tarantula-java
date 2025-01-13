@@ -3,21 +3,16 @@ package com.icodesoftware.test;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.util.BufferProxy;
-import com.icodesoftware.util.DataBufferInputStream;
-import com.icodesoftware.util.DataBufferWriter;
-import com.icodesoftware.util.JsonUtil;
+import com.icodesoftware.util.*;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -135,11 +130,24 @@ public class JsonUtilTest {
         Assert.assertEquals(cp.get("foo").getAsLong(),12);
         Assert.assertEquals(cp.get("valid").getAsBoolean(),true);
         try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            DataBufferOutputStream out = new DataBufferOutputStream(BufferProxy.buffer(100,true));
             JsonWriter writer = new JsonWriter(new OutputStreamWriter(out));
             writer.beginObject().name("id").value(100).name("name").value("moon").endObject();
             writer.flush();
-            System.out.println(new String(out.toByteArray()));
+            InputStreamReader in = new InputStreamReader(new DataBufferInputStream(out.src()));
+            JsonReader reader = new JsonReader(in);
+            reader.beginObject();
+            while (reader.hasNext()){
+                String name = reader.nextName();
+                if(name.equals("id")){
+                    Assert.assertEquals(reader.nextInt(),100);
+                    continue;
+                }
+                if(name.equals("name")){
+                    Assert.assertEquals(reader.nextString(),"moon");
+                }
+            }
+            reader.endObject();
         }catch (Exception ex){
             ex.printStackTrace();
         }

@@ -22,13 +22,12 @@ public class DataBufferWriter extends Writer {
 
     @Override
     public void flush() throws IOException {
-        System.out.println("flush");
         dataBuffer.flip();
     }
 
     @Override
     public void close() throws IOException {
-        System.out.println("close");
+
     }
 
     public Recoverable.DataBuffer src(){
