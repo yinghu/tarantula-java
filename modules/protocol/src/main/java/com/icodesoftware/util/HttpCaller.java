@@ -39,7 +39,13 @@ final public class HttpCaller implements HttpClientProvider {
     public void _init() throws Exception{
         SSLContext sct = SSLContext.getInstance("TLS");
         sct.init(null,new TrustManager[]{new _X509TrustManager()},null);
-        client = HttpClient.newBuilder().sslContext(sct).version(HttpClient.Version.HTTP_2).build();
+        if(poolSetting==null){
+            client = HttpClient.newBuilder().sslContext(sct).version(HttpClient.Version.HTTP_2).build();
+            return;
+        }
+        TarantulaExecutorServiceFactory.createExecutorService(poolSetting,(pool,size,reject)->{
+            client = HttpClient.newBuilder().executor(pool).sslContext(sct).version(HttpClient.Version.HTTP_2).build();
+        });
     }
     public String index() throws Exception{
         String[] headers = new String[]{
