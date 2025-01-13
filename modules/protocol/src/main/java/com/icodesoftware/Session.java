@@ -1,6 +1,9 @@
 package com.icodesoftware;
 
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 public interface Session extends OnApplication {
 
     String DataStore = "game_session";

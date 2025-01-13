@@ -3,16 +3,21 @@ package com.icodesoftware.test;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.util.DataBufferInputStream;
+import com.icodesoftware.util.DataBufferWriter;
 import com.icodesoftware.util.JsonUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -129,7 +134,15 @@ public class JsonUtilTest {
         Assert.assertEquals(cp.get("age").getAsInt(),1);
         Assert.assertEquals(cp.get("foo").getAsLong(),12);
         Assert.assertEquals(cp.get("valid").getAsBoolean(),true);
-
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            JsonWriter writer = new JsonWriter(new OutputStreamWriter(out));
+            writer.beginObject().name("id").value(100).name("name").value("moon").endObject();
+            writer.flush();
+            System.out.println(new String(out.toByteArray()));
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
 }

@@ -17,4 +17,8 @@ public class DataBufferOutputStream extends OutputStream {
     public void write(int b) throws IOException {
         this.dataBuffer.writeByte((byte)b);
     }
+
+    public Recoverable.DataBuffer src(){
+        return dataBuffer;
+    }
 }
