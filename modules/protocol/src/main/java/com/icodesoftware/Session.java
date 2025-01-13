@@ -1,9 +1,5 @@
 package com.icodesoftware;
 
-
-import java.io.InputStream;
-import java.io.OutputStream;
-
 public interface Session extends OnApplication {
 
     String DataStore = "game_session";
@@ -16,7 +12,7 @@ public interface Session extends OnApplication {
     String TARANTULA_VIEW_ID ="Tarantula-view-id";
 
     String TARANTULA_SERVER_ID ="Tarantula-server-id";
-
+    String TARANTULA_SYSTEM_ID ="Tarantula-system-id";
     String TARANTULA_TOKEN ="Tarantula-token";
     String TARANTULA_ACCESS_KEY ="Tarantula-access-key";
     String TARANTULA_PAYLOAD_SIZE ="Tarantula-payload-size";
@@ -72,7 +68,7 @@ public interface Session extends OnApplication {
 
     String token();
     void token(String token);
-
+    default void onEvent(Event event){}
     interface TimeoutListener{
         void timeout(long systemId,long stub);
     }

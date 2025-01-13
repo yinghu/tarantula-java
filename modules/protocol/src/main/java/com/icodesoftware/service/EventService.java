@@ -7,7 +7,7 @@ import com.icodesoftware.RoutingKey;
 public interface EventService extends EventListener, Serviceable {
 
 	void publish(Event out);
-    void retry(String retryKey);
+    default void retry(String retryKey){}
 
     //delegates topic subscribe
     void registerEventListener(String topic, EventListener callback);
@@ -15,5 +15,4 @@ public interface EventService extends EventListener, Serviceable {
     RoutingKey routingKey(Object magicKey,String tag);
     RoutingKey routingKey(Object magicKey,String tag,int routingNumber);
 
-    default void publish(Event out,EventListener callback){}
 }
