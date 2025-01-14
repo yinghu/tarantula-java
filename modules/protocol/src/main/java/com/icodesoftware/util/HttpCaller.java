@@ -39,7 +39,7 @@ final public class HttpCaller implements HttpClientProvider {
     public void _init() throws Exception{
         SSLContext sct = SSLContext.getInstance("TLS");
         sct.init(null,new TrustManager[]{new _X509TrustManager()},null);
-        if(poolSetting==null){
+        if(poolSetting == null){
             client = HttpClient.newBuilder().sslContext(sct).version(HttpClient.Version.HTTP_2).build();
             return;
         }
@@ -66,7 +66,6 @@ final public class HttpCaller implements HttpClientProvider {
     }
     public String post(String path,byte[] payload, String[] headers) throws Exception{
         HttpRequest request = HttpRequest.newBuilder()
-                //.version(HttpClient.Version.HTTP_1_1)
                 .uri(URI.create(host+"/"+path))
                 .timeout(Duration.ofSeconds(TIME_OUT))
                 .header(ACCEPT, ACCEPT_JSON)
@@ -82,7 +81,6 @@ final public class HttpCaller implements HttpClientProvider {
     @Override
     public String post(String host, String path, String[] headers, byte[] payload) throws Exception{
         HttpRequest request = HttpRequest.newBuilder()
-                //.version(HttpClient.Version.HTTP_1_1)
                 .uri(URI.create(host+"/"+path))
                 .timeout(Duration.ofSeconds(TIME_OUT))
                 .header(ACCEPT, ACCEPT_JSON)

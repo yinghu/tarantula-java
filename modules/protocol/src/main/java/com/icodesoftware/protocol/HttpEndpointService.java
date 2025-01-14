@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.service.EndPoint;
 import com.icodesoftware.service.MetricsListener;
+import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.Serviceable;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
@@ -37,6 +38,7 @@ public class HttpEndpointService implements EndPoint {
 
     protected Resource resource;
 
+    protected ServiceContext serviceContext;
 
     protected MetricsListener metricsListener;
 
@@ -71,6 +73,10 @@ public class HttpEndpointService implements EndPoint {
         return EndPoint.HTTP_ENDPOINT;
     }
 
+
+    public void setup(ServiceContext serviceContext){
+        this.serviceContext = serviceContext;
+    }
     @Override
     public void start() throws Exception {
         if(onResource()) return;
@@ -125,7 +131,8 @@ public class HttpEndpointService implements EndPoint {
                 JsonObject endpoint = e.getAsJsonObject();
                 String path = endpoint.get("path").getAsString();
                 try{
-                    HttpHandler httpHandler = (HttpHandler) Class.forName(endpoint.get("handler").getAsString()).getConstructor().newInstance();
+                    AbstractHttpHandler httpHandler = (AbstractHttpHandler) Class.forName(endpoint.get("handler").getAsString()).getConstructor().newInstance();
+                    httpHandler.setup(serviceContext);
                     server.createContext(path,httpHandler);
                 }catch (Exception ex){
                     throw new RuntimeException(ex);
