@@ -28,6 +28,7 @@ public class Announcement extends RecoverableObject {
         jsonObject.addProperty("Subject",subject);
         jsonObject.addProperty("Body",body);
         jsonObject.addProperty("StartTime",startTime.format(DateTimeFormatter.ISO_DATE_TIME));
+        jsonObject.addProperty("DistributionId", distributionId);
         return jsonObject;
     }
 }

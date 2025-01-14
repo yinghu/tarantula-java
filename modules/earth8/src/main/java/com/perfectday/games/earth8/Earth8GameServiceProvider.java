@@ -10,7 +10,12 @@ import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.SnowflakeKey;
 import com.perfectday.games.earth8.analytics.*;
+
+import com.perfectday.games.earth8.data.GamePlayCount;
+import com.perfectday.games.earth8.data.GamePlayEventRunner;
+
 import com.perfectday.games.earth8.inbox.ItemGrantEventQuery;
+
 import com.perfectday.games.earth8.inbox.PlayerAction;
 import com.perfectday.games.earth8.inbox.PlayerActionQuery;
 import com.perfectday.games.earth8.inbox.PlayerEventInbox;
@@ -30,22 +35,35 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
     private ConcurrentHashMap<Long,Tournament> tournamentIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Long,Boolean> tournamentBannedPlayersList = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, GamePlayCount> gamePlayCounts = new ConcurrentHashMap<>();
 
     private ConcurrentHashMap<String,ApplicationResource> resourceIndex = new ConcurrentHashMap<>();
+
     ConcurrentHashMap<Long, ScoreRunner> scoreRunners = new ConcurrentHashMap<>();
+
+    private CheatDetectionRule cheatDetectionRule = new CheatDetectionRule(this);
 
     public void setup(GameContext gameContext){
         this.gameContext = gameContext;
         this.gameContext.registerTournamentListener(this);
         this.gameContext.recoverableRegistry(new Earth8PortableRegistry<>());
         ANALYTICS_QUERY = this.gameContext.applicationSchema().typeId()+ANALYTICS_QUERY_HEADER;
+        Statistics metrics = gameContext.metrics().statistics();
+        GamePlayCount currentPlayers = new GamePlayCount(gameContext,GamePlayCount.CONCURRENT_PLAYERS,metrics.entry(GamePlayCount.ON_JOINED).total(),null);
+        gamePlayCounts.put(GamePlayCount.CONCURRENT_PLAYERS,currentPlayers);
+        gamePlayCounts.put(GamePlayCount.ON_JOINED,new GamePlayCount(gameContext,GamePlayCount.ON_JOINED,metrics.entry(GamePlayCount.ON_JOINED).total(),currentPlayers));
+        gamePlayCounts.put(GamePlayCount.ON_LEFT,new GamePlayCount(gameContext,GamePlayCount.ON_LEFT,metrics.entry(GamePlayCount.ON_LEFT).total(),currentPlayers));
+        gamePlayCounts.put(GamePlayCount.ON_START_GAME,new GamePlayCount(gameContext,GamePlayCount.ON_START_GAME,metrics.entry(GamePlayCount.ON_START_GAME).total(),currentPlayers));
+        gamePlayCounts.put(GamePlayCount.ON_UPDATE_GAME,new GamePlayCount(gameContext,GamePlayCount.ON_UPDATE_GAME,metrics.entry(GamePlayCount.ON_UPDATE_GAME).total(),currentPlayers));
+        gamePlayCounts.put(GamePlayCount.ON_END_GAME,new GamePlayCount(gameContext,GamePlayCount.ON_END_GAME,metrics.entry(GamePlayCount.ON_END_GAME).total(),currentPlayers));
+        gamePlayCounts.put(GamePlayCount.ON_GAME_CLUSTER_EVENT,new GamePlayCount(gameContext,GamePlayCount.ON_GAME_CLUSTER_EVENT,metrics.entry(GamePlayCount.ON_GAME_CLUSTER_EVENT).total(),null));
+        this.gameContext.schedule(new GamePlayEventRunner(gameContext,gamePlayCounts,ANALYTICS_QUERY));
         this.gameContext.log("Start earth 8 game service provider with typeId : "+this.gameContext.applicationSchema().typeId(), OnLog.WARN);
     }
 
     //callbacks from HTTP
     @Override
     public void onJoined(Session session,Room room) {
-
         TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
         PlayerDataTrack analyticsSession = PlayerDataTrack.lookup(gameContext,session.distributionId(), PlayerDataTrack.Type.Analytics);
         analyticsSession.trackId = gameContext.applicationSchema().applicationPreSetup().distributionId();
@@ -54,11 +72,12 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
                 webhook.upload(ANALYTICS_QUERY,serverConnectTransaction.toString().getBytes()))
         );
+        this.gamePlayCounts.get(GamePlayCount.ON_JOINED).success(session.distributionId());
     }
 
     @Override
     public void onLeft(Session session) {
-
+        this.gamePlayCounts.get(GamePlayCount.ON_LEFT).success(session.distributionId());
     }
 
     public void startGame(Session session, byte[] payload) throws Exception{
@@ -66,6 +85,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         BattleTransaction battleTransaction = BattleTransaction.fromJson(payload);
         if(!battleTransaction.validate()){
             session.write(JsonUtil.toSimpleResponse(false,"invalid battle settings").getBytes());
+            this.gamePlayCounts.get(GamePlayCount.ON_START_GAME).failure(session.distributionId());
             return;
         }
         //single read to validate party items
@@ -91,11 +111,18 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                 transactions.forEach(analytics -> webhook.upload(ANALYTICS_QUERY, analytics.toString().getBytes()));
             }
         }));
-        gameContext.onMetrics("totalBattle",1);
+        if(created) {
+            this.gamePlayCounts.get(GamePlayCount.ON_START_GAME).success(session.distributionId());
+        }
+        else{
+            this.gamePlayCounts.get(GamePlayCount.ON_START_GAME).failure(session.distributionId());
+        }
     }
 
     public void updateGame(Session session,byte[] payload) throws Exception{
+        this.gamePlayCounts.get(GamePlayCount.ON_UPDATE_GAME).success(session.distributionId());
         BattleUpdate update = BattleUpdate.fromJson(payload);
+        cheatDetectionRule.detect(update, session);
         PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext, session.distributionId(), PlayerDataTrack.Type.Analytics);
 
         if(!tournamentBannedPlayersList.containsKey(session.distributionId())) {
@@ -103,7 +130,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                 scoreRunner(session).add(new PendingScore(session, serverSession, update));
             }
         }
-
+        
         if(update.updateId == BattleUpdate.UpdateId.ItemGrantEventCompleted){
             gameContext.applicationSchema().transaction().execute(ctx->{
                 DataStore itemGrantEventDataStore = ctx.onDataStore("player_item_grant_events");
@@ -133,6 +160,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         BattleTransaction battleTransaction = BattleTransaction.fromJson(payload);
         if(battleTransaction.distributionId()<=0){
             session.write(JsonUtil.toSimpleResponse(false,"invalid battleId").getBytes());
+            this.gamePlayCounts.get(GamePlayCount.ON_END_GAME).failure(session.distributionId());
             return;
         }
         boolean win = battleTransaction.win;
@@ -164,10 +192,12 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                 transactions.forEach(analytics -> webhook.upload(ANALYTICS_QUERY, analytics.toString().getBytes()));
             }
         }));
+        this.gamePlayCounts.get(GamePlayCount.ON_END_GAME).success(session.distributionId());
     }
 
     //System level game event callbacks
     public <T extends OnAccess> void onGameEvent(T event){
+        this.gamePlayCounts.get(GamePlayCount.ON_GAME_CLUSTER_EVENT).success(0);
         if(event.command().equals("ShippingFormCompleted")){
             if(gameContext.applicationSchema().transaction().execute(ctx->{
                 var tournamentType = JsonUtil.parse((byte[])event.property(OnAccess.PAYLOAD)).get("tournament_type").getAsString();
@@ -200,6 +230,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             else{
                 tournamentBannedPlayersList.remove(systemID);
             }
+        } else if (event.command().equals("CheatDetectionConfigUpdated")) {
+            updateCheatDetectionRule();
         }
     }
 
@@ -388,4 +420,18 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         });
     }
 
+    private void updateCheatDetectionRule(){
+        TokenValidatorProvider.AuthVendor download = gameContext.authorVendor(OnAccess.DOWNLOAD_CENTER);
+        byte[] payload = download.download(gameContext.applicationSchema().typeId()+"#CheatDetection");
+
+        cheatDetectionRule.configure(payload);
+    }
+
+    public void sendCheatDetectedAnalytic(Session session, int maxValueExceeded, AnalyticsBatchUtils.AnalyticsData analyticsData){
+        PlayerDataTrack serverSession = PlayerDataTrack.lookup(gameContext, session.distributionId(), PlayerDataTrack.Type.Analytics);
+        TokenValidatorProvider.AuthVendor webhook = gameContext.authorVendor(OnAccess.WEB_HOOK);
+        gameContext.schedule(new ScheduleRunner(EVENT_DISPATCH_DELAY,()->
+                webhook.upload(ANALYTICS_QUERY, new CheatDetectedTransaction(session, serverSession.trackId, maxValueExceeded, analyticsData).toBytes())
+        ));
+    }
 }

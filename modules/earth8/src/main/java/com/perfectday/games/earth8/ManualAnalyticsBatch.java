@@ -10,7 +10,7 @@ import java.util.List;
 public class ManualAnalyticsBatch extends BattleUpdate {
 
 
-    private final List<AnalyticsBatchUtils.AnalyticsData> analytics = new ArrayList<>();
+    public final List<AnalyticsBatchUtils.AnalyticsData> analytics = new ArrayList<>();
 
     @Override
     public int getClassId() {

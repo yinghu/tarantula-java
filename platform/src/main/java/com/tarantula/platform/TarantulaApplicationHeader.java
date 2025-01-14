@@ -2,6 +2,7 @@ package com.tarantula.platform;
 
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
+import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.util.*;
 
 public class TarantulaApplicationHeader implements TarantulaApplication {
@@ -17,7 +18,8 @@ public class TarantulaApplicationHeader implements TarantulaApplication {
     public void onError(Session session, Exception ex) {
         this.context.log(session.toString(),ex, OnLog.ERROR);
         String msg = ex.getMessage()!=null?ex.getMessage():"Unexpected error";
-        session.write(this.builder.create().toJson(new ResponseHeader("onError",false,400,msg,"error")).getBytes());
+        session.write(JsonUtil.toSimpleResponse(false,msg).getBytes());
+        //session.write(this.builder.create().toJson(new ResponseHeader("onError",false,400,msg,"error")).getBytes());
     }
 
 
