@@ -13,6 +13,8 @@ import com.tarantula.platform.lobby.LobbyItem;
 import com.tarantula.platform.lobby.RoomItem;
 import com.tarantula.platform.lobby.ZoneItem;
 import com.tarantula.platform.presence.dailygiveaway.DailyLoginTrack;
+import com.tarantula.platform.presence.pvp.EquipmentInstance;
+import com.tarantula.platform.presence.pvp.UnitInstance;
 import com.tarantula.platform.presence.saves.*;
 import com.tarantula.platform.resource.GameResource;
 
@@ -72,6 +74,8 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
 
     public static final int BANNED_PLAYER_CID = 28;
 
+    public static final int UNIT_INSTANCE_CID = 29;
+    public static final int EQUIPMENT_INSTANCE_CID = 30;
 
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
@@ -164,6 +168,12 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
                 break;
             case BANNED_PLAYER_CID:
                 pt = new PlatformBannedPlayer();
+                break;
+            case UNIT_INSTANCE_CID:
+                pt = new UnitInstance();
+                break;
+            case EQUIPMENT_INSTANCE_CID:
+                pt = new EquipmentInstance();
                 break;
             default:
         }
