@@ -80,9 +80,9 @@ public class EquipmentInstance extends RecoverableObject {
     @Override
     public JsonObject toJson() {
         JsonObject resp = new JsonObject();
-        resp.add("levelAndRank",OffenseTeam.levelAndRank(level,rank,currentLevelExperience,currentRankExperience));
+        resp.add("levelAndRank", DefenseTeam.levelAndRank(level,rank,currentLevelExperience,currentRankExperience));
         resp.add("primaryStat",primaryStat.toJson());
-        resp.add("subStats",OffenseTeam.subStats(subStats));
+        resp.add("subStats", DefenseTeam.subStats(subStats));
         resp.addProperty("configID",configID);
         resp.addProperty("setConfigID",setConfigID);
         resp.addProperty("rewardConfigID",rewardConfigID);

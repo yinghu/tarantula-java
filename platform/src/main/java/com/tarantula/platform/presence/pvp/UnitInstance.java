@@ -76,10 +76,10 @@ public class UnitInstance extends RecoverableObject {
     @Override
     public JsonObject toJson() {
         JsonObject resp = new JsonObject();
-        resp.add("levelAndRank",OffenseTeam.levelAndRank(level,rank,currentLevelExperience,currentRankExperience));
+        resp.add("levelAndRank", DefenseTeam.levelAndRank(level,rank,currentLevelExperience,currentRankExperience));
         resp.addProperty("configID",configID);
-        resp.add("equipment",OffenseTeam.equipment(weaponIDValue,helmetIDValue,chestPieceIDValue,glovesIDValue,forceFieldIDValue,bootsIDValue));
-        resp.add("abilityRanks",OffenseTeam.abilityRanks(abilityRanks,passiveRank));
+        resp.add("equipment", DefenseTeam.equipment(weaponIDValue,helmetIDValue,chestPieceIDValue,glovesIDValue,forceFieldIDValue,bootsIDValue));
+        resp.add("abilityRanks", DefenseTeam.abilityRanks(abilityRanks,passiveRank));
         return resp;
     }
 }
