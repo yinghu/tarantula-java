@@ -16,6 +16,8 @@ public class BattleTransaction extends RecoverableObject {
 
     public String TEMP_BattleStage;
 
+    public boolean pvp;
+
     //Data store write contract
     @Override
     public boolean write(DataBuffer buffer) {
@@ -73,7 +75,7 @@ public class BattleTransaction extends RecoverableObject {
         self.win = JsonUtil.getJsonBool(json,"Win",false);
         self.chapterId = JsonUtil.getJsonLong(json,"ChapterId",0);
         self.stageId = JsonUtil.getJsonLong(json,"StageId",0);
-
+        self.pvp = JsonUtil.getJsonBool(json,"pvp",false);
         JsonArray party = JsonUtil.getJsonArray(json, "Party");
         self.party = new long[party.size()];
         for(int i=0;i<self.party.length;i++){

@@ -21,6 +21,9 @@
   "inbox": {
       "pendingReward": true
   },
+  "pvp": {
+     "waitingMinutesPerTeamFormation": 5
+  },
 
   "playList":{
     "recentlyListSize" :10,

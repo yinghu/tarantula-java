@@ -15,6 +15,7 @@ import com.tarantula.platform.lobby.ZoneItem;
 import com.tarantula.platform.presence.dailygiveaway.DailyLoginTrack;
 import com.tarantula.platform.presence.pvp.DefenseTeam;
 import com.tarantula.platform.presence.pvp.EquipmentInstance;
+import com.tarantula.platform.presence.pvp.TeamFormationIndex;
 import com.tarantula.platform.presence.pvp.UnitInstance;
 import com.tarantula.platform.presence.saves.*;
 import com.tarantula.platform.resource.GameResource;
@@ -78,6 +79,7 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
     public static final int UNIT_INSTANCE_CID = 29;
     public static final int EQUIPMENT_INSTANCE_CID = 30;
     public static final int DEFENSE_TEAM_CID = 31;
+    public static final int TEAM_FORMATION_INDEX_CID = 32;
 
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
@@ -179,6 +181,9 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
                 break;
             case DEFENSE_TEAM_CID:
                 pt = new DefenseTeam();
+                break;
+            case TEAM_FORMATION_INDEX_CID:
+                pt = new TeamFormationIndex();
                 break;
             default:
         }

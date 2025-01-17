@@ -5,6 +5,7 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Rating;
 import com.tarantula.platform.event.PortableEventRegistry;
+import com.tarantula.platform.presence.pvp.PVPPointGenerator;
 
 import java.io.IOException;
 
@@ -22,6 +23,12 @@ public class GameRating extends PlayerGameObject implements Rating {
     public GameRating(){
         this.onEdge = true;
         this.label = "rating";
+    }
+
+    public Rating elo(boolean win){
+        //TO NEW ELO POINT ON WIN OR LOST
+        level = PVPPointGenerator.update(this,win);
+        return this;
     }
 
     public Rating update(double xpDelta, double levelUpLimit){

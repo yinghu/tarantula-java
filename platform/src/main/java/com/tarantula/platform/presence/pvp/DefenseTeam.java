@@ -2,17 +2,25 @@ package com.tarantula.platform.presence.pvp;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.icodesoftware.DataStore;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DefenseTeam extends RecoverableObject {
 
+    public static int MAX_UNITS = 5;
+    public static int MAX_EQUIPMENTS = 30;
+
     public int teamPower;
-    public int icon;
+    public final long[] unitInstanceIndex = new long[MAX_UNITS]; ;
+    public final long[] equipmentInstanceIndex = new long[MAX_EQUIPMENTS] ;
+
     public final List<UnitInstance> unitInstances = new ArrayList<>();
     public final List<EquipmentInstance> equipmentInstances = new ArrayList<>();
 
@@ -28,14 +36,24 @@ public class DefenseTeam extends RecoverableObject {
     @Override
     public boolean read(DataBuffer buffer) {
         teamPower = buffer.readInt();
-        icon = buffer.readInt();
+        for(int i=0;i<MAX_UNITS;i++){
+            unitInstanceIndex[i]=buffer.readLong();
+        }
+        for(int i=0;i<MAX_EQUIPMENTS;i++){
+            equipmentInstanceIndex[i]=buffer.readLong();
+        }
         return true;
     }
 
     @Override
     public boolean write(DataBuffer buffer) {
         buffer.writeInt(teamPower);
-        buffer.writeInt(icon);
+        for(int i=0;i<MAX_UNITS;i++){
+            buffer.writeLong(unitInstanceIndex[i]);
+        }
+        for(int i=0;i<MAX_EQUIPMENTS;i++){
+            buffer.writeLong(equipmentInstanceIndex[i]);
+        }
         return true;
     }
 
@@ -50,6 +68,44 @@ public class DefenseTeam extends RecoverableObject {
         resp.add("equipmentData",equips);
         return resp;
     }
+
+    public void load(DataStore dataStore,TeamFormationIndex teamFormationIndex){
+        this.distributionId = teamFormationIndex.teamId;
+        dataStore.load(this);
+        for(long id : unitInstanceIndex){
+            if(id==0) continue;
+            UnitInstance unitInstance = new UnitInstance();
+            unitInstance.distributionId(id);
+            if(!dataStore.load(unitInstance)) continue;
+            unitInstances.add(unitInstance);
+        }
+        for(long id : equipmentInstanceIndex){
+            if(id==0) continue;
+            EquipmentInstance equipmentInstance = new EquipmentInstance();
+            equipmentInstance.distributionId(id);
+            if(!dataStore.load(equipmentInstance)) continue;
+            equipmentInstances.add(equipmentInstance);
+        }
+    }
+
+    public void save(DataStore dataStore,TeamFormationIndex teamFormationIndex,int teamCreationWaitingTime){
+        int[] ix = {0};
+        unitInstances.forEach(unitInstance -> {
+            dataStore.create(unitInstance);
+            unitInstanceIndex[ix[0]++]=unitInstance.distributionId();
+        });
+        ix[0]=0;
+        equipmentInstances.forEach(equipmentInstance -> {
+            dataStore.create(equipmentInstance);
+            equipmentInstanceIndex[ix[0]++]=equipmentInstance.distributionId();
+        });
+        dataStore.create(this);
+        teamFormationIndex.teamId = this.distributionId;
+        teamFormationIndex.totalTeams++;
+        teamFormationIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusMinutes(teamCreationWaitingTime)));
+        dataStore.update(teamFormationIndex);
+    }
+
 
     public static JsonObject levelAndRank(int level,int rank,int levelExp,int rankExp){
         JsonObject levelAndRank = new JsonObject();
@@ -89,7 +145,6 @@ public class DefenseTeam extends RecoverableObject {
         DefenseTeam defenseTeam = new DefenseTeam();
         JsonObject teamJson = JsonUtil.parse(payload);
         defenseTeam.teamPower = teamJson.get("teamPower").getAsInt();
-        defenseTeam.icon = teamJson.get("icon").getAsInt();
         JsonArray unitInstancesJson = teamJson.get("unitInstances").getAsJsonArray();
         parseUnitInstance(unitInstancesJson,defenseTeam);
         JsonArray equipmentDataJson = arrayIfExists(teamJson,"equipmentData");

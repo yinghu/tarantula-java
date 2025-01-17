@@ -1,7 +1,11 @@
 package com.tarantula.test;
 
 
+import com.icodesoftware.DataStore;
 import com.tarantula.platform.presence.pvp.DefenseTeam;
+import com.tarantula.platform.presence.pvp.EquipmentInstance;
+import com.tarantula.platform.presence.pvp.TeamFormationIndex;
+import com.tarantula.platform.presence.pvp.UnitInstance;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -57,7 +61,6 @@ public class DefenseTeamTest extends DataStoreHook{
                 }
             });
             Assert.assertTrue(defenseTeam.teamPower>0);
-            Assert.assertTrue(defenseTeam.icon>0);
         }catch (Exception ex){
             exception = ex;
         }
@@ -74,7 +77,52 @@ public class DefenseTeamTest extends DataStoreHook{
             Assert.assertEquals(defenseTeam.unitInstances.size(),5);
             Assert.assertEquals(defenseTeam.equipmentInstances.size(),0);
             Assert.assertTrue(defenseTeam.teamPower>0);
-            Assert.assertTrue(defenseTeam.icon>0);
+        }catch (Exception ex){
+            exception = ex;
+        }
+        Assert.assertNull(exception);
+    }
+
+    @Test(groups = { "DefenseTeam" })
+    public void teamFormationIndexTest(){
+        Exception exception = null;
+        try(InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("SampleDefenseFormation-no-equipments.json")){
+            DataStore dataStore = dataStoreProvider.createDataStore("test_pvp_teams");
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            inputStream.transferTo(outputStream);
+            DefenseTeam defenseTeam = DefenseTeam.parse(outputStream.toByteArray());
+            TeamFormationIndex teamFormationIndex = new TeamFormationIndex();
+            teamFormationIndex.distributionId(100);
+            dataStore.createIfAbsent(teamFormationIndex,true);
+            Assert.assertTrue(teamFormationIndex.expired());
+            defenseTeam.save(dataStore,teamFormationIndex,5);
+            Assert.assertTrue(teamFormationIndex.teamId>0);
+            DefenseTeam load = new DefenseTeam();
+            load.load(dataStore,teamFormationIndex);
+            load.toJson();
+        }catch (Exception ex){
+            exception = ex;
+        }
+        Assert.assertNull(exception);
+    }
+
+    @Test(groups = { "DefenseTeam" })
+    public void fullTeamFormationIndexTest(){
+        Exception exception = null;
+        try(InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("SampleDefenseFormation-full.json")){
+            DataStore dataStore = dataStoreProvider.createDataStore("test_pvp_teams");
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            inputStream.transferTo(outputStream);
+            DefenseTeam defenseTeam = DefenseTeam.parse(outputStream.toByteArray());
+            TeamFormationIndex teamFormationIndex = new TeamFormationIndex();
+            teamFormationIndex.distributionId(200);
+            dataStore.createIfAbsent(teamFormationIndex,true);
+            Assert.assertTrue(teamFormationIndex.expired());
+            defenseTeam.save(dataStore,teamFormationIndex,5);
+            Assert.assertTrue(teamFormationIndex.teamId>0);
+            DefenseTeam load = new DefenseTeam();
+            load.load(dataStore,teamFormationIndex);
+            load.toJson();
         }catch (Exception ex){
             exception = ex;
         }
