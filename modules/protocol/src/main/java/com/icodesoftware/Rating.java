@@ -7,4 +7,6 @@ public interface Rating extends Recoverable, DataStore.Updatable {
     double xp();
 
     Rating update(double delta,double levelUpLimit);
+
+    default Rating elo(boolean win){ return null;}
 }

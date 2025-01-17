@@ -9,6 +9,7 @@ import com.tarantula.platform.presence.*;
 
 import com.tarantula.game.PlayerSavedGames;
 import com.tarantula.game.util.SavedGameDeserializer;
+import com.tarantula.platform.presence.pvp.TeamFormationResponse;
 import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 import com.tarantula.platform.presence.saves.PlatformSavedGameServiceProvider;
 import com.tarantula.platform.presence.saves.SaveRevisionInfo;
@@ -75,6 +76,14 @@ public class SavedGameModule extends ModuleHeader {
 
             session.write(JsonUtil.toSimpleResponse(successful,"create player profile").getBytes());
         }
+
+        //pvp saves start
+        else if(session.action().equals("onSaveDefenseTeam")){
+            TeamFormationResponse response  = gameServiceProvider.pvpBattleServiceProvider().saveDefenseTeam(session,bytes);
+            session.write(response.toJson().toString().getBytes());
+        }
+        //pvp saves end
+
         else{
             throw new UnsupportedOperationException(session.action());
         }
