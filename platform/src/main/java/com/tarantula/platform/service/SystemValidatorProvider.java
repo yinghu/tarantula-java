@@ -638,12 +638,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
                 long expiry = p.get("exp").getAsLong();
                 if (TimeUtil.expired(TimeUtil.fromUTCMilliseconds(expiry))) {
                     //log.warn("Token expired  : "+expiry);
-                    return true;
+                    return false;
                 }
                 Access.Role r = rMap.get(p.get("aud").getAsString());
                 if (r == null) {
                     //log.warn("Role cannot be null");
-                    return true;
+                    return false;
                 }
                 byte[] data = decrypt(CipherUtil.fromBase64Key(h.get("kid").getAsString()));
                 Recoverable.DataBuffer dataBuffer = BufferProxy.wrap(data);
