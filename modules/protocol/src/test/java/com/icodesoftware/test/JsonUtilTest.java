@@ -153,4 +153,23 @@ public class JsonUtilTest {
         }
     }
 
+    @Test(groups = { "json util" })
+    public void bufferWriterTest() {
+        DataBufferWriter dataBufferWriter = new DataBufferWriter(BufferProxy.buffer(100,true));
+        JsonWriter writer = new JsonWriter(dataBufferWriter);
+        try {
+            writer.beginObject().name("name").value("aname").name("age").value(1).name("valid").value(true).endObject();
+            writer.flush();
+        }catch (Exception ex){}
+        JsonObject src = JsonUtil.parse(dataBufferWriter.src().array());
+        Map<String,Object> props = new HashMap<>();
+        props.put("name","aname");
+        props.put("age",1);
+        props.put("valid",true);
+        JsonObject json = JsonUtil.toJsonObject(props);
+        Assert.assertEquals(json.get("name").getAsString(),src.get("name").getAsString());
+        Assert.assertEquals(json.get("age").getAsInt(),src.get("age").getAsInt());
+        Assert.assertEquals(json.get("valid").getAsBoolean(),src.get("valid").getAsBoolean());
+    }
+
 }
