@@ -154,22 +154,44 @@ public class JsonUtilTest {
     }
 
     @Test(groups = { "json util" })
-    public void bufferWriterTest() {
-        DataBufferWriter dataBufferWriter = new DataBufferWriter(BufferProxy.buffer(100,true));
-        JsonWriter writer = new JsonWriter(dataBufferWriter);
-        try {
-            writer.beginObject().name("name").value("aname").name("age").value(1).name("valid").value(true).endObject();
-            writer.flush();
-        }catch (Exception ex){}
+    public void bufferWriterTest(){
+        DataBufferJsonWriter dataBufferWriter = new DataBufferJsonWriter(BufferProxy.buffer(100,true));
+        dataBufferWriter.start();
+        dataBufferWriter.beginObject();
+        dataBufferWriter.namedString("name","aname");
+        dataBufferWriter.namedNumber("age",1);
+        dataBufferWriter.endObject();
+        dataBufferWriter.end();
         JsonObject src = JsonUtil.parse(dataBufferWriter.src().array());
-        Map<String,Object> props = new HashMap<>();
-        props.put("name","aname");
-        props.put("age",1);
-        props.put("valid",true);
-        JsonObject json = JsonUtil.toJsonObject(props);
-        Assert.assertEquals(json.get("name").getAsString(),src.get("name").getAsString());
-        Assert.assertEquals(json.get("age").getAsInt(),src.get("age").getAsInt());
-        Assert.assertEquals(json.get("valid").getAsBoolean(),src.get("valid").getAsBoolean());
+        Assert.assertEquals(src.get("name").getAsString(),"aname");
+        Assert.assertEquals(src.get("age").getAsInt(),1);
+
+        dataBufferWriter.start();
+        dataBufferWriter.beginObject();
+        dataBufferWriter.namedString("name","bname");
+        dataBufferWriter.endObject();
+        dataBufferWriter.end();
+        JsonObject src1 = JsonUtil.parse(dataBufferWriter.src().array());
+        Assert.assertEquals(src1.get("name").getAsString(),"bname");
+
+        dataBufferWriter.start().beginObject();
+        dataBufferWriter.namedString("name","bname");
+        dataBufferWriter.namedArray("classes").stringOfArray("a").stringOfArray("b").endArray();
+        dataBufferWriter.endObject().end();
+        JsonObject src3 = JsonUtil.parse(dataBufferWriter.src().array());
+        Assert.assertEquals(src3.get("name").getAsString(),"bname");
+        Assert.assertEquals(src3.get("classes").getAsJsonArray().size(),2);
+
+        dataBufferWriter.start().beginObject().namedArray("list");
+        for(int i=0;i<2;i++){
+            dataBufferWriter.beginObject();
+            dataBufferWriter.namedString("a","a").namedBoolean("b",true);
+            dataBufferWriter.endObject();
+        }
+        dataBufferWriter.endArray().endObject().end();
+        JsonObject src4 = (JsonUtil.parse(dataBufferWriter.src().array()));
+        Assert.assertEquals(src4.get("list").getAsJsonArray().size(),2);
+
     }
 
 }
