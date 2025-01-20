@@ -6,8 +6,9 @@ public interface TarantulaApplication extends Initializer, EventListener, Bucket
 
 
     default void initialize(Session session) throws Exception{}
-	
-	void callback(Session session,byte[] payload) throws Exception;
+
+    default void callback(Session session) throws Exception{}
+	default void callback(Session session,byte[] payload) throws Exception{}
 
     void onError(Session session, Exception ex);
 
