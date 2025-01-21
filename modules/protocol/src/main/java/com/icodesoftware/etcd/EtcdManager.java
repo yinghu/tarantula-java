@@ -251,6 +251,10 @@ public class EtcdManager {
         return view;
     }
 
+    public static EtcdTopic topic(String topic){
+        return topicIndex.get(topic);
+    }
+
     public static List<Integer> partition(String nodeName){
         List<Integer> view = new ArrayList<>();
         nodeIndexByPartition.forEach((k,v)->{
