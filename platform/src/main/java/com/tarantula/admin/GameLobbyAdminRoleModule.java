@@ -88,7 +88,7 @@ public class GameLobbyAdminRoleModule implements Module {
     public void setup(ApplicationContext applicationContext) throws Exception {
         this.context = applicationContext;
         this.deploymentServiceProvider = context.serviceProvider(DeploymentServiceProvider.NAME);
-        this.context.log("Game lobby admin module started", OnLog.WARN);
+        this.context.log("Game lobby admin module started", OnLog.INFO);
     }
 
     private JsonObject toJson(Lobby lobby){

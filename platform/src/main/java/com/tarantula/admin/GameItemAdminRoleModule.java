@@ -246,7 +246,7 @@ public class GameItemAdminRoleModule implements Module,Configurable.Listener<Gam
         this.context = applicationContext;
         this.deploymentServiceProvider = context.serviceProvider(DeploymentServiceProvider.NAME);
         this.deploymentServiceProvider.registerConfigurableListener(GameCluster.GAME_CLUSTER_CONFIGURATION_TYPE,this);
-        this.context.log("Game item admin module started", OnLog.WARN);
+        this.context.log("Game item admin module started", OnLog.INFO);
     }
 
     private ConfigurableCategories configurableCategories(String type,GameCluster gameCluster,ApplicationPreSetup applicationPreSetup){

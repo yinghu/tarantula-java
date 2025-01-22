@@ -241,7 +241,7 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
 
     @Override
     public void onStart() {
-        log.warn("access index started");
+        log.info("access index started");
         onIndex.set(true);
     }
 

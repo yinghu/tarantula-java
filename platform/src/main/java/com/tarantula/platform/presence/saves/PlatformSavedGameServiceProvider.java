@@ -54,7 +54,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         saveTimeout = saveGame.get("saveTimeout").getAsInt()*saveTimeout;
         dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
         this.logger = JDKLogger.getLogger(PlatformSavedGameServiceProvider.class);
-        this.logger.warn("Saved game service provider started on ->"+gameServiceName+" : "+mappingObjectMaxSize);
+        this.logger.info("Saved game service provider started on ->"+gameServiceName+" : "+mappingObjectMaxSize);
     }
 
 
@@ -176,7 +176,7 @@ public class PlatformSavedGameServiceProvider extends PlatformItemServiceProvide
         int chunkSize = chunks.size();
         if(chunkSize > maxOverSizeBatch){
             //throw new RuntimeException("oversize payload reached max chunk size ["+chunks.size()+"]");
-            logger.warn("Chunk size : "+chunkSize +" is over max batch size : "+maxOverSizeBatch);
+            logger.info("Chunk size : "+chunkSize +" is over max batch size : "+maxOverSizeBatch);
         }
         Transaction transaction = gameCluster.transaction();
         try{

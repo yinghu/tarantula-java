@@ -29,7 +29,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 		long bucketId = this.context.node().bucketId();
 
 		List<LobbyDescriptor> bList = datastore.list(new LobbyQuery(bucketId));
-		logger.warn("Lobbies load : "+bList.size()+" : "+bucketId);
+		logger.info("Lobbies load : "+bList.size()+" : "+bucketId);
 		if(bList.isEmpty()){
 			bList = deployFromLocal(bucketId);
 		}
@@ -70,7 +70,7 @@ public class TarantulaApplicationDeployer implements Serviceable, Configurable.L
 			}
 			this.context.setGameServiceProvider(gameCluster);
 			this.context.setGameClusterOnLobby(gameCluster,this);
-			logger.warn("Game cluster is ready ...");
+			logger.info("Game cluster is ready ...");
 			gameCluster.ready.countDown();
 		}catch (Exception ex){
 			throw new RuntimeException(ex);

@@ -35,7 +35,7 @@ public class ClusterRecoverService implements ManagedService, RemoteService {
         this.scope = Integer.parseInt(properties.getProperty("tarantula-scope"));
         tarantulaContext = TarantulaContext.getInstance();
         new ServiceBootstrap(TarantulaContext._integrationClusterStarted,TarantulaContext._recoverServiceStarted,new RecoverServiceBootstrap(this),"recover-service",true).start();
-        log.warn("Cluster Recover Service Started on scope ["+scope+"]");
+        log.info("Cluster Recover Service Started on scope ["+scope+"]");
     }
 
     public void setup() throws Exception{

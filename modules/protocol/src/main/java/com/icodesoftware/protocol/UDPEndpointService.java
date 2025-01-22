@@ -111,14 +111,14 @@ final public class UDPEndpointService implements UDPEndpointServiceProvider, UDP
         InetSocketAddress addr = host!=null?new InetSocketAddress(host,port):new InetSocketAddress(port);
         if(host==null) host = addr.getHostName();
         this.datagramChannel.bind(addr);
-        log.warn("Inbound message handler number ["+messageHandlerSize+"]");
-        log.warn("Client Ping Interval ["+clientPingInterval+"]");
-        log.warn("Game Cluster Ping Interval ["+pingListenerInterval+"]");
-        log.warn("Retry Interval ["+retryInterval+"]");
-        log.warn("User Session Timeout ["+sessionTimeout+"]");
-        log.warn("UDP Receive Timeout ["+receiverTimeout+"]");
-        log.warn("UDP Receive Buffer Size ["+this.datagramChannel.getReceiveBufferSize()+"]");
-        log.warn("UDP Send Buffer Size ["+this.datagramChannel.getSendBufferSize()+"]");
+        log.info("Inbound message handler number ["+messageHandlerSize+"]");
+        log.info("Client Ping Interval ["+clientPingInterval+"]");
+        log.info("Game Cluster Ping Interval ["+pingListenerInterval+"]");
+        log.info("Retry Interval ["+retryInterval+"]");
+        log.info("User Session Timeout ["+sessionTimeout+"]");
+        log.info("UDP Receive Timeout ["+receiverTimeout+"]");
+        log.info("UDP Receive Buffer Size ["+this.datagramChannel.getReceiveBufferSize()+"]");
+        log.info("UDP Send Buffer Size ["+this.datagramChannel.getSendBufferSize()+"]");
     }
     public void shutdown() throws Exception{
         log.warn("UDP endpoint service is going down");

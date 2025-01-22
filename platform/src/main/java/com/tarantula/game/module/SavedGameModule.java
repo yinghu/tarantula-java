@@ -88,7 +88,7 @@ public class SavedGameModule extends ModuleHeader {
         this.builder.registerTypeAdapter(SavedGame.class,new SavedGameDeserializer());
         this.savedGameServiceProvider = gameServiceProvider.savedGameServiceProvider();
         this.presenceServiceProvider = gameServiceProvider.presenceServiceProvider();
-        this.context.log("Saved game module started on tag->"+this.context.descriptor().tag(), OnLog.WARN);
+        this.context.log("Saved game module started on tag->"+this.context.descriptor().tag(), OnLog.INFO);
     }
 
 }

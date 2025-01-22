@@ -58,7 +58,7 @@ public class TournamentModule extends ModuleHeader implements Configurable.Liste
         tokenValidatorProvider = applicationContext.serviceProvider(TokenValidatorProvider.NAME);
         this.tournamentServiceProvider = gameServiceProvider.tournamentServiceProvider();
         this.tournamentServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
-        this.context.log("Tournament module started", OnLog.WARN);
+        this.context.log("Tournament module started", OnLog.INFO);
     }
 
 }
