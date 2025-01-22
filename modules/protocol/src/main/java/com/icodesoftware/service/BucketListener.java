@@ -6,5 +6,5 @@ public interface BucketListener {
     int OPEN = 0;
     int CLOSE = 1;
     int SHUT_DOWN = 2;
-    void onBucket(int bucket,int state);
+    default void onBucket(int bucket,int state){}
 }
