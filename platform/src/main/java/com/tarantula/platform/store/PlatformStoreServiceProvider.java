@@ -45,7 +45,7 @@ public class PlatformStoreServiceProvider implements ConfigurationServiceProvide
 
     @Override
     public void start() throws Exception {
-        this.logger.warn("Store service provider started on->"+gameServiceName);
+        this.logger.info("Store service provider started on->"+gameServiceName);
     }
 
     @Override

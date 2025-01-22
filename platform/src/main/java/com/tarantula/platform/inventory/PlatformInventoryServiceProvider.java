@@ -33,7 +33,7 @@ public class PlatformInventoryServiceProvider extends PlatformItemServiceProvide
 
     @Override
     public void start() throws Exception {
-        logger.warn("Inventory service provider started->"+gameServiceName);
+        logger.info("Inventory service provider started->"+gameServiceName);
     }
 
     @Override

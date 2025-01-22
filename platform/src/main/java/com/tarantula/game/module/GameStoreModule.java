@@ -87,7 +87,7 @@ public class GameStoreModule extends ModuleHeader implements Configurable.Listen
         this.storeServiceProvider.registerConfigurableListener(this.context.descriptor(),this);
         this.inventoryServiceProvider = gameServiceProvider.inventoryServiceProvider();
         this.serviceTypeId = this.context.descriptor().typeId().replace("-service","");
-        this.context.log("Game store module started with ["+serviceTypeId+"]", OnLog.WARN);
+        this.context.log("Game store module started with ["+serviceTypeId+"]", OnLog.INFO);
     }
 
 }

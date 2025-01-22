@@ -24,7 +24,7 @@ public class RoomClusterService implements ManagedService, RemoteService {
     public void init(NodeEngine nodeEngine, Properties properties) {
         this.nodeEngine = nodeEngine;
         this.tarantulaContext = TarantulaContext.getInstance();
-        log.warn("Start Room cluster service");
+        log.info("Start Room cluster service");
     }
 
     @Override

@@ -224,7 +224,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
                 throw new RuntimeException("Duplicate portable registry ["+r.registryId()+"]");
             }
             fMap.put(r.registryId(),r);
-            log.warn("Portable registry ["+r.registryId()+"] added");
+            log.info("Portable registry ["+r.registryId()+"] added");
         });
         this.dataScopeReplicationProxy = new DataScopeReplicationProxy();
         this.integrationScopeReplicationProxy = new IntegrationScopeReplicationProxy();
@@ -241,7 +241,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
                 this.deploymentDataStoreProvider.start();
                 this.deploymentDataStoreProvider.setup(this);
                 this._initMirrorClusterBackup();
-                log.warn("Tarantula data store provider started");
+                log.info("Tarantula data store provider started");
             }catch (Exception ex){
                 throw new RuntimeException(ex);
             }
@@ -640,7 +640,7 @@ public class TarantulaContext implements Serviceable, ServiceContext {
     public void _syncNodeData() throws Exception{
  	    this.accessIndexService().onDisable();
         for(String s : this.integrationCluster.recoverService().onListModules()){
-            log.warn("Loading module files from master node ["+s+"]");
+            log.info("Loading module files from master node ["+s+"]");
             byte[] ret = this.integrationCluster.recoverService().onLoadModuleJarFile(s);
             if(ret.length>0){
                 _writeContent(s,ret);
@@ -974,14 +974,14 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         TokenValidatorProvider tokenValidatorProvider = (TokenValidatorProvider)this.serviceProvider(TokenValidatorProvider.NAME);
  	    ThirdPartyServiceProvider thirdPartyServiceProvider = (ThirdPartyServiceProvider)tokenValidatorProvider.authVendor(authVendor.name());
         if(thirdPartyServiceProvider == null) throw new RuntimeException("third party provider not existed ["+authVendor.name()+"]");
-        log.warn("Third party provider ["+authVendor.name()+"] registered with type id ["+authVendor.typeId()+"]");
+        log.info("Third party provider ["+authVendor.name()+"] registered with type id ["+authVendor.typeId()+"]");
         thirdPartyServiceProvider.registerAuthVendor(authVendor);
  	}
     public void unregisterAuthVendor(TokenValidatorProvider.AuthVendor authVendor){
         TokenValidatorProvider tokenValidatorProvider = (TokenValidatorProvider)this.serviceProvider(TokenValidatorProvider.NAME);
         ThirdPartyServiceProvider thirdPartyServiceProvider = (ThirdPartyServiceProvider)tokenValidatorProvider.authVendor(authVendor.name());
         if(thirdPartyServiceProvider == null) throw new RuntimeException("third party provider not existed ["+authVendor.name()+"]");
-        log.warn("Third party provider ["+authVendor.name()+"] unregistered with type id ["+authVendor.typeId()+"]");
+        log.info("Third party provider ["+authVendor.name()+"] unregistered with type id ["+authVendor.typeId()+"]");
         thirdPartyServiceProvider.releaseAuthVendor(authVendor);
     }
 

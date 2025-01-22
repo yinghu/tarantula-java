@@ -191,7 +191,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         if(!onLobby.closed()){
             String[] ps = onLobby.typeId().split("-");
             liveGameContext.addGameIndex(ps[0]);
-            context.log("Lobby ["+onLobby.typeId()+"] is going to be live",OnLog.WARN);
+            context.log("Lobby ["+onLobby.typeId()+"] is going to be live",OnLog.INFO);
         }
         else{
             String[] ps = onLobby.typeId().split("-");
@@ -201,7 +201,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
     }
     @Override
     public boolean onEvent(Event event){
-        this.context.log("remote event",OnLog.WARN);
+        this.context.log("remote event",OnLog.INFO);
         return true;
     }
 }

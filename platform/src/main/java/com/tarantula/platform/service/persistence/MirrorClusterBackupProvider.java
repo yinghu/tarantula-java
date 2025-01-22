@@ -128,7 +128,7 @@ public class MirrorClusterBackupProvider implements BackupProvider{
     public void setup(ServiceContext serviceContext){
         this.serviceContext = serviceContext;
         this.bMap = new ConcurrentHashMap<>();
-        log.warn("Run mirror backup provider ["+runAsMirror+"]");
+        log.info("Run mirror backup provider ["+runAsMirror+"]");
         if(runAsMirror){
             for(int i=0;i<timerCount;i++){
                 this.serviceContext.schedule(new MirrorBackupSynchronizer(this,nextSyncInterval+10));

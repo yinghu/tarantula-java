@@ -85,17 +85,17 @@ public class GameLobbyProxy extends RecoverableObject implements GameLobby,Confi
 
     @Override
     public void onLoaded(LobbyItem lobbyItem){
-        this.context.log("configurable lobby item loaded->"+lobbyItem.configurationName(), OnLog.WARN);
+        this.context.log("configurable lobby item loaded->"+lobbyItem.configurationName(), OnLog.INFO);
         if(configure(lobbyItem)) this.started = true;
     }
     @Override
     public void onUpdated(LobbyItem lobbyItem){
-        this.context.log("configurable lobby item updated->"+lobbyItem.configurationName(),OnLog.WARN);
+        this.context.log("configurable lobby item updated->"+lobbyItem.configurationName(),OnLog.INFO);
         if(configure(lobbyItem)) this.started = true;
     }
     @Override
     public void onRemoved(LobbyItem lobbyItem){
-        this.context.log("configurable lobby item removed->"+lobbyItem.configurationName(),OnLog.WARN);
+        this.context.log("configurable lobby item removed->"+lobbyItem.configurationName(),OnLog.INFO);
         this.started = false;
         zoneIndex.clear();
         lobbyItem.zoneList().forEach(zoneItem -> {

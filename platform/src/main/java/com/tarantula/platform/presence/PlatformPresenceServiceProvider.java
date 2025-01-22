@@ -123,7 +123,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         this.tournamentServiceProvider = platformGameServiceProvider.tournamentServiceProvider();
         this.distributionPresenceService = this.serviceContext.clusterProvider().serviceProvider(DistributionPresenceService.NAME);
         this.logger = JDKLogger.getLogger(PlatformPresenceServiceProvider.class);
-        this.logger.warn("Presence service provider started on ->"+gameServiceName);
+        this.logger.info("Presence service provider started on ->"+gameServiceName);
         topic = platformGameServiceProvider.registerEventListener(NAME,e->{
             if(e instanceof GameClusterSyncEvent){
                 GameClusterSyncEvent gameClusterSyncEvent = (GameClusterSyncEvent)e;

@@ -121,7 +121,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
                     }
                     t.loadPrizes(applicationPreSetup, application);
                 }catch (Exception ex){
-                    logger.warn("Unexpected exception",ex);
+                    logger.error("Unexpected exception",ex);
                 }
             });
             scheduleTournament();
@@ -249,7 +249,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
             //return true;
         //});
         dataStore.list(new TournamentScheduleStatusQuery(this.gameCluster.distributionId())).forEach(status->{
-            logger.warn("Tournament Status : "+status.tournamentId+" : "+status.status);
+            logger.info("Tournament Status : "+status.tournamentId+" : "+status.status);
             byte[] lockKey = status.key().asBinary();
             try{
                 scheduleStore.mapLock(lockKey);
@@ -261,7 +261,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
                         launch(tournament);
                     }
                     else{
-                        logger.warn("Tournament cannot be loaded ["+status.tournamentId+"]");
+                        logger.info("Tournament cannot be loaded ["+status.tournamentId+"]");
                     }
                 }
             }
@@ -269,12 +269,12 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
                 scheduleStore.mapUnlock(lockKey);
             }
         });
-        this.logger.warn("Tournament service provider started on ["+gameServiceName+"]["+gameCluster.name()+"] with local operation enabled ["+localOperationEnabled+"]");
+        this.logger.info("Tournament service provider started on ["+gameServiceName+"]["+gameCluster.name()+"] with local operation enabled ["+localOperationEnabled+"]");
     }
 
     @Override
     public void shutdown() throws Exception {
-        this.logger.warn("distributed tournament shutdown");
+        this.logger.info("distributed tournament shutdown");
         this.serviceContext.clusterProvider().unregisterReloadListener(reloadKey);
     }
 
@@ -324,16 +324,16 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         return snapshotTimerInterval.get()*60*1000+3*60000;//add 3 minute buffer
     }
     void startTournament(TournamentManager tournament){
-        logger.warn("Tournament start : "+tournament.distributionId()+" : "+tournament.global());
+        logger.info("Tournament start : "+tournament.distributionId()+" : "+tournament.global());
         tournament.setup(this);
         if(tournament.toClosingTime()>=sortingTimer()){
             tournament.nextSortingTime = LocalDateTime.now().plusMinutes(snapshotTimerInterval.get());
-            logger.warn("Next sorting time : "+tournament.nextSortingTime);
+            logger.info("Next sorting time : "+tournament.nextSortingTime);
             tournament.pendingSchedule = this.serviceContext.schedule(new TournamentSnapshotMonitor(tournament,this));
         }else{
             tournament.pendingSchedule = this.serviceContext.schedule(new TournamentCloseMonitor(tournament,this));
         }
-        logger.warn(tournament.toString());
+        logger.info(tournament.toString());
         listeners.forEach(l->{
             l.tournamentStarted(tournament);
             List<PlatformBannedPlayer> bannedPlayers = gameCluster.platformGameServiceProvider().presenceServiceProvider().blacklist("tournament");
@@ -351,14 +351,14 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         tournament.snapshot();
         if(tournament.toClosingTime()>=sortingTimer()){
             tournament.nextSortingTime = LocalDateTime.now().plusMinutes(snapshotTimerInterval.get());
-            logger.warn("Next sorting time : "+tournament.nextSortingTime);
+            logger.info("Next sorting time : "+tournament.nextSortingTime);
             tournament.pendingSchedule = this.serviceContext.schedule(new TournamentSnapshotMonitor(tournament,this));
         }else{
             tournament.pendingSchedule = this.serviceContext.schedule(new TournamentCloseMonitor(tournament,this));
         }
     }
     void closeTournament(TournamentManager tournament){
-        logger.warn("Tournament Close : "+tournament.distributionId()+" : "+tournament.global());
+        logger.info("Tournament Close : "+tournament.distributionId()+" : "+tournament.global());
         this.listeners.forEach(l->l.tournamentClosed(tournament));
         TournamentScheduleStatus status = loadStatus(tournament.scheduleId());
         byte[] lockKey = status.key().asBinary();
@@ -372,7 +372,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
         }
     }
     void endTournament(TournamentManager tournament){
-        logger.warn("Tournament End : "+tournament.distributionId()+" : "+tournament.global());
+        logger.info("Tournament End : "+tournament.distributionId()+" : "+tournament.global());
         this.distributionItemService.onReleaseItem(gameServiceName, name(), "TournamentSchedule", tournament.distributionKey());
         TournamentScheduleStatus status = loadStatus(tournament.scheduleId());
         byte[] lockKey = status.key().asBinary();
@@ -509,7 +509,7 @@ public class PlatformTournamentServiceProvider implements TournamentServiceProvi
     private void launch(TournamentManager tournament){
         this.tournamentIndex.put(tournament.distributionId(),tournament);
         tournament.tournamentServiceProvider = this;
-        logger.warn("Tournament ["+tournament.distributionId()+"] is scheduling to start at ["+tournament.startTime()+"]");
+        logger.info("Tournament ["+tournament.distributionId()+"] is scheduling to start at ["+tournament.startTime()+"]");
         tournament.pendingSchedule = this.serviceContext.schedule(new TournamentStartMonitor(tournament,this));
         if(application==null) return;
         loadPrizes(tournament);

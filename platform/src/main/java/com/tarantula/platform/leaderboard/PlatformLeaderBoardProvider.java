@@ -70,7 +70,7 @@ public class PlatformLeaderBoardProvider implements ServiceProvider, LeaderBoard
 
     @Override
     public void start() throws Exception {
-        logger.warn("Leader board service provider started on ["+gameCluster.serviceType()+"] with topic ["+topic+"]");
+        logger.info("Leader board service provider started on ["+gameCluster.serviceType()+"] with topic ["+topic+"]");
     }
 
     @Override

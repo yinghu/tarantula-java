@@ -381,7 +381,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         if(!onLobby.closed()){
             String[] ps = onLobby.typeId().split("-");
             onLobbyIndex.put(ps[0],onLobby);
-            context.log("Lobby ["+onLobby.typeId()+"] is going to be live",OnLog.WARN);
+            context.log("Lobby ["+onLobby.typeId()+"] is going to be live",OnLog.INFO);
         }
         else{
             String[] ps = onLobby.typeId().split("-");

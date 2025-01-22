@@ -30,7 +30,7 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
 
     @Override
     public void start() throws Exception {
-        this.logger.warn("Messaging service started on ["+topic+"]");
+        this.logger.info("Messaging service started on ["+topic+"]");
     }
 
     @Override

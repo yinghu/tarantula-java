@@ -29,7 +29,7 @@ public class PresenceClusterService implements ManagedService, RemoteService {
     public void init(NodeEngine nodeEngine, Properties properties) {
         this.nodeEngine = nodeEngine;
         this.tarantulaContext = TarantulaContext.getInstance();
-        log.warn("Start presence cluster service");
+        log.info("Start presence cluster service");
     }
 
     @Override
