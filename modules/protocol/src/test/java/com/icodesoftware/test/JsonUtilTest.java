@@ -130,7 +130,7 @@ public class JsonUtilTest {
         Assert.assertEquals(cp.get("foo").getAsLong(),12);
         Assert.assertEquals(cp.get("valid").getAsBoolean(),true);
         try {
-            DataBufferOutputStream out = new DataBufferOutputStream(BufferProxy.buffer(100,true));
+            DataBufferOutputStream out = new DataBufferOutputStream(100,true);
             JsonWriter writer = new JsonWriter(new OutputStreamWriter(out));
             writer.beginObject().name("id").value(100).name("name").value("moon").endObject();
             writer.flush();
@@ -155,7 +155,7 @@ public class JsonUtilTest {
 
     @Test(groups = { "json util" })
     public void bufferWriterTest(){
-        DataBufferJsonWriter dataBufferWriter = new DataBufferJsonWriter(BufferProxy.buffer(100,true));
+        DataBufferJsonWriter dataBufferWriter = new DataBufferJsonWriter(10,true);
         dataBufferWriter.start();
         dataBufferWriter.beginObject();
         dataBufferWriter.namedString("name","aname");

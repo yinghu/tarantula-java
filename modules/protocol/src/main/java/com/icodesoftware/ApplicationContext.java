@@ -41,4 +41,11 @@ public interface ApplicationContext extends Context{
     ClusterProvider.Node node();
 
     Transaction transaction();
+
+    default DataStore dataStore(int scope,String name){
+        return dataStore(name);
+    }
+    default long distributionId(){
+        return 0;
+    }
 }

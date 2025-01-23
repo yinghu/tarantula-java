@@ -7,15 +7,21 @@ import java.io.OutputStream;
 
 public class DataBufferOutputStream extends OutputStream {
 
-    private final Recoverable.DataBuffer dataBuffer;
+    private Recoverable.DataBuffer dataBuffer;
 
-    public DataBufferOutputStream(Recoverable.DataBuffer dataBuffer){
-        this.dataBuffer = dataBuffer;
+    public DataBufferOutputStream(int size,boolean direct){
+        this.dataBuffer = BufferProxy.buffer(size,direct);
     }
 
     @Override
     public void write(int b) throws IOException {
-        this.dataBuffer.writeByte((byte)b);
+        if(!dataBuffer.full()){
+            this.dataBuffer.writeByte((byte)b);
+            return;
+        }
+        dataBuffer.flip();
+        dataBuffer = BufferProxy.transfer(dataBuffer,BufferProxy.buffer(dataBuffer.size()*2, dataBuffer.direct()));
+        dataBuffer.writeByte((byte)b);
     }
 
     @Override

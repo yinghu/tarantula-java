@@ -96,6 +96,9 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable,V
         boolean hasRemaining();
         int remaining();
         void position(int position);
+        boolean full();
+        int size();
+        boolean direct();
     }
 
     interface DataBufferPair extends Resettable,AutoCloseable{

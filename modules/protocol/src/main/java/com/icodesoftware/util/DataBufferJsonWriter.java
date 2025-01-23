@@ -11,16 +11,22 @@ import java.io.Writer;
 
 public class DataBufferJsonWriter extends Writer {
 
-    private final Recoverable.DataBuffer dataBuffer;
+    private Recoverable.DataBuffer dataBuffer;
     private JsonWriter jsonWriter;
 
-    public DataBufferJsonWriter(Recoverable.DataBuffer dataBuffer){
-        this.dataBuffer = dataBuffer;
+    public DataBufferJsonWriter(int size,boolean direct){
+        this.dataBuffer = BufferProxy.buffer(size,direct);
     }
 
     @Override
     public void write(char[] cbuf, int off, int len) throws IOException {
         for(int i=off;i<len;i++){
+            if(!dataBuffer.full()){
+                dataBuffer.writeByte((byte)cbuf[i]);
+                continue;
+            }
+            dataBuffer.flip();
+            dataBuffer = BufferProxy.transfer(dataBuffer,BufferProxy.buffer(dataBuffer.size()*2, dataBuffer.direct()));
             dataBuffer.writeByte((byte)cbuf[i]);
         }
     }
