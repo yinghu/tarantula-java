@@ -130,6 +130,7 @@ final public class HttpCaller implements HttpClientProvider {
     }
 
     public static class ResponseData{
+        public int code;
         public String dataAsString;
         public byte[] dataAsBytes;
     }
