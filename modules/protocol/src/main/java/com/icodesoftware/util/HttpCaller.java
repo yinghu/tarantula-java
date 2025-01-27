@@ -1,5 +1,6 @@
 package com.icodesoftware.util;
 
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.Session;
 import com.icodesoftware.service.HttpClientProvider;
 
@@ -133,6 +134,7 @@ final public class HttpCaller implements HttpClientProvider {
         public int code;
         public String dataAsString;
         public byte[] dataAsBytes;
+        public Recoverable.DataBuffer dataBuffer;
     }
     private class _X509TrustManager implements X509TrustManager{
         private X509Certificate[] certificate;

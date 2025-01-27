@@ -8,12 +8,12 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.Serviceable;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 import java.io.InputStream;
 import java.net.InetSocketAddress;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
+
 /*
 tarantula.endpoint.http.address=10.0.0.2 ( optional )
 tarantula.endpoint.http.port=8090
@@ -29,7 +29,7 @@ public class HttpEndpointService implements EndPoint {
 
     private String inboundThreadPoolSetting;
     private String configuration;
-    private ExecutorService executorService;
+    private Executor executorService;
     private Serviceable retryPool;
 
     protected HttpServer server;
@@ -91,7 +91,7 @@ public class HttpEndpointService implements EndPoint {
         if(!started) return;
         onStop();
         retryPool.shutdown();
-        executorService.shutdown();
+        //executorService.shutdown();
         this.server.stop(0);
     }
 
@@ -117,7 +117,7 @@ public class HttpEndpointService implements EndPoint {
         server = HttpServer.create(ip,this.backlog);
         server.setExecutor(this.executorService);
     }
-    private boolean onResource() throws Exception{
+    protected boolean onResource() throws Exception{
         if(configuration == null) return false;
         try(InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(configuration)){
             JsonObject settings = JsonUtil.parse(inputStream);
