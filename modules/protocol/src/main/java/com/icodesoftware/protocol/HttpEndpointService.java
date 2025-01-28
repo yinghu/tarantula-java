@@ -24,12 +24,12 @@ tarantula.endpoint.http.pool.in.setting=http-inbound,8,32,8,60,100
 public class HttpEndpointService implements EndPoint {
 
     protected String address;
-    private int port;
-    private int backlog;
+    protected int port;
+    protected int backlog;
 
-    private String inboundThreadPoolSetting;
-    private String configuration;
-    private Executor executorService;
+    protected String inboundThreadPoolSetting;
+    protected String configuration;
+    protected Executor executorService;
     private Serviceable retryPool;
 
     protected HttpServer server;
