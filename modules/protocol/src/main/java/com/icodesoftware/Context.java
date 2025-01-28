@@ -9,4 +9,6 @@ public interface Context {
     void log(String message,int level);
 
     void log(String message,Exception error,int level);
+
+    default void execute(Runnable runnable){}
 }

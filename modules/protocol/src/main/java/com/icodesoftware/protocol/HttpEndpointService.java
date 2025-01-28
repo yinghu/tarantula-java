@@ -90,8 +90,7 @@ public class HttpEndpointService implements EndPoint {
     public void shutdown() throws Exception {
         if(!started) return;
         onStop();
-        retryPool.shutdown();
-        //executorService.shutdown();
+        if(retryPool!=null) retryPool.shutdown();
         this.server.stop(0);
     }
 
