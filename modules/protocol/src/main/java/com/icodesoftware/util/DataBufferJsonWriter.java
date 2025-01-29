@@ -14,6 +14,9 @@ public class DataBufferJsonWriter extends Writer {
     private Recoverable.DataBuffer dataBuffer;
     private JsonWriter jsonWriter;
 
+    public DataBufferJsonWriter(){
+        this(1024,false);
+    }
     public DataBufferJsonWriter(int size,boolean direct){
         this.dataBuffer = BufferProxy.buffer(size,direct);
     }

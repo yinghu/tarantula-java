@@ -9,6 +9,9 @@ public class DataBufferOutputStream extends OutputStream {
 
     private Recoverable.DataBuffer dataBuffer;
 
+    public DataBufferOutputStream(){
+        this(1024,false);
+    }
     public DataBufferOutputStream(int size,boolean direct){
         this.dataBuffer = BufferProxy.buffer(size,direct);
     }
