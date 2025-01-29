@@ -25,7 +25,7 @@ public class GameRating extends PlayerGameObject implements Rating {
         this.label = "rating";
     }
 
-    public Rating elo(boolean win){
+    public Rating elo(boolean win,long opponentId,int teamPower){
         //TO NEW ELO POINT ON WIN OR LOST
         level = PVPPointGenerator.update(this,win);
         return this;
