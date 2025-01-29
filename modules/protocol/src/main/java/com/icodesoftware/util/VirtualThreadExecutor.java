@@ -8,7 +8,7 @@ public class VirtualThreadExecutor implements Executor {
     private final Semaphore permission;
 
     private VirtualThreadExecutor(int concurrentSize){
-        permission = new Semaphore(concurrentSize);
+        permission = new Semaphore(concurrentSize,true);
     }
 
     @Override
