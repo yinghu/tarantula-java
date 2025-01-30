@@ -14,6 +14,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     public static final String NAME = "pvp_battle";
     private int teamCreationWaitingTime = 5;
+    private int seasonTimeGap = 5; //minutes
+    private int seasonRunningDays = 12; //days
 
     public PlatformPVPBattleServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
@@ -25,10 +27,14 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         Configuration configuration = serviceContext.configuration("game-presence-settings");
         JsonObject pvp = ((JsonElement)configuration.property("pvp")).getAsJsonObject();
         teamCreationWaitingTime = pvp.get("waitingMinutesPerTeamFormation").getAsInt();
+        seasonTimeGap = pvp.get("seasonTimeGapMinutes").getAsInt();
+        seasonRunningDays = pvp.get("seasonRunningDays").getAsInt();
         this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
         this.logger = JDKLogger.getLogger(PlatformPVPBattleServiceProvider.class);
         this.logger.warn("PVP battle service provider started on ->"+gameServiceName);
     }
+
+
 
     public TeamFormationResponse saveDefenseTeam(Session session,byte[] content){
         TeamFormationIndex teamFormationIndex = new TeamFormationIndex();
