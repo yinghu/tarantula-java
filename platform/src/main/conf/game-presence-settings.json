@@ -22,7 +22,9 @@
       "pendingReward": true
   },
   "pvp": {
-     "waitingMinutesPerTeamFormation": 5
+     "waitingMinutesPerTeamFormation": 5,
+     "seasonTimeGapMinutes": 5,
+     "seasonRunningDays": 12
   },
 
   "playList":{
