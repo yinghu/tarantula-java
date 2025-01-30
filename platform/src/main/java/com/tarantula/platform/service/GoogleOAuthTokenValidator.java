@@ -76,6 +76,7 @@ public class GoogleOAuthTokenValidator extends AuthObject {
             }
             JsonObject resp = JsonUtil.parse(responseData.dataAsString);
             String accessToken = resp.get("access_token").getAsString();
+            params.put("thirdPartyToken",accessToken);
             if(verifyPlayer(webClient.applicationId(),accessToken,params)){
                 onMetrics(GameClusterMetrics.ACCESS_GOOGLE_LOGIN_COUNT);
                 return true;

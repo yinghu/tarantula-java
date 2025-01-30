@@ -39,10 +39,12 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
         String action = onExchange.header(Session.TARANTULA_ACTION);
         String typeId = onExchange.header(Session.TARANTULA_TYPE_ID);
         String accessKey = onExchange.header(Session.TARANTULA_ACCESS_KEY);
+        String token = onExchange.header(Session.TARANTULA_TOKEN);
         if(path.equals("/user/action")){
             byte[] _payload = onExchange.payload();
             RoutingKey routingKey = eventService.routingKey(magicKey!=null?(this.bucket+"/"+magicKey):(this.bucket+"/"+onExchange.id()),tag);
             ServiceActionEvent event = new ServiceActionEvent(this.serviceTopic,onExchange.id(),_payload);
+            event.name(token);
             event.action(action);
             event.routingNumber(routingKey.routingNumber());
             event.destination(routingKey.route());

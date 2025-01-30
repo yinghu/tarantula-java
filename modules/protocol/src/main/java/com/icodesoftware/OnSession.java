@@ -8,6 +8,8 @@ public interface OnSession extends OnApplication, Response,DataStore.Updatable {
     String token();
     void token(String token);
 
+    void thirdPartyToken(String token);
+
     String login();
     void login(String login);
 

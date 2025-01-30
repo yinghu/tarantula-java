@@ -10,7 +10,6 @@ import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,7 +28,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
     private TokenValidatorProvider tokenValidatorProvider;
 
     private ConcurrentHashMap<String,OnLobby> onLobbyIndex;
-
 
     @Override
     public void setup(ApplicationContext context) throws Exception {
@@ -101,10 +99,15 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             params.put(OnAccess.SYSTEM_ID,session.systemId());
             String typeId = (String) params.get(OnAccess.TYPE_ID);
             String deviceId = acc.property("deviceId")!=null?acc.property("deviceId").toString():"device-id-assigned";
-            boolean suc = this.context.validator().validateToken(params);
+            boolean suc;
+            if(session.name().equals("_unknown_")) //No Third Party Token Given (First Time Login)
+                suc = this.context.validator().validateToken(params);
+            else //Token Refresh Bypass Third Party Token Validation
+                suc = true;
             LoginProvider _ox = userService.loginProvider(session.distributionId());
             if(suc && _ox!=null ){
                 OnSession onSession = this.login(session.distributionId(),_ox.password(),session);
+                onSession.thirdPartyToken((String) params.get("thirdPartyToken")); //Cache ThirdPartyToken on Client After Fist Login
                 onPlatformProvider(onSession,session,_ox,deviceId);
             }
             else if(suc && _ox == null){
