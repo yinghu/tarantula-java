@@ -635,11 +635,11 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         OnSession onSession = new OnSessionTrack();
         try {
             if (!jwt.verify(token, (h, p) -> {
-                long expiry = p.get("exp").getAsLong();
-                if (TimeUtil.expired(TimeUtil.fromUTCMilliseconds(expiry))) {
-                    //log.warn("Token expired  : "+expiry);
-                    return false;
-                }
+//                long expiry = p.get("exp").getAsLong();
+//                if (TimeUtil.expired(TimeUtil.fromUTCMilliseconds(expiry))) {
+//                    //log.warn("Token expired  : "+expiry);
+//                    return false;
+//                }
                 Access.Role r = rMap.get(p.get("aud").getAsString());
                 if (r == null) {
                     //log.warn("Role cannot be null");
