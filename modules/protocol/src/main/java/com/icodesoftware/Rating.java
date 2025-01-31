@@ -8,5 +8,5 @@ public interface Rating extends Recoverable, DataStore.Updatable {
 
     Rating update(double delta,double levelUpLimit);
 
-    default Rating elo(boolean win){ return null;}
+    default Rating elo(boolean win,long opponentId,int teamPower){ return null;}
 }

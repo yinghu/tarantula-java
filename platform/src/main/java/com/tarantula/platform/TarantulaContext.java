@@ -732,6 +732,8 @@ public class TarantulaContext implements Serviceable, ServiceContext {
         if(name.equals(OnAccess.DOWNLOAD_CENTER)) return new ThirdPartyServiceProvider(OnAccess.DOWNLOAD_CENTER);
 
         if(name.equals(OnAccess.POST_OFFICE)) return new ThirdPartyServiceProvider(OnAccess.POST_OFFICE);
+
+        if(name.equals(OnAccess.SEASON)) return new ThirdPartyServiceProvider(OnAccess.SEASON);
         return null;
 
     }

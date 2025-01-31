@@ -220,4 +220,8 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         return tem;
     }
 
+    public SeasonCredentialConfiguration seasonCredentialConfiguration(){
+        return (SeasonCredentialConfiguration)vendorCredentials.get(OnAccess.SEASON);
+    }
+
 }

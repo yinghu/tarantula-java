@@ -16,7 +16,8 @@ public class BattleTransaction extends RecoverableObject {
 
     public String TEMP_BattleStage;
 
-    public boolean pvp;
+    public long opponentId;
+    public int teamPower; //the player's team power
 
     //Data store write contract
     @Override
@@ -29,8 +30,13 @@ public class BattleTransaction extends RecoverableObject {
         }
         buffer.writeBoolean(win);
         buffer.writeBoolean(disabled);
-
         buffer.writeUTF8(TEMP_BattleStage);
+        try{
+            buffer.writeLong(opponentId);
+            buffer.writeInt(teamPower);
+        }catch (Exception ex){
+            //ignore
+        }
         return true;
     }
 
@@ -47,6 +53,12 @@ public class BattleTransaction extends RecoverableObject {
         win = buffer.readBoolean();
         disabled = buffer.readBoolean();
         TEMP_BattleStage = buffer.readUTF8();
+        try{
+            opponentId = buffer.readLong();
+            teamPower = buffer.readInt();
+        }catch (Exception exception){
+            //ignore
+        }
         return true;
     }
 
@@ -56,6 +68,8 @@ public class BattleTransaction extends RecoverableObject {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("Successful",true);
         jsonObject.addProperty("BattleId",distributionKey());
+        jsonObject.addProperty("OpponentId",Long.toString(opponentId));
+        jsonObject.addProperty("TeamPower",teamPower);
         return jsonObject;
     }
 
@@ -75,7 +89,8 @@ public class BattleTransaction extends RecoverableObject {
         self.win = JsonUtil.getJsonBool(json,"Win",false);
         self.chapterId = JsonUtil.getJsonLong(json,"ChapterId",0);
         self.stageId = JsonUtil.getJsonLong(json,"StageId",0);
-        self.pvp = JsonUtil.getJsonBool(json,"pvp",false);
+        self.opponentId = JsonUtil.getJsonLong(json,"OpponentId",0);
+        self.teamPower = JsonUtil.getJsonInt(json,"TeamPower",0);
         JsonArray party = JsonUtil.getJsonArray(json, "Party");
         self.party = new long[party.size()];
         for(int i=0;i<self.party.length;i++){
