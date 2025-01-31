@@ -44,7 +44,6 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
             byte[] _payload = onExchange.payload();
             RoutingKey routingKey = eventService.routingKey(magicKey!=null?(this.bucket+"/"+magicKey):(this.bucket+"/"+onExchange.id()),tag);
             ServiceActionEvent event = new ServiceActionEvent(this.serviceTopic,onExchange.id(),_payload);
-            event.name(token);
             event.action(action);
             event.routingNumber(routingKey.routingNumber());
             event.destination(routingKey.route());
@@ -66,6 +65,7 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
             else if(action.equals("onToken")){//to server topic
                 AccessIndex acc = accessIndexService.get(magicKey);
                 if(acc!=null){//existing entry
+                    event.name(token);
                     event.distributionId(acc.distributionId());
                     RoutingKey _routingKey = eventService.routingKey(acc.distributionId(),tag);
                     event.destination(_routingKey.route());

@@ -100,9 +100,9 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             String typeId = (String) params.get(OnAccess.TYPE_ID);
             String deviceId = acc.property("deviceId")!=null?acc.property("deviceId").toString():"device-id-assigned";
             boolean suc;
-            if(session.name().equals("_unknown_")) //No Third Party Token Given (First Time Login)
+            if(session.name() == null || session.name().equals("_unknown_")) //No Third Party Token Given (First Time Login)
                 suc = this.context.validator().validateToken(params);
-            else //Token Refresh Bypass Third Party Token Validation
+            else //Token Refresh, Bypass Third Party Token Validation
                 suc = true;
             LoginProvider _ox = userService.loginProvider(session.distributionId());
             if(suc && _ox!=null ){
