@@ -5,6 +5,7 @@ import com.icodesoftware.Recoverable;
 
 import java.io.DataOutputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 
 public class OutputStreamDataBufferProxy extends IOStreamDataBuffer{
 
@@ -102,6 +103,20 @@ public class OutputStreamDataBufferProxy extends IOStreamDataBuffer{
         }
     }
 
+    @Override
+    public boolean full() {
+        return false;
+    }
+
+    @Override
+    public ByteBuffer flip(){
+        return null;
+    }
+
+    @Override
+    public ByteBuffer clear() {
+        return null;
+    }
 
     public static Recoverable.DataBuffer proxy(OutputStream dest){
         return new OutputStreamDataBufferProxy(dest);

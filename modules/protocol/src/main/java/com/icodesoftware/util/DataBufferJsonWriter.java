@@ -20,6 +20,9 @@ public class DataBufferJsonWriter extends Writer {
     public DataBufferJsonWriter(int size,boolean direct){
         this.dataBuffer = BufferProxy.buffer(size,direct);
     }
+    public DataBufferJsonWriter(Recoverable.DataBuffer dataBuffer){
+        this.dataBuffer = dataBuffer;
+    }
 
     @Override
     public void write(char[] cbuf, int off, int len) throws IOException {
