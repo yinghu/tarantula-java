@@ -6,7 +6,6 @@ import java.util.concurrent.Semaphore;
 public class VirtualThreadExecutor implements Executor {
 
     private final Semaphore permission;
-
     private VirtualThreadExecutor(int concurrentSize){
         permission = new Semaphore(concurrentSize,true);
     }
@@ -31,4 +30,5 @@ public class VirtualThreadExecutor implements Executor {
     public static VirtualThreadExecutor create(int concurrentSize){
         return new VirtualThreadExecutor(concurrentSize);
     }
+
 }

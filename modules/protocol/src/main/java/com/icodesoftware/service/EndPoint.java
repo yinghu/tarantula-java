@@ -5,6 +5,8 @@ import com.icodesoftware.protocol.Channel;
 import com.icodesoftware.Session;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 
+import java.util.concurrent.Executor;
+
 public interface EndPoint extends ServiceProvider {
 
     String HTTP_ENDPOINT = "HTTPEndpoint";
@@ -14,7 +16,8 @@ public interface EndPoint extends ServiceProvider {
     default void backlog(int backlog){}
     void port(int port);
     int port();
-    void inboundThreadPoolSetting(String inboundThreadPoolSetting);
+    default void inboundThreadPoolSetting(String inboundThreadPoolSetting){}
+    default void executor(Executor executor){}
     default void resource(String resource){}
     default void resource(Resource resource){}
     default Channel register(Session session, UDPEndpointServiceProvider.RequestListener requestListener, Session.TimeoutListener timeoutListener){return  null;}
