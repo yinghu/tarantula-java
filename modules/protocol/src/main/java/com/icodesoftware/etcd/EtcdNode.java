@@ -15,7 +15,9 @@ public class EtcdNode extends RecoverableObject {
 
     public HttpClientProvider httpClientProvider;
     public String etcdHost;
-
+    private String protocol;
+    private String host;
+    private int port;
     private EtcdNode(){
 
     }
@@ -28,6 +30,10 @@ public class EtcdNode extends RecoverableObject {
     private EtcdNode(String name,String endpoint){
         this(name);
         this.endpoint = endpoint;
+        String[] parts = endpoint.split(":");
+        host = parts[1].substring(2);
+        port = Integer.parseInt(parts[2]);
+        protocol = parts[0];
     }
 
 
@@ -49,13 +55,13 @@ public class EtcdNode extends RecoverableObject {
     }
 
     public String protocol(){
-        return endpoint.split("//")[0];
+        return protocol;
     }
     public int port(){
-        return Integer.parseInt(endpoint.split(":")[2]);
+        return port;
     }
     public String host(){
-        return endpoint.split(":")[1].substring(2);
+        return host;
     }
 
     public static EtcdNode create(String name){

@@ -15,6 +15,8 @@ public interface Event extends Session {
 	int retries();
 	void retries(int retries);
 
-    interface EventOnTopic extends Event{}
+	default RoutingKey routingKey(){ return null;}
+
+	interface EventOnTopic extends Event{}
 	interface EventOnSession extends Event{}
 }
