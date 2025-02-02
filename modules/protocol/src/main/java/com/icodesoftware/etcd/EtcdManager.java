@@ -199,12 +199,12 @@ public class EtcdManager {
         }
         if(!available) return false;
         nodeIndexByName.put(localNode.name(),localNode);
-        EtcdManager.register(ClaimEvent.create(localNode.name(),localNode.httpEndpoint));
+        EtcdManager.register(ClaimEvent.create(localNode.name(),localNode.endpoint));
         return true;
     }
     public static void joined(EtcdEvent event){
         if(event.nodeName.equals(localNode.name())) return;
-        EtcdManager.register(JoinedEvent.create(localNode.name(),localNode.httpEndpoint));
+        EtcdManager.register(JoinedEvent.create(localNode.name(),localNode.endpoint));
         topicIndex.forEach((k,v)->{
             EtcdManager.register(TopicEvent.create(k));
             v.subscribers.forEach((sk,sv)->{
@@ -301,7 +301,7 @@ public class EtcdManager {
             int p =  i % sz;
             EtcdNode node = pending.get(p);
             nodeIndexByPartition.get(i).onPartition(node);
-            logger.warn("partition ["+i+"] on  node ["+node.name()+"/"+node.httpEndpoint+"]");
+            logger.warn("partition ["+i+"] on  node ["+node.name()+"/"+node.endpoint+"]");
         }
     }
 
