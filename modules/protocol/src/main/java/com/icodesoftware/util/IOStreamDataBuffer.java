@@ -152,6 +152,12 @@ public class IOStreamDataBuffer implements Recoverable.DataBuffer {
         throw new RuntimeException("must override on subclass");
     }
 
+    public Recoverable.DataBuffer write(Recoverable.DataBuffer src){
+        throw new RuntimeException("must override on subclass");
+    }
+    public void read(Recoverable.DataBuffer dest){
+        throw new RuntimeException("must override on subclass");
+    }
     public static Recoverable.DataBuffer reader(InputStream src){
         return InputStreamDataBufferProxy.proxy(src);
     }

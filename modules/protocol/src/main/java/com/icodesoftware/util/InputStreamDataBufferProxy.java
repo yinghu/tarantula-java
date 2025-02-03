@@ -93,6 +93,17 @@ public class InputStreamDataBufferProxy extends IOStreamDataBuffer{
     }
 
 
+    public void read(Recoverable.DataBuffer dest){
+        try{
+            while (!dest.full()){
+                dest.writeByte(src.readByte());
+            }
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+    }
+
+
     public static Recoverable.DataBuffer proxy(InputStream src){
         return new InputStreamDataBufferProxy(src);
     }

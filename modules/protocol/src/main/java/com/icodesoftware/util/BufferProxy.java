@@ -117,6 +117,13 @@ public class BufferProxy implements Recoverable.DataBuffer {
         return ret.equals(Recoverable.UTF_NULL)?null:ret;
     }
 
+    public Recoverable.DataBuffer write(Recoverable.DataBuffer src){
+        return this;
+    }
+    public void read(Recoverable.DataBuffer dest){
+
+    }
+
     public static Recoverable.DataBuffer buffer(ByteBuffer buffer){
         return new BufferProxy(buffer);
     }
@@ -190,7 +197,7 @@ public class BufferProxy implements Recoverable.DataBuffer {
 
     @Override
     public boolean full() {
-        return buffer.position()==buffer.capacity();
+        return buffer.position() == buffer.capacity();
     }
 
     public int size(){

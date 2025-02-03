@@ -2,6 +2,7 @@ package com.icodesoftware.test;
 
 import com.beust.ah.A;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.util.DataBufferInputStream;
 import com.icodesoftware.util.IOStreamDataBuffer;
 import com.icodesoftware.util.LocalHeader;
@@ -34,6 +35,10 @@ public class IOStreamBufferTest {
             out.writeFloat(10.1f);
             out.writeUTF("utfstring");
             out.writeByte(1);
+            byte[] hb = "hello".getBytes();
+            for(byte b : hb){
+                out.writeByte(b);
+            }
             Recoverable.DataBuffer buffer = IOStreamDataBuffer.reader(new ByteArrayInputStream(dest.toByteArray()));
             Assert.assertEquals(buffer.readLong(),100);
             Assert.assertTrue(buffer.readBoolean());
@@ -43,6 +48,10 @@ public class IOStreamBufferTest {
             Assert.assertEquals(buffer.readFloat(),10.1f);
             Assert.assertEquals(buffer.readUTF8(),"utfstring");
             Assert.assertEquals(buffer.readByte(),1);
+            Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(5,false);
+            buffer.read(dataBuffer);
+            dataBuffer.flip();
+            Assert.assertEquals(new String(dataBuffer.array()),"hello");
         }catch (Exception ex){
             exception = ex;
         }
@@ -57,6 +66,13 @@ public class IOStreamBufferTest {
         buffer.writeInt(100).writeUTF8("test").writeShort((short) 2);
         buffer.writeBoolean(false).writeLong(1000).writeDouble(10.3D).writeFloat(2.1f);
         buffer.writeByte((byte) 3);
+        Recoverable.DataBuffer src = BufferProxy.buffer(5,false);
+        byte[] hb = "hello".getBytes();
+        for(byte b : hb){
+            src.writeByte(b);
+        }
+        src.flip();
+        buffer.write(src);
         Recoverable.DataBuffer reader = IOStreamDataBuffer.reader(new ByteArrayInputStream(dest.toByteArray()));
         Recoverable.DataHeader header = reader.readHeader();
         Assert.assertEquals(header.revision(),100);
@@ -70,5 +86,8 @@ public class IOStreamBufferTest {
         Assert.assertEquals(reader.readDouble(),10.3D);
         Assert.assertEquals(reader.readFloat(),2.1f);
         Assert.assertEquals(reader.readByte(),3);
+        Recoverable.DataBuffer dest1 = BufferProxy.buffer(5,false);
+        reader.read(dest1);
+        Assert.assertEquals(new String(dest1.array()),"hello");
     }
 }
