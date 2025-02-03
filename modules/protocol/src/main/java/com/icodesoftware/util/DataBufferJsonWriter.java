@@ -189,6 +189,7 @@ public class DataBufferJsonWriter extends Writer {
         }
     }
 
+
     public JsonObject toJson(){
         return JsonParser.parseReader(new InputStreamReader(new DataBufferInputStream(src()))).getAsJsonObject();
     }
