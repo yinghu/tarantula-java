@@ -32,4 +32,8 @@ public class LocalHeader implements Recoverable.DataHeader {
     public void update(long revisionDelta){
         revision = revision+revisionDelta;
     }
+    
+    public static Recoverable.DataHeader create(int factoryId,int classId){
+        return new LocalHeader(0,factoryId,classId);
+    }
 }
