@@ -17,9 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class UserManagementApplication extends TarantulaApplicationHeader implements Configurable.Listener<OnLobby>{
-
-    private TarantulaLogger logger = JDKLogger.getLogger(UserManagementApplication.class);
-
     private final static String METRICS_LOGIN_COUNT = "applicationLoginCount";
     private boolean activated;
     private int trialDays;
@@ -106,7 +103,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             boolean suc;
             String thirdPartyToken = null;
             if(session.name() == null || session.name().equals("_unknown_")) { //No Third Party Token Given (First Time Login)
-                logger.warn("session.name(): " + session.name());
                 suc = this.context.validator().validateToken(params);
                 if(params.containsKey("thirdPartyToken"))
                     thirdPartyToken = (String) params.get("thirdPartyToken");
@@ -118,7 +114,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             LoginProvider _ox = userService.loginProvider(session.distributionId());
             if(suc && _ox!=null ){
                 OnSession onSession = this.login(session.distributionId(),_ox.password(),session);
-                logger.warn("thirdPartyToken: " + thirdPartyToken);
                 onSession.thirdPartyToken(thirdPartyToken); //Cache ThirdPartyToken on Client
                 onPlatformProvider(onSession,session,_ox,deviceId);
             }
@@ -130,8 +125,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 acc.typeId(typeId);
                 createLogin(acc,session.distributionId(),AccessControl.player.name(),true,acc.name(),true);
                 OnSession onSession = login(session.distributionId(),thirdPartyLogin.password(),session);
-                if(params.containsKey("thirdPartyToken"))
-                    onSession.thirdPartyToken((String) params.get("thirdPartyToken")); //Cache ThirdPartyToken on Client After Fist Login
                 onPlatformProvider(onSession,session,thirdPartyLogin,deviceId);
             }
             else{
