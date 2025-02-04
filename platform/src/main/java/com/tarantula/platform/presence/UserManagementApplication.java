@@ -1,8 +1,6 @@
 package com.tarantula.platform.presence;
 
 import com.icodesoftware.*;
-import com.icodesoftware.lmdb.LMDBDataStoreProvider;
-import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.SnowflakeKey;
@@ -100,21 +98,13 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             params.put(OnAccess.SYSTEM_ID,session.systemId());
             String typeId = (String) params.get(OnAccess.TYPE_ID);
             String deviceId = acc.property("deviceId")!=null?acc.property("deviceId").toString():"device-id-assigned";
-            boolean suc;
-            String thirdPartyToken = null;
-            if(session.name() == null || session.name().equals("_unknown_")) { //No Third Party Token Given (First Time Login)
-                suc = this.context.validator().validateToken(params);
-                if(params.containsKey("thirdPartyToken"))
-                    thirdPartyToken = (String) params.get("thirdPartyToken");
-            }
-            else { //Token Refresh, Bypass Third Party Token Validation
-                suc = true;
-                thirdPartyToken = session.name();
-            }
+
+            boolean suc = this.context.validator().validateToken(params);
             LoginProvider _ox = userService.loginProvider(session.distributionId());
+
             if(suc && _ox!=null ){
                 OnSession onSession = this.login(session.distributionId(),_ox.password(),session);
-                onSession.thirdPartyToken(thirdPartyToken); //Cache ThirdPartyToken on Client
+                onSession.thirdPartyToken((String) params.get("thirdPartyToken")); //Cache ThirdPartyToken on Client
                 onPlatformProvider(onSession,session,_ox,deviceId);
             }
             else if(suc && _ox == null){
@@ -125,6 +115,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 acc.typeId(typeId);
                 createLogin(acc,session.distributionId(),AccessControl.player.name(),true,acc.name(),true);
                 OnSession onSession = login(session.distributionId(),thirdPartyLogin.password(),session);
+                onSession.thirdPartyToken((String) params.get("thirdPartyToken")); //Cache ThirdPartyToken on Client
                 onPlatformProvider(onSession,session,thirdPartyLogin,deviceId);
             }
             else{
