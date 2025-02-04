@@ -187,6 +187,8 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
         try(final Recoverable.DataBufferPair cache = lmdbDataStoreProvider.dataBufferPair()){
             Recoverable.DataBuffer key = cache.key();
             Recoverable.DataBuffer value = cache.value();
+            key.clear();
+            value.clear();
             if(!t.writeKey(key)) {
                 throw new IllegalArgumentException("Key must be assigned first");
             }

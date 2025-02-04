@@ -99,6 +99,7 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable,V
         boolean hasRemaining();
         int remaining();
         void position(int position);
+        //int position();
         boolean full();
         int size();
         boolean direct();
