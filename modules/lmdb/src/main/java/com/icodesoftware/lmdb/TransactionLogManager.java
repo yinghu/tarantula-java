@@ -71,35 +71,34 @@ public class TransactionLogManager implements Closable {
         if(metadata.label()==null){
             Recoverable.DataHeader header = value.readHeader();
             value.rewind();
-            byte[] ak = key.array();
-            byte[] av = value.array();
             boolean suc = dataStore.backup().set((k,v)->{
-                for(byte b : ak){
-                    k.writeByte(b);
+                while(key.hasRemaining()){
+                    k.writeByte(key.readByte());
                 }
-                for(byte b : av){
-                    v.writeByte(b);
+                while (value.hasRemaining()){
+                    v.writeByte(value.readByte());
                 }
                 return true;
             });
             if(!suc || transactionId <0 ) return;
-            TransactionLog log = TransactionLog.log(transactionId,false, metadata.scope(), metadata.source(),metadata.label(),ak,null,header.revision());
+            key.rewind();
+            TransactionLog log = TransactionLog.log(transactionId,false, metadata.scope(), metadata.source(),metadata.label(),key.array(),null,header.revision());
             ts.create(log);
             return;
         }
-        byte[] ak = key.array();
-        byte[] av = value.array();
         boolean suc = dataStore.backup().setEdge(metadata.label(),(k,v)->{
-            for(byte b : ak){
-                k.writeByte(b);
+            while (key.hasRemaining()){
+                k.writeByte(key.readByte());
             }
-            for(byte b : av){
-                v.writeByte(b);
+            while (value.hasRemaining()){
+                v.writeByte(value.readByte());
             }
             return true;
         });
         if(!suc || transactionId <0 ) return;
-        TransactionLog log = TransactionLog.log(transactionId,false,metadata.scope(),metadata.source(),metadata.label(),ak,av,0);
+        key.rewind();
+        value.rewind();
+        TransactionLog log = TransactionLog.log(transactionId,false,metadata.scope(),metadata.source(),metadata.label(),key.array(),value.array(),0);
         ts.create(log);
     }
 

@@ -2,11 +2,11 @@ package com.icodesoftware.etcd;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.service.HttpClientProvider;
-import com.icodesoftware.util.RecoverableObject;
+import com.icodesoftware.util.AbstractClusterNode;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class EtcdNode extends RecoverableObject {
+public class EtcdNode extends AbstractClusterNode {
 
 
     public String endpoint;

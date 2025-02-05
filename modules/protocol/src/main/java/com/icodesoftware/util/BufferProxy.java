@@ -118,10 +118,15 @@ public class BufferProxy implements Recoverable.DataBuffer {
     }
 
     public Recoverable.DataBuffer write(Recoverable.DataBuffer src){
+        while (src.hasRemaining()){
+            writeByte(src.readByte());
+        }
         return this;
     }
     public void read(Recoverable.DataBuffer dest){
-
+        while (!dest.full()){
+            dest.writeByte(readByte());
+        }
     }
 
     public static Recoverable.DataBuffer buffer(ByteBuffer buffer){
@@ -137,7 +142,7 @@ public class BufferProxy implements Recoverable.DataBuffer {
     }
 
     public static Recoverable.DataBuffer copy(ByteBuffer src){
-        Recoverable.DataBuffer dest = BufferProxy.buffer(src.remaining(),false);
+        Recoverable.DataBuffer dest = BufferProxy.buffer(src.remaining(), src.isDirect());
         while (src.hasRemaining()){
             dest.writeByte(src.get());
         }
