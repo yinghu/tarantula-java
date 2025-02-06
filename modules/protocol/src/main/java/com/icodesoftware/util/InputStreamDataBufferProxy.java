@@ -23,7 +23,8 @@ public class InputStreamDataBufferProxy extends IOStreamDataBuffer{
 
     public String readUTF8(){
         try{
-            return src.readUTF();
+            String utf = src.readUTF();
+            return utf.equals(Recoverable.UTF_NULL)?null:utf;
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }

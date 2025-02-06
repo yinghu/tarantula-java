@@ -96,7 +96,7 @@ public class OutputStreamDataBufferProxy extends IOStreamDataBuffer{
     }
     public Recoverable.DataBuffer writeUTF8(String utf){
         try{
-            dest.writeUTF(utf);
+            dest.writeUTF(utf!=null?utf:Recoverable.UTF_NULL);
             return this;
         }catch (Exception ex){
             throw new RuntimeException(ex);
