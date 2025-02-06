@@ -14,6 +14,8 @@ public interface GameContext extends Context {
 
     TokenValidatorProvider.AuthVendor authorVendor(String name);
 
+    void registerConfigurableListener(String serviceName,String configurationName,Configurable.Listener listener);
+
     void registerTournamentListener(Tournament.Listener listener);
     void recoverableRegistry(RecoverableListener recoverableListener);
 

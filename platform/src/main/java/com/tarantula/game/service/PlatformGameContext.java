@@ -108,4 +108,11 @@ public class PlatformGameContext implements GameContext {
     public Metrics metrics(){
         return this.platformGameServiceProvider.metrics();
     }
+
+    @Override
+    public void registerConfigurableListener(String serviceName,String name, Configurable.Listener listener) {
+        ServiceProvider serviceProvider = platformGameServiceProvider.serviceProvider(serviceName);
+        if(serviceProvider==null) return;
+        serviceProvider.addConfigurableListener(name,listener);
+    }
 }

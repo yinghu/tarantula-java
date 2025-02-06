@@ -11,6 +11,7 @@ import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.SnowflakeKey;
 import com.perfectday.games.earth8.analytics.*;
 
+import com.perfectday.games.earth8.config.SeasonConfigurationListener;
 import com.perfectday.games.earth8.data.GamePlayCount;
 import com.perfectday.games.earth8.data.GamePlayEventRunner;
 
@@ -28,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Earth8GameServiceProvider implements GameServiceProvider {
-    GameContext gameContext;
+    public GameContext gameContext;
     private final static String ANALYTICS_QUERY_HEADER = "#Analytics";
     private final static long EVENT_DISPATCH_DELAY = 100; //100ms
     private String ANALYTICS_QUERY;
@@ -36,6 +37,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     private ConcurrentHashMap<Long,Tournament> tournamentIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Long,Boolean> tournamentBannedPlayersList = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, GamePlayCount> gamePlayCounts = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<String,Configurable> configurations = new ConcurrentHashMap<>();
 
     private ConcurrentHashMap<String,ApplicationResource> resourceIndex = new ConcurrentHashMap<>();
 
@@ -58,6 +60,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         gamePlayCounts.put(GamePlayCount.ON_END_GAME,new GamePlayCount(gameContext,GamePlayCount.ON_END_GAME,metrics.entry(GamePlayCount.ON_END_GAME).total(),currentPlayers));
         gamePlayCounts.put(GamePlayCount.ON_GAME_CLUSTER_EVENT,new GamePlayCount(gameContext,GamePlayCount.ON_GAME_CLUSTER_EVENT,metrics.entry(GamePlayCount.ON_GAME_CLUSTER_EVENT).total(),null));
         this.gameContext.schedule(new GamePlayEventRunner(gameContext,gamePlayCounts,ANALYTICS_QUERY));
+        this.gameContext.registerConfigurableListener(SeasonConfigurationListener.platformServiceName,OnAccess.SEASON,new SeasonConfigurationListener(this));
         this.gameContext.log("Start earth 8 game service provider with typeId : "+this.gameContext.applicationSchema().typeId(), OnLog.WARN);
     }
 

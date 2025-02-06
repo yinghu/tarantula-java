@@ -1,6 +1,7 @@
 package com.tarantula.platform.configuration;
 
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.OnAccess;
@@ -12,6 +13,7 @@ import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.item.ConfigurableObject;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,9 +42,11 @@ public class SeasonCredentialConfiguration extends CredentialConfiguration {
             configurationObject.distributionId(id.getAsLong());
             if(this.dataStore.load(configurationObject)){
                 Season season = new Season();
+                season.seasonId = configurationObject.distributionId();
                 season.faction1 = Faction.values()[configurationObject.header().get("Faction1").getAsInt()];
                 season.faction2 = Faction.values()[configurationObject.header().get("Faction2").getAsInt()];
                 season.faction3 = Faction.values()[configurationObject.header().get("Faction3").getAsInt()];
+                seasons.add(season);
             }
             else{
                 logger.warn("Season ["+id.getAsLong()+"] cannot be loaded");
@@ -51,10 +55,36 @@ public class SeasonCredentialConfiguration extends CredentialConfiguration {
         return true;
     }
 
-    public static class Season{
+    @Override
+    public JsonObject toJson() {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("SeasonId",distributionId);
+        JsonArray list = new JsonArray();
+        seasons.forEach(season -> list.add(season.toJson()) );
+        jsonObject.add("_seasons",list);
+        return jsonObject;
+    }
+
+    public static class Season extends ConfigurableObject{
+        public long seasonId;
         public Faction faction1;
         public Faction faction2;
         public Faction faction3;
+
+        public JsonObject toJson(){
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("SeasonId",seasonId);
+            jsonObject.addProperty("EndTime",LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+            jsonObject.addProperty("Faction1",faction1.ordinal());
+            jsonObject.addProperty("Faction2",faction1.ordinal());
+            jsonObject.addProperty("Faction3",faction1.ordinal());
+            return jsonObject;
+        }
+
+        @Override
+        public long distributionId(){
+            return seasonId;
+        }
     }
 
 }

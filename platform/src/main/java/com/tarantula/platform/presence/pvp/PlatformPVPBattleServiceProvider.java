@@ -2,21 +2,26 @@ package com.tarantula.platform.presence.pvp;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.icodesoftware.Configurable;
 import com.icodesoftware.Configuration;
+import com.icodesoftware.OnAccess;
 import com.icodesoftware.Session;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
+import com.tarantula.platform.configuration.SeasonCredentialConfiguration;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
 
+import java.util.concurrent.ConcurrentHashMap;
 
-public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvider {
+
+public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvider implements Configurable.Listener<SeasonCredentialConfiguration> {
 
     public static final String NAME = "pvp_battle";
     private int teamCreationWaitingTime = 5;
     private int seasonTimeGap = 5; //minutes
     private int seasonRunningDays = 12; //days
-
+    private ConcurrentHashMap<Integer, SeasonCredentialConfiguration.Season> seasons = new ConcurrentHashMap();
     public PlatformPVPBattleServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
     }
@@ -32,6 +37,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
         this.logger = JDKLogger.getLogger(PlatformPVPBattleServiceProvider.class);
         this.logger.warn("PVP battle service provider started on ->"+gameServiceName);
+        this.platformGameServiceProvider.configurationServiceProvider().addConfigurableListener(OnAccess.SEASON,this);
     }
 
 
@@ -45,4 +51,30 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         defenseTeam.save(dataStore,teamFormationIndex,teamCreationWaitingTime);
         return TeamFormationResponse.success(teamFormationIndex.timestamp());
     }
+
+    public void onLoaded(SeasonCredentialConfiguration loaded){
+        logger.warn("season loaded");
+        Configurable.Listener listener = configurableListeners.get(OnAccess.SEASON);
+        if(listener==null) return;
+        loaded.list().forEach(season->{
+            listener.onLoaded(season);
+        });
+    }
+
+    public void onRemoved(SeasonCredentialConfiguration removed){
+        Configurable.Listener listener = configurableListeners.get(OnAccess.SEASON);
+        if(listener==null) return;
+        removed.list().forEach(season->{
+            listener.onRemoved(season);
+        });
+    }
+
+    public SeasonCredentialConfiguration.Season currentSeason(){
+        return seasons.get(0);// currentSeason from season rotation
+    }
+
+
+
+
+
 }
