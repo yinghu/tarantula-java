@@ -49,8 +49,12 @@ public class SocketEndpointService implements EndPoint {
         serverSocket = address ==null? new ServerSocket(port,backlog) : new ServerSocket(port,backlog, InetAddress.getByName(address));
         started = true;
         while (started){
-            Socket socket = serverSocket.accept();
-            executor.execute(()->onSocket(socket));
+            try{
+                Socket socket = serverSocket.accept();
+                executor.execute(()->onSocket(socket));
+            }catch (Exception ex){
+                onException(ex);
+            }
         }
     }
 
@@ -61,6 +65,10 @@ public class SocketEndpointService implements EndPoint {
     }
 
     protected void onSocket(Socket socket){
+
+    }
+
+    protected void onException(Exception ex){
 
     }
 }
