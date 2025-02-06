@@ -11,8 +11,9 @@ public class PVPPointGenerator {
     public static int powerDiffMaxRating = 1500;
     public static int minPowerDiffConstant = 1000;
     public static int maxPowerDiffConstant = 2000;
-    public static int eloExponent = 800;
+    public static int eloExponent = 400;
     public static int relativePowerConstant = maxPowerDiffConstant - minPowerDiffConstant;
+    public static int minimumCap = 300;
 
     public static int update(Rating rating, boolean win){
 
@@ -32,7 +33,19 @@ public class PVPPointGenerator {
         double maxRatingChangeAttacker = softMaxRatingChange * (attackerWin ? (1 + attackerPowerModifier) : 1);
         double maxRatingChangeDefender = softDefenseMaxRatingChange * (!attackerWin ? defenderPowerModifier : 1);
 
-        attackerRating.level = (int) Math.round(attackerRating.level() + maxRatingChangeAttacker * ((attackerWin ? 1 : 0) - probOfWinAttacker));
-        defenderRating.level = (int) Math.round(defenderRating.level() + maxRatingChangeDefender * ((!attackerWin ? 1 : 0) - probOfWinDefender));
+        int newAttackerELO = (int) Math.round(attackerRating.level() + maxRatingChangeAttacker * ((attackerWin ? 1 : 0) - probOfWinAttacker));
+        int newDefenderELO = (int) Math.round(defenderRating.level() + maxRatingChangeDefender * ((!attackerWin ? 1 : 0) - probOfWinDefender));
+
+        if(attackerRating.level() >= minimumCap && newAttackerELO < minimumCap){
+            attackerRating.level = minimumCap;
+        }else {
+            attackerRating.level = newAttackerELO;
+        }
+
+        if(defenderRating.level() >= minimumCap && newDefenderELO < minimumCap){
+            defenderRating.level = minimumCap;
+        }else {
+            defenderRating.level = newDefenderELO;
+        }
     }
 }

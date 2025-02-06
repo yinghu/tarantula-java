@@ -11,28 +11,28 @@ public class PVPPointGeneratorTest {
     public void calculateELO(){
         GameRating attackerRating = new GameRating();
         GameRating defenderRating = new GameRating();
-        attackerRating.level = 20;
-        defenderRating.level = 15;
+        attackerRating.level = 298;
+        defenderRating.level = 290;
 
-        int attackerPower = 50;
+        int attackerPower = 60;
         int defenderPower = 60;
         boolean attackerWin = true;
 
         PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
 
-        Assert.assertEquals(attackerRating.level, 30);
-        Assert.assertEquals(defenderRating.level, 12);
+        Assert.assertEquals(attackerRating.level, 315);
+        Assert.assertEquals(defenderRating.level, 287);
 
-
-        attackerRating.level = 45;
-        defenderRating.level = 45;
-        attackerPower = 100;
-        defenderPower = 70;
         attackerWin = false;
 
         PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
 
-        Assert.assertEquals(attackerRating.level, 35);
-        Assert.assertEquals(defenderRating.level, 48);
+        Assert.assertEquals(attackerRating.level, 306);
+        Assert.assertEquals(defenderRating.level, 289);
+
+        PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
+
+        Assert.assertEquals(attackerRating.level, 300);
+        Assert.assertEquals(defenderRating.level, 291);
     }
 }
