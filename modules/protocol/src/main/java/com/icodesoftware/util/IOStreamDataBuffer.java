@@ -139,7 +139,8 @@ public class IOStreamDataBuffer implements Recoverable.DataBuffer {
 
     @Override
     public boolean full() {
-        throw new RuntimeException("must override on subclass");
+        return false;
+        //throw new RuntimeException("must override on subclass");
     }
 
     @Override
@@ -149,7 +150,8 @@ public class IOStreamDataBuffer implements Recoverable.DataBuffer {
 
     @Override
     public boolean direct() {
-        throw new RuntimeException("must override on subclass");
+        return true;
+        //throw new RuntimeException("must override on subclass");
     }
 
     public Recoverable.DataBuffer write(Recoverable.DataBuffer src){
