@@ -19,7 +19,7 @@ public class BackupDataStoreTest extends LMDBHook{
     public void testSummary(){
         long ownerId = localDistributionIdGenerator.id();
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
             testMapStoreListener.transactionLogManager.onTransaction(logs);
         };
         DataStore dataStore = lmdbDataStoreProvider.createDataStore("test_backup_user");
@@ -48,7 +48,7 @@ public class BackupDataStoreTest extends LMDBHook{
     public void testGet(){
         long ownerId = localDistributionIdGenerator.id();
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
             testMapStoreListener.transactionLogManager.onTransaction(logs);
         };
         DataStore dataStore = lmdbDataStoreProvider.createDataStore("test_backup_user_get");
@@ -93,7 +93,7 @@ public class BackupDataStoreTest extends LMDBHook{
     public void testForEach(){
         long ownerId = localDistributionIdGenerator.id();
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
             testMapStoreListener.transactionLogManager.onTransaction(logs);
         };
         DataStore dataStore = lmdbDataStoreProvider.createDataStore("test_backup_user_for");
@@ -138,7 +138,7 @@ public class BackupDataStoreTest extends LMDBHook{
     public void testForEachEdge(){
         long ownerId = localDistributionIdGenerator.id();
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
             testMapStoreListener.transactionLogManager.onTransaction(logs);
         };
         DataStore dataStore = lmdbDataStoreProvider.createDataStore("test_backup_user_for_edge");
@@ -182,7 +182,7 @@ public class BackupDataStoreTest extends LMDBHook{
     public void testForEachEdgeValue(){
         long ownerId = localDistributionIdGenerator.id();
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
             testMapStoreListener.transactionLogManager.onTransaction(logs);
         };
         DataStore dataStore = lmdbDataStoreProvider.createDataStore("test_backup_user_for_edge_value");
@@ -234,7 +234,7 @@ public class BackupDataStoreTest extends LMDBHook{
     public void testSet(){
         long ownerId = localDistributionIdGenerator.id();
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
             testMapStoreListener.transactionLogManager.onTransaction(logs);
         };
         DataStore dataStore = lmdbDataStoreProvider.createDataStore("test_backup_user_set");

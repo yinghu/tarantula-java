@@ -1,9 +1,6 @@
 package com.icodesoftware.lmdb;
 
-import com.icodesoftware.Closable;
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Distributable;
-import com.icodesoftware.Recoverable;
+import com.icodesoftware.*;
 import com.icodesoftware.service.Batchable;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
@@ -30,26 +27,26 @@ public class TransactionLogManager implements Closable {
     public static final String DATA_TRANSACTION_LOG = "log_tarantula_transaction_1";
     public static final String INTEGRATION_TRANSACTION_LOG = "log_tarantula_transaction_2";
 
-    private TransactionLogListener transactionLogListener = transactionLog -> {};
+    private Transaction.TransactionLogListener transactionLogListener = transactionLog -> {};
     private ServiceContext serviceContext;
 
     public void setup(ServiceContext serviceContext){
         this.serviceContext = serviceContext;
     }
 
-    public void registerTransactionLogListener(TransactionLogListener listener){
+    public void registerTransactionLogListener(Transaction.TransactionLogListener listener){
         if(listener==null) return;
         this.transactionLogListener = listener;
     }
-    public List<TransactionLog> committed(int scope,long transactionId){
+    public List<Transaction.Log> committed(int scope,long transactionId){
         DataStore ts = transactionLogStore(scope);
         TransactionLogQuery query = new TransactionLogQuery(transactionId);
-        List<TransactionLog> pending = new ArrayList<>();
+        List<Transaction.Log> pending = new ArrayList<>();
         ts.list(query).forEach(t->{
-            DataStore tds = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(t.scope)+t.source);
-            if(t.edgeLabel==null && !t.deleting){
-                tds.backup().get(BinaryKey.from(t.key),(k, v)->{
-                    t.value = v.array();
+            DataStore tds = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(t.sourceScope())+t.source());
+            if(t.edgeLabel()==null && !t.deleting()){
+                tds.backup().get(BinaryKey.from(t.primaryKey()),(k, v)->{
+                    t.value(v.array());
                     pending.add(t);
                     return true;
                 });
@@ -223,35 +220,35 @@ public class TransactionLogManager implements Closable {
         return serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
     }
 
-    public void onTransaction(List<TransactionLog> transactionLogs) {
-        for(TransactionLog log : transactionLogs){
-            DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(log.scope)+log.source);
-            if(log.deleting){
-                if(log.edgeLabel==null){
+    public void onTransaction(List<Transaction.Log> transactionLogs) {
+        for(Transaction.Log log : transactionLogs){
+            DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(log.sourceScope())+log.source());
+            if(log.deleting()){
+                if(log.edgeLabel()==null){
                     dataStore.backup().unset((k,v)->{
-                        k.write(log.key);
+                        k.write(log.primaryKey());
                         return true;
                     });
                 }else {
-                    dataStore.backup().unsetEdge(log.edgeLabel, (k, v) -> {
-                        k.write(log.key);
-                        if (log.edgeKey == null) return true;
-                        v.write(log.edgeKey);
+                    dataStore.backup().unsetEdge(log.edgeLabel(), (k, v) -> {
+                        k.write(log.primaryKey());
+                        if (log.edgeKey() == null) return true;
+                        v.write(log.edgeKey());
                         return true;
-                    }, log.edgeKey == null);
+                    }, log.edgeKey() == null);
                 }
             }else{
-                if(log.edgeLabel==null){//write key/value
+                if(log.edgeLabel()==null){//write key/value
                     dataStore.backup().set((k,v)->{
-                        k.write(log.key);
-                        v.write(log.value);
+                        k.write(log.primaryKey());
+                        v.write(log.value());
                         return true;
                     });
                 }else{
                     //write edge
-                    dataStore.backup().setEdge(log.edgeLabel,(k,v)->{
-                        k.write(log.key);
-                        v.write(log.edgeKey);
+                    dataStore.backup().setEdge(log.edgeLabel(),(k,v)->{
+                        k.write(log.primaryKey());
+                        v.write(log.edgeKey());
                         return true;
                     });
                 }

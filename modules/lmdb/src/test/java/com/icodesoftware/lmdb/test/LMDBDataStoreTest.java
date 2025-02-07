@@ -23,7 +23,7 @@ public class LMDBDataStoreTest extends LMDBHook{
     public void testCreate(){
         long ownerId = localDistributionIdGenerator.id();
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
             testMapStoreListener.transactionLogManager.onTransaction(logs);
         };
         try(Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE)){
@@ -50,7 +50,7 @@ public class LMDBDataStoreTest extends LMDBHook{
     @Test(groups = { "LMDB" })
     public void testCreateIfAbsent() {
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
             testMapStoreListener.transactionLogManager.onTransaction(logs);
         };
         long ownerId = localDistributionIdGenerator.id();
@@ -74,7 +74,7 @@ public class LMDBDataStoreTest extends LMDBHook{
     @Test(groups = { "LMDB" })
     public void testUpdate() {
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
             testMapStoreListener.transactionLogManager.onTransaction(logs);
         };
         long ownerId = localDistributionIdGenerator.id();
@@ -109,7 +109,7 @@ public class LMDBDataStoreTest extends LMDBHook{
     @Test(groups = { "LMDB" })
     public void testDelete() {
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
             testMapStoreListener.transactionLogManager.onTransaction(logs);
         };
         DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore("test_lmdb_delete");
@@ -172,7 +172,7 @@ public class LMDBDataStoreTest extends LMDBHook{
     @Test(groups = { "LMDB" })
     public void testDeleteEdge() {
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
             testMapStoreListener.transactionLogManager.onTransaction(logs);
         };
         DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore("test_lmdb_delete_edge");
@@ -250,7 +250,7 @@ public class LMDBDataStoreTest extends LMDBHook{
     public void testCommitOnTransaction(){
         long ownerId = localDistributionIdGenerator.id();
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
             Assert.assertEquals(logs.size(),4);
             testMapStoreListener.transactionLogManager.onTransaction(logs);
         };
@@ -506,9 +506,9 @@ public class LMDBDataStoreTest extends LMDBHook{
         DataStore flog = lmdbDataStoreProvider.createLogDataStore("index_a_test_foo_txc");
         long ownerId = localDistributionIdGenerator.id();
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
             logs.forEach(e->{
-                e.source = "test_foo_txc";
+                e.source("test_foo_txc");
             });
             testMapStoreListener.transactionLogManager.onTransaction(logs);
         };

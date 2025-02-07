@@ -3,8 +3,8 @@ package com.tarantula.platform.service.persistence;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.Transaction;
 import com.icodesoftware.lmdb.TransactionLog;
-import com.icodesoftware.lmdb.TransactionLogListener;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.event.TransactionReplicationEvent;
@@ -12,7 +12,7 @@ import com.tarantula.platform.event.TransactionReplicationEvent;
 
 import java.util.List;
 
-public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy implements TransactionLogListener {
+public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy implements Transaction.TransactionLogListener {
 
     public IntegrationScopeReplicationProxy(){
         super("integration", Distributable.INTEGRATION_SCOPE);
@@ -22,7 +22,7 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy imp
     public void onCommit(int scope,long transactionId) {
         super.onCommit(scope,transactionId);
         ReplicationSynchronizerTimeout replicationEvent = new ReplicationSynchronizerTimeout(asyncInterval,()->{
-            List<TransactionLog> logs = transactionLogManager.committed(scope,transactionId);
+            List<Transaction.Log> logs = transactionLogManager.committed(scope,transactionId);
             transactionLogManager.onTransaction(logs);//local index
             TransactionReplicationEvent transactionReplicationEvent = new TransactionReplicationEvent();
             transactionReplicationEvent.destination(MapStoreListener.INTEGRATION_MAP_STORE_NAME);
@@ -74,7 +74,7 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy imp
         transactionLogManager.registerTransactionLogListener(this);
     }
     @Override
-    public void onTransactionLog(TransactionLog transactionLog) {
+    public void onTransactionLog(Transaction.Log transactionLog) {
         //operations on original data store
         super.onHomingAgent(transactionLog);
     }

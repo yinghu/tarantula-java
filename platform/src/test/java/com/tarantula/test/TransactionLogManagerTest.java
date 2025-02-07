@@ -2,6 +2,7 @@ package com.tarantula.test;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
+import com.icodesoftware.Transaction;
 import com.icodesoftware.lmdb.TransactionLog;
 import com.icodesoftware.lmdb.TransactionResult;
 import com.icodesoftware.util.SnowflakeKey;
@@ -34,9 +35,9 @@ public class TransactionLogManagerTest extends DataStoreHook{
         Assert.assertTrue(dataStore.list(query).size()==10);
         List<TransactionResult> logs = transactionLogManager.pending(Distributable.DATA_SCOPE,serviceContext.node().nodeId());
         logs.forEach(log->{
-            List<TransactionLog> pg = transactionLogManager.committed(Distributable.DATA_SCOPE,log.distributionId());
+            List<Transaction.Log> pg = transactionLogManager.committed(Distributable.DATA_SCOPE,log.distributionId());
             pg.forEach(p->{
-                p.source = "foo_test";
+                p.source("foo_test");
             });
             transactionLogManager.onTransaction(pg);
         });

@@ -6,7 +6,6 @@ import com.hazelcast.nio.serialization.Portable;
 import com.icodesoftware.*;
 
 import com.icodesoftware.lmdb.TransactionLog;
-import com.icodesoftware.lmdb.TransactionLogListener;
 import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.event.TransactionReplicationEvent;
@@ -15,7 +14,7 @@ import com.tarantula.platform.service.cluster.DistributionReplicator;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider, TransactionLogListener {
+public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider, Transaction.TransactionLogListener {
 
     private final static String CONFIG = "replication-service-settings";
 
@@ -108,7 +107,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider,
     }
 
     public void onTransactionReplicationEvent(TransactionReplicationEvent event){
-        List<TransactionLog> logs = new ArrayList<>();
+        List<Transaction.Log> logs = new ArrayList<>();
         for(Portable portableTransactionLog : event.pendingLogs){
             logs.add(((PortableTransactionLog)portableTransactionLog).transactionLog);
         }
@@ -118,29 +117,29 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider,
     public TransactionLogManager transactionLogManager(){
         return transactionLogManager;
     }
-    protected void onHomingAgent(TransactionLog transactionLog){
+    protected void onHomingAgent(Transaction.Log transactionLog){
         serviceContext.node().homingAgent().onTransactionLog(transactionLog.toBinary());
     }
 
     @Override
-    public void onTransactionLog(TransactionLog transactionLog) {
+    public void onTransactionLog(Transaction.Log transactionLog) {
         //super.onHomingAgent(transactionLog);
-        if(!transactionLog.deleting) return;
-        logger.warn("Deleting from : "+transactionLog.source+" : "+transactionLog.edgeLabel+" : "+transactionLog.revision());
-        DataStore dataStore = serviceContext.dataStore(scope,transactionLog.source);
-        if(transactionLog.edgeLabel==null){
+        if(!transactionLog.deleting()) return;
+        logger.warn("Deleting from : "+transactionLog.source()+" : "+transactionLog.edgeLabel()+" : "+transactionLog.revisionNumber());
+        DataStore dataStore = serviceContext.dataStore(scope,transactionLog.source());
+        if(transactionLog.edgeLabel()==null){
             dataStore.backup().unset((k,v)->{
-                k.write(transactionLog.key);
+                k.write(transactionLog.primaryKey());
                 return true;
             });
             return;
         }
-        dataStore.backup().unsetEdge(transactionLog.edgeLabel,(k,v)->{
-            k.write(transactionLog.key);
-            if (transactionLog.edgeKey == null) return true;
-            v.write(transactionLog.edgeKey);
+        dataStore.backup().unsetEdge(transactionLog.edgeLabel(),(k,v)->{
+            k.write(transactionLog.primaryKey());
+            if (transactionLog.edgeKey() == null) return true;
+            v.write(transactionLog.edgeKey());
             return true;
-        },transactionLog.edgeLabel==null);
+        },transactionLog.edgeLabel()==null);
 
     }
 }

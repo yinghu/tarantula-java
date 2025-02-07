@@ -22,7 +22,7 @@ public class LMDBRecoveryTest extends LMDBHook{
         DataStore dataStore = lmdbDataStoreProvider.createDataStore("test_user");
         Metadata metadata = new LocalMetadata(Distributable.DATA_SCOPE,"test_user");
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
             testMapStoreListener.transactionLogManager.onTransaction(logs);
             try(Recoverable.DataBufferPair kv = lmdbDataStoreProvider.dataBufferPair()){
                 Recoverable.DataBuffer key  = kv.key();
@@ -61,7 +61,7 @@ public class LMDBRecoveryTest extends LMDBHook{
         long ownerId = localDistributionIdGenerator.id();
         Metadata metadata = new LocalMetadata(Distributable.DATA_SCOPE,"test_user");
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
             testMapStoreListener.transactionLogManager.onTransaction(logs);
             try(Recoverable.DataBufferPair kv = lmdbDataStoreProvider.dataBufferPair()){
                 Recoverable.DataBuffer key  = kv.key();

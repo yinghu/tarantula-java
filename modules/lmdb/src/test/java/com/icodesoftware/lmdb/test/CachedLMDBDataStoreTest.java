@@ -3,6 +3,7 @@ package com.icodesoftware.lmdb.test;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.Transaction;
 import com.icodesoftware.lmdb.*;
 import com.icodesoftware.util.SnowflakeKey;
 
@@ -20,7 +21,7 @@ public class CachedLMDBDataStoreTest extends LMDBHook{
     public void testCreate(){
         long ownerId = localDistributionIdGenerator.id();
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
             Assert.assertEquals(logs.size(),2);
             testMapStoreListener.transactionLogManager.onTransaction(logs);
         };
@@ -62,7 +63,7 @@ public class CachedLMDBDataStoreTest extends LMDBHook{
     @Test(groups = { "LMDB" })
     public void testCreateIfAbsent() {
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
             testMapStoreListener.transactionLogManager.onTransaction(logs);
         };
         DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore("test_cmdb_access");
@@ -86,7 +87,7 @@ public class CachedLMDBDataStoreTest extends LMDBHook{
     @Test(groups = { "LMDB" })
     public void testUpdate() {
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
             testMapStoreListener.transactionLogManager.onTransaction(logs);
         };
         DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore("test_cmdb_update");
@@ -122,7 +123,7 @@ public class CachedLMDBDataStoreTest extends LMDBHook{
     @Test(groups = { "LMDB" })
     public void testDelete() {
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
             testMapStoreListener.transactionLogManager.onTransaction(logs);
         };
         DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore("test_cmdb_delete");
@@ -173,7 +174,7 @@ public class CachedLMDBDataStoreTest extends LMDBHook{
     @Test(groups = { "LMDB" })
     public void testDeleteEdge() {
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
             testMapStoreListener.transactionLogManager.onTransaction(logs);
         };
         DataStore ds = lmdbDataStoreProvider.createAccessIndexDataStore("test_cmdb_delete_edge");

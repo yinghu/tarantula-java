@@ -3,6 +3,7 @@ package com.tarantula.platform.service.persistence;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+import com.icodesoftware.Transaction;
 import com.icodesoftware.lmdb.TransactionLog;
 import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.util.RecoverableObject;
@@ -13,9 +14,9 @@ import java.io.IOException;
 
 public class PortableTransactionLog extends RecoverableObject implements Portable {
 
-    public TransactionLog transactionLog;
+    public Transaction.Log transactionLog;
 
-    public PortableTransactionLog(TransactionLog transactionLog){
+    public PortableTransactionLog(Transaction.Log transactionLog){
         this.transactionLog = transactionLog;
     }
 
@@ -34,27 +35,27 @@ public class PortableTransactionLog extends RecoverableObject implements Portabl
 
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeBoolean("1",transactionLog.deleting);
-        portableWriter.writeInt("2",transactionLog.scope);
-        portableWriter.writeUTF("3",transactionLog.source);
-        portableWriter.writeLong("4",transactionLog.revision());
-        portableWriter.writeUTF("5",transactionLog.edgeLabel);
-        portableWriter.writeByteArray("6",transactionLog.key);
-        portableWriter.writeByteArray("7",transactionLog.value);
-        portableWriter.writeByteArray("8",transactionLog.edgeKey);
+        portableWriter.writeBoolean("1",transactionLog.deleting());
+        portableWriter.writeInt("2",transactionLog.sourceScope());
+        portableWriter.writeUTF("3",transactionLog.source());
+        portableWriter.writeLong("4",transactionLog.revisionNumber());
+        portableWriter.writeUTF("5",transactionLog.edgeLabel());
+        portableWriter.writeByteArray("6",transactionLog.primaryKey());
+        portableWriter.writeByteArray("7",transactionLog.value());
+        portableWriter.writeByteArray("8",transactionLog.edgeKey());
     }
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
         transactionLog = new TransactionLog();
-        transactionLog.deleting = portableReader.readBoolean("1");
-        transactionLog.scope = portableReader.readInt("2");
-        transactionLog.source = portableReader.readUTF("3");
-        transactionLog.revision(portableReader.readLong("4"));
-        transactionLog.edgeLabel = portableReader.readUTF("5");
-        transactionLog.key = portableReader.readByteArray("6");
-        transactionLog.value = portableReader.readByteArray("7");
-        transactionLog.edgeKey = portableReader.readByteArray("8");
+        transactionLog.deleting(portableReader.readBoolean("1"));
+        transactionLog.sourceScope(portableReader.readInt("2"));
+        transactionLog.source(portableReader.readUTF("3"));
+        transactionLog.revisionNumber(portableReader.readLong("4"));
+        transactionLog.edgeLabel(portableReader.readUTF("5"));
+        transactionLog.primaryKey( portableReader.readByteArray("6"));
+        transactionLog.value(portableReader.readByteArray("7"));
+        transactionLog.edgeKey(portableReader.readByteArray("8"));
     }
 
 }

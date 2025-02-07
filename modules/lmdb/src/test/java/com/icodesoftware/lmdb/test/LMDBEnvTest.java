@@ -3,6 +3,7 @@ package com.icodesoftware.lmdb.test;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.Transaction;
 import com.icodesoftware.lmdb.*;
 import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.util.BufferUtil;
@@ -25,7 +26,7 @@ public class LMDBEnvTest extends LMDBHook{
     @Test(groups = { "LMDBRecovery" })
     public void testCreate(){
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
             testMapStoreListener.transactionLogManager.onTransaction(logs);
         };
         long ownerId = localDistributionIdGenerator.id();

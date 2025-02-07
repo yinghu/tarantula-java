@@ -3,8 +3,8 @@ package com.tarantula.platform.service.persistence;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.Transaction;
 import com.icodesoftware.lmdb.TransactionLog;
-import com.icodesoftware.lmdb.TransactionLogListener;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Batchable;
 import com.icodesoftware.service.MapStoreListener;
@@ -15,7 +15,7 @@ import com.tarantula.platform.event.TransactionReplicationEvent;
 
 import java.util.List;
 
-public class DataScopeReplicationProxy extends ScopedReplicationProxy implements TransactionLogListener {
+public class DataScopeReplicationProxy extends ScopedReplicationProxy implements Transaction.TransactionLogListener {
     public DataScopeReplicationProxy(){
         super("data", Distributable.DATA_SCOPE);
     }
@@ -23,7 +23,7 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy implements
     public void onCommit(int scope,long transactionId) {
         super.onCommit(scope, transactionId);
         ReplicationSynchronizerTimeout replicationEvent = new ReplicationSynchronizerTimeout(asyncInterval, () -> {
-            List<TransactionLog> logs = transactionLogManager.committed(scope, transactionId);
+            List<Transaction.Log> logs = transactionLogManager.committed(scope, transactionId);
             transactionLogManager.onTransaction(logs);
             TransactionReplicationEvent transactionReplicationEvent = new TransactionReplicationEvent();
             transactionReplicationEvent.destination(MapStoreListener.DATA_MAP_STORE_NAME);
@@ -117,24 +117,24 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy implements
     }
 
     @Override
-    public void onTransactionLog(TransactionLog transactionLog) {
+    public void onTransactionLog(Transaction.Log transactionLog) {
         super.onHomingAgent(transactionLog);
-        if(!transactionLog.deleting) return;
-        logger.warn("Deleting from : "+transactionLog.source+" : "+transactionLog.edgeLabel+" : "+transactionLog.revision());
-        DataStore dataStore = serviceContext.dataStore(scope,transactionLog.source);
-        if(transactionLog.edgeLabel==null){
+        if(!transactionLog.deleting()) return;
+        logger.warn("Deleting from : "+transactionLog.source()+" : "+transactionLog.edgeLabel()+" : "+transactionLog.revisionNumber());
+        DataStore dataStore = serviceContext.dataStore(scope,transactionLog.source());
+        if(transactionLog.edgeLabel()==null){
             dataStore.backup().unset((k,v)->{
-                k.write(transactionLog.key);
+                k.write(transactionLog.primaryKey());
                 return true;
             });
             return;
         }
-        dataStore.backup().unsetEdge(transactionLog.edgeLabel,(k,v)->{
-            k.write(transactionLog.key);
-            if (transactionLog.edgeKey == null) return true;
-            v.write(transactionLog.edgeKey);
+        dataStore.backup().unsetEdge(transactionLog.edgeLabel(),(k,v)->{
+            k.write(transactionLog.primaryKey());
+            if (transactionLog.edgeKey() == null) return true;
+            v.write(transactionLog.edgeKey());
             return true;
-        },transactionLog.edgeLabel==null);
+        },transactionLog.edgeLabel()==null);
     }
 }
 

@@ -456,9 +456,9 @@ public class TransactionTest extends LMDBHook{
         //DataStore flog = lmdbDataStoreProvider.createLogDataStore("log_a_test_bar_txc");
         long ownerId = localDistributionIdGenerator.id();
         testMapStoreListener.verifier = (tid)->{
-            List<TransactionLog> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(Distributable.INTEGRATION_SCOPE,tid);
             logs.forEach(e->{
-                e.source = "test_bar_txc";
+                e.source("test_bar_txc");
             });
             testMapStoreListener.transactionLogManager.onTransaction(logs);
         };

@@ -23,21 +23,31 @@ public interface Transaction extends AutoCloseable{
     }
     interface Log{
         boolean deleting();
-        int scope();
+        int sourceScope();
         String source();
         String edgeLabel();
-        long revision();
+        long revisionNumber();
         byte[] primaryKey();
         byte[] value();
         byte[] edgeKey();
 
         void deleting(boolean deleting);
-        void scope(int scope);
+        void sourceScope(int sourceScope);
         void source(String source);
         void edgeLabel(String edgeLabel);
-        void revision(long revisionNumber);
+        void revisionNumber(long revisionNumber);
         void primaryKey(byte[] primaryKey);
         void value(byte[] value);
         void edgeKey(byte[] edgeKey);
+
+        byte[] toBinary();
+        void fromBinary(byte[] payload);
+
+         boolean read(Recoverable.DataBuffer buffer);
+         boolean write(Recoverable.DataBuffer buffer);
+    }
+    interface TransactionLogListener {
+
+        void onTransactionLog(Transaction.Log transactionLog);
     }
 }
