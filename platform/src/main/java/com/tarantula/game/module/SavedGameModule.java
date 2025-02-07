@@ -3,7 +3,6 @@ package com.tarantula.game.module;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
-import com.icodesoftware.service.Content;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.presence.*;
 
@@ -76,14 +75,23 @@ public class SavedGameModule extends ModuleHeader {
 
             session.write(JsonUtil.toSimpleResponse(successful,"create player profile").getBytes());
         }
-
-        //pvp saves start
         else if(session.action().equals("onSaveDefenseTeam")){
             TeamFormationResponse response  = gameServiceProvider.pvpBattleServiceProvider().saveDefenseTeam(session,bytes);
             session.write(response.toJson().toString().getBytes());
         }
-        //pvp saves end
+        else if(session.action().equals("onSeasonInfo")){
+            //SeasonCredentialConfiguration.Season season  = gameServiceProvider.pvpBattleServiceProvider().currentSeason();
+            //session.write(season.toJson().toString().getBytes());
+            session.write(PVPMockData.getSeasonInfo().getBytes());
+        }
+        else if(session.action().equals("onPVPList")){
+            boolean shouldRefresh = Boolean.parseBoolean(session.name());
 
+            session.write(PVPMockData.getPVPList().getBytes());
+        }
+        else if(session.action().equals("onBattleLog")){
+            session.write(PVPMockData.getBattleLog().getBytes());
+        }
         else{
             throw new UnsupportedOperationException(session.action());
         }
