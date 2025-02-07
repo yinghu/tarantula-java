@@ -26,10 +26,18 @@ public interface Transaction extends AutoCloseable{
         int scope();
         String source();
         String edgeLabel();
-        long revisionNumber();
-        byte[] key();
+        long revision();
+        byte[] primaryKey();
         byte[] value();
         byte[] edgeKey();
 
+        void deleting(boolean deleting);
+        void scope(int scope);
+        void source(String source);
+        void edgeLabel(String edgeLabel);
+        void revision(long revisionNumber);
+        void primaryKey(byte[] primaryKey);
+        void value(byte[] value);
+        void edgeKey(byte[] edgeKey);
     }
 }

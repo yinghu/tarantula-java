@@ -37,7 +37,7 @@ public class PortableTransactionLog extends RecoverableObject implements Portabl
         portableWriter.writeBoolean("1",transactionLog.deleting);
         portableWriter.writeInt("2",transactionLog.scope);
         portableWriter.writeUTF("3",transactionLog.source);
-        portableWriter.writeLong("4",transactionLog.updatingRevision);
+        portableWriter.writeLong("4",transactionLog.revision());
         portableWriter.writeUTF("5",transactionLog.edgeLabel);
         portableWriter.writeByteArray("6",transactionLog.key);
         portableWriter.writeByteArray("7",transactionLog.value);
@@ -50,7 +50,7 @@ public class PortableTransactionLog extends RecoverableObject implements Portabl
         transactionLog.deleting = portableReader.readBoolean("1");
         transactionLog.scope = portableReader.readInt("2");
         transactionLog.source = portableReader.readUTF("3");
-        transactionLog.updatingRevision = portableReader.readLong("4");
+        transactionLog.revision(portableReader.readLong("4"));
         transactionLog.edgeLabel = portableReader.readUTF("5");
         transactionLog.key = portableReader.readByteArray("6");
         transactionLog.value = portableReader.readByteArray("7");

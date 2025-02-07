@@ -126,7 +126,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider,
     public void onTransactionLog(TransactionLog transactionLog) {
         //super.onHomingAgent(transactionLog);
         if(!transactionLog.deleting) return;
-        logger.warn("Deleting from : "+transactionLog.source+" : "+transactionLog.edgeLabel+" : "+transactionLog.updatingRevision);
+        logger.warn("Deleting from : "+transactionLog.source+" : "+transactionLog.edgeLabel+" : "+transactionLog.revision());
         DataStore dataStore = serviceContext.dataStore(scope,transactionLog.source);
         if(transactionLog.edgeLabel==null){
             dataStore.backup().unset((k,v)->{
