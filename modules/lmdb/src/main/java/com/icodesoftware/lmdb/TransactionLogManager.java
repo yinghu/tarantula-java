@@ -9,6 +9,7 @@ import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.BinaryKey;
 import com.icodesoftware.util.BufferProxy;
+import com.icodesoftware.util.DataBufferKey;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,11 +48,12 @@ public class TransactionLogManager implements Closable {
         ts.list(query).forEach(t->{
             DataStore tds = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(t.scope)+t.source);
             if(t.edgeLabel==null && !t.deleting){
-                tds.backup().get(new BinaryKey(t.key),(k,v)->{
-                    t.value = v.array();
+                tds.backup().get(DataBufferKey.from(t.key),(k, v)->{
+                    t.value = BufferProxy.copy(v.src());
                     pending.add(t);
                     return true;
                 });
+                t.key.rewind();
             }else{
                 pending.add(t);
             }
@@ -82,7 +84,7 @@ public class TransactionLogManager implements Closable {
             });
             if(!suc || transactionId <0 ) return;
             key.rewind();
-            TransactionLog log = TransactionLog.log(transactionId,false, metadata.scope(), metadata.source(),metadata.label(),key.array(),null,header.revision());
+            TransactionLog log = TransactionLog.log(transactionId,false, metadata.scope(), metadata.source(),metadata.label(),key,null,header.revision());
             ts.create(log);
             return;
         }
@@ -98,7 +100,7 @@ public class TransactionLogManager implements Closable {
         if(!suc || transactionId <0 ) return;
         key.rewind();
         value.rewind();
-        TransactionLog log = TransactionLog.log(transactionId,false,metadata.scope(),metadata.source(),metadata.label(),key.array(),value.array(),0);
+        TransactionLog log = TransactionLog.log(transactionId,false,metadata.scope(),metadata.source(),metadata.label(),key,value,0);
         ts.create(log);
     }
 
@@ -160,28 +162,26 @@ public class TransactionLogManager implements Closable {
         DataStore dataStore = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(metadata.scope())+metadata.source());
         DataStore ts = transactionLogStore(metadata.scope());
         if(metadata.label()==null){
-            byte[] ak = key.array();
             if(!dataStore.backup().unset((k,v)->{
-                for(byte b : ak){
-                    k.writeByte(b);
-                }
+                k.write(key);
                 return true;
             })) return false;
-            TransactionLog log = TransactionLog.log(transactionId,true, metadata.scope(), metadata.source(),metadata.label(),ak,null,0);
+            key.rewind();
+            TransactionLog log = TransactionLog.log(transactionId,true, metadata.scope(), metadata.source(),metadata.label(),key,null,0);
             ts.create(log);
             return true;
         }
         if(value!=null) {
-            byte[] ak = key.array();
-            byte[] av = value.array();
-            TransactionLog log = TransactionLog.log(transactionId,true, metadata.scope(), metadata.source(),metadata.label(),ak,av,0);
+            TransactionLog log = TransactionLog.log(transactionId,true, metadata.scope(), metadata.source(),metadata.label(),key,value,0);
             ts.create(log);
-            return dataStore.deleteEdge(new BinaryKey(ak),new BinaryKey(av), metadata.label());
+            key.rewind();
+            value.rewind();
+            return dataStore.deleteEdge(DataBufferKey.from(key),DataBufferKey.from(value), metadata.label());
         }
-        byte[] ak = key.array();
-        TransactionLog log = TransactionLog.log(transactionId,true, metadata.scope(), metadata.source(),metadata.label(),ak,null,0);
+        TransactionLog log = TransactionLog.log(transactionId,true, metadata.scope(), metadata.source(),metadata.label(),key,null,0);
         ts.create(log);
-        return dataStore.deleteEdge(new BinaryKey(ak),metadata.label());
+        key.rewind();
+        return dataStore.deleteEdge(DataBufferKey.from(key),metadata.label());
     }
 
 
@@ -230,43 +230,29 @@ public class TransactionLogManager implements Closable {
             if(log.deleting){
                 if(log.edgeLabel==null){
                     dataStore.backup().unset((k,v)->{
-                        for(byte b : log.key){
-                            k.writeByte(b);
-                        }
+                        k.write(log.key);
                         return true;
                     });
                 }else {
                     dataStore.backup().unsetEdge(log.edgeLabel, (k, v) -> {
-                        for (byte b : log.key) {
-                            k.writeByte(b);
-                        }
+                        k.write(log.key);
                         if (log.edgeKey == null) return true;
-                        for (byte b : log.edgeKey) {
-                            v.writeByte(b);
-                        }
+                        v.write(log.edgeKey);
                         return true;
                     }, log.edgeKey == null);
                 }
             }else{
                 if(log.edgeLabel==null){//write key/value
                     dataStore.backup().set((k,v)->{
-                        for(byte b : log.key){
-                            k.writeByte(b);
-                        }
-                        for(byte b : log.value){
-                            v.writeByte(b);
-                        }
+                        k.write(log.key);
+                        v.write(log.value);
                         return true;
                     });
                 }else{
                     //write edge
                     dataStore.backup().setEdge(log.edgeLabel,(k,v)->{
-                        for(byte b : log.key){
-                            k.writeByte(b);
-                        }
-                        for(byte b : log.edgeKey){
-                            v.writeByte(b);
-                        }
+                        k.write(log.key);
+                        v.write(log.edgeKey);
                         return true;
                     });
                 }

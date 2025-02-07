@@ -21,4 +21,15 @@ public interface Transaction extends AutoCloseable{
         default void afterCommit(long transactionId){}
         default void afterAbort(long transactionId,Exception exception){}
     }
+    interface Log{
+        boolean deleting();
+        int scope();
+        String source();
+        String edgeLabel();
+        long revisionNumber();
+        Recoverable.DataBuffer key();
+        Recoverable.DataBuffer value();
+        Recoverable.DataBuffer edgeKey();
+
+    }
 }

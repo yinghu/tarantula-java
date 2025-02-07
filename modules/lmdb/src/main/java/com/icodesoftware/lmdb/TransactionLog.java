@@ -1,8 +1,11 @@
 package com.icodesoftware.lmdb;
 
 import com.icodesoftware.util.BufferProxy;
+import com.icodesoftware.util.IOStreamDataBuffer;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.SnowflakeKey;
+
+import java.io.ByteArrayOutputStream;
 
 public class TransactionLog extends RecoverableObject {
 
@@ -16,23 +19,23 @@ public class TransactionLog extends RecoverableObject {
     public String source;
     public String edgeLabel;
 
-    public byte[] key;
+    public DataBuffer key;
 
-    public byte[] value;
-    public byte[] edgeKey;
+    public DataBuffer value;
+    public DataBuffer edgeKey;
 
     public TransactionLog(){
         this.label = LABEL;
         this.onEdge = true;
     }
-    public TransactionLog(boolean deleting, int scope, String source, String edgeLabel, byte[] key, byte[] edgeKey, long updatingRevision){
+    public TransactionLog(boolean deleting, int scope, String source, String edgeLabel, DataBuffer key, DataBuffer edgeKey, long updatingRevision){
         this();
         this.deleting = deleting;
         this.scope = scope;
         this.source = source;
         this.edgeLabel = edgeLabel;
-        this.key = key;
-        this.edgeKey = edgeKey;
+        this.key = BufferProxy.copy(key.src());
+        if(edgeKey != null) this.edgeKey = BufferProxy.copy(edgeKey.src());
         this.updatingRevision = updatingRevision;
     }
     @Override
@@ -42,19 +45,15 @@ public class TransactionLog extends RecoverableObject {
         buffer.writeInt(scope);
         buffer.writeUTF8(source);
         buffer.writeUTF8(edgeLabel);
-        buffer.writeInt(key.length);
-        for(byte b: key){
-            buffer.writeByte(b);
-        }
+        buffer.writeInt(key.remaining());
+        buffer.write(key);
         if(edgeLabel==null) return true;
         if(edgeKey==null){
             buffer.writeInt(0);
             return true;
         }
-        buffer.writeInt(edgeKey.length);
-        for(byte b: edgeKey){
-            buffer.writeByte(b);
-        }
+        buffer.writeInt(edgeKey.remaining());
+        buffer.write(edgeKey);
         return true;
     }
 
@@ -65,17 +64,15 @@ public class TransactionLog extends RecoverableObject {
         scope = buffer.readInt();
         source = buffer.readUTF8();
         edgeLabel = buffer.readUTF8();
-        key = new byte[buffer.readInt()];
-        for(int i=0;i<key.length;i++){
-            key[i]=buffer.readByte();
-        }
+        key = BufferProxy.buffer(buffer.readInt(),buffer.direct());
+        buffer.read(key);
+        key.flip();
         if(edgeLabel==null) return true;
         int esize = buffer.readInt();
         if(esize==0) return true;
-        edgeKey = new byte[esize];
-        for(int i=0;i<edgeKey.length;i++){
-            edgeKey[i]=buffer.readByte();
-        }
+        edgeKey = BufferProxy.buffer(esize,buffer.direct());
+        buffer.read(edgeKey);
+        edgeKey.flip();
         return true;
     }
 
@@ -87,52 +84,51 @@ public class TransactionLog extends RecoverableObject {
         scope = buffer.readInt();
         source = buffer.readUTF8();
         edgeLabel = buffer.readUTF8();
-        key = new byte[buffer.readInt()];
-        for(int i=0;i<key.length;i++){
-            key[i]=buffer.readByte();
+        key = BufferProxy.buffer(buffer.readInt(),false);
+        while (!key.full()){
+            key.writeByte(buffer.readByte());
         }
+        key.flip();
         int esize = buffer.readInt();
         if(esize>0){
-            edgeKey = new byte[esize];
-            for(int i=0;i<edgeKey.length;i++){
-                edgeKey[i]=buffer.readByte();
+            edgeKey = BufferProxy.buffer(esize,false);
+            while (!edgeKey.full()){
+                edgeKey.writeByte(buffer.readByte());
             }
+            edgeKey.flip();
         }
         int vsize = buffer.readInt();
         if(vsize>0){
-            value = new byte[vsize];
-            for(int i=0;i<value.length;i++){
-                value[i]=buffer.readByte();
+            value =  BufferProxy.buffer(vsize,false);
+            while (!value.full()){
+                value.writeByte(buffer.readByte());
             }
+            value.flip();
         }
     }
 
     @Override
     public byte[] toBinary() {
-        DataBuffer buffer = BufferProxy.buffer(2032,true);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(2000);
+        DataBuffer buffer = IOStreamDataBuffer.writer(outputStream);
         buffer.writeBoolean(deleting);
         buffer.writeLong(updatingRevision);
         buffer.writeInt(scope);
         buffer.writeUTF8(source);
         buffer.writeUTF8(edgeLabel);
-        buffer.writeInt(key.length);
-        for(byte b: key){
-            buffer.writeByte(b);
-        }
-        buffer.writeInt(edgeLabel!=null?edgeKey.length:0);
+        buffer.writeInt(key.remaining());
+        buffer.write(key);
+
+        buffer.writeInt(edgeLabel!=null?edgeKey.remaining():0);
         if(edgeLabel!=null){
-            for(byte b: edgeKey){
-                buffer.writeByte(b);
-            }
+            buffer.write(edgeKey);
         }
-        buffer.writeInt(value!=null?value.length:0);
+        buffer.writeInt(value!=null?value.remaining():0);
         if(value!=null){
-            for(byte b: value){
-                buffer.writeByte(b);
-            }
+            buffer.write(value);
         }
         buffer.flip();
-        return buffer.array();
+        return outputStream.toByteArray();
     }
 
     @Override
@@ -145,7 +141,7 @@ public class TransactionLog extends RecoverableObject {
         return PersistencePortableRegistry.TRANSACTION_LOG_CID;
     }
 
-    public static TransactionLog log(long transactionId,boolean deleting,int scope,String source,String edgeLabel,byte[] key,byte[] edgeKey,long updatingRevision){
+    public static TransactionLog log(long transactionId, boolean deleting, int scope, String source, String edgeLabel, DataBuffer key, DataBuffer edgeKey, long updatingRevision){
         TransactionLog transactionLog = new TransactionLog(deleting,scope,source,edgeLabel,key,edgeKey,updatingRevision);
         transactionLog.ownerKey(new SnowflakeKey(transactionId));
         return transactionLog;

@@ -130,21 +130,15 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider,
         DataStore dataStore = serviceContext.dataStore(scope,transactionLog.source);
         if(transactionLog.edgeLabel==null){
             dataStore.backup().unset((k,v)->{
-                for(byte b : transactionLog.key){
-                    k.writeByte(b);
-                }
+                k.write(transactionLog.key);
                 return true;
             });
             return;
         }
         dataStore.backup().unsetEdge(transactionLog.edgeLabel,(k,v)->{
-            for (byte b : transactionLog.key) {
-                k.writeByte(b);
-            }
+            k.write(transactionLog.key);
             if (transactionLog.edgeKey == null) return true;
-            for (byte b : transactionLog.edgeKey) {
-                v.writeByte(b);
-            }
+            v.write(transactionLog.edgeKey);
             return true;
         },transactionLog.edgeLabel==null);
 
