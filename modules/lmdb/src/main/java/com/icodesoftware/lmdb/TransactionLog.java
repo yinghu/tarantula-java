@@ -84,14 +84,14 @@ public class TransactionLog extends RecoverableObject {
         scope = buffer.readInt();
         source = buffer.readUTF8();
         edgeLabel = buffer.readUTF8();
-        key = BufferProxy.buffer(buffer.readInt(),false);
+        key = BufferProxy.buffer(buffer.readInt(),true);
         while (!key.full()){
             key.writeByte(buffer.readByte());
         }
         key.flip();
         int esize = buffer.readInt();
         if(esize>0){
-            edgeKey = BufferProxy.buffer(esize,false);
+            edgeKey = BufferProxy.buffer(esize,true);
             while (!edgeKey.full()){
                 edgeKey.writeByte(buffer.readByte());
             }
@@ -99,7 +99,7 @@ public class TransactionLog extends RecoverableObject {
         }
         int vsize = buffer.readInt();
         if(vsize>0){
-            value =  BufferProxy.buffer(vsize,false);
+            value =  BufferProxy.buffer(vsize,true);
             while (!value.full()){
                 value.writeByte(buffer.readByte());
             }

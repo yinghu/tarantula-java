@@ -349,8 +349,8 @@ public class CachedLMDBDataStore implements DataStore,DataStore.Backup ,Closable
             LocalEdgeDataStore localEdgeDataStore = lmdbDataStoreProvider.createEdgeDB(scope,name,query.label());
             key.flip();
             if(lmdbDataStoreProvider.onRecovering(localEdgeDataStore.metadata(),key,(e,v)->{
-                ByteBuffer ek1 = e.flip();
-                ByteBuffer ev1 = v.flip();
+                ByteBuffer ek1 = e.src();
+                ByteBuffer ev1 = v.src();
                 set(ek1,ev1);
                 e.rewind();
                 key.rewind();

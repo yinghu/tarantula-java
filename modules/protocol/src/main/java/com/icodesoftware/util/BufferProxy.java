@@ -161,6 +161,7 @@ public class BufferProxy implements Recoverable.DataBuffer {
         for(byte b : data){
             wrap.writeByte(b);
         }
+        wrap.flip();
         return wrap;
     }
 

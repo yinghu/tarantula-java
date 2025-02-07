@@ -113,7 +113,7 @@ public class BufferProxyTest {
         Assert.assertEquals(bytes.length,20);
 
         Recoverable.DataBuffer dataBuffer = BufferProxy.wrapDirectly(bytes);
-        dataBuffer.flip();
+        //dataBuffer.flip();
         Assert.assertEquals(dataBuffer.readUTF8(),"test");
         Assert.assertEquals(dataBuffer.readLong(),100);
         Assert.assertEquals(dataBuffer.readInt(),200);
