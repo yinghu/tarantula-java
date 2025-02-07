@@ -19,23 +19,23 @@ public class TransactionLog extends RecoverableObject {
     public String source;
     public String edgeLabel;
 
-    public DataBuffer key;
+    public byte[] key;
 
-    public DataBuffer value;
-    public DataBuffer edgeKey;
+    public byte[] value;
+    public byte[] edgeKey;
 
     public TransactionLog(){
         this.label = LABEL;
         this.onEdge = true;
     }
-    public TransactionLog(boolean deleting, int scope, String source, String edgeLabel, DataBuffer key, DataBuffer edgeKey, long updatingRevision){
+    public TransactionLog(boolean deleting, int scope, String source, String edgeLabel, byte[] key, byte[] edgeKey, long updatingRevision){
         this();
         this.deleting = deleting;
         this.scope = scope;
         this.source = source;
         this.edgeLabel = edgeLabel;
-        this.key = BufferProxy.copy(key.src());
-        if(edgeKey != null) this.edgeKey = BufferProxy.copy(edgeKey.src());
+        this.key = key;
+        if(edgeKey != null) this.edgeKey = edgeKey;
         this.updatingRevision = updatingRevision;
     }
     @Override
@@ -45,14 +45,14 @@ public class TransactionLog extends RecoverableObject {
         buffer.writeInt(scope);
         buffer.writeUTF8(source);
         buffer.writeUTF8(edgeLabel);
-        buffer.writeInt(key.remaining());
+        buffer.writeInt(key.length);
         buffer.write(key);
         if(edgeLabel==null) return true;
         if(edgeKey==null){
             buffer.writeInt(0);
             return true;
         }
-        buffer.writeInt(edgeKey.remaining());
+        buffer.writeInt(edgeKey.length);
         buffer.write(edgeKey);
         return true;
     }
@@ -64,15 +64,13 @@ public class TransactionLog extends RecoverableObject {
         scope = buffer.readInt();
         source = buffer.readUTF8();
         edgeLabel = buffer.readUTF8();
-        key = BufferProxy.buffer(buffer.readInt(),buffer.direct());
+        key = new byte[buffer.readInt()];
         buffer.read(key);
-        key.flip();
         if(edgeLabel==null) return true;
         int esize = buffer.readInt();
         if(esize==0) return true;
-        edgeKey = BufferProxy.buffer(esize,buffer.direct());
+        edgeKey = new byte[esize];
         buffer.read(edgeKey);
-        edgeKey.flip();
         return true;
     }
 
@@ -84,26 +82,17 @@ public class TransactionLog extends RecoverableObject {
         scope = buffer.readInt();
         source = buffer.readUTF8();
         edgeLabel = buffer.readUTF8();
-        key = BufferProxy.buffer(buffer.readInt(),true);
-        while (!key.full()){
-            key.writeByte(buffer.readByte());
-        }
-        key.flip();
+        key = new byte[buffer.readInt()];
+        buffer.read(key);
         int esize = buffer.readInt();
         if(esize>0){
-            edgeKey = BufferProxy.buffer(esize,true);
-            while (!edgeKey.full()){
-                edgeKey.writeByte(buffer.readByte());
-            }
-            edgeKey.flip();
+            edgeKey = new byte[esize];
+            buffer.read(edgeKey);
         }
         int vsize = buffer.readInt();
         if(vsize>0){
-            value =  BufferProxy.buffer(vsize,true);
-            while (!value.full()){
-                value.writeByte(buffer.readByte());
-            }
-            value.flip();
+            value =  new byte[vsize];
+            buffer.read(value);
         }
     }
 
@@ -116,14 +105,14 @@ public class TransactionLog extends RecoverableObject {
         buffer.writeInt(scope);
         buffer.writeUTF8(source);
         buffer.writeUTF8(edgeLabel);
-        buffer.writeInt(key.remaining());
+        buffer.writeInt(key.length);
         buffer.write(key);
 
-        buffer.writeInt(edgeLabel!=null?edgeKey.remaining():0);
+        buffer.writeInt(edgeLabel!=null?edgeKey.length:0);
         if(edgeLabel!=null){
             buffer.write(edgeKey);
         }
-        buffer.writeInt(value!=null?value.remaining():0);
+        buffer.writeInt(value!=null?value.length:0);
         if(value!=null){
             buffer.write(value);
         }
@@ -141,7 +130,7 @@ public class TransactionLog extends RecoverableObject {
         return PersistencePortableRegistry.TRANSACTION_LOG_CID;
     }
 
-    public static TransactionLog log(long transactionId, boolean deleting, int scope, String source, String edgeLabel, DataBuffer key, DataBuffer edgeKey, long updatingRevision){
+    public static TransactionLog log(long transactionId, boolean deleting, int scope, String source, String edgeLabel, byte[] key, byte[] edgeKey, long updatingRevision){
         TransactionLog transactionLog = new TransactionLog(deleting,scope,source,edgeLabel,key,edgeKey,updatingRevision);
         transactionLog.ownerKey(new SnowflakeKey(transactionId));
         return transactionLog;

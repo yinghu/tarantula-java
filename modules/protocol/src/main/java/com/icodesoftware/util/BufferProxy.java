@@ -117,6 +117,17 @@ public class BufferProxy implements Recoverable.DataBuffer {
         return ret.equals(Recoverable.UTF_NULL)?null:ret;
     }
 
+    public Recoverable.DataBuffer write(byte[] src){
+        for(byte b : src){
+            writeByte(b);
+        }
+        return this;
+    }
+    public void read(byte[] dest){
+        for(int i=0;i<dest.length;i++){
+            dest[i]=readByte();
+        }
+    }
     public Recoverable.DataBuffer write(Recoverable.DataBuffer src){
         while (src.hasRemaining()){
             writeByte(src.readByte());

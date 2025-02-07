@@ -27,9 +27,9 @@ public interface Transaction extends AutoCloseable{
         String source();
         String edgeLabel();
         long revisionNumber();
-        Recoverable.DataBuffer key();
-        Recoverable.DataBuffer value();
-        Recoverable.DataBuffer edgeKey();
+        byte[] key();
+        byte[] value();
+        byte[] edgeKey();
 
     }
 }

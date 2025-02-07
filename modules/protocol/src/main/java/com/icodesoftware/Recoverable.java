@@ -90,7 +90,8 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable,V
 
         DataBuffer write(DataBuffer src);
         void read(DataBuffer dest);
-
+        DataBuffer write(byte[] src);
+        void read(byte[] dest);
         byte[] array();
         ByteBuffer src();
         ByteBuffer flip();

@@ -48,12 +48,11 @@ public class TransactionLogManager implements Closable {
         ts.list(query).forEach(t->{
             DataStore tds = serviceContext.dataStore(Distributable.LOG_SCOPE,logPrefix(t.scope)+t.source);
             if(t.edgeLabel==null && !t.deleting){
-                tds.backup().get(DataBufferKey.from(t.key),(k, v)->{
-                    t.value = BufferProxy.copy(v.src());
+                tds.backup().get(BinaryKey.from(t.key),(k, v)->{
+                    t.value = v.array();
                     pending.add(t);
                     return true;
                 });
-                t.key.rewind();
             }else{
                 pending.add(t);
             }
@@ -84,7 +83,7 @@ public class TransactionLogManager implements Closable {
             });
             if(!suc || transactionId <0 ) return;
             key.rewind();
-            TransactionLog log = TransactionLog.log(transactionId,false, metadata.scope(), metadata.source(),metadata.label(),key,null,header.revision());
+            TransactionLog log = TransactionLog.log(transactionId,false, metadata.scope(), metadata.source(),metadata.label(),key.array(),null,header.revision());
             ts.create(log);
             return;
         }
@@ -100,7 +99,7 @@ public class TransactionLogManager implements Closable {
         if(!suc || transactionId <0 ) return;
         key.rewind();
         value.rewind();
-        TransactionLog log = TransactionLog.log(transactionId,false,metadata.scope(),metadata.source(),metadata.label(),key,value,0);
+        TransactionLog log = TransactionLog.log(transactionId,false,metadata.scope(),metadata.source(),metadata.label(),key.array(),value.array(),0);
         ts.create(log);
     }
 
@@ -167,18 +166,18 @@ public class TransactionLogManager implements Closable {
                 return true;
             })) return false;
             key.rewind();
-            TransactionLog log = TransactionLog.log(transactionId,true, metadata.scope(), metadata.source(),metadata.label(),key,null,0);
+            TransactionLog log = TransactionLog.log(transactionId,true, metadata.scope(), metadata.source(),metadata.label(),key.array(),null,0);
             ts.create(log);
             return true;
         }
         if(value!=null) {
-            TransactionLog log = TransactionLog.log(transactionId,true, metadata.scope(), metadata.source(),metadata.label(),key,value,0);
+            TransactionLog log = TransactionLog.log(transactionId,true, metadata.scope(), metadata.source(),metadata.label(),key.array(),value.array(),0);
             ts.create(log);
             key.rewind();
             value.rewind();
             return dataStore.deleteEdge(DataBufferKey.from(key),DataBufferKey.from(value), metadata.label());
         }
-        TransactionLog log = TransactionLog.log(transactionId,true, metadata.scope(), metadata.source(),metadata.label(),key,null,0);
+        TransactionLog log = TransactionLog.log(transactionId,true, metadata.scope(), metadata.source(),metadata.label(),key.array(),null,0);
         ts.create(log);
         key.rewind();
         return dataStore.deleteEdge(DataBufferKey.from(key),metadata.label());

@@ -114,6 +114,16 @@ public class OutputStreamDataBufferProxy extends IOStreamDataBuffer{
         return this;
     }
 
+    public Recoverable.DataBuffer write(byte[] src){
+        for(byte b : src){
+            try{
+                dest.writeByte(b);
+            }catch (Exception ex){
+                throw new RuntimeException(ex);
+            }
+        }
+        return this;
+    }
 
     @Override
     public boolean full() {

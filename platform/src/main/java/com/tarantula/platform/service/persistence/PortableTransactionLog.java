@@ -39,9 +39,9 @@ public class PortableTransactionLog extends RecoverableObject implements Portabl
         portableWriter.writeUTF("3",transactionLog.source);
         portableWriter.writeLong("4",transactionLog.updatingRevision);
         portableWriter.writeUTF("5",transactionLog.edgeLabel);
-        portableWriter.writeByteArray("6",transactionLog.key.array());
-        portableWriter.writeByteArray("7",transactionLog.value.array());
-        portableWriter.writeByteArray("8",transactionLog.edgeKey.array());
+        portableWriter.writeByteArray("6",transactionLog.key);
+        portableWriter.writeByteArray("7",transactionLog.value);
+        portableWriter.writeByteArray("8",transactionLog.edgeKey);
     }
 
     @Override
@@ -52,9 +52,9 @@ public class PortableTransactionLog extends RecoverableObject implements Portabl
         transactionLog.source = portableReader.readUTF("3");
         transactionLog.updatingRevision = portableReader.readLong("4");
         transactionLog.edgeLabel = portableReader.readUTF("5");
-        transactionLog.key = BufferProxy.wrapDirectly(portableReader.readByteArray("6"));
-        transactionLog.value = BufferProxy.wrapDirectly(portableReader.readByteArray("7"));
-        transactionLog.edgeKey = BufferProxy.wrapDirectly(portableReader.readByteArray("8"));
+        transactionLog.key = portableReader.readByteArray("6");
+        transactionLog.value = portableReader.readByteArray("7");
+        transactionLog.edgeKey = portableReader.readByteArray("8");
     }
 
 }
