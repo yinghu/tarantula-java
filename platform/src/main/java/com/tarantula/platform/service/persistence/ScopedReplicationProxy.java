@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.icodesoftware.*;
 
-import com.icodesoftware.lmdb.TransactionLog;
 import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.event.TransactionReplicationEvent;
@@ -14,7 +13,7 @@ import com.tarantula.platform.service.cluster.DistributionReplicator;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider, Transaction.TransactionLogListener {
+public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider, Transaction.LogListener {
 
     private final static String CONFIG = "replication-service-settings";
 
@@ -103,7 +102,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider,
 
     @Override
     public void shutdown() throws Exception {
-        transactionLogManager.close();
+        //transactionLogManager.close();
     }
 
     public void onTransactionReplicationEvent(TransactionReplicationEvent event){
@@ -122,7 +121,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider,
     }
 
     @Override
-    public void onTransactionLog(Transaction.Log transactionLog) {
+    public void onLog(Transaction.Log transactionLog) {
         //super.onHomingAgent(transactionLog);
         if(!transactionLog.deleting()) return;
         logger.warn("Deleting from : "+transactionLog.source()+" : "+transactionLog.edgeLabel()+" : "+transactionLog.revisionNumber());

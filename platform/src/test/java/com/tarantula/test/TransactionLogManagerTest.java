@@ -3,7 +3,6 @@ package com.tarantula.test;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Transaction;
-import com.icodesoftware.lmdb.TransactionLog;
 import com.icodesoftware.lmdb.TransactionResult;
 import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.platform.PresenceIndex;

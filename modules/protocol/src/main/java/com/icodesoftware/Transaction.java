@@ -1,5 +1,9 @@
 package com.icodesoftware;
 
+import com.icodesoftware.service.Metadata;
+
+import java.util.List;
+
 public interface Transaction extends AutoCloseable{
 
     boolean execute(TransactionContext transactionContext);
@@ -46,8 +50,16 @@ public interface Transaction extends AutoCloseable{
          boolean read(Recoverable.DataBuffer buffer);
          boolean write(Recoverable.DataBuffer buffer);
     }
-    interface TransactionLogListener {
+    interface LogManager{
+        void onCommit(int scope, long transactionId);
+        void onAbort(int scope, long transactionId);
+        List<Log> committed(int scope, long transactionId);
+        void registerLogListener(Transaction.LogListener listener);
 
-        void onTransactionLog(Transaction.Log transactionLog);
+        void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value, long transactionId);
+        boolean onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value, long transactionId);
+    }
+    interface LogListener {
+        void onLog(Transaction.Log transactionLog);
     }
 }

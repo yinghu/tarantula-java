@@ -12,7 +12,7 @@ import com.tarantula.platform.event.TransactionReplicationEvent;
 
 import java.util.List;
 
-public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy implements Transaction.TransactionLogListener {
+public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy implements Transaction.LogListener {
 
     public IntegrationScopeReplicationProxy(){
         super("integration", Distributable.INTEGRATION_SCOPE);
@@ -71,10 +71,10 @@ public class IntegrationScopeReplicationProxy extends ScopedReplicationProxy imp
         logger = JDKLogger.getLogger(IntegrationScopeReplicationProxy.class);
         super.setup(serviceContext);
 
-        transactionLogManager.registerTransactionLogListener(this);
+        transactionLogManager.registerLogListener(this);
     }
     @Override
-    public void onTransactionLog(Transaction.Log transactionLog) {
+    public void onLog(Transaction.Log transactionLog) {
         //operations on original data store
         super.onHomingAgent(transactionLog);
     }

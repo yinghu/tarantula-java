@@ -15,7 +15,7 @@ import com.tarantula.platform.event.TransactionReplicationEvent;
 
 import java.util.List;
 
-public class DataScopeReplicationProxy extends ScopedReplicationProxy implements Transaction.TransactionLogListener {
+public class DataScopeReplicationProxy extends ScopedReplicationProxy implements Transaction.LogListener {
     public DataScopeReplicationProxy(){
         super("data", Distributable.DATA_SCOPE);
     }
@@ -113,11 +113,11 @@ public class DataScopeReplicationProxy extends ScopedReplicationProxy implements
     public void setup(ServiceContext serviceContext) {
         logger = JDKLogger.getLogger(DataScopeReplicationProxy.class);
         super.setup(serviceContext);
-        this.transactionLogManager.registerTransactionLogListener(this);
+        this.transactionLogManager.registerLogListener(this);
     }
 
     @Override
-    public void onTransactionLog(Transaction.Log transactionLog) {
+    public void onLog(Transaction.Log transactionLog) {
         super.onHomingAgent(transactionLog);
         if(!transactionLog.deleting()) return;
         logger.warn("Deleting from : "+transactionLog.source()+" : "+transactionLog.edgeLabel()+" : "+transactionLog.revisionNumber());

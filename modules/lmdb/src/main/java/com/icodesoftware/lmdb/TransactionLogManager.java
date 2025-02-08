@@ -11,7 +11,7 @@ import com.icodesoftware.util.DataBufferKey;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TransactionLogManager implements Closable {
+public class TransactionLogManager implements Transaction.LogManager{
 
 
     public static final String DATA_PREFIX = "log_d_";
@@ -27,14 +27,14 @@ public class TransactionLogManager implements Closable {
     public static final String DATA_TRANSACTION_LOG = "log_tarantula_transaction_1";
     public static final String INTEGRATION_TRANSACTION_LOG = "log_tarantula_transaction_2";
 
-    private Transaction.TransactionLogListener transactionLogListener = transactionLog -> {};
+    private Transaction.LogListener transactionLogListener = transactionLog -> {};
     private ServiceContext serviceContext;
 
     public void setup(ServiceContext serviceContext){
         this.serviceContext = serviceContext;
     }
 
-    public void registerTransactionLogListener(Transaction.TransactionLogListener listener){
+    public void registerLogListener(Transaction.LogListener listener){
         if(listener==null) return;
         this.transactionLogListener = listener;
     }
@@ -57,6 +57,7 @@ public class TransactionLogManager implements Closable {
         return pending;
     }
 
+    //used for test
     public List<TransactionResult> pending(int scopeId,long nodeId){
         DataStore ts = transactionLogStore(scopeId);
         TransactionResultQuery query = new TransactionResultQuery(nodeId);
@@ -253,11 +254,9 @@ public class TransactionLogManager implements Closable {
                     });
                 }
             }
-            transactionLogListener.onTransactionLog(log);
+            transactionLogListener.onLog(log);
         }
     }
-    public void close(){
-        //clear resources if any
-    }
+
 
 }
