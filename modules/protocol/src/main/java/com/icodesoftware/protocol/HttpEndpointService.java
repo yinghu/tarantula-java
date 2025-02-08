@@ -8,6 +8,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.Serviceable;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.TarantulaExecutorServiceFactory;
+import com.icodesoftware.util.VirtualThreadExecutor;
 import com.sun.net.httpserver.HttpServer;
 
 import java.io.InputStream;
@@ -123,8 +124,12 @@ public class HttpEndpointService implements EndPoint {
             this.address = settings.has("address")? settings.get("address").getAsString() : null;
             this.port = settings.has("port")? settings.get("port").getAsInt() : 8090;
             this.backlog = settings.has("backlog")? settings.get("backlog").getAsInt() : 100;
-            this.inboundThreadPoolSetting = settings.has("inboundThreadPoolSetting")? settings.get("inboundThreadPoolSetting").getAsString() : "http-inbound,8,32,8,60,100";
-            bootstrap();
+            int inboundPermits = settings.has("inboundConcurrentPermits")?settings.get("inboundConcurrentPermits").getAsInt() : 8;
+            this.executorService = VirtualThreadExecutor.create(inboundPermits);
+            InetSocketAddress ip = this.address==null? new InetSocketAddress(this.port) : new InetSocketAddress(this.address,this.port);
+            if(address==null) address = ip.getHostName();
+            server = HttpServer.create(ip,this.backlog);
+            server.setExecutor(this.executorService);
             JsonArray endpoints = settings.get("endpoints").getAsJsonArray();
             endpoints.forEach(e->{
                 JsonObject endpoint = e.getAsJsonObject();
