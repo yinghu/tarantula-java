@@ -71,12 +71,8 @@ public class TransactionLogManager implements Transaction.LogManager{
             Recoverable.DataHeader header = value.readHeader();
             value.rewind();
             boolean suc = dataStore.backup().set((k,v)->{
-                while(key.hasRemaining()){
-                    k.writeByte(key.readByte());
-                }
-                while (value.hasRemaining()){
-                    v.writeByte(value.readByte());
-                }
+                k.write(key);
+                v.write(value);
                 return true;
             });
             if(!suc || transactionId <0 ) return;
@@ -86,12 +82,8 @@ public class TransactionLogManager implements Transaction.LogManager{
             return;
         }
         boolean suc = dataStore.backup().setEdge(metadata.label(),(k,v)->{
-            while (key.hasRemaining()){
-                k.writeByte(key.readByte());
-            }
-            while (value.hasRemaining()){
-                v.writeByte(value.readByte());
-            }
+            k.write(key);
+            v.write(value);
             return true;
         });
         if(!suc || transactionId <0 ) return;
@@ -106,9 +98,7 @@ public class TransactionLogManager implements Transaction.LogManager{
         DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
         if(metadata.label()!=null) return false;
         return dataStore.backup().get(BinaryKey.from(key.array()),(k,v)->{
-            for(byte b : v.array()){
-                value.writeByte(b);
-            }
+            value.write(v);
             return true;
         });
     }
