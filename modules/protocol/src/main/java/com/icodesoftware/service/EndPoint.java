@@ -11,6 +11,7 @@ public interface EndPoint extends ServiceProvider {
 
     String HTTP_ENDPOINT = "HTTPEndpoint";
     String UDP_ENDPOINT = "UDPEndpoint";
+    String TCP_ENDPOINT = "TCPEndpoint";
 
     void address(String address);
     default void backlog(int backlog){}

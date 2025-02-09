@@ -12,12 +12,14 @@ public class SocketEndpointService implements EndPoint {
 
     public static final int PORT = 5000;
     public static final int BACK_LOG = 100;
+    public static final int PERMITS = 8;
     protected int port = PORT;
     protected String address;
     protected int backlog = BACK_LOG;
     protected ServerSocket serverSocket;
     protected boolean started;
     protected Executor executor;
+    protected int permits = PERMITS;
     @Override
     public void address(String address) {
         this.address = address;
@@ -39,13 +41,13 @@ public class SocketEndpointService implements EndPoint {
 
     @Override
     public String name() {
-        return "socket";
+        return EndPoint.TCP_ENDPOINT;
     }
 
     @Override
     public void start() throws Exception {
         if(started) return;
-        executor = VirtualThreadExecutor.create(8);
+        executor = VirtualThreadExecutor.create(permits);
         serverSocket = address ==null? new ServerSocket(port,backlog) : new ServerSocket(port,backlog, InetAddress.getByName(address));
         started = true;
         while (started){

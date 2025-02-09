@@ -2,6 +2,8 @@ package com.icodesoftware.protocol;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.EndPoint;
 import com.icodesoftware.service.MetricsListener;
 import com.icodesoftware.service.ServiceContext;
@@ -23,6 +25,8 @@ tarantula.endpoint.http.pool.in.setting=http-inbound,8,32,8,60,100
 */
 
 public class HttpEndpointService implements EndPoint {
+
+    protected static TarantulaLogger logger = JDKLogger.getLogger(HttpEndpointService.class);
 
     protected String address;
     protected int port;
@@ -119,6 +123,7 @@ public class HttpEndpointService implements EndPoint {
     }
     protected boolean onResource() throws Exception{
         if(configuration == null) return false;
+        logger.warn("Http endpoint is using configuration to start ["+configuration+"]");
         try(InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(configuration)){
             JsonObject settings = JsonUtil.parse(inputStream);
             this.address = settings.has("address")? settings.get("address").getAsString() : null;
