@@ -20,7 +20,7 @@ public class TarantulaFormatter extends Formatter {
             builder.append(" ").append(record.getMessage()).append(" ");
             StringWriter out = new StringWriter();
             record.getThrown().printStackTrace(new PrintWriter(out));
-            builder.append(out.toString()).append(System.getProperty("line.separator"));
+            builder.append(out).append(System.getProperty("line.separator"));
         }
         return builder.toString();
     }
