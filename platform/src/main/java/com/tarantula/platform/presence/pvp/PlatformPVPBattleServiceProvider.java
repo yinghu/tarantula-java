@@ -2,10 +2,7 @@ package com.tarantula.platform.presence.pvp;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.icodesoftware.Configurable;
-import com.icodesoftware.Configuration;
-import com.icodesoftware.OnAccess;
-import com.icodesoftware.Session;
+import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.ServiceContext;
@@ -17,6 +14,8 @@ import com.tarantula.platform.configuration.SeasonCredentialConfiguration;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -53,6 +52,18 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     }
 
 
+    public List<DefenseTeam> matchMaking(Session session){
+        ArrayList<DefenseTeam> matches = new ArrayList<>();
+        findMatches(session).forEach(rating -> {
+            DefenseTeam defenseTeam = defenseTeam(rating);
+            if(defenseTeam != null){
+                //calculate the estimated pvp points if the player wins.
+                defenseTeam.winPointsEstimated = 100;
+                matches.add(defenseTeam);
+            }
+        });
+        return matches;
+    }
 
     public TeamFormationResponse saveDefenseTeam(Session session,byte[] content){
         TeamFormationIndex teamFormationIndex = new TeamFormationIndex();
@@ -63,6 +74,20 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         defenseTeam.playerId = session.distributionId();
         defenseTeam.save(dataStore,teamFormationIndex,teamCreationWaitingTime);
         return TeamFormationResponse.success(teamFormationIndex.timestamp());
+    }
+
+    public TeamFormationResponse saveOffenseTeam(Session session,byte[] content){
+        DefenseTeam defenseTeam = DefenseTeam.parse(content);
+        defenseTeam.playerId = session.distributionId();
+        dataStore.create(defenseTeam);
+        return TeamFormationResponse.responseOnOffenseTeam(defenseTeam.distributionId());
+    }
+
+    public DefenseTeam defenseTeam(Rating rating){
+        TeamFormationIndex teamFormationIndex = new TeamFormationIndex();
+        teamFormationIndex.distributionId(rating.distributionId());
+        if(!dataStore.load(teamFormationIndex)) return null;
+        return defenseTeam(teamFormationIndex.teamId);
     }
 
     public DefenseTeam defenseTeam(long defenseTeamId){
@@ -98,6 +123,10 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     public SeasonCredentialConfiguration.Season currentSeason(){
         return seasons.get(CURRENT_SEASON_INDEX);// currentSeason from season rotation
+    }
+
+    public void onBattleEnd(){
+
     }
 
     private void startSeason(SeasonRuntime seasonRuntime){
@@ -185,6 +214,10 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         }
     }
 
+    private List<Rating> findMatches(Session session){
+        List<Rating> matches = new ArrayList<>();
+        return matches;
+    }
 
 
 

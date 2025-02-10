@@ -18,7 +18,7 @@ public class BattleTransaction extends RecoverableObject {
 
     public long seasonId;
     public long opponentId;
-    public int teamPower; //the player's team power
+    public long teamId; //the player's team id on battle start
 
     //Data store write contract
     @Override
@@ -35,7 +35,7 @@ public class BattleTransaction extends RecoverableObject {
         try{
             buffer.writeLong(seasonId);
             buffer.writeLong(opponentId);
-            buffer.writeInt(teamPower);
+            buffer.writeLong(teamId);
         }catch (Exception ex){
             //ignore
         }
@@ -58,7 +58,7 @@ public class BattleTransaction extends RecoverableObject {
         try{
             seasonId = buffer.readLong();
             opponentId = buffer.readLong();
-            teamPower = buffer.readInt();
+            teamId = buffer.readLong();
         }catch (Exception exception){
             //ignore
         }
@@ -73,7 +73,7 @@ public class BattleTransaction extends RecoverableObject {
         jsonObject.addProperty("BattleId",distributionKey());
         jsonObject.addProperty("SeasonId",seasonId);
         jsonObject.addProperty("OpponentId",Long.toString(opponentId));
-        jsonObject.addProperty("TeamPower",teamPower);
+        jsonObject.addProperty("TeamId",Long.toString(teamId));
         return jsonObject;
     }
 
@@ -95,7 +95,7 @@ public class BattleTransaction extends RecoverableObject {
         self.stageId = JsonUtil.getJsonLong(json,"StageId",0);
         self.seasonId = JsonUtil.getJsonLong(json,"SeasonId",0);
         self.opponentId = JsonUtil.getJsonLong(json,"OpponentId",0);
-        self.teamPower = JsonUtil.getJsonInt(json,"TeamPower",0);
+        self.teamId = JsonUtil.getJsonInt(json,"TeamId",0);
         JsonArray party = JsonUtil.getJsonArray(json, "Party");
         self.party = new long[party.size()];
         for(int i=0;i<self.party.length;i++){

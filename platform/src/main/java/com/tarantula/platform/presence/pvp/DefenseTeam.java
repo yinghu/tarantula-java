@@ -17,6 +17,9 @@ public class DefenseTeam extends RecoverableObject {
     public static int MAX_UNITS = 5;
     public static int MAX_EQUIPMENTS = 30;
 
+    //calculating on match-making
+    public int winPointsEstimated;
+
     public long playerId;
     public int teamPower;
     public final long[] unitInstanceIndex = new long[MAX_UNITS]; ;
@@ -63,6 +66,9 @@ public class DefenseTeam extends RecoverableObject {
     @Override
     public JsonObject toJson() {
         JsonObject resp = new JsonObject();
+        resp.addProperty("winPointsEstimated",winPointsEstimated);
+        resp.addProperty("playerId",playerId);
+        resp.addProperty("teamPower",teamPower);
         JsonArray units = new JsonArray();
         unitInstances.forEach(unitInstance -> units.add(unitInstance.toJson()));
         JsonArray equips = new JsonArray();
