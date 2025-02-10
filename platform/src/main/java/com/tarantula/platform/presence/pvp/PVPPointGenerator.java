@@ -1,11 +1,11 @@
 package com.tarantula.platform.presence.pvp;
 
-
 import com.icodesoftware.Rating;
-import com.tarantula.game.GameRating;
+
 
 //ELO implementation
 public class PVPPointGenerator {
+
     public static int softMaxRatingChange = 20;
     public static int softDefenseMaxRatingChange = 5;
     public static int powerDiffMaxRating = 1500;
@@ -15,19 +15,14 @@ public class PVPPointGenerator {
     public static int relativePowerConstant = maxPowerDiffConstant - minPowerDiffConstant;
     public static int minimumCap = 300;
 
-    public static int update(Rating rating, boolean win){
-
-        return 0; //new level
-    }
-
-    public static void updateELO(GameRating attackerRating, GameRating defenderRating, int attackerPower, int defenderPower, boolean attackerWin){
+    public static void updateELO(Rating attackerRating, Rating defenderRating, int attackerPower, int defenderPower, boolean attackerWin){
         double powerDifference = attackerPower - defenderPower;
         double ratingDifference = attackerRating.level() - defenderRating.level();
 
         double probOfWinAttacker = 1.0 / (1.0 + Math.pow(10, ratingDifference /eloExponent));
         double probOfWinDefender = 1.0 - probOfWinAttacker;
 
-        double attackerPowerModifier = (Math.min(relativePowerConstant, Math.max(0, Math.abs(powerDifference) - minPowerDiffConstant)) / relativePowerConstant) * (attackerRating.level < powerDiffMaxRating ? 1 : 0);
+        double attackerPowerModifier = (Math.min(relativePowerConstant, Math.max(0, Math.abs(powerDifference) - minPowerDiffConstant)) / relativePowerConstant) * (attackerRating.level() < powerDiffMaxRating ? 1 : 0);
         double defenderPowerModifier = 1 - attackerPowerModifier;
 
         double maxRatingChangeAttacker = softMaxRatingChange * (attackerWin ? (1 + attackerPowerModifier) : 1);
@@ -37,15 +32,15 @@ public class PVPPointGenerator {
         int newDefenderELO = (int) Math.round(defenderRating.level() + maxRatingChangeDefender * ((!attackerWin ? 1 : 0) - probOfWinDefender));
 
         if(attackerRating.level() >= minimumCap && newAttackerELO < minimumCap){
-            attackerRating.level = minimumCap;
+            attackerRating.level(minimumCap);
         }else {
-            attackerRating.level = newAttackerELO;
+            attackerRating.level(newAttackerELO);
         }
 
         if(defenderRating.level() >= minimumCap && newDefenderELO < minimumCap){
-            defenderRating.level = minimumCap;
+            defenderRating.level(minimumCap);
         }else {
-            defenderRating.level = newDefenderELO;
+            defenderRating.level(newDefenderELO);
         }
     }
 }

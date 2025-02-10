@@ -84,4 +84,8 @@ public class UserRating extends RecoverableObject implements Rating {
     public double xp() {
         return xp;
     }
+
+    public void level(int eloAssigned){
+        this.level = eloAssigned;
+    }
 }

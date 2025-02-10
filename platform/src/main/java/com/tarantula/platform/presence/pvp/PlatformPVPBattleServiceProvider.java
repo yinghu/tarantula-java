@@ -60,8 +60,16 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         dataStore.createIfAbsent(teamFormationIndex,true);
         if(!teamFormationIndex.expired()) return TeamFormationResponse.failure(teamFormationIndex.timestamp());
         DefenseTeam defenseTeam = DefenseTeam.parse(content);
+        defenseTeam.playerId = session.distributionId();
         defenseTeam.save(dataStore,teamFormationIndex,teamCreationWaitingTime);
         return TeamFormationResponse.success(teamFormationIndex.timestamp());
+    }
+
+    public DefenseTeam defenseTeam(long defenseTeamId){
+        DefenseTeam defenseTeam = new DefenseTeam();
+        defenseTeam.distributionId(defenseTeamId);
+        dataStore.load(defenseTeam);
+        return defenseTeam;
     }
 
     public void onLoaded(SeasonCredentialConfiguration loaded){
