@@ -169,7 +169,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         boolean win = battleTransaction.win;
         //ELO UPDATE IF PVP battle
         if(battleTransaction.opponentId>0){
-            Rating rating = gameContext.rating(session).elo(battleTransaction.win,battleTransaction.opponentId,battleTransaction.teamPower);
+            Rating rating = gameContext.rating(session).elo(battleTransaction.win,battleTransaction.opponentId,battleTransaction.teamId);
             //push analytics event to s3
         }
         Transaction transaction = gameContext.applicationSchema().transaction();

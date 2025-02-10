@@ -24,7 +24,7 @@ public class GameRating extends PlayerGameObject implements Rating {
         this.label = "rating";
     }
 
-    public Rating elo(boolean win,long opponentId,int teamPower){
+    public Rating elo(boolean win,long opponentId,long teamPower){
         //no direct call
         return this;
     }
