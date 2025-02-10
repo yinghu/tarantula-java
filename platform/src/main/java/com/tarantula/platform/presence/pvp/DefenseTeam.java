@@ -17,6 +17,7 @@ public class DefenseTeam extends RecoverableObject {
     public static int MAX_UNITS = 5;
     public static int MAX_EQUIPMENTS = 30;
 
+    public long playerId;
     public int teamPower;
     public final long[] unitInstanceIndex = new long[MAX_UNITS]; ;
     public final long[] equipmentInstanceIndex = new long[MAX_EQUIPMENTS] ;
@@ -42,6 +43,7 @@ public class DefenseTeam extends RecoverableObject {
         for(int i=0;i<MAX_EQUIPMENTS;i++){
             equipmentInstanceIndex[i]=buffer.readLong();
         }
+        playerId = buffer.readLong();
         return true;
     }
 
@@ -54,6 +56,7 @@ public class DefenseTeam extends RecoverableObject {
         for(int i=0;i<MAX_EQUIPMENTS;i++){
             buffer.writeLong(equipmentInstanceIndex[i]);
         }
+        buffer.writeLong(playerId);
         return true;
     }
 

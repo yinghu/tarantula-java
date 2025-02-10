@@ -13,10 +13,7 @@ import com.tarantula.platform.lobby.LobbyItem;
 import com.tarantula.platform.lobby.RoomItem;
 import com.tarantula.platform.lobby.ZoneItem;
 import com.tarantula.platform.presence.dailygiveaway.DailyLoginTrack;
-import com.tarantula.platform.presence.pvp.DefenseTeam;
-import com.tarantula.platform.presence.pvp.EquipmentInstance;
-import com.tarantula.platform.presence.pvp.TeamFormationIndex;
-import com.tarantula.platform.presence.pvp.UnitInstance;
+import com.tarantula.platform.presence.pvp.*;
 import com.tarantula.platform.presence.saves.*;
 import com.tarantula.platform.resource.GameResource;
 
@@ -76,11 +73,13 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
 
     public static final int BANNED_PLAYER_CID = 28;
 
+    //PVP
     public static final int UNIT_INSTANCE_CID = 29;
     public static final int EQUIPMENT_INSTANCE_CID = 30;
     public static final int DEFENSE_TEAM_CID = 31;
     public static final int TEAM_FORMATION_INDEX_CID = 32;
-
+    public static final int SEASON_RUNTIME_CID = 33;
+    //END PVP
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
     public static PresencePortableRegistry INS;
@@ -184,6 +183,9 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
                 break;
             case TEAM_FORMATION_INDEX_CID:
                 pt = new TeamFormationIndex();
+                break;
+            case SEASON_RUNTIME_CID:
+                pt = new SeasonRuntime();
                 break;
             default:
         }

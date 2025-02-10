@@ -23,7 +23,7 @@
   },
   "pvp": {
      "waitingMinutesPerTeamFormation": 5,
-     "seasonTimeGapMinutes": 5,
+     "seasonTimeGapMinutes": 12,
      "seasonRunningDays": 12
   },
 
