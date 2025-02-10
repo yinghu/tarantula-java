@@ -82,15 +82,20 @@ public class SavedGameModule extends ModuleHeader {
         else if(session.action().equals("onSeasonInfo")){
             //SeasonCredentialConfiguration.Season season  = gameServiceProvider.pvpBattleServiceProvider().currentSeason();
             //session.write(season.toJson().toString().getBytes());
-            session.write(PVPMockData.getSeasonInfo().getBytes());
+            String seasonInfoMockData = gameServiceProvider.pvpBattleServiceProvider().getSeasonInfo();
+
+            session.write(seasonInfoMockData.getBytes());
         }
         else if(session.action().equals("onPVPList")){
             boolean shouldRefresh = Boolean.parseBoolean(session.name());
+            String pvpListMockData = gameServiceProvider.pvpBattleServiceProvider().getPVPList(shouldRefresh);
 
-            session.write(PVPMockData.getPVPList().getBytes());
+            session.write(pvpListMockData.getBytes());
         }
         else if(session.action().equals("onBattleLog")){
-            session.write(PVPMockData.getBattleLog().getBytes());
+            String battleLogMockData = gameServiceProvider.pvpBattleServiceProvider().getBattleLog();
+
+            session.write(battleLogMockData.getBytes());
         }
         else{
             throw new UnsupportedOperationException(session.action());
