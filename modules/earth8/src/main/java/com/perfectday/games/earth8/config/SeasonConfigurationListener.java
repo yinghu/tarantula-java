@@ -16,7 +16,7 @@ public class SeasonConfigurationListener implements Configurable.Listener<Config
 
     public void onLoaded(Configurable loaded){
         this.earth8GameServiceProvider.configurations.put(OnAccess.SEASON,loaded);
-        this.earth8GameServiceProvider.gameContext.log(loaded.distributionId()+" loaded", OnLog.WARN);
+        this.earth8GameServiceProvider.gameContext.log(loaded.distributionId()+" loaded :"+loaded.header(), OnLog.WARN);
     }
 
     public void onRemoved(Configurable removed){
