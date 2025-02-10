@@ -5,11 +5,11 @@ import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.game.SimpleStub;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 
-public class PlayerRankingProxy extends RecoverableObject implements Rating {
+public class PlayerEloRatingProxy extends RecoverableObject implements Rating {
 
     private Rating playerRanking;
     private PlatformGameServiceProvider platformGameServiceProvider;
-    public PlayerRankingProxy(Rating playerRanking,PlatformGameServiceProvider platformGameServiceProvider){
+    public PlayerEloRatingProxy(Rating playerRanking, PlatformGameServiceProvider platformGameServiceProvider){
         this.playerRanking = playerRanking;
         this.platformGameServiceProvider = platformGameServiceProvider;
     }
