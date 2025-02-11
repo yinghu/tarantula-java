@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.Content;
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.platform.configuration.SeasonCredentialConfiguration;
 import com.tarantula.platform.presence.*;
 
 import com.tarantula.game.PlayerSavedGames;
@@ -81,6 +82,10 @@ public class SavedGameModule extends ModuleHeader {
         else if(session.action().equals("onSaveDefenseTeam")){
             TeamFormationResponse response  = gameServiceProvider.pvpBattleServiceProvider().saveDefenseTeam(session,bytes);
             session.write(response.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onSeasonInfo")){
+            SeasonCredentialConfiguration.Season season  = gameServiceProvider.pvpBattleServiceProvider().currentSeason();
+            session.write(season.toJson().toString().getBytes());
         }
         //pvp saves end
 
