@@ -238,7 +238,7 @@ public class PlatformUserService implements UserService {
         trialMaxUsersPerAccount = ((Number)configuration.property("trialMaxUserCount")).intValue();
         subscribedMaxUsersPerAccount = ((Number)configuration.property("subscribedMaxUserCount")).intValue();
         maxOnSessionCount = ((Number)configuration.property("maxOnSessionCount")).intValue();
-        logger.warn("User service started with max users per account ["+trialMaxUsersPerAccount+","+subscribedMaxUsersPerAccount+"]["+maxOnSessionCount+"]");
+        logger.info("User service started with max users per account ["+trialMaxUsersPerAccount+","+subscribedMaxUsersPerAccount+"]["+maxOnSessionCount+"]");
     }
 
     @Override

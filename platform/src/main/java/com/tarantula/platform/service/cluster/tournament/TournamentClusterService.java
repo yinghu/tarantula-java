@@ -24,7 +24,7 @@ public class TournamentClusterService implements ManagedService, RemoteService {
     public void init(NodeEngine nodeEngine, Properties properties) {
         this.nodeEngine = nodeEngine;
         this.tarantulaContext = TarantulaContext.getInstance();
-        log.warn("Start tournament cluster service");
+        log.info("Start tournament cluster service");
     }
 
     @Override
@@ -34,7 +34,7 @@ public class TournamentClusterService implements ManagedService, RemoteService {
 
     @Override
     public void shutdown(boolean b) {
-        log.warn("Shutting down tournament cluster service");
+        log.info("Shutting down tournament cluster service");
     }
 
     @Override

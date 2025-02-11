@@ -123,7 +123,7 @@ public class UDPEndpoint implements EndPoint,UDPEndpointServiceProvider.SessionL
                 }
             }
         },"tarantula-udp-outbound-message-sender");
-        logger.warn("UDP Endpoint running as a daemon with channel pool size ["+channelPoolSize+"] on ["+serviceContext.node().servicePushAddress()+":"+connection.port()+"]");
+        logger.info("UDP Endpoint running as a daemon with channel pool size ["+channelPoolSize+"] on ["+serviceContext.node().servicePushAddress()+":"+connection.port()+"]");
     }
 
     @Override

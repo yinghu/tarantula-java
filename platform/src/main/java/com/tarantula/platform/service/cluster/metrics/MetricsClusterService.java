@@ -33,7 +33,7 @@ public class MetricsClusterService implements ManagedService, RemoteService {
     public void init(NodeEngine nodeEngine, Properties properties) {
         this.nodeEngine = nodeEngine;
         tarantulaContext = TarantulaContext.getInstance();
-        log.warn("Metrics cluster service started");
+        log.info("Metrics cluster service started");
     }
 
     @Override

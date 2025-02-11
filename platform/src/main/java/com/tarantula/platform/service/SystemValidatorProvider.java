@@ -521,7 +521,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
                 log.warn("Cluster and token keys have initialized on node ["+serviceContext.node().nodeName()+"]");
             }
             else{
-                log.warn("Cluster and token keys have loaded on node ["+serviceContext.node().nodeName()+"]");
+                log.info("Cluster and token keys have loaded on node ["+serviceContext.node().nodeName()+"]");
             }
             encrypt = CipherUtil.encrypt(pKey.clusterKey());
             decrypt = CipherUtil.decrypt(pKey.clusterKey());
@@ -530,7 +530,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         }catch (Exception ex){
             throw new RuntimeException(ex);
         }
-        log.warn("System validator provider started ["+serviceContext.node().nodeId()+"]["+serviceContext.node().bucketId()+"]");
+        log.info("System validator provider started ["+serviceContext.node().nodeId()+"]["+serviceContext.node().bucketId()+"]");
     }
 
     @Override
@@ -644,12 +644,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
                 long expiry = p.get("exp").getAsLong();
                 if (TimeUtil.expired(TimeUtil.fromUTCMilliseconds(expiry))) {
                     //log.warn("Token expired  : "+expiry);
-                    return true;
+                    return false;
                 }
                 Access.Role r = rMap.get(p.get("aud").getAsString());
                 if (r == null) {
                     //log.warn("Role cannot be null");
-                    return true;
+                    return false;
                 }
                 byte[] data = decrypt(CipherUtil.fromBase64Key(h.get("kid").getAsString()));
                 Recoverable.DataBuffer dataBuffer = BufferProxy.wrap(data);

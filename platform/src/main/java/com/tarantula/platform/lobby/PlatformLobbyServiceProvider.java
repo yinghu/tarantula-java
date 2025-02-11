@@ -46,7 +46,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
         this.applicationPreSetup = gameCluster.applicationPreSetup();
         this.distributionItemService = this.serviceContext.clusterProvider().serviceProvider(DistributionItemService.NAME);
         this.logger = JDKLogger.getLogger(PlatformLobbyServiceProvider.class);
-        this.logger.warn("Lobby service provider started on ->"+gameServiceName+"-->"+gameTypeId);
+        this.logger.info("Lobby service provider started on ->"+gameServiceName+"-->"+gameTypeId);
     }
     @Override
     public String name() {
@@ -66,13 +66,13 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
     @Override
     public <T extends Configurable> void register(T t) {
         t.registered();
-        logger.warn("register->"+t.distributionKey());
+        logger.info("register->"+t.distributionKey());
         distributionItemService.onRegisterItem(gameServiceName,name(),t.configurationTypeId(),t.distributionKey());
     }
     @Override
     public <T extends Configurable> void release(T t) {
         t.released();
-        logger.warn("release->"+t.distributionKey());
+        logger.info("release->"+t.distributionKey());
         distributionItemService.onReleaseItem(gameServiceName,name(),t.configurationTypeId(),t.configurationName());
     }
 
@@ -104,7 +104,7 @@ public class PlatformLobbyServiceProvider implements ConfigurationServiceProvide
         lobbyListeners.put(descriptor.tag(),new ListenerOnLobby(descriptor,listener));
         List<LobbyItem> items = applicationPreSetup.list(descriptor,new LobbyItemObjectQuery(descriptor.key(),descriptor.category()));
         items.forEach((a)-> {
-            logger.warn(a.configurationCategory()+""+a.distributionId());
+            logger.info(a.configurationCategory()+""+a.distributionId());
             if(!a.disabled()){
                 a.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
                 a.setup();

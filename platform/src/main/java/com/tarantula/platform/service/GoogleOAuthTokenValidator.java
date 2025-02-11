@@ -50,6 +50,12 @@ public class GoogleOAuthTokenValidator extends AuthObject {
                 return true;
             }
             GoogleWebClient webClient = configuration.webClient();
+            String thirdPartyToken = (String) params.get("thirdPartyToken");
+
+            if(thirdPartyToken != null){
+                return verifyPlayer(webClient.applicationId(),thirdPartyToken,params);
+            }
+
             String token = (String) params.get("token");
             StringBuffer query = new StringBuffer(webClient.tokenUri());
             query.append("?client_id=").append(webClient.clientId());
@@ -76,6 +82,7 @@ public class GoogleOAuthTokenValidator extends AuthObject {
             }
             JsonObject resp = JsonUtil.parse(responseData.dataAsString);
             String accessToken = resp.get("access_token").getAsString();
+            params.put("thirdPartyToken",accessToken);
             if(verifyPlayer(webClient.applicationId(),accessToken,params)){
                 onMetrics(GameClusterMetrics.ACCESS_GOOGLE_LOGIN_COUNT);
                 return true;
@@ -116,5 +123,4 @@ public class GoogleOAuthTokenValidator extends AuthObject {
             return false;
         }
     }
-
 }

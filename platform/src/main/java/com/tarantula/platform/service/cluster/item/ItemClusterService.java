@@ -24,7 +24,7 @@ public class ItemClusterService implements ManagedService, RemoteService {
     public void init(NodeEngine nodeEngine, Properties properties) {
         this.nodeEngine = nodeEngine;
         this.tarantulaContext = TarantulaContext.getInstance();
-        log.warn("Start item cluster service");
+        log.info("Start item cluster service");
     }
 
     @Override

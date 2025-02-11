@@ -71,7 +71,7 @@ public class MatchMakingModule extends ModuleHeader implements Configurable.List
         this.registerKey = deploymentServiceProvider.registerConfigurableListener(OnLobby.TYPE,new OnLobbyListener());
         this.gameServiceProvider.lobbyServiceProvider().registerConfigurableListener(this.context.descriptor(),this);
         //this.gameServiceProvider.tournamentServiceProvider().registerTournamentListener(this);
-        context.log("Started match making module on ->"+this.context.descriptor().tag(), OnLog.WARN);
+        context.log("Started match making module on ->"+this.context.descriptor().tag(), OnLog.INFO);
     }
     @Override
     public void clear() {
@@ -103,7 +103,7 @@ public class MatchMakingModule extends ModuleHeader implements Configurable.List
             this.context.log("No lobby Entries for Game->"+context.descriptor().typeId(),OnLog.WARN);
         }
         mLobby.forEach((k,v)->{
-            context.log("Access Rank ["+k+"] registered on ["+v.accessRank()+"]",OnLog.WARN);
+            context.log("Access Rank ["+k+"] registered on ["+v.accessRank()+"]",OnLog.INFO);
         });
         return lobby;
     }
@@ -121,7 +121,7 @@ public class MatchMakingModule extends ModuleHeader implements Configurable.List
                     deploymentServiceProvider.unregisterConfigurableListener(registerKey);
                     return;
                 }
-                context.log("Lobby ["+onLobby.typeId()+"] is going to be online",OnLog.WARN);
+                context.log("Lobby ["+onLobby.typeId()+"] is going to be online",OnLog.INFO);
                 listLobby().addListener(this);
             }
         }

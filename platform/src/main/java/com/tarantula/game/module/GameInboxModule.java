@@ -42,7 +42,7 @@ public class GameInboxModule extends ModuleHeader{
     public void setup(ApplicationContext applicationContext) throws Exception {
         super.setup(applicationContext);
         tokenValidatorProvider = applicationContext.serviceProvider(TokenValidatorProvider.NAME);
-        this.context.log("Game inbox module started -"+this.context.descriptor().tag(), OnLog.WARN);
+        this.context.log("Game inbox module started -"+this.context.descriptor().tag(), OnLog.INFO);
     }
 
 }

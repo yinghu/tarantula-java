@@ -15,7 +15,7 @@ public class GameItemModule extends ModuleHeader{
     @Override
     public void setup(ApplicationContext applicationContext) throws Exception {
         super.setup(applicationContext);
-        this.context.log("Game item module started", OnLog.WARN);
+        this.context.log("Game item module started", OnLog.INFO);
     }
 
 }
