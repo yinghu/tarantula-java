@@ -39,15 +39,16 @@ public class PlayerEloRatingProxy extends RecoverableObject implements Rating {
     }
 
     public Rating elo(boolean win,long opponentId,long teamId){
-        DefenseTeam offenseTeam = this.platformGameServiceProvider.pvpBattleServiceProvider().defenseTeam(teamId);
-        DefenseTeam defenseTeam = this.platformGameServiceProvider.pvpBattleServiceProvider().defenseTeam(opponentId);
-        Rating opponentRaking = this.platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(defenseTeam.playerId));
-        int playerElo = playerRanking.level();
-        int opponentElo = opponentRaking.level();
-        PVPPointGenerator.updateELO(playerRanking,opponentRaking,offenseTeam.teamPower,defenseTeam.teamPower,win);
-        playerRanking.update();
-        opponentRaking.update();
-
         return this;
+        //DefenseTeam offenseTeam = this.platformGameServiceProvider.pvpBattleServiceProvider().defenseTeam(teamId);
+        //DefenseTeam defenseTeam = this.platformGameServiceProvider.pvpBattleServiceProvider().defenseTeam(opponentId);
+        //Rating opponentRaking = this.platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(defenseTeam.playerId));
+        //int playerElo = playerRanking.level();
+        //int opponentElo = opponentRaking.level();
+        //PVPPointGenerator.updateELO(playerRanking,opponentRaking,offenseTeam.teamPower,defenseTeam.teamPower,win);
+        //playerRanking.update();
+        //opponentRaking.update();
+
+        //return this;
     }
 }
