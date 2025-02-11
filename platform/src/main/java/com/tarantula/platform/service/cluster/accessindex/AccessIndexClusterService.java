@@ -49,7 +49,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
 
     @Override
     public void shutdown(boolean b) {
-        log.warn("Shutting down access index cluster service");
+        log.info("Shutting down access index cluster service");
     }
 
     @Override
@@ -109,7 +109,7 @@ public class AccessIndexClusterService implements ManagedService, RemoteService 
             return false;
         });
         TarantulaContext._cluster_service_ready.countDown();
-        log.warn("Access index service is ready on ["+nodeEngine.getLocalMember().getUuid()+"]["+bucket+"]");
+        log.info("Access index service is ready on ["+nodeEngine.getLocalMember().getUuid()+"]["+bucket+"]");
     }
 
     public byte[] recover(byte[] key){

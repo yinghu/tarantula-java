@@ -166,6 +166,7 @@
                         <span id='game-cluster-global-item-grant-id-0' tx-game-cluster-id='' view-id='create.global.item.grant.event' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Global Item Granter</span>
                         <span id='game-cluster-player-data-delete-id-0' tx-game-cluster-id='' view-id='player.data.delete' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Delete Player Data</span>
                         <span id='game-cluster-ban-player-id-0' tx-game-cluster-id='' view-id='ban.player' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Ban Player Tool</span>
+                        <span id='game-cluster-get-player-id-0' tx-game-cluster-id='' view-id='get.player' class='w3-bar-item w3-tag w3-right w3-round w3-border w3-border-red w3-green tx-text-14 tx-padding-button tx-margin-top-8 tx-margin-left-4 tx-action'>Get Player Data</span>
                     </div>  
                 </div>    
                  
@@ -579,6 +580,7 @@
                     document.querySelector('#game-cluster-global-item-grant-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
                     document.querySelector('#game-cluster-player-data-delete-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
                     document.querySelector('#game-cluster-ban-player-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
+                    document.querySelector('#game-cluster-get-player-id-'+i).setAttribute('tx-game-cluster-id',g.gameClusterId);
                     document.querySelector('#game-cluster-'+i).style.display='block';
                 });
                 TARA_API.query().gameClusterIndex = resp.index;

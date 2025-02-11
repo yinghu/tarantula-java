@@ -1,0 +1,77 @@
+<div class="w3-modal-content">
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-48">
+        <div class="w3-display-topright w3-padding">
+            <span id="tx-get-data-close"><i class="fa fa-close" style="font-size:12px"></i></span>
+        </div>
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cogs" style="font-size:24px"></i></span>
+            <span class="tx-margin-left-8 tx-text-24">Get Player Data</span>
+        </div>
+    </div>
+    <div class="w3-display-container w3-red w3-border-bottom w3-border-white tx-content-8"></div>
+    <div class="w3-display-container w3-white tx-content-8"></div>
+    <div class="w3-panel w3-center w3-text-red tx-text-12" id="tx-get-data-message"></div>
+    <div class="w3-panel w3-border-bottom w3-border-white">
+        <div class="w3-panel">
+            <label class="tx-text-12">PlayerID</label>
+            <input id ="tx-player-id" class="w3-input w3-round w3-border" type="number" placeholder='playerID'/>
+        </div>
+        <div class="w3-panel">
+            <div class="w3-bar w3-white w3-border-bottom w3-border-red">
+                <span id="tx-get-data" class="w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8">Get Data</span>
+            </div>
+        </div>
+    </div>
+    <div class="w3-panel">
+        <div class='w3-bar w3-white'>
+            <span id='tx-find-user-json-mode-tree' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Tree</span>
+            <span id='tx-find-user-json-mode-code' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Code</span>
+            <span id='tx-find-user-json-mode-preview' class='w3-bar-item w3-left w3-tag w3-round w3-border w3-border-red w3-green tx-text-10 tx-padding-button tx-margin-bottom-8 tx-margin-left-4'>Preview</span>
+            <span class="w3-bar-item w3-right tx-text-18 tx-margin-bottom-8 tx-margin-left-4">Players Data</span>
+        </div>
+    </div>
+    <div class="w3-panel w3-center tx-text-14">
+        <div id="jsoneditor-game-service" style="width: 100%;"></div>
+    </div>
+    <div class="w3-display-container w3-green w3-border-bottom w3-border-white tx-content-36">
+        <div class="w3-display-topleft w3-padding">
+            <span><i class="fa fa-cubes" style="font-size:18px"></i></span>
+        </div>
+        <div class="w3-display-bottomright w3-padding">
+            <span class="tx-text-12">Powered By ICodeSoftware</span>
+        </div>
+    </div>
+</div>
+<script>
+    let editor = new JSONEditor(document.querySelector("#jsoneditor-game-service"),{mode:'tree'},{});
+
+    document.querySelector('#tx-get-data').onclick=()=>{
+        let _playerID = document.querySelector('#tx-player-id').value;
+
+        if(_playerID==''){
+            document.querySelector('#tx-get-data-message').innerHTML = "PlayerID Field Cannot Be Empty";
+            return;
+        }
+
+        let payload ={playerID:_playerID};
+
+        TARA_API.onSet('role/admin','onGetPlayerInfo',TARA_API.query().gameClusterId,payload,(resp)=>{
+            editor.set(resp);
+        });
+    };
+
+    document.querySelector('#tx-get-data-close').onclick=()=>{
+        tx_close_current_page();
+    };
+
+    document.querySelector('#tx-find-user-json-mode-tree').onclick=()=>{
+        editor.setMode('tree');
+    };
+    document.querySelector('#tx-find-user-json-mode-code').onclick=()=>{
+        editor.setMode('code');
+    };
+    document.querySelector('#tx-find-user-json-mode-preview').onclick=()=>{
+        editor.setMode('preview');
+    };
+
+</script>

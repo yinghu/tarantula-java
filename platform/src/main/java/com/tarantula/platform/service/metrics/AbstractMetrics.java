@@ -122,7 +122,7 @@ abstract public class AbstractMetrics implements Metrics, SchedulingTask {
             this.dataStore.update(yearly);
         }
         serviceContext.schedule(this);
-        logger.warn("Metrics ["+name+"] has registered with update rate at ["+(pendingUpdateInterval/1000)+"] seconds");
+        logger.info("Metrics ["+name+"] has registered with update rate at ["+(pendingUpdateInterval/1000)+"] seconds");
     }
 
 

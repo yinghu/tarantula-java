@@ -10,6 +10,8 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
 
     private String login;
 
+    private String thirdPartyToken;
+
     public static final OnSession PASSWORD_NOT_MATCHED = new OnSessionTrack("PASSWORD NOT MATCHED");
     public static final OnSession INVALID_TOKEN = new OnSessionTrack("INVALID TOKEN");
 
@@ -50,6 +52,11 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
     public void token(String token){
         this.token = token;
     }
+
+    public void thirdPartyToken(String thirdPartyToken){
+        this.thirdPartyToken = thirdPartyToken;
+    }
+
     public String login(){
         return this.login;
     }
@@ -69,6 +76,7 @@ public class OnSessionTrack extends OnApplicationHeader implements OnSession {
         jp.addProperty("Stub",stub);
         jp.addProperty("Token",token);
         jp.addProperty("Login",login);
+        jp.addProperty("ThirdPartyToken",thirdPartyToken);
         return jp;
     }
 

@@ -83,7 +83,7 @@ public class ScopedReplicationProxy implements MapStoreListener,ServiceProvider,
         broadcasting = conf.get("broadcasting").getAsBoolean();
         asyncInterval = conf.get("asyncInterval").getAsLong();
         maxReplicationNodes = conf.get("maxReplicationNodes").getAsInt();
-        logger.warn("Using replication setting ["+asyncDistributing+" : "+asyncInterval+" : "+broadcasting+" : "+maxReplicationNodes+"]");
+        logger.info("Using replication setting ["+asyncDistributing+" : "+asyncInterval+" : "+broadcasting+" : "+maxReplicationNodes+"]");
     }
 
     @Override

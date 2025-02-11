@@ -50,7 +50,7 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
         startingResourceName = startingInventory.get("resourceName").getAsString();
         grantingPolicy = startingInventory.get("grantPolicy").getAsString();
         this.logger = JDKLogger.getLogger(PlatformResourceServiceProvider.class);
-        this.logger.warn("Resource service provider started on ->"+gameServiceName);
+        this.logger.info("Resource service provider started on ->"+gameServiceName);
     }
 
     public boolean onItemRegistered(String category,String itemId){

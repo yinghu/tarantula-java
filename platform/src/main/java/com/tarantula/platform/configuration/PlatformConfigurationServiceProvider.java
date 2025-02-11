@@ -73,7 +73,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             if(!vendor.get("disabled").getAsBoolean()){
                 JsonArray providers = vendor.get("providers").getAsJsonArray();
                 providers.forEach(p->{
-                    logger.warn("Register provider->"+p.getAsString());
+                    logger.info("Register provider->"+p.getAsString());
                     try{
                         TokenValidatorProvider.AuthVendor authVendor = (TokenValidatorProvider.AuthVendor) Class.forName(p.getAsString()).getConstructor(PlatformGameServiceProvider.class, MetricsListener.class).newInstance(platformGameServiceProvider,serviceContext.metrics(gameServiceName));
                         serviceContext.registerAuthVendor(authVendor);
@@ -117,7 +117,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             if (credentialConfiguration.setup(serviceContext, dataStore)) {
                 vendorCredentials.put(credentialConfiguration.name(), credentialConfiguration);
                 vendorCredentials.put(credentialConfiguration.distributionKey(),credentialConfiguration);
-                logger.warn(credentialConfiguration.name()+" : "+credentialConfiguration.distributionKey());
+                logger.info(credentialConfiguration.name()+" : "+credentialConfiguration.distributionKey());
 
                 if (credentialConfiguration.name().equals("CheatDetection")){
                     OnAccess access = new OnAccessTrack();
@@ -155,12 +155,12 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         Configuration configuration = serviceContext.configuration("game-vendor-credential-settings");
         JsonArray vlist = ((JsonElement)configuration.property("vendors")).getAsJsonArray();
         vlist.forEach(v->{
-            logger.warn(v.toString());
+            logger.debug(v.toString());
             JsonObject jo = v.getAsJsonObject();
             vendors.put(jo.get("configuration").getAsString(),jo);
         });
         this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME+"_credentials");
-        this.logger.warn("Configuration service provider started on ["+gameServiceName+"]["+gameCluster.property(GameCluster.NAME)+"]");
+        this.logger.info("Configuration service provider started on ["+gameServiceName+"]["+gameCluster.property(GameCluster.NAME)+"]");
     }
 
     public <T extends Configurable> void onCreated(Descriptor application,T t){
