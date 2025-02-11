@@ -1,6 +1,7 @@
 package com.icodesoftware.protocol;
 
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.protocol.session.AccessKeyTrack;
 import com.icodesoftware.protocol.statistics.UserRating;
 import com.icodesoftware.protocol.statistics.StatisticsEntry;
 import com.icodesoftware.protocol.statistics.UserStatistics;
@@ -13,6 +14,7 @@ public class ProtocolPortableRegistry<T extends Recoverable> extends AbstractRec
     public static final int USER_RATION_CID = 2;
     public static final int STATISTICS_CID = 3;
     public static final int STATISTICS_ENTRY_CID = 5;
+    public static final int ACCESS_KEY_TRACK_ID = 6;
 
 
     @Override
@@ -37,6 +39,9 @@ public class ProtocolPortableRegistry<T extends Recoverable> extends AbstractRec
                 break;
             case STATISTICS_ENTRY_CID:
                 _ins = new StatisticsEntry();
+                break;
+            case ACCESS_KEY_TRACK_ID:
+                _ins = new AccessKeyTrack();
                 break;
             default:
                 throw new RuntimeException("Class ID ["+cid+"] not supported");
