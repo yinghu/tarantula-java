@@ -80,7 +80,7 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
         JsonObject inbox = ((JsonElement)configuration.property("inbox")).getAsJsonObject();
         pendingReward = inbox.get("pendingReward").getAsBoolean();
         this.logger = JDKLogger.getLogger(PlatformInboxServiceProvider.class);
-        logger.warn("Platform inbox started->"+gameServiceName);
+        logger.info("Platform inbox started->"+gameServiceName);
     }
 
     public <T extends Application> void claim(long systemId,T item){

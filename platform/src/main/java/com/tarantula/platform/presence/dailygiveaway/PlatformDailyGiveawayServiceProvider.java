@@ -38,7 +38,7 @@ public class PlatformDailyGiveawayServiceProvider extends PlatformItemServicePro
         maxConsecutiveDays = dailyReward.get("maxConsecutiveDays").getAsInt();
         maxRewardTier = dailyReward.get("maxRewardTiers").getAsInt();
         this.logger = JDKLogger.getLogger(PlatformDailyGiveawayServiceProvider.class);
-        this.logger.warn("Daily giveaway service provider started on ->"+gameServiceName);
+        this.logger.info("Daily giveaway service provider started on ->"+gameServiceName);
     }
 
     public DailyLoginTrack claim(Session session){

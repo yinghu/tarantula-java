@@ -15,6 +15,7 @@ import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 
 import com.perfectday.games.earth8.inbox.ItemGrantEventQuery;
+import com.tarantula.game.SimpleStub;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.*;
 import com.tarantula.platform.inbox.*;
@@ -305,10 +306,61 @@ public class AdminRoleModule implements Module{
             }
 
         }
+        else if(session.action().equals("onGetPlayerInfo")){
+            //Parse Data From UI
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            String playerID = (String)onAccess.property("playerID");
+            long playerIdSnowflake = Long.parseLong(playerID);
+
+            //Create Item Grant Event
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
+            var profile = gameCluster.platformGameServiceProvider().presenceServiceProvider().loadProfile(playerIdSnowflake);
+
+            var response = new JsonObject();
+            if(profile == null) {
+                response.addProperty("profile", "{}");
+            }
+            else {
+                response.add("profile", profile.toJson());
+            }
+
+            response.addProperty("Campaign", GetPlayerSaveData(gameCluster, playerIdSnowflake, "Campaign"));
+            response.addProperty("Inventory", GetPlayerSaveData(gameCluster, playerIdSnowflake, "Inventory"));
+            response.addProperty("Energy", GetPlayerSaveData(gameCluster, playerIdSnowflake, "Energy"));
+            response.addProperty("Dialogue", GetPlayerSaveData(gameCluster, playerIdSnowflake, "Dialogue"));
+            response.addProperty("DailyRewards", GetPlayerSaveData(gameCluster, playerIdSnowflake, "DailyRewards"));
+            response.addProperty("ShopState", GetPlayerSaveData(gameCluster, playerIdSnowflake, "ShopState"));
+            response.addProperty("Missions", GetPlayerSaveData(gameCluster, playerIdSnowflake, "Missions"));
+            response.addProperty("PlayerLevel", GetPlayerSaveData(gameCluster, playerIdSnowflake, "PlayerLevel"));
+            response.addProperty("Tournament", GetPlayerSaveData(gameCluster, playerIdSnowflake, "Tournament"));
+            response.addProperty("FTUE", GetPlayerSaveData(gameCluster, playerIdSnowflake, "FTUE"));
+            response.addProperty("AccountCreation", GetPlayerSaveData(gameCluster, playerIdSnowflake, "AccountCreation"));
+            response.addProperty("Mailbox", GetPlayerSaveData(gameCluster, playerIdSnowflake, "Mailbox"));
+            response.addProperty("PlayerJourney", GetPlayerSaveData(gameCluster, playerIdSnowflake, "PlayerJourney"));
+
+            //Return Message To Web UI
+            session.write(response.toString().getBytes());
+        }
         else{
             session.write(this.builder.create().toJson(new ResponseHeader("onError", session.action()+" operation not supported", false)).getBytes());
         }
         return false;
+    }
+
+    private String GetPlayerSaveData(GameCluster cluster, long playerSnowflake, String key)
+    {
+        var playerSession = new SimpleStub(playerSnowflake);
+        playerSession.name(key);
+        var save = cluster
+                .platformGameServiceProvider()
+                .savedGameServiceProvider()
+                .loadData(playerSession, key);
+
+        if(save != null)
+        {
+            return new String(save);
+        }
+        return "";
     }
 
     @Override

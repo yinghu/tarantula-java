@@ -267,7 +267,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
     @Override
     public void stateChanged(LifecycleEvent state) {
         LifecycleEvent.LifecycleState cs = state.getState();
-        log.warn("Integration cluster state changed : "+state);
+        log.info("Integration cluster state changed : "+state);
         switch(cs){
             case STARTED:
                 _integrationInstanceStarted.countDown();
@@ -305,15 +305,15 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
             MultiMap<String, byte[]> mIndex = null;
             IQueue<byte[]> vQueue = null;
             if(map){
-                log.warn(DATA_MAP_PREFIX+size+name);
+                log.debug(DATA_MAP_PREFIX+size+name);
                 vMap = _cluster.getMap(DATA_MAP_PREFIX+size+name);
             }
             if(index) {
-                log.warn(INDEX_MAP_PREFIX+name);
+                log.debug(INDEX_MAP_PREFIX+name);
                 mIndex = _cluster.getMultiMap(INDEX_MAP_PREFIX + name);
             }
             if(queue) {
-                log.warn(DATA_QUEUE_PREFIX+size+name);
+                log.debug(DATA_QUEUE_PREFIX+size+name);
                 vQueue = _cluster.getQueue(DATA_QUEUE_PREFIX + size + name);
             }
             return  new IntegrationClusterStore(this,name,mIndex,vMap,vQueue,TarantulaContext.operationTimeout);
@@ -401,7 +401,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
         if(existingNode!=null){
             nList.forEach(nodeListener -> nodeListener.nodeAdded(existingNode));
             this.summary.register(existingNode);
-            log.warn("Node is ready : "+nodeName+" : "+memberId+" : "+nodeId);
+            log.info("Node is ready : "+nodeName+" : "+memberId+" : "+nodeId);
         }
     }
 

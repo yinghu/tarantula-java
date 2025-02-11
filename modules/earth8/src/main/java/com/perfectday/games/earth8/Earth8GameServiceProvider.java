@@ -58,7 +58,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         gamePlayCounts.put(GamePlayCount.ON_END_GAME,new GamePlayCount(gameContext,GamePlayCount.ON_END_GAME,metrics.entry(GamePlayCount.ON_END_GAME).total(),currentPlayers));
         gamePlayCounts.put(GamePlayCount.ON_GAME_CLUSTER_EVENT,new GamePlayCount(gameContext,GamePlayCount.ON_GAME_CLUSTER_EVENT,metrics.entry(GamePlayCount.ON_GAME_CLUSTER_EVENT).total(),null));
         this.gameContext.schedule(new GamePlayEventRunner(gameContext,gamePlayCounts,ANALYTICS_QUERY));
-        this.gameContext.log("Start earth 8 game service provider with typeId : "+this.gameContext.applicationSchema().typeId(), OnLog.WARN);
+        this.gameContext.log("Start earth 8 game service provider with typeId : "+this.gameContext.applicationSchema().typeId(), OnLog.INFO);
     }
 
     //callbacks from HTTP

@@ -296,7 +296,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         }
         FileInputStream in = new FileInputStream(backupLog);
         jsonObject = JsonUtil.parse(in);
-        logger.warn("LMDB Provider started with store size ["+storeSize+"] queue side ["+pendingQueue.size()+"] store no sync mode ["+envNoSyncFlag+"]");
+        logger.info("LMDB Provider started with store size ["+storeSize+"] queue side ["+pendingQueue.size()+"] store no sync mode ["+envNoSyncFlag+"]");
     }
 
     @Override
@@ -310,7 +310,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(dataMapStoreListener!=null){
             dataMapStoreListener.setup(serviceContext);
         }
-        logger.warn("Setup LMDB provider map store listeners");
+        logger.info("Setup LMDB provider map store listeners");
     }
 
     @Override
@@ -324,7 +324,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         if(dataMapStoreListener!=null){
             dataMapStoreListener.waitForData();
         }
-        logger.warn("Waiting data for LMDB provider map store listeners");
+        logger.info("Waiting data for LMDB provider map store listeners");
     }
     private void closeMapStore() {
         try{
@@ -359,7 +359,7 @@ public class LMDBDataStoreProvider implements DataStoreProvider,MapStoreListener
         log.close();
         local.sync(true);
         local.close();
-        logger.warn("LMDB Shutting down with pending buffer size ["+pendingQueue.size()+"]");
+        logger.info("LMDB Shutting down with pending buffer size ["+pendingQueue.size()+"]");
         pendingQueue.clear();
     }
 

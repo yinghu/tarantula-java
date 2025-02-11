@@ -119,7 +119,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public void start() throws Exception {
-        logger.warn("Room service provider started for ["+serviceType+"]["+typeLobby+"]["+this.playMode+"]["+dedicated+"]["+maxRoomPoolSizePerZone+"]["+pushChannelEnabled+"]");
+        logger.info("Room service provider started for ["+serviceType+"]["+typeLobby+"]["+this.playMode+"]["+dedicated+"]["+maxRoomPoolSizePerZone+"]["+pushChannelEnabled+"]");
         this.udpEndpoint = (UDPEndpoint) this.serviceContext.serviceProvider(UDPEndpoint.UDP_ENDPOINT);
         this.started = this.udpEndpoint != null;
         if(!dedicated) return;
@@ -201,7 +201,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
 
     @Override
     public <T extends Configurable> void register(T t) {
-        logger.warn("Game Zone Registered With ["+t.configurationTypeId()+"]["+minRoomPoolSizePerZone+"]");
+        logger.info("Game Zone Registered With ["+t.configurationTypeId()+"]["+minRoomPoolSizePerZone+"]");
         GameZone gameZone = (GameZone)t;
         GameZoneIndex index = new GameZoneIndex();
         index.gameZone = gameZone;
@@ -219,7 +219,7 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
                     }
                 }
             }
-            logger.warn("Initializing push channels ["+minRoomPoolSizePerZone+"]");
+            logger.info("Initializing push channels ["+minRoomPoolSizePerZone+"]");
         }
         else{
             index.pendingRooms = new ArrayBlockingQueue<>(maxRoomPoolSizePerZone);
@@ -232,19 +232,19 @@ public class PlatformRoomServiceProvider implements ConfigurationServiceProvider
             });
             if(rooms[0] < minRoomPoolSizePerZone){
                 int remaining = minRoomPoolSizePerZone - rooms[0];
-                logger.warn("Creating game room on node->"+serviceContext.node().nodeId()+" : "+remaining);
+                logger.info("Creating game room on node->"+serviceContext.node().nodeId()+" : "+remaining);
                 for(int i=0; i<remaining;i++){
                     GameRoom gameRoom = this.createGameRoom(index,true);
                     if(gameRoom!=null) rooms[0]++;
                 }
             }
             int roomPoolRemaining = index.maxRoomPoolSize.addAndGet((-1)*rooms[0]);
-            logger.warn(gameZone+" Remaining Room Pool Size ["+roomPoolRemaining+"] Capacity ["+gameZone.capacity()+"]");
+            logger.info(gameZone+" Remaining Room Pool Size ["+roomPoolRemaining+"] Capacity ["+gameZone.capacity()+"]");
             if(started && pushChannelEnabled) {
                 gameRoomIndex.forEach((rk, rv) -> {
                     rv.setup(udpEndpoint.createChannels(gameZone.capacity()));
                 });
-                logger.warn("Initializing push channels ["+minRoomPoolSizePerZone+"]");
+                logger.info("Initializing push channels ["+minRoomPoolSizePerZone+"]");
             }
         }
         gameZoneIndex.put(gameZone.distributionKey(),index);

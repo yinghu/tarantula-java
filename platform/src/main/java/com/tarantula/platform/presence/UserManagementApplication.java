@@ -10,13 +10,11 @@ import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
 public class UserManagementApplication extends TarantulaApplicationHeader implements Configurable.Listener<OnLobby>{
-
     private final static String METRICS_LOGIN_COUNT = "applicationLoginCount";
     private boolean activated;
     private int trialDays;
@@ -29,7 +27,6 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
     private TokenValidatorProvider tokenValidatorProvider;
 
     private ConcurrentHashMap<String,OnLobby> onLobbyIndex;
-
 
     @Override
     public void setup(ApplicationContext context) throws Exception {
@@ -101,10 +98,13 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             params.put(OnAccess.SYSTEM_ID,session.systemId());
             String typeId = (String) params.get(OnAccess.TYPE_ID);
             String deviceId = acc.property("deviceId")!=null?acc.property("deviceId").toString():"device-id-assigned";
+
             boolean suc = this.context.validator().validateToken(params);
             LoginProvider _ox = userService.loginProvider(session.distributionId());
+
             if(suc && _ox!=null ){
                 OnSession onSession = this.login(session.distributionId(),_ox.password(),session);
+                onSession.thirdPartyToken((String) params.get("thirdPartyToken")); //Cache ThirdPartyToken on Client
                 onPlatformProvider(onSession,session,_ox,deviceId);
             }
             else if(suc && _ox == null){
@@ -115,6 +115,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 acc.typeId(typeId);
                 createLogin(acc,session.distributionId(),AccessControl.player.name(),true,acc.name(),true);
                 OnSession onSession = login(session.distributionId(),thirdPartyLogin.password(),session);
+                onSession.thirdPartyToken((String) params.get("thirdPartyToken")); //Cache ThirdPartyToken on Client
                 onPlatformProvider(onSession,session,thirdPartyLogin,deviceId);
             }
             else{
@@ -381,7 +382,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
         if(!onLobby.closed()){
             String[] ps = onLobby.typeId().split("-");
             onLobbyIndex.put(ps[0],onLobby);
-            context.log("Lobby ["+onLobby.typeId()+"] is going to be live",OnLog.WARN);
+            context.log("Lobby ["+onLobby.typeId()+"] is going to be live",OnLog.INFO);
         }
         else{
             String[] ps = onLobby.typeId().split("-");

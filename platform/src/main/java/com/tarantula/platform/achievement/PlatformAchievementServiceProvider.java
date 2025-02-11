@@ -30,7 +30,7 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
     public void setup(ServiceContext serviceContext) {
         super.setup(serviceContext);
         this.logger = JDKLogger.getLogger(PlatformAchievementServiceProvider.class);
-        this.logger.warn("Achievement service provider started on ->"+gameServiceName);
+        this.logger.info("Achievement service provider started on ->"+gameServiceName);
     }
 
     public Achievement achievement(Session session){
@@ -47,7 +47,7 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
             DataStore ds = preSetup.onDataStore(NAME);
             ds.createIfAbsent(achievementProgress,true);
             achievementProgress.dataStore(ds);
-            logger.warn("STATUS : "+achievementProgress.disabled()+" : "+delta+" : "+achievementProgress.progress());
+            logger.info("STATUS : "+achievementProgress.disabled()+" : "+delta+" : "+achievementProgress.progress());
             if(achievementProgress.disabled()) tryNextAchievement(achievementProgress);
             if(achievementProgress.disabled()) return true;
             if(achievementProgress.onProgress(delta)){
@@ -57,13 +57,13 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
                     achievementProgress.update();
                     return true;
                 }
-                logger.warn("Achieved : "+achievement.configurationTypeId());
+                logger.info("Achieved : "+achievement.configurationTypeId());
                 Descriptor app = gameCluster.application(achievement.configurationTypeId());
                 ApplicationRedeemer redeemer = new ApplicationRedeemer(session.systemId(),preSetup);
                 redeemer.distributionKey(achievement.distributionKey());
                 if(!preSetup.load(app,redeemer)) return false;
                 redeemer.redeem();
-                logger.warn("Redeemed : "+achievement.configurationTypeId());
+                logger.info("Redeemed : "+achievement.configurationTypeId());
                 if(!tryNextAchievement(achievementProgress)){
                     achievementProgress.disabled(true);
                     achievementProgress.update();
@@ -112,7 +112,7 @@ public class PlatformAchievementServiceProvider extends PlatformItemServiceProvi
     public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
         List<AchievementItem> items = applicationPreSetup.list(descriptor,new AchievementObjectQuery(descriptor.key(),"Achievement"));
         items.forEach((a)-> {
-            logger.warn("<><><>"+a.name()+"<><>"+a.objective());
+            logger.info("<><><>"+a.name()+"<><>"+a.objective());
             a.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
             a.setup();
             if(!a.disabled()) achievements.put(a.name(),a);
