@@ -83,6 +83,10 @@ public class SavedGameModule extends ModuleHeader {
             TeamFormationResponse response  = gameServiceProvider.pvpBattleServiceProvider().saveDefenseTeam(session,bytes);
             session.write(response.toJson().toString().getBytes());
         }
+        else if(session.action().equals("onSaveOffenseTeam")){
+            TeamFormationResponse response  = gameServiceProvider.pvpBattleServiceProvider().saveOffenseTeam(session,bytes);
+            session.write(response.toJson().toString().getBytes());
+        }
         else if(session.action().equals("onSeasonInfo")){
             SeasonCredentialConfiguration.Season season  = gameServiceProvider.pvpBattleServiceProvider().currentSeason();
             session.write(season.toJson().toString().getBytes());
