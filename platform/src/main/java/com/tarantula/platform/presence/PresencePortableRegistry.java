@@ -190,7 +190,7 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
                 pt = new SeasonRuntime();
                 break;
             case BATTLE_LOG_CID:
-                pt = new BattleLog();
+                pt = new BattleLogIndex();
                 break;
             case PLAYER_BATTLE_LOG_INDEX_CID:
                 pt = new PlayerBattleLogIndex();
