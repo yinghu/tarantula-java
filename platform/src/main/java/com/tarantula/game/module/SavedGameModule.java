@@ -10,6 +10,7 @@ import com.tarantula.platform.presence.*;
 
 import com.tarantula.game.PlayerSavedGames;
 import com.tarantula.game.util.SavedGameDeserializer;
+import com.tarantula.platform.presence.pvp.BattleLogList;
 import com.tarantula.platform.presence.pvp.TeamFormationResponse;
 import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 import com.tarantula.platform.presence.saves.PlatformSavedGameServiceProvider;
@@ -90,6 +91,10 @@ public class SavedGameModule extends ModuleHeader {
         else if(session.action().equals("onSeasonInfo")){
             SeasonCredentialConfiguration.Season season  = gameServiceProvider.pvpBattleServiceProvider().currentSeason();
             session.write(season.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onBattleLog")){
+            BattleLogList battleLogList = gameServiceProvider.pvpBattleServiceProvider().battleLogList(session);
+            session.write(battleLogList.toJson().toString().getBytes());
         }
         //pvp saves end
 
