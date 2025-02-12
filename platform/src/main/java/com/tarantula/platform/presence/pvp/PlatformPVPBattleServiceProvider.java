@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvider implements Configurable.Listener<SeasonCredentialConfiguration> {
 
     private static final long CURRENT_SEASON_INDEX = 0;
-    public static final String NAME = "pvp_battle_1";
+    public static final String NAME = "pvp_battle";
     private int teamCreationWaitingTime = 5;
     private int seasonTimeGap = 10; //minutes
     private int seasonRunningDays = 12; //days
@@ -31,6 +31,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     private final SeasonRuntime rotation = new SeasonRuntime();
 
+    private DataStore battleHistory;
 
     public PlatformPVPBattleServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
@@ -45,6 +46,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         seasonTimeGap = pvp.get("seasonTimeGapMinutes").getAsInt();
         seasonRunningDays = pvp.get("seasonRunningDays").getAsInt();
         this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
+        this.battleHistory = applicationPreSetup.dataStore(gameCluster,NAME+"_history");
         this.scheduleStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,gameCluster.typeId()+"."+NAME);
         this.logger = JDKLogger.getLogger(PlatformPVPBattleServiceProvider.class);
         this.logger.warn("PVP battle service provider started on ->"+gameServiceName);
@@ -95,6 +97,70 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         defenseTeam.distributionId(defenseTeamId);
         dataStore.load(defenseTeam);
         return defenseTeam;
+    }
+
+    public BattleLogList battleLogList(Session session){
+        BattleLogList battleLogList = new BattleLogList(battleHistory(session));
+        //Mock data here
+        return battleLogList;
+    }
+
+    private List<BattleLog> battleHistory(Session session){
+        List<BattleLog> battleLogs = new ArrayList<>();
+        PlayerBattleLogIndex logIndex = new PlayerBattleLogIndex();
+        logIndex.distributionId(session.distributionId());
+        battleHistory.createIfAbsent(logIndex,true);
+        if(logIndex.battleId0>0){
+            BattleLogIndex log = new BattleLogIndex();
+            log.distributionId(logIndex.battleId0);
+            if(battleHistory.load(log)){
+                BattleLog battleLog = new BattleLog(log);
+                battleLog.defenseTeam = defenseTeam(log.defenseTeamId);
+                battleLog.offenseTeam = defenseTeam(log.offenseTeamId);
+                battleLogs.add(battleLog);
+            }
+        }
+        if(logIndex.battleId1>0){
+            BattleLogIndex log = new BattleLogIndex();
+            log.distributionId(logIndex.battleId1);
+            if(battleHistory.load(log)){
+                BattleLog battleLog = new BattleLog(log);
+                battleLog.defenseTeam = defenseTeam(log.defenseTeamId);
+                battleLog.offenseTeam = defenseTeam(log.offenseTeamId);
+                battleLogs.add(battleLog);
+            }
+        }
+        if(logIndex.battleId2>0){
+            BattleLogIndex log = new BattleLogIndex();
+            log.distributionId(logIndex.battleId2);
+            if(battleHistory.load(log)){
+                BattleLog battleLog = new BattleLog(log);
+                battleLog.defenseTeam = defenseTeam(log.defenseTeamId);
+                battleLog.offenseTeam = defenseTeam(log.offenseTeamId);
+                battleLogs.add(battleLog);
+            }
+        }
+        if(logIndex.battleId3>0){
+            BattleLogIndex log = new BattleLogIndex();
+            log.distributionId(logIndex.battleId3);
+            if(battleHistory.load(log)){
+                BattleLog battleLog = new BattleLog(log);
+                battleLog.defenseTeam = defenseTeam(log.defenseTeamId);
+                battleLog.offenseTeam = defenseTeam(log.offenseTeamId);
+                battleLogs.add(battleLog);
+            }
+        }
+        if(logIndex.battleId4>0){
+            BattleLogIndex log = new BattleLogIndex();
+            log.distributionId(logIndex.battleId4);
+            if(battleHistory.load(log)){
+                BattleLog battleLog = new BattleLog(log);
+                battleLog.defenseTeam = defenseTeam(log.defenseTeamId);
+                battleLog.offenseTeam = defenseTeam(log.offenseTeamId);
+                battleLogs.add(battleLog);
+            }
+        }
+        return battleLogs;
     }
 
     public void onLoaded(SeasonCredentialConfiguration loaded){
