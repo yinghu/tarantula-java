@@ -24,7 +24,8 @@
   "pvp": {
      "waitingMinutesPerTeamFormation": 5,
      "seasonTimeGapMinutes": 12,
-     "seasonRunningDays": 12
+     "seasonRunningDays": 12,
+     "reMatchWaitingTimeMinutes": 60
   },
 
   "playList":{

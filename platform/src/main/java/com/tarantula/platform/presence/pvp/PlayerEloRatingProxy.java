@@ -48,7 +48,6 @@ public class PlayerEloRatingProxy extends RecoverableObject implements Rating {
         //PVPPointGenerator.updateELO(playerRanking,opponentRaking,offenseTeam.teamPower,defenseTeam.teamPower,win);
         //playerRanking.update();
         //opponentRaking.update();
-
         //return this;
     }
 }

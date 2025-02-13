@@ -25,13 +25,15 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     public static final String NAME = "pvp_battle";
     private int teamCreationWaitingTime = 5;
     private int seasonTimeGap = 10; //minutes
-    private int seasonRunningDays = 12; //days
+    private int seasonRunningDays = 12;//days
+    private int reMatchWaitingTimeMinutes = 60; //minutes
     private ConcurrentHashMap<Long, SeasonCredentialConfiguration.Season> seasons = new ConcurrentHashMap();
     private ClusterProvider.ClusterStore scheduleStore;
 
     private final SeasonRuntime rotation = new SeasonRuntime();
 
     private DataStore battleHistory;
+    private String gameEndTopic = GameEndEvent.GAME_END_TOPIC;
 
     public PlatformPVPBattleServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
@@ -45,26 +47,33 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         teamCreationWaitingTime = pvp.get("waitingMinutesPerTeamFormation").getAsInt();
         seasonTimeGap = pvp.get("seasonTimeGapMinutes").getAsInt();
         seasonRunningDays = pvp.get("seasonRunningDays").getAsInt();
+        reMatchWaitingTimeMinutes = pvp.get("reMatchWaitingTimeMinutes").getAsInt();
         this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
         this.battleHistory = applicationPreSetup.dataStore(gameCluster,NAME+"_history");
         this.scheduleStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,gameCluster.typeId()+"."+NAME);
         this.logger = JDKLogger.getLogger(PlatformPVPBattleServiceProvider.class);
         this.logger.warn("PVP battle service provider started on ->"+gameServiceName);
+        this.serviceContext.eventService().registerEventListener(gameEndTopic,e->{
+            return true;
+        });
         this.platformGameServiceProvider.configurationServiceProvider().addConfigurableListener(OnAccess.SEASON,this);
     }
 
 
-    public List<DefenseTeam> matchMaking(Session session){
-        ArrayList<DefenseTeam> matches = new ArrayList<>();
+    public MatchMaking matchMaking(Session session){
+        ArrayList<BattleTeam> matches = new ArrayList<>();
         findMatches(session).forEach(rating -> {
-            DefenseTeam defenseTeam = defenseTeam(rating);
+            BattleTeam defenseTeam = defenseTeam(rating);
             if(defenseTeam != null){
                 //calculate the estimated pvp points if the player wins.
-                defenseTeam.winPointsEstimated = 100;
+                defenseTeam.winPointsEstimated = 100;//sampling
                 matches.add(defenseTeam);
             }
         });
-        return matches;
+        MatchMaking matchMaking = new MatchMaking();
+        matchMaking.nextRefreshTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusMinutes(reMatchWaitingTimeMinutes));
+        matchMaking.battleTeams = matches;
+        return matchMaking;
     }
 
     public TeamFormationResponse saveDefenseTeam(Session session,byte[] content){
@@ -72,28 +81,28 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         teamFormationIndex.distributionId(session.distributionId());
         dataStore.createIfAbsent(teamFormationIndex,true);
         if(!teamFormationIndex.expired()) return TeamFormationResponse.failure(teamFormationIndex.timestamp());
-        DefenseTeam defenseTeam = DefenseTeam.parse(content);
+        BattleTeam defenseTeam = BattleTeam.parse(content);
         defenseTeam.playerId = session.distributionId();
         defenseTeam.save(dataStore,teamFormationIndex,teamCreationWaitingTime);
         return TeamFormationResponse.success(teamFormationIndex.timestamp());
     }
 
     public TeamFormationResponse saveOffenseTeam(Session session,byte[] content){
-        DefenseTeam defenseTeam = DefenseTeam.parse(content);
+        BattleTeam defenseTeam = BattleTeam.parse(content);
         defenseTeam.playerId = session.distributionId();
         dataStore.create(defenseTeam);
         return TeamFormationResponse.responseOnOffenseTeam(defenseTeam.distributionId());
     }
 
-    public DefenseTeam defenseTeam(Rating rating){
+    public BattleTeam defenseTeam(Rating rating){
         TeamFormationIndex teamFormationIndex = new TeamFormationIndex();
         teamFormationIndex.distributionId(rating.distributionId());
         if(!dataStore.load(teamFormationIndex)) return null;
         return defenseTeam(teamFormationIndex.teamId);
     }
 
-    public DefenseTeam defenseTeam(long defenseTeamId){
-        DefenseTeam defenseTeam = new DefenseTeam();
+    public BattleTeam defenseTeam(long defenseTeamId){
+        BattleTeam defenseTeam = new BattleTeam();
         defenseTeam.distributionId(defenseTeamId);
         dataStore.load(defenseTeam);
         return defenseTeam;

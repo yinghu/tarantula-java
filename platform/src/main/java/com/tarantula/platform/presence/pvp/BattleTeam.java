@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DefenseTeam extends RecoverableObject {
+public class BattleTeam extends RecoverableObject {
 
     public static int MAX_UNITS = 5;
     public static int MAX_EQUIPMENTS = 30;
@@ -150,8 +150,8 @@ public class DefenseTeam extends RecoverableObject {
         return subStats;
     }
 
-    public static DefenseTeam parse(byte[] payload){
-        DefenseTeam defenseTeam = new DefenseTeam();
+    public static BattleTeam parse(byte[] payload){
+        BattleTeam defenseTeam = new BattleTeam();
         JsonObject teamJson = JsonUtil.parse(payload);
         defenseTeam.teamPower = teamJson.get("teamPower").getAsInt();
         JsonArray unitInstancesJson = teamJson.get("unitInstances").getAsJsonArray();
@@ -161,7 +161,7 @@ public class DefenseTeam extends RecoverableObject {
         return defenseTeam;
     }
 
-    private static void parseEquipmentData(JsonArray equipmentData,DefenseTeam defenseTeam){
+    private static void parseEquipmentData(JsonArray equipmentData, BattleTeam defenseTeam){
         equipmentData.forEach(jsonElement -> {
             JsonObject jo = jsonElement.getAsJsonObject();
             EquipmentInstance equipmentInstance = new EquipmentInstance();
@@ -191,7 +191,7 @@ public class DefenseTeam extends RecoverableObject {
         });
     }
 
-    private static void parseUnitInstance(JsonArray unitInstancesJson,DefenseTeam defenseTeam){
+    private static void parseUnitInstance(JsonArray unitInstancesJson, BattleTeam defenseTeam){
         unitInstancesJson.forEach(jsonElement -> {
             JsonObject jo = jsonElement.getAsJsonObject();
             UnitInstance unitInstance = new UnitInstance();

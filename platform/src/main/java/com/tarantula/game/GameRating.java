@@ -87,6 +87,7 @@ public class GameRating extends PlayerGameObject implements Rating {
 
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("PlayerId",distributionId);
         jsonObject.addProperty("Rank",rank);
         jsonObject.addProperty("Level",level);
         jsonObject.addProperty("Xp",xp);
@@ -110,5 +111,12 @@ public class GameRating extends PlayerGameObject implements Rating {
 
     public void level(int eloAssigned){
         this.level = eloAssigned;
+    }
+
+    public static Rating from(long distributionId,int level){
+        GameRating rating = new GameRating();
+        rating.distributionId(distributionId);
+        rating.level(level);
+        return rating;
     }
 }

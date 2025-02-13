@@ -2,10 +2,8 @@ package com.tarantula.test;
 
 
 import com.icodesoftware.DataStore;
-import com.tarantula.platform.presence.pvp.DefenseTeam;
-import com.tarantula.platform.presence.pvp.EquipmentInstance;
+import com.tarantula.platform.presence.pvp.BattleTeam;
 import com.tarantula.platform.presence.pvp.TeamFormationIndex;
-import com.tarantula.platform.presence.pvp.UnitInstance;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -20,7 +18,7 @@ public class DefenseTeamTest extends DataStoreHook{
         try(InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("SampleDefenseFormation-full.json")){
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             inputStream.transferTo(outputStream);
-            DefenseTeam defenseTeam = DefenseTeam.parse(outputStream.toByteArray());
+            BattleTeam defenseTeam = BattleTeam.parse(outputStream.toByteArray());
             Assert.assertEquals(defenseTeam.unitInstances.size(),5);
             defenseTeam.unitInstances.forEach(unitInstance -> {
                 Assert.assertTrue(unitInstance.level>0);
@@ -73,7 +71,7 @@ public class DefenseTeamTest extends DataStoreHook{
         try(InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("SampleDefenseFormation-no-equipments.json")){
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             inputStream.transferTo(outputStream);
-            DefenseTeam defenseTeam = DefenseTeam.parse(outputStream.toByteArray());
+            BattleTeam defenseTeam = BattleTeam.parse(outputStream.toByteArray());
             Assert.assertEquals(defenseTeam.unitInstances.size(),5);
             Assert.assertEquals(defenseTeam.equipmentInstances.size(),0);
             Assert.assertTrue(defenseTeam.teamPower>0);
@@ -90,14 +88,14 @@ public class DefenseTeamTest extends DataStoreHook{
             DataStore dataStore = dataStoreProvider.createDataStore("test_pvp_teams");
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             inputStream.transferTo(outputStream);
-            DefenseTeam defenseTeam = DefenseTeam.parse(outputStream.toByteArray());
+            BattleTeam defenseTeam = BattleTeam.parse(outputStream.toByteArray());
             TeamFormationIndex teamFormationIndex = new TeamFormationIndex();
             teamFormationIndex.distributionId(100);
             dataStore.createIfAbsent(teamFormationIndex,true);
             Assert.assertTrue(teamFormationIndex.expired());
             defenseTeam.save(dataStore,teamFormationIndex,5);
             Assert.assertTrue(teamFormationIndex.teamId>0);
-            DefenseTeam load = new DefenseTeam();
+            BattleTeam load = new BattleTeam();
             load.load(dataStore,teamFormationIndex);
             load.toJson();
         }catch (Exception ex){
@@ -113,14 +111,14 @@ public class DefenseTeamTest extends DataStoreHook{
             DataStore dataStore = dataStoreProvider.createDataStore("test_pvp_teams");
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             inputStream.transferTo(outputStream);
-            DefenseTeam defenseTeam = DefenseTeam.parse(outputStream.toByteArray());
+            BattleTeam defenseTeam = BattleTeam.parse(outputStream.toByteArray());
             TeamFormationIndex teamFormationIndex = new TeamFormationIndex();
             teamFormationIndex.distributionId(200);
             dataStore.createIfAbsent(teamFormationIndex,true);
             Assert.assertTrue(teamFormationIndex.expired());
             defenseTeam.save(dataStore,teamFormationIndex,5);
             Assert.assertTrue(teamFormationIndex.teamId>0);
-            DefenseTeam load = new DefenseTeam();
+            BattleTeam load = new BattleTeam();
             load.load(dataStore,teamFormationIndex);
             load.toJson();
         }catch (Exception ex){

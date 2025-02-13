@@ -11,8 +11,8 @@ public class BattleLog implements JsonSerializable {
     public int defenseEloGain;
     public int defenseElo;
 
-    public DefenseTeam defenseTeam;
-    public DefenseTeam offenseTeam;
+    public BattleTeam defenseTeam;
+    public BattleTeam offenseTeam;
 
     public BattleLog(BattleLogIndex battleLogIndex){
         this.offenseEloGain = battleLogIndex.offenseEloGain;
