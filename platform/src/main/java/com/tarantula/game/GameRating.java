@@ -111,4 +111,11 @@ public class GameRating extends PlayerGameObject implements Rating {
     public void level(int eloAssigned){
         this.level = eloAssigned;
     }
+
+    public static Rating from(long distributionId,int level){
+        GameRating rating = new GameRating();
+        rating.distributionId(distributionId);
+        rating.level(level);
+        return rating;
+    }
 }

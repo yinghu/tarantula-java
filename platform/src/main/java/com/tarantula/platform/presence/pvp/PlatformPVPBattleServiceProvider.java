@@ -32,6 +32,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private final SeasonRuntime rotation = new SeasonRuntime();
 
     private DataStore battleHistory;
+    private String gameEndTopic = GameEndEvent.GAME_END_TOPIC;
 
     public PlatformPVPBattleServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
@@ -50,6 +51,9 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         this.scheduleStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,gameCluster.typeId()+"."+NAME);
         this.logger = JDKLogger.getLogger(PlatformPVPBattleServiceProvider.class);
         this.logger.warn("PVP battle service provider started on ->"+gameServiceName);
+        this.serviceContext.eventService().registerEventListener(gameEndTopic,e->{
+            return true;
+        });
         this.platformGameServiceProvider.configurationServiceProvider().addConfigurableListener(OnAccess.SEASON,this);
     }
 
