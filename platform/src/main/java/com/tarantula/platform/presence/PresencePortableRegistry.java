@@ -181,7 +181,7 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
                 pt = new EquipmentInstance();
                 break;
             case DEFENSE_TEAM_CID:
-                pt = new DefenseTeam();
+                pt = new BattleTeam();
                 break;
             case TEAM_FORMATION_INDEX_CID:
                 pt = new TeamFormationIndex();

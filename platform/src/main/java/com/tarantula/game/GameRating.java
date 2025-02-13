@@ -87,6 +87,7 @@ public class GameRating extends PlayerGameObject implements Rating {
 
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("PlayerId",distributionId);
         jsonObject.addProperty("Rank",rank);
         jsonObject.addProperty("Level",level);
         jsonObject.addProperty("Xp",xp);
