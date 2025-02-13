@@ -2,6 +2,7 @@ package com.tarantula.platform;
 
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.session.OnSessionTrack;
+import com.icodesoftware.service.AccessKey;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.platform.service.SystemValidatorProvider;
 import com.tarantula.platform.util.SystemUtil;
@@ -90,6 +91,12 @@ public class SystemValidator{
         }
         public Access.Role role(long systemId){
             return systemValidatorProvider.role(systemId);
+        }
+        public String accessKey(AccessKey accessKey){
+            return null;
+        }
+        public AccessKey validateAccessKey(String access){
+            return null;
         }
     }
 }

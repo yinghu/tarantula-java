@@ -5,10 +5,11 @@ import com.icodesoftware.OnSession;
 import com.icodesoftware.Session;
 import com.icodesoftware.TokenValidator;
 import com.icodesoftware.protocol.session.OnSessionTrack;
+import com.icodesoftware.service.AccessKey;
 
 import java.util.Map;
 
-public class AbstractTokenValidator implements TokenValidator {
+abstract public class AbstractTokenValidator implements TokenValidator {
 
     protected int ticketDuration;
 
@@ -58,4 +59,15 @@ public class AbstractTokenValidator implements TokenValidator {
     public Access.Role role(long systemId) {
         return null;
     }
+
+    public String accessKey(AccessKey accessKey){
+        return CryptoManager.accessKey(accessKey);
+    }
+    public AccessKey validateAccessKey(String access){
+        AccessKey accessKey = CryptoManager.validateAccessKey(access);
+        return onAccessKey(accessKey);
+    }
+
+    abstract protected OnSession onSession(Access access);
+    abstract AccessKey onAccessKey(AccessKey accessKey);
 }

@@ -1,5 +1,7 @@
 package com.icodesoftware;
 
+import com.icodesoftware.service.AccessKey;
+
 import java.util.Map;
 
 public interface TokenValidator {
@@ -10,7 +12,7 @@ public interface TokenValidator {
 
     //hash password to avoid direct password persistence
     String hashPassword(String password);
-    OnSession validatePassword(Access hash, String password);
+    OnSession validatePassword(Access access, String password);
 
     //generate the ticket with limited life circle
     String ticket(long id,long stub);
@@ -24,5 +26,8 @@ public interface TokenValidator {
     boolean upgradeRole(Access access,String role);
 
     Access.Role role(long systemId);
+
+    String accessKey(AccessKey accessKey);
+    AccessKey validateAccessKey(String access);
 
 }
