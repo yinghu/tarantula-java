@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.service.Content;
 import com.icodesoftware.util.JsonUtil;
+import com.tarantula.game.GameRating;
 import com.tarantula.platform.configuration.SeasonCredentialConfiguration;
 import com.tarantula.platform.presence.*;
 
@@ -95,6 +96,10 @@ public class SavedGameModule extends ModuleHeader {
         else if(session.action().equals("onBattleLog")){
             BattleLogList battleLogList = gameServiceProvider.pvpBattleServiceProvider().battleLogList(session);
             session.write(battleLogList.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onRating")){
+            GameRating rating = presenceServiceProvider.rating(session);
+            session.write(rating.toJson().toString().getBytes());
         }
         //pvp saves end
 
