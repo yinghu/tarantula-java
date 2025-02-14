@@ -40,7 +40,7 @@ public class GameRating extends PlayerGameObject implements Rating {
 
     @Override
     public void startCooldown() {
-        defeatCooldown = TimeUtil.toUTCMilliseconds(LocalDateTime.now().minusMinutes(60));
+        defeatCooldown = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusMinutes(60));
     }
 
     public Rating update(double xpDelta, double levelUpLimit){
