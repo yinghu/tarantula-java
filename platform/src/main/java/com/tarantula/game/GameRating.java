@@ -4,9 +4,11 @@ import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Rating;
+import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 public class GameRating extends PlayerGameObject implements Rating {
 
@@ -19,6 +21,8 @@ public class GameRating extends PlayerGameObject implements Rating {
     public boolean granted;
     private double levelUpXp =0;  //xp of arena level
 
+    public long defeatCooldown;
+
     public GameRating(){
         this.onEdge = true;
         this.label = "rating";
@@ -27,6 +31,16 @@ public class GameRating extends PlayerGameObject implements Rating {
     public Rating elo(boolean win,long opponentId,long teamPower){
         //no direct call
         return this;
+    }
+
+    @Override
+    public boolean onCooldown() {
+        return !TimeUtil.expired(TimeUtil.fromUTCMilliseconds(defeatCooldown));
+    }
+
+    @Override
+    public void startCooldown() {
+        defeatCooldown = TimeUtil.toUTCMilliseconds(LocalDateTime.now().minusMinutes(60));
     }
 
     public Rating update(double xpDelta, double levelUpLimit){

@@ -8,6 +8,33 @@ import org.testng.annotations.Test;
 public class PVPPointGeneratorTest {
 
     @Test(groups = { "PVP_ELO" })
+    public void defenderCooldownTest(){
+        GameRating attackerRating = new GameRating();
+        GameRating defenderRating = new GameRating();
+        attackerRating.level = 200;
+        defenderRating.level = 200;
+
+        int attackerPower = 60;
+        int defenderPower = 60;
+        boolean attackerWin = true;
+
+        PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
+
+        Assert.assertEquals(attackerRating.level, 210);
+        Assert.assertEquals(defenderRating.level, 198);
+
+        PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
+
+        Assert.assertEquals(attackerRating.level, 220);
+        Assert.assertEquals(defenderRating.level, 198);
+
+        PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
+
+        Assert.assertEquals(attackerRating.level, 231);
+        Assert.assertEquals(defenderRating.level, 198);
+    }
+
+    @Test(groups = { "PVP_ELO" })
     public void basicGenerateByWinTest(){
         GameRating attackerRating = new GameRating();
         GameRating defenderRating = new GameRating();
