@@ -34,6 +34,16 @@ public class UserRating extends RecoverableObject implements Rating {
         return this;
     }
 
+    @Override
+    public boolean onCooldown() {
+        return false;
+    }
+
+    @Override
+    public void startCooldown() {
+
+    }
+
     public boolean read(DataBuffer buffer){
         this.rank = buffer.readInt();
         this.level = buffer.readInt();

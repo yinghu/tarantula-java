@@ -50,4 +50,14 @@ public class PlayerEloRatingProxy extends RecoverableObject implements Rating {
         //opponentRaking.update();
         //return this;
     }
+
+    @Override
+    public boolean onCooldown() {
+        return false;
+    }
+
+    @Override
+    public void startCooldown() {
+
+    }
 }
