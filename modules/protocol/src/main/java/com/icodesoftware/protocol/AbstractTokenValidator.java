@@ -4,7 +4,7 @@ import com.icodesoftware.Access;
 import com.icodesoftware.OnSession;
 import com.icodesoftware.Session;
 import com.icodesoftware.TokenValidator;
-import com.icodesoftware.protocol.session.OnSessionTrack;
+import com.icodesoftware.protocol.presence.OnSessionTrack;
 import com.icodesoftware.service.AccessKey;
 
 import java.util.Map;

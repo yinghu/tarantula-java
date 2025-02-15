@@ -2,7 +2,7 @@ package com.tarantula.platform.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.util.BufferProxy;
-import com.icodesoftware.protocol.session.OnSessionTrack;
+import com.icodesoftware.protocol.presence.OnSessionTrack;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.*;

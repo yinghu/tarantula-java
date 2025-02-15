@@ -8,7 +8,7 @@ import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.JWTUtil;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.AccessControl;
-import com.icodesoftware.protocol.session.OnSessionTrack;
+import com.icodesoftware.protocol.presence.OnSessionTrack;
 import com.tarantula.platform.presence.User;
 import org.testng.Assert;
 import org.testng.annotations.Test;

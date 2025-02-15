@@ -1,7 +1,7 @@
 package com.tarantula.platform;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.protocol.session.OnSessionTrack;
+import com.icodesoftware.protocol.presence.OnSessionTrack;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 

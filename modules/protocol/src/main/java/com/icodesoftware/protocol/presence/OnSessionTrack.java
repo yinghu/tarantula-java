@@ -1,4 +1,4 @@
-package com.icodesoftware.protocol.session;
+package com.icodesoftware.protocol.presence;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnSession;

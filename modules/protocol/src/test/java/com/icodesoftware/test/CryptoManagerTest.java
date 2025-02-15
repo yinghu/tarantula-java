@@ -4,8 +4,8 @@ package com.icodesoftware.test;
 import com.icodesoftware.OnSession;
 import com.icodesoftware.protocol.CryptoManager;
 
-import com.icodesoftware.protocol.session.AccessKeyTrack;
-import com.icodesoftware.protocol.session.OnSessionTrack;
+import com.icodesoftware.protocol.presence.AccessKeyTrack;
+import com.icodesoftware.protocol.presence.OnSessionTrack;
 import com.icodesoftware.service.AccessKey;
 import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.JWTUtil;

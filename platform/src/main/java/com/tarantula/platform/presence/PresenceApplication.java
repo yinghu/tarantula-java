@@ -3,7 +3,7 @@ package com.tarantula.platform.presence;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
-import com.icodesoftware.protocol.session.OnSessionTrack;
+import com.icodesoftware.protocol.presence.OnSessionTrack;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.TokenValidatorProvider;

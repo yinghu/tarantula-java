@@ -1,7 +1,7 @@
 package com.tarantula.platform.presence;
 
 import com.icodesoftware.*;
-import com.icodesoftware.protocol.session.OnSessionTrack;
+import com.icodesoftware.protocol.presence.OnSessionTrack;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.ResponseHeader;
@@ -12,7 +12,6 @@ import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

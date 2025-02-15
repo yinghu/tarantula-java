@@ -1,7 +1,7 @@
 package com.tarantula.platform;
 
 import com.icodesoftware.*;
-import com.icodesoftware.protocol.session.OnSessionTrack;
+import com.icodesoftware.protocol.presence.OnSessionTrack;
 import com.icodesoftware.service.AccessKey;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.platform.service.SystemValidatorProvider;
