@@ -26,8 +26,7 @@ abstract public class AbstractTokenValidator implements TokenValidator {
     @Override
     public OnSession validatePassword(Access access, String password) {
         if(!CryptoManager.hash(password).equals(access.password())) return OnSessionTrack.PASSWORD_NOT_MATCHED;
-        OnSessionTrack onSessionTrack = new OnSessionTrack();
-        return onSessionTrack;
+        return onSession(access);
     }
 
     @Override
@@ -69,5 +68,5 @@ abstract public class AbstractTokenValidator implements TokenValidator {
     }
 
     abstract protected OnSession onSession(Access access);
-    abstract AccessKey onAccessKey(AccessKey accessKey);
+    abstract protected AccessKey onAccessKey(AccessKey accessKey);
 }
