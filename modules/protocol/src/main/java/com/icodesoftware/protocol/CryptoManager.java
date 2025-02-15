@@ -2,7 +2,7 @@ package com.icodesoftware.protocol;
 
 import com.icodesoftware.OnSession;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.protocol.presence.AccessKeyTrack;
+import com.icodesoftware.protocol.service.AccessKeyTrack;
 import com.icodesoftware.protocol.presence.OnSessionTrack;
 import com.icodesoftware.service.AccessKey;
 import com.icodesoftware.service.TokenValidatorProvider;

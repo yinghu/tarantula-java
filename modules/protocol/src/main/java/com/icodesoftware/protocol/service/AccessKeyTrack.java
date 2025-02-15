@@ -1,4 +1,4 @@
-package com.icodesoftware.protocol.presence;
+package com.icodesoftware.protocol.service;
 
 import com.icodesoftware.protocol.ProtocolPortableRegistry;
 import com.icodesoftware.service.AccessKey;

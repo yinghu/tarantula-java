@@ -1,7 +1,7 @@
 package com.icodesoftware.protocol;
 
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.protocol.presence.AccessKeyTrack;
+import com.icodesoftware.protocol.service.AccessKeyTrack;
 import com.icodesoftware.protocol.statistics.UserRating;
 import com.icodesoftware.protocol.statistics.StatisticsEntry;
 import com.icodesoftware.protocol.statistics.UserStatistics;
