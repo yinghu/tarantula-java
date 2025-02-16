@@ -1,6 +1,7 @@
 package com.icodesoftware.protocol.presence;
 
 import com.google.gson.JsonObject;
+import com.icodesoftware.Access;
 import com.icodesoftware.OnSession;
 import com.icodesoftware.util.OnApplicationHeader;
 
@@ -10,7 +11,7 @@ public class TROnSession extends OnApplicationHeader implements OnSession {
     private String token;
 
     private String login;
-
+    private String role = TRRole.player.name();
     public static final OnSession PASSWORD_NOT_MATCHED = new TROnSession("PASSWORD NOT MATCHED");
     public static final OnSession INVALID_TOKEN = new TROnSession("INVALID TOKEN");
 
@@ -46,7 +47,13 @@ public class TROnSession extends OnApplicationHeader implements OnSession {
     public void login(String login){
         this.login = login;
     }
+    public String role(){
+        return role;
+    }
 
+    public void role(String role){
+        this.role = role;
+    }
     public String toString(){
         return "OnSession->["+token+"]";
     }

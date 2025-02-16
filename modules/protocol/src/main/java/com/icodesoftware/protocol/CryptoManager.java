@@ -102,25 +102,27 @@ public class CryptoManager {
             dataBuffer.writeLong(session.systemId()).writeLong(session.stub());
             byte[] mark = encrypt(dataBuffer.array());
             h.addProperty("kid",CipherUtil.toBase64Key(mark));
-            p.addProperty("aud","player");
+            p.addProperty("aud",session.role());
             p.addProperty("exp",expiry);
             return true;
         });
     }
 
     public static OnSession verify(String token){
-        OnSession onSession = new TROnSession();
+        TROnSession onSession = new TROnSession();
         if(!jwt.verify(token,(h,p)->{
             long expiry = p.get("exp").getAsLong();
             if (TimeUtil.expired(TimeUtil.fromUTCMilliseconds(expiry))) {
                 return false;
             }
+            String role = p.get("aud").getAsString();
             byte[] data = decrypt(CipherUtil.fromBase64Key(h.get("kid").getAsString()));
             Recoverable.DataBuffer dataBuffer = BufferProxy.wrap(data);
             long id = dataBuffer.readLong();
             long stub = dataBuffer.readLong();
             onSession.distributionId(id);
             onSession.stub(stub);
+            onSession.role(role);
             return true;
         })) return TROnSession.INVALID_TOKEN;
         return onSession;
