@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Access;
 import com.icodesoftware.util.RecoverableObject;
 
-public class AbstractAccess extends RecoverableObject implements Access {
+public class TRAccess extends RecoverableObject implements Access {
 
     protected String login;
     protected String password;//hash of the password
@@ -17,7 +17,7 @@ public class AbstractAccess extends RecoverableObject implements Access {
     protected String validator;
     protected String role;
 
-    public AbstractAccess(){
+    public TRAccess(){
         this.label = Access.LABEL;
         this.onEdge = true;
     }

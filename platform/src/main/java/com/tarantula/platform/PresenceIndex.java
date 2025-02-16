@@ -1,7 +1,7 @@
 package com.tarantula.platform;
 
 import com.icodesoftware.*;
-import com.icodesoftware.protocol.presence.OnSessionTrack;
+import com.icodesoftware.protocol.presence.TROnSession;
 import com.icodesoftware.service.EventService;
 import com.icodesoftware.service.ServiceContext;
 import com.tarantula.platform.presence.PresencePortableRegistry;
@@ -83,7 +83,7 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     public OnSession stub(){
         counter++;
         this.update();
-        return new OnSessionTrack(distributionId,serviceContext.distributionId());
+        return new TROnSession(distributionId,serviceContext.distributionId());
     }
 
     @Override

@@ -4,7 +4,7 @@ import com.icodesoftware.protocol.ProtocolPortableRegistry;
 import com.icodesoftware.service.AccessKey;
 import com.icodesoftware.util.RecoverableObject;
 
-public class AccessKeyTrack extends RecoverableObject implements AccessKey {
+public class TRAccessKey extends RecoverableObject implements AccessKey {
 
     public int getFactoryId(){
         return ProtocolPortableRegistry.OID;

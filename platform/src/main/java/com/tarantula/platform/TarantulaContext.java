@@ -301,7 +301,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
     }
 
     private void setApplicationManager(DeploymentDescriptor c,Lobby lb) throws Exception{
-        if(lb.descriptor().accessMode() > c.accessMode) c.accessMode(lb.descriptor().accessMode());
+        if(lb.descriptor().accessMode() > c.accessMode()) c.accessMode(lb.descriptor().accessMode());
         SingletonApplicationManager singletonApplicationManager = new SingletonApplicationManager(this,c);//pass the class loader
         this.availableApplicationManagers.put(c.distributionId(),singletonApplicationManager);
         singletonApplicationManager.start();
@@ -321,7 +321,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
             if(!masterDataStore().load(lobbyTypeIdIndex)) throw new RuntimeException("no lobby config data");
         }
         GameCluster gameCluster = new GameCluster();
-        if(conf.descriptor.resetEnabled && conf.descriptor.deployCode == DeployCode.USER_GAME_CLUSTER){
+        if(conf.descriptor.resetEnabled() && conf.descriptor.deployCode() == DeployCode.USER_GAME_CLUSTER){
             gameCluster = this.loadGameCluster(lobbyTypeIdIndex.gameClusterId());
             if(gameCluster==null) throw new RuntimeException("no game cluster config data");
         }
@@ -329,7 +329,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
 		Collections.sort(conf.applications, new DeploymentDescriptorComparator());//deploy by priority
         for (DeploymentDescriptor c : conf.applications) {
             if(c.disabled()) {
-                log.warn("Application is disabled->"+c.tag);
+                log.warn("Application is disabled->"+c.tag());
                 continue;
             }
             this.setApplicationManager(c, lb);
@@ -392,7 +392,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
         configurations.forEach((c)->_setOnLobby(c,listener));
     }
     private void _setOnLobby(LobbyConfiguration lc,OnLobby.Listener listener){
-        if(this._lobbyMapping.containsKey(lc.descriptor.typeId)){
+        if(this._lobbyMapping.containsKey(lc.descriptor.typeId())){
             return;
         }
         LobbyDescriptor d = lc.descriptor;

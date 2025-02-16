@@ -1,10 +1,9 @@
 package com.tarantula.platform;
 
+import com.icodesoftware.protocol.service.TRDescriptor;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
-import java.util.Map;
-
-public class LobbyDescriptor extends DefaultDescriptor {
+public class LobbyDescriptor extends TRDescriptor {
 
     public static String LABEL = "lobby";
     public LobbyDescriptor(){

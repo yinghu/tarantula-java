@@ -4,7 +4,7 @@ import com.icodesoftware.Access;
 import com.icodesoftware.OnSession;
 import com.icodesoftware.Session;
 import com.icodesoftware.TokenValidator;
-import com.icodesoftware.protocol.presence.OnSessionTrack;
+import com.icodesoftware.protocol.presence.TROnSession;
 import com.icodesoftware.service.AccessKey;
 
 import java.util.Map;
@@ -25,7 +25,7 @@ abstract public class AbstractTokenValidator implements TokenValidator {
 
     @Override
     public OnSession validatePassword(Access access, String password) {
-        if(!CryptoManager.hash(password).equals(access.password())) return OnSessionTrack.PASSWORD_NOT_MATCHED;
+        if(!CryptoManager.hash(password).equals(access.password())) return TROnSession.PASSWORD_NOT_MATCHED;
         return onSession(access);
     }
 

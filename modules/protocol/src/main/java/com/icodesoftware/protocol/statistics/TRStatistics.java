@@ -11,14 +11,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class UserStatistics extends OnApplicationHeader implements Statistics {
+public class TRStatistics extends OnApplicationHeader implements Statistics {
 
     private Map<String,StatisticsEntry> mappings = new ConcurrentHashMap<>();
 
     private Listener listener;
 
 
-    public UserStatistics(){
+    public TRStatistics(){
 
     }
 

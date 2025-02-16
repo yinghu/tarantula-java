@@ -3,7 +3,7 @@ package com.tarantula.platform.presence;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
-import com.icodesoftware.protocol.presence.OnSessionTrack;
+import com.icodesoftware.protocol.presence.TROnSession;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.TokenValidatorProvider;
@@ -49,7 +49,7 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
         else if (session.action().equals("onPresence")) {
             //Presence presence = this.context.presence(session);
             PresenceContext pc = new PresenceContext(session.action());
-            pc.presence= new OnSessionTrack(session.distributionId(),session.stub());
+            pc.presence= new TROnSession(session.distributionId(),session.stub());
             pc.access = user(session.distributionId());
             pc.account = account(pc.access);
             pc.subscription = membership(pc.access.primary()?session.distributionId():pc.access.primaryId());

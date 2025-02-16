@@ -1,7 +1,7 @@
 package com.tarantula.test;
 
 import com.icodesoftware.Rating;
-import com.icodesoftware.protocol.statistics.UserRating;
+import com.icodesoftware.protocol.statistics.TRRating;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -10,7 +10,7 @@ public class RatingTest implements Rating.Listener {
 
     @Test(groups = { "Rating" })
     public void levelUpTest() {
-        UserRating rating = new UserRating();
+        TRRating rating = new TRRating();
         Rating r = rating.update(100);
         Assert.assertEquals(r.rank(), 1);
         Assert.assertEquals(r.xp(),100);
@@ -23,7 +23,7 @@ public class RatingTest implements Rating.Listener {
 
     @Test(groups = { "Rating" })
     public void levelUpOnListenerTest() {
-        UserRating userRating = new UserRating();
+        TRRating userRating = new TRRating();
         Assert.assertEquals(userRating.level,1);
         Assert.assertEquals(userRating.rank,1);
         Assert.assertEquals(userRating.xp,0);

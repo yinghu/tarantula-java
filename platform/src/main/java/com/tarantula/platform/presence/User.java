@@ -1,8 +1,8 @@
 package com.tarantula.platform.presence;
 
-import com.icodesoftware.protocol.presence.AbstractAccess;
+import com.icodesoftware.protocol.presence.TRAccess;
 
-public class User extends AbstractAccess {
+public class User extends TRAccess {
 
 
     public User(){

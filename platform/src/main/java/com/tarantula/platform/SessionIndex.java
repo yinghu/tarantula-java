@@ -1,11 +1,11 @@
 package com.tarantula.platform;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.protocol.presence.OnSessionTrack;
+import com.icodesoftware.protocol.presence.TROnSession;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 
-public class SessionIndex extends OnSessionTrack {
+public class SessionIndex extends TROnSession {
 
     public SessionIndex(){
        super();

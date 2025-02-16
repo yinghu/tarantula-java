@@ -2,8 +2,8 @@ package com.icodesoftware.protocol;
 
 import com.icodesoftware.OnSession;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.protocol.service.AccessKeyTrack;
-import com.icodesoftware.protocol.presence.OnSessionTrack;
+import com.icodesoftware.protocol.service.TRAccessKey;
+import com.icodesoftware.protocol.presence.TROnSession;
 import com.icodesoftware.service.AccessKey;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.util.*;
@@ -109,7 +109,7 @@ public class CryptoManager {
     }
 
     public static OnSession verify(String token){
-        OnSession onSession = new OnSessionTrack();
+        OnSession onSession = new TROnSession();
         if(!jwt.verify(token,(h,p)->{
             long expiry = p.get("exp").getAsLong();
             if (TimeUtil.expired(TimeUtil.fromUTCMilliseconds(expiry))) {
@@ -122,7 +122,7 @@ public class CryptoManager {
             onSession.distributionId(id);
             onSession.stub(stub);
             return true;
-        })) return OnSessionTrack.INVALID_TOKEN;
+        })) return TROnSession.INVALID_TOKEN;
         return onSession;
     }
 
@@ -155,7 +155,7 @@ public class CryptoManager {
         byte[] name = new byte[buffer.remaining()-8];
         long keyId = buffer.getLong();
         buffer.get(name);
-        AccessKeyTrack accessKeyTrack = new AccessKeyTrack();
+        TRAccessKey accessKeyTrack = new TRAccessKey();
         accessKeyTrack.distributionId(keyId);
         accessKeyTrack.name(new String(name));
         return accessKeyTrack;

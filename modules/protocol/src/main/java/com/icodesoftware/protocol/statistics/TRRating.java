@@ -7,7 +7,7 @@ import com.icodesoftware.Rating;
 import com.icodesoftware.protocol.ProtocolPortableRegistry;
 import com.icodesoftware.util.RecoverableObject;
 
-public class UserRating extends RecoverableObject implements Rating,Rating.Listener, DataStore.Loadable {
+public class TRRating extends RecoverableObject implements Rating,Rating.Listener, DataStore.Loadable {
 
 
     public static int RANK_UP_LEVEL_BASE = 100;
@@ -18,7 +18,7 @@ public class UserRating extends RecoverableObject implements Rating,Rating.Liste
     public boolean granted;
     private double levelUpXp =0;  //xp of arena level
 
-    public UserRating(){
+    public TRRating(){
         //this.onEdge = true;
         //this.label = "rating";
     }

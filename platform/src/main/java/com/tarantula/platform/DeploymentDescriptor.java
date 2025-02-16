@@ -6,12 +6,12 @@ import java.util.Map;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.icodesoftware.Bufferable;
 import com.icodesoftware.Descriptor;
+import com.icodesoftware.protocol.service.TRDescriptor;
 import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.service.ApplicationProvider;
 
-public class DeploymentDescriptor extends DefaultDescriptor implements Portable {
+public class DeploymentDescriptor extends TRDescriptor implements Portable {
 
 
     public DeploymentDescriptor(){

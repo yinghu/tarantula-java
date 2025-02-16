@@ -8,7 +8,7 @@ import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.JWTUtil;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.AccessControl;
-import com.icodesoftware.protocol.presence.OnSessionTrack;
+import com.icodesoftware.protocol.presence.TROnSession;
 import com.tarantula.platform.presence.User;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -26,7 +26,7 @@ public class JWTTokenTest {
         Access access = new User();
         access.distributionId(1000);
         access.role(AccessControl.root.name());
-        OnSession session = new OnSessionTrack();
+        OnSession session = new TROnSession();
         session.stub(1);
         HashMap<String, Access.Role> roles = new HashMap<>();
         roles.put(AccessControl.root.name(),AccessControl.root);

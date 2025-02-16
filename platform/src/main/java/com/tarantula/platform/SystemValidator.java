@@ -1,7 +1,7 @@
 package com.tarantula.platform;
 
 import com.icodesoftware.*;
-import com.icodesoftware.protocol.presence.OnSessionTrack;
+import com.icodesoftware.protocol.presence.TROnSession;
 import com.icodesoftware.service.AccessKey;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.platform.service.SystemValidatorProvider;
@@ -56,7 +56,7 @@ public class SystemValidator{
             else
             {
                 //return on failed password check
-                return OnSessionTrack.PASSWORD_NOT_MATCHED;
+                return TROnSession.PASSWORD_NOT_MATCHED;
             }
         }
         @Override

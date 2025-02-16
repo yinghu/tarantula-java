@@ -4,8 +4,8 @@ package com.icodesoftware.test;
 import com.icodesoftware.OnSession;
 import com.icodesoftware.protocol.CryptoManager;
 
-import com.icodesoftware.protocol.service.AccessKeyTrack;
-import com.icodesoftware.protocol.presence.OnSessionTrack;
+import com.icodesoftware.protocol.service.TRAccessKey;
+import com.icodesoftware.protocol.presence.TROnSession;
 import com.icodesoftware.service.AccessKey;
 import com.icodesoftware.util.CipherUtil;
 import com.icodesoftware.util.JWTUtil;
@@ -29,7 +29,7 @@ public class CryptoManagerTest extends LoggerSetup{
     @Test(groups = { "CryptoManager" })
     public void tokenTest() {
         CryptoManager.init();
-        OnSession onSession = new OnSessionTrack(100,200);
+        OnSession onSession = new TROnSession(100,200);
         String token = CryptoManager.token(onSession);
         OnSession verify = CryptoManager.verify(token);
         Assert.assertEquals(onSession.systemId(),verify.systemId());
@@ -39,7 +39,7 @@ public class CryptoManagerTest extends LoggerSetup{
     @Test(groups = { "CryptoManager" })
     public void accessKeyTest() {
         CryptoManager.init();
-        AccessKeyTrack accessKeyTrack = new AccessKeyTrack();
+        TRAccessKey accessKeyTrack = new TRAccessKey();
         accessKeyTrack.distributionId(100);
         accessKeyTrack.name("test");
         Assert.assertEquals(accessKeyTrack.keyId(),100);
@@ -82,7 +82,7 @@ public class CryptoManagerTest extends LoggerSetup{
         byte[] keyForCipher = CipherUtil.key();
         byte[] keyForSigner = JWTUtil.key();
         CryptoManager.init(keyForJwt,keyForCipher,keyForSigner);
-        OnSession onSession = new OnSessionTrack(100,200);
+        OnSession onSession = new TROnSession(100,200);
         String token = CryptoManager.token(onSession);
         OnSession verify = CryptoManager.verify(token);
         Assert.assertEquals(onSession.systemId(),verify.systemId());
@@ -95,7 +95,7 @@ public class CryptoManagerTest extends LoggerSetup{
         byte[] keyForCipher = CipherUtil.key();
         byte[] keyForSigner = JWTUtil.key();
         CryptoManager.init(keyForJwt,keyForCipher,keyForSigner);
-        AccessKeyTrack accessKeyTrack = new AccessKeyTrack();
+        TRAccessKey accessKeyTrack = new TRAccessKey();
         accessKeyTrack.distributionId(100);
         accessKeyTrack.name("test");
         Assert.assertEquals(accessKeyTrack.keyId(),100);

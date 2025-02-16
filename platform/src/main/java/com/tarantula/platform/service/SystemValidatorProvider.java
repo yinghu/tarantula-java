@@ -2,7 +2,7 @@ package com.tarantula.platform.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.util.BufferProxy;
-import com.icodesoftware.protocol.presence.OnSessionTrack;
+import com.icodesoftware.protocol.presence.TROnSession;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.*;
@@ -606,7 +606,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         Access acc = new User();
         acc.distributionId(systemId);
         udataStore.load(acc);
-        OnSession onSession = new OnSessionTrack();
+        OnSession onSession = new TROnSession();
         onSession.stub(stub);
         return jwtToken(acc,onSession);
     }
@@ -623,7 +623,7 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
         });
     }
     public OnSession jwtToken(String token){
-        OnSession onSession = new OnSessionTrack();
+        OnSession onSession = new TROnSession();
         try {
             if (!jwt.verify(token, (h, p) -> {
                 long expiry = p.get("exp").getAsLong();
@@ -643,11 +643,11 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
                 onSession.distributionId(id);
                 onSession.stub(stub);
                 return true;
-            })) return OnSessionTrack.INVALID_TOKEN;
+            })) return TROnSession.INVALID_TOKEN;
         }
         catch (Exception ex){
             log.warn("Should not be here :",ex);
-            return OnSessionTrack.INVALID_TOKEN;
+            return TROnSession.INVALID_TOKEN;
         }
         onSession.ticket(ticket(onSession.distributionId(),onSession.stub(),timeoutInSeconds));
         onSession.successful(true);

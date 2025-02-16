@@ -6,11 +6,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.protocol.statistics.UserRating;
-import com.icodesoftware.protocol.statistics.UserStatistics;
+import com.icodesoftware.protocol.statistics.TRRating;
+import com.icodesoftware.protocol.statistics.TRStatistics;
 import com.icodesoftware.service.ServiceContext;
 
-import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
@@ -23,14 +22,12 @@ import com.tarantula.game.service.PlatformGameServiceSetup;
 
 import com.tarantula.platform.presence.leaderboard.PlatformLeaderBoardProvider;
 
-import com.tarantula.platform.GameCluster;
 import com.tarantula.platform.OnAccessTrack;
 import com.tarantula.platform.event.GameClusterSyncEvent;
 import com.tarantula.platform.inbox.GlobalItemGrantEvent;
 import com.tarantula.platform.inbox.GlobalItemGrantEventQuery;
 import com.tarantula.platform.inbox.PlatformItemGrantEvent;
 import com.tarantula.platform.inbox.PlatformItemGrantEventQuery;
-import com.tarantula.platform.presence.leaderboard.PlatformLeaderBoardProvider;
 
 
 import com.tarantula.platform.presence.saves.*;
@@ -227,7 +224,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     }
 
     public Rating rating(Session session){
-        UserRating rating  = new UserRating();
+        TRRating rating  = new TRRating();
 //>>>>>>> earth8-prod
         CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);
         rating.distributionId(currentSaveIndex.saveId);
@@ -246,7 +243,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     }
     public Statistics statistics(Session session){
         CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);
-        UserStatistics deltaStatistics = new UserStatistics();
+        TRStatistics deltaStatistics = new TRStatistics();
         deltaStatistics.distributionId(currentSaveIndex.saveId);
         deltaStatistics.dataStore(applicationPreSetup.dataStore(gameCluster,NAME+"_statistics"));
         deltaStatistics.load();

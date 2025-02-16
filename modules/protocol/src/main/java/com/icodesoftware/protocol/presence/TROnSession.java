@@ -5,28 +5,28 @@ import com.icodesoftware.OnSession;
 import com.icodesoftware.util.OnApplicationHeader;
 
 
-public class OnSessionTrack extends OnApplicationHeader implements OnSession {
+public class TROnSession extends OnApplicationHeader implements OnSession {
 
     private String token;
 
     private String login;
 
-    public static final OnSession PASSWORD_NOT_MATCHED = new OnSessionTrack("PASSWORD NOT MATCHED");
-    public static final OnSession INVALID_TOKEN = new OnSessionTrack("INVALID TOKEN");
+    public static final OnSession PASSWORD_NOT_MATCHED = new TROnSession("PASSWORD NOT MATCHED");
+    public static final OnSession INVALID_TOKEN = new TROnSession("INVALID TOKEN");
 
-    public static final OnSession SESSION_NOT_AVAILABLE = new OnSessionTrack("SESSION NOT AVAILABLE");
+    public static final OnSession SESSION_NOT_AVAILABLE = new TROnSession("SESSION NOT AVAILABLE");
 
 
-    public OnSessionTrack(){
+    public TROnSession(){
         this.onEdge = true;
         this.label = LABEL;
     }
-    public OnSessionTrack(String message){
+    public TROnSession(String message){
         this();
         this.message = message;
         this.successful = false;
     }
-    public OnSessionTrack(long systemId,long stub){
+    public TROnSession(long systemId, long stub){
         this();
         this.distributionId = systemId;
         this.stub = stub;

@@ -2,8 +2,6 @@ package com.tarantula.test;
 
 
 import com.icodesoftware.DataStore;
-import com.icodesoftware.protocol.ProtocolPortableRegistry;
-import com.icodesoftware.protocol.statistics.UserRating;
 import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.presence.PresencePortableRegistry;

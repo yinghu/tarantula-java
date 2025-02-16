@@ -1,16 +1,12 @@
-package com.tarantula.platform;
+package com.icodesoftware.protocol.service;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Access;
 import com.icodesoftware.Descriptor;
-
 import com.icodesoftware.service.DeployCode;
-import com.icodesoftware.util.JsonUtil;
 import com.icodesoftware.util.RecoverableObject;
 
-import java.util.Map;
-
-public class DefaultDescriptor extends RecoverableObject implements Descriptor {
+public class TRDescriptor extends RecoverableObject implements Descriptor {
 
 	protected String typeId;
     protected String type;
@@ -37,7 +33,7 @@ public class DefaultDescriptor extends RecoverableObject implements Descriptor {
     protected boolean resetEnabled;
     protected boolean tournamentEnabled;
 
-    public DefaultDescriptor(){
+    public TRDescriptor(){
         this.onEdge = true;
     }
     public String moduleId(){
