@@ -21,6 +21,8 @@ public class TRAccess extends RecoverableObject implements Access {
         this.label = Access.LABEL;
         this.onEdge = true;
     }
+
+
     public String login(){
         return this.login;
     }
