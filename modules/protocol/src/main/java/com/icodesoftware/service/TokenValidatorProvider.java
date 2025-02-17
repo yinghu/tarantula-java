@@ -35,9 +35,6 @@ public interface TokenValidatorProvider extends ServiceProvider,Resettable {
    
     String token(long systemId,long stub);
 
-    //OnSession onSession(Session session);
-    //void updateVendorAccessToken(String systemId,String accessToken);
-
 
     Access.Role role(long systemId);
     boolean checkRole(Access access,String role);

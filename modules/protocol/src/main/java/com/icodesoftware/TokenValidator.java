@@ -18,6 +18,7 @@ public interface TokenValidator {
     String ticket(long id,long stub);
     //validate ticket, call before application callback
     boolean validateTicket(Session session);
+    default OnSession validateTicket(String ticket){ throw new UnsupportedOperationException();}
 
     void offSession(long id,long stub);
 

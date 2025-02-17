@@ -40,6 +40,11 @@ abstract public class AbstractTokenValidator implements TokenValidator {
     }
 
     @Override
+    public OnSession validateTicket(String ticket){
+        return CryptoManager.validateTicket(ticket);
+    }
+
+    @Override
     public void offSession(long systemId, long stub) {
 
     }

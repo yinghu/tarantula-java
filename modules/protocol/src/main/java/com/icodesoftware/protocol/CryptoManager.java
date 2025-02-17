@@ -178,5 +178,12 @@ public class CryptoManager {
         return buffer.readLong()==(key) && buffer.readLong() == stub;
     }
 
+    public static OnSession validateTicket(String ticket){
+        byte[] mark = decrypt(Base64Util.fromBase64String(ticket));
+        Recoverable.DataBuffer buffer = BufferProxy.wrap(mark);
+        if(TimeUtil.expired(TimeUtil.fromUTCMilliseconds(buffer.readLong()))) return TROnSession.INVALID_TICKET;
+        return new TROnSession(buffer.readLong(),buffer.readLong());
+    }
+
 
 }

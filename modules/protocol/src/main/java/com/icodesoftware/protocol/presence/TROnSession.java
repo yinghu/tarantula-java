@@ -14,7 +14,7 @@ public class TROnSession extends OnApplicationHeader implements OnSession {
     private String role = TRRole.player.name();
     public static final OnSession PASSWORD_NOT_MATCHED = new TROnSession("PASSWORD NOT MATCHED");
     public static final OnSession INVALID_TOKEN = new TROnSession("INVALID TOKEN");
-
+    public static final OnSession INVALID_TICKET = new TROnSession("INVALID TICKET");
     public static final OnSession SESSION_NOT_AVAILABLE = new TROnSession("SESSION NOT AVAILABLE");
 
 
