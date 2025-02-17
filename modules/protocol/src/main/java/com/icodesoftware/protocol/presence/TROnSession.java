@@ -1,7 +1,6 @@
 package com.icodesoftware.protocol.presence;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.Access;
 import com.icodesoftware.OnSession;
 import com.icodesoftware.util.OnApplicationHeader;
 

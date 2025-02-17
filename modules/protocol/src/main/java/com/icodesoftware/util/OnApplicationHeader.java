@@ -29,6 +29,8 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
 
     protected transient int referenceId;
 
+    protected transient String role;
+
     protected transient String contentType ="application/json";
 
     protected transient byte[] payload;
@@ -39,7 +41,7 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
 
 
     public long systemId() {
-        return systemId;
+        return systemId!=0?systemId:distributionId;
     }
 
     public void systemId(long systemId) {
@@ -201,5 +203,12 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
     }
     public void referenceId(int referenceId){
         this.referenceId = referenceId;
+    }
+
+    public String role(){
+        return this.role;
+    }
+    public void role(String role){
+        this.role = role;
     }
 }
