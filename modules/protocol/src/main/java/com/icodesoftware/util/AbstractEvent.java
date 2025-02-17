@@ -8,6 +8,7 @@ public class AbstractEvent extends OnApplicationHeader implements Event {
     protected String tag;
     protected String destination;
     protected int retries;
+
     protected EventService eventService;
     @Override
     public String tag() {

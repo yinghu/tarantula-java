@@ -50,8 +50,7 @@ abstract public class Data extends OnApplicationHeader implements Portable{
     public void retries(int retries) {
         this.retries = retries;
     }
-
-
+    
     public Portable portable(){
         return this.portable;
     }

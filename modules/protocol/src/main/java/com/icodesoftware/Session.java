@@ -66,6 +66,9 @@ public interface Session extends OnApplication {
     default DataBuffer dataBuffer(){ return null;}
     default void dataBuffer(DataBuffer dataBuffer){}
 
+    int referenceId();
+    void referenceId(int referenceId);
+
     String trackId();
     void trackId(String trackId);
 

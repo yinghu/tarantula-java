@@ -27,6 +27,8 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
 
     protected transient String trackId;
 
+    protected transient int referenceId;
+
     protected transient String contentType ="application/json";
 
     protected transient byte[] payload;
@@ -192,5 +194,12 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
     }
     public void dataBuffer(DataBuffer dataBuffer){
         this.dataBuffer = dataBuffer;
+    }
+
+    public int referenceId(){
+        return this.referenceId;
+    }
+    public void referenceId(int referenceId){
+        this.referenceId = referenceId;
     }
 }
