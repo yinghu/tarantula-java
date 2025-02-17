@@ -99,7 +99,7 @@ public class CryptoManager {
         return jwt.token((h,p)->{
             long expiry = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusHours(tokenDurationHours));
             Recoverable.DataBuffer dataBuffer = BufferProxy.buffer(16,false);
-            dataBuffer.writeLong(session.systemId()).writeLong(session.stub());
+            dataBuffer.writeLong(session.distributionId()).writeLong(session.stub());
             byte[] mark = encrypt(dataBuffer.array());
             h.addProperty("kid",CipherUtil.toBase64Key(mark));
             p.addProperty("aud",session.role());
