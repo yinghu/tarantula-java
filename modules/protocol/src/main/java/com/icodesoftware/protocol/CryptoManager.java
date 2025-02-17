@@ -123,6 +123,7 @@ public class CryptoManager {
             onSession.distributionId(id);
             onSession.stub(stub);
             onSession.role(role);
+            onSession.successful(true);
             return true;
         })) return TROnSession.INVALID_TOKEN;
         return onSession;
