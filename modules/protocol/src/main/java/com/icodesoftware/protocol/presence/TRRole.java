@@ -8,6 +8,7 @@ public class TRRole implements Access.Role {
     public static final Access.Role admin = new TRRole("admin",Access.ADMIN_ACCESS_CONTROL);
     public static final Access.Role account = new TRRole("account",Access.ACCOUNT_ACCESS_CONTROL);
     public static final Access.Role player = new TRRole("player",Access.PLAYER_ACCESS_CONTROL);
+    public static final Access.Role any = new TRRole("any",Access.PUBLIC_ACCESS_CONTROL);
 
     private final String name;
     private final int accessControl;

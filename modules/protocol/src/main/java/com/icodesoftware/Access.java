@@ -11,7 +11,9 @@ public interface Access extends Recoverable,DataStore.Updatable {
     int PRIVATE_ACCESS_MODE = 13;
 
     //LOWEST O - HIGHEST 100
-    int PLAYER_ACCESS_CONTROL = 0;//manage own assets on app
+    int PUBLIC_ACCESS_CONTROL = 0;//manage own assets on app
+
+    int PLAYER_ACCESS_CONTROL = 10;//manage own assets on app
 
     int ACCOUNT_ACCESS_CONTROL = 20;//manage own assets by account
 
