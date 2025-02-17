@@ -19,7 +19,7 @@ public interface TokenValidator {
     //validate ticket, call before application callback
     boolean validateTicket(Session session);
     default OnSession validateTicket(String ticket){ throw new UnsupportedOperationException();}
-    default boolean checkPermission(OnSession pending){ return false;}
+    default void checkPermission(Event pending){}
     void offSession(long id,long stub);
 
     boolean validateToken(Map<String,Object> params);
