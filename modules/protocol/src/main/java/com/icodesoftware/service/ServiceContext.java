@@ -24,7 +24,9 @@ public interface ServiceContext extends Context{
 
     <T extends Recoverable> RecoverableRegistry<T> recoverableRegistry(int registryId);
     void recoverableRegistry(RecoverableListener recoverableListener);
-
+    default TokenValidator tokenValidator(){
+        return null;
+    }
     Configuration configuration(String config);
     List<Descriptor> availableServices();
 
