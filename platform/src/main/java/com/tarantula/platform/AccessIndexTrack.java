@@ -15,14 +15,11 @@ public class AccessIndexTrack extends TRAccessIndex implements  Portable {
     public AccessIndexTrack(){
     }
     public AccessIndexTrack(String owner,int referenceId,long distributionId){
-        this.owner = owner;
-        this.referenceId = referenceId;
-        this.distributionId = distributionId;
+        super(owner,referenceId,distributionId);
     }
 
     public AccessIndexTrack(String owner){
-        this();
-        this.owner = owner;
+        super(owner);
     }
 
     @Override
