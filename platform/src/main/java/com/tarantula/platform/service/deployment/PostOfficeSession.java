@@ -11,9 +11,9 @@ public class PostOfficeSession implements PostOffice {
     public PostOfficeSession(EventService eventService){
         this.eventService = eventService;
     }
-    public OnTopic onTopic(String topic){
-        return new PostOfficeOnTopic(topic,this.eventService);
-    }
+    //public OnTopic onTopic(String topic){
+        //return new PostOfficeOnTopic(topic,this.eventService);
+    //}
     public OnSMS onSMS(String phoneNumber){
         return ((data) -> Email.send(phoneNumber,data));
     }
@@ -21,8 +21,8 @@ public class PostOfficeSession implements PostOffice {
         return ((data) -> Email.send(emailAddress,data));
     }
 
-    public OnTag onTag(String tag){
-        return new PostOfficeOnTag(tag,this.eventService);
-    }
+    //public OnTag onTag(String tag){
+        //return new PostOfficeOnTag(tag,this.eventService);
+    //}
 
 }

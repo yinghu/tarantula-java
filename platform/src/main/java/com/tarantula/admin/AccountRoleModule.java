@@ -74,7 +74,7 @@ public class AccountRoleModule implements Module, AccessIndexService.Listener {
                     user.primaryId(ua.primary()?ua.distributionId():ua.primaryId());
                     user.password((String)onAccess.property(OnAccess.PASSWORD));
                     user.role(AccessControl.player.name());
-                    this.context.postOffice().onTag("index/user").send(query.distributionId(),user);
+                    //this.context.postOffice().onTag("index/user").send(query.distributionId(),user);
                     session.write(this.toMessage("add user event send",true).getBytes());
                 }
                 else {

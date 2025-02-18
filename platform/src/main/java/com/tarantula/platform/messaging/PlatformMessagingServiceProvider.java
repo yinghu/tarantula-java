@@ -48,6 +48,6 @@ public class PlatformMessagingServiceProvider implements ServiceProvider {
     }
 
     public void publish(Session.Header header,byte[] message){
-        this.serviceContext.postOffice().onTopic(topic).send(NAME,header,message);
+        //this.serviceContext.postOffice().onTopic(topic).send(NAME,header,message);
     }
 }

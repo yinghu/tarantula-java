@@ -7,15 +7,15 @@ public interface PostOffice {
     default OnSMS onSMS(String phoneNumber){ return null;}
 
     //app to app
-    default OnTag onTag(String tag){ return null;}
-    default OnTopic onTopic(String topic){ return null;}
+    //default OnTag onTag(String tag){ return null;}
+    //default OnTopic onTopic(String topic){ return null;}
     default OnEvent onEvent(){ return null;}
 
     //send data to client on the notification topic
-    interface OnTopic{
-        void send(String trackId,byte[] data);
-        void send(String trackId,Session.Header header,byte[] data);
-    }
+    //interface OnTopic{
+        //void send(String trackId,byte[] data);
+        //void send(String trackId,Session.Header header,byte[] data);
+    //}
 
     interface OnEmail{
         boolean send(String text);
@@ -26,9 +26,9 @@ public interface PostOffice {
     }
 
     //app to app messaging
-    interface OnTag{
-       <T extends Recoverable> void send(Object routingKey,T data);
-    }
+    //interface OnTag{
+       //<T extends Recoverable> void send(Object routingKey,T data);
+    //}
 
     interface OnEvent{
         <T extends Event> void send(T event);
