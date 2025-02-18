@@ -33,4 +33,3 @@ public class ThirdPartyLoginTest extends DataStoreHook{
         Assert.assertEquals(thirdPartyLoginLoaded.thirdPartyToken(), token);
     }
 }
-}
