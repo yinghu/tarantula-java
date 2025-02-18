@@ -25,6 +25,7 @@ public interface UserService extends ServiceProvider{
     Subscription subscribe(Account accountId,int durationMonth);
 
     LoginProvider loginProvider(long systemId);
+    void updateThirdPartyToken(String thirdPartyToken, LoginProvider loginProvider);
     void createLoginProvider(LoginProvider loginProvider);
 
     boolean deleteUser(long systemId);
