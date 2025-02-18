@@ -14,6 +14,5 @@ public interface LoginProvider extends OnApplication, DataStore.Updatable {
     void deviceId(String deviceId);
 
     String thirdPartyToken();
-
-    void setThirdPartyToken(String thirdPartyToken);
+    void thirdPartyToken(String thirdPartyToken);
 }

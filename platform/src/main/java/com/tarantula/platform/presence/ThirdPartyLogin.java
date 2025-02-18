@@ -6,6 +6,8 @@ import com.tarantula.platform.OnApplicationHeader;
 
 public class ThirdPartyLogin extends OnApplicationHeader implements LoginProvider {
 
+    protected String thirdPartyToken;
+
 
     public ThirdPartyLogin(){
 
@@ -72,7 +74,7 @@ public class ThirdPartyLogin extends OnApplicationHeader implements LoginProvide
     }
 
     @Override
-    public void setThirdPartyToken(String thirdPartyToken) {
+    public void thirdPartyToken(String thirdPartyToken) {
         this.thirdPartyToken = thirdPartyToken;
     }
 }

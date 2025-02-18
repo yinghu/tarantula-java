@@ -108,7 +108,8 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
 
                 thirdPartyToken = (String) params.get("thirdPartyToken");
                 if(thirdPartyToken != null){
-                    userService.updateThirdPartyToken(thirdPartyToken, _ox);
+                    _ox.thirdPartyToken(thirdPartyToken);
+                    _ox.update();
                 }
             }
             else{

@@ -15,7 +15,7 @@ public class OnApplicationHeader extends ResponseHeader implements OnAccess {
 
     protected String ticket;
 
-    protected String thirdPartyToken;
+
 
     public String systemId() {
         return systemId==null?Long.toString(this.distributionId):systemId;
