@@ -3,12 +3,13 @@ package com.icodesoftware;
 public interface PostOffice {
 
     //app to client
-    OnEmail onEmail(String emailAddress);
-    OnSMS onSMS(String phoneNumber);
+    default OnEmail onEmail(String emailAddress){ return null;}
+    default OnSMS onSMS(String phoneNumber){ return null;}
 
     //app to app
-    OnTag onTag(String tag);
-    OnTopic onTopic(String topic);
+    default OnTag onTag(String tag){ return null;}
+    default OnTopic onTopic(String topic){ return null;}
+    default OnEvent onEvent(){ return null;}
 
     //send data to client on the notification topic
     interface OnTopic{
@@ -27,6 +28,10 @@ public interface PostOffice {
     //app to app messaging
     interface OnTag{
        <T extends Recoverable> void send(Object routingKey,T data);
+    }
+
+    interface OnEvent{
+        <T extends Event> void send(T event);
     }
 
 }
