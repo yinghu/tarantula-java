@@ -14,8 +14,10 @@ public class GameEndEvent extends Data implements Event {
 
     public static final String GAME_END_TOPIC = "pvp_battle_end_topic";
 
-    public Rating offenseRating;
-    public Rating defenseRating;
+    public long defenseTeamId;
+    public int defenseEloLevel;
+    public long offenseTeamId;
+    public int offenseEloLevel;
 
     public GameEndEvent(){
         this.destination = GAME_END_TOPIC;
@@ -23,21 +25,23 @@ public class GameEndEvent extends Data implements Event {
 
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeLong("1",defenseRating.distributionId());
-        portableWriter.writeInt("2",defenseRating.level());
-        portableWriter.writeLong("3",offenseRating.distributionId());
-        portableWriter.writeLong("4",defenseRating.level());
+        portableWriter.writeLong("1",defenseTeamId);
+        portableWriter.writeInt("2",defenseEloLevel);
+        portableWriter.writeLong("3",offenseTeamId);
+        portableWriter.writeInt("4",offenseEloLevel);
     }
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
-        defenseRating = GameRating.from(portableReader.readLong("1"),portableReader.readInt("2"));
-        defenseRating = GameRating.from(portableReader.readLong("3"),portableReader.readInt("4"));
+        defenseTeamId = portableReader.readLong("1");
+        defenseEloLevel = portableReader.readInt("2");
+        offenseTeamId = portableReader.readLong("3");
+        offenseEloLevel = portableReader.readInt("4");
     }
 
     @Override
     public int getClassId() {
-        return PortableEventRegistry.SERVER_PUSH_EVENT_CID;
+        return PortableEventRegistry.GAME_END_EVENT_CID;
     }
     @Override
     public int getFactoryId() {

@@ -28,6 +28,8 @@ public interface ApplicationPreSetup extends Transaction.DataStoreContext{
 
     //{game}_service_{suffix_service}
     DataStore dataStore(ApplicationSchema gameCluster,String service);
+    DataStore localDataStore(ApplicationSchema gameCluster,String service);
+
 
     //{game}_service data store
     DataStore dataStore(Descriptor descriptor);
