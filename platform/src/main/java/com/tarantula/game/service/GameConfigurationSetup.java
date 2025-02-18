@@ -141,7 +141,9 @@ public class GameConfigurationSetup extends GamePreSetup implements ApplicationP
     public DataStore dataStore(ApplicationSchema gameCluster,String service){
         return parentContext.onDataStore(configureDataStore(gameCluster,DS_CONFIG));
     }
-
+    public DataStore localDataStore(ApplicationSchema gameCluster,String service){
+        return parentContext.onLocalDataStore(configureDataStore(gameCluster,DS_CONFIG));
+    }
     public DataStore dataStore(Descriptor application){
         return parentContext.onDataStore(serviceDataStore(application));
     }

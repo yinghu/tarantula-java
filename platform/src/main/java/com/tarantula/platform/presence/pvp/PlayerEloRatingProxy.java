@@ -39,6 +39,8 @@ public class PlayerEloRatingProxy extends RecoverableObject implements Rating {
     }
 
     public Rating elo(boolean win,long opponentId,long teamId){
+        GameEndEvent gameEndEvent = new GameEndEvent();
+        platformGameServiceProvider.pvpBattleServiceProvider().onBattleEnd(gameEndEvent);
         return this;
         //DefenseTeam offenseTeam = this.platformGameServiceProvider.pvpBattleServiceProvider().defenseTeam(teamId);
         //DefenseTeam defenseTeam = this.platformGameServiceProvider.pvpBattleServiceProvider().defenseTeam(opponentId);

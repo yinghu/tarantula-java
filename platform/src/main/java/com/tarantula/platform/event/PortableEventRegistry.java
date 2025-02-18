@@ -5,6 +5,7 @@ import com.hazelcast.nio.serialization.PortableFactory;
 import com.tarantula.cci.udp.GameChannel;
 import com.tarantula.platform.ClientConnection;
 import com.tarantula.platform.presence.pvp.GameEndEvent;
+import com.tarantula.platform.presence.pvp.TeamFormationEvent;
 import com.tarantula.platform.room.*;
 import com.tarantula.game.GameRating;
 import com.tarantula.platform.AccessIndexTrack;
@@ -45,7 +46,10 @@ public class PortableEventRegistry implements PortableFactory {
 
     public static final int CLUSTER_BATCH_CID = 28;
 
+    //PVP
     public static final int GAME_END_EVENT_CID = 29;
+    public static final int TEAM_FORMATION_EVENT_CID = 30;
+    //PVP
 
     //EVENT PORTABLE OBJECTS
     public static final int SINGLETON_FORWARD_CID = 100;
@@ -192,6 +196,9 @@ public class PortableEventRegistry implements PortableFactory {
                 break;
             case GAME_END_EVENT_CID:
                 _ins = new GameEndEvent();
+                break;
+            case TEAM_FORMATION_EVENT_CID:
+                _ins = new TeamFormationEvent();
                 break;
             default:
 				throw new IllegalArgumentException("Not supported event type");

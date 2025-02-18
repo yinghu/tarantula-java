@@ -6,11 +6,14 @@ import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.util.IntegerRangeKey;
 import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
+import com.tarantula.game.SimpleStub;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.configuration.SeasonCredentialConfiguration;
+import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
 
 import java.time.LocalDateTime;
@@ -33,6 +36,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private final SeasonRuntime rotation = new SeasonRuntime();
 
     private DataStore battleHistory;
+    private DataStore cooldownStore;
+    private DataStore matchMakingStore;
     private String gameEndTopic = GameEndEvent.GAME_END_TOPIC;
 
     public PlatformPVPBattleServiceProvider(PlatformGameServiceProvider gameServiceProvider){
@@ -49,11 +54,14 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         seasonRunningDays = pvp.get("seasonRunningDays").getAsInt();
         reMatchWaitingTimeMinutes = pvp.get("reMatchWaitingTimeMinutes").getAsInt();
         this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
+        this.cooldownStore = applicationPreSetup.localDataStore(gameCluster,NAME+"_cooldown");
+        this.matchMakingStore = applicationPreSetup.localDataStore(gameCluster,NAME+"_match_making");
         this.battleHistory = applicationPreSetup.dataStore(gameCluster,NAME+"_history");
         this.scheduleStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,gameCluster.typeId()+"."+NAME);
         this.logger = JDKLogger.getLogger(PlatformPVPBattleServiceProvider.class);
         this.logger.warn("PVP battle service provider started on ->"+gameServiceName);
         this.serviceContext.eventService().registerEventListener(gameEndTopic,e->{
+            onEvent(e);
             return true;
         });
         this.platformGameServiceProvider.configurationServiceProvider().addConfigurableListener(OnAccess.SEASON,this);
@@ -61,7 +69,11 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
 
     public MatchMaking matchMaking(Session session){
-        ArrayList<BattleTeam> matches = new ArrayList<>();
+        TeamFormationIndex teamFormationIndex = teamFormationIndex(session.distributionId());
+        if(teamFormationIndex.teamId==0){
+            return MatchMaking.failure(PvpErrorCode.NO_TEAM_FORMATION,"no defense team created");
+        }
+        List<BattleTeam> matches = new ArrayList<>();
         findMatches(session).forEach(rating -> {
             BattleTeam defenseTeam = defenseTeam(rating);
             if(defenseTeam != null){
@@ -70,9 +82,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 matches.add(defenseTeam);
             }
         });
-        MatchMaking matchMaking = new MatchMaking();
-        matchMaking.nextRefreshTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusMinutes(reMatchWaitingTimeMinutes));
-        matchMaking.battleTeams = matches;
+        MatchMaking matchMaking = MatchMaking.success(teamFormationIndex.timestamp(),matches);
         return matchMaking;
     }
 
@@ -80,17 +90,21 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         TeamFormationIndex teamFormationIndex = new TeamFormationIndex();
         teamFormationIndex.distributionId(session.distributionId());
         dataStore.createIfAbsent(teamFormationIndex,true);
-        if(!teamFormationIndex.expired()) return TeamFormationResponse.failure(teamFormationIndex.timestamp());
+        if(!teamFormationIndex.expired()) return TeamFormationResponse.failureOnDefenseTeam(teamFormationIndex.timestamp());
         BattleTeam defenseTeam = BattleTeam.parse(content);
         defenseTeam.playerId = session.distributionId();
         defenseTeam.save(dataStore,teamFormationIndex,teamCreationWaitingTime);
-        return TeamFormationResponse.success(teamFormationIndex.timestamp());
+        Rating rating = platformGameServiceProvider.presenceServiceProvider().rating(session);
+        this.serviceContext.eventService().publish(new TeamFormationEvent(session.distributionId(),rating.level()));
+        return TeamFormationResponse.responseOnDefenseTeam(teamFormationIndex.timestamp());
     }
 
     public TeamFormationResponse saveOffenseTeam(Session session,byte[] content){
         BattleTeam defenseTeam = BattleTeam.parse(content);
         defenseTeam.playerId = session.distributionId();
-        dataStore.create(defenseTeam);
+        if(!dataStore.create(defenseTeam)){
+            return TeamFormationResponse.retryOffenseTeam();
+        }
         return TeamFormationResponse.responseOnOffenseTeam(defenseTeam.distributionId());
     }
 
@@ -200,8 +214,13 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         return seasons.get(CURRENT_SEASON_INDEX);// currentSeason from season rotation
     }
 
-    public void onBattleEnd(){
-
+    public void onBattleEnd(GameEndEvent gameEndEvent){
+        gameEndEvent.defenseTeamId = serviceContext.distributionId();
+        gameEndEvent.defenseEloLevel = 100;
+        gameEndEvent.offenseTeamId = serviceContext.distributionId();
+        gameEndEvent.offenseEloLevel = 100;
+        this.serviceContext.eventService().publish(gameEndEvent);
+        findMatches(new SimpleStub());
     }
 
     private void startSeason(SeasonRuntime seasonRuntime){
@@ -291,10 +310,45 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     private List<Rating> findMatches(Session session){
         List<Rating> matches = new ArrayList<>();
+        Rating rating = platformGameServiceProvider.presenceServiceProvider().rating(session);
+        int[] size={0};
+        matchMakingStore.backup().forEachEdgeKey(MatchMaking.rangedKey(rating.level()),"elo",(k, v)->{
+            Rating match = platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(v.readLong()));
+            //to do filter out code
+            matches.add(match);
+            size[0]++;
+            return size[0]<5;
+        });
         return matches;
     }
 
+    private TeamFormationIndex teamFormationIndex(long systemId){
+        TeamFormationIndex teamFormationIndex = new TeamFormationIndex();
+        teamFormationIndex.distributionId(systemId);
+        dataStore.createIfAbsent(teamFormationIndex,true);
+        return teamFormationIndex;
+    }
 
+    private void onEvent(Event event){
+        if(event.getClassId()== PortableEventRegistry.GAME_END_EVENT_CID){
+            GameEndEvent gameEndEvent =(GameEndEvent)event;
+            if(gameEndEvent.offenseTeamId > 0) onMatchMakingPool(gameEndEvent.offenseTeamId,gameEndEvent.offenseEloLevel);
+            if(gameEndEvent.defenseTeamId > 0) onMatchMakingPool(gameEndEvent.defenseTeamId,gameEndEvent.defenseEloLevel);
+            return;
+        }
+        if(event.getClassId()==PortableEventRegistry.TEAM_FORMATION_EVENT_CID){
+            TeamFormationEvent formationEvent = (TeamFormationEvent)event;
+            if(formationEvent.distributionId() > 0) onMatchMakingPool(formationEvent.distributionId(), formationEvent.eloLevel);
+        }
+    }
 
+    private void onMatchMakingPool(long systemId,int eloLevel){
+        IntegerRangeKey integerKey = MatchMaking.rangedKey(eloLevel);
+        matchMakingStore.backup().setEdge("elo",(k,v)->{
+            integerKey.write(k);
+            v.writeLong(systemId);
+            return true;
+        });
+    }
 
 }
