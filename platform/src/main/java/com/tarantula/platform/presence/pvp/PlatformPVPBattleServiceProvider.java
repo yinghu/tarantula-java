@@ -351,4 +351,23 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         });
     }
 
+    public boolean isDefenseOnCooldown(long defenseTeamId){
+        DefenseCooldown defenseCooldown = new DefenseCooldown();
+        defenseCooldown.distributionId(defenseTeamId);
+        if(!cooldownStore.load(defenseCooldown)) {
+            return false;
+        }
+        else{
+            return !TimeUtil.expired(TimeUtil.fromUTCMilliseconds(defenseCooldown.cooldownTimer));
+        }
+    }
+
+    public void startDefenseCooldown(long defenseTeamId){
+        DefenseCooldown defenseCooldown = new DefenseCooldown();
+        defenseCooldown.distributionId(defenseTeamId);
+        cooldownStore.createIfAbsent(defenseCooldown,true);
+        defenseCooldown.cooldownTimer = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusMinutes(60));
+        cooldownStore.update(defenseCooldown);
+    }
+
 }
