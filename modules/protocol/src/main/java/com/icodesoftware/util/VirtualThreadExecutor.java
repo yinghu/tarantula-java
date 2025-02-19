@@ -14,7 +14,7 @@ public class VirtualThreadExecutor implements Executor {
     public void execute(Runnable command) {
         try{
             permission.acquire();
-            Thread.ofVirtual().start(command);
+            Thread.ofVirtual().name("tarantula-virtual-thread").start(command);
         }catch (Exception ex){
             //ignore
         }
