@@ -214,7 +214,6 @@ public class PlatformUserService implements UserService {
         thirdPartyLogin.dataStore(loginProviderDataStore);
         return loginProviderDataStore.load(thirdPartyLogin)?thirdPartyLogin:null;
     }
-
     public void createLoginProvider(LoginProvider loginProvider){
         loginProvider.dataStore(loginProviderDataStore);
         this.loginProviderDataStore.createIfAbsent(loginProvider,false);
