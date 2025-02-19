@@ -239,12 +239,19 @@ public class EtcdManager {
             return v;
         });
     }
-    public static List<EtcdNode> nodeView(){
+    public static List<EtcdNode> nodeView(boolean localNodeExcluded){
         List<EtcdNode> view = new ArrayList<>();
-        nodeIndexByName.forEach((k,v)->view.add(v));
+        nodeIndexByName.forEach((k,v)->{
+            if(localNodeExcluded){
+                if(!v.name().equals(localNode.name())) view.add(v);
+            }else{
+                view.add(v);
+            }
+        });
         Collections.sort(view,new NodeComparator());
         return view;
     }
+
     public static List<EtcdTopic> topicView(){
         List<EtcdTopic> view = new ArrayList<>();
         topicIndex.forEach((k,v)->view.add(v));
