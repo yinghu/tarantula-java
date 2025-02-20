@@ -1292,7 +1292,7 @@
         },
         "offenseEloGain": 10,
         "defenseEloGain": -10,
-        "offenseElo": 100,
+        "offenseElo": 102,
         "defenseElo": 150
       },
       {
@@ -2584,9 +2584,2597 @@
           "eloGain": 10,
           "hasBattled": true
         },
-        "offenseEloGain": 10,
-        "defenseEloGain": -10,
-        "offenseElo": 100,
+        "offenseEloGain": 20,
+        "defenseEloGain": -20,
+        "offenseElo": 102,
+        "defenseElo": 150
+      },
+      {
+        "_offenseTeam": {
+          "unitInstances": [
+            {
+              "levelAndRank": {
+                "level": 6,
+                "rank": 7,
+                "currentLevelExperience": 256,
+                "currentRankExperience": 0
+              },
+              "configID": "f56f1034ee3694bd69faa5ab0d848815",
+              "equipment": {
+                "weaponIDValue": 1457915154271305700,
+                "helmetIDValue": 1457975636235649000,
+                "chestPieceIDValue": 1457974822825885700,
+                "glovesIDValue": 1457974795462246400,
+                "forceFieldIDValue": 1457974801141334000,
+                "bootsIDValue": 1457975628258082800
+              },
+              "abilityRanks": {
+                "abilityRanks": [],
+                "passiveRank": 1
+              }
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 4,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 20
+              },
+              "configID": "6cd4892136ed24845b0ef6882692d7c3",
+              "equipment": {
+                "weaponIDValue": 0,
+                "helmetIDValue": 0,
+                "chestPieceIDValue": 0,
+                "glovesIDValue": 0,
+                "forceFieldIDValue": 0,
+                "bootsIDValue": 0
+              },
+              "abilityRanks": {
+                "abilityRanks": [],
+                "passiveRank": 1
+              }
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "configID": "8ba0e25f63a8c4c5cb447ef416d353c3",
+              "equipment": {
+                "weaponIDValue": 0,
+                "helmetIDValue": 0,
+                "chestPieceIDValue": 0,
+                "glovesIDValue": 0,
+                "forceFieldIDValue": 0,
+                "bootsIDValue": 0
+              },
+              "abilityRanks": {
+                "abilityRanks": [],
+                "passiveRank": 1
+              }
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "configID": "513cd7964843744dda75b54d8965bd03",
+              "equipment": {
+                "weaponIDValue": 0,
+                "helmetIDValue": 0,
+                "chestPieceIDValue": 0,
+                "glovesIDValue": 0,
+                "forceFieldIDValue": 0,
+                "bootsIDValue": 0
+              },
+              "abilityRanks": {
+                "abilityRanks": [],
+                "passiveRank": 1
+              }
+            },
+            {
+              "levelAndRank": {
+                "level": 5,
+                "rank": 1,
+                "currentLevelExperience": 101,
+                "currentRankExperience": 0
+              },
+              "configID": "6a94feb5f0fec46d090134c8df5ee079",
+              "equipment": {
+                "weaponIDValue": 1457974750432198700,
+                "helmetIDValue": 1457974741624160300,
+                "chestPieceIDValue": 1457974732564463600,
+                "glovesIDValue": 1457974736985260000,
+                "forceFieldIDValue": 1457974746716045300,
+                "bootsIDValue": 1457974721986429000
+              },
+              "abilityRanks": {
+                "abilityRanks": [],
+                "passiveRank": 1
+              }
+            }
+          ],
+          "equipmentData": [
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "41932113190b943e586a16fb2210d8dc"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.827115834,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.11864116,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.5740773,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.5845824,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.08938713,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                }
+              ],
+              "configID": "f38e0e96792414ed8b118591fe929d93",
+              "setConfigID": "59e84beb6bcda4089893d8c1f2db6660",
+              "rewardConfigID": "2dd3fd367dda44fe58bb5fb9d1dbe66e",
+              "snowflakeIDValue": 1457915154271305700
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "b3e82760690054e74b67485e998a97c3"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.624917,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.190723628,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.803073,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.6521043,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.152792215,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                }
+              ],
+              "configID": "fc5b891e7781d481c989f08f40f00ba3",
+              "setConfigID": "59e84beb6bcda4089893d8c1f2db6660",
+              "rewardConfigID": "79cd0387e7ffd4bf08517bbdfbd25061",
+              "snowflakeIDValue": 1457975636235649000
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.0516770333,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.90739423,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.7585002,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.6698397,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.277008235,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                }
+              ],
+              "configID": "addb3d94ec7be4421b526009dc458f26",
+              "setConfigID": "4663e76e6a3a14084b68507514821173",
+              "rewardConfigID": "0a8843816706748338f032e15158b62e",
+              "snowflakeIDValue": 1457974822825885700
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.9956458,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.6117259,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.867070556,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.777933657,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.211262912,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                }
+              ],
+              "configID": "1a676f9e1cd4a46db968cc53f296c1e2",
+              "setConfigID": "c49883c38bf0647f7926c157d665c7c4",
+              "rewardConfigID": "ad836e802f2fc4c70a405b57bc5da0c2",
+              "snowflakeIDValue": 1457974795462246400
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "07a77019785654f488d188768033478d"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.6374201,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.174387977,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.706432641,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.5602421,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "24a6628984d244c1691f79f9b675ca3f"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.3543277,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                }
+              ],
+              "configID": "b849bea38db8c43169b01c0e6b0c463e",
+              "setConfigID": "c49883c38bf0647f7926c157d665c7c4",
+              "rewardConfigID": "118a117b7b079448f9abad52af251854",
+              "snowflakeIDValue": 1457974801141334000
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "07a77019785654f488d188768033478d"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.05074648,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.297446638,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.9694133,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.376636237,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.0584018677,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                }
+              ],
+              "configID": "2d704407373774224ad5dda725686e09",
+              "setConfigID": "59e84beb6bcda4089893d8c1f2db6660",
+              "rewardConfigID": "b88639640477c4f64a3bf686e49be5f8",
+              "snowflakeIDValue": 1457975628258082800
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "41932113190b943e586a16fb2210d8dc"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.401827037,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.5164612,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.7304549,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.12558794,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.644894361,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                }
+              ],
+              "configID": "f38e0e96792414ed8b118591fe929d93",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "c7e5629f09cd642ec8c5ef7e61c8d4c7",
+              "snowflakeIDValue": 1457974750432198700
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "b3e82760690054e74b67485e998a97c3"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.0804189,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.6844812,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.1051774,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.09348187,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.8637397,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                }
+              ],
+              "configID": "fc5b891e7781d481c989f08f40f00ba3",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "c45318fdc84e4481c87cbc5c5c43bb36",
+              "snowflakeIDValue": 1457974741624160300
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.637525439,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.88420707,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.64889127,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.6442271,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.5350304,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                }
+              ],
+              "configID": "addb3d94ec7be4421b526009dc458f26",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "35044aae010ba434fa17f0f13d2ee1bd",
+              "snowflakeIDValue": 1457974732564463600
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "41932113190b943e586a16fb2210d8dc"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.360636979,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.0501653254,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.3243051,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.41422832,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "24a6628984d244c1691f79f9b675ca3f"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.156355128,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                }
+              ],
+              "configID": "1a676f9e1cd4a46db968cc53f296c1e2",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "51320493a0f4c4c8c95ce081d81b1e72",
+              "snowflakeIDValue": 1457974736985260000
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "07a77019785654f488d188768033478d"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.757814944,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.453255147,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.111443736,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.211824149,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.612977445,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                }
+              ],
+              "configID": "b849bea38db8c43169b01c0e6b0c463e",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "d217484bd71d94d0db8af210d3dd7551",
+              "snowflakeIDValue": 1457974746716045300
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "24a6628984d244c1691f79f9b675ca3f"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.8008707,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.268106759,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.8260616,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.447786063,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.688728333,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                }
+              ],
+              "configID": "2d704407373774224ad5dda725686e09",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "aa83181e74b92459bb1c4ec9f44c9af6",
+              "snowflakeIDValue": 1457974721986429000
+            }
+          ],
+          "teamPower": 1234,
+          "icon": 0,
+          "elo": 0,
+          "eloGain": 10,
+          "hasBattled": true
+        },
+        "_defenseTeam": {
+          "unitInstances": [
+            {
+              "levelAndRank": {
+                "level": 6,
+                "rank": 7,
+                "currentLevelExperience": 256,
+                "currentRankExperience": 0
+              },
+              "configID": "f56f1034ee3694bd69faa5ab0d848815",
+              "equipment": {
+                "weaponIDValue": 1457915154271305700,
+                "helmetIDValue": 1457975636235649000,
+                "chestPieceIDValue": 1457974822825885700,
+                "glovesIDValue": 1457974795462246400,
+                "forceFieldIDValue": 1457974801141334000,
+                "bootsIDValue": 1457975628258082800
+              },
+              "abilityRanks": {
+                "abilityRanks": [],
+                "passiveRank": 1
+              }
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 4,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 20
+              },
+              "configID": "6cd4892136ed24845b0ef6882692d7c3",
+              "equipment": {
+                "weaponIDValue": 0,
+                "helmetIDValue": 0,
+                "chestPieceIDValue": 0,
+                "glovesIDValue": 0,
+                "forceFieldIDValue": 0,
+                "bootsIDValue": 0
+              },
+              "abilityRanks": {
+                "abilityRanks": [],
+                "passiveRank": 1
+              }
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "configID": "8ba0e25f63a8c4c5cb447ef416d353c3",
+              "equipment": {
+                "weaponIDValue": 0,
+                "helmetIDValue": 0,
+                "chestPieceIDValue": 0,
+                "glovesIDValue": 0,
+                "forceFieldIDValue": 0,
+                "bootsIDValue": 0
+              },
+              "abilityRanks": {
+                "abilityRanks": [],
+                "passiveRank": 1
+              }
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "configID": "513cd7964843744dda75b54d8965bd03",
+              "equipment": {
+                "weaponIDValue": 0,
+                "helmetIDValue": 0,
+                "chestPieceIDValue": 0,
+                "glovesIDValue": 0,
+                "forceFieldIDValue": 0,
+                "bootsIDValue": 0
+              },
+              "abilityRanks": {
+                "abilityRanks": [],
+                "passiveRank": 1
+              }
+            },
+            {
+              "levelAndRank": {
+                "level": 5,
+                "rank": 1,
+                "currentLevelExperience": 101,
+                "currentRankExperience": 0
+              },
+              "configID": "6a94feb5f0fec46d090134c8df5ee079",
+              "equipment": {
+                "weaponIDValue": 1457974750432198700,
+                "helmetIDValue": 1457974741624160300,
+                "chestPieceIDValue": 1457974732564463600,
+                "glovesIDValue": 1457974736985260000,
+                "forceFieldIDValue": 1457974746716045300,
+                "bootsIDValue": 1457974721986429000
+              },
+              "abilityRanks": {
+                "abilityRanks": [],
+                "passiveRank": 1
+              }
+            }
+          ],
+          "equipmentData": [
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "41932113190b943e586a16fb2210d8dc"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.827115834,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.11864116,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.5740773,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.5845824,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.08938713,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                }
+              ],
+              "configID": "f38e0e96792414ed8b118591fe929d93",
+              "setConfigID": "59e84beb6bcda4089893d8c1f2db6660",
+              "rewardConfigID": "2dd3fd367dda44fe58bb5fb9d1dbe66e",
+              "snowflakeIDValue": 1457915154271305700
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "b3e82760690054e74b67485e998a97c3"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.624917,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.190723628,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.803073,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.6521043,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.152792215,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                }
+              ],
+              "configID": "fc5b891e7781d481c989f08f40f00ba3",
+              "setConfigID": "59e84beb6bcda4089893d8c1f2db6660",
+              "rewardConfigID": "79cd0387e7ffd4bf08517bbdfbd25061",
+              "snowflakeIDValue": 1457975636235649000
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.0516770333,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.90739423,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.7585002,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.6698397,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.277008235,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                }
+              ],
+              "configID": "addb3d94ec7be4421b526009dc458f26",
+              "setConfigID": "4663e76e6a3a14084b68507514821173",
+              "rewardConfigID": "0a8843816706748338f032e15158b62e",
+              "snowflakeIDValue": 1457974822825885700
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.9956458,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.6117259,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.867070556,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.777933657,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.211262912,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                }
+              ],
+              "configID": "1a676f9e1cd4a46db968cc53f296c1e2",
+              "setConfigID": "c49883c38bf0647f7926c157d665c7c4",
+              "rewardConfigID": "ad836e802f2fc4c70a405b57bc5da0c2",
+              "snowflakeIDValue": 1457974795462246400
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "07a77019785654f488d188768033478d"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.6374201,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.174387977,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.706432641,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.5602421,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "24a6628984d244c1691f79f9b675ca3f"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.3543277,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                }
+              ],
+              "configID": "b849bea38db8c43169b01c0e6b0c463e",
+              "setConfigID": "c49883c38bf0647f7926c157d665c7c4",
+              "rewardConfigID": "118a117b7b079448f9abad52af251854",
+              "snowflakeIDValue": 1457974801141334000
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "07a77019785654f488d188768033478d"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.05074648,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.297446638,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.9694133,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.376636237,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.0584018677,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                }
+              ],
+              "configID": "2d704407373774224ad5dda725686e09",
+              "setConfigID": "59e84beb6bcda4089893d8c1f2db6660",
+              "rewardConfigID": "b88639640477c4f64a3bf686e49be5f8",
+              "snowflakeIDValue": 1457975628258082800
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "41932113190b943e586a16fb2210d8dc"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.401827037,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.5164612,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.7304549,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.12558794,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.644894361,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                }
+              ],
+              "configID": "f38e0e96792414ed8b118591fe929d93",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "c7e5629f09cd642ec8c5ef7e61c8d4c7",
+              "snowflakeIDValue": 1457974750432198700
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "b3e82760690054e74b67485e998a97c3"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.0804189,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.6844812,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.1051774,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.09348187,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.8637397,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                }
+              ],
+              "configID": "fc5b891e7781d481c989f08f40f00ba3",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "c45318fdc84e4481c87cbc5c5c43bb36",
+              "snowflakeIDValue": 1457974741624160300
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.637525439,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.88420707,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.64889127,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.6442271,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.5350304,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                }
+              ],
+              "configID": "addb3d94ec7be4421b526009dc458f26",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "35044aae010ba434fa17f0f13d2ee1bd",
+              "snowflakeIDValue": 1457974732564463600
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "41932113190b943e586a16fb2210d8dc"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.360636979,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.0501653254,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.3243051,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.41422832,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "24a6628984d244c1691f79f9b675ca3f"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.156355128,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                }
+              ],
+              "configID": "1a676f9e1cd4a46db968cc53f296c1e2",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "51320493a0f4c4c8c95ce081d81b1e72",
+              "snowflakeIDValue": 1457974736985260000
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "07a77019785654f488d188768033478d"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.757814944,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.453255147,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.111443736,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.211824149,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.612977445,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                }
+              ],
+              "configID": "b849bea38db8c43169b01c0e6b0c463e",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "d217484bd71d94d0db8af210d3dd7551",
+              "snowflakeIDValue": 1457974746716045300
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "24a6628984d244c1691f79f9b675ca3f"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.8008707,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.268106759,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.8260616,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.447786063,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.688728333,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                }
+              ],
+              "configID": "2d704407373774224ad5dda725686e09",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "aa83181e74b92459bb1c4ec9f44c9af6",
+              "snowflakeIDValue": 1457974721986429000
+            }
+          ],
+          "teamPower": 1234,
+          "icon": 0,
+          "elo": 0,
+          "eloGain": 10,
+          "hasBattled": true
+        },
+        "offenseEloGain": -10,
+        "defenseEloGain": 10,
+        "offenseElo": 102,
+        "defenseElo": 150
+      },
+      {
+        "_offenseTeam": {
+          "unitInstances": [
+            {
+              "levelAndRank": {
+                "level": 6,
+                "rank": 7,
+                "currentLevelExperience": 256,
+                "currentRankExperience": 0
+              },
+              "configID": "f56f1034ee3694bd69faa5ab0d848815",
+              "equipment": {
+                "weaponIDValue": 1457915154271305700,
+                "helmetIDValue": 1457975636235649000,
+                "chestPieceIDValue": 1457974822825885700,
+                "glovesIDValue": 1457974795462246400,
+                "forceFieldIDValue": 1457974801141334000,
+                "bootsIDValue": 1457975628258082800
+              },
+              "abilityRanks": {
+                "abilityRanks": [],
+                "passiveRank": 1
+              }
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 4,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 20
+              },
+              "configID": "6cd4892136ed24845b0ef6882692d7c3",
+              "equipment": {
+                "weaponIDValue": 0,
+                "helmetIDValue": 0,
+                "chestPieceIDValue": 0,
+                "glovesIDValue": 0,
+                "forceFieldIDValue": 0,
+                "bootsIDValue": 0
+              },
+              "abilityRanks": {
+                "abilityRanks": [],
+                "passiveRank": 1
+              }
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "configID": "8ba0e25f63a8c4c5cb447ef416d353c3",
+              "equipment": {
+                "weaponIDValue": 0,
+                "helmetIDValue": 0,
+                "chestPieceIDValue": 0,
+                "glovesIDValue": 0,
+                "forceFieldIDValue": 0,
+                "bootsIDValue": 0
+              },
+              "abilityRanks": {
+                "abilityRanks": [],
+                "passiveRank": 1
+              }
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "configID": "513cd7964843744dda75b54d8965bd03",
+              "equipment": {
+                "weaponIDValue": 0,
+                "helmetIDValue": 0,
+                "chestPieceIDValue": 0,
+                "glovesIDValue": 0,
+                "forceFieldIDValue": 0,
+                "bootsIDValue": 0
+              },
+              "abilityRanks": {
+                "abilityRanks": [],
+                "passiveRank": 1
+              }
+            },
+            {
+              "levelAndRank": {
+                "level": 5,
+                "rank": 1,
+                "currentLevelExperience": 101,
+                "currentRankExperience": 0
+              },
+              "configID": "6a94feb5f0fec46d090134c8df5ee079",
+              "equipment": {
+                "weaponIDValue": 1457974750432198700,
+                "helmetIDValue": 1457974741624160300,
+                "chestPieceIDValue": 1457974732564463600,
+                "glovesIDValue": 1457974736985260000,
+                "forceFieldIDValue": 1457974746716045300,
+                "bootsIDValue": 1457974721986429000
+              },
+              "abilityRanks": {
+                "abilityRanks": [],
+                "passiveRank": 1
+              }
+            }
+          ],
+          "equipmentData": [
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "41932113190b943e586a16fb2210d8dc"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.827115834,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.11864116,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.5740773,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.5845824,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.08938713,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                }
+              ],
+              "configID": "f38e0e96792414ed8b118591fe929d93",
+              "setConfigID": "59e84beb6bcda4089893d8c1f2db6660",
+              "rewardConfigID": "2dd3fd367dda44fe58bb5fb9d1dbe66e",
+              "snowflakeIDValue": 1457915154271305700
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "b3e82760690054e74b67485e998a97c3"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.624917,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.190723628,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.803073,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.6521043,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.152792215,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                }
+              ],
+              "configID": "fc5b891e7781d481c989f08f40f00ba3",
+              "setConfigID": "59e84beb6bcda4089893d8c1f2db6660",
+              "rewardConfigID": "79cd0387e7ffd4bf08517bbdfbd25061",
+              "snowflakeIDValue": 1457975636235649000
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.0516770333,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.90739423,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.7585002,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.6698397,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.277008235,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                }
+              ],
+              "configID": "addb3d94ec7be4421b526009dc458f26",
+              "setConfigID": "4663e76e6a3a14084b68507514821173",
+              "rewardConfigID": "0a8843816706748338f032e15158b62e",
+              "snowflakeIDValue": 1457974822825885700
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.9956458,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.6117259,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.867070556,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.777933657,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.211262912,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                }
+              ],
+              "configID": "1a676f9e1cd4a46db968cc53f296c1e2",
+              "setConfigID": "c49883c38bf0647f7926c157d665c7c4",
+              "rewardConfigID": "ad836e802f2fc4c70a405b57bc5da0c2",
+              "snowflakeIDValue": 1457974795462246400
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "07a77019785654f488d188768033478d"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.6374201,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.174387977,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.706432641,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.5602421,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "24a6628984d244c1691f79f9b675ca3f"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.3543277,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                }
+              ],
+              "configID": "b849bea38db8c43169b01c0e6b0c463e",
+              "setConfigID": "c49883c38bf0647f7926c157d665c7c4",
+              "rewardConfigID": "118a117b7b079448f9abad52af251854",
+              "snowflakeIDValue": 1457974801141334000
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "07a77019785654f488d188768033478d"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.05074648,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.297446638,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.9694133,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.376636237,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.0584018677,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                }
+              ],
+              "configID": "2d704407373774224ad5dda725686e09",
+              "setConfigID": "59e84beb6bcda4089893d8c1f2db6660",
+              "rewardConfigID": "b88639640477c4f64a3bf686e49be5f8",
+              "snowflakeIDValue": 1457975628258082800
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "41932113190b943e586a16fb2210d8dc"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.401827037,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.5164612,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.7304549,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.12558794,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.644894361,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                }
+              ],
+              "configID": "f38e0e96792414ed8b118591fe929d93",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "c7e5629f09cd642ec8c5ef7e61c8d4c7",
+              "snowflakeIDValue": 1457974750432198700
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "b3e82760690054e74b67485e998a97c3"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.0804189,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.6844812,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.1051774,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.09348187,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.8637397,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                }
+              ],
+              "configID": "fc5b891e7781d481c989f08f40f00ba3",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "c45318fdc84e4481c87cbc5c5c43bb36",
+              "snowflakeIDValue": 1457974741624160300
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.637525439,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.88420707,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.64889127,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.6442271,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.5350304,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                }
+              ],
+              "configID": "addb3d94ec7be4421b526009dc458f26",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "35044aae010ba434fa17f0f13d2ee1bd",
+              "snowflakeIDValue": 1457974732564463600
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "41932113190b943e586a16fb2210d8dc"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.360636979,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.0501653254,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.3243051,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.41422832,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "24a6628984d244c1691f79f9b675ca3f"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.156355128,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                }
+              ],
+              "configID": "1a676f9e1cd4a46db968cc53f296c1e2",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "51320493a0f4c4c8c95ce081d81b1e72",
+              "snowflakeIDValue": 1457974736985260000
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "07a77019785654f488d188768033478d"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.757814944,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.453255147,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.111443736,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.211824149,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.612977445,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                }
+              ],
+              "configID": "b849bea38db8c43169b01c0e6b0c463e",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "d217484bd71d94d0db8af210d3dd7551",
+              "snowflakeIDValue": 1457974746716045300
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "24a6628984d244c1691f79f9b675ca3f"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.8008707,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.268106759,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.8260616,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.447786063,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.688728333,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                }
+              ],
+              "configID": "2d704407373774224ad5dda725686e09",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "aa83181e74b92459bb1c4ec9f44c9af6",
+              "snowflakeIDValue": 1457974721986429000
+            }
+          ],
+          "teamPower": 1234,
+          "icon": 0,
+          "elo": 0,
+          "eloGain": 10,
+          "hasBattled": true
+        },
+        "_defenseTeam": {
+          "unitInstances": [
+            {
+              "levelAndRank": {
+                "level": 6,
+                "rank": 7,
+                "currentLevelExperience": 256,
+                "currentRankExperience": 0
+              },
+              "configID": "f56f1034ee3694bd69faa5ab0d848815",
+              "equipment": {
+                "weaponIDValue": 1457915154271305700,
+                "helmetIDValue": 1457975636235649000,
+                "chestPieceIDValue": 1457974822825885700,
+                "glovesIDValue": 1457974795462246400,
+                "forceFieldIDValue": 1457974801141334000,
+                "bootsIDValue": 1457975628258082800
+              },
+              "abilityRanks": {
+                "abilityRanks": [],
+                "passiveRank": 1
+              }
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 4,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 20
+              },
+              "configID": "6cd4892136ed24845b0ef6882692d7c3",
+              "equipment": {
+                "weaponIDValue": 0,
+                "helmetIDValue": 0,
+                "chestPieceIDValue": 0,
+                "glovesIDValue": 0,
+                "forceFieldIDValue": 0,
+                "bootsIDValue": 0
+              },
+              "abilityRanks": {
+                "abilityRanks": [],
+                "passiveRank": 1
+              }
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "configID": "8ba0e25f63a8c4c5cb447ef416d353c3",
+              "equipment": {
+                "weaponIDValue": 0,
+                "helmetIDValue": 0,
+                "chestPieceIDValue": 0,
+                "glovesIDValue": 0,
+                "forceFieldIDValue": 0,
+                "bootsIDValue": 0
+              },
+              "abilityRanks": {
+                "abilityRanks": [],
+                "passiveRank": 1
+              }
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "configID": "513cd7964843744dda75b54d8965bd03",
+              "equipment": {
+                "weaponIDValue": 0,
+                "helmetIDValue": 0,
+                "chestPieceIDValue": 0,
+                "glovesIDValue": 0,
+                "forceFieldIDValue": 0,
+                "bootsIDValue": 0
+              },
+              "abilityRanks": {
+                "abilityRanks": [],
+                "passiveRank": 1
+              }
+            },
+            {
+              "levelAndRank": {
+                "level": 5,
+                "rank": 1,
+                "currentLevelExperience": 101,
+                "currentRankExperience": 0
+              },
+              "configID": "6a94feb5f0fec46d090134c8df5ee079",
+              "equipment": {
+                "weaponIDValue": 1457974750432198700,
+                "helmetIDValue": 1457974741624160300,
+                "chestPieceIDValue": 1457974732564463600,
+                "glovesIDValue": 1457974736985260000,
+                "forceFieldIDValue": 1457974746716045300,
+                "bootsIDValue": 1457974721986429000
+              },
+              "abilityRanks": {
+                "abilityRanks": [],
+                "passiveRank": 1
+              }
+            }
+          ],
+          "equipmentData": [
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "41932113190b943e586a16fb2210d8dc"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.827115834,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.11864116,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.5740773,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.5845824,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.08938713,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                }
+              ],
+              "configID": "f38e0e96792414ed8b118591fe929d93",
+              "setConfigID": "59e84beb6bcda4089893d8c1f2db6660",
+              "rewardConfigID": "2dd3fd367dda44fe58bb5fb9d1dbe66e",
+              "snowflakeIDValue": 1457915154271305700
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "b3e82760690054e74b67485e998a97c3"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.624917,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.190723628,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.803073,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.6521043,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.152792215,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                }
+              ],
+              "configID": "fc5b891e7781d481c989f08f40f00ba3",
+              "setConfigID": "59e84beb6bcda4089893d8c1f2db6660",
+              "rewardConfigID": "79cd0387e7ffd4bf08517bbdfbd25061",
+              "snowflakeIDValue": 1457975636235649000
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.0516770333,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.90739423,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.7585002,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.6698397,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.277008235,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                }
+              ],
+              "configID": "addb3d94ec7be4421b526009dc458f26",
+              "setConfigID": "4663e76e6a3a14084b68507514821173",
+              "rewardConfigID": "0a8843816706748338f032e15158b62e",
+              "snowflakeIDValue": 1457974822825885700
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.9956458,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.6117259,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.867070556,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.777933657,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.211262912,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                }
+              ],
+              "configID": "1a676f9e1cd4a46db968cc53f296c1e2",
+              "setConfigID": "c49883c38bf0647f7926c157d665c7c4",
+              "rewardConfigID": "ad836e802f2fc4c70a405b57bc5da0c2",
+              "snowflakeIDValue": 1457974795462246400
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "07a77019785654f488d188768033478d"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.6374201,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.174387977,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.706432641,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.5602421,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "24a6628984d244c1691f79f9b675ca3f"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.3543277,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                }
+              ],
+              "configID": "b849bea38db8c43169b01c0e6b0c463e",
+              "setConfigID": "c49883c38bf0647f7926c157d665c7c4",
+              "rewardConfigID": "118a117b7b079448f9abad52af251854",
+              "snowflakeIDValue": 1457974801141334000
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "07a77019785654f488d188768033478d"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.05074648,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.297446638,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.9694133,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.376636237,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.0584018677,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                }
+              ],
+              "configID": "2d704407373774224ad5dda725686e09",
+              "setConfigID": "59e84beb6bcda4089893d8c1f2db6660",
+              "rewardConfigID": "b88639640477c4f64a3bf686e49be5f8",
+              "snowflakeIDValue": 1457975628258082800
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "41932113190b943e586a16fb2210d8dc"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.401827037,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.5164612,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.7304549,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.12558794,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.644894361,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                }
+              ],
+              "configID": "f38e0e96792414ed8b118591fe929d93",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "c7e5629f09cd642ec8c5ef7e61c8d4c7",
+              "snowflakeIDValue": 1457974750432198700
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "b3e82760690054e74b67485e998a97c3"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.0804189,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.6844812,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.1051774,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.09348187,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.8637397,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                }
+              ],
+              "configID": "fc5b891e7781d481c989f08f40f00ba3",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "c45318fdc84e4481c87cbc5c5c43bb36",
+              "snowflakeIDValue": 1457974741624160300
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.637525439,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.88420707,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.64889127,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.6442271,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.5350304,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                }
+              ],
+              "configID": "addb3d94ec7be4421b526009dc458f26",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "35044aae010ba434fa17f0f13d2ee1bd",
+              "snowflakeIDValue": 1457974732564463600
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "41932113190b943e586a16fb2210d8dc"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.360636979,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.0501653254,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.3243051,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.41422832,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "24a6628984d244c1691f79f9b675ca3f"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.156355128,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                }
+              ],
+              "configID": "1a676f9e1cd4a46db968cc53f296c1e2",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "51320493a0f4c4c8c95ce081d81b1e72",
+              "snowflakeIDValue": 1457974736985260000
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "07a77019785654f488d188768033478d"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.757814944,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.453255147,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "b3e82760690054e74b67485e998a97c3"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.111443736,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.211824149,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "1dd59b5c8c01a4bf9806f28b72686cba"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.612977445,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0e5e14f469a554655a2744ca78dbe8da"
+                }
+              ],
+              "configID": "b849bea38db8c43169b01c0e6b0c463e",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "d217484bd71d94d0db8af210d3dd7551",
+              "snowflakeIDValue": 1457974746716045300
+            },
+            {
+              "levelAndRank": {
+                "level": 1,
+                "rank": 1,
+                "currentLevelExperience": 0,
+                "currentRankExperience": 0
+              },
+              "primaryStat": {
+                "subStatRolledPercentageNormalized": 0,
+                "hasSubStatRoll": false,
+                "statConfigID": "24a6628984d244c1691f79f9b675ca3f"
+              },
+              "subStats": [
+                {
+                  "subStatRolledPercentageNormalized": 0.8008707,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "25fe7a37b67834ceba0a6ce5d5411ef4"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.268106759,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "07a77019785654f488d188768033478d"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.8260616,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "952ddf74029df41dc847b26e6b1e1553"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.447786063,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "41932113190b943e586a16fb2210d8dc"
+                },
+                {
+                  "subStatRolledPercentageNormalized": 0.688728333,
+                  "hasSubStatRoll": true,
+                  "statConfigID": "0098e2ec87b78463e8626debfbce3327"
+                }
+              ],
+              "configID": "2d704407373774224ad5dda725686e09",
+              "setConfigID": "353e047cae33246f2a9836a52392c334",
+              "rewardConfigID": "aa83181e74b92459bb1c4ec9f44c9af6",
+              "snowflakeIDValue": 1457974721986429000
+            }
+          ],
+          "teamPower": 1234,
+          "icon": 0,
+          "elo": 0,
+          "eloGain": 10,
+          "hasBattled": true
+        },
+        "offenseEloGain": -20,
+        "defenseEloGain": 20,
+        "offenseElo": 102,
         "defenseElo": 150
       }
     ]
