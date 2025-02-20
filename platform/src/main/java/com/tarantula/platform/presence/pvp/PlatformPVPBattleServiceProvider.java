@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.protocol.ApplicationResource;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.IntegerRangeKey;
@@ -14,7 +15,11 @@ import com.tarantula.game.SimpleStub;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.configuration.SeasonCredentialConfiguration;
 import com.tarantula.platform.event.PortableEventRegistry;
+import com.tarantula.platform.item.ConfigurableObject;
+import com.tarantula.platform.item.ConfigurableObjectQuery;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
+import com.tarantula.platform.presence.dailygiveaway.DailyGiveaway;
+import com.tarantula.platform.presence.dailygiveaway.DailygGiveawayObjectQuery;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,7 +27,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvider implements Configurable.Listener<SeasonCredentialConfiguration> {
+public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvider implements Configurable.Listener<SeasonCredentialConfiguration>{
 
     private static final long CURRENT_SEASON_INDEX = 0;
     public static final String NAME = "pvp_battle";
@@ -31,6 +36,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private int seasonRunningDays = 12;//days
     private int reMatchWaitingTimeMinutes = 60; //minutes
     private ConcurrentHashMap<Long, SeasonCredentialConfiguration.Season> seasons = new ConcurrentHashMap();
+    private ConcurrentHashMap<Integer,League> leagues = new ConcurrentHashMap<>();
     private ClusterProvider.ClusterStore scheduleStore;
 
     private final SeasonRuntime rotation = new SeasonRuntime();
@@ -349,6 +355,63 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             v.writeLong(systemId);
             return true;
         });
+    }
+
+    @Override
+    public boolean onItemRegistered(String category,String itemId) {
+        ConfigurableObject configurableObject = new ConfigurableObject();
+        configurableObject.distributionKey(itemId);
+        Descriptor app = gameCluster.serviceWithCategory(category);
+        if(!applicationPreSetup.load(app,configurableObject)){
+            logger.warn("League config not available");
+            return false;
+        }
+        onLeague(configurableObject);
+        return true;
+    }
+
+    @Override
+    public boolean onItemReleased(String category,String itemId) {
+        ConfigurableObject configurableObject = new ConfigurableObject();
+        configurableObject.distributionKey(itemId);
+        Descriptor app = gameCluster.serviceWithCategory(category);
+        if(!applicationPreSetup.load(app,configurableObject)){
+            logger.warn("League config not available");
+            return false;
+        }
+        League removed = new League(configurableObject);
+        for(int i=removed.startPoint();i<=removed.endPoint();i++){
+            leagues.remove(i);
+        }
+        return true;
+    }
+
+    @Override
+    public String registerConfigurableListener(Descriptor descriptor, Configurable.Listener listener) {
+        List<ConfigurableObject> items = applicationPreSetup.list(descriptor,new ConfigurableObjectQuery(descriptor.key(),"League"));
+        items.forEach((a)-> {
+            if(!a.disabled()) {
+                onLeague(a);
+            }
+        });
+        return null;
+    }
+
+    private void onLeague(ConfigurableObject a){
+        PostBattleReward postBattleReward = new PostBattleReward();
+        postBattleReward.distributionId(a.application().get("PostBattleReward").getAsJsonArray().get(0).getAsLong());
+        PlacementReward placementReward = new PlacementReward();
+        placementReward.distributionId(a.application().get("PlacementReward").getAsJsonArray().get(0).getAsLong());
+        LeagueReward leagueReward = new LeagueReward();
+        leagueReward.distributionId(a.application().get("LeagueReward").getAsJsonArray().get(0).getAsLong());
+        a.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
+        League league = new League(a.setup());
+        league.postBattleReward = postBattleReward;
+        league.placementReward = placementReward;
+        league.leagueReward = leagueReward;
+        for(int i=league.startPoint();i<=league.endPoint();i++){
+            leagues.put(i,league);
+        }
     }
 
 }
