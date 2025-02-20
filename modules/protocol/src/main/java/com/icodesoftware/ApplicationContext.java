@@ -42,6 +42,7 @@ public interface ApplicationContext extends Context{
 
     Transaction transaction();
 
+    default Transaction.LogManager logManager(){ throw new UnsupportedOperationException();}
     default DataStore dataStore(int scope,String name){
         return dataStore(name);
     }
