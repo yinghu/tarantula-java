@@ -41,5 +41,6 @@ public interface ServiceContext extends Context{
     PostOffice postOffice();
 
     Transaction transaction(int scope);
+    default Transaction.LogManager logManager(){ throw new UnsupportedOperationException();}
 
 }
