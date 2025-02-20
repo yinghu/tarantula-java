@@ -2,7 +2,17 @@
   "battleLogMockData": {
     "_battleLogs": [
       {
+        "OffenseWin": true,
+        "DefenseWin": false,
+        "OffenseEloGain": 10,
+        "DefenseEloGain": -10,
+        "OffenseElo": 102,
+        "DefenseElo": 150,
         "_offenseTeam": {
+          "winPointsEstimated": 100,
+          "playerId": 647568271901466624,
+          "teamPower": 1234,
+          "elo": 0,
           "unitInstances": [
             {
               "levelAndRank": {
@@ -639,14 +649,13 @@
               "rewardConfigID": "aa83181e74b92459bb1c4ec9f44c9af6",
               "snowflakeIDValue": 1457974721986429000
             }
-          ],
-          "teamPower": 1234,
-          "icon": 0,
-          "elo": 0,
-          "eloGain": 10,
-          "hasBattled": true
+          ]
         },
         "_defenseTeam": {
+          "winPointsEstimated": 100,
+          "playerId": 647568271901466624,
+          "teamPower": 1234,
+          "elo": 0,
           "unitInstances": [
             {
               "levelAndRank": {
@@ -1283,20 +1292,21 @@
               "rewardConfigID": "aa83181e74b92459bb1c4ec9f44c9af6",
               "snowflakeIDValue": 1457974721986429000
             }
-          ],
-          "teamPower": 1234,
-          "icon": 0,
-          "elo": 0,
-          "eloGain": 10,
-          "hasBattled": true
-        },
-        "offenseEloGain": 10,
-        "defenseEloGain": -10,
-        "offenseElo": 102,
-        "defenseElo": 150
+          ]
+        }
       },
       {
+        "OffenseWin": true,
+        "DefenseWin": false,
+        "OffenseEloGain": 20,
+        "DefenseEloGain": -20,
+        "OffenseElo": 102,
+        "DefenseElo": 150,
         "_offenseTeam": {
+          "winPointsEstimated": 100,
+          "playerId": 647568271901466624,
+          "teamPower": 1234,
+          "elo": 0,
           "unitInstances": [
             {
               "levelAndRank": {
@@ -1933,14 +1943,13 @@
               "rewardConfigID": "aa83181e74b92459bb1c4ec9f44c9af6",
               "snowflakeIDValue": 1457974721986429000
             }
-          ],
-          "teamPower": 1234,
-          "icon": 0,
-          "elo": 0,
-          "eloGain": 10,
-          "hasBattled": true
+          ]
         },
         "_defenseTeam": {
+          "winPointsEstimated": 100,
+          "playerId": 647568271901466624,
+          "teamPower": 1234,
+          "elo": 0,
           "unitInstances": [
             {
               "levelAndRank": {
@@ -2577,20 +2586,21 @@
               "rewardConfigID": "aa83181e74b92459bb1c4ec9f44c9af6",
               "snowflakeIDValue": 1457974721986429000
             }
-          ],
-          "teamPower": 1234,
-          "icon": 0,
-          "elo": 0,
-          "eloGain": 10,
-          "hasBattled": true
-        },
-        "offenseEloGain": 20,
-        "defenseEloGain": -20,
-        "offenseElo": 102,
-        "defenseElo": 150
+          ]
+        }
       },
       {
+        "OffenseWin": false,
+        "DefenseWin": true,
+        "OffenseEloGain": -10,
+        "DefenseEloGain": 10,
+        "OffenseElo": 102,
+        "DefenseElo": 150,
         "_offenseTeam": {
+          "winPointsEstimated": 100,
+          "playerId": 647568271901466624,
+          "teamPower": 1234,
+          "elo": 0,
           "unitInstances": [
             {
               "levelAndRank": {
@@ -3227,14 +3237,13 @@
               "rewardConfigID": "aa83181e74b92459bb1c4ec9f44c9af6",
               "snowflakeIDValue": 1457974721986429000
             }
-          ],
-          "teamPower": 1234,
-          "icon": 0,
-          "elo": 0,
-          "eloGain": 10,
-          "hasBattled": true
+          ]
         },
         "_defenseTeam": {
+          "winPointsEstimated": 100,
+          "playerId": 647568271901466624,
+          "teamPower": 1234,
+          "elo": 0,
           "unitInstances": [
             {
               "levelAndRank": {
@@ -3871,20 +3880,21 @@
               "rewardConfigID": "aa83181e74b92459bb1c4ec9f44c9af6",
               "snowflakeIDValue": 1457974721986429000
             }
-          ],
-          "teamPower": 1234,
-          "icon": 0,
-          "elo": 0,
-          "eloGain": 10,
-          "hasBattled": true
-        },
-        "offenseEloGain": -10,
-        "defenseEloGain": 10,
-        "offenseElo": 102,
-        "defenseElo": 150
+          ]
+        }
       },
       {
+        "OffenseWin": false,
+        "DefenseWin": true,
+        "OffenseEloGain": -20,
+        "DefenseEloGain": 20,
+        "DffenseElo": 102,
+        "DefenseElo": 150,
         "_offenseTeam": {
+          "winPointsEstimated": 100,
+          "playerId": 647568271901466624,
+          "teamPower": 1234,
+          "elo": 0,
           "unitInstances": [
             {
               "levelAndRank": {
@@ -4521,14 +4531,13 @@
               "rewardConfigID": "aa83181e74b92459bb1c4ec9f44c9af6",
               "snowflakeIDValue": 1457974721986429000
             }
-          ],
-          "teamPower": 1234,
-          "icon": 0,
-          "elo": 0,
-          "eloGain": 10,
-          "hasBattled": true
+          ]
         },
         "_defenseTeam": {
+          "winPointsEstimated": 100,
+          "playerId": 647568271901466624,
+          "teamPower": 1234,
+          "elo": 0,
           "unitInstances": [
             {
               "levelAndRank": {
@@ -5165,17 +5174,8 @@
               "rewardConfigID": "aa83181e74b92459bb1c4ec9f44c9af6",
               "snowflakeIDValue": 1457974721986429000
             }
-          ],
-          "teamPower": 1234,
-          "icon": 0,
-          "elo": 0,
-          "eloGain": 10,
-          "hasBattled": true
-        },
-        "offenseEloGain": -20,
-        "defenseEloGain": 20,
-        "offenseElo": 102,
-        "defenseElo": 150
+          ]
+        }
       }
     ]
   }
