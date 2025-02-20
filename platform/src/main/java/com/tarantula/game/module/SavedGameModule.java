@@ -12,6 +12,7 @@ import com.tarantula.platform.presence.*;
 import com.tarantula.game.PlayerSavedGames;
 import com.tarantula.game.util.SavedGameDeserializer;
 import com.tarantula.platform.presence.pvp.BattleLogList;
+import com.tarantula.platform.presence.pvp.MatchMaking;
 import com.tarantula.platform.presence.pvp.TeamFormationResponse;
 import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 import com.tarantula.platform.presence.saves.PlatformSavedGameServiceProvider;
@@ -94,12 +95,17 @@ public class SavedGameModule extends ModuleHeader {
             session.write(season.toJson().toString().getBytes());
         }
         else if(session.action().equals("onBattleLog")){
-            BattleLogList battleLogList = gameServiceProvider.pvpBattleServiceProvider().battleLogList(session);
-            session.write(battleLogList.toJson().toString().getBytes());
+//            BattleLogList battleLogList = gameServiceProvider.pvpBattleServiceProvider().battleLogList(session);
+//            session.write(battleLogList.toJson().toString().getBytes());
+            session.write(gameServiceProvider.pvpBattleServiceProvider().battleLogMockData().getBytes());
         }
         else if(session.action().equals("onRating")){
             GameRating rating = presenceServiceProvider.rating(session);
             session.write(rating.toJson().toString().getBytes());
+        }
+        else if(session.action().equals("onPaidMatchMaking")){
+            MatchMaking matchMaking = gameServiceProvider.pvpBattleServiceProvider().matchMaking(session);
+            session.write(matchMaking.toJson().toString().getBytes());
         }
         //pvp saves end
 
