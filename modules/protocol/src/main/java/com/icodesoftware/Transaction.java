@@ -1,5 +1,6 @@
 package com.icodesoftware;
 
+import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
 
@@ -53,6 +54,12 @@ public interface Transaction extends AutoCloseable{
          boolean write(Recoverable.DataBuffer buffer);
     }
 
+    interface History extends Recoverable{
+        int scope();
+        boolean committed();
+        long transactionId();
+    }
+
     interface LogManager{
         void setup(ServiceContext serviceContext);
 
@@ -79,6 +86,9 @@ public interface Transaction extends AutoCloseable{
 
         //callback on store load
         boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferStream bufferStream);
+
+        List<History> history(int scope,ClusterProvider.Node node);
+        void history(int scope, ClusterProvider.Node node, DataStore.Stream<History> stream);
     }
 
     interface LogListener {

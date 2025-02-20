@@ -2,6 +2,7 @@ package com.icodesoftware.lmdb;
 
 import com.icodesoftware.*;
 import com.icodesoftware.service.Batchable;
+import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.BinaryKey;
@@ -57,11 +58,16 @@ public class TransactionLogManager implements Transaction.LogManager{
         return pending;
     }
 
-    //used for test
-    public List<TransactionResult> pending(int scopeId,long nodeId){
-        DataStore ts = transactionLogStore(scopeId);
-        TransactionResultQuery query = new TransactionResultQuery(nodeId);
+    public List<Transaction.History> history(int scope, ClusterProvider.Node node){
+        DataStore ts = transactionLogStore(scope);
+        TransactionResultQuery query = new TransactionResultQuery(node.nodeId());
         return ts.list(query);
+    }
+
+    public void history(int scope, ClusterProvider.Node node, DataStore.Stream<Transaction.History> stream){
+        DataStore ts = transactionLogStore(scope);
+        TransactionResultQuery query = new TransactionResultQuery(node.nodeId());
+        ts.list(query,stream);
     }
 
     public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value, long transactionId) {
@@ -175,13 +181,13 @@ public class TransactionLogManager implements Transaction.LogManager{
 
     public void onCommit(int scope, long transactionId) {
         DataStore ts = transactionLogStore(scope);
-        ts.createIfAbsent(TransactionResult.result(transactionId,scope,true,serviceContext.node().nodeId()),false);
+        ts.create(TransactionResult.result(transactionId,scope,true,serviceContext.node().nodeId()));
     }
 
 
     public void onAbort(int scope, long transactionId) {
         DataStore ts = transactionLogStore(scope);
-        ts.createIfAbsent(TransactionResult.result(transactionId,scope,false,serviceContext.node().nodeId()),false);
+        ts.create(TransactionResult.result(transactionId,scope,false,serviceContext.node().nodeId()));
     }
 
     private String logPrefix(int scope){

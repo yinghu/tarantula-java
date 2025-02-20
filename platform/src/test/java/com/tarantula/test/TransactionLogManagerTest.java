@@ -3,7 +3,6 @@ package com.tarantula.test;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Transaction;
-import com.icodesoftware.lmdb.TransactionResult;
 import com.icodesoftware.util.SnowflakeKey;
 import com.tarantula.platform.PresenceIndex;
 import com.tarantula.platform.presence.PresencePortableRegistry;
@@ -32,9 +31,9 @@ public class TransactionLogManagerTest extends DataStoreHook{
         presenceIndex.label("presence_list");
         RecoverableQuery<PresenceIndex> query = RecoverableQuery.query(100,presenceIndex, PresencePortableRegistry.INS);
         Assert.assertTrue(dataStore.list(query).size()==10);
-        List<TransactionResult> logs = transactionLogManager.pending(Distributable.DATA_SCOPE,serviceContext.node().nodeId());
+        List<Transaction.History> logs = transactionLogManager.history(Distributable.DATA_SCOPE,serviceContext.node());
         logs.forEach(log->{
-            List<Transaction.Log> pg = transactionLogManager.committed(Distributable.DATA_SCOPE,log.distributionId());
+            List<Transaction.Log> pg = transactionLogManager.committed(Distributable.DATA_SCOPE,log.transactionId());
             pg.forEach(p->{
                 p.source("foo_test");
             });

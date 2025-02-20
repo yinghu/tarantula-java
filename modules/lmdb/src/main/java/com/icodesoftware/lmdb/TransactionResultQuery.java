@@ -3,8 +3,8 @@ package com.icodesoftware.lmdb;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.util.SnowflakeKey;
-
-public class TransactionResultQuery implements RecoverableFactory<TransactionResult> {
+import com.icodesoftware.Transaction;
+public class TransactionResultQuery implements RecoverableFactory<Transaction.History> {
 
     public long nodeId;
     public TransactionResultQuery(long nodeId){
@@ -12,7 +12,7 @@ public class TransactionResultQuery implements RecoverableFactory<TransactionRes
     }
 
     @Override
-    public TransactionResult create() {
+    public Transaction.History create() {
         return new TransactionResult();
     }
 
