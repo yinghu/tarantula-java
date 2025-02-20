@@ -120,6 +120,17 @@ public class TransactionLogManager implements Transaction.LogManager{
         return null;
     }
 
+    public Recoverable.DataBuffer load(Metadata metadata, Recoverable.DataBuffer key){
+        DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
+        if(metadata.label()!=null) return null;
+        Recoverable.DataBuffer[] loaded = {null};
+        if(dataStore.backup().get(DataBufferKey.from(key),(k, v)->{
+            loaded[0] = BufferProxy.copy(v.src());
+            return true;
+        })) return loaded[0];
+        return null;
+    }
+
     public List<Batchable.BatchData> loadEdgeValueFromCommitted(Metadata metadata, byte[] key){
         DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
         List<Batchable.BatchData> edgeValueSet = new ArrayList<>();
