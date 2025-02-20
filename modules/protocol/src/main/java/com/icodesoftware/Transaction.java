@@ -85,6 +85,7 @@ public interface Transaction extends AutoCloseable{
         boolean onDeleting(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value, long transactionId);
 
         //callback on store load
+        boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,Recoverable.DataBuffer value);
         boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferStream bufferStream);
 
         List<History> history(int scope,ClusterProvider.Node node);
