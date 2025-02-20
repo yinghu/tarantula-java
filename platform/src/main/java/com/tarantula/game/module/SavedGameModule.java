@@ -94,8 +94,9 @@ public class SavedGameModule extends ModuleHeader {
             session.write(season.toJson().toString().getBytes());
         }
         else if(session.action().equals("onBattleLog")){
-            BattleLogList battleLogList = gameServiceProvider.pvpBattleServiceProvider().battleLogList(session);
-            session.write(battleLogList.toJson().toString().getBytes());
+//            BattleLogList battleLogList = gameServiceProvider.pvpBattleServiceProvider().battleLogList(session);
+//            session.write(battleLogList.toJson().toString().getBytes());
+            session.write(gameServiceProvider.pvpBattleServiceProvider().battleLogMockData().getBytes());
         }
         else if(session.action().equals("onRating")){
             GameRating rating = presenceServiceProvider.rating(session);

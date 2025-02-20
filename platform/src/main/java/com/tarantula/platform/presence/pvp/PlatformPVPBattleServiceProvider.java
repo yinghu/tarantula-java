@@ -39,6 +39,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private DataStore cooldownStore;
     private DataStore matchMakingStore;
     private String gameEndTopic = GameEndEvent.GAME_END_TOPIC;
+    private JsonObject battleLogMockData;
 
     public PlatformPVPBattleServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
@@ -48,7 +49,9 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     public void setup(ServiceContext serviceContext) {
         super.setup(serviceContext);
         Configuration configuration = serviceContext.configuration("game-presence-settings");
+        Configuration mockDataConfig = serviceContext.configuration("pvp-mock-data");
         JsonObject pvp = ((JsonElement)configuration.property("pvp")).getAsJsonObject();
+        battleLogMockData = ((JsonElement)mockDataConfig.property("battleLogMockData")).getAsJsonObject();
         teamCreationWaitingTime = pvp.get("waitingMinutesPerTeamFormation").getAsInt();
         seasonTimeGap = pvp.get("seasonTimeGapMinutes").getAsInt();
         seasonRunningDays = pvp.get("seasonRunningDays").getAsInt();
@@ -351,4 +354,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         });
     }
 
+    public String battleLogMockData(){
+        return battleLogMockData.toString();
+    }
 }
