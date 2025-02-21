@@ -59,7 +59,6 @@ public class LMDBDataStoreProvider implements LocalLMDBProvider{
 
 
     private MapStoreListener integrationMapStoreListener;
-    private MapStoreListener keyIndexMapStoreListener;
     private MapStoreListener dataMapStoreListener;
     private DistributionIdGenerator distributionIdGenerator;
 
@@ -96,10 +95,6 @@ public class LMDBDataStoreProvider implements LocalLMDBProvider{
     public void registerMapStoreListener(int scope, MapStoreListener mapStoreListener) {
         if(scope==Distributable.INTEGRATION_SCOPE){
             integrationMapStoreListener = mapStoreListener;
-            return;
-        }
-        if(scope==Distributable.INDEX_SCOPE){
-            keyIndexMapStoreListener = mapStoreListener;
             return;
         }
         if(scope==Distributable.DATA_SCOPE){
@@ -303,9 +298,6 @@ public class LMDBDataStoreProvider implements LocalLMDBProvider{
 
     @Override
     public void setup(ServiceContext serviceContext){
-        if(keyIndexMapStoreListener!=null){
-            keyIndexMapStoreListener.setup(serviceContext);
-        }
         if(integrationMapStoreListener!=null){
             integrationMapStoreListener.setup(serviceContext);
         }
@@ -317,9 +309,6 @@ public class LMDBDataStoreProvider implements LocalLMDBProvider{
 
     @Override
     public void waitForData() {
-        if(keyIndexMapStoreListener!=null){
-            keyIndexMapStoreListener.waitForData();
-        }
         if(integrationMapStoreListener!=null){
             integrationMapStoreListener.waitForData();
         }
@@ -330,9 +319,6 @@ public class LMDBDataStoreProvider implements LocalLMDBProvider{
     }
     private void closeMapStore() {
         try{
-            if(keyIndexMapStoreListener!=null){
-                keyIndexMapStoreListener.shutdown();
-            }
             if(integrationMapStoreListener!=null){
                 integrationMapStoreListener.shutdown();
             }
