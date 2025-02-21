@@ -74,6 +74,9 @@ public class LMDBRecoveryTest extends LMDBHook{
                 Assert.assertTrue(testMapStoreListener.transactionLogManager.set(metadata,key,dataBuffer));
                 Assert.assertNotNull(dataBuffer);
                 Assert.assertTrue(recovery);
+                key.rewind();
+                value.clear();
+                recovery = testMapStoreListener.transactionLogManager.onRecovering(metadata,key,value);
                 if(recovery) {
                     value.flip();
                     Recoverable.DataHeader header = value.readHeader();
