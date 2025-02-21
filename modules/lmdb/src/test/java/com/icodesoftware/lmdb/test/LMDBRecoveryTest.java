@@ -68,6 +68,11 @@ public class LMDBRecoveryTest extends LMDBHook{
                 Recoverable.DataBuffer value = kv.value();
                 key.writeLong(ownerId).flip();
                 boolean recovery = testMapStoreListener.transactionLogManager.onRecovering(metadata,key,value);
+                key.rewind();
+                Recoverable.DataBuffer dataBuffer = testMapStoreListener.transactionLogManager.get(metadata,key);
+                key.rewind();
+                Assert.assertTrue(testMapStoreListener.transactionLogManager.set(metadata,key,dataBuffer));
+                Assert.assertNotNull(dataBuffer);
                 Assert.assertTrue(recovery);
                 if(recovery) {
                     value.flip();
