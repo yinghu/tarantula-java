@@ -103,7 +103,7 @@ public class TransactionLogManager implements Transaction.LogManager{
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value) {
         DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
         if(metadata.label()!=null) return false;
-        return dataStore.backup().get(BinaryKey.from(key.array()),(k,v)->{
+        return dataStore.backup().get(DataBufferKey.from(key),(k,v)->{
             value.write(v);
             return true;
         });
@@ -130,7 +130,14 @@ public class TransactionLogManager implements Transaction.LogManager{
         })) return loaded[0];
         return null;
     }
-
+    public boolean set(Metadata metadata,Recoverable.DataBuffer key,Recoverable.DataBuffer value){
+        DataStore dataStore = onTransaction(metadata);
+        return dataStore.backup().set((k,v)->{
+            k.write(key);
+            v.write(value);
+            return true;
+        });
+    }
     public List<Batchable.BatchData> loadEdgeValueFromCommitted(Metadata metadata, byte[] key){
         DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
         List<Batchable.BatchData> edgeValueSet = new ArrayList<>();
