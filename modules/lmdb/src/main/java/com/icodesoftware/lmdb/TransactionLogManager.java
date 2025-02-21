@@ -120,7 +120,7 @@ public class TransactionLogManager implements Transaction.LogManager{
         return null;
     }
 
-    public Recoverable.DataBuffer load(Metadata metadata, Recoverable.DataBuffer key){
+    public Recoverable.DataBuffer get(Metadata metadata, Recoverable.DataBuffer key){
         DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
         if(metadata.label()!=null) return null;
         Recoverable.DataBuffer[] loaded = {null};
