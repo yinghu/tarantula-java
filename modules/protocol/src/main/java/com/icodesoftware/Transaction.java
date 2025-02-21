@@ -91,7 +91,9 @@ public interface Transaction extends AutoCloseable{
         List<History> history(int scope,ClusterProvider.Node node);
         void history(int scope, ClusterProvider.Node node, DataStore.Stream<History> stream);
         Recoverable.DataBuffer get(Metadata metadata, Recoverable.DataBuffer key);
+        void get(Metadata metadata, Recoverable.DataBuffer key, DataStore.BufferStream stream);
         boolean set(Metadata metadata,Recoverable.DataBuffer key,Recoverable.DataBuffer value);
+        boolean setEdge(Metadata metadata,Recoverable.DataBuffer key,Recoverable.DataBuffer value);
     }
 
     interface LogListener {

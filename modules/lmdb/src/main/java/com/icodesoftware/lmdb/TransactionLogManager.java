@@ -138,6 +138,21 @@ public class TransactionLogManager implements Transaction.LogManager{
             return true;
         });
     }
+    public boolean setEdge(Metadata metadata,Recoverable.DataBuffer key,Recoverable.DataBuffer value){
+        DataStore dataStore = onTransaction(metadata);
+        return dataStore.backup().setEdge(metadata.label(), (k,v)->{
+            k.write(key);
+            v.write(value);
+            return true;
+        });
+    }
+
+    public void get(Metadata metadata, Recoverable.DataBuffer key, DataStore.BufferStream stream){
+        if(metadata.label()==null) return;
+        DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
+        dataStore.backup().forEachEdgeKeyValue(DataBufferKey.from(key),metadata.label(),(e,v)->stream.on(BufferProxy.copy(e.src()),BufferProxy.copy(v.src())));
+    }
+
     public List<Batchable.BatchData> loadEdgeValueFromCommitted(Metadata metadata, byte[] key){
         DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
         List<Batchable.BatchData> edgeValueSet = new ArrayList<>();
