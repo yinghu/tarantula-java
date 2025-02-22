@@ -148,9 +148,13 @@ public class TransactionLogManager implements Transaction.LogManager{
     }
 
     public void get(Metadata metadata, Recoverable.DataBuffer key, DataStore.BufferStream stream){
-        if(metadata.label()==null) return;
+        if(metadata.label()==null){
+            stream.on(null,null);
+            return;
+        }
         DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
         dataStore.backup().forEachEdgeKeyValue(DataBufferKey.from(key),metadata.label(),(e,v)->stream.on(BufferProxy.copy(e.src()),BufferProxy.copy(v.src())));
+        stream.on(null,null);
     }
 
     public List<Batchable.BatchData> loadEdgeValueFromCommitted(Metadata metadata, byte[] key){
