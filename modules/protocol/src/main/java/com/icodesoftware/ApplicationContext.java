@@ -49,4 +49,5 @@ public interface ApplicationContext extends Context{
     default long distributionId(){
         return 0;
     }
+    default Transaction transaction(int scope){ throw new UnsupportedOperationException();}
 }
