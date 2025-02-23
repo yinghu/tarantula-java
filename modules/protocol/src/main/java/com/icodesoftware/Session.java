@@ -5,7 +5,7 @@ public interface Session extends OnApplication {
     String DataStore = "game_session";
     //standard HTTP headers
     String HTTP_CONTENT_TYPE ="Content-type";
-
+    String HTTP_TRANSFER_ENCODING = "Transfer-Encoding";
     //tarantula headers
     String TARANTULA_TOURNAMENT_ID ="Tarantula-tournament-id";
     String TARANTULA_TYPE_ID ="Tarantula-type-id";
