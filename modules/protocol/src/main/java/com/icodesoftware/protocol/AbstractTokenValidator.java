@@ -1,10 +1,8 @@
 package com.icodesoftware.protocol;
 
-import com.icodesoftware.Access;
-import com.icodesoftware.OnSession;
-import com.icodesoftware.Session;
-import com.icodesoftware.TokenValidator;
+import com.icodesoftware.*;
 import com.icodesoftware.protocol.presence.TROnSession;
+import com.icodesoftware.protocol.presence.TRRole;
 import com.icodesoftware.service.AccessKey;
 
 import java.util.Map;
@@ -51,7 +49,7 @@ abstract public class AbstractTokenValidator implements TokenValidator {
 
     @Override
     public boolean validateToken(Map<String, Object> params) {
-        return false;
+        return onVendorToken(params);
     }
 
     @Override
@@ -61,7 +59,7 @@ abstract public class AbstractTokenValidator implements TokenValidator {
 
     @Override
     public Access.Role role(long systemId) {
-        return null;
+        return TRRole.player;
     }
 
     public String accessKey(AccessKey accessKey){
@@ -71,7 +69,7 @@ abstract public class AbstractTokenValidator implements TokenValidator {
         AccessKey accessKey = CryptoManager.validateAccessKey(access);
         return onAccessKey(accessKey);
     }
-
+    abstract protected boolean onVendorToken(Map<String,Object> params);
     abstract protected OnSession onSession(Access access);
     abstract protected AccessKey onAccessKey(AccessKey accessKey);
 }
