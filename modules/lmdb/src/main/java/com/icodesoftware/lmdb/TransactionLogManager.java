@@ -174,9 +174,9 @@ public class TransactionLogManager implements Transaction.LogManager{
         if(metadata.label()==null) return false;
         List<Recoverable.DataBuffer> ex = new ArrayList<>();
         List<Recoverable.DataBuffer> ev = new ArrayList<>();
-        dataStore.backup().forEachEdgeKeyValue(BinaryKey.from(key.array()),metadata.label(),(e,v)->{
-            ex.add(BufferProxy.wrapDirectly(e.array()));
-            ev.add(BufferProxy.wrapDirectly(v.array()));
+        dataStore.backup().forEachEdgeKeyValue(DataBufferKey.from(key),metadata.label(),(e,v)->{
+            ex.add(BufferProxy.copy(e.src()));
+            ev.add(BufferProxy.copy(v.src()));
             return true;
         });
         key.rewind();
