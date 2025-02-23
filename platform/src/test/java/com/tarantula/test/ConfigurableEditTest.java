@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.icodesoftware.DataStore;
-import com.icodesoftware.Rating;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.item.Commodity;
 import com.tarantula.platform.item.ConfigurableEdit;
