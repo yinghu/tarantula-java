@@ -4,7 +4,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.protocol.ApplicationResource;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.IntegerRangeKey;
@@ -18,8 +17,7 @@ import com.tarantula.platform.event.PortableEventRegistry;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ConfigurableObjectQuery;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
-import com.tarantula.platform.presence.dailygiveaway.DailyGiveaway;
-import com.tarantula.platform.presence.dailygiveaway.DailygGiveawayObjectQuery;
+
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -87,7 +85,10 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             BattleTeam defenseTeam = defenseTeam(rating);
             if(defenseTeam != null){
                 //calculate the estimated pvp points if the player wins.
+                defenseTeam.battled = true; //sampling
+                defenseTeam.battlePoint = 100; //sampling
                 defenseTeam.winPointsEstimated = 100;//sampling
+                defenseTeam.elo = rating.level();
                 matches.add(defenseTeam);
             }
         });
@@ -121,7 +122,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         TeamFormationIndex teamFormationIndex = new TeamFormationIndex();
         teamFormationIndex.distributionId(rating.distributionId());
         if(!dataStore.load(teamFormationIndex)) return null;
-        return defenseTeam(teamFormationIndex.teamId);
+        return defenseTeam(teamFormationIndex.teamId).load(dataStore,teamFormationIndex);
     }
 
     public BattleTeam defenseTeam(long defenseTeamId){
@@ -229,7 +230,6 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         gameEndEvent.offenseTeamId = serviceContext.distributionId();
         gameEndEvent.offenseEloLevel = 100;
         this.serviceContext.eventService().publish(gameEndEvent);
-        findMatches(new SimpleStub());
     }
 
     private void startSeason(SeasonRuntime seasonRuntime){

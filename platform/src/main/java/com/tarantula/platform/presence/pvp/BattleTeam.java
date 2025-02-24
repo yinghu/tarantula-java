@@ -19,6 +19,9 @@ public class BattleTeam extends RecoverableObject {
 
     //calculating on match-making
     public int winPointsEstimated;
+    public int elo;
+    public boolean battled;
+    public int battlePoint; //positive win , negative lost
 
     public long playerId;
     public int teamPower;
@@ -67,8 +70,11 @@ public class BattleTeam extends RecoverableObject {
     public JsonObject toJson() {
         JsonObject resp = new JsonObject();
         resp.addProperty("winPointsEstimated",winPointsEstimated);
+        resp.addProperty("elo",elo);
         resp.addProperty("playerId",playerId);
         resp.addProperty("teamPower",teamPower);
+        resp.addProperty("battled",battled);
+        resp.addProperty("battlePoint",battlePoint);
         JsonArray units = new JsonArray();
         unitInstances.forEach(unitInstance -> units.add(unitInstance.toJson()));
         JsonArray equips = new JsonArray();
@@ -78,7 +84,7 @@ public class BattleTeam extends RecoverableObject {
         return resp;
     }
 
-    public void load(DataStore dataStore,TeamFormationIndex teamFormationIndex){
+    public BattleTeam load(DataStore dataStore,TeamFormationIndex teamFormationIndex){
         this.distributionId = teamFormationIndex.teamId;
         dataStore.load(this);
         for(long id : unitInstanceIndex){
@@ -95,6 +101,7 @@ public class BattleTeam extends RecoverableObject {
             if(!dataStore.load(equipmentInstance)) continue;
             equipmentInstances.add(equipmentInstance);
         }
+        return this;
     }
 
     public void save(DataStore dataStore,TeamFormationIndex teamFormationIndex,int teamCreationWaitingTime){
