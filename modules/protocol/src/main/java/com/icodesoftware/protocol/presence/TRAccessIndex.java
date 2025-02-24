@@ -3,11 +3,8 @@ package com.icodesoftware.protocol.presence;
 import com.google.gson.JsonObject;
 import com.icodesoftware.AccessIndex;
 import com.icodesoftware.Distributable;
-import com.icodesoftware.util.NaturalKey;
-import com.icodesoftware.util.RecoverableObject;
 
-
-public class TRAccessIndex extends RecoverableObject implements AccessIndex {
+public class TRAccessIndex extends TROwnerObject implements AccessIndex {
 
     protected int referenceId;
     public TRAccessIndex(){
@@ -36,10 +33,6 @@ public class TRAccessIndex extends RecoverableObject implements AccessIndex {
         return "Access ["+owner+"] Distribution ID ["+distributionId+"] ReferenceID ["+referenceId+"]";
     }
 
-    public Key key(){
-        return new NaturalKey(this.owner);
-    }
-
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("login",owner);
@@ -61,20 +54,5 @@ public class TRAccessIndex extends RecoverableObject implements AccessIndex {
         buffer.writeLong(distributionId);
         return true;
     }
-    @Override
-    public boolean readKey(DataBuffer buffer){
-        owner = buffer.readUTF8();
-        return true;
-    }
-    @Override
-    public boolean writeKey(DataBuffer buffer){
-        if(owner==null) return false;
-        buffer.writeUTF8(owner);
-        return true;
-    }
 
-    @Override
-    public boolean validate() {
-        return owner!=null && owner.length()>4;
-    }
 }
