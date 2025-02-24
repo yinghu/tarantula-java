@@ -85,6 +85,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             BattleTeam defenseTeam = defenseTeam(rating);
             if(defenseTeam != null){
                 //calculate the estimated pvp points if the player wins.
+                defenseTeam.battled = true; //sampling
+                defenseTeam.battlePoint = 100; //sampling
                 defenseTeam.winPointsEstimated = 100;//sampling
                 defenseTeam.elo = rating.level();
                 matches.add(defenseTeam);
