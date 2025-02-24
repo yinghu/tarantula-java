@@ -39,4 +39,13 @@ public class PlayerBattleLogIndex extends RecoverableObject {
         buffer.writeLong(battleId4);
         return true;
     }
+
+    public void update(long latestBattleId){
+        battleId0 = battleId1;
+        battleId1 = battleId2;
+        battleId2 = battleId3;
+        battleId3 = battleId4;
+        battleId4 = latestBattleId;
+        update();
+    }
 }

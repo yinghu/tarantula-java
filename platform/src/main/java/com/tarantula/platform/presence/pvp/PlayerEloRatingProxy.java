@@ -41,11 +41,15 @@ public class PlayerEloRatingProxy extends RecoverableObject implements Rating {
     public Rating elo(boolean win,long opponentId,long teamId){
         BattleTeam offenseTeam = this.platformGameServiceProvider.pvpBattleServiceProvider().defenseTeam(teamId);
         BattleTeam defenseTeam = this.platformGameServiceProvider.pvpBattleServiceProvider().defenseTeam(opponentId);
-
+        BattleEndResult gameEnd = new BattleEndResult();
+        gameEnd.defenseTeamId = opponentId;
+        gameEnd.offensePlayerId = offenseTeam.playerId;
+        gameEnd.defensePlayerId = defenseTeam.playerId;
+        gameEnd.offenseTeamId = teamId;
         Rating opponentRaking = this.platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(defenseTeam.playerId));
-
+        gameEnd.offenseEloLevelUpdated = level();
+        gameEnd.defenseEloLevelUpdated = opponentRaking.level();
         PVPPointGenerator.updateELO(playerRanking,opponentRaking,offenseTeam.teamPower,defenseTeam.teamPower,win);
-
         playerRanking.update();
 
         boolean isDefenseOnCooldown = this.platformGameServiceProvider.pvpBattleServiceProvider().isDefenseOnCooldown(defenseTeam.playerId);
@@ -58,9 +62,11 @@ public class PlayerEloRatingProxy extends RecoverableObject implements Rating {
             this.platformGameServiceProvider.pvpBattleServiceProvider().startDefenseCooldown(defenseTeam.playerId);
         }
 
-        GameEndEvent gameEndEvent = new GameEndEvent();
-        platformGameServiceProvider.pvpBattleServiceProvider().onBattleEnd(gameEndEvent);
-
+        gameEnd.offenseEloLevelDelta = level()-gameEnd.offenseEloLevelUpdated;
+        gameEnd.defenseEloLevelDelta = opponentRaking.level()-gameEnd.defenseEloLevelUpdated;
+        gameEnd.offenseEloLevelUpdated = level();
+        gameEnd.defenseEloLevelUpdated = opponentRaking.level();
+        platformGameServiceProvider.pvpBattleServiceProvider().onBattleEnd(gameEnd);
         return this;
     }
 }
