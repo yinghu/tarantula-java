@@ -8,7 +8,7 @@ import com.icodesoftware.logging.JDKLogger;
 
 
 import com.icodesoftware.util.BufferUtil;
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 
 import com.icodesoftware.util.FileUtil;
 
@@ -382,7 +382,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         DataStore ds = this.tarantulaContext.masterDataStore();
         LobbyTypeIdIndex query = new LobbyTypeIdIndex(tarantulaContext.node().deploymentId(),onView.owner());
         if(!ds.load(query)){
-            return new ResponseHeader("create/update view","cannot create view",false);
+            return new TRResponse("create/update view","cannot create view",false);
         }
         boolean updated = false;
         onView.owner(query.index());
@@ -393,7 +393,7 @@ public class PlatformDeploymentServiceProvider implements DeploymentServiceProvi
         if(updated){
             this.tarantulaContext.integrationCluster().deployService().onUpdateView(onView);
         }
-        return new ResponseHeader("create/update view",updated?"view deployed->"+onView.moduleContext():"cannot create view",updated);
+        return new TRResponse("create/update view",updated?"view deployed->"+onView.moduleContext():"cannot create view",updated);
     }
 
     private void register(OnLobby onLobby){

@@ -1,12 +1,12 @@
 package com.tarantula.platform.service;
 
 import com.icodesoftware.OnAccess;
-import com.icodesoftware.util.OnApplicationHeader;
+import com.icodesoftware.util.TROnApplication;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 import java.util.Map;
 
-public class AccessKey extends OnApplicationHeader implements OnAccess {
+public class AccessKey extends TROnApplication implements OnAccess {
 
     public static String LABEL = "accessKey";
     public AccessKey(){

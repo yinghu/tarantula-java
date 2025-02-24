@@ -3,7 +3,7 @@ package com.icodesoftware.util;
 import com.icodesoftware.OnAccess;
 
 
-public class OnApplicationHeader extends ResponseHeader implements OnAccess {
+public class TROnApplication extends TRResponse implements OnAccess {
 
     protected long tournamentId;
 

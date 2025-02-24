@@ -2,12 +2,12 @@ package com.tarantula.game;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 import com.tarantula.platform.resource.GameResource;
 
 import java.util.List;
 
-public class GameResourceContext extends ResponseHeader {
+public class GameResourceContext extends TRResponse {
 
     private List<GameResource> itemList;
 

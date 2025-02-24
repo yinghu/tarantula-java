@@ -8,29 +8,23 @@ import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.lmdb.LMDBDataStoreProvider;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.protocol.GameServerListener;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 
-import com.icodesoftware.util.ResponseHeader;
-import com.icodesoftware.util.SnowflakeKey;
+import com.icodesoftware.util.TRResponse;
 
 import com.icodesoftware.util.TimeUtil;
 
-import com.perfectday.games.earth8.inbox.ItemGrantEventQuery;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.*;
 import com.tarantula.platform.inbox.*;
 import com.tarantula.platform.presence.PlatformBannedPlayer;
-import com.tarantula.platform.presence.PlatformBannedPlayerQuery;
 import com.tarantula.platform.presence.*;
 import com.tarantula.platform.util.OnAccessDeserializer;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -132,7 +126,7 @@ public class AdminRoleModule implements Module{
                 }
                 else{
                     //reach max count
-                    session.write(this.builder.create().toJson(new ResponseHeader(session.action(),"you already have max game clusters",false)).getBytes());
+                    session.write(this.builder.create().toJson(new TRResponse(session.action(),"you already have max game clusters",false)).getBytes());
                 }
             }
         }
@@ -182,17 +176,17 @@ public class AdminRoleModule implements Module{
             Account acc = userService.loadAccount(_u);
             if(acc.trial()||acc.subscribed()){
                 boolean suc = this.deploymentServiceProvider.launchGameCluster(gameCluster);
-                session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"operation successfully":"operation failed",suc)).getBytes());
+                session.write(this.builder.create().toJson(new TRResponse(session.action(),suc?"operation successfully":"operation failed",suc)).getBytes());
             }
             else {
-                session.write(this.builder.create().toJson(new ResponseHeader(session.action(), "no subscription or trial found", false)).getBytes());
+                session.write(this.builder.create().toJson(new TRResponse(session.action(), "no subscription or trial found", false)).getBytes());
             }
         }
 
         else if(session.action().equals("onShutdownGameCluster")){
             GameCluster gc = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
             boolean suc = this.deploymentServiceProvider.shutdownGameCluster(gc);
-            session.write(this.builder.create().toJson(new ResponseHeader(session.action(),suc?"operation successfully":"operation failed",suc)).getBytes());
+            session.write(this.builder.create().toJson(new TRResponse(session.action(),suc?"operation successfully":"operation failed",suc)).getBytes());
         }
         else if(session.action().equals("onItemGrantEvent")){
             //Parse Data From UI
@@ -307,7 +301,7 @@ public class AdminRoleModule implements Module{
 
         }
         else{
-            session.write(this.builder.create().toJson(new ResponseHeader("onError", session.action()+" operation not supported", false)).getBytes());
+            session.write(this.builder.create().toJson(new TRResponse("onError", session.action()+" operation not supported", false)).getBytes());
         }
         return false;
     }
@@ -316,7 +310,7 @@ public class AdminRoleModule implements Module{
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
         this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
+        this.builder.registerTypeAdapter(TRResponse.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.tokenValidatorProvider = this.context.serviceProvider(TokenValidatorProvider.NAME);
         this.deploymentServiceProvider = this.context.serviceProvider(DeploymentServiceProvider.NAME);

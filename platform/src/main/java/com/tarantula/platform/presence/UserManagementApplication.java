@@ -4,7 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.protocol.presence.TROnSession;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.*;
@@ -119,7 +119,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 onPlatformProvider(onSession,session,thirdPartyLogin,deviceId);
             }
             else{
-                session.write(this.builder.create().toJson(new ResponseHeader("onToken", "invalid token", false)).getBytes());
+                session.write(this.builder.create().toJson(new TRResponse("onToken", "invalid token", false)).getBytes());
             }
         }
         else if(session.action().equals("onTicket")){//validate game server connection
@@ -131,7 +131,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 session.write(this.builder.create().toJson(ptx).getBytes());
             }
             else{
-                session.write(this.builder.create().toJson(new ResponseHeader("onTicket", "invalid ticket", false)).getBytes());
+                session.write(this.builder.create().toJson(new TRResponse("onTicket", "invalid ticket", false)).getBytes());
             }
         }
         else if(session.action().equals("onTokenRegister")){
@@ -155,16 +155,16 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                     onPlatformProvider(onSession,session,thirdPartyLogin,deviceId);
                 }
                 else{
-                    session.write(builder.create().toJson(new ResponseHeader(session.action(),false,0,"login [" + acc.property("login") + "] cannot be registered","error")).getBytes());
+                    session.write(builder.create().toJson(new TRResponse(session.action(),false,0,"login [" + acc.property("login") + "] cannot be registered","error")).getBytes());
                 }
             }else{
-                session.write(this.builder.create().toJson(new ResponseHeader("onToken", "invalid token", false)).getBytes());
+                session.write(this.builder.create().toJson(new TRResponse("onToken", "invalid token", false)).getBytes());
             }
         }
         else if(session.action().equals("onRegister")){
             AccessIndex _query = accessIndexService.get((String) acc.property(OnAccess.LOGIN));
             if(_query==null){//double-check
-                session.write(builder.create().toJson(new ResponseHeader(session.action(),false,0,"login [" + acc.property("login") + "] cannot be registered","error")).getBytes());
+                session.write(builder.create().toJson(new TRResponse(session.action(),false,0,"login [" + acc.property("login") + "] cannot be registered","error")).getBytes());
             }
             else{
                 Access access = this.createLogin(acc,session.distributionId(),AccessControl.admin.name(),false,"password",true);
@@ -211,7 +211,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 onSession(access,session);
             }
             else{
-                session.write(this.builder.create().toJson(new ResponseHeader("onDevice","wrong device id", false)).getBytes());
+                session.write(this.builder.create().toJson(new TRResponse("onDevice","wrong device id", false)).getBytes());
             }
         }
         else if(session.action().equals("onResetCode")){
@@ -237,7 +237,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                     onSession(onSession,session);
                 }
                 else{
-                    session.write(this.builder.create().toJson(new ResponseHeader("onResetPassword", "Invalid recovery", false)).getBytes());
+                    session.write(this.builder.create().toJson(new TRResponse("onResetPassword", "Invalid recovery", false)).getBytes());
                 }
             }
         }
@@ -263,7 +263,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 onSession(access,session);
             }
             else{
-                session.write(this.builder.create().toJson(new ResponseHeader("onDeveloper","wrong device id", false)).getBytes());
+                session.write(this.builder.create().toJson(new TRResponse("onDeveloper","wrong device id", false)).getBytes());
             }
         }
         else{

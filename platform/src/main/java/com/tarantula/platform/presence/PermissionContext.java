@@ -2,11 +2,11 @@ package com.tarantula.platform.presence;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 
 import java.util.List;
 
-public class PermissionContext extends ResponseHeader {
+public class PermissionContext extends TRResponse {
     public int maxGameClusterCount;
     public int currentCount;
     public int maxLobbyCount;

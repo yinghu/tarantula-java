@@ -2,14 +2,14 @@ package com.perfectday.games.earth8.inbox;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnAccess;
-import com.icodesoftware.util.OnApplicationHeader;
+import com.icodesoftware.util.TROnApplication;
 import com.icodesoftware.util.TimeUtil;
 import com.perfectday.games.earth8.Earth8PortableRegistry;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class ItemGrantEvent extends OnApplicationHeader implements OnAccess {
+public class ItemGrantEvent extends TROnApplication implements OnAccess {
     public static final String LABEL = "inbox";
 
     public String type;

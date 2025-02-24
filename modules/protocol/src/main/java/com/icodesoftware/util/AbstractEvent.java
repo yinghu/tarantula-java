@@ -3,7 +3,7 @@ package com.icodesoftware.util;
 import com.icodesoftware.Event;
 import com.icodesoftware.service.EventService;
 
-public class AbstractEvent extends OnApplicationHeader implements Event {
+public class AbstractEvent extends TROnApplication implements Event {
 
     protected String tag;
     protected String destination;

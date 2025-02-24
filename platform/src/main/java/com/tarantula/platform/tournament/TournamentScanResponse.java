@@ -2,11 +2,11 @@ package com.tarantula.platform.tournament;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 
 import java.util.List;
 
-public class TournamentScanResponse extends ResponseHeader {
+public class TournamentScanResponse extends TRResponse {
 
     private List<TournamentOnNode> tournamentOnNodes;
 

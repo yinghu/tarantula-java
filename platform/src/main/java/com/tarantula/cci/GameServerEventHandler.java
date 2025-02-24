@@ -9,7 +9,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.Base64Util;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.GameCluster;
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.room.ChannelStub;
 import com.tarantula.platform.room.ConnectionStub;
@@ -155,7 +155,7 @@ public class GameServerEventHandler extends AbstractRequestHandler {
     public void start() throws Exception {
         super.start();
         this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
+        this.builder.registerTypeAdapter(TRResponse.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(ConnectionStub.class,new ConnectionDeserializer());
         this.builder.registerTypeAdapter(ChannelStub.class,new ChannelDeserializer());
         log.info("Game server event handler started");

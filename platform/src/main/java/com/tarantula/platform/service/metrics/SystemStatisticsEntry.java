@@ -5,12 +5,12 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.Distributable;
 
 import com.icodesoftware.Statistics;
-import com.icodesoftware.util.OnApplicationHeader;
+import com.icodesoftware.util.TROnApplication;
 import com.icodesoftware.util.TimeUtil;
 
 import java.time.LocalDateTime;
 
-public class SystemStatisticsEntry extends OnApplicationHeader implements Statistics.Entry {
+public class SystemStatisticsEntry extends TROnApplication implements Statistics.Entry {
 
     //private String name;
     private double total=0;

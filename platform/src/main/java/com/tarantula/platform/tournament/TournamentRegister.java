@@ -3,14 +3,14 @@ package com.tarantula.platform.tournament;
 import com.icodesoftware.Tournament;
 import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.TimeUtil;
-import com.icodesoftware.util.OnApplicationHeader;
+import com.icodesoftware.util.TROnApplication;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-public class TournamentRegister extends OnApplicationHeader {
+public class TournamentRegister extends TROnApplication {
 
     private AtomicInteger totalJoined = new AtomicInteger(0);
 

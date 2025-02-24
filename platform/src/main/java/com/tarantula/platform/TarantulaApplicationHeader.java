@@ -2,7 +2,7 @@ package com.tarantula.platform;
 
 import com.google.gson.GsonBuilder;
 import com.icodesoftware.*;
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 import com.tarantula.platform.util.*;
 
 public class TarantulaApplicationHeader implements TarantulaApplication {
@@ -18,14 +18,14 @@ public class TarantulaApplicationHeader implements TarantulaApplication {
     public void onError(Session session, Exception ex) {
         this.context.log(session.toString(),ex, OnLog.ERROR);
         String msg = ex.getMessage()!=null?ex.getMessage():"Unexpected error";
-        session.write(new ResponseHeader("onError",false,400,msg,"error").toJson().toString().getBytes());
+        session.write(new TRResponse("onError",false,400,msg,"error").toJson().toString().getBytes());
     }
 
 
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
         this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
+        this.builder.registerTypeAdapter(TRResponse.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
         this.builder.registerTypeAdapter(OnAccessTrack.class,new OnAccessSerializer());
     }

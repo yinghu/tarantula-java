@@ -4,7 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.platform.GameCluster;
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.event.ServiceActionEvent;
 import com.tarantula.platform.util.ResponseSerializer;
@@ -57,7 +57,7 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
                     this.eventService.publish(event);
                 }else{
                     //send login failed back
-                    byte[] eb = this.builder.create().toJson(new ResponseHeader("onLogin","wrong login/password combination",false)).getBytes();
+                    byte[] eb = this.builder.create().toJson(new TRResponse("onLogin","wrong login/password combination",false)).getBytes();
                     super.onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                 }
             }
@@ -81,12 +81,12 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
                         this.eventService.publish(event);
                     }
                     else{
-                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onTokenRegister","["+magicKey+"] not available",false)).getBytes();
+                        byte[] eb = this.builder.create().toJson(new TRResponse("onTokenRegister","["+magicKey+"] not available",false)).getBytes();
                         super.onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                     }
                 }
                 else{
-                    byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service not available,will be back shortly",false)).getBytes();
+                    byte[] eb = this.builder.create().toJson(new TRResponse("onToken","service not available,will be back shortly",false)).getBytes();
                     super.onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                 }
             }
@@ -99,7 +99,7 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
                     event.routingNumber(_routingKey.routingNumber());
                     this.eventService.publish(event);
                 }else{
-                    byte[] eb = this.builder.create().toJson(new ResponseHeader("onTicket","ticket not exist",false)).getBytes();
+                    byte[] eb = this.builder.create().toJson(new TRResponse("onTicket","ticket not exist",false)).getBytes();
                     super.onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                 }
             }
@@ -113,12 +113,12 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
                         event.routingNumber(_routingKey.routingNumber());
                         this.eventService.publish(event);
                     }else{
-                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onRegister","["+magicKey+"] not available",false)).getBytes();
+                        byte[] eb = this.builder.create().toJson(new TRResponse("onRegister","["+magicKey+"] not available",false)).getBytes();
                         super.onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                     }
                 }
                 else{
-                    byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service not available,will be back shortly",false)).getBytes();
+                    byte[] eb = this.builder.create().toJson(new TRResponse("onToken","service not available,will be back shortly",false)).getBytes();
                     super.onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                 }
             }
@@ -141,12 +141,12 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
                         this.eventService.publish(event);
                     }
                     else{
-                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onDeviceRegister","["+magicKey+"] not available",false)).getBytes();
+                        byte[] eb = this.builder.create().toJson(new TRResponse("onDeviceRegister","["+magicKey+"] not available",false)).getBytes();
                         super.onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                     }
                 }
                 else{
-                    byte[] eb = this.builder.create().toJson(new ResponseHeader("onDevice","service not available,will be back shortly",false)).getBytes();
+                    byte[] eb = this.builder.create().toJson(new TRResponse("onDevice","service not available,will be back shortly",false)).getBytes();
                     super.onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                 }
             }
@@ -164,7 +164,7 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
                     this.eventService.publish(event);
                 }else{
                     //send login failed back
-                    byte[] eb = this.builder.create().toJson(new ResponseHeader("onResetPassword","wrong login/password combination",false)).getBytes();
+                    byte[] eb = this.builder.create().toJson(new TRResponse("onResetPassword","wrong login/password combination",false)).getBytes();
                     super.onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                 }
             }
@@ -198,12 +198,12 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
                         this.eventService.publish(event);
                     }
                     else{
-                        byte[] eb = this.builder.create().toJson(new ResponseHeader("onDeveloperRegister","["+magicKey+"] not available",false)).getBytes();
+                        byte[] eb = this.builder.create().toJson(new TRResponse("onDeveloperRegister","["+magicKey+"] not available",false)).getBytes();
                         super.onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                     }
                 }
                 else{
-                    byte[] eb = this.builder.create().toJson(new ResponseHeader("onToken","service not available,will be back shortly",false)).getBytes();
+                    byte[] eb = this.builder.create().toJson(new TRResponse("onToken","service not available,will be back shortly",false)).getBytes();
                     super.onEvent(new ResponsiveEvent("",event.sessionId(),eb,true));
                 }
             }
@@ -217,7 +217,7 @@ public class UserEventHandler extends AbstractRequestHandler implements AccessIn
     public void start() throws Exception {
         super.start();
         this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
+        this.builder.registerTypeAdapter(TRResponse.class,new ResponseSerializer());
         log.info("User handler started");
     }
 

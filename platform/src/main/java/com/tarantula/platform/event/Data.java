@@ -2,9 +2,9 @@ package com.tarantula.platform.event;
 import com.hazelcast.nio.serialization.Portable;
 import com.icodesoftware.Session;
 import com.icodesoftware.service.EventService;
-import com.icodesoftware.util.OnApplicationHeader;
+import com.icodesoftware.util.TROnApplication;
 
-abstract public class Data extends OnApplicationHeader implements Portable{
+abstract public class Data extends TROnApplication implements Portable{
 
     protected transient String destination;
 

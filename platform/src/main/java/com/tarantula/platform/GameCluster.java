@@ -10,7 +10,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ApplicationSchema;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.util.OnApplicationHeader;
+import com.icodesoftware.util.TROnApplication;
 import com.tarantula.game.service.GameConfigurationSetup;
 import com.tarantula.game.service.GameObjectSetup;
 import com.tarantula.game.service.PlatformGameServiceProvider;
@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 
-public class GameCluster extends OnApplicationHeader implements ApplicationSchema,Portable, ApplicationPreSetup.Listener, Inventory.Listener {
+public class GameCluster extends TROnApplication implements ApplicationSchema,Portable, ApplicationPreSetup.Listener, Inventory.Listener {
 
     private TarantulaLogger logger = JDKLogger.getLogger(GameCluster.class);
 

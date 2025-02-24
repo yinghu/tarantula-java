@@ -3,7 +3,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.protocol.ProtocolPortableRegistry;
-import com.icodesoftware.util.OnApplicationHeader;
+import com.icodesoftware.util.TROnApplication;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class TRStatistics extends OnApplicationHeader implements Statistics {
+public class TRStatistics extends TROnApplication implements Statistics {
 
     private Map<String,StatisticsEntry> mappings = new ConcurrentHashMap<>();
 

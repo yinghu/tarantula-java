@@ -5,11 +5,11 @@ import com.icodesoftware.LeaderBoard;
 
 import com.icodesoftware.Statistics;
 import com.icodesoftware.util.BufferProxy;
-import com.icodesoftware.util.OnApplicationHeader;
+import com.icodesoftware.util.TROnApplication;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
 
-public class LeaderBoardEntry extends OnApplicationHeader implements LeaderBoard.Entry {
+public class LeaderBoardEntry extends TROnApplication implements LeaderBoard.Entry {
 
     private double value=0;
     private String classifier;

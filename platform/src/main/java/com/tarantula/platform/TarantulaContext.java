@@ -732,7 +732,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
     }
 
     public Response checkResource(OnView pending,String targetFolder){
- 	    Response response = new ResponseHeader();
+ 	    Response response = new TRResponse();
  	    try{
  	        int ix = pending.moduleResourceFile().lastIndexOf('/');
  	        String checkFile = ix<0?pending.moduleResourceFile():pending.moduleResourceFile().substring(ix+1);

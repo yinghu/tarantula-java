@@ -3,10 +3,10 @@ package com.tarantula.platform.presence.saves;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Recoverable;
 import com.tarantula.platform.AssociateKey;
-import com.icodesoftware.util.OnApplicationHeader;
+import com.icodesoftware.util.TROnApplication;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
-public class SaveRevisionInfo extends OnApplicationHeader {
+public class SaveRevisionInfo extends TROnApplication {
 
     public int clientRevisionNumber;
     public String deviceId;

@@ -7,8 +7,7 @@ import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.MatchMakingComparator;
-import com.tarantula.platform.AccessControl;
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 import com.tarantula.platform.lobby.LobbyItem;
 import com.tarantula.platform.util.ResponseSerializer;
 
@@ -62,7 +61,7 @@ public class MatchMakingModule extends ModuleHeader implements Configurable.List
     public void setup(ApplicationContext context) throws Exception {
         super.setup(context);
         this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
+        this.builder.registerTypeAdapter(TRResponse.class,new ResponseSerializer());
         this.mLobby = new ConcurrentHashMap<>();//max matching level
         lobbyId = this.context.descriptor().typeId().replace("data","lobby");
         this.maxRank = this.gameServiceProvider.gameCluster().maxLobbyCount();//((Number)this.gameServiceProvider.configuration().property("matchMakingMaxRank")).intValue();

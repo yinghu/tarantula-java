@@ -9,7 +9,7 @@ import com.icodesoftware.service.OnLobby;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.icodesoftware.service.UserService;
 import com.icodesoftware.util.JsonUtil;
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 import com.tarantula.platform.*;
 import com.tarantula.platform.util.*;
 
@@ -105,13 +105,13 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             if(userService.updateEmail(onAccess)){
                 String code = this.deploymentServiceProvider.resetCode(session.systemId());
                 if(this.context.postOffice().onEmail(email).send(code)){
-                    session.write(this.builder.create().toJson(new ResponseHeader("","check email for code", true)).getBytes());
+                    session.write(this.builder.create().toJson(new TRResponse("","check email for code", true)).getBytes());
                 }else {
-                    session.write(this.builder.create().toJson(new ResponseHeader("","system issue, try later", false)).getBytes());
+                    session.write(this.builder.create().toJson(new TRResponse("","system issue, try later", false)).getBytes());
                 }
             }
             else{
-                session.write(this.builder.create().toJson(new ResponseHeader("","wrong email format ["+email+"]",false)).getBytes());
+                session.write(this.builder.create().toJson(new TRResponse("","wrong email format ["+email+"]",false)).getBytes());
             }
         }
         else if(session.action().equals("onRequestCode")){
@@ -123,9 +123,9 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
                 if(u.emailAddress()!=null&&u.emailAddress().contains("@")){
                     String code = this.deploymentServiceProvider.resetCode(session.systemId());
                     if(this.context.postOffice().onEmail(u.emailAddress()).send(code)){
-                        session.write(this.builder.create().toJson(new ResponseHeader("","check email for code", true)).getBytes());
+                        session.write(this.builder.create().toJson(new TRResponse("","check email for code", true)).getBytes());
                     }else {
-                        session.write(this.builder.create().toJson(new ResponseHeader("","system issue, try later", false)).getBytes());
+                        session.write(this.builder.create().toJson(new TRResponse("","system issue, try later", false)).getBytes());
                     }
                 }
                 else{
@@ -183,15 +183,15 @@ public class PresenceApplication extends TarantulaApplicationHeader implements C
             OnAccess onAccess = this.builder.create().fromJson(new String(payload).trim(),OnAccess.class);
             onAccess.property(OnAccess.SYSTEM_ID,session.systemId());
             boolean suc = this.userService.changePassword(onAccess);
-            ResponseHeader responseHeader = new ResponseHeader(session.action(),suc?"You have changed password":"Failed to change password",suc);
+            TRResponse responseHeader = new TRResponse(session.action(),suc?"You have changed password":"Failed to change password",suc);
             session.write(this.builder.create().toJson(responseHeader).getBytes());
         }
         else if (session.action().equals("onAbsence")) {
             this.context.absence(session);
-            session.write(this.builder.create().toJson(new ResponseHeader("onAbsence", "off session [" + session.stub() + "]", true)).getBytes());
+            session.write(this.builder.create().toJson(new TRResponse("onAbsence", "off session [" + session.stub() + "]", true)).getBytes());
         }
         else{
-            session.write(this.builder.create().toJson(new ResponseHeader("onError", "operation not supported", false)).getBytes());
+            session.write(this.builder.create().toJson(new TRResponse("onError", "operation not supported", false)).getBytes());
         }
     }
     private Access user(long systemId){

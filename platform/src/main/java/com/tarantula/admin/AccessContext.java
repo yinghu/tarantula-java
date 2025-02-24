@@ -3,11 +3,11 @@ package com.tarantula.admin;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Access;
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 
 import java.util.List;
 
-public class AccessContext extends ResponseHeader {
+public class AccessContext extends TRResponse {
     public List<Access> userList;
     public List<SubscriptionItem> subscriptionList;
     public AccessContext(){

@@ -6,13 +6,13 @@ import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Connection;
 
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 import com.tarantula.platform.event.PortableEventRegistry;
 
 import java.io.IOException;
 
 
-public class ClientConnection extends ResponseHeader implements Connection, Portable {
+public class ClientConnection extends TRResponse implements Connection, Portable {
 
     protected String configurationTypeId;
     protected String configurationName;

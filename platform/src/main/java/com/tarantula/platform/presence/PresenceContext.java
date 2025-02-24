@@ -1,11 +1,11 @@
 package com.tarantula.platform.presence;
 
 import com.icodesoftware.*;
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 
 import java.util.List;
 
-public class PresenceContext extends ResponseHeader {
+public class PresenceContext extends TRResponse {
 
     public Access access;
     public Account account;

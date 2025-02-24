@@ -2,12 +2,12 @@ package com.tarantula.admin;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 import com.tarantula.platform.item.ConfigurableObject;
 
 import java.util.List;
 
-public class ItemAdminContext extends ResponseHeader {
+public class ItemAdminContext extends TRResponse {
 
     private List<ConfigurableObject> itemList;
 

@@ -4,12 +4,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Tournament;
 
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 
 
 import java.util.List;
 
-public class TournamentContext extends ResponseHeader {
+public class TournamentContext extends TRResponse {
 
     private List<Tournament> itemList;
     private Tournament.RaceBoard raceBoard;

@@ -4,9 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.service.Metrics;
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 
-public class MetricsContext extends ResponseHeader {
+public class MetricsContext extends TRResponse {
 
     public Metrics metrics;
     public MetricsContext(){

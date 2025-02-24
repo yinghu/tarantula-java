@@ -3,11 +3,11 @@ package com.tarantula.platform.store;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Inventory;
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 import java.util.List;
 import java.util.Map;
 
-public class StorePurchase extends ResponseHeader {
+public class StorePurchase extends TRResponse {
 
     public String transactionId;
     public List<Inventory> inventoryList;

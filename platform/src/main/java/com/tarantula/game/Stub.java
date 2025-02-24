@@ -3,13 +3,13 @@ package com.tarantula.game;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.Channel;
-import com.icodesoftware.util.OnApplicationHeader;
+import com.icodesoftware.util.TROnApplication;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.room.GameRoom;
 
 import java.time.LocalDateTime;
 
-public class Stub extends OnApplicationHeader{
+public class Stub extends TROnApplication {
 
     public final static String LABEL = "stub";
 

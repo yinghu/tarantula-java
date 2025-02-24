@@ -2,10 +2,10 @@ package com.perfectday.games.earth8.inbox;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnAccess;
-import com.icodesoftware.util.OnApplicationHeader;
+import com.icodesoftware.util.TROnApplication;
 import com.perfectday.games.earth8.Earth8PortableRegistry;
 
-public class PlayerAction extends OnApplicationHeader implements OnAccess {
+public class PlayerAction extends TROnApplication implements OnAccess {
 
     public static final String LABEL = "inbox";
     public boolean completed;

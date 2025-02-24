@@ -3,11 +3,11 @@ package com.tarantula.admin;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.tarantula.platform.GameCluster;
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 
 import java.util.List;
 
-public class GameClusterContext extends ResponseHeader {
+public class GameClusterContext extends TRResponse {
     public List<GameCluster> gameClusterList;
     public int index;
     public int pageSize=1;

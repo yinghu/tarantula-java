@@ -10,7 +10,7 @@ import com.icodesoftware.*;
 
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 import com.tarantula.platform.*;
 import com.tarantula.platform.bootstrap.ServiceBootstrap;
 import com.tarantula.platform.bootstrap.TarantulaMain;
@@ -36,7 +36,7 @@ public class ClusterDeployService implements ManagedService, RemoteService, Memb
         tarantulaContext = TarantulaContext.getInstance();
         this.deploymentServiceProvider = this.tarantulaContext.deploymentService();
         this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
+        this.builder.registerTypeAdapter(TRResponse.class,new ResponseSerializer());
         new ServiceBootstrap(TarantulaContext._integrationClusterStarted,TarantulaContext._deployServiceStarted,new DeployServiceBootstrap(this),"deploy-service",true).start();
     }
     public void setup(){

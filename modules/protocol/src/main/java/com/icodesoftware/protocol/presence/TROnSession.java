@@ -2,10 +2,10 @@ package com.icodesoftware.protocol.presence;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnSession;
-import com.icodesoftware.util.OnApplicationHeader;
+import com.icodesoftware.util.TROnApplication;
 
 
-public class TROnSession extends OnApplicationHeader implements OnSession {
+public class TROnSession extends TROnApplication implements OnSession {
 
     private String token;
 

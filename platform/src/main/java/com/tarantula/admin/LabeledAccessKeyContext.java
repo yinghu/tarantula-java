@@ -3,11 +3,11 @@ package com.tarantula.admin;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnAccess;
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 
 import java.util.List;
 
-public class LabeledAccessKeyContext extends ResponseHeader {
+public class LabeledAccessKeyContext extends TRResponse {
 
     public List<OnAccess> accessKeyList;
 

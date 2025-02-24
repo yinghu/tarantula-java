@@ -2,12 +2,12 @@ package com.tarantula.platform.inbox;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 
 import java.util.Comparator;
 import java.util.List;
 
-public class GlobalItemGrantList extends ResponseHeader {
+public class GlobalItemGrantList extends TRResponse {
     public List<GlobalItemGrantEvent> grantEventList;
 
     public GlobalItemGrantList(List<GlobalItemGrantEvent> grantEventList){

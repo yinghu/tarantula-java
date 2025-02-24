@@ -1,9 +1,9 @@
 package com.tarantula.game;
 
 
-import com.icodesoftware.util.OnApplicationHeader;
+import com.icodesoftware.util.TROnApplication;
 
-public class SimpleStub extends OnApplicationHeader {
+public class SimpleStub extends TROnApplication {
 
     public SimpleStub(long systemId,long stub){
         this.systemId = systemId;

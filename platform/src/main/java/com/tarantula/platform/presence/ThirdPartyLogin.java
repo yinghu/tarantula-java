@@ -1,10 +1,10 @@
 package com.tarantula.platform.presence;
 
 import com.icodesoftware.service.LoginProvider;
-import com.icodesoftware.util.OnApplicationHeader;
+import com.icodesoftware.util.TROnApplication;
 
 
-public class ThirdPartyLogin extends OnApplicationHeader implements LoginProvider {
+public class ThirdPartyLogin extends TROnApplication implements LoginProvider {
 
 
     public ThirdPartyLogin(){

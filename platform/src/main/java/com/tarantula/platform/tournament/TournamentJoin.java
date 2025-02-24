@@ -4,9 +4,9 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Session;
 import com.icodesoftware.util.SnowflakeKey;
-import com.icodesoftware.util.OnApplicationHeader;
+import com.icodesoftware.util.TROnApplication;
 
-public class TournamentJoin extends OnApplicationHeader {
+public class TournamentJoin extends TROnApplication {
 
     public static final String TOURNAMENT_JOIN_LABEL = "tournament_join";
     public static final String PLAYER_JOIN_LABEL = "player_tournament_join";

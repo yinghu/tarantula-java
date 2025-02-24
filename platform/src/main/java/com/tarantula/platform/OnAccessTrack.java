@@ -2,12 +2,12 @@ package com.tarantula.platform;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.OnAccess;
-import com.icodesoftware.util.OnApplicationHeader;
+import com.icodesoftware.util.TROnApplication;
 import com.tarantula.platform.presence.UserPortableRegistry;
 import com.icodesoftware.util.JsonUtil;
 import java.util.Map;
 
-public class OnAccessTrack extends OnApplicationHeader implements OnAccess {
+public class OnAccessTrack extends TROnApplication implements OnAccess {
 
     protected String accessKey;
     protected String accessId;

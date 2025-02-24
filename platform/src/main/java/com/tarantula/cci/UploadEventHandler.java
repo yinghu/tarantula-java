@@ -7,7 +7,7 @@ import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.GameCluster;
-import com.icodesoftware.util.ResponseHeader;
+import com.icodesoftware.util.TRResponse;
 import com.tarantula.platform.event.ResponsiveEvent;
 import com.tarantula.platform.util.ResponseSerializer;
 import com.tarantula.platform.util.SystemUtil;
@@ -51,7 +51,7 @@ public class UploadEventHandler extends AbstractRequestHandler {
     public void start() throws Exception {
         super.start();
         this.builder = new GsonBuilder();
-        this.builder.registerTypeAdapter(ResponseHeader.class,new ResponseSerializer());
+        this.builder.registerTypeAdapter(TRResponse.class,new ResponseSerializer());
         log.info("Upload handler started");
     }
 
@@ -74,7 +74,7 @@ public class UploadEventHandler extends AbstractRequestHandler {
             if (typeId == null || typeId.equals("root")) {
                 String path = exchange.path();
                 boolean suc = deployService.onUpload(path.substring(path.lastIndexOf("/") + 1), uploadContent.content);
-                ResponseHeader response = new ResponseHeader("upload", suc ? "uploaded" : "failed", suc);
+                TRResponse response = new TRResponse("upload", suc ? "uploaded" : "failed", suc);
                 return super.onEvent(new ResponsiveEvent("", event.sessionId(), this.builder.create().toJson(response).getBytes(), 0, "text/html", true));
             }
             if (typeId.equals("createGameCluster")) {

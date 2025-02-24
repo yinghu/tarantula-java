@@ -1,9 +1,9 @@
 package com.tarantula.platform;
 
-import com.icodesoftware.util.OnApplicationHeader;
+import com.icodesoftware.util.TROnApplication;
 import com.tarantula.platform.event.PortableEventRegistry;
 
-public class ExposedGameService extends OnApplicationHeader {
+public class ExposedGameService extends TROnApplication {
 
     public static final String INDEX_LABEL = "IX";
 
