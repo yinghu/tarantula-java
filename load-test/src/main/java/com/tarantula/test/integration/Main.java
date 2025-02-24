@@ -36,6 +36,7 @@ public class Main {
 
     static String inventoryKey = "inventory";
     static String campaignKey = "campaign";
+    static String battleTeamKey = "battleTeam";
     static boolean saveDataCompressed;
     public static void vmain(String[] args) throws Exception{
         HttpCaller httpCaller = new HttpCaller("http://localhost:8090");
