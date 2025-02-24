@@ -224,12 +224,36 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         return seasons.get(CURRENT_SEASON_INDEX);// currentSeason from season rotation
     }
 
-    public void onBattleEnd(GameEndEvent gameEndEvent){
-        gameEndEvent.defenseTeamId = serviceContext.distributionId();
-        gameEndEvent.defenseEloLevel = 100;
-        gameEndEvent.offenseTeamId = serviceContext.distributionId();
-        gameEndEvent.offenseEloLevel = 100;
+    public void onBattleEnd(BattleEndResult battleEndResult){
+        GameEndEvent gameEndEvent = new GameEndEvent();
+        gameEndEvent.offenseTeamId = battleEndResult.offenseTeamId;
+        gameEndEvent.offenseEloLevel = battleEndResult.offenseEloLevelUpdated;
+        gameEndEvent.defenseTeamId = battleEndResult.defenseTeamId;
+        gameEndEvent.defenseEloLevel = battleEndResult.defenseEloLevelUpdated;
         this.serviceContext.eventService().publish(gameEndEvent);
+        //generate battle log
+        BattleLogIndex battleLog = new BattleLogIndex();
+        battleLog.defenseTeamId = battleEndResult.defenseTeamId;
+        battleLog.offenseTeamId = battleEndResult.offenseTeamId;
+        battleLog.defenseEloGain = battleEndResult.defenseEloLevelDelta;
+        battleLog.offenseEloGain = battleEndResult.offenseEloLevelDelta;
+        battleLog.defenseElo = battleEndResult.defenseEloLevelUpdated;
+        if(!battleHistory.create(battleLog)){
+            logger.warn("Should be happening if disk space not full");
+            return;
+        }
+        PlayerBattleLogIndex defenseLogIndex = new PlayerBattleLogIndex();
+        defenseLogIndex.distributionId(battleEndResult.defensePlayerId);
+        defenseLogIndex.dataStore(battleHistory);
+        battleHistory.createIfAbsent(defenseLogIndex,true);
+        defenseLogIndex.update(battleLog.distributionId());
+
+        PlayerBattleLogIndex offenseLogIndex = new PlayerBattleLogIndex();
+        offenseLogIndex.distributionId(battleEndResult.defensePlayerId);
+        offenseLogIndex.dataStore(battleHistory);
+        battleHistory.createIfAbsent(offenseLogIndex,true);
+        offenseLogIndex.update(battleLog.distributionId());
+
     }
 
     private void startSeason(SeasonRuntime seasonRuntime){
