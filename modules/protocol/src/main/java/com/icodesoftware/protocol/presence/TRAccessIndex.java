@@ -3,6 +3,7 @@ package com.icodesoftware.protocol.presence;
 import com.google.gson.JsonObject;
 import com.icodesoftware.AccessIndex;
 import com.icodesoftware.Distributable;
+import com.icodesoftware.util.TROwnerObject;
 
 public class TRAccessIndex extends TROwnerObject implements AccessIndex {
 

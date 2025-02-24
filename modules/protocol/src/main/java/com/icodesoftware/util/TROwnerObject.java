@@ -1,8 +1,6 @@
-package com.icodesoftware.protocol.presence;
+package com.icodesoftware.util;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.util.NaturalKey;
-import com.icodesoftware.util.RecoverableObject;
 
 
 public class TROwnerObject extends RecoverableObject{
