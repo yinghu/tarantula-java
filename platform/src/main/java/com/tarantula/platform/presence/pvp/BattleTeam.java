@@ -69,6 +69,7 @@ public class BattleTeam extends RecoverableObject {
     @Override
     public JsonObject toJson() {
         JsonObject resp = new JsonObject();
+        resp.addProperty("teamId",distributionId);
         resp.addProperty("winPointsEstimated",winPointsEstimated);
         resp.addProperty("elo",elo);
         resp.addProperty("playerId",playerId);
