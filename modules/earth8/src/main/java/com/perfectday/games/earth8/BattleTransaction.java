@@ -95,7 +95,7 @@ public class BattleTransaction extends RecoverableObject {
         self.stageId = JsonUtil.getJsonLong(json,"StageId",0);
         self.seasonId = JsonUtil.getJsonLong(json,"SeasonId",0);
         self.opponentId = JsonUtil.getJsonLong(json,"OpponentId",0);
-        self.teamId = JsonUtil.getJsonInt(json,"TeamId",0);
+        self.teamId = JsonUtil.getJsonLong(json,"TeamId",0);
         JsonArray party = JsonUtil.getJsonArray(json, "Party");
         self.party = new long[party.size()];
         for(int i=0;i<self.party.length;i++){
