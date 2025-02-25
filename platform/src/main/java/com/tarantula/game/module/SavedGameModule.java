@@ -107,6 +107,10 @@ public class SavedGameModule extends ModuleHeader {
             MatchMaking matchMaking = gameServiceProvider.pvpBattleServiceProvider().matchMaking(session);
             session.write(matchMaking.toJson().toString().getBytes());
         }
+        else if(session.action().equals("onMatchMaking")){
+            MatchMaking matchMaking = gameServiceProvider.pvpBattleServiceProvider().matchMaking(session);
+            session.write(matchMaking.toJson().toString().getBytes());
+        }
         //pvp saves end
 
         else{
