@@ -51,16 +51,18 @@ public class PlayerEloRatingProxy extends RecoverableObject implements Rating {
         gameEnd.defenseEloLevelUpdated = opponentRaking.level();
         PVPPointGenerator.updateELO(playerRanking,opponentRaking,offenseTeam.teamPower,defenseTeam.teamPower,win);
         playerRanking.update();
+        opponentRaking.update();
 
-        boolean isDefenseOnCooldown = this.platformGameServiceProvider.pvpBattleServiceProvider().isDefenseOnCooldown(defenseTeam.playerId);
+        //Defense ELO cooldown disabled
+/*        boolean isDefenseOnCooldown = this.platformGameServiceProvider.pvpBattleServiceProvider().isDefenseOnCooldown(defenseTeam.playerId);
 
         if(!isDefenseOnCooldown || !win){
             opponentRaking.update();
         }
 
-        if(!isDefenseOnCooldown && win){
+        if(!isDefenseOnCooldown && win && opponentRaking.level() >= PVPPointGenerator.minimumCap){
             this.platformGameServiceProvider.pvpBattleServiceProvider().startDefenseCooldown(defenseTeam.playerId);
-        }
+        }*/
 
         gameEnd.offenseEloLevelDelta = level()-gameEnd.offenseEloLevelUpdated;
         gameEnd.defenseEloLevelDelta = opponentRaking.level()-gameEnd.defenseEloLevelUpdated;

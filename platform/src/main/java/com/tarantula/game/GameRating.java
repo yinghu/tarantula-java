@@ -14,7 +14,7 @@ public class GameRating extends PlayerGameObject implements Rating {
     public static int RANK_UP_LEVEL_BASE = 100;
 
     public int rank = 1; //rank of lobby
-    public int level = 1; //total level
+    public int level = 0; //total level
     public double xp =0; //total xp
     public boolean granted;
     private double levelUpXp =0;  //xp of arena level
