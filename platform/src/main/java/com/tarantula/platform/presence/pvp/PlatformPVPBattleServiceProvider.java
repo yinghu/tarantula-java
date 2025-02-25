@@ -346,10 +346,13 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         Rating rating = platformGameServiceProvider.presenceServiceProvider().rating(session);
         int[] size={0};
         matchMakingStore.backup().forEachEdgeKey(MatchMaking.rangedKey(rating.level()),"elo",(k, v)->{
-            Rating match = platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(v.readLong()));
-            //to do filter out code
-            matches.add(match);
-            size[0]++;
+            long matchId = v.readLong();
+            if(matchId != session.distributionId()){
+                Rating match = platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(matchId));
+                //to do filter out code
+                matches.add(match);
+                size[0]++;
+            }
             return size[0]<5;
         });
         return matches;
