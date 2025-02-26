@@ -16,7 +16,11 @@ public interface Event extends Session {
 	void retries(int retries);
 
 	default RoutingKey routingKey(){ return null;}
+	default void registerStreamingListener(StreamingListener listener){}
 
 	interface EventOnTopic extends Event{}
 	interface EventOnSession extends Event{}
+	interface StreamingListener{
+		void onCode(int streamCode);
+	}
 }

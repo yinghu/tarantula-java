@@ -10,6 +10,7 @@ public class AbstractEvent extends TROnApplication implements Event {
     protected int retries;
 
     protected EventService eventService;
+    protected StreamingListener streamingListener = code->{};
     @Override
     public String tag() {
         return tag;
@@ -45,4 +46,9 @@ public class AbstractEvent extends TROnApplication implements Event {
         this.retries = retries;
     }
 
+    @Override
+    public void registerStreamingListener(StreamingListener streamingListener){
+        if(streamingListener == null) return;
+        this.streamingListener = streamingListener;
+    }
 }
