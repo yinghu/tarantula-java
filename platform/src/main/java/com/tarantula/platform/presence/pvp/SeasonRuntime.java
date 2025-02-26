@@ -44,7 +44,7 @@ public class SeasonRuntime extends ConfigurableObject {
 
     @Override
     public byte[] toBinary() {
-        ByteBuffer buffer = ByteBuffer.allocate(16);
+        ByteBuffer buffer = ByteBuffer.allocate(24);
         buffer.putLong(currentSeason);
         buffer.putLong(endTime);
         buffer.putLong(sequence);

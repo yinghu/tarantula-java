@@ -11,6 +11,7 @@ import com.icodesoftware.service.ServiceContext;
 
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.item.ConfigurableObject;
+import com.tarantula.platform.presence.pvp.PvpErrorCode;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -72,12 +73,20 @@ public class SeasonCredentialConfiguration extends CredentialConfiguration {
         public Faction faction3;
 
         public JsonObject toJson(){
+            if(seasonId>0){
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("Successful",true);
+                jsonObject.addProperty("SeasonId",seasonId);
+                jsonObject.addProperty("EndTime",LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+                jsonObject.addProperty("Faction1",faction1.ordinal());
+                jsonObject.addProperty("Faction2",faction1.ordinal());
+                jsonObject.addProperty("Faction3",faction1.ordinal());
+                return jsonObject;
+            }
             JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("SeasonId",seasonId);
-            jsonObject.addProperty("EndTime",LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-            jsonObject.addProperty("Faction1",faction1.ordinal());
-            jsonObject.addProperty("Faction2",faction1.ordinal());
-            jsonObject.addProperty("Faction3",faction1.ordinal());
+            jsonObject.addProperty("Successful",false);
+            jsonObject.addProperty("ErrorCode", PvpErrorCode.NO_SEASON_SCHEDULED);
+            jsonObject.addProperty("Message","No season scheduled");
             return jsonObject;
         }
 
