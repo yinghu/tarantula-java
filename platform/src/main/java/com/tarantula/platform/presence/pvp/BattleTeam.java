@@ -68,25 +68,32 @@ public class BattleTeam extends RecoverableObject {
 
     @Override
     public JsonObject toJson() {
-        JsonObject resp = new JsonObject();
-        resp.addProperty("teamId",distributionId);
-        resp.addProperty("winPointsEstimated",winPointsEstimated);
-        resp.addProperty("elo",elo);
-        resp.addProperty("playerId",playerId);
-        resp.addProperty("teamPower",teamPower);
-        resp.addProperty("battled",battled);
-        resp.addProperty("battlePoint",battlePoint);
-        JsonArray units = new JsonArray();
-        unitInstances.forEach(unitInstance -> units.add(unitInstance.toJson()));
-        JsonArray equips = new JsonArray();
-        equipmentInstances.forEach(equipmentInstance -> equips.add(equipmentInstance.toJson()));
-        resp.add("unitInstances",units);
-        resp.add("equipmentData",equips);
-        return resp;
+        if(distributionId>0){
+            JsonObject resp = new JsonObject();
+            resp.addProperty("teamId",distributionId);
+            resp.addProperty("winPointsEstimated",winPointsEstimated);
+            resp.addProperty("elo",elo);
+            resp.addProperty("playerId",playerId);
+            resp.addProperty("teamPower",teamPower);
+            resp.addProperty("battled",battled);
+            resp.addProperty("battlePoint",battlePoint);
+            JsonArray units = new JsonArray();
+            unitInstances.forEach(unitInstance -> units.add(unitInstance.toJson()));
+            JsonArray equips = new JsonArray();
+            equipmentInstances.forEach(equipmentInstance -> equips.add(equipmentInstance.toJson()));
+            resp.add("unitInstances",units);
+            resp.add("equipmentData",equips);
+            return resp;
+        }
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("Successful",false);
+        jsonObject.addProperty("ErrorCode", PvpErrorCode.NO_TEAM_FORMATION);
+        jsonObject.addProperty("Message","No defense team formation");
+        return jsonObject;
     }
 
-    public BattleTeam load(DataStore dataStore,TeamFormationIndex teamFormationIndex){
-        this.distributionId = teamFormationIndex.teamId;
+    public BattleTeam load(DataStore dataStore,long teamId){
+        this.distributionId = teamId;
         dataStore.load(this);
         for(long id : unitInstanceIndex){
             if(id==0) continue;
@@ -102,6 +109,11 @@ public class BattleTeam extends RecoverableObject {
             if(!dataStore.load(equipmentInstance)) continue;
             equipmentInstances.add(equipmentInstance);
         }
+        return this;
+    }
+
+    public BattleTeam load(DataStore dataStore,TeamFormationIndex teamFormationIndex){
+        load(dataStore,teamFormationIndex.teamId);
         return this;
     }
 

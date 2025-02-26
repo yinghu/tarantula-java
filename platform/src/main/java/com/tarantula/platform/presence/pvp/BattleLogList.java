@@ -1,30 +1,26 @@
 package com.tarantula.platform.presence.pvp;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.icodesoftware.JsonSerializable;
+import com.icodesoftware.util.RecoverableObject;
 
 import java.util.List;
-import java.util.Map;
 
-public class BattleLogList implements JsonSerializable {
+public class BattleLogList extends RecoverableObject {
 
-    private List<BattleLog> battleLogs;
+    private final List<BattleLog> battleLogs;
     public BattleLogList(List<BattleLog> battleLogs){
         this.battleLogs = battleLogs;
     }
 
-    @Override
-    public Map<String, Object> toMap() {
-        return Map.of();
-    }
 
-    @Override
-    public void fromMap(Map<String, Object> properties) {
-
-    }
 
     @Override
     public JsonObject toJson() {
-        return null;
+        JsonObject jsonObject = new JsonObject();
+        JsonArray logs = new JsonArray();
+        battleLogs.forEach(battleLog -> logs.add(battleLog.toJson()));
+        jsonObject.add("_battleLogs",logs);
+        return jsonObject;
     }
 }

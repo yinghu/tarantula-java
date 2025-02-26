@@ -10,4 +10,5 @@ public interface PvpErrorCode {
 
     int NO_SEASON_SCHEDULED = 700003;
 
+    int NO_DEFENSE_TEAM_FORMATION = 700004;
 }
