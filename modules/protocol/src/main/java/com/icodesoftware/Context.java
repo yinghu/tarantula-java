@@ -1,5 +1,6 @@
 package com.icodesoftware;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
 
 public interface Context {
@@ -11,5 +12,6 @@ public interface Context {
     void log(String message,Exception error,int level);
 
     default void execute(Runnable runnable){}
+    default <T extends Object> T execute(Callable<T> callable){ return null;}
 
 }
