@@ -12,6 +12,4 @@ public interface Context {
 
     default void execute(Runnable runnable){}
 
-    default PostOffice postOffice(){throw new UnsupportedOperationException(); }
-    default PostOffice postOffice(Session session){ throw new UnsupportedOperationException();}
 }
