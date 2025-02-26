@@ -7,4 +7,7 @@ public interface PvpErrorCode {
     int NO_TEAM_FORMATION = 700001;
 
     int TEAM_FORMATION_TIME_LIMIT = 700002;
+
+    int NO_SEASON_SCHEDULED = 700003;
+
 }

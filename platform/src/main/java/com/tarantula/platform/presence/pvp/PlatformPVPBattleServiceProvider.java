@@ -199,8 +199,10 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     public void onLoaded(SeasonCredentialConfiguration loaded){
         long[] ix ={1};
         loaded.list().forEach(season ->{
-            seasons.put(ix[0]++,season);//season order index
+            seasons.put(ix[0],season);//season order index
             seasons.put(season.distributionId(),season);
+            logger.warn("Season installed on ["+ix[0]+"] "+season.seasonId);
+            ix[0]++;
         });
         this.rotation.seasonRotation = loaded.distributionId();
         long delay = TimeUtil.expired(loaded.startTime())? 100 : TimeUtil.durationUTCMilliseconds(LocalDateTime.now(),loaded.startTime());
@@ -221,7 +223,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     }
 
     public SeasonCredentialConfiguration.Season currentSeason(){
-        return seasons.get(CURRENT_SEASON_INDEX);// currentSeason from season rotation
+        SeasonCredentialConfiguration.Season season = seasons.get(CURRENT_SEASON_INDEX);// currentSeason from season rotation
+        return season!=null ? season : new SeasonCredentialConfiguration.Season();
     }
 
     public void onBattleEnd(BattleEndResult battleEndResult){
@@ -325,7 +328,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 return;
             }
             if(seasonRuntime.currentSeason==0){
-                SeasonCredentialConfiguration.Season startSeason = seasons.get(1);
+                SeasonCredentialConfiguration.Season startSeason = seasons.get(1L);
                 seasonRuntime.sequence = 1;
                 seasonRuntime.currentSeason = startSeason.seasonId;
                 seasonRuntime.endTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusDays(seasonRunningDays).plusMinutes(seasonTimeGap));
