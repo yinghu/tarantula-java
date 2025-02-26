@@ -1,11 +1,9 @@
 package com.tarantula.platform.presence.pvp;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.JsonSerializable;
+import com.icodesoftware.util.RecoverableObject;
 
-import java.util.Map;
-
-public class BattleLog implements JsonSerializable {
+public class BattleLog extends RecoverableObject {
 
     public int offenseEloGain; //positive for win , nagitive for lost
     public int defenseEloGain;
@@ -19,15 +17,7 @@ public class BattleLog implements JsonSerializable {
         this.defenseEloGain = battleLogIndex.defenseEloGain;
         this.defenseElo = battleLogIndex.defenseElo;
     }
-    @Override
-    public Map<String, Object> toMap() {
-        return Map.of();
-    }
 
-    @Override
-    public void fromMap(Map<String, Object> properties) {
-
-    }
 
     @Override
     public JsonObject toJson() {

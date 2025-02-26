@@ -43,7 +43,6 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private DataStore cooldownStore;
     private DataStore matchMakingStore;
     private String gameEndTopic = GameEndEvent.GAME_END_TOPIC;
-    private JsonObject battleLogMockData;
 
     public PlatformPVPBattleServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
@@ -53,9 +52,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     public void setup(ServiceContext serviceContext) {
         super.setup(serviceContext);
         Configuration configuration = serviceContext.configuration("game-presence-settings");
-        Configuration mockDataConfig = serviceContext.configuration("pvp-mock-data");
         JsonObject pvp = ((JsonElement)configuration.property("pvp")).getAsJsonObject();
-        battleLogMockData = ((JsonElement)mockDataConfig.property("battleLogMockData")).getAsJsonObject();
         teamCreationWaitingTime = pvp.get("waitingMinutesPerTeamFormation").getAsInt();
         seasonTimeGap = pvp.get("seasonTimeGapMinutes").getAsInt();
         seasonRunningDays = pvp.get("seasonRunningDays").getAsInt();
@@ -109,6 +106,14 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         return TeamFormationResponse.responseOnDefenseTeam(teamFormationIndex.timestamp());
     }
 
+    public BattleTeam currentDefenseTeam(Session session){
+        TeamFormationIndex teamFormationIndex = new TeamFormationIndex();
+        teamFormationIndex.distributionId(session.distributionId());
+        dataStore.createIfAbsent(teamFormationIndex,true);
+        if(teamFormationIndex.teamId>0) return assembly(teamFormationIndex.teamId);
+        return new BattleTeam();
+    }
+
     public TeamFormationResponse saveOffenseTeam(Session session,byte[] content){
         BattleTeam defenseTeam = BattleTeam.parse(content);
         defenseTeam.playerId = session.distributionId();
@@ -134,8 +139,12 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     public BattleLogList battleLogList(Session session){
         BattleLogList battleLogList = new BattleLogList(battleHistory(session));
-        //Mock data here
         return battleLogList;
+    }
+
+    private BattleTeam assembly(long teamId){
+        BattleTeam battleTeam = new BattleTeam();
+        return battleTeam.load(dataStore,teamId);
     }
 
     private List<BattleLog> battleHistory(Session session){
@@ -148,8 +157,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             log.distributionId(logIndex.battleId0);
             if(battleHistory.load(log)){
                 BattleLog battleLog = new BattleLog(log);
-                battleLog.defenseTeam = defenseTeam(log.defenseTeamId);
-                battleLog.offenseTeam = defenseTeam(log.offenseTeamId);
+                battleLog.defenseTeam = assembly(log.defenseTeamId);
+                battleLog.offenseTeam = assembly(log.offenseTeamId);
                 battleLogs.add(battleLog);
             }
         }
@@ -158,8 +167,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             log.distributionId(logIndex.battleId1);
             if(battleHistory.load(log)){
                 BattleLog battleLog = new BattleLog(log);
-                battleLog.defenseTeam = defenseTeam(log.defenseTeamId);
-                battleLog.offenseTeam = defenseTeam(log.offenseTeamId);
+                battleLog.defenseTeam = assembly(log.defenseTeamId);
+                battleLog.offenseTeam = assembly(log.offenseTeamId);
                 battleLogs.add(battleLog);
             }
         }
@@ -168,8 +177,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             log.distributionId(logIndex.battleId2);
             if(battleHistory.load(log)){
                 BattleLog battleLog = new BattleLog(log);
-                battleLog.defenseTeam = defenseTeam(log.defenseTeamId);
-                battleLog.offenseTeam = defenseTeam(log.offenseTeamId);
+                battleLog.defenseTeam = assembly(log.defenseTeamId);
+                battleLog.offenseTeam = assembly(log.offenseTeamId);
                 battleLogs.add(battleLog);
             }
         }
@@ -178,8 +187,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             log.distributionId(logIndex.battleId3);
             if(battleHistory.load(log)){
                 BattleLog battleLog = new BattleLog(log);
-                battleLog.defenseTeam = defenseTeam(log.defenseTeamId);
-                battleLog.offenseTeam = defenseTeam(log.offenseTeamId);
+                battleLog.defenseTeam = assembly(log.defenseTeamId);
+                battleLog.offenseTeam = assembly(log.offenseTeamId);
                 battleLogs.add(battleLog);
             }
         }
@@ -188,8 +197,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             log.distributionId(logIndex.battleId4);
             if(battleHistory.load(log)){
                 BattleLog battleLog = new BattleLog(log);
-                battleLog.defenseTeam = defenseTeam(log.defenseTeamId);
-                battleLog.offenseTeam = defenseTeam(log.offenseTeamId);
+                battleLog.defenseTeam = assembly(log.defenseTeamId);
+                battleLog.offenseTeam = assembly(log.offenseTeamId);
                 battleLogs.add(battleLog);
             }
         }
@@ -250,13 +259,11 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         defenseLogIndex.dataStore(battleHistory);
         battleHistory.createIfAbsent(defenseLogIndex,true);
         defenseLogIndex.update(battleLog.distributionId());
-
         PlayerBattleLogIndex offenseLogIndex = new PlayerBattleLogIndex();
-        offenseLogIndex.distributionId(battleEndResult.defensePlayerId);
+        offenseLogIndex.distributionId(battleEndResult.offensePlayerId);
         offenseLogIndex.dataStore(battleHistory);
         battleHistory.createIfAbsent(offenseLogIndex,true);
         offenseLogIndex.update(battleLog.distributionId());
-
     }
 
     private void startSeason(SeasonRuntime seasonRuntime){
@@ -466,8 +473,5 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         cooldownStore.update(defenseCooldown);
     }
 
-    public String battleLogMockData(){
-        return battleLogMockData.toString();
-    }
 
 }
