@@ -1,11 +1,10 @@
 package com.icodesoftware;
 
 import com.icodesoftware.service.ClusterProvider;
-import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceProvider;
 
 import java.util.List;
-import java.util.concurrent.ScheduledFuture;
+
 
 public interface ApplicationContext extends Context{
 
