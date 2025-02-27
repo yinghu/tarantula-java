@@ -1,6 +1,6 @@
 package com.icodesoftware;
 
-public interface PostOffice {
+public interface PostOffice extends Closable{
 
     //app to client
     default OnEmail onEmail(String emailAddress){ return null;}
