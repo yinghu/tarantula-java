@@ -99,12 +99,26 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             String typeId = (String) params.get(OnAccess.TYPE_ID);
             String deviceId = acc.property("deviceId")!=null?acc.property("deviceId").toString():"device-id-assigned";
 
-            boolean suc = this.context.validator().validateToken(params);
+            boolean suc;
             LoginProvider _ox = userService.loginProvider(session.distributionId());
+            String thirdPartyToken = (String) params.get("thirdPartyToken");
+
+            if(thirdPartyToken == null){
+                suc = this.context.validator().validateToken(params);
+
+                thirdPartyToken = (String) params.get("thirdPartyToken");
+                if(thirdPartyToken != null){
+                    _ox.thirdPartyToken(thirdPartyToken);
+                    _ox.update();
+                }
+            }
+            else{
+                suc = thirdPartyToken.equals(_ox.thirdPartyToken());
+            }
 
             if(suc && _ox!=null ){
                 OnSession onSession = this.login(session.distributionId(),_ox.password(),session);
-                onSession.thirdPartyToken((String) params.get("thirdPartyToken")); //Cache ThirdPartyToken on Client
+                onSession.thirdPartyToken(thirdPartyToken); //Cache ThirdPartyToken on Client
                 onPlatformProvider(onSession,session,_ox,deviceId);
             }
             else if(suc && _ox == null){
@@ -115,7 +129,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 acc.typeId(typeId);
                 createLogin(acc,session.distributionId(),AccessControl.player.name(),true,acc.name(),true);
                 OnSession onSession = login(session.distributionId(),thirdPartyLogin.password(),session);
-                onSession.thirdPartyToken((String) params.get("thirdPartyToken")); //Cache ThirdPartyToken on Client
+                onSession.thirdPartyToken(thirdPartyToken); //Cache ThirdPartyToken on Client
                 onPlatformProvider(onSession,session,thirdPartyLogin,deviceId);
             }
             else{

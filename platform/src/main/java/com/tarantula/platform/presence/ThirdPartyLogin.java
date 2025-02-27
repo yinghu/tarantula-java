@@ -6,6 +6,8 @@ import com.tarantula.platform.OnApplicationHeader;
 
 public class ThirdPartyLogin extends OnApplicationHeader implements LoginProvider {
 
+    protected String thirdPartyToken;
+
 
     public ThirdPartyLogin(){
 
@@ -32,6 +34,7 @@ public class ThirdPartyLogin extends OnApplicationHeader implements LoginProvide
         buffer.writeUTF8(name);
         buffer.writeLong(stub);
         buffer.writeLong(timestamp);
+        buffer.writeUTF8(thirdPartyToken);
         return true;
     }
 
@@ -43,6 +46,7 @@ public class ThirdPartyLogin extends OnApplicationHeader implements LoginProvide
         try{
             stub = buffer.readLong();
             timestamp = buffer.readLong();
+            thirdPartyToken = buffer.readUTF8();
         }catch (Exception ex){
             //ignore
         }
@@ -62,5 +66,15 @@ public class ThirdPartyLogin extends OnApplicationHeader implements LoginProvide
     }
     public void deviceId(String deviceId){
         this.name = deviceId;
+    }
+
+    @Override
+    public String thirdPartyToken() {
+        return thirdPartyToken;
+    }
+
+    @Override
+    public void thirdPartyToken(String thirdPartyToken) {
+        this.thirdPartyToken = thirdPartyToken;
     }
 }
