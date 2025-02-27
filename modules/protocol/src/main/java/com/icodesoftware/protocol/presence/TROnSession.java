@@ -7,10 +7,11 @@ import com.icodesoftware.util.TROnApplication;
 
 public class TROnSession extends TROnApplication implements OnSession {
 
-    private String token;
+    protected String token;
 
-    private String login;
-    private String role = TRRole.player.name();
+    protected String login;
+    protected String role = TRRole.player.name();
+
     public static final OnSession PASSWORD_NOT_MATCHED = new TROnSession("PASSWORD NOT MATCHED");
     public static final OnSession INVALID_TOKEN = new TROnSession("INVALID TOKEN");
     public static final OnSession INVALID_TICKET = new TROnSession("INVALID TICKET");
