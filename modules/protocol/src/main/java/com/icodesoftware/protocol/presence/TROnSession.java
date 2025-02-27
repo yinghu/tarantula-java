@@ -29,6 +29,7 @@ public class TROnSession extends TROnApplication implements OnSession {
     }
     public TROnSession(long systemId, long stub){
         this();
+        this.systemId = systemId;
         this.distributionId = systemId;
         this.stub = stub;
         this.successful = true;
