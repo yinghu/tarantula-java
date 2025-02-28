@@ -38,8 +38,6 @@ public interface ServiceContext extends Context{
     void registerMetrics(Metrics metrics);
     void unregisterMetrics(Metrics metrics);
 
-    //PostOffice postOffice();
-
     Transaction transaction(int scope);
     default Transaction.LogManager logManager(){ throw new UnsupportedOperationException();}
 

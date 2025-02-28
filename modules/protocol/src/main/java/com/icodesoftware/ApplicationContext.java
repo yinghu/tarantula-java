@@ -30,9 +30,6 @@ public interface ApplicationContext extends Context{
 
     void resource(String name,Module.OnResource onResource);
 
-    PostOffice postOffice();
-    default PostOffice postOffice(Session session){ throw new UnsupportedOperationException();}
-
     ClusterProvider clusterProvider();
 
     void onMetrics(String category,double delta);

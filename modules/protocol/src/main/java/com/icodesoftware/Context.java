@@ -13,5 +13,5 @@ public interface Context {
 
     default void execute(Runnable runnable){}
     default <T extends Object> T execute(Callable<T> callable){ return null;}
-
+    PostOffice postOffice();
 }

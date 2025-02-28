@@ -117,10 +117,10 @@ public class ServiceContextHeader implements ServiceContext {
 
     }
 
-    //@Override
-    //public PostOffice postOffice() {
-        //return null;
-    //}
+    @Override
+    public PostOffice postOffice() {
+        return null;
+    }
 
     @Override
     public Transaction transaction(int scope) {

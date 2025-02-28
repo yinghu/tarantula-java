@@ -58,6 +58,9 @@ public class PlatformGameContext implements GameContext {
         }
     }
 
+    public PostOffice postOffice(){
+        return this.serviceContext.postOffice();
+    }
     @Override
     public ApplicationSchema applicationSchema(){
         return platformGameServiceProvider.gameCluster();
