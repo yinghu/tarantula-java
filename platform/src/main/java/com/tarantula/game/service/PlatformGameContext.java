@@ -156,4 +156,7 @@ public class PlatformGameContext implements GameContext {
         return null;
     }
 
+    public TokenValidator validator(){
+        return null;
+    }
 }

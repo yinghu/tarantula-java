@@ -1095,4 +1095,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
     public DataStore dataStore(String name) {
         return this.dataStore(Distributable.DATA_SCOPE,name);
     }
+
+    public TokenValidator validator(){
+        return tokenValidatorProvider.tokenValidator();
+    }
 }

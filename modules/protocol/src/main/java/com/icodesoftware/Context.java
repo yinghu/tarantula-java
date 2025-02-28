@@ -32,4 +32,6 @@ public interface Context {
     long distributionId();
 
     ClusterProvider.Node node();
+
+    TokenValidator validator();
 }

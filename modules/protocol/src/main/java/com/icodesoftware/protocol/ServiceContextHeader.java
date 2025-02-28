@@ -162,4 +162,8 @@ public class ServiceContextHeader implements ServiceContext {
     public DataStore dataStore(String name) {
         return null;
     }
+
+    public TokenValidator validator(){
+        return null;
+    }
 }

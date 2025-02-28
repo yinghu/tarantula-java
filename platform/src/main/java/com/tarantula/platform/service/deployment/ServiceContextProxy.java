@@ -154,4 +154,8 @@ public class ServiceContextProxy implements ServiceContext {
     public DataStore dataStore(String name) {
         return this.tarantulaContext.dataStore(Distributable.DATA_SCOPE,name);
     }
+
+    public TokenValidator validator(){
+        return this.tarantulaContext.validator();
+    }
 }

@@ -18,7 +18,7 @@ public interface ApplicationContext extends Context{
 
     Configuration configuration(String name);
 
-    TokenValidator validator();
+    //TokenValidator validator();
     Descriptor descriptor();
 
 
