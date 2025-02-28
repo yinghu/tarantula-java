@@ -75,7 +75,6 @@ public interface Session extends OnApplication {
     String token();
     void token(String token);
     default void onEvent(Event event){}
-    default void registerStreamingListener(StreamingListener listener){}
 
     interface TimeoutListener{
         void timeout(long systemId,long stub);
@@ -92,10 +91,6 @@ public interface Session extends OnApplication {
         short batch();
         boolean broadcasting();
         boolean encrypted();
-    }
-
-    interface StreamingListener{
-        void onCode(int streamCode);
     }
 
 }
