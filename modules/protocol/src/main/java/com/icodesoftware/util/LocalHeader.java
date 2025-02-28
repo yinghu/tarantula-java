@@ -36,4 +36,8 @@ public class LocalHeader implements Recoverable.DataHeader {
     public static Recoverable.DataHeader create(int factoryId,int classId){
         return new LocalHeader(0,factoryId,classId);
     }
+
+    public static Recoverable.DataHeader create(int factoryId,int classId,long revision){
+        return new LocalHeader(revision,factoryId,classId);
+    }
 }
