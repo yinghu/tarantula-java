@@ -19,7 +19,7 @@ public interface ServiceContext extends Context{
 
     OnPartition[] partitions();
     OnPartition[] buckets();
-    ClusterProvider.Node node();
+
 
     <T extends Recoverable> RecoverableRegistry<T> recoverableRegistry(int registryId);
     void recoverableRegistry(RecoverableListener recoverableListener);

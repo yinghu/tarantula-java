@@ -1,5 +1,7 @@
 package com.icodesoftware;
 
+import com.icodesoftware.service.ClusterProvider;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
 
@@ -28,4 +30,6 @@ public interface Context {
     DataStore dataStore(int scope,String name);
 
     long distributionId();
+
+    ClusterProvider.Node node();
 }

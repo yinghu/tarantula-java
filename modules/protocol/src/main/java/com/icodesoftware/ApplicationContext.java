@@ -33,7 +33,6 @@ public interface ApplicationContext extends Context{
 
     void onMetrics(String category,double delta);
 
-    ClusterProvider.Node node();
 
 
 }

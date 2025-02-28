@@ -2,10 +2,7 @@ package com.tarantula.game.service;
 
 import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
-import com.icodesoftware.service.ApplicationPreSetup;
-import com.icodesoftware.service.ApplicationSchema;
-import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.service.TokenValidatorProvider;
+import com.icodesoftware.service.*;
 import com.tarantula.platform.item.ConfigurableObject;
 
 import java.util.concurrent.Callable;
@@ -152,6 +149,11 @@ public class PlatformGameContext implements GameContext {
     @Override
     public long distributionId() {
         return 0;
+    }
+
+    @Override
+    public ClusterProvider.Node node() {
+        return null;
     }
 
 }
