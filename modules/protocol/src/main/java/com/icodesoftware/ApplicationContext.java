@@ -37,14 +37,11 @@ public interface ApplicationContext extends Context{
 
     ClusterProvider.Node node();
 
-    Transaction transaction();
-
-    default Transaction.LogManager logManager(){ throw new UnsupportedOperationException();}
     default DataStore dataStore(int scope,String name){
         return dataStore(name);
     }
     default long distributionId(){
         return 0;
     }
-    default Transaction transaction(int scope){ throw new UnsupportedOperationException();}
+
 }

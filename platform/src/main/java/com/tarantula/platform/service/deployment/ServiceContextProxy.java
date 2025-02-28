@@ -5,6 +5,7 @@ import com.icodesoftware.service.*;
 import com.tarantula.platform.TarantulaContext;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
 
 public class ServiceContextProxy implements ServiceContext {
@@ -112,6 +113,11 @@ public class ServiceContextProxy implements ServiceContext {
         return this.tarantulaContext.postOffice();
     }
 
+    @Override
+    public Transaction transaction() {
+        return this.tarantulaContext.transaction();
+    }
+
     public void log(String message,int level){
         this.tarantulaContext.log(message,level);
 
@@ -131,5 +137,16 @@ public class ServiceContextProxy implements ServiceContext {
 
     public DataStore dataStore(ApplicationSchema applicationSchema,int scope,String name){
         return this.tarantulaContext.dataStore(applicationSchema,scope,name);
+    }
+
+    @Override
+    public Transaction.LogManager logManager() {
+        return null;
+    }
+
+    public void execute(Runnable runnable){}
+
+    public <T extends Object> T execute(Callable<T> callable){
+        return null;
     }
 }

@@ -8,6 +8,7 @@ import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.service.TokenValidatorProvider;
 import com.tarantula.platform.item.ConfigurableObject;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
 
 public class PlatformGameContext implements GameContext {
@@ -61,6 +62,22 @@ public class PlatformGameContext implements GameContext {
     public PostOffice postOffice(){
         return this.serviceContext.postOffice();
     }
+
+    @Override
+    public Transaction transaction() {
+        return null;
+    }
+
+    @Override
+    public Transaction transaction(int scope) {
+        return null;
+    }
+
+    @Override
+    public Transaction.LogManager logManager() {
+        return null;
+    }
+
     @Override
     public ApplicationSchema applicationSchema(){
         return platformGameServiceProvider.gameCluster();
@@ -115,4 +132,12 @@ public class PlatformGameContext implements GameContext {
     public Room room(long roomId){
         return platformGameServiceProvider.roomServiceProvider().room(roomId);
     }
+
+    public void execute(Runnable runnable){}
+
+    public <T extends Object> T execute(Callable<T> callable){
+        return null;
+    }
+    
+
 }

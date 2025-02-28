@@ -1006,6 +1006,10 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
          return dataStoreProvider().transaction(scope);
     }
 
+    @Override
+    public Transaction transaction() {
+        return dataStoreProvider().transaction(Distributable.DATA_SCOPE);
+    }
     public void onTransactionEvent(int scope,TransactionReplicationEvent event){
          if(scope==Distributable.DATA_SCOPE){
              dataScopeReplicationProxy.onTransactionReplicationEvent(event);
@@ -1074,5 +1078,16 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
                 Thread.sleep(1000);
             }
         }
+    }
+
+    @Override
+    public Transaction.LogManager logManager() {
+        return null;
+    }
+
+    public void execute(Runnable runnable){}
+
+    public <T extends Object> T execute(Callable<T> callable){
+        return null;
     }
 }

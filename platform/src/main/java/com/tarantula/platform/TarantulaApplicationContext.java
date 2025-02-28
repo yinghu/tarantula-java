@@ -11,6 +11,7 @@ import com.tarantula.platform.event.*;
 import com.tarantula.platform.service.deployment.ApplicationContextProxy;
 
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
@@ -181,8 +182,24 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         return this.tarantulaContext.deploymentDataStoreProvider.transaction(Distributable.DATA_SCOPE);
     }
 
+    @Override
+    public Transaction transaction(int scope) {
+        return this.tarantulaContext.deploymentDataStoreProvider.transaction(scope);
+    }
+
     public void registerMetricsListener(MetricsListener metricsListener){
         if(metricsListener==null) return;
         this.metricsListener = metricsListener;
+    }
+
+    @Override
+    public Transaction.LogManager logManager() {
+        return null;
+    }
+
+    public void execute(Runnable runnable){}
+
+    public <T extends Object> T execute(Callable<T> callable){
+        return null;
     }
 }

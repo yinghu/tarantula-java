@@ -9,6 +9,7 @@ import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.TarantulaApplicationContext;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
 
 public class ApplicationContextProxy implements ApplicationContext {
@@ -110,5 +111,21 @@ public class ApplicationContextProxy implements ApplicationContext {
     @Override
     public Transaction transaction() {
         return this.tarantulaApplicationContext.transaction();
+    }
+
+    @Override
+    public Transaction transaction(int scope) {
+        return tarantulaApplicationContext.transaction(scope);
+    }
+
+    @Override
+    public Transaction.LogManager logManager() {
+        return null;
+    }
+
+    public void execute(Runnable runnable){}
+
+    public <T extends Object> T execute(Callable<T> callable){
+        return null;
     }
 }

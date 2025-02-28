@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
 
 public class ServiceContextHeader implements ServiceContext {
@@ -123,6 +124,11 @@ public class ServiceContextHeader implements ServiceContext {
     }
 
     @Override
+    public Transaction transaction() {
+        return null;
+    }
+
+    @Override
     public Transaction transaction(int scope) {
         return null;
     }
@@ -140,5 +146,15 @@ public class ServiceContextHeader implements ServiceContext {
     @Override
     public void log(String message, Exception error, int level) {
 
+    }
+
+    public void execute(Runnable runnable){}
+
+    public <T extends Object> T execute(Callable<T> callable){
+        return null;
+    }
+
+    public Transaction.LogManager logManager(){
+        return null;
     }
 }

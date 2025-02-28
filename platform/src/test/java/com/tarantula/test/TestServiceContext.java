@@ -14,6 +14,7 @@ import com.tarantula.platform.tournament.TournamentPortableRegistry;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
 
 public class TestServiceContext implements ServiceContext {
@@ -173,6 +174,11 @@ public class TestServiceContext implements ServiceContext {
         return null;
     }
 
+    @Override
+    public Transaction transaction() {
+        return dataStoreProvider.transaction(Distributable.DATA_SCOPE);
+    }
+
     public Transaction transaction(int scope){
         return dataStoreProvider.transaction(scope);
     }
@@ -181,6 +187,17 @@ public class TestServiceContext implements ServiceContext {
         return null;
     }
     public DataStore dataStore(ApplicationSchema applicationSchema,int scope,String name){
+        return null;
+    }
+
+    @Override
+    public Transaction.LogManager logManager() {
+        return null;
+    }
+
+    public void execute(Runnable runnable){}
+
+    public <T extends Object> T execute(Callable<T> callable){
         return null;
     }
 }

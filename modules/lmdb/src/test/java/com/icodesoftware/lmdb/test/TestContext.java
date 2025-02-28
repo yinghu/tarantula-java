@@ -1,13 +1,13 @@
 package com.icodesoftware.lmdb.test;
 
 import com.icodesoftware.*;
-import com.icodesoftware.lmdb.LMDBDataStoreProvider;
+import com.icodesoftware.protocol.ServiceContextHeader;
 import com.icodesoftware.service.*;
 
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
-public class TestContext implements ServiceContext {
+public class TestContext extends ServiceContextHeader {
 
     public DataStoreProvider lmdbDataStoreProvider;
     public TestNode testNode = new TestNode();
@@ -137,6 +137,11 @@ public class TestContext implements ServiceContext {
 
 
     public PostOffice postOffice() {
+        return null;
+    }
+
+    @Override
+    public Transaction transaction() {
         return null;
     }
 
