@@ -11,6 +11,16 @@ public class TarantulaApplicationHeader implements TarantulaApplication {
     protected ApplicationContext context;
     protected GsonBuilder builder;
 
+    @Override
+    public void initialize(Session session) throws Exception {
+
+    }
+
+    @Override
+    public void callback(Session session) throws Exception {
+
+    }
+
     public void callback(Session session, byte[] payload) throws Exception {
 
     }
@@ -21,9 +31,15 @@ public class TarantulaApplicationHeader implements TarantulaApplication {
         session.write(new TRResponse("onError",false,400,msg,"error").toJson().toString().getBytes());
     }
 
+    @Override
+    public void clear() {
+
+    }
+
 
     public void setup(ApplicationContext context) throws Exception {
         this.context = context;
+        this.descriptor = context.descriptor();
         this.builder = new GsonBuilder();
         this.builder.registerTypeAdapter(TRResponse.class,new ResponseSerializer());
         this.builder.registerTypeAdapter(OnAccess.class,new OnAccessDeserializer());
@@ -36,10 +52,6 @@ public class TarantulaApplicationHeader implements TarantulaApplication {
     }
 
 
-    public void descriptor(Descriptor descriptor) {
-        this.descriptor = descriptor;
-    }
-
     public boolean onEvent(Event event) {
         this.context.log("MISSING EVENT->"+event.toString(),OnLog.WARN);
         return false;
@@ -50,7 +62,5 @@ public class TarantulaApplicationHeader implements TarantulaApplication {
         return this.descriptor.tag();
     }
 
-    public void onBucket(int bucket,int state) {
 
-    }
 }

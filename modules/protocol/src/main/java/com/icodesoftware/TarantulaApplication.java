@@ -1,18 +1,17 @@
 package com.icodesoftware;
 
-import com.icodesoftware.service.BucketListener;
 
-public interface TarantulaApplication extends Initializer, EventListener, BucketListener{
+public interface TarantulaApplication extends Initializer, EventListener{
 
 
-    default void initialize(Session session) throws Exception{}
+    void initialize(Session session) throws Exception;
 
-    default void callback(Session session) throws Exception{}
-	default void callback(Session session,byte[] payload) throws Exception{}
+     void callback(Session session) throws Exception;
 
-    void onError(Session session, Exception ex);
+     void callback(Session session,byte[] payload) throws Exception;
 
-    default void clear(){}
+     void onError(Session session, Exception ex);
 
+     void clear();
 
 }

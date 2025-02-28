@@ -151,7 +151,7 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
         }
     }
     public void onBucketReceiver(int bucket,int state){
-        this.application.onBucket(bucket,state);
+        //this.application.onBucket(bucket,state);
     }
     public void resource(String name, Module.OnResource onResource){
         this.tarantulaContext.deploymentService().resource(this.descriptor(),name,onResource);

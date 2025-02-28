@@ -6,6 +6,4 @@ public interface Initializer {
 
     Descriptor descriptor();
 
-    void descriptor(Descriptor descriptor);
-
 }

@@ -42,7 +42,7 @@ public class DefaultApplication implements ApplicationProvider {
         try{
             TarantulaApplicationContext app;
             TarantulaApplication _app = (TarantulaApplication)Class.forName(this.deploymentDescriptor.applicationClassName()).getConstructor().newInstance();
-            _app.descriptor(dd);
+            //_app.descriptor(dd);
             app = new TarantulaApplicationContext(tarantulaContext,dd,_app);
             app.registerMetricsListener(tarantulaContext.metrics(Metrics.APPLICATION));
             return app;
