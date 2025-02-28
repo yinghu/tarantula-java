@@ -45,5 +45,5 @@ public class AbstractEvent extends TROnApplication implements Event {
     public void retries(int retries) {
         this.retries = retries;
     }
-    
+
 }
