@@ -138,6 +138,20 @@ public class PlatformGameContext implements GameContext {
     public <T extends Object> T execute(Callable<T> callable){
         return null;
     }
-    
+
+    @Override
+    public DataStore dataStore(int scope,String name) {
+        return null;//this.tarantulaContext.dataStore(scope,name);
+    }
+
+    @Override
+    public DataStore dataStore(String name) {
+        return null;//this.tarantulaContext.dataStore(scope,name);
+    }
+
+    @Override
+    public long distributionId() {
+        return 0;
+    }
 
 }

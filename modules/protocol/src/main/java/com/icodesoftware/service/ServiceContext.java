@@ -7,7 +7,7 @@ import java.util.List;
 public interface ServiceContext extends Context{
 
     //create data scope partitioned data store
-    DataStore dataStore(int scope,String name);
+
     DataStore dataStore(ApplicationSchema applicationSchema,int scope,String name);
 
     Recoverable.DataBufferPair dataBufferPair();
@@ -20,7 +20,6 @@ public interface ServiceContext extends Context{
     OnPartition[] partitions();
     OnPartition[] buckets();
     ClusterProvider.Node node();
-    long distributionId();
 
     <T extends Recoverable> RecoverableRegistry<T> recoverableRegistry(int registryId);
     void recoverableRegistry(RecoverableListener recoverableListener);

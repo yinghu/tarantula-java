@@ -202,4 +202,14 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     public <T extends Object> T execute(Callable<T> callable){
         return null;
     }
+
+    @Override
+    public DataStore dataStore(int scope,String name) {
+        return this.tarantulaContext.dataStore(scope,name);
+    }
+
+    @Override
+    public long distributionId() {
+        return this.tarantulaContext.distributionId();
+    }
 }

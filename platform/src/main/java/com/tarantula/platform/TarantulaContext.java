@@ -1090,4 +1090,9 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
     public <T extends Object> T execute(Callable<T> callable){
         return null;
     }
+
+    @Override
+    public DataStore dataStore(String name) {
+        return this.dataStore(Distributable.DATA_SCOPE,name);
+    }
 }

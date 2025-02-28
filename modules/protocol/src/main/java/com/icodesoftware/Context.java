@@ -22,4 +22,10 @@ public interface Context {
     Transaction transaction(int scope);
 
     Transaction.LogManager logManager();
+
+    DataStore dataStore(String name);
+
+    DataStore dataStore(int scope,String name);
+
+    long distributionId();
 }

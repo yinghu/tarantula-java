@@ -157,4 +157,9 @@ public class ServiceContextHeader implements ServiceContext {
     public Transaction.LogManager logManager(){
         return null;
     }
+
+    @Override
+    public DataStore dataStore(String name) {
+        return null;
+    }
 }

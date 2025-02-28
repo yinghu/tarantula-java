@@ -21,7 +21,6 @@ public interface ApplicationContext extends Context{
     TokenValidator validator();
     Descriptor descriptor();
 
-    DataStore dataStore(String name);
 
     RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener);
     void unregisterRecoverableListener(int factoryId);
@@ -34,14 +33,7 @@ public interface ApplicationContext extends Context{
 
     void onMetrics(String category,double delta);
 
-
     ClusterProvider.Node node();
 
-    default DataStore dataStore(int scope,String name){
-        return dataStore(name);
-    }
-    default long distributionId(){
-        return 0;
-    }
 
 }
