@@ -83,14 +83,14 @@ public class EtcdManager {
     public static void registerETCDWatchListener(ETCDWatchListener listener){
         watcherIndex.put(listener.watchKey(),listener);
     }
-    public static void setup(ServiceContext serviceContext) throws Exception{
+    public static void setup(ServiceContext serviceContext,NodeStartingListener nodeStartingListener) throws Exception{
         ClusterProvider.Node node = serviceContext.node();
         EtcdNode etcdNode = EtcdNode.create(node.nodeName(),node.address());
         etcdNode.httpClientProvider = serviceContext.httpClientProvider();
         etcdNode.etcdHost = node.etcdHost();
-        start(etcdNode,node.clusterNameSuffix());
+        start(etcdNode,node.clusterNameSuffix(),nodeStartingListener);
     }
-    public static void start(EtcdNode localNode,String clusterName) throws Exception{
+    public static void start(EtcdNode localNode,String clusterName,NodeStartingListener nodeStartingListener) throws Exception{
         if(running) return;
         EtcdManager.registerETCDWatchListener(new NodeJoinListener());
         EtcdManager.registerETCDWatchListener(new NodePingListener());
@@ -123,6 +123,9 @@ public class EtcdManager {
                     //ignore
                 }
             }
+            CountDownLatch starting = new CountDownLatch(1);
+            nodeStartingListener.onStarting(starting);
+            try{starting.await();}catch (Exception ex){}
             running = EtcdManager.register();
             joined.countDown();
             int loop = 0;
