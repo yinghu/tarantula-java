@@ -3,6 +3,7 @@ package com.icodesoftware.protocol;
 import com.icodesoftware.*;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.DataStoreProvider;
+import com.icodesoftware.service.HttpClientProvider;
 
 import java.util.concurrent.*;
 
@@ -15,6 +16,7 @@ public class TRContext implements Context {
     protected Transaction.LogManager logManager;
     protected DataStoreProvider.DistributionIdGenerator distributionIdGenerator;
     protected TokenValidator tokenValidator;
+    protected HttpClientProvider httpClientProvider;
 
     protected final CopyOnWriteArrayList<TimerListener> timerListeners = new CopyOnWriteArrayList<>();
 
@@ -137,5 +139,9 @@ public class TRContext implements Context {
     public void registerTimerListener(TimerListener timerListener) {
         if(timerListener==null) return;
         timerListeners.add(timerListener);
+    }
+
+    public HttpClientProvider httpClientProvider(){
+        return httpClientProvider;
     }
 }

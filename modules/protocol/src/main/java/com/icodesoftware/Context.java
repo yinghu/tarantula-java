@@ -1,6 +1,7 @@
 package com.icodesoftware;
 
 import com.icodesoftware.service.ClusterProvider;
+import com.icodesoftware.service.HttpClientProvider;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.Callable;
@@ -35,6 +36,8 @@ public interface Context {
     ClusterProvider.Node node();
 
     TokenValidator validator();
+
+    HttpClientProvider httpClientProvider();
 
     void registerTimerListener(TimerListener timerListener);
 

@@ -3,6 +3,7 @@ package com.tarantula.platform;
 import com.icodesoftware.*;
 import com.icodesoftware.EventListener;
 import com.icodesoftware.Module;
+import com.icodesoftware.service.HttpClientProvider;
 import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.MetricsListener;
@@ -215,5 +216,9 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
 
     public void registerTimerListener(TimerListener timerListener){
 
+    }
+
+    public HttpClientProvider httpClientProvider(){
+        return this.tarantulaContext.httpClientProvider();
     }
 }

@@ -163,4 +163,8 @@ public class PlatformGameContext implements GameContext {
     public void registerTimerListener(TimerListener timerListener){
 
     }
+
+    public HttpClientProvider httpClientProvider(){
+        return serviceContext.httpClientProvider();
+    }
 }

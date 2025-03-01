@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.Module;
 import com.icodesoftware.protocol.UDPEndpointServiceProvider;
 import com.icodesoftware.service.ClusterProvider;
+import com.icodesoftware.service.HttpClientProvider;
 import com.icodesoftware.service.Metrics;
 import com.icodesoftware.service.ServiceProvider;
 import com.tarantula.platform.TarantulaApplicationContext;
@@ -141,5 +142,9 @@ public class ApplicationContextProxy implements ApplicationContext {
 
     public void registerTimerListener(TimerListener timerListener){
 
+    }
+
+    public HttpClientProvider httpClientProvider(){
+        return this.tarantulaApplicationContext.httpClientProvider();
     }
 }
