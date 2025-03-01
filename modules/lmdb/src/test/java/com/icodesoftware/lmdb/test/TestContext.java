@@ -1,13 +1,13 @@
 package com.icodesoftware.lmdb.test;
 
 import com.icodesoftware.*;
-import com.icodesoftware.protocol.ServiceContextHeader;
+import com.icodesoftware.protocol.TRServiceContext;
 import com.icodesoftware.service.*;
 
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
-public class TestContext extends ServiceContextHeader {
+public class TestContext extends TRServiceContext {
 
     public DataStoreProvider lmdbDataStoreProvider;
     public TestNode testNode = new TestNode();

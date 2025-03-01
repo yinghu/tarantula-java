@@ -4,15 +4,9 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ScheduledFuture;
 
-public class ServiceContextHeader implements ServiceContext {
-    @Override
-    public DataStore dataStore(int scope, String name) {
-        return null;
-    }
 
+public class TRServiceContext extends TRContext implements ServiceContext {
     @Override
     public DataStore dataStore(ApplicationSchema applicationSchema, int scope, String name) {
         return null;
@@ -58,15 +52,6 @@ public class ServiceContextHeader implements ServiceContext {
         return new OnPartition[0];
     }
 
-    @Override
-    public ClusterProvider.Node node() {
-        return null;
-    }
-
-    @Override
-    public long distributionId() {
-        return 0;
-    }
 
     @Override
     public <T extends Recoverable> RecoverableRegistry<T> recoverableRegistry(int registryId) {
@@ -115,58 +100,6 @@ public class ServiceContextHeader implements ServiceContext {
 
     @Override
     public void unregisterMetrics(Metrics metrics) {
-
-    }
-
-    @Override
-    public PostOffice postOffice() {
-        return null;
-    }
-
-    @Override
-    public Transaction transaction() {
-        return null;
-    }
-
-    @Override
-    public Transaction transaction(int scope) {
-        return null;
-    }
-
-    @Override
-    public ScheduledFuture<?> schedule(SchedulingTask task) {
-        return null;
-    }
-
-    @Override
-    public void log(String message, int level) {
-
-    }
-
-    @Override
-    public void log(String message, Exception error, int level) {
-
-    }
-
-    public void execute(Runnable runnable){}
-
-    public <T extends Object> T execute(Callable<T> callable){
-        return null;
-    }
-
-    public Transaction.LogManager logManager(){
-        return null;
-    }
-
-    @Override
-    public DataStore dataStore(String name) {
-        return null;
-    }
-
-    public TokenValidator validator(){
-        return null;
-    }
-    public void registerTimerListener(TimerListener timerListener){
 
     }
 

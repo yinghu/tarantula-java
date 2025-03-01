@@ -1,7 +1,7 @@
 package com.tarantula.test;
 
 import com.icodesoftware.*;
-import com.icodesoftware.protocol.ServiceContextHeader;
+import com.icodesoftware.protocol.TRServiceContext;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.GamePortableRegistry;
@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
 
-public class TestServiceContext extends ServiceContextHeader {
+public class TestServiceContext extends TRServiceContext {
 
     ClusterNode node;
     DataStoreProvider dataStoreProvider;

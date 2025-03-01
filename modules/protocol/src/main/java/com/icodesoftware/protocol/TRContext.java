@@ -16,6 +16,8 @@ public class TRContext implements Context {
     protected DataStoreProvider.DistributionIdGenerator distributionIdGenerator;
     protected TokenValidator tokenValidator;
 
+    protected final CopyOnWriteArrayList<TimerListener> timerListeners = new CopyOnWriteArrayList<>();
+
     @Override
     public ScheduledFuture<?> schedule(SchedulingTask task) {
         if(task.oneTime()){
@@ -133,6 +135,7 @@ public class TRContext implements Context {
 
     @Override
     public void registerTimerListener(TimerListener timerListener) {
-
+        if(timerListener==null) return;
+        timerListeners.add(timerListener);
     }
 }
