@@ -18,9 +18,7 @@ public interface ApplicationContext extends Context{
 
     Configuration configuration(String name);
 
-    //TokenValidator validator();
     Descriptor descriptor();
-
 
     RecoverableListener registerRecoverableListener(RecoverableListener recoverableListener);
     void unregisterRecoverableListener(int factoryId);
