@@ -138,4 +138,8 @@ public class ApplicationContextProxy implements ApplicationContext {
     public long distributionId() {
         return this.tarantulaApplicationContext.distributionId();
     }
+
+    public void registerTimerListener(TimerListener timerListener){
+
+    }
 }

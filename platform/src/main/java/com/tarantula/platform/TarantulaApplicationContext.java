@@ -212,4 +212,8 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     public long distributionId() {
         return this.tarantulaContext.distributionId();
     }
+
+    public void registerTimerListener(TimerListener timerListener){
+
+    }
 }

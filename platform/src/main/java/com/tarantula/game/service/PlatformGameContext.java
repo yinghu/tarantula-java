@@ -159,4 +159,8 @@ public class PlatformGameContext implements GameContext {
     public TokenValidator validator(){
         return null;
     }
+
+    public void registerTimerListener(TimerListener timerListener){
+
+    }
 }

@@ -166,4 +166,7 @@ public class ServiceContextHeader implements ServiceContext {
     public TokenValidator validator(){
         return null;
     }
+    public void registerTimerListener(TimerListener timerListener){
+
+    }
 }

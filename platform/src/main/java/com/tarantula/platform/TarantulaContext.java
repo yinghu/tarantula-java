@@ -1099,4 +1099,8 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
     public TokenValidator validator(){
         return tokenValidatorProvider.tokenValidator();
     }
+
+    public void registerTimerListener(TimerListener timerListener){
+
+    }
 }

@@ -158,4 +158,8 @@ public class ServiceContextProxy implements ServiceContext {
     public TokenValidator validator(){
         return this.tarantulaContext.validator();
     }
+
+    public void registerTimerListener(TimerListener timerListener){
+
+    }
 }

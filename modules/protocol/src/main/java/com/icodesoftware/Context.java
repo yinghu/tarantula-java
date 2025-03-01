@@ -2,6 +2,7 @@ package com.icodesoftware;
 
 import com.icodesoftware.service.ClusterProvider;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
 
@@ -34,4 +35,10 @@ public interface Context {
     ClusterProvider.Node node();
 
     TokenValidator validator();
+
+    void registerTimerListener(TimerListener timerListener);
+
+    interface TimerListener{
+        void atMidnight(LocalDateTime now);
+    }
 }
