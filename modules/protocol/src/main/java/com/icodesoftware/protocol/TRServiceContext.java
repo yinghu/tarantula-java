@@ -7,6 +7,9 @@ import java.util.List;
 
 
 public class TRServiceContext extends TRContext implements ServiceContext {
+
+    protected EventService eventService;
+
     @Override
     public DataStore dataStore(ApplicationSchema applicationSchema, int scope, String name) {
         return null;
@@ -14,12 +17,12 @@ public class TRServiceContext extends TRContext implements ServiceContext {
 
     @Override
     public Recoverable.DataBufferPair dataBufferPair() {
-        return null;
+        return dataStoreProvider.dataBufferPair();
     }
 
     @Override
     public EventService eventService() {
-        return null;
+        return eventService;
     }
 
     @Override
@@ -37,10 +40,6 @@ public class TRServiceContext extends TRContext implements ServiceContext {
         return null;
     }
 
-    @Override
-    public HttpClientProvider httpClientProvider() {
-        return null;
-    }
 
     @Override
     public OnPartition[] partitions() {

@@ -1,6 +1,8 @@
 package com.icodesoftware.protocol;
 
 import com.icodesoftware.*;
+import com.icodesoftware.etcd.EtcdManager;
+import com.icodesoftware.etcd.EtcdNode;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.DataStoreProvider;
 import com.icodesoftware.service.HttpClientProvider;
@@ -127,7 +129,7 @@ public class TRContext implements Context {
 
     @Override
     public ClusterProvider.Node node() {
-        return null;
+        return EtcdManager.localNode();
     }
 
     @Override
