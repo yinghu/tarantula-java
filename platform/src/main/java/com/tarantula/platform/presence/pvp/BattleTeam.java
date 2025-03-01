@@ -131,7 +131,7 @@ public class BattleTeam extends RecoverableObject {
         dataStore.create(this);
         teamFormationIndex.teamId = this.distributionId;
         teamFormationIndex.totalTeams++;
-        teamFormationIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusMinutes(teamCreationWaitingTime)));
+        teamFormationIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(teamCreationWaitingTime)));
         dataStore.update(teamFormationIndex);
     }
 
