@@ -4,11 +4,13 @@ import com.icodesoftware.*;
 import com.icodesoftware.service.*;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class TRServiceContext extends TRContext implements ServiceContext {
 
     protected EventService eventService;
+    protected final ConcurrentHashMap<Integer,RecoverableRegistry> recoverableRegistries = new ConcurrentHashMap<>();
 
     @Override
     public DataStore dataStore(ApplicationSchema applicationSchema, int scope, String name) {
@@ -54,12 +56,12 @@ public class TRServiceContext extends TRContext implements ServiceContext {
 
     @Override
     public <T extends Recoverable> RecoverableRegistry<T> recoverableRegistry(int registryId) {
-        return null;
+        return recoverableRegistries.get(registryId);
     }
 
     @Override
     public void recoverableRegistry(RecoverableListener recoverableListener) {
-
+        recoverableRegistries.put(recoverableListener.registryId(),recoverableListener);
     }
 
     @Override

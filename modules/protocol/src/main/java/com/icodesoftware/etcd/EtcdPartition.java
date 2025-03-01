@@ -1,6 +1,8 @@
 package com.icodesoftware.etcd;
 
-public class EtcdPartition {
+import com.icodesoftware.service.OnPartition;
+
+public class EtcdPartition implements OnPartition {
     public final int partition;
     private EtcdNode etcdNode;
     public EtcdPartition(int partition){
@@ -12,5 +14,15 @@ public class EtcdPartition {
     }
     public void onPartition(EtcdNode etcdNode){
         this.etcdNode = etcdNode;
+    }
+
+    @Override
+    public int partition() {
+        return partition;
+    }
+
+    @Override
+    public boolean opening() {
+        return true;
     }
 }
