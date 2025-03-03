@@ -67,7 +67,7 @@ public class UnitInstance extends RecoverableObject {
         buffer.writeLong(forceFieldIDValue);
         buffer.writeLong(bootsIDValue);
         for(int i=0;i<MAX_ABILITY_RANKS;i++){
-            buffer.writeInt(abilityRanks[0]);
+            buffer.writeInt(abilityRanks[i]);
         }
         buffer.writeInt(passiveRank);
         return true;

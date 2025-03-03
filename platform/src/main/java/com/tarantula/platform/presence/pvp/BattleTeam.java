@@ -10,6 +10,8 @@ import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class BattleTeam extends RecoverableObject {
@@ -146,8 +148,17 @@ public class BattleTeam extends RecoverableObject {
     }
 
     public static JsonObject abilityRanks(int[] ranks,int passiveRank){
-        JsonObject abilityRanks = new JsonObject();
-        return abilityRanks;
+        JsonObject abilityRanksWrapper = new JsonObject();
+        JsonArray abilityRanks = new JsonArray();
+        for (int rank : ranks) {
+            if (rank>0) {
+                abilityRanks.add(rank);
+            }
+        }
+
+        abilityRanksWrapper.add("abilityRanks", abilityRanks);
+        abilityRanksWrapper.addProperty("passiveRank",passiveRank);
+        return abilityRanksWrapper;
     }
 
     public static JsonObject equipment(long weaponIDValue,long helmetIDValue,long chestPieceIDValue,long glovesIDValue,long forceFieldIDValue,long bootsIDValue){
