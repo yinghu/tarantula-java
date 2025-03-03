@@ -34,6 +34,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private int seasonRunningDays = 12;//days
     private int reMatchWaitingTimeMinutes = 60; //minutes
     private ConcurrentHashMap<Long, SeasonCredentialConfiguration.Season> seasons = new ConcurrentHashMap();
+    private ConcurrentHashMap<Long,League> leagueConfigs = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Integer,League> leagues = new ConcurrentHashMap<>();
     private ClusterProvider.ClusterStore scheduleStore;
 
@@ -419,6 +420,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             logger.warn("League config not available");
             return false;
         }
+        leagueConfigs.remove(configurableObject.distributionId());
         League removed = new League(configurableObject);
         for(int i=removed.startPoint();i<=removed.endPoint();i++){
             leagues.remove(i);
@@ -437,6 +439,12 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         return null;
     }
 
+    public LeagueList league(){
+        ArrayList<League> list = new ArrayList<>();
+        leagueConfigs.forEach((k,v)->list.add(v));
+        return new LeagueList(list);
+    }
+
     private void onLeague(ConfigurableObject a){
         PostBattleReward postBattleReward = new PostBattleReward();
         postBattleReward.distributionId(a.application().get("PostBattleReward").getAsJsonArray().get(0).getAsLong());
@@ -449,6 +457,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         league.postBattleReward = postBattleReward;
         league.placementReward = placementReward;
         league.leagueReward = leagueReward;
+        leagueConfigs.put(a.distributionId(),league);
         for(int i=league.startPoint();i<=league.endPoint();i++){
             leagues.put(i,league);
         }

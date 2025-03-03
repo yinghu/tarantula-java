@@ -397,9 +397,7 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
         ConfigurableCategoryQuery query = ConfigurableCategoryQuery.query(type,"category");
         ConfigurableTypeQuery typeQuery = ConfigurableTypeQuery.query(type,"type");
         preSetup.list(this, query).forEach(c->{
-            if(!c.name().equals("Season") && (!c.name().equals("SeasonCredentialConfiguration"))){
-                categories.addCategory(c);
-            }
+            categories.addCategory(c);
         });
         ConfigurableTemplate configuration = this.categoryTemplateSetting(type);
         JsonArray cdata = (JsonArray)configuration.property("itemList");
@@ -425,9 +423,7 @@ public class GameCluster extends OnApplicationHeader implements ApplicationSchem
         configurableTypes.name(name);
         ConfigurableTypeQuery query = ConfigurableTypeQuery.query(name,"type");
         applicationPreSetup().list(this,query).forEach(t->{
-            if(!t.name().equals("Season") && (!t.name().equals("SeasonCredentialConfiguration"))){
-                configurableTypes.addType(t);
-            }
+            configurableTypes.addType(t);
         });
         Configuration commonTypes = this.serviceContext.deploymentServiceProvider().configuration(this,GameCluster.GAME_COMMON_TYPE_TEMPLATE);
         JsonArray ctypes = (JsonArray)commonTypes.property("itemList");

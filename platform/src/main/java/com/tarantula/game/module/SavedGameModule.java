@@ -11,10 +11,7 @@ import com.tarantula.platform.presence.*;
 
 import com.tarantula.game.PlayerSavedGames;
 import com.tarantula.game.util.SavedGameDeserializer;
-import com.tarantula.platform.presence.pvp.BattleLogList;
-import com.tarantula.platform.presence.pvp.BattleTeam;
-import com.tarantula.platform.presence.pvp.MatchMaking;
-import com.tarantula.platform.presence.pvp.TeamFormationResponse;
+import com.tarantula.platform.presence.pvp.*;
 import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 import com.tarantula.platform.presence.saves.PlatformSavedGameServiceProvider;
 import com.tarantula.platform.presence.saves.SaveRevisionInfo;
@@ -115,6 +112,11 @@ public class SavedGameModule extends ModuleHeader {
         else if(session.action().equals("onCurrentDefenseTeam")){
             BattleTeam battleTeam = gameServiceProvider.pvpBattleServiceProvider().currentDefenseTeam(session);
             session.write(battleTeam.toJson().toString().getBytes());
+        }
+
+        else if(session.action().equals("onLeagueList")){
+            LeagueList leagueList = gameServiceProvider.pvpBattleServiceProvider().league();
+            session.write(leagueList.toJson().toString().getBytes());
         }
         //pvp saves end
 
