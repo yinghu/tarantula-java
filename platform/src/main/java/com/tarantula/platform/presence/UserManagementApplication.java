@@ -10,6 +10,7 @@ import com.tarantula.platform.util.PresenceContextSerializer;
 import com.tarantula.platform.util.SystemUtil;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -97,31 +98,38 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             Map<String,Object> params = acc.toMap();
             params.put(OnAccess.SYSTEM_ID,session.systemId());
             String typeId = (String) params.get(OnAccess.TYPE_ID);
-            String deviceId = acc.property("deviceId")!=null?acc.property("deviceId").toString():"device-id-assigned";
+            String deviceId = acc.property("deviceId") != null
+                    ? acc.property("deviceId").toString()
+                    : "device-id-assigned";
 
-            boolean suc;
             LoginProvider _ox = userService.loginProvider(session.distributionId());
             String thirdPartyToken = (String) params.get("thirdPartyToken");
 
+            // If this is the first login of a session, validate the token
+            // if it's a refresh login, ensure the token sent is the same as what we have saved
+            var tokenValidated = false;
             if(thirdPartyToken == null){
-                suc = this.context.validator().validateToken(params);
+                tokenValidated = this.context.validator().validateToken(params);
 
-                thirdPartyToken = (String) params.get("thirdPartyToken");
+                thirdPartyToken = (String) params.get("token");
                 if(thirdPartyToken != null){
                     _ox.thirdPartyToken(thirdPartyToken);
                     _ox.update();
                 }
             }
             else{
-                suc = thirdPartyToken.equals(_ox.thirdPartyToken());
+                tokenValidated = thirdPartyToken.equals(_ox.thirdPartyToken());
             }
 
-            if(suc && _ox!=null ){
+            // If we know this platform (which should always be the case) and the token is validated
+            // do the normal login flow, saving the token on the session
+            // else if token validated, create a custom provider for auth
+            if(tokenValidated && _ox != null){
                 OnSession onSession = this.login(session.distributionId(),_ox.password(),session);
                 onSession.thirdPartyToken(thirdPartyToken); //Cache ThirdPartyToken on Client
                 onPlatformProvider(onSession,session,_ox,deviceId);
             }
-            else if(suc && _ox == null){
+            else if(tokenValidated && _ox == null){
                 ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin(typeId+"#"+params.get("provider"),SystemUtil.oid(),deviceId);
                 thirdPartyLogin.distributionKey(session.systemId());
                 userService.createLoginProvider(thirdPartyLogin);
