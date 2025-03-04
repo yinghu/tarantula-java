@@ -75,18 +75,36 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     public MatchMaking matchMaking(Session session){
         TeamFormationIndex teamFormationIndex = teamFormationIndex(session.distributionId());
+
         if(teamFormationIndex.teamId==0){
             return MatchMaking.failure(PvpErrorCode.NO_TEAM_FORMATION,"no defense team created");
         }
+
         List<BattleTeam> matches = new ArrayList<>();
-        findMatches(session).forEach(rating -> {
-            BattleTeam defenseTeam = defenseTeam(rating);
+        List<BattleLog> battleLogs = battleHistory(session);
+        Rating attackerRating = platformGameServiceProvider.presenceServiceProvider().rating(session);
+        BattleTeam attackersDefenseTeam = defenseTeam(attackerRating);
+
+        findMatches(session).forEach(defenderRating -> {
+            BattleTeam defenseTeam = defenseTeam(defenderRating);
+
             if(defenseTeam != null){
-                //calculate the estimated pvp points if the player wins.
-                defenseTeam.battled = true; //sampling
-                defenseTeam.battlePoint = 100; //sampling
-                defenseTeam.winPointsEstimated = 100;//sampling
-                defenseTeam.elo = rating.level();
+                defenseTeam.elo = defenderRating.level();
+
+                battleLogs.forEach(battleLog -> {
+                    if(battleLog.defenseTeam.distributionId() == defenseTeam.distributionId()) {
+                        defenseTeam.battled = true;
+                        defenseTeam.battlePoint = battleLog.offenseEloGain;
+                    }
+                });
+
+                if(!defenseTeam.battled){
+                    int currentELO = attackerRating.level();
+                    PVPPointGenerator.updateELO(attackerRating, defenderRating, attackersDefenseTeam.teamPower, defenseTeam.teamPower, true);
+                    defenseTeam.winPointsEstimated = attackerRating.level() - currentELO;
+                    attackerRating.level(currentELO);
+                }
+
                 matches.add(defenseTeam);
             }
         });
