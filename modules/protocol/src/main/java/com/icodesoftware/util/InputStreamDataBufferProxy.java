@@ -3,6 +3,7 @@ package com.icodesoftware.util;
 import com.icodesoftware.Recoverable;
 
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.InputStream;
 
 public class InputStreamDataBufferProxy extends IOStreamDataBuffer{
@@ -100,6 +101,9 @@ public class InputStreamDataBufferProxy extends IOStreamDataBuffer{
                 dest.writeByte(src.readByte());
             }
         }catch (Exception ex){
+            if(ex instanceof EOFException){
+                return;
+            }
             throw new RuntimeException(ex);
         }
     }

@@ -1,5 +1,7 @@
 package com.icodesoftware;
 
+import java.io.InputStream;
+
 public interface Session extends OnApplication {
 
     String DataStore = "game_session";
@@ -94,7 +96,7 @@ public interface Session extends OnApplication {
     }
 
     interface Streaming{
-        void onNext(DataBuffer dataBuffer,boolean next);
+        void on(DataBuffer dataBuffer,boolean next);
     }
 
 }
