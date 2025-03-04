@@ -14,6 +14,7 @@ import com.tarantula.game.SimpleStub;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.configuration.SeasonCredentialConfiguration;
 import com.tarantula.platform.event.PortableEventRegistry;
+import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ConfigurableObjectQuery;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
@@ -33,6 +34,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private int seasonTimeGap = 10; //minutes
     private int seasonRunningDays = 12;//days
     private int reMatchWaitingTimeMinutes = 60; //minutes
+    private ConcurrentHashMap<Long, Application> rewardIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Long, SeasonCredentialConfiguration.Season> seasons = new ConcurrentHashMap();
     private ConcurrentHashMap<Long,League> leagueConfigs = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Integer,League> leagues = new ConcurrentHashMap<>();
@@ -41,7 +43,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private final SeasonRuntime rotation = new SeasonRuntime();
 
     private DataStore battleHistory;
-    private DataStore cooldownStore;
+    private DataStore playerStateStore;
     private DataStore matchMakingStore;
     private String gameEndTopic = GameEndEvent.GAME_END_TOPIC;
 
@@ -59,7 +61,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         seasonRunningDays = pvp.get("seasonRunningDays").getAsInt();
         reMatchWaitingTimeMinutes = pvp.get("reMatchWaitingTimeMinutes").getAsInt();
         this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
-        this.cooldownStore = applicationPreSetup.localDataStore(gameCluster,NAME+"_cooldown");
+        this.playerStateStore = applicationPreSetup.dataStore(gameCluster,NAME+"_player_state");
         this.matchMakingStore = applicationPreSetup.localDataStore(gameCluster,NAME+"_match_making");
         this.battleHistory = applicationPreSetup.dataStore(gameCluster,NAME+"_history");
         this.scheduleStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,gameCluster.typeId()+"."+NAME);
@@ -109,6 +111,10 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             }
         });
         MatchMaking matchMaking = MatchMaking.success(teamFormationIndex.timestamp(),matches);
+        PlayerRewardIndex playerRewardIndex = playerRewardIndex(session.distributionId());
+        Application postReward = rewardIndex.get(playerRewardIndex.postBattleRewardId);
+        if(postReward==null) return matchMaking;
+        matchMaking.postBattleReward = postReward;
         return matchMaking;
     }
 
@@ -262,6 +268,14 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         gameEndEvent.defenseTeamId = battleEndResult.defenseTeamId;
         gameEndEvent.defenseEloLevel = battleEndResult.defenseEloLevelUpdated;
         this.serviceContext.eventService().publish(gameEndEvent);
+        if(battleEndResult.offenseEloLevelDelta>0){
+            PlayerRewardIndex playerRewardIndex = playerRewardIndex(battleEndResult.offensePlayerId);
+            League league = leagues.get(battleEndResult.offenseEloLevelUpdated);
+            if(league!=null){
+                playerRewardIndex.postBattleRewardId = league.postBattleReward.distributionId();
+                playerRewardIndex.update();
+            }
+        }
         //generate battle log
         BattleLogIndex battleLog = new BattleLogIndex();
         battleLog.defenseTeamId = battleEndResult.defenseTeamId;
@@ -464,14 +478,15 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     }
 
     private void onLeague(ConfigurableObject a){
-        PostBattleReward postBattleReward = new PostBattleReward();
-        postBattleReward.distributionId(a.application().get("PostBattleReward").getAsJsonArray().get(0).getAsLong());
-        PlacementReward placementReward = new PlacementReward();
-        placementReward.distributionId(a.application().get("PlacementReward").getAsJsonArray().get(0).getAsLong());
-        LeagueReward leagueReward = new LeagueReward();
-        leagueReward.distributionId(a.application().get("LeagueReward").getAsJsonArray().get(0).getAsLong());
         a.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
         League league = new League(a.setup());
+        JsonObject payload = league.toJson();
+        PostBattleReward postBattleReward = new PostBattleReward(payload.get("_postBattleReward").getAsJsonObject());
+        rewardIndex.put(postBattleReward.distributionId(),postBattleReward);
+        PlacementReward placementReward = new PlacementReward(payload.get("_placementReward").getAsJsonObject());
+        rewardIndex.put(placementReward.distributionId(),placementReward);
+        LeagueReward leagueReward = new LeagueReward(payload.get("_leagueReward").getAsJsonObject());
+        rewardIndex.put(leagueReward.distributionId(),leagueReward);
         league.postBattleReward = postBattleReward;
         league.placementReward = placementReward;
         league.leagueReward = leagueReward;
@@ -481,23 +496,18 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         }
     }
 
-    public boolean isDefenseOnCooldown(long defenseTeamId){
-        DefenseCooldown defenseCooldown = new DefenseCooldown();
-        defenseCooldown.distributionId(defenseTeamId);
-        if(!cooldownStore.load(defenseCooldown)) {
-            return false;
-        }
-        else{
-            return !TimeUtil.expired(TimeUtil.fromUTCMilliseconds(defenseCooldown.cooldownTimer));
-        }
+    private PlayerRewardIndex playerRewardIndex(long playerId){
+        PlayerRewardIndex playerRewardIndex = new PlayerRewardIndex(playerId);
+        playerRewardIndex.dataStore(playerStateStore);
+        playerStateStore.createIfAbsent(playerRewardIndex,true);
+        return playerRewardIndex;
     }
 
-    public void startDefenseCooldown(long defenseTeamId){
-        DefenseCooldown defenseCooldown = new DefenseCooldown();
-        defenseCooldown.distributionId(defenseTeamId);
-        cooldownStore.createIfAbsent(defenseCooldown,true);
-        defenseCooldown.cooldownTimer = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusMinutes(60));
-        cooldownStore.update(defenseCooldown);
+    public DefenseCooldown defenseCooldown(long teamId){
+        DefenseCooldown defenseCooldown = new DefenseCooldown(teamId);
+        defenseCooldown.dataStore(playerStateStore);
+        playerStateStore.createIfAbsent(defenseCooldown,true);
+        return defenseCooldown;
     }
 
 
