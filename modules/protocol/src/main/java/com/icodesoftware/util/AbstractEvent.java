@@ -46,4 +46,38 @@ public class AbstractEvent extends TROnApplication implements Event {
         this.retries = retries;
     }
 
+    public void streaming(Streaming next){
+        if(dataBuffer==null) return;
+        if(dataBuffer.type()==DataBuffer.MEMORY){
+            next.on(dataBuffer,false);
+            return;
+        }
+        if(dataBuffer.type()==DataBuffer.RAW_HTTP){
+            while (true){
+                DataBuffer buffer = BufferProxy.buffer(4096,true);
+                dataBuffer.read(buffer);
+                if(!buffer.full()){
+                    buffer.flip();
+                    next.on(buffer,false);
+                    break;
+                }
+                buffer.flip();
+                next.on(buffer,true);
+            }
+            return;
+        }
+        if(dataBuffer.type()==DataBuffer.BATCH_TCP){
+            while (true){
+                int sz  = dataBuffer.readInt();
+                if(sz==0){
+                    break;
+                }
+                DataBuffer buffer = BufferProxy.buffer(sz,true);
+                dataBuffer.read(buffer);
+                buffer.flip();
+                next.on(buffer,true);
+            }
+        }
+    }
+
 }
