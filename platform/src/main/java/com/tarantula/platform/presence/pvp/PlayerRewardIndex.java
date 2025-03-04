@@ -15,6 +15,11 @@ public class PlayerRewardIndex extends RecoverableObject {
         this.label = LABEL;
     }
 
+    public PlayerRewardIndex(long playerId) {
+        this();
+        this.distributionId = playerId;
+    }
+
     @Override
     public boolean write(DataBuffer buffer) {
         buffer.writeLong(postBattleRewardId);

@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.icodesoftware.util.IntegerRangeKey;
 import com.tarantula.platform.ResponseHeader;
+import com.tarantula.platform.item.Application;
 
 import java.util.List;
 
@@ -35,6 +36,7 @@ public class MatchMaking extends ResponseHeader {
 
     public long nextRefreshTime;
     public List<BattleTeam> battleTeams;
+    public Application postBattleReward;
 
     private MatchMaking(int code,String message){
         this.code = code;
@@ -61,6 +63,7 @@ public class MatchMaking extends ResponseHeader {
         JsonArray teams = new JsonArray();
         battleTeams.forEach(battleTeam -> teams.add(battleTeam.toJson()));
         jsonObject.add("_opponents",teams);
+        if(postBattleReward!=null) jsonObject.add("postBattleReward",postBattleReward.toJson());
         return jsonObject;
     }
 
