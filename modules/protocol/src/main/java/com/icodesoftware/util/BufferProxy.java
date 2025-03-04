@@ -137,6 +137,7 @@ public class BufferProxy implements Recoverable.DataBuffer {
     }
     public void read(Recoverable.DataBuffer dest){
         while (!dest.full()){
+            if(!hasRemaining()) break;
             dest.writeByte(readByte());
         }
     }
