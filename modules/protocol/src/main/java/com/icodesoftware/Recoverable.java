@@ -53,7 +53,9 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable,V
     }
 
     interface DataBuffer{
-
+        int MEMORY = 0;
+        int RAW_HTTP = 1;
+        int BATCH_TCP = 2;
         DataBuffer writeHeader(DataHeader header);
         DataBuffer writeInt(int i);
         DataBuffer writeLong(long l);
@@ -104,6 +106,7 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable,V
         boolean full();
         int size();
         boolean direct();
+        default int type(){ return MEMORY;}
     }
 
     interface DataBufferPair extends Resettable,AutoCloseable{

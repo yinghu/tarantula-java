@@ -7,6 +7,9 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
 public class IOStreamDataBuffer implements Recoverable.DataBuffer {
+
+    protected int type;
+
     @Override
     public Recoverable.DataBuffer writeHeader(Recoverable.DataHeader header) {
         throw new RuntimeException("must override on subclass");
@@ -154,6 +157,11 @@ public class IOStreamDataBuffer implements Recoverable.DataBuffer {
         //throw new RuntimeException("must override on subclass");
     }
 
+    @Override
+    public int type() {
+        return this.type;
+    }
+
     public Recoverable.DataBuffer write(Recoverable.DataBuffer src){
         throw new RuntimeException("must override on subclass");
     }
@@ -166,8 +174,8 @@ public class IOStreamDataBuffer implements Recoverable.DataBuffer {
     public void read(byte[] dest){
 
     }
-    public static Recoverable.DataBuffer reader(InputStream src){
-        return InputStreamDataBufferProxy.proxy(src);
+    public static Recoverable.DataBuffer reader(InputStream src,int type){
+        return InputStreamDataBufferProxy.proxy(src,type);
     }
     public static Recoverable.DataBuffer writer(OutputStream dest){
         return OutputStreamDataBufferProxy.proxy(dest);

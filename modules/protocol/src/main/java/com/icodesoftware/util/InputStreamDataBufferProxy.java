@@ -10,8 +10,9 @@ public class InputStreamDataBufferProxy extends IOStreamDataBuffer{
 
     private final DataInputStream src;
 
-    private InputStreamDataBufferProxy(InputStream inputStream){
+    private InputStreamDataBufferProxy(InputStream inputStream,int type){
         this.src = new DataInputStream(inputStream);
+        this.type = type;
     }
 
     public Recoverable.DataHeader readHeader(){
@@ -119,8 +120,8 @@ public class InputStreamDataBufferProxy extends IOStreamDataBuffer{
     }
 
 
-    public static Recoverable.DataBuffer proxy(InputStream src){
-        return new InputStreamDataBufferProxy(src);
+    public static Recoverable.DataBuffer proxy(InputStream src,int type){
+        return new InputStreamDataBufferProxy(src,type);
     }
 
 }

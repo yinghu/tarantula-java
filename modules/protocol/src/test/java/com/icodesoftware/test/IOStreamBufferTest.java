@@ -39,7 +39,7 @@ public class IOStreamBufferTest {
             for(byte b : hb){
                 out.writeByte(b);
             }
-            Recoverable.DataBuffer buffer = IOStreamDataBuffer.reader(new ByteArrayInputStream(dest.toByteArray()));
+            Recoverable.DataBuffer buffer = IOStreamDataBuffer.reader(new ByteArrayInputStream(dest.toByteArray()), Recoverable.DataBuffer.RAW_HTTP);
             Assert.assertEquals(buffer.readLong(),100);
             Assert.assertTrue(buffer.readBoolean());
             Assert.assertEquals(buffer.readInt(),199);
@@ -73,7 +73,7 @@ public class IOStreamBufferTest {
         }
         src.flip();
         buffer.write(src);
-        Recoverable.DataBuffer reader = IOStreamDataBuffer.reader(new ByteArrayInputStream(dest.toByteArray()));
+        Recoverable.DataBuffer reader = IOStreamDataBuffer.reader(new ByteArrayInputStream(dest.toByteArray()), Recoverable.DataBuffer.RAW_HTTP);
         Recoverable.DataHeader header = reader.readHeader();
         Assert.assertEquals(header.revision(),100);
         Assert.assertEquals(header.factoryId(),10);
