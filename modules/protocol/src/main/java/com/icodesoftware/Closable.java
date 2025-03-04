@@ -1,6 +1,6 @@
 package com.icodesoftware;
 
 
-public interface Closable extends AutoCloseable{
+public interface Closable{
     default void close(){}
 }
