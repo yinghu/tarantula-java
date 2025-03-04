@@ -1,14 +1,22 @@
 package com.tarantula.platform.presence.pvp;
 
+import com.google.gson.JsonObject;
 import com.tarantula.platform.item.Application;
 
-import java.util.List;
 
 public class LeagueReward extends Application {
 
+    public LeagueReward(JsonObject config){
+        this.application = config;
+    }
 
+    @Override
+    public long distributionId(){
+        return Long.parseLong(this.application.get("ItemId").getAsString());
+    }
 
-    public List<LeagueRewardItem> rewards(){
-        return null;
+    @Override
+    public JsonObject toJson() {
+        return application;
     }
 }

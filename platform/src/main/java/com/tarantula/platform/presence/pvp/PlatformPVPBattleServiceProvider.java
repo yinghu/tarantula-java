@@ -446,14 +446,12 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     }
 
     private void onLeague(ConfigurableObject a){
-        PostBattleReward postBattleReward = new PostBattleReward();
-        postBattleReward.distributionId(a.application().get("PostBattleReward").getAsJsonArray().get(0).getAsLong());
-        PlacementReward placementReward = new PlacementReward();
-        placementReward.distributionId(a.application().get("PlacementReward").getAsJsonArray().get(0).getAsLong());
-        LeagueReward leagueReward = new LeagueReward();
-        leagueReward.distributionId(a.application().get("LeagueReward").getAsJsonArray().get(0).getAsLong());
         a.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
         League league = new League(a.setup());
+        JsonObject payload = league.toJson();
+        PostBattleReward postBattleReward = new PostBattleReward(payload.get("_postBattleReward").getAsJsonObject());
+        PlacementReward placementReward = new PlacementReward(payload.get("_placementReward").getAsJsonObject());
+        LeagueReward leagueReward = new LeagueReward(payload.get("_leagueReward").getAsJsonObject());
         league.postBattleReward = postBattleReward;
         league.placementReward = placementReward;
         league.leagueReward = leagueReward;

@@ -1,24 +1,21 @@
 package com.tarantula.platform.presence.pvp;
 
+import com.google.gson.JsonObject;
 import com.tarantula.platform.item.Application;
-import com.tarantula.platform.item.Commodity;
 
 public class PostBattleReward extends Application {
 
-
-
-
-    public int MinXPChipVariableRewardCount(){
-        return header.get("MinXPChipVariableRewardCount").getAsInt();
-    }
-    public int MaxXPChipVariableRewardCount(){
-        return header.get("MaxXPChipVariableRewardCount").getAsInt();
+    public PostBattleReward(JsonObject config){
+        this.application = config;
     }
 
-    public Commodity hardCurrencyPerWin(){
-
-        return null;
+    @Override
+    public long distributionId(){
+        return Long.parseLong(this.application.get("ItemId").getAsString());
     }
 
-
+    @Override
+    public JsonObject toJson() {
+        return application;
+    }
 }
