@@ -65,7 +65,7 @@ public interface Session extends OnApplication {
 
     default DataBuffer dataBuffer(){ return null;}
     default void dataBuffer(DataBuffer dataBuffer){}
-
+    default void streaming(Streaming streaming){}
     int referenceId();
     void referenceId(int referenceId);
 
@@ -91,6 +91,10 @@ public interface Session extends OnApplication {
         short batch();
         boolean broadcasting();
         boolean encrypted();
+    }
+
+    interface Streaming{
+        void onNext(DataBuffer dataBuffer,boolean next);
     }
 
 }
