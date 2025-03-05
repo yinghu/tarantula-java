@@ -3,6 +3,7 @@ package com.icodesoftware;
 import com.icodesoftware.service.HttpClientProvider;
 
 import java.io.File;
+import java.nio.file.Path;
 
 public interface PostOffice extends Closable{
 
@@ -33,7 +34,7 @@ public interface PostOffice extends Closable{
     }
 
     interface OnFile{
-        File home(Session session);
+        Path home(Session session);
     }
 
 }
