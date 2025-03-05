@@ -271,6 +271,9 @@ public class EtcdManager {
             return v;
         });
     }
+    public static EtcdNode node(String name){
+        return nodeIndexByName.get(name);
+    }
     public static List<EtcdNode> nodeView(boolean localNodeExcluded){
         List<EtcdNode> view = new ArrayList<>();
         nodeIndexByName.forEach((k,v)->{
