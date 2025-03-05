@@ -8,6 +8,7 @@ public class AbstractEvent extends TROnApplication implements Event {
     protected String tag;
     protected String destination;
     protected int retries;
+    protected int streamingBatchSize = 512;
 
     protected EventService eventService;
 
@@ -54,7 +55,7 @@ public class AbstractEvent extends TROnApplication implements Event {
         }
         if(dataBuffer.type()==DataBuffer.RAW_HTTP){
             while (true){
-                DataBuffer buffer = BufferProxy.buffer(4096,true);
+                DataBuffer buffer = BufferProxy.buffer(streamingBatchSize,true);
                 dataBuffer.read(buffer);
                 if(!buffer.full()){
                     buffer.flip();
