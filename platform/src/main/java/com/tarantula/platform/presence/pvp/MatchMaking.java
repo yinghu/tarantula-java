@@ -63,7 +63,7 @@ public class MatchMaking extends ResponseHeader {
         JsonArray teams = new JsonArray();
         battleTeams.forEach(battleTeam -> teams.add(battleTeam.toJson()));
         jsonObject.add("_opponents",teams);
-        if(postBattleReward!=null) jsonObject.add("postBattleReward",postBattleReward.toJson());
+        if(postBattleReward!=null) jsonObject.add("_postBattleReward",postBattleReward.toJson());
         return jsonObject;
     }
 

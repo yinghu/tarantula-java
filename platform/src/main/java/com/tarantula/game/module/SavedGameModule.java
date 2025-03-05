@@ -118,6 +118,11 @@ public class SavedGameModule extends ModuleHeader {
             LeagueList leagueList = gameServiceProvider.pvpBattleServiceProvider().league();
             session.write(leagueList.toJson().toString().getBytes());
         }
+
+        else if(session.action().equals("onRewardList")){
+            RewardList rewardList = gameServiceProvider.pvpBattleServiceProvider().rewardList(session);
+            session.write(rewardList.toJson().toString().getBytes());
+        }
         //pvp saves end
 
         else{
