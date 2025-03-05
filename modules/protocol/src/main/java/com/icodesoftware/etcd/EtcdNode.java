@@ -25,6 +25,7 @@ public class EtcdNode extends AbstractClusterNode {
     private EtcdNode(String name){
         this();
         this.name = name;
+        this.nodeName = name;
     }
 
     private EtcdNode(String name,String endpoint){

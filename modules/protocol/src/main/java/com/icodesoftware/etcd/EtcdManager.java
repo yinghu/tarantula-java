@@ -65,6 +65,7 @@ public class EtcdManager {
     private static ReentrantLock lock = new ReentrantLock(true);
     private final static CountDownLatch joined = new CountDownLatch(1);
     private static boolean running;
+    private static NodeStateListener nodeStateListener;
     private EtcdManager(){}
     public static void optional(EtcdConfiguration etcdConfiguration){
         configuration = etcdConfiguration;
@@ -83,15 +84,16 @@ public class EtcdManager {
     public static void registerETCDWatchListener(ETCDWatchListener listener){
         watcherIndex.put(listener.watchKey(),listener);
     }
-    public static void setup(ServiceContext serviceContext,NodeStartingListener nodeStartingListener) throws Exception{
+    public static void setup(ServiceContext serviceContext, NodeStateListener nodeStateListener) throws Exception{
         ClusterProvider.Node node = serviceContext.node();
         EtcdNode etcdNode = EtcdNode.create(node.nodeName(),node.address());
         etcdNode.httpClientProvider = serviceContext.httpClientProvider();
         etcdNode.etcdHost = node.etcdHost();
-        start(etcdNode,node.clusterNameSuffix(),nodeStartingListener);
+        start(etcdNode,node.clusterNameSuffix(),nodeStateListener);
     }
-    public static void start(EtcdNode localNode,String clusterName,NodeStartingListener nodeStartingListener) throws Exception{
+    public static void start(EtcdNode localNode, String clusterName, NodeStateListener nodeStateListener) throws Exception{
         if(running) return;
+        EtcdManager.nodeStateListener = nodeStateListener;
         EtcdManager.registerETCDWatchListener(new NodeJoinListener());
         EtcdManager.registerETCDWatchListener(new NodePingListener());
         EtcdManager.registerETCDWatchListener(new NodeJoinedListener());
@@ -103,6 +105,7 @@ public class EtcdManager {
             EtcdManager.localNode.httpClientProvider = new HttpCaller();
             EtcdManager.localNode.httpClientProvider.start();
         }
+        register(localNode);
         EtcdManager.watchStart = clusterName+"#";
         WatchKey.PREFIX = EtcdManager.watchStart;//overriding default
         EtcdManager.watchEnd = clusterName+"$";
@@ -124,7 +127,7 @@ public class EtcdManager {
                 }
             }
             CountDownLatch starting = new CountDownLatch(1);
-            nodeStartingListener.onStarting(starting);
+            nodeStateListener.onStarting(starting);
             try{starting.await();}catch (Exception ex){}
             running = EtcdManager.register();
             joined.countDown();
@@ -150,6 +153,31 @@ public class EtcdManager {
     public static void shutdown() throws Exception{
         running = false;
         watcher.interrupt();
+    }
+
+    public static void register(EtcdNode node){
+        logger.warn("Registering node ["+node.name()+" : "+node.address()+"]");
+        String base64Key = Base64Util.toBase64String(node.name().getBytes());
+        String base64Value = Base64Util.toBase64String(node.address().getBytes());
+        put(base64Key,base64Value);
+    }
+
+    public static void lookup(String key, EtcdEventParser.OnKeyValue onKeyValue){
+        try {
+            HttpClientProvider httpCaller = localNode.httpClientProvider;
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("key",Base64Util.toBase64String(key.getBytes()));
+            ResponseData data = new ResponseData();
+            int code = httpCaller.request(client->{
+                HttpResponse<String> response = client.send(build(GET,jsonObject.toString()),HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+                data.dataAsString = response.body();
+                return response.statusCode();
+            });
+            if(code!=200) throw new RuntimeException(data.dataAsString);
+            EtcdEventParser.parse(data.dataAsString,onKeyValue);
+        }catch (Exception ex){
+            logger.error("Error on etcd lookup",ex);
+        }
     }
 
     public static void register(EtcdEvent event){
@@ -220,6 +248,7 @@ public class EtcdManager {
             lock.lock();
             nodeIndexByName.put(node.name(),node);
             partition();
+            nodeStateListener.onJoined(node);
         }finally {
             lock.unlock();
         }
@@ -295,7 +324,10 @@ public class EtcdManager {
                 }
             });
             if(pending.size()>0){
-                pending.forEach(kickoff->nodeIndexByName.remove(kickoff.name()));
+                pending.forEach(kickoff->{
+                    nodeStateListener.onLeft(kickoff);
+                    nodeIndexByName.remove(kickoff.name());
+                });
                 partition();
             }
         }finally {
