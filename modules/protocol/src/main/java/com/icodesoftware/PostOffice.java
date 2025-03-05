@@ -2,6 +2,8 @@ package com.icodesoftware;
 
 import com.icodesoftware.service.HttpClientProvider;
 
+import java.io.File;
+
 public interface PostOffice extends Closable{
 
     //app to client
@@ -11,6 +13,8 @@ public interface PostOffice extends Closable{
     default OnEvent onEvent(){ return null;}
 
     default OnHttp onHttp(){ return null;}
+
+    default OnFile onFile(){ return null;}
 
     interface OnEmail{
         boolean send(String text);
@@ -26,6 +30,10 @@ public interface PostOffice extends Closable{
 
     interface OnHttp{
         int request(HttpClientProvider.OnRequest onRequest);
+    }
+
+    interface OnFile{
+        File home(Session session);
     }
 
 }
