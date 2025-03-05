@@ -11,6 +11,7 @@ public class TROnSession extends TROnApplication implements OnSession {
 
     protected String login;
     protected String role = TRRole.player.name();
+    protected String home;
 
     public static final OnSession PASSWORD_NOT_MATCHED = new TROnSession("PASSWORD NOT MATCHED");
     public static final OnSession INVALID_TOKEN = new TROnSession("INVALID TOKEN");
@@ -55,6 +56,16 @@ public class TROnSession extends TROnApplication implements OnSession {
     public void role(String role){
         this.role = role;
     }
+
+    @Override
+    public String home() {
+        return home;
+    }
+    @Override
+    public void home(String home){
+        this.home = home;
+    }
+
     public String toString(){
         return "OnSession->["+token+"]";
     }
@@ -67,6 +78,7 @@ public class TROnSession extends TROnApplication implements OnSession {
         jp.addProperty("Stub",Long.toString(stub));
         jp.addProperty("Token",token);
         jp.addProperty("Login",login);
+        jp.addProperty("Home",home);
         return jp;
     }
 
