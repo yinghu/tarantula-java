@@ -1099,7 +1099,9 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
     public TokenValidator validator(){
         return tokenValidatorProvider.tokenValidator();
     }
-
+    public ClusterProvider.Node node(OnSession onSession){
+        throw new UnsupportedOperationException("Must have the implementation");
+    }
     public void registerTimerListener(TimerListener timerListener){
 
     }

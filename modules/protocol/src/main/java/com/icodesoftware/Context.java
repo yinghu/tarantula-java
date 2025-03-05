@@ -34,7 +34,7 @@ public interface Context {
     long distributionId();
 
     ClusterProvider.Node node();
-
+    ClusterProvider.Node node(OnSession onSession);
     TokenValidator validator();
 
     HttpClientProvider httpClientProvider();

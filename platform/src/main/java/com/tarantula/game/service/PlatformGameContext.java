@@ -167,4 +167,8 @@ public class PlatformGameContext implements GameContext {
     public HttpClientProvider httpClientProvider(){
         return serviceContext.httpClientProvider();
     }
+
+    public ClusterProvider.Node node(OnSession onSession){
+        throw new UnsupportedOperationException("Must have the implementation");
+    }
 }

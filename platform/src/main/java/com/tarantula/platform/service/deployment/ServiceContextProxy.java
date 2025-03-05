@@ -162,4 +162,8 @@ public class ServiceContextProxy implements ServiceContext {
     public void registerTimerListener(TimerListener timerListener){
 
     }
+
+    public ClusterProvider.Node node(OnSession onSession){
+        throw new UnsupportedOperationException("Must have the implementation");
+    }
 }

@@ -221,4 +221,8 @@ public class TarantulaApplicationContext implements ApplicationContext, EventLis
     public HttpClientProvider httpClientProvider(){
         return this.tarantulaContext.httpClientProvider();
     }
+
+    public ClusterProvider.Node node(OnSession onSession){
+        throw new UnsupportedOperationException("Must have the implementation");
+    }
 }

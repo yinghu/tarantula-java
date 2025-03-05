@@ -131,6 +131,9 @@ public class TRContext implements Context {
         return EtcdManager.localNode();
     }
 
+    public ClusterProvider.Node node(OnSession onSession){
+        throw new UnsupportedOperationException("Must have the implementation");
+    }
     @Override
     public TokenValidator validator() {
         return tokenValidator;
