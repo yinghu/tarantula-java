@@ -167,6 +167,18 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         return battleLogList;
     }
 
+    public RewardList rewardList(Session session){
+        RewardList rewardList = new RewardList();
+        PlayerRewardIndex playerRewardIndex = playerRewardIndex(session.distributionId());
+        if(playerRewardIndex.placementRewardId > 0){
+            rewardList.placementReward = rewardIndex.get(playerRewardIndex.placementRewardId);
+        }
+        if(playerRewardIndex.leagueRewardId > 0){
+            rewardList.leagueReward = rewardIndex.get(playerRewardIndex.leagueRewardId);
+        }
+        return  rewardList;
+    }
+
     private BattleTeam assembly(long teamId){
         BattleTeam battleTeam = new BattleTeam();
         return battleTeam.load(dataStore,teamId);
