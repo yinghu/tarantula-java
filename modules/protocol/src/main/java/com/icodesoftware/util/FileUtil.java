@@ -46,11 +46,11 @@ public class FileUtil {
     public static String currentDirectory() {
         return Paths.get(".").toAbsolutePath().normalize().toString();
     }
-    public static void createDirectory(String dir){
+    public static Path createDirectory(String dir){
         Path directory = Paths.get(dir);
-        if(Files.exists(directory)) return;
+        if(Files.exists(directory)) return directory;
         try{
-            Files.createDirectories(directory);
+            return Files.createDirectories(directory);
         }catch (Exception ex){
             throw new RuntimeException("cannot create directory",ex);
         }
