@@ -110,7 +110,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             if(thirdPartyToken == null){
                 tokenValidated = this.context.validator().validateToken(params);
 
-                thirdPartyToken = (String) params.get("token");
+                thirdPartyToken = (String) params.get("thirdPartyToken");
                 if(thirdPartyToken != null){
                     _ox.thirdPartyToken(thirdPartyToken);
                     _ox.update();
@@ -322,8 +322,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             loginProvider.update();
             return onSession(access,session);
         }
-        //this.context.log("DeviceId : "+loginProvider.deviceId()+" ; "+deviceId+" Access :"+access.successful(),OnLog.WARN);
-        //this.context.log("Session not expired : "+lastPing.format(DateTimeFormatter.ISO_DATE_TIME),OnLog.WARN);
+        this.context.log("Session Not Expired:: DeviceId : "+loginProvider.deviceId()+" ; "+deviceId,OnLog.WARN);
         session.write(JsonUtil.toSimpleResponse(false,"Session not expired on another device").getBytes());
         return false;
     }
