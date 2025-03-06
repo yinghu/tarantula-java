@@ -225,4 +225,11 @@ public class BufferProxy implements Recoverable.DataBuffer {
     public boolean direct(){
         return buffer.isDirect();
     }
+
+    public static DataBufferOutputStream outputStream(int initialSize,boolean direct){
+        return new DataBufferOutputStream(initialSize,direct);
+    }
+    public static DataBufferInputStream inputStream(Recoverable.DataBuffer src){
+        return new DataBufferInputStream(src);
+    }
 }
