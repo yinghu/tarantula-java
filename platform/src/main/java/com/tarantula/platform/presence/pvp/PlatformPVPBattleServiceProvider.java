@@ -22,6 +22,7 @@ import com.tarantula.platform.item.PlatformItemServiceProvider;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -83,7 +84,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         }
 
         List<BattleTeam> matches = new ArrayList<>();
-        List<BattleLog> battleLogs = battleHistory(session);
+        List<BattleLog> offenseHistory = offenseHistory(session);
         Rating attackerRating = platformGameServiceProvider.presenceServiceProvider().rating(session);
         BattleTeam attackersDefenseTeam = defenseTeam(attackerRating);
 
@@ -93,7 +94,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             if(defenseTeam != null){
                 defenseTeam.elo = defenderRating.level();
 
-                battleLogs.forEach(battleLog -> {
+                offenseHistory.forEach(battleLog -> {
                     if(battleLog.defenseTeam.distributionId() == defenseTeam.distributionId()) {
                         defenseTeam.battled = true;
                         defenseTeam.battlePoint = battleLog.offenseEloGain;
@@ -172,62 +173,47 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         return battleTeam.load(dataStore,teamId);
     }
 
+    private List<BattleLog> offenseHistory(Session session){
+        List<BattleLog> battleLogs = new ArrayList<>();
+        PlayerBattleLogIndex logIndex = new PlayerBattleLogIndex();
+        logIndex.distributionId(session.distributionId());
+        battleHistory.createIfAbsent(logIndex,true);
+
+        for(long battleId: logIndex.getOffenseBattles()){
+            addToBattleLog(battleLogs, battleId);
+        }
+
+        return battleLogs;
+    }
+
     private List<BattleLog> battleHistory(Session session){
         List<BattleLog> battleLogs = new ArrayList<>();
         PlayerBattleLogIndex logIndex = new PlayerBattleLogIndex();
         logIndex.distributionId(session.distributionId());
         battleHistory.createIfAbsent(logIndex,true);
-        if(logIndex.battleId0>0){
-            BattleLogIndex log = new BattleLogIndex();
-            log.distributionId(logIndex.battleId0);
-            if(battleHistory.load(log)){
-                BattleLog battleLog = new BattleLog(log);
-                battleLog.defenseTeam = assembly(log.defenseTeamId);
-                battleLog.offenseTeam = assembly(log.offenseTeamId);
-                battleLogs.add(battleLog);
-            }
+
+        for(long battleId: logIndex.getOffenseBattles()){
+            addToBattleLog(battleLogs, battleId);
         }
-        if(logIndex.battleId1>0){
-            BattleLogIndex log = new BattleLogIndex();
-            log.distributionId(logIndex.battleId1);
-            if(battleHistory.load(log)){
-                BattleLog battleLog = new BattleLog(log);
-                battleLog.defenseTeam = assembly(log.defenseTeamId);
-                battleLog.offenseTeam = assembly(log.offenseTeamId);
-                battleLogs.add(battleLog);
-            }
+
+        for(long battleId: logIndex.getDefenseBattles()){
+            addToBattleLog(battleLogs, battleId);
         }
-        if(logIndex.battleId2>0){
-            BattleLogIndex log = new BattleLogIndex();
-            log.distributionId(logIndex.battleId2);
-            if(battleHistory.load(log)){
-                BattleLog battleLog = new BattleLog(log);
-                battleLog.defenseTeam = assembly(log.defenseTeamId);
-                battleLog.offenseTeam = assembly(log.offenseTeamId);
-                battleLogs.add(battleLog);
-            }
-        }
-        if(logIndex.battleId3>0){
-            BattleLogIndex log = new BattleLogIndex();
-            log.distributionId(logIndex.battleId3);
-            if(battleHistory.load(log)){
-                BattleLog battleLog = new BattleLog(log);
-                battleLog.defenseTeam = assembly(log.defenseTeamId);
-                battleLog.offenseTeam = assembly(log.offenseTeamId);
-                battleLogs.add(battleLog);
-            }
-        }
-        if(logIndex.battleId4>0){
-            BattleLogIndex log = new BattleLogIndex();
-            log.distributionId(logIndex.battleId4);
-            if(battleHistory.load(log)){
-                BattleLog battleLog = new BattleLog(log);
-                battleLog.defenseTeam = assembly(log.defenseTeamId);
-                battleLog.offenseTeam = assembly(log.offenseTeamId);
-                battleLogs.add(battleLog);
-            }
-        }
+
         return battleLogs;
+    }
+
+    private void addToBattleLog(List<BattleLog> battleLogs, long battleId) {
+        if(battleId > 0){
+            BattleLogIndex log = new BattleLogIndex();
+            log.distributionId(battleId);
+            if(battleHistory.load(log)){
+                BattleLog battleLog = new BattleLog(log);
+                battleLog.defenseTeam = assembly(log.defenseTeamId);
+                battleLog.offenseTeam = assembly(log.offenseTeamId);
+                battleLogs.add(battleLog);
+            }
+        }
     }
 
     public void onLoaded(SeasonCredentialConfiguration loaded){
@@ -287,16 +273,18 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             logger.warn("Should be happening if disk space not full");
             return;
         }
+
         PlayerBattleLogIndex defenseLogIndex = new PlayerBattleLogIndex();
         defenseLogIndex.distributionId(battleEndResult.defensePlayerId);
         defenseLogIndex.dataStore(battleHistory);
         battleHistory.createIfAbsent(defenseLogIndex,true);
-        defenseLogIndex.update(battleLog.distributionId());
+        defenseLogIndex.updateDefenseLogs(battleLog.distributionId());
+
         PlayerBattleLogIndex offenseLogIndex = new PlayerBattleLogIndex();
         offenseLogIndex.distributionId(battleEndResult.offensePlayerId);
         offenseLogIndex.dataStore(battleHistory);
         battleHistory.createIfAbsent(offenseLogIndex,true);
-        offenseLogIndex.update(battleLog.distributionId());
+        offenseLogIndex.updateOffenseLogs(battleLog.distributionId());
     }
 
     private void startSeason(SeasonRuntime seasonRuntime){

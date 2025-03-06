@@ -10,6 +10,11 @@ public class PlayerBattleLogIndex extends RecoverableObject {
     public long battleId2;
     public long battleId3;
     public long battleId4;
+    public long battleId5;
+    public long battleId6;
+    public long battleId7;
+    public long battleId8;
+    public long battleId9;
 
     @Override
     public int getFactoryId() {
@@ -27,6 +32,13 @@ public class PlayerBattleLogIndex extends RecoverableObject {
         battleId2 = buffer.readLong();
         battleId3 = buffer.readLong();
         battleId4 = buffer.readLong();
+        try {
+            battleId5 = buffer.readLong();
+            battleId6 = buffer.readLong();
+            battleId7 = buffer.readLong();
+            battleId8 = buffer.readLong();
+            battleId9 = buffer.readLong();
+        }catch (Exception ignored){}
         return true;
     }
 
@@ -37,10 +49,15 @@ public class PlayerBattleLogIndex extends RecoverableObject {
         buffer.writeLong(battleId2);
         buffer.writeLong(battleId3);
         buffer.writeLong(battleId4);
+        buffer.writeLong(battleId5);
+        buffer.writeLong(battleId6);
+        buffer.writeLong(battleId7);
+        buffer.writeLong(battleId8);
+        buffer.writeLong(battleId9);
         return true;
     }
 
-    public void update(long latestBattleId){
+    public void updateOffenseLogs(long latestBattleId){
         battleId0 = battleId1;
         battleId1 = battleId2;
         battleId2 = battleId3;
@@ -48,4 +65,22 @@ public class PlayerBattleLogIndex extends RecoverableObject {
         battleId4 = latestBattleId;
         update();
     }
+
+    public void updateDefenseLogs(long latestBattleId){
+        battleId5 = battleId6;
+        battleId6 = battleId7;
+        battleId7 = battleId8;
+        battleId8 = battleId9;
+        battleId9 = latestBattleId;
+        update();
+    }
+
+    public long[] getOffenseBattles(){
+        return new long[]{battleId0, battleId1, battleId2, battleId3, battleId4};
+    }
+
+    public long[] getDefenseBattles(){
+        return new long[]{battleId5, battleId6, battleId7, battleId8, battleId9};
+    }
+
 }
