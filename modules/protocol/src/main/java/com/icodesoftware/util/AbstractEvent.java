@@ -50,7 +50,7 @@ public class AbstractEvent extends TROnApplication implements Event {
     public void streaming(Streaming next){
         if(dataBuffer==null) return;
         if(dataBuffer.type()==DataBuffer.MEMORY){
-            next.on(dataBuffer,false);
+            next.on(dataBuffer);
             return;
         }
         if(dataBuffer.type()==DataBuffer.RAW_HTTP){
@@ -59,11 +59,11 @@ public class AbstractEvent extends TROnApplication implements Event {
                 dataBuffer.read(buffer);
                 if(!buffer.full()){
                     buffer.flip();
-                    next.on(buffer,false);
+                    next.on(buffer);
                     break;
                 }
                 buffer.flip();
-                next.on(buffer,true);
+                next.on(buffer);
             }
             return;
         }
@@ -76,7 +76,7 @@ public class AbstractEvent extends TROnApplication implements Event {
                 DataBuffer buffer = BufferProxy.buffer(sz,true);
                 dataBuffer.read(buffer);
                 buffer.flip();
-                next.on(buffer,true);
+                next.on(buffer);
             }
         }
     }
