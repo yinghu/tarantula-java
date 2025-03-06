@@ -97,17 +97,38 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             Map<String,Object> params = acc.toMap();
             params.put(OnAccess.SYSTEM_ID,session.systemId());
             String typeId = (String) params.get(OnAccess.TYPE_ID);
-            String deviceId = acc.property("deviceId")!=null?acc.property("deviceId").toString():"device-id-assigned";
+            String deviceId = acc.property("deviceId") != null
+                    ? acc.property("deviceId").toString()
+                    : "device-id-assigned";
 
-            boolean suc = this.context.validator().validateToken(params);
             LoginProvider _ox = userService.loginProvider(session.distributionId());
+            String thirdPartyToken = (String) params.get("thirdPartyToken");
 
-            if(suc && _ox!=null ){
+            // If this is the first login of a session, validate the token
+            // if it's a refresh login, ensure the token sent is the same as what we have saved
+            var tokenValidated = false;
+            if(thirdPartyToken == null){
+                tokenValidated = this.context.validator().validateToken(params);
+
+                thirdPartyToken = (String) params.get("thirdPartyToken");
+                if(thirdPartyToken != null){
+                    _ox.thirdPartyToken(thirdPartyToken);
+                    _ox.update();
+                }
+            }
+            else{
+                tokenValidated = thirdPartyToken.equals(_ox.thirdPartyToken());
+            }
+
+            // If we know this platform (which should always be the case) and the token is validated
+            // do the normal login flow, saving the token on the session
+            // else if token validated, create a custom provider for auth
+            if(tokenValidated && _ox != null){
                 OnSession onSession = this.login(session.distributionId(),_ox.password(),session);
-                onSession.thirdPartyToken((String) params.get("thirdPartyToken")); //Cache ThirdPartyToken on Client
+                onSession.thirdPartyToken(thirdPartyToken); //Cache ThirdPartyToken on Client
                 onPlatformProvider(onSession,session,_ox,deviceId);
             }
-            else if(suc && _ox == null){
+            else if(tokenValidated && _ox == null){
                 ThirdPartyLogin thirdPartyLogin = new ThirdPartyLogin(typeId+"#"+params.get("provider"),SystemUtil.oid(),deviceId);
                 thirdPartyLogin.distributionKey(session.systemId());
                 userService.createLoginProvider(thirdPartyLogin);
@@ -115,7 +136,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
                 acc.typeId(typeId);
                 createLogin(acc,session.distributionId(),AccessControl.player.name(),true,acc.name(),true);
                 OnSession onSession = login(session.distributionId(),thirdPartyLogin.password(),session);
-                onSession.thirdPartyToken((String) params.get("thirdPartyToken")); //Cache ThirdPartyToken on Client
+                onSession.thirdPartyToken(thirdPartyToken); //Cache ThirdPartyToken on Client
                 onPlatformProvider(onSession,session,thirdPartyLogin,deviceId);
             }
             else{
@@ -301,8 +322,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             loginProvider.update();
             return onSession(access,session);
         }
-        //this.context.log("DeviceId : "+loginProvider.deviceId()+" ; "+deviceId+" Access :"+access.successful(),OnLog.WARN);
-        //this.context.log("Session not expired : "+lastPing.format(DateTimeFormatter.ISO_DATE_TIME),OnLog.WARN);
+        this.context.log("Session Not Expired:: DeviceId : "+loginProvider.deviceId()+" ; "+deviceId,OnLog.WARN);
         session.write(JsonUtil.toSimpleResponse(false,"Session not expired on another device").getBytes());
         return false;
     }
