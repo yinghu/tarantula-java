@@ -34,4 +34,14 @@ public class DataBufferOutputStream extends OutputStream {
     public Recoverable.DataBuffer src(){
         return dataBuffer;
     }
+
+    public void write(Recoverable.DataBuffer dataBuffer){
+        while (dataBuffer.hasRemaining()){
+            try{
+                write(dataBuffer.readByte());
+            }catch (Exception ex){
+                throw new RuntimeException(ex);
+            }
+        }
+    }
 }
