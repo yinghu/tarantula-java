@@ -27,6 +27,6 @@ public class PostOfficeSession implements PostOffice {
 
     @Override
     public void reset() {
-        
+
     }
 }
