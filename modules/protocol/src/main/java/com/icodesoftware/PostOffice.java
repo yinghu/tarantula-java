@@ -4,7 +4,7 @@ import com.icodesoftware.service.HttpClientProvider;
 
 import java.nio.file.Path;
 
-public interface PostOffice extends Closable{
+public interface PostOffice extends Closable,Resettable{
 
     //app to client
     default OnEmail onEmail(String emailAddress){ return null;}

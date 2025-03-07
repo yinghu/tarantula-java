@@ -25,4 +25,8 @@ public class PostOfficeSession implements PostOffice {
         //return new PostOfficeOnTag(tag,this.eventService);
     //}
 
+    @Override
+    public void reset() {
+        
+    }
 }
