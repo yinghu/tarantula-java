@@ -24,6 +24,8 @@ public interface GameContext extends Context {
     Statistics statistics(Session session);
     Rating rating(Session session);
 
+    long seasonId();
+
     Achievement achievement(Session session);
 
     ApplicationResource.Redeemer redeemer(Session session);

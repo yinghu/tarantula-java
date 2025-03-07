@@ -94,6 +94,13 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         }
         //single read to validate party items
 
+        if(battleTransaction.opponentId > 0){
+            if(gameContext.seasonId() == 0){
+                session.write(JsonUtil.toSimpleResponse(false,"no season available").getBytes());
+                return;
+            }
+        }
+
         //if party check fail return false;
         Transaction transaction = gameContext.applicationSchema().transaction();
         boolean created = transaction.execute(ctx->{
@@ -170,6 +177,13 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         boolean win = battleTransaction.win;
         //ELO UPDATE IF PVP battle
         if(battleTransaction.opponentId>0){
+            if(battleTransaction.seasonId > 0){
+                if(gameContext.seasonId() == 0){
+                    session.write(JsonUtil.toSimpleResponse(false,"no season available").getBytes());
+                    return;
+                }
+            }
+
             Rating rating = gameContext.rating(session).elo(battleTransaction.win,battleTransaction.opponentId,battleTransaction.teamId);
             //push analytics event to s3
         }

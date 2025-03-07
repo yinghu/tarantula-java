@@ -88,6 +88,9 @@ public class GameServiceContext implements GameContext {
     }
 
     @Override
+    public long seasonId() {return 0L;}
+
+    @Override
     public Achievement achievement(Session session) {
         return null;
     }
