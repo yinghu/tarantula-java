@@ -21,6 +21,7 @@ public class BattleTeam extends RecoverableObject {
 
     //calculating on match-making
     public int winPointsEstimated;
+    public int losePointsEstimated;
     public int elo;
     public boolean battled;
     public int battlePoint; //positive win , negative lost
@@ -74,6 +75,7 @@ public class BattleTeam extends RecoverableObject {
             JsonObject resp = new JsonObject();
             resp.addProperty("teamId",distributionId);
             resp.addProperty("winPointsEstimated",winPointsEstimated);
+            resp.addProperty("losePointsEstimated",losePointsEstimated);
             resp.addProperty("elo",elo);
             resp.addProperty("playerId",playerId);
             resp.addProperty("teamPower",teamPower);
