@@ -22,19 +22,25 @@ import com.tarantula.platform.item.PlatformItemServiceProvider;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
 public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvider implements Configurable.Listener<SeasonCredentialConfiguration>{
 
+    //NEVER PUSH TO REMOTE WITH TRUE
+    private static final boolean DEV_CONFIG = false;
+
     private static final long CURRENT_SEASON_INDEX = 0;
     public static final String NAME = "pvp_battle";
+    // seconds dev sample config replaced with the pvp config section DEV_CONFIG = false
     private int teamCreationWaitingTime = 5;
-    private int seasonTimeGap = 10; //minutes
-    private int seasonRunningDays = 12;//days
-    private int reMatchWaitingTimeMinutes = 60; //minutes
+    private int seasonTimeGap = 60;
+    private int seasonRunningTime = 180;
+    private int reMatchWaitingTime = 180;
+    // seconds end
+    private int championsLeaderBoardThreshold = 2050;
+
     private ConcurrentHashMap<Long, Application> rewardIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Long, SeasonCredentialConfiguration.Season> seasons = new ConcurrentHashMap();
     private ConcurrentHashMap<Long,League> leagueConfigs = new ConcurrentHashMap<>();
@@ -55,18 +61,23 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     @Override
     public void setup(ServiceContext serviceContext) {
         super.setup(serviceContext);
+        this.logger = JDKLogger.getLogger(PlatformPVPBattleServiceProvider.class);
         Configuration configuration = serviceContext.configuration("game-presence-settings");
         JsonObject pvp = ((JsonElement)configuration.property("pvp")).getAsJsonObject();
-        teamCreationWaitingTime = pvp.get("waitingMinutesPerTeamFormation").getAsInt();
-        seasonTimeGap = pvp.get("seasonTimeGapMinutes").getAsInt();
-        seasonRunningDays = pvp.get("seasonRunningDays").getAsInt();
-        reMatchWaitingTimeMinutes = pvp.get("reMatchWaitingTimeMinutes").getAsInt();
+        if(!DEV_CONFIG){
+            logger.warn("Loading configuration values to override dev values");
+            teamCreationWaitingTime = pvp.get("waitingMinutesPerTeamFormation").getAsInt()*60; //to seconds
+            seasonTimeGap = pvp.get("seasonTimeGapMinutes").getAsInt()*60; //to seconds
+            seasonRunningTime= pvp.get("seasonRunningDays").getAsInt()*24*60*60; //to seconds
+            reMatchWaitingTime = pvp.get("reMatchWaitingTimeMinutes").getAsInt()*60; //to seconds
+        }
+        championsLeaderBoardThreshold = pvp.get("championsLeaderBoardThreshold").getAsInt();
         this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
         this.playerStateStore = applicationPreSetup.dataStore(gameCluster,NAME+"_player_state");
         this.matchMakingStore = applicationPreSetup.localDataStore(gameCluster,NAME+"_match_making");
         this.battleHistory = applicationPreSetup.dataStore(gameCluster,NAME+"_history");
         this.scheduleStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,gameCluster.typeId()+"."+NAME);
-        this.logger = JDKLogger.getLogger(PlatformPVPBattleServiceProvider.class);
+
         this.logger.warn("PVP battle service provider started on ->"+gameServiceName);
         this.serviceContext.eventService().registerEventListener(gameEndTopic,e->{
             onEvent(e);
@@ -245,12 +256,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         scheduleStore.mapRemove(removed.key().asBinary());
         this.rotation.seasonRotation = 0;
         if(this.rotation.scheduledFuture!=null) this.rotation.scheduledFuture.cancel(true);
-        Configurable.Listener listener = configurableListeners.get(OnAccess.SEASON);
-        if(listener==null) return;
         SeasonCredentialConfiguration.Season current = seasons.remove(CURRENT_SEASON_INDEX);
-        if(current!=null){
-            listener.onRemoved(current);
-        }
+        onSeasonListener(current,true);
         seasons.clear();
     }
 
@@ -306,45 +313,67 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         this.rotation.scheduledFuture = serviceContext.schedule(new ScheduleRunner(endTimeDuration,()->{
             endSeason();
         }));
+        logger.warn("Season starting ["+seasonRuntime.currentSeason+" : "+seasonRuntime.sequence+"]");
+        SeasonCredentialConfiguration.Season season = seasons.get(seasonRuntime.currentSeason);
+        seasons.put(CURRENT_SEASON_INDEX,season);
+        onSeasonListener(season,false);
+    }
+
+    private void onSeasonListener(SeasonCredentialConfiguration.Season updated,boolean ended){
+        if(updated==null) return;
         Configurable.Listener listener = configurableListeners.get(OnAccess.SEASON);
         if(listener==null){
             logger.warn("No game module listener available");
             return;
         }
-        SeasonCredentialConfiguration.Season season = seasons.get(seasonRuntime.currentSeason);
-        seasons.put(CURRENT_SEASON_INDEX,season);
-        listener.onLoaded(season);
+        if(ended){
+            listener.onRemoved(updated);
+            return;
+        }
+        listener.onLoaded(updated);
     }
 
     private void endSeason(){
-        if(rotation.seasonRotation==0) return;
+        if(rotation.seasonRotation==0){
+            logger.warn("No season rotation has scheduled");
+            return;
+        }
+        onSeasonListener(currentSeason(),true);
+        seasons.remove(CURRENT_SEASON_INDEX);
         byte[] lockKey = SnowflakeKey.from(rotation.seasonRotation).asBinary();
         try{
             scheduleStore.mapLock(lockKey);
-            scheduleStore.mapRemove(lockKey);
-            //do end first
-            //start next if any
-            SeasonCredentialConfiguration.Season next = seasons.get(rotation.sequence+1);
-            SeasonRuntime seasonRuntime = new SeasonRuntime();
-            seasonRuntime.distributionId(rotation.seasonRotation);
-            dataStore.createIfAbsent(seasonRuntime,true);
-            if(next==null){
-                seasonRuntime.currentSeason=0;
-                seasonRuntime.endTime = 0;
-                seasonRuntime.ended = true;
+            if(scheduleStore.mapRemove(lockKey)==null){
+                logger.warn("Season end processing on other nodes");
+            }else{
+                logger.warn("Processing season end ["+rotation.sequence+"]["+rotation.currentSeason+"]");
+                //do end first
+                //start next if any
+                SeasonCredentialConfiguration.Season next = seasons.get(rotation.sequence+1);
+                SeasonRuntime seasonRuntime = new SeasonRuntime();
+                seasonRuntime.distributionId(rotation.seasonRotation);
+                dataStore.createIfAbsent(seasonRuntime,true);
+                if(next==null){
+                    logger.warn("No season rotation ["+rotation.seasonRotation+"]");
+                    seasonRuntime.currentSeason=0;
+                    seasonRuntime.endTime = 0;
+                    seasonRuntime.ended = true;
+                }
+                else{
+                    seasonRuntime.sequence++;
+                    seasonRuntime.currentSeason = next.seasonId;
+                    seasonRuntime.endTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(seasonRunningTime).plusSeconds(seasonTimeGap));
+                    scheduleStore.mapSet(lockKey,seasonRuntime.toBinary());
+                }
+                dataStore.update(seasonRuntime);
             }
-            else{
-                seasonRuntime.currentSeason = next.seasonId;
-                seasonRuntime.endTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusDays(seasonRunningDays).plusMinutes(seasonTimeGap));
-                scheduleStore.mapSet(lockKey,seasonRuntime.toBinary());
-            }
-            dataStore.update(seasonRuntime);
         }catch (Exception ex){
             logger.error("Error on end season",ex);
         }
         finally {
             scheduleStore.mapUnlock(lockKey);
         }
+        try{Thread.sleep(1000);}catch (Exception ex){} //waiting for clustering data update
         scheduleSeason();
     }
 
@@ -365,14 +394,16 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             dataStore.createIfAbsent(seasonRuntime,true);
             if(seasonRuntime.ended){
                 logger.warn("Season rotation is ended");
+                rotation.seasonRotation = 0;
                 return;
             }
             if(seasonRuntime.currentSeason==0){
                 SeasonCredentialConfiguration.Season startSeason = seasons.get(1L);
                 seasonRuntime.sequence = 1;
                 seasonRuntime.currentSeason = startSeason.seasonId;
-                seasonRuntime.endTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusDays(seasonRunningDays).plusMinutes(seasonTimeGap));
-                dataStore.update(startSeason);
+                seasonRuntime.endTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(seasonRunningTime).plusSeconds(seasonTimeGap));
+                dataStore.update(seasonRuntime);
+                logger.warn("Initializing season from ["+seasonRuntime.currentSeason+" : "+seasonRuntime.sequence+"]");
             }
             scheduleStore.mapSet(lockKey,seasonRuntime.toBinary());
             startSeason(seasonRuntime);

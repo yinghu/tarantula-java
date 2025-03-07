@@ -25,7 +25,8 @@
      "waitingMinutesPerTeamFormation": 5,
      "seasonTimeGapMinutes": 12,
      "seasonRunningDays": 12,
-     "reMatchWaitingTimeMinutes": 60
+     "reMatchWaitingTimeMinutes": 60,
+     "championsLeaderBoardThreshold": 2050
   },
 
   "playList":{
