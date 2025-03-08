@@ -53,7 +53,7 @@ public class AbstractEvent extends TROnApplication implements Event {
             next.on(dataBuffer);
             return;
         }
-        if(dataBuffer.type()==DataBuffer.RAW_HTTP){
+        if(dataBuffer.type()==DataBuffer.RAW_INPUT_STREAM){
             while (true){
                 DataBuffer buffer = BufferProxy.buffer(streamingBatchSize,true);
                 dataBuffer.read(buffer);

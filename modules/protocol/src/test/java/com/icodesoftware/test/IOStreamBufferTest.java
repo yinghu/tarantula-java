@@ -1,16 +1,15 @@
 package com.icodesoftware.test;
 
-import com.beust.ah.A;
+
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.BufferProxy;
-import com.icodesoftware.util.DataBufferInputStream;
+
 import com.icodesoftware.util.IOStreamDataBuffer;
 import com.icodesoftware.util.LocalHeader;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -39,7 +38,7 @@ public class IOStreamBufferTest {
             for(byte b : hb){
                 out.writeByte(b);
             }
-            Recoverable.DataBuffer buffer = IOStreamDataBuffer.reader(new ByteArrayInputStream(dest.toByteArray()), Recoverable.DataBuffer.RAW_HTTP);
+            Recoverable.DataBuffer buffer = IOStreamDataBuffer.reader(new ByteArrayInputStream(dest.toByteArray()), Recoverable.DataBuffer.RAW_INPUT_STREAM);
             Assert.assertEquals(buffer.readLong(),100);
             Assert.assertTrue(buffer.readBoolean());
             Assert.assertEquals(buffer.readInt(),199);
@@ -73,7 +72,7 @@ public class IOStreamBufferTest {
         }
         src.flip();
         buffer.write(src);
-        Recoverable.DataBuffer reader = IOStreamDataBuffer.reader(new ByteArrayInputStream(dest.toByteArray()), Recoverable.DataBuffer.RAW_HTTP);
+        Recoverable.DataBuffer reader = IOStreamDataBuffer.reader(new ByteArrayInputStream(dest.toByteArray()), Recoverable.DataBuffer.RAW_INPUT_STREAM);
         Recoverable.DataHeader header = reader.readHeader();
         Assert.assertEquals(header.revision(),100);
         Assert.assertEquals(header.factoryId(),10);

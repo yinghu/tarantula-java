@@ -54,8 +54,9 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable,V
 
     interface DataBuffer{
         int MEMORY = 0;
-        int RAW_HTTP = 1;
+        int RAW_INPUT_STREAM = 1;
         int BATCH_TCP = 2;
+
         DataBuffer writeHeader(DataHeader header);
         DataBuffer writeInt(int i);
         DataBuffer writeLong(long l);
