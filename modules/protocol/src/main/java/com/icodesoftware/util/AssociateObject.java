@@ -1,7 +1,6 @@
-package com.tarantula.platform;
+package com.icodesoftware.util;
 
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.util.RecoverableObject;
 
 public class AssociateObject extends RecoverableObject {
 

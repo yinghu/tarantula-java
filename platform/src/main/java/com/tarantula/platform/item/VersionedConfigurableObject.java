@@ -1,8 +1,7 @@
 package com.tarantula.platform.item;
 
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.util.NaturalKey;
-import com.tarantula.platform.AssociateKey;
+import com.icodesoftware.util.AssociateKey;
 
 public class VersionedConfigurableObject extends ConfigurableObject{
 

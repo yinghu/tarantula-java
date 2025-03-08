@@ -2,7 +2,7 @@ package com.tarantula.platform.presence.saves;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Recoverable;
-import com.tarantula.platform.AssociateKey;
+import com.icodesoftware.util.AssociateKey;
 import com.icodesoftware.util.TROnApplication;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 

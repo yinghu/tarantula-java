@@ -1,6 +1,6 @@
 package com.tarantula.test;
 
-import com.tarantula.platform.AssociateKey;
+import com.icodesoftware.util.AssociateKey;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

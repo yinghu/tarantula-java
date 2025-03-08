@@ -2,7 +2,7 @@ package com.tarantula.platform.service;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.util.CipherUtil;
-import com.tarantula.platform.AssociateObject;
+import com.icodesoftware.util.AssociateObject;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 

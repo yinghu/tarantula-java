@@ -2,6 +2,7 @@ package com.tarantula.platform;
 
 
 import com.icodesoftware.service.OnLobby;
+import com.icodesoftware.util.AssociateKey;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 import com.icodesoftware.util.RecoverableObject;
 

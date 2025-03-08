@@ -1,4 +1,4 @@
-package com.tarantula.platform;
+package com.icodesoftware.util;
 import com.icodesoftware.Recoverable;
 
 import java.nio.ByteBuffer;
@@ -18,8 +18,7 @@ public class AssociateKey implements Recoverable.Key {
     @Override
     public String asString() {
         if(ownerId==0 || label==null) return "key not available";
-        //byte[] data = ByteBuffer.allocate(13+label.length()).order(ByteOrder.nativeOrder()).putLong(ownerId).put(Recoverable.PATH_SEPARATOR.getBytes()).putInt(label.length()).put(label.getBytes()).flip().array();
-        return Base64.getEncoder().encodeToString(asBinary());//new StringBuffer().append(ownerId).append(Recoverable.PATH_SEPARATOR).append(label).toString();
+         return Base64.getEncoder().encodeToString(asBinary());
     }
 
     @Override

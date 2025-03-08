@@ -1,5 +1,6 @@
 package com.tarantula.platform;
 
+import com.icodesoftware.util.AssociateObject;
 import com.tarantula.platform.service.cluster.PortableRegistry;
 
 public class LobbyTypeIdIndex extends AssociateObject {
