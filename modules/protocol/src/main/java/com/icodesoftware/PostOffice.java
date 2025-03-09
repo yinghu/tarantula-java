@@ -14,7 +14,7 @@ public interface PostOffice extends Closable,Resettable{
 
     default OnHttp onHttp(){ return null;}
 
-    default OnFile onFile(){ return null;}
+    default OnHome onHome(){ return null;}
 
     interface OnEmail{
         boolean send(String text);
@@ -32,8 +32,9 @@ public interface PostOffice extends Closable,Resettable{
         int request(HttpClientProvider.OnRequest onRequest);
     }
 
-    interface OnFile{
-        Path home(Session session);
+    interface OnHome{
+        Path player(Session session);
+        Path role(Access.Role role);
     }
 
 }
