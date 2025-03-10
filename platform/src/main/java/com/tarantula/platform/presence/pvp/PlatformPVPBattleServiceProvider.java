@@ -90,7 +90,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         this.matchMakingSnapshot.put(MatchMaking.B0_100,new MatchMakingSnapshot(matchMakingSnapshotSize));
         matchMakingStore.backup().forEachEdgeKey(MatchMaking.B0_100,MM_LABEL,(k,v)->{
             MatchMakingSnapshot b0_100 = matchMakingSnapshot.get(MatchMaking.B0_100);
-            b0_100.pending.add(v.readLong());
+            b0_100.pending.offer(v.readLong());
             return true;
         });
         //to do preload mm-snapshot
