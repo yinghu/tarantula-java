@@ -21,7 +21,7 @@ public class PVPPointGeneratorTest {
         PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
 
         Assert.assertEquals(attackerRating.level, 210);
-        Assert.assertEquals(defenderRating.level, 200);
+        Assert.assertEquals(defenderRating.level, 198);
     }
 
     @Test(groups = { "PVP_ELO" })
@@ -37,7 +37,7 @@ public class PVPPointGeneratorTest {
 
         PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
 
-        Assert.assertEquals(attackerRating.level, 200);
+        Assert.assertEquals(attackerRating.level, 190);
         Assert.assertEquals(defenderRating.level, 203);
     }
 
@@ -122,7 +122,7 @@ public class PVPPointGeneratorTest {
         for (int i = 0; i < 100000; i++){
             PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
             if(attackerRating.level == 300){
-                Assert.assertTrue(true, "Loses to 300: " + i);
+                Assert.assertTrue(true, "Losses to 300: " + i);
                 return;
             }
         }
@@ -143,14 +143,14 @@ public class PVPPointGeneratorTest {
         PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
 
         Assert.assertEquals(attackerRating.level, 308);
-        Assert.assertEquals(defenderRating.level, 290);
+        Assert.assertEquals(defenderRating.level, 288);
 
         attackerWin = false;
 
         PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
 
         Assert.assertEquals(attackerRating.level, 300);
-        Assert.assertEquals(defenderRating.level, 292);
+        Assert.assertEquals(defenderRating.level, 291);
 
         PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
 
@@ -160,6 +160,26 @@ public class PVPPointGeneratorTest {
         PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
 
         Assert.assertEquals(attackerRating.level, 300);
-        Assert.assertEquals(defenderRating.level, 296);
+        Assert.assertEquals(defenderRating.level, 297);
+    }
+
+    @Test(groups = { "PVP_ELO" })
+    public void ELOChangeAtLeastOne(){
+        GameRating attackerRating = new GameRating();
+        GameRating defenderRating = new GameRating();
+        attackerRating.level = 550;
+        defenderRating.level = 1;
+
+        int attackerPower = 60;
+        int defenderPower = 60;
+        boolean attackerWin = true;
+
+        int oldAttackerELO = attackerRating.level;
+        int oldDefenderELO = defenderRating.level;
+
+        PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
+
+        Assert.assertEquals(attackerRating.level - oldAttackerELO, 1);
+        Assert.assertEquals(defenderRating.level - oldDefenderELO, -1);
     }
 }
