@@ -26,7 +26,8 @@
      "seasonTimeGapMinutes": 12,
      "seasonRunningDays": 12,
      "reMatchWaitingTimeMinutes": 60,
-     "championsLeaderBoardThreshold": 2050
+     "championsLeaderBoardThreshold": 2050,
+     "matchMakingSnapshotSize": 100
   },
 
   "playList":{
