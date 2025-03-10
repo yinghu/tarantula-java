@@ -44,7 +44,7 @@ public class PVPPointGenerator {
         } else if(defenderELOChange > -1 && defenderELOChange < 0){
             defenderELOChange = -1;
         } else {
-            attackerELOChange = Math.round(attackerELOChange);
+            defenderELOChange = Math.round(defenderELOChange);
         }
 
         int newAttackerELO = attackerRating.level() + (int) attackerELOChange;
