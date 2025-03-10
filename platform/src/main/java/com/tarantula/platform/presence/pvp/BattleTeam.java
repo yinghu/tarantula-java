@@ -139,6 +139,21 @@ public class BattleTeam extends RecoverableObject {
         dataStore.update(teamFormationIndex);
     }
 
+    public void saveAsBot(DataStore botdataStore){
+        int[] ix = {0};
+        unitInstances.forEach(unitInstance -> {
+            botdataStore.create(unitInstance);
+            unitInstanceIndex[ix[0]++]=unitInstance.distributionId();
+        });
+        ix[0]=0;
+        equipmentInstances.forEach(equipmentInstance -> {
+            botdataStore.create(equipmentInstance);
+            equipmentInstanceIndex[ix[0]++]=equipmentInstance.distributionId();
+        });
+        botdataStore.create(this);
+
+    }
+
 
     public static JsonObject levelAndRank(int level,int rank,int levelExp,int rankExp){
         JsonObject levelAndRank = new JsonObject();
