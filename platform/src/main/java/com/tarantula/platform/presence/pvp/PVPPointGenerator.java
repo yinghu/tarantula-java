@@ -28,22 +28,37 @@ public class PVPPointGenerator {
         double maxRatingChangeAttacker = softMaxRatingChange * (attackerWin ? (1 + attackerPowerModifier) : 1);
         double maxRatingChangeDefender = softDefenseMaxRatingChange * (!attackerWin ? defenderPowerModifier : 1);
 
-        int newAttackerELO = (int) Math.round(attackerRating.level() + maxRatingChangeAttacker * ((attackerWin ? 1 : 0) - probOfWinAttacker));
-        int newDefenderELO = (int) Math.round(defenderRating.level() + maxRatingChangeDefender * ((!attackerWin ? 1 : 0) - probOfWinDefender));
+        double attackerELOChange = maxRatingChangeAttacker * ((attackerWin ? 1 : 0) - probOfWinDefender);
+        double defenderELOChange =  maxRatingChangeDefender * ((!attackerWin ? 1 : 0) - probOfWinAttacker);
+
+        if(attackerELOChange < 1 && attackerELOChange > 0){
+            attackerELOChange = 1;
+        } else if(attackerELOChange > -1 && attackerELOChange < 0){
+            attackerELOChange = -1;
+        } else {
+            attackerELOChange = Math.round(attackerELOChange);
+        }
+
+        if(defenderELOChange < 1 && defenderELOChange > 0){
+            defenderELOChange = 1;
+        } else if(defenderELOChange > -1 && defenderELOChange < 0){
+            defenderELOChange = -1;
+        } else {
+            attackerELOChange = Math.round(attackerELOChange);
+        }
+
+        int newAttackerELO = attackerRating.level() + (int) attackerELOChange;
+        int newDefenderELO = defenderRating.level() + (int) defenderELOChange;
 
         if(attackerRating.level() >= minimumCap && newAttackerELO < minimumCap){
             attackerRating.level(minimumCap);
-        }else if(attackerRating.level() >= minimumCap){
-            attackerRating.level(newAttackerELO);
-        } else if(attackerRating.level() < minimumCap && newAttackerELO > attackerRating.level()) {
+        }else {
             attackerRating.level(newAttackerELO);
         }
 
         if(defenderRating.level() >= minimumCap && newDefenderELO < minimumCap){
             defenderRating.level(minimumCap);
-        }else if(defenderRating.level() >= minimumCap){
-            defenderRating.level(newDefenderELO);
-        }else if(defenderRating.level() < minimumCap && newDefenderELO > defenderRating.level()) {
+        }else {
             defenderRating.level(newDefenderELO);
         }
     }
