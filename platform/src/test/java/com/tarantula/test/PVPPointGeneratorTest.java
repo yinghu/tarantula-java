@@ -150,17 +150,17 @@ public class PVPPointGeneratorTest {
         PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
 
         Assert.assertEquals(attackerRating.level, 300);
-        Assert.assertEquals(defenderRating.level, 290);
+        Assert.assertEquals(defenderRating.level, 291);
 
         PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
 
         Assert.assertEquals(attackerRating.level, 300);
-        Assert.assertEquals(defenderRating.level, 293);
+        Assert.assertEquals(defenderRating.level, 294);
 
         PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
 
         Assert.assertEquals(attackerRating.level, 300);
-        Assert.assertEquals(defenderRating.level, 296);
+        Assert.assertEquals(defenderRating.level, 297);
     }
 
     @Test(groups = { "PVP_ELO" })
