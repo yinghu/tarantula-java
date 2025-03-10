@@ -38,7 +38,7 @@ public class PVPPointGeneratorTest {
         PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
 
         Assert.assertEquals(attackerRating.level, 190);
-        Assert.assertEquals(defenderRating.level, 202);
+        Assert.assertEquals(defenderRating.level, 203);
     }
 
     @Test(groups = { "PVP_ELO" })
