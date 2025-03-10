@@ -117,6 +117,10 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                     PVPPointGenerator.updateELO(attackerRating, defenderRating, attackersDefenseTeam.teamPower, defenseTeam.teamPower, true);
                     defenseTeam.winPointsEstimated = attackerRating.level() - currentELO;
                     attackerRating.level(currentELO);
+
+                    PVPPointGenerator.updateELO(attackerRating, defenderRating, attackersDefenseTeam.teamPower, defenseTeam.teamPower, false);
+                    defenseTeam.losePointsEstimated = attackerRating.level() - currentELO;
+                    attackerRating.level(currentELO);
                 }
 
                 matches.add(defenseTeam);
