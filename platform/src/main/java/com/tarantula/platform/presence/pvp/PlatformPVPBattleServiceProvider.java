@@ -6,10 +6,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.ServiceContext;
-import com.icodesoftware.util.IntegerRangeKey;
-import com.icodesoftware.util.ScheduleRunner;
-import com.icodesoftware.util.SnowflakeKey;
-import com.icodesoftware.util.TimeUtil;
+import com.icodesoftware.util.*;
 import com.tarantula.game.SimpleStub;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.configuration.SeasonCredentialConfiguration;
@@ -19,7 +16,7 @@ import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ConfigurableObjectQuery;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
 
-
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +27,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     //NEVER PUSH TO REMOTE WITH TRUE
     private static final boolean DEV_CONFIG = false;
+    private static final boolean DEV_TEST_BOT = true;
 
     private static final long CURRENT_SEASON_INDEX = 0;
     public static final String NAME = "pvp_battle";
@@ -53,9 +51,12 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private DataStore battleHistory;
     private DataStore playerStateStore;
     private DataStore matchMakingStore;
+
     private String gameEndTopic = GameEndEvent.GAME_END_TOPIC;
 
     private ConcurrentHashMap<IntegerRangeKey,MatchMakingSnapshot> matchMakingSnapshot = new ConcurrentHashMap<>();
+
+    private List<BattleTeam> bots;
 
     public PlatformPVPBattleServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
@@ -94,11 +95,42 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             return true;
         });
         //to do preload mm-snapshot
+
+        bots = dataStore.list(new BotFormationQuery(serviceContext.node().nodeId()));
+        if(bots.size()==0){
+            List<String> dlist = new ArrayList<>();
+            File f = new File("../conf/pvp");
+            if(f.exists()){
+                for(String s : f.list()){
+                    if(s.endsWith(".json")){
+                        dlist.add(s);
+                    }
+                }
+            }
+            SimpleStub bot = new SimpleStub(serviceContext.distributionId());
+            dlist.forEach(js->{
+                logger.warn("Creating bot from ["+js+"]");
+                JsonObject formation = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("pvp/"+js));
+                bots.add(saveBot(bot,formation.toString().getBytes()));
+            });
+        }
+        bots.forEach(bot->{
+            bot.load(dataStore,bot.distributionId());
+        });
         this.platformGameServiceProvider.configurationServiceProvider().addConfigurableListener(OnAccess.SEASON,this);
     }
 
 
     public MatchMaking matchMaking(Session session){
+        if(DEV_TEST_BOT){
+            logger.warn("Testing defense bot formation");
+            MatchMaking botMatchMaking = MatchMaking.success(TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusMinutes(5)),bots);
+            PlayerRewardIndex playerRewardIndex = playerRewardIndex(session.distributionId());
+            Application postReward = rewardIndex.get(playerRewardIndex.postBattleRewardId);
+            if(postReward==null) return botMatchMaking;
+            botMatchMaking.postBattleReward = postReward;
+            return botMatchMaking;
+        }
         TeamFormationIndex teamFormationIndex = teamFormationIndex(session.distributionId());
 
         if(teamFormationIndex.teamId==0){
@@ -307,7 +339,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             logger.warn("Should be happening if disk space not full");
             return;
         }
-
+        logger.warn("OFFENSE : "+battleEndResult.offensePlayerId+" : "+battleEndResult.offenseEloLevelUpdated+" : "+battleEndResult.offenseEloLevelDelta);
+        logger.warn("DEFENSE : "+battleEndResult.defensePlayerId+" : "+battleEndResult.defenseEloLevelUpdated+" : "+battleEndResult.defenseEloLevelDelta);
         PlayerBattleLogIndex defenseLogIndex = new PlayerBattleLogIndex();
         defenseLogIndex.distributionId(battleEndResult.defensePlayerId);
         defenseLogIndex.dataStore(battleHistory);
@@ -477,7 +510,12 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             v.writeLong(systemId);
             return true;
         });
-        matchMakingSnapshot.putIfAbsent(integerKey,new MatchMakingSnapshot(matchMakingSnapshotSize)).pending.add(systemId);
+
+        MatchMakingSnapshot snapshot = matchMakingSnapshot.putIfAbsent(integerKey,new MatchMakingSnapshot(matchMakingSnapshotSize));
+        if(!snapshot.pending.offer(systemId)){
+            snapshot.pending.poll();//kick out first
+            snapshot.pending.offer(systemId);
+        }
     }
 
     @Override
@@ -558,6 +596,16 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         defenseCooldown.dataStore(playerStateStore);
         playerStateStore.createIfAbsent(defenseCooldown,true);
         return defenseCooldown;
+    }
+
+    private BattleTeam saveBot(Session session,byte[] content){
+        BattleTeam defenseTeam = BattleTeam.parse(content);
+        defenseTeam.ownerKey(SnowflakeKey.from(serviceContext.node().nodeId()));
+        defenseTeam.label("defense_bot");
+        defenseTeam.onEdge(true);
+        defenseTeam.playerId = session.distributionId();
+        defenseTeam.saveAsBot(dataStore);
+        return defenseTeam;
     }
 
 
