@@ -33,6 +33,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     private static final long CURRENT_SEASON_INDEX = 0;
     public static final String NAME = "pvp_battle";
+    public static final String MM_LABEL = "elo";
     // seconds dev sample config replaced with the pvp config section DEV_CONFIG = false
     private int teamCreationWaitingTime = 5;
     private int seasonTimeGap = 60;
@@ -40,7 +41,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private int reMatchWaitingTime = 180;
     // seconds end
     private int championsLeaderBoardThreshold = 2050;
-
+    private int matchMakingSnapshotSize = 100;
     private ConcurrentHashMap<Long, Application> rewardIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Long, SeasonCredentialConfiguration.Season> seasons = new ConcurrentHashMap();
     private ConcurrentHashMap<Long,League> leagueConfigs = new ConcurrentHashMap<>();
@@ -53,6 +54,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private DataStore playerStateStore;
     private DataStore matchMakingStore;
     private String gameEndTopic = GameEndEvent.GAME_END_TOPIC;
+
+    private ConcurrentHashMap<IntegerRangeKey,MatchMakingSnapshot> matchMakingSnapshot = new ConcurrentHashMap<>();
 
     public PlatformPVPBattleServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
@@ -72,6 +75,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             reMatchWaitingTime = pvp.get("reMatchWaitingTimeMinutes").getAsInt()*60; //to seconds
         }
         championsLeaderBoardThreshold = pvp.get("championsLeaderBoardThreshold").getAsInt();
+        this.matchMakingSnapshotSize = pvp.get("matchMakingSnapshotSize").getAsInt();
         this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
         this.playerStateStore = applicationPreSetup.dataStore(gameCluster,NAME+"_player_state");
         this.matchMakingStore = applicationPreSetup.localDataStore(gameCluster,NAME+"_match_making");
@@ -83,6 +87,13 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             onEvent(e);
             return true;
         });
+        this.matchMakingSnapshot.put(MatchMaking.B0_100,new MatchMakingSnapshot(matchMakingSnapshotSize));
+        matchMakingStore.backup().forEachEdgeKey(MatchMaking.B0_100,MM_LABEL,(k,v)->{
+            MatchMakingSnapshot b0_100 = matchMakingSnapshot.get(MatchMaking.B0_100);
+            b0_100.pending.add(v.readLong());
+            return true;
+        });
+        //to do preload mm-snapshot
         this.platformGameServiceProvider.configurationServiceProvider().addConfigurableListener(OnAccess.SEASON,this);
     }
 
@@ -420,19 +431,22 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     }
 
     private List<Rating> findMatches(Session session){
+        //temp code to pull first 5 from single pooled.
         List<Rating> matches = new ArrayList<>();
         Rating rating = platformGameServiceProvider.presenceServiceProvider().rating(session);
-        int[] size={0};
-        matchMakingStore.backup().forEachEdgeKey(MatchMaking.rangedKey(rating.level()),"elo",(k, v)->{
-            long matchId = v.readLong();
+        IntegerRangeKey mkey = MatchMaking.rangedKey(rating.level());
+        MatchMakingSnapshot snapshot = matchMakingSnapshot.putIfAbsent(mkey,new MatchMakingSnapshot(matchMakingSnapshotSize));
+        List<Long> temp = snapshot.pending.stream().toList();
+        int msize = 5;
+        for(long matchId : temp){
             if(matchId != session.distributionId()){
                 Rating match = platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(matchId));
                 //to do filter out code
                 matches.add(match);
-                size[0]++;
+                msize--;
             }
-            return size[0]<5;
-        });
+            if(msize==0) break;
+        }
         return matches;
     }
 
@@ -458,11 +472,12 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     private void onMatchMakingPool(long systemId,int eloLevel){
         IntegerRangeKey integerKey = MatchMaking.rangedKey(eloLevel);
-        matchMakingStore.backup().setEdge("elo",(k,v)->{
+        matchMakingStore.backup().setEdge(MM_LABEL,(k,v)->{
             integerKey.write(k);
             v.writeLong(systemId);
             return true;
         });
+        matchMakingSnapshot.putIfAbsent(integerKey,new MatchMakingSnapshot(matchMakingSnapshotSize)).pending.add(systemId);
     }
 
     @Override
