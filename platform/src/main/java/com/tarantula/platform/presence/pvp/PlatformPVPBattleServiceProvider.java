@@ -99,7 +99,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         bots = dataStore.list(new BotFormationQuery(serviceContext.node().nodeId()));
         if(bots.size()==0){
             List<String> dlist = new ArrayList<>();
-            File f = new File("../conf/pvp");
+            File f = new File("../conf/pvp/bot");
             if(f.exists()){
                 for(String s : f.list()){
                     if(s.endsWith(".json")){
@@ -116,6 +116,9 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         }
         bots.forEach(bot->{
             bot.load(dataStore,bot.distributionId());
+            JsonObject profile = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("pvp/profile/profile_"+bot.teamPower+".json"));
+            bot.botProfile = profile;
+            logger.warn(bot.botProfile.toString());
         });
         this.platformGameServiceProvider.configurationServiceProvider().addConfigurableListener(OnAccess.SEASON,this);
     }

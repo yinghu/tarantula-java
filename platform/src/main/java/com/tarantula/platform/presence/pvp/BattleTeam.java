@@ -25,7 +25,7 @@ public class BattleTeam extends RecoverableObject {
     public int elo;
     public boolean battled;
     public int battlePoint; //positive win , negative lost
-
+    public JsonObject botProfile;
     public long playerId;
     public int teamPower;
     public final long[] unitInstanceIndex = new long[MAX_UNITS]; ;
@@ -81,6 +81,7 @@ public class BattleTeam extends RecoverableObject {
             resp.addProperty("teamPower",teamPower);
             resp.addProperty("battled",battled);
             resp.addProperty("battlePoint",battlePoint);
+            if(botProfile!=null) resp.add("profile",botProfile);
             JsonArray units = new JsonArray();
             unitInstances.forEach(unitInstance -> units.add(unitInstance.toJson()));
             JsonArray equips = new JsonArray();
