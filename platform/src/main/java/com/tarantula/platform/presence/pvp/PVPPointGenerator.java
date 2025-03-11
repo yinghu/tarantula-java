@@ -26,7 +26,7 @@ public class PVPPointGenerator {
         double defenderPowerModifier = 1 - attackerPowerModifier;
 
         double maxRatingChangeAttacker = softMaxRatingChange * (attackerWin ? (1 + attackerPowerModifier) : 1);
-        double maxRatingChangeDefender = softDefenseMaxRatingChange * (!attackerWin ? defenderPowerModifier : 1);
+        double maxRatingChangeDefender = softDefenseMaxRatingChange * (attackerWin ? defenderPowerModifier : 1);
 
         double attackerELOChange = maxRatingChangeAttacker * ((attackerWin ? 1 : 0) - probOfWinDefender);
         double defenderELOChange =  maxRatingChangeDefender * ((!attackerWin ? 1 : 0) - probOfWinAttacker);

@@ -5,6 +5,8 @@ import com.tarantula.platform.presence.pvp.PVPPointGenerator;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.Random;
+
 public class PVPPointGeneratorTest {
 
     @Test(groups = { "PVP_ELO" })
@@ -203,5 +205,101 @@ public class PVPPointGeneratorTest {
 
         Assert.assertEquals(attackerRating.level, 21);
         Assert.assertEquals(defenderRating.level , 0);
+    }
+
+    @Test(groups = { "PVP_ELO" })
+    public void negativeELOTest(){
+        GameRating attackerRating = new GameRating();
+        GameRating defenderRating = new GameRating();
+        attackerRating.level = 130;
+        defenderRating.level = 0;
+
+        int attackerPower = 60;
+        int defenderPower = 60;
+        boolean attackerWin = false;
+
+        PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
+
+        Assert.assertEquals(attackerRating.level, 116);
+        Assert.assertEquals(defenderRating.level , 3);
+    }
+
+    @Test(groups = { "PVP_ELO" })
+    public void ZeroELOWinTest(){
+        GameRating attackerRating = new GameRating();
+        GameRating defenderRating = new GameRating();
+        attackerRating.level = 0;
+        defenderRating.level = 0;
+
+        int attackerPower = 60;
+        int defenderPower = 60;
+        boolean attackerWin = true;
+
+        PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
+
+        Assert.assertEquals(attackerRating.level, 10);
+        Assert.assertEquals(defenderRating.level , 0);
+    }
+
+    @Test(groups = { "PVP_ELO" })
+    public void ZeroELOLoseTest(){
+        GameRating attackerRating = new GameRating();
+        GameRating defenderRating = new GameRating();
+        attackerRating.level = 0;
+        defenderRating.level = 0;
+
+        int attackerPower = 60;
+        int defenderPower = 60;
+        boolean attackerWin = false;
+
+        PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
+
+        Assert.assertEquals(attackerRating.level, 0);
+        Assert.assertEquals(defenderRating.level , 3);
+    }
+
+    @Test(groups = { "PVP_ELO" })
+    public void basicGenerateByWinTestHighPower(){
+        GameRating attackerRating = new GameRating();
+        GameRating defenderRating = new GameRating();
+        attackerRating.level = 53;
+        defenderRating.level = 0;
+
+        int attackerPower = 2146;
+        int defenderPower = 6515;
+        boolean attackerWin = false;
+
+        PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
+        Assert.assertEquals(attackerRating.level, 41);
+        Assert.assertEquals(defenderRating.level , 3);
+    }
+
+    @Test(groups = { "PVP_ELO" })
+    public void randomTeamStatsTest(){
+        GameRating attackerRating = new GameRating();
+        GameRating defenderRating = new GameRating();
+        Random rand = new Random();
+
+        for (int i = 0; i < 100000; i++){
+            attackerRating.level = rand.nextInt(10000);;
+            defenderRating.level = rand.nextInt(10000);;
+
+            int attackerPower = rand.nextInt(100000);;
+            int defenderPower = rand.nextInt(100000);;
+            boolean attackerWin = rand.nextBoolean();
+
+            int oldAttackerELO = attackerRating.level;
+            int oldDefenderELO = defenderRating.level;
+
+            PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
+
+            if(attackerWin){
+                Assert.assertTrue(attackerRating.level() > oldAttackerELO);
+                Assert.assertTrue(defenderRating.level() < oldDefenderELO || defenderRating.level == 0);
+            }else{
+                Assert.assertTrue(defenderRating.level() > oldDefenderELO);
+                Assert.assertTrue(attackerRating.level() < oldAttackerELO || attackerRating.level == 0);
+            }
+        }
     }
 }
