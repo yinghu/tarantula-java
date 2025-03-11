@@ -53,13 +53,13 @@ public class PVPPointGenerator {
         if(attackerRating.level() >= minimumCap && newAttackerELO < minimumCap){
             attackerRating.level(minimumCap);
         }else {
-            attackerRating.level(newAttackerELO);
+            attackerRating.level(Math.max(newAttackerELO, 0));
         }
 
         if(defenderRating.level() >= minimumCap && newDefenderELO < minimumCap){
             defenderRating.level(minimumCap);
         }else {
-            defenderRating.level(newDefenderELO);
+            defenderRating.level(Math.max(newDefenderELO, 0));
         }
     }
 }
