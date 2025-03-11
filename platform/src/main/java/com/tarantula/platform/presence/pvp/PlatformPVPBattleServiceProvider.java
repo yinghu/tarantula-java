@@ -110,7 +110,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             SimpleStub bot = new SimpleStub(serviceContext.distributionId());
             dlist.forEach(js->{
                 logger.warn("Creating bot from ["+js+"]");
-                JsonObject formation = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("pvp/"+js));
+                JsonObject formation = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("pvp/bot/"+js));
                 bots.add(saveBot(bot,formation.toString().getBytes()));
             });
         }
