@@ -238,6 +238,21 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         return  rewardList;
     }
 
+    public void rewardGranted(Session session){
+        long rewardId = Long.parseLong(session.name());
+        PlayerRewardIndex playerRewardIndex = playerRewardIndex(session.distributionId());
+        if(playerRewardIndex.postBattleRewardId == rewardId){
+            playerRewardIndex.postBattleRewardId = 0;
+        }
+        if(playerRewardIndex.placementRewardId == rewardId){
+            playerRewardIndex.placementRewardId = 0;
+        }
+        if(playerRewardIndex.leagueRewardId == rewardId){
+            playerRewardIndex.leagueRewardId = 0;
+        }
+        playerRewardIndex.update();
+    }
+
     private BattleTeam assembly(long teamId){
         BattleTeam battleTeam = new BattleTeam();
         return battleTeam.load(dataStore,teamId);

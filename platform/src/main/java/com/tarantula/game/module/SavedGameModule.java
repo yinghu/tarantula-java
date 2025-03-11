@@ -123,8 +123,13 @@ public class SavedGameModule extends ModuleHeader {
             RewardList rewardList = gameServiceProvider.pvpBattleServiceProvider().rewardList(session);
             session.write(rewardList.toJson().toString().getBytes());
         }
-        //pvp saves end
 
+        else if(session.action().equals("onRewardGrant")){
+            gameServiceProvider.pvpBattleServiceProvider().rewardGranted(session);
+            session.write(JsonUtil.toSimpleResponse(true,"granted").getBytes());
+        }
+
+        //pvp saves end
         else{
             throw new UnsupportedOperationException(session.action());
         }
