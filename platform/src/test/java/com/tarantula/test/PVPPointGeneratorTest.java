@@ -262,16 +262,16 @@ public class PVPPointGeneratorTest {
     public void basicGenerateByWinTestHighPower(){
         GameRating attackerRating = new GameRating();
         GameRating defenderRating = new GameRating();
-        attackerRating.level = 53;
-        defenderRating.level = 0;
+        attackerRating.level = 45;
+        defenderRating.level = 122;
 
-        int attackerPower = 2146;
-        int defenderPower = 6515;
-        boolean attackerWin = false;
+        int attackerPower = 60;
+        int defenderPower = 60000;
+        boolean attackerWin = true;
 
         PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
-        Assert.assertEquals(attackerRating.level, 41);
-        Assert.assertEquals(defenderRating.level , 3);
+        Assert.assertEquals(attackerRating.level, 69);
+        Assert.assertEquals(defenderRating.level , 121);
     }
 
     @Test(groups = { "PVP_ELO" })
@@ -281,11 +281,11 @@ public class PVPPointGeneratorTest {
         Random rand = new Random();
 
         for (int i = 0; i < 100000; i++){
-            attackerRating.level = rand.nextInt(1500);;
-            defenderRating.level = rand.nextInt(1500);;
+            attackerRating.level = rand.nextInt(6000);;
+            defenderRating.level = rand.nextInt(6000);;
 
-            int attackerPower = rand.nextInt(1500);;
-            int defenderPower = rand.nextInt(1500);;
+            int attackerPower = rand.nextInt(6000);;
+            int defenderPower = rand.nextInt(6000);;
             boolean attackerWin = rand.nextBoolean();
 
             int oldAttackerELO = attackerRating.level;
