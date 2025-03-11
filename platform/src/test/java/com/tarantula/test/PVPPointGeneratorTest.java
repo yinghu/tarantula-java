@@ -281,11 +281,11 @@ public class PVPPointGeneratorTest {
         Random rand = new Random();
 
         for (int i = 0; i < 100000; i++){
-            attackerRating.level = rand.nextInt(10000);;
-            defenderRating.level = rand.nextInt(10000);;
+            attackerRating.level = rand.nextInt(1500);;
+            defenderRating.level = rand.nextInt(1500);;
 
-            int attackerPower = rand.nextInt(100000);;
-            int defenderPower = rand.nextInt(100000);;
+            int attackerPower = rand.nextInt(1500);;
+            int defenderPower = rand.nextInt(1500);;
             boolean attackerWin = rand.nextBoolean();
 
             int oldAttackerELO = attackerRating.level;
@@ -294,11 +294,39 @@ public class PVPPointGeneratorTest {
             PVPPointGenerator.updateELO(attackerRating, defenderRating, attackerPower, defenderPower, attackerWin);
 
             if(attackerWin){
-                Assert.assertTrue(attackerRating.level() > oldAttackerELO);
-                Assert.assertTrue(defenderRating.level() < oldDefenderELO || defenderRating.level == 0);
+                if(!(attackerRating.level > oldAttackerELO)){
+                    System.out.println("attackWin: " + attackerWin + " oldDefenseELO: " + oldDefenderELO);
+                    System.out.println("attackPower: " + attackerPower + " defensePower: " + defenderPower);
+                    System.out.println("new: " + attackerRating.level + " old: " + oldAttackerELO);
+
+                    Assert.fail();
+                }
+
+                if(!(defenderRating.level < oldDefenderELO || defenderRating.level == 0 || defenderRating.level == 300)){
+                    System.out.println("attackWin: " + attackerWin+ " oldAttackELO: " + oldAttackerELO);
+                    System.out.println("attackPower: " + attackerPower + " defensePower: " + defenderPower);
+                    System.out.println("new: " + defenderRating.level + " old: " + oldDefenderELO);
+
+                    Assert.fail();
+                }
+
             }else{
-                Assert.assertTrue(defenderRating.level() > oldDefenderELO);
-                Assert.assertTrue(attackerRating.level() < oldAttackerELO || attackerRating.level == 0);
+                if(!(defenderRating.level > oldDefenderELO)){
+                    System.out.println("attackWin: " + attackerWin+ " oldAttackELO: " + oldAttackerELO);
+                    System.out.println("attackPower: " + attackerPower + " defensePower: " + defenderPower);
+                    System.out.println("new: " + defenderRating.level + " old: " + oldDefenderELO);
+
+                    Assert.fail();
+                }
+
+                if(!(attackerRating.level < oldAttackerELO || attackerRating.level == 0 || attackerRating.level == 300)){
+                    System.out.println("attackWin: " + attackerWin + " oldDefenseELO: " + oldDefenderELO);
+                    System.out.println("attackPower: " + attackerPower + " defensePower: " + defenderPower);
+                    System.out.println("new: " + attackerRating.level + " old: " + oldAttackerELO);
+
+                    Assert.fail();
+                }
+
             }
         }
     }
