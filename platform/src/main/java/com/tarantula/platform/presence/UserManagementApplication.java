@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class UserManagementApplication extends TarantulaApplicationHeader implements Configurable.Listener<OnLobby>,RecoverableListener.Filter{
+public class UserManagementApplication extends TarantulaApplicationHeader implements Configurable.Listener<OnLobby>,RecoverableListener.Filter<User>{
 
     private final static String METRICS_LOGIN_COUNT = "applicationLoginCount";
     private boolean activated;
@@ -69,8 +69,7 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
     }
 
     @Override
-    public <T extends Recoverable> void on(T updated) {
-        User uadded = (User)updated;
+    public void on(User uadded) {
         Account account = new UserAccount();
         account.distributionId(uadded.primaryId());
         userService.createUser(account,uadded);
