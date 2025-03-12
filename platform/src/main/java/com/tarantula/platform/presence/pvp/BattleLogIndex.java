@@ -1,9 +1,12 @@
 package com.tarantula.platform.presence.pvp;
 
+import com.icodesoftware.util.LongCompositeKey;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
 public class BattleLogIndex extends RecoverableObject {
+
+    public long playerId;
 
     public long offenseTeamId;
     public long defenseTeamId;
@@ -41,4 +44,28 @@ public class BattleLogIndex extends RecoverableObject {
         return true;
     }
 
+    @Override
+    public boolean writeKey(DataBuffer buffer) {
+        if(playerId==0 || defenseTeamId == 0) return false;
+        buffer.writeLong(playerId);
+        buffer.writeLong(defenseTeamId);
+        return true;
+    }
+
+    @Override
+    public boolean readKey(DataBuffer buffer) {
+        this.playerId = buffer.readLong();
+        this.defenseTeamId = buffer.readLong();
+        return true;
+    }
+
+    @Override
+    public long distributionId() {
+        return defenseTeamId;
+    }
+
+    @Override
+    public Key key() {
+        return new LongCompositeKey(playerId,defenseTeamId);
+    }
 }

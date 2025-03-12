@@ -104,7 +104,7 @@ public class BattleTeam extends RecoverableObject {
 
     public BattleTeam load(DataStore dataStore,long teamId){
         this.distributionId = teamId;
-        dataStore.load(this);
+        if(!dataStore.load(this)) return null;
         for(long id : unitInstanceIndex){
             if(id==0) continue;
             UnitInstance unitInstance = new UnitInstance();
@@ -123,8 +123,7 @@ public class BattleTeam extends RecoverableObject {
     }
 
     public BattleTeam load(DataStore dataStore,TeamFormationIndex teamFormationIndex){
-        load(dataStore,teamFormationIndex.teamId);
-        return this;
+        return  load(dataStore,teamFormationIndex.teamId);
     }
 
     public void saveAsDefense(DataStore dataStore,TeamFormationIndex teamFormationIndex,int teamCreationWaitingTime){
