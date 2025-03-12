@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class UserManagementApplication extends TarantulaApplicationHeader implements Configurable.Listener<OnLobby>{
+public class UserManagementApplication extends TarantulaApplicationHeader implements Configurable.Listener<OnLobby>,RecoverableListener.Filter{
 
     private final static String METRICS_LOGIN_COUNT = "applicationLoginCount";
     private boolean activated;
@@ -63,16 +63,19 @@ public class UserManagementApplication extends TarantulaApplicationHeader implem
             membership.trial(true);
             this.userService.createAccount(user,membership);
         }
-        this.context.registerRecoverableListener(UserPortableRegistry.INS).addRecoverableFilter(UserPortableRegistry.USER_CID,(a)->{
-            //add player user to the account
-            User uadded = (User) a;
-            Account account = new UserAccount();
-            account.distributionId(uadded.primaryId());
-            userService.createUser(account,uadded);
-        });
+        this.context.registerRecoverableListener(UserPortableRegistry.INS).addRecoverableFilter(UserPortableRegistry.USER_CID,this);
         this.deploymentServiceProvider.registerConfigurableListener(OnLobby.TYPE,this);
         this.context.log("User management application started on tag ["+descriptor.tag()+"]",OnLog.INFO);
     }
+
+    @Override
+    public <T extends Recoverable> void on(T updated) {
+        User uadded = (User)updated;
+        Account account = new UserAccount();
+        account.distributionId(uadded.primaryId());
+        userService.createUser(account,uadded);
+    }
+
     @Override
     public void callback(Session session,byte[] payload) throws Exception {
         //this.context.log(new String(payload),OnLog.WARN);

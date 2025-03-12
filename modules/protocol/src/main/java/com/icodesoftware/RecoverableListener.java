@@ -6,6 +6,6 @@ public interface RecoverableListener extends RecoverableRegistry{
     void addRecoverableFilter(int classId,Filter recoverableFilter);
 
     interface Filter {
-        void on(Recoverable updated);
+        <T extends Recoverable> void on(T updated);
     }
 }
