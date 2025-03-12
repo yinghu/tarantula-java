@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ClusterProvider;
+import com.icodesoftware.service.OnPartition;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.*;
 import com.tarantula.game.SimpleStub;
@@ -27,7 +28,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     //NEVER PUSH TO REMOTE WITH TRUE
     private static final boolean DEV_CONFIG = false;
-    private static final boolean DEV_TEST_BOT = true;
+    private static final boolean DEV_TEST_BOT = false;
+    private static final boolean COOL_DOWN_ENABLED = false;
 
     private static final long CURRENT_SEASON_INDEX = 0;
     public static final String NAME = "pvp_battle";
@@ -39,6 +41,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private int reMatchWaitingTime = 180;
     // seconds end
     private int championsLeaderBoardThreshold = 2050;
+    private int coolDownTime = 60;
 
     private int matchMakingSnapshotSize = 100;
     private ConcurrentHashMap<Long, Application> rewardIndex = new ConcurrentHashMap<>();
@@ -75,6 +78,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             seasonTimeGap = pvp.get("seasonTimeGapMinutes").getAsInt()*60; //to seconds
             seasonRunningTime= pvp.get("seasonRunningDays").getAsInt()*24*60*60; //to seconds
             reMatchWaitingTime = pvp.get("reMatchWaitingTimeMinutes").getAsInt()*60; //to seconds
+            coolDownTime = pvp.get("defenseCooldownMinutes").getAsInt()*60;
         }
         championsLeaderBoardThreshold = pvp.get("championsLeaderBoardThreshold").getAsInt();
         this.matchMakingSnapshotSize = pvp.get("matchMakingSnapshotSize").getAsInt();
@@ -321,10 +325,15 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     public void onBattleEnd(BattleEndResult battleEndResult){
         GameEndEvent gameEndEvent = new GameEndEvent();
+        gameEndEvent.offensePlayerId = battleEndResult.offensePlayerId;
         gameEndEvent.offenseTeamId = battleEndResult.offenseTeamId;
         gameEndEvent.offenseEloLevel = battleEndResult.offenseEloLevelUpdated;
+        gameEndEvent.offenseEloLevelDelta = battleEndResult.offenseEloLevelDelta;
+        gameEndEvent.defensePlayerId = battleEndResult.defensePlayerId;
         gameEndEvent.defenseTeamId = battleEndResult.defenseTeamId;
         gameEndEvent.defenseEloLevel = battleEndResult.defenseEloLevelUpdated;
+        gameEndEvent.defenseEloLevelDelta = battleEndResult.defenseEloLevelDelta;
+
         this.serviceContext.eventService().publish(gameEndEvent);
         if(battleEndResult.offenseEloLevelDelta>0){
             PlayerRewardIndex playerRewardIndex = playerRewardIndex(battleEndResult.offensePlayerId);
@@ -477,7 +486,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         int msize = 5;
         for(DefenseTeamIndex match : temp){
             if(match.playerId != session.distributionId()){
-                if(match.onCooldown()) continue;
+                matchMakingStore.load(match);
+                if(match.onCooldown() && COOL_DOWN_ENABLED) continue;
                 matches.add(match);
                 msize--;
             }
@@ -496,8 +506,23 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private void onEvent(Event event){
         if(event.getClassId()== PortableEventRegistry.GAME_END_EVENT_CID){
             GameEndEvent gameEndEvent =(GameEndEvent)event;
-            //if(gameEndEvent.offenseTeamId > 0) onMatchMakingPool(gameEndEvent.offenseTeamId,gameEndEvent.offenseEloLevel);
-            //if(gameEndEvent.defenseTeamId > 0) onMatchMakingPool(gameEndEvent.defenseTeamId,gameEndEvent.defenseEloLevel);
+            OnPartition[] partitions = serviceContext.partitions();
+            RoutingKey routingKey = serviceContext.eventService().routingKey(gameEndEvent.offenseTeamId,"user/presence");
+            if(partitions[routingKey.routingNumber()].opening()){
+                Rating defenseElo = platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(gameEndEvent.defensePlayerId));
+                logger.warn("defense elo before update ["+defenseElo.level()+"]");
+                defenseElo.level(defenseElo.level()+(gameEndEvent.defenseEloLevelDelta));
+                defenseElo.update();
+                logger.warn("defense elo updated ["+defenseElo.level()+"] with delta ["+gameEndEvent.defenseEloLevelDelta+"]");
+            }
+            if(gameEndEvent.defenseEloLevelDelta<0){
+                DefenseTeamIndex defenseTeamIndex = new DefenseTeamIndex();
+                defenseTeamIndex.distributionId(gameEndEvent.defenseTeamId);
+                if(matchMakingStore.load(defenseTeamIndex)){
+                    defenseTeamIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(coolDownTime)));
+                    matchMakingStore.update(defenseTeamIndex);
+                }
+            }
             return;
         }
         if(event.getClassId()==PortableEventRegistry.TEAM_FORMATION_EVENT_CID){
@@ -598,12 +623,6 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         return playerRewardIndex;
     }
 
-    public DefenseCooldown defenseCooldown(long teamId){
-        DefenseCooldown defenseCooldown = new DefenseCooldown(teamId);
-        defenseCooldown.dataStore(playerStateStore);
-        playerStateStore.createIfAbsent(defenseCooldown,true);
-        return defenseCooldown;
-    }
 
     private BattleTeam saveBot(byte[] content){
         BattleTeam botTeam = BattleTeam.parse(content);

@@ -26,6 +26,7 @@
      "seasonTimeGapMinutes": 12,
      "seasonRunningDays": 12,
      "reMatchWaitingTimeMinutes": 60,
+     "defenseCooldownMinutes": 60,
      "championsLeaderBoardThreshold": 2050,
      "matchMakingSnapshotSize": 100
   },

@@ -14,10 +14,15 @@ public class GameEndEvent extends Data implements Event {
 
     public static final String GAME_END_TOPIC = "pvp_battle_end_topic";
 
+    public long defensePlayerId;
     public long defenseTeamId;
     public int defenseEloLevel;
+    public int defenseEloLevelDelta;
+
+    public long offensePlayerId;
     public long offenseTeamId;
     public int offenseEloLevel;
+    public int offenseEloLevelDelta;
 
     public GameEndEvent(){
         this.destination = GAME_END_TOPIC;
@@ -25,18 +30,26 @@ public class GameEndEvent extends Data implements Event {
 
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
-        portableWriter.writeLong("1",defenseTeamId);
-        portableWriter.writeInt("2",defenseEloLevel);
-        portableWriter.writeLong("3",offenseTeamId);
-        portableWriter.writeInt("4",offenseEloLevel);
+        portableWriter.writeLong("1",defensePlayerId);
+        portableWriter.writeLong("2",defenseTeamId);
+        portableWriter.writeInt("3",defenseEloLevel);
+        portableWriter.writeInt("4",defenseEloLevelDelta);
+        portableWriter.writeLong("5",offensePlayerId);
+        portableWriter.writeLong("6",offenseTeamId);
+        portableWriter.writeInt("7",offenseEloLevel);
+        portableWriter.writeInt("8",offenseEloLevelDelta);
     }
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
-        defenseTeamId = portableReader.readLong("1");
-        defenseEloLevel = portableReader.readInt("2");
-        offenseTeamId = portableReader.readLong("3");
-        offenseEloLevel = portableReader.readInt("4");
+        defensePlayerId = portableReader.readLong("1");
+        defenseTeamId = portableReader.readLong("2");
+        defenseEloLevel = portableReader.readInt("3");
+        defenseEloLevelDelta = portableReader.readInt("4");
+        offensePlayerId = portableReader.readLong("5");
+        offenseTeamId = portableReader.readLong("6");
+        offenseEloLevel = portableReader.readInt("7");
+        offenseEloLevelDelta = portableReader.readInt("8");
     }
 
     @Override

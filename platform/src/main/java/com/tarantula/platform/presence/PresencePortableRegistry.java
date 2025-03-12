@@ -82,7 +82,7 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
     public static final int BATTLE_LOG_CID = 34;
     public static final int PLAYER_BATTLE_LOG_INDEX_CID = 35;
     public static final int MATCH_MAKING_INDEX_CID = 36;
-    public static final int DEFENSE_COOLDOWN_CID = 37;
+
     public static final int PLAYER_REWARD_INDEX_CID = 38;
     public static final int BATTLE_TEAM_INDEX_CID = 39;
 
