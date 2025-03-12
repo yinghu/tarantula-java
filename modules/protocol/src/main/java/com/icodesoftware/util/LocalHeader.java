@@ -2,6 +2,8 @@ package com.icodesoftware.util;
 
 import com.icodesoftware.Recoverable;
 
+import java.util.Arrays;
+
 public class LocalHeader implements Recoverable.DataHeader {
 
     private long revision;
@@ -33,7 +35,18 @@ public class LocalHeader implements Recoverable.DataHeader {
         revision = revision+revisionDelta;
     }
 
-    public static Recoverable.DataHeader create(int factoryId,int classId){
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(new int[]{factoryId,classId});
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        LocalHeader localHeader = (LocalHeader)obj;
+        return factoryId==localHeader.factoryId() && classId == localHeader.classId();
+    }
+
+    public static Recoverable.DataHeader create(int factoryId, int classId){
         return new LocalHeader(0,factoryId,classId);
     }
 
