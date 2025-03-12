@@ -77,7 +77,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         }
         championsLeaderBoardThreshold = pvp.get("championsLeaderBoardThreshold").getAsInt();
         this.matchMakingSnapshotSize = pvp.get("matchMakingSnapshotSize").getAsInt();
-        this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME);
+        this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME+"_team_formation");
         this.playerStateStore = applicationPreSetup.dataStore(gameCluster,NAME+"_player_state");
         this.matchMakingStore = applicationPreSetup.localDataStore(gameCluster,NAME+"_match_making");
         this.battleHistory = applicationPreSetup.dataStore(gameCluster,NAME+"_history");
@@ -187,9 +187,9 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         if(!teamFormationIndex.expired()) return TeamFormationResponse.failureOnDefenseTeam(teamFormationIndex.timestamp());
         BattleTeam defenseTeam = BattleTeam.parse(content);
         defenseTeam.playerId = session.distributionId();
-        defenseTeam.save(dataStore,teamFormationIndex,teamCreationWaitingTime);
+        defenseTeam.saveAsDefense(dataStore,teamFormationIndex,teamCreationWaitingTime);
         Rating rating = platformGameServiceProvider.presenceServiceProvider().rating(session);
-        this.serviceContext.eventService().publish(new TeamFormationEvent(session.distributionId(),rating.level()));
+        this.serviceContext.eventService().publish(new TeamFormationEvent(defenseTeam.distributionId(),rating.level()));
         return TeamFormationResponse.responseOnDefenseTeam(teamFormationIndex.timestamp());
     }
 
@@ -202,12 +202,12 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     }
 
     public TeamFormationResponse saveOffenseTeam(Session session,byte[] content){
-        BattleTeam defenseTeam = BattleTeam.parse(content);
-        defenseTeam.playerId = session.distributionId();
-        if(!dataStore.create(defenseTeam)){
+        BattleTeam offenseTeam = BattleTeam.parse(content);
+        offenseTeam.playerId = session.distributionId();
+        if(offenseTeam.saveAsOffense(dataStore)){
             return TeamFormationResponse.retryOffenseTeam();
         }
-        return TeamFormationResponse.responseOnOffenseTeam(defenseTeam.distributionId());
+        return TeamFormationResponse.responseOnOffenseTeam(offenseTeam.distributionId());
     }
 
     public BattleTeam defenseTeam(Rating rating){
@@ -617,13 +617,13 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     }
 
     private BattleTeam saveBot(Session session,byte[] content){
-        BattleTeam defenseTeam = BattleTeam.parse(content);
-        defenseTeam.ownerKey(SnowflakeKey.from(serviceContext.node().nodeId()));
-        defenseTeam.label("defense_bot");
-        defenseTeam.onEdge(true);
-        defenseTeam.playerId = session.distributionId();
-        defenseTeam.saveAsBot(dataStore);
-        return defenseTeam;
+        BattleTeam botTeam = BattleTeam.parse(content);
+        botTeam.ownerKey(SnowflakeKey.from(serviceContext.node().nodeId()));
+        botTeam.label("defense_bot");
+        botTeam.onEdge(true);
+        botTeam.playerId = session.distributionId();
+        botTeam.saveAsBot(dataStore);
+        return botTeam;
     }
 
 

@@ -10,11 +10,12 @@ import com.tarantula.platform.presence.PresencePortableRegistry;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+
 import java.util.List;
 
 public class BattleTeam extends RecoverableObject {
+
+    public enum TeamType{DEFENSE,OFFENSE,BOT}
 
     public static int MAX_UNITS = 5;
     public static int MAX_EQUIPMENTS = 30;
@@ -28,6 +29,8 @@ public class BattleTeam extends RecoverableObject {
     public JsonObject botProfile;
     public long playerId;
     public int teamPower;
+    public TeamType teamType;
+
     public final long[] unitInstanceIndex = new long[MAX_UNITS]; ;
     public final long[] equipmentInstanceIndex = new long[MAX_EQUIPMENTS] ;
 
@@ -45,6 +48,8 @@ public class BattleTeam extends RecoverableObject {
 
     @Override
     public boolean read(DataBuffer buffer) {
+        teamType = TeamType.values()[buffer.readInt()];
+        playerId = buffer.readLong();
         teamPower = buffer.readInt();
         for(int i=0;i<MAX_UNITS;i++){
             unitInstanceIndex[i]=buffer.readLong();
@@ -52,12 +57,13 @@ public class BattleTeam extends RecoverableObject {
         for(int i=0;i<MAX_EQUIPMENTS;i++){
             equipmentInstanceIndex[i]=buffer.readLong();
         }
-        playerId = buffer.readLong();
         return true;
     }
 
     @Override
     public boolean write(DataBuffer buffer) {
+        buffer.writeInt(teamType.ordinal());
+        buffer.writeLong(playerId);
         buffer.writeInt(teamPower);
         for(int i=0;i<MAX_UNITS;i++){
             buffer.writeLong(unitInstanceIndex[i]);
@@ -65,7 +71,6 @@ public class BattleTeam extends RecoverableObject {
         for(int i=0;i<MAX_EQUIPMENTS;i++){
             buffer.writeLong(equipmentInstanceIndex[i]);
         }
-        buffer.writeLong(playerId);
         return true;
     }
 
@@ -122,7 +127,9 @@ public class BattleTeam extends RecoverableObject {
         return this;
     }
 
-    public void save(DataStore dataStore,TeamFormationIndex teamFormationIndex,int teamCreationWaitingTime){
+    public void saveAsDefense(DataStore dataStore,TeamFormationIndex teamFormationIndex,int teamCreationWaitingTime){
+        if(playerId <= 0) throw new RuntimeException("battle team must associate with a player");
+        teamType = TeamType.DEFENSE;
         int[] ix = {0};
         unitInstances.forEach(unitInstance -> {
             dataStore.create(unitInstance);
@@ -140,7 +147,25 @@ public class BattleTeam extends RecoverableObject {
         dataStore.update(teamFormationIndex);
     }
 
+    public boolean saveAsOffense(DataStore dataStore){
+        if(playerId <= 0) throw new RuntimeException("battle team must associate with a player");
+        this.teamType = TeamType.OFFENSE;
+        int[] ix = {0};
+        unitInstances.forEach(unitInstance -> {
+            dataStore.create(unitInstance);
+            unitInstanceIndex[ix[0]++]=unitInstance.distributionId();
+        });
+        ix[0]=0;
+        equipmentInstances.forEach(equipmentInstance -> {
+            dataStore.create(equipmentInstance);
+            equipmentInstanceIndex[ix[0]++]=equipmentInstance.distributionId();
+        });
+        return dataStore.create(this);
+    }
+
     public void saveAsBot(DataStore botdataStore){
+        if(playerId <= 0) throw new RuntimeException("battle team must associate with a player");
+        teamType = TeamType.BOT;
         int[] ix = {0};
         unitInstances.forEach(unitInstance -> {
             botdataStore.create(unitInstance);

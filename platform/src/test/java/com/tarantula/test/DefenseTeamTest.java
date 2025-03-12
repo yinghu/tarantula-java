@@ -93,7 +93,9 @@ public class DefenseTeamTest extends DataStoreHook{
             teamFormationIndex.distributionId(100);
             dataStore.createIfAbsent(teamFormationIndex,true);
             Assert.assertTrue(teamFormationIndex.expired());
-            defenseTeam.save(dataStore,teamFormationIndex,5);
+
+            defenseTeam.playerId = 100;
+            defenseTeam.saveAsDefense(dataStore,teamFormationIndex,5);
             Assert.assertTrue(teamFormationIndex.teamId>0);
             BattleTeam load = new BattleTeam();
             load.load(dataStore,teamFormationIndex);
@@ -116,10 +118,33 @@ public class DefenseTeamTest extends DataStoreHook{
             teamFormationIndex.distributionId(200);
             dataStore.createIfAbsent(teamFormationIndex,true);
             Assert.assertTrue(teamFormationIndex.expired());
-            defenseTeam.save(dataStore,teamFormationIndex,5);
+
+            defenseTeam.playerId = 200;
+            defenseTeam.saveAsDefense(dataStore,teamFormationIndex,5);
             Assert.assertTrue(teamFormationIndex.teamId>0);
             BattleTeam load = new BattleTeam();
             load.load(dataStore,teamFormationIndex);
+            load.toJson();
+        }catch (Exception ex){
+            exception = ex;
+        }
+        Assert.assertNull(exception);
+    }
+
+    @Test(groups = { "DefenseTeam" })
+    public void fullOffenseTeamFormationIndexTest(){
+        Exception exception = null;
+        try(InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("SampleDefenseFormation-full.json")){
+            DataStore dataStore = dataStoreProvider.createDataStore("test_pvp_teams");
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            inputStream.transferTo(outputStream);
+            BattleTeam offenseTeam = BattleTeam.parse(outputStream.toByteArray());
+
+            offenseTeam.playerId = 200;
+            Assert.assertTrue(offenseTeam.saveAsOffense(dataStore));
+
+            BattleTeam load = new BattleTeam();
+            load.load(dataStore,offenseTeam.distributionId());
             load.toJson();
         }catch (Exception ex){
             exception = ex;
