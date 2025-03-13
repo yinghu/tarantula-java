@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvider implements Configurable.Listener<SeasonCredentialConfiguration>{
@@ -30,6 +31,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private static final boolean DEV_CONFIG = false;
     private static final boolean DEV_TEST_BOT = false;
     private static final boolean COOL_DOWN_ENABLED = false;
+    private static final boolean DEV_MM_SINGLE_POOL = false;
 
     private static final long CURRENT_SEASON_INDEX = 0;
     public static final String NAME = "pvp_battle";
@@ -41,9 +43,14 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private int reMatchWaitingTime = 180;
     // seconds end
     private int championsLeaderBoardThreshold = 2050;
+    private int botFillEloThreshold = 250;
+    private int matchEloDifferenceThreshold = 1000;
     private int coolDownTime = 60;
 
     private int matchMakingSnapshotSize = 100;
+    private int matchMakingPoolSize = 100;
+    private int matchMakingListSize = 5;
+    private final AtomicInteger roundRobin = new AtomicInteger(0);
     private ConcurrentHashMap<Long, Application> rewardIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Long, SeasonCredentialConfiguration.Season> seasons = new ConcurrentHashMap();
     private ConcurrentHashMap<Long,League> leagueConfigs = new ConcurrentHashMap<>();
@@ -55,6 +62,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private DataStore battleHistory;
     private DataStore playerStateStore;
     private DataStore matchMakingStore;
+
 
     private String gameEndTopic = GameEndEvent.GAME_END_TOPIC;
 
@@ -81,6 +89,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             coolDownTime = pvp.get("defenseCooldownMinutes").getAsInt()*60;
         }
         championsLeaderBoardThreshold = pvp.get("championsLeaderBoardThreshold").getAsInt();
+        botFillEloThreshold = pvp.get("botFillEloThreshold").getAsInt();
         this.matchMakingSnapshotSize = pvp.get("matchMakingSnapshotSize").getAsInt();
         this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME+"_team_formation");
         this.playerStateStore = applicationPreSetup.dataStore(gameCluster,NAME+"_player_state");
@@ -93,12 +102,25 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             onEvent(e);
             return true;
         });
-        IntegerKey mmPool = MatchMaking.pool(0);
-        MatchMakingSnapshot matchMakingSnapshot = new MatchMakingSnapshot(matchMakingSnapshotSize);
-        this.matchMakingSnapshot.put(mmPool,matchMakingSnapshot);
-        matchMakingStore.list(new DefenseTeamIndexQuery(mmPool,DefenseTeamIndex.POOL_LABEL),(t)->
-            matchMakingSnapshot.pending.offer(t)
-        );
+        if(!DEV_MM_SINGLE_POOL){
+            for(int i=0;i<matchMakingPoolSize;i++){
+                IntegerKey mmPool = MatchMaking.pool(i);
+                MatchMakingSnapshot matchMakingSnapshot = new MatchMakingSnapshot(matchMakingSnapshotSize);
+                this.matchMakingSnapshot.put(mmPool,matchMakingSnapshot);
+                matchMakingStore.list(new DefenseTeamIndexQuery(mmPool,DefenseTeamIndex.POOL_LABEL),(t)->
+                    matchMakingSnapshot.pending.offer(t)
+                );
+            }
+        }
+        else{
+            logger.warn("Running single match making pool ...");
+            IntegerKey mmPool = MatchMaking.pool(0);
+            MatchMakingSnapshot matchMakingSnapshot = new MatchMakingSnapshot(matchMakingSnapshotSize);
+            this.matchMakingSnapshot.put(mmPool,matchMakingSnapshot);
+            matchMakingStore.list(new DefenseTeamIndexQuery(mmPool,DefenseTeamIndex.POOL_LABEL),(t)->
+                    matchMakingSnapshot.pending.offer(t)
+            );
+        }
         //to do preload mm-snapshot
 
         bots = dataStore.list(new BotFormationQuery(serviceContext.node().nodeId()));
@@ -128,11 +150,19 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         this.platformGameServiceProvider.configurationServiceProvider().addConfigurableListener(OnAccess.SEASON,this);
     }
 
+    public MatchMaking forceMatchMaking(Session session){
+        MatchMakingIndex matchMakingIndex = new MatchMakingIndex();
+        matchMakingIndex.distributionId(session.distributionId());
+        matchMakingStore.createIfAbsent(matchMakingIndex,true);
+        matchMakingIndex.timestamp(0);
+        matchMakingStore.update(matchMakingIndex);
+        return matchMaking(session);
+    }
 
     public MatchMaking matchMaking(Session session){
         if(DEV_TEST_BOT){
             logger.warn("Testing defense bot formation");
-            MatchMaking botMatchMaking = MatchMaking.success(TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusMinutes(5)),bots);
+            MatchMaking botMatchMaking = MatchMaking.success(TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(reMatchWaitingTime)),bots);
             PlayerRewardIndex playerRewardIndex = playerRewardIndex(session.distributionId());
             Application postReward = rewardIndex.get(playerRewardIndex.postBattleRewardId);
             if(postReward==null) return botMatchMaking;
@@ -144,13 +174,21 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         if(teamFormationIndex.teamId==0){
             return MatchMaking.failure(PvpErrorCode.NO_TEAM_FORMATION,"no defense team created");
         }
-
-        List<BattleTeam> matches = new ArrayList<>();
-
+        MatchMakingIndex matchMakingIndex = new MatchMakingIndex();
+        matchMakingIndex.distributionId(session.distributionId());
+        matchMakingStore.createIfAbsent(matchMakingIndex,true);
+        List<DefenseTeamIndex> pending;
+        if(!matchMakingIndex.expired()){
+            pending = matchMakingIndex.list();
+        }
+        else{
+            pending = findMatches(session,matchMakingIndex);
+        }
         Rating attackerRating = platformGameServiceProvider.presenceServiceProvider().rating(session);
         BattleTeam attackersDefenseTeam = defenseTeam(attackerRating);
 
-        findMatches(session).forEach(defenseTeamIndex -> {
+        List<BattleTeam> matches = new ArrayList<>();
+        pending.forEach(defenseTeamIndex -> {
             BattleTeam defenseTeam = assembly(defenseTeamIndex.teamId());
             if(defenseTeam != null){
                 Rating defenderRating = this.platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(defenseTeamIndex.playerId));
@@ -177,6 +215,9 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 matches.add(defenseTeam);
             }
         });
+        if(matches.size()< 5 && attackerRating.level() < botFillEloThreshold){
+            fillBots(matches);
+        }
         MatchMaking matchMaking = MatchMaking.success(teamFormationIndex.timestamp(),matches);
         PlayerRewardIndex playerRewardIndex = playerRewardIndex(session.distributionId());
         Application postReward = rewardIndex.get(playerRewardIndex.postBattleRewardId);
@@ -477,22 +518,30 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         }
     }
 
-    private List<DefenseTeamIndex> findMatches(Session session){
+    private List<DefenseTeamIndex> findMatches(Session session,MatchMakingIndex matchMakingIndex){
         //temp code to pull first 5 from single pooled.
+        Rating playerElo = platformGameServiceProvider.presenceServiceProvider().rating(session);
         List<DefenseTeamIndex> matches = new ArrayList<>();
-        IntegerKey mkey = MatchMaking.pool(0);
+        IntegerKey mkey = DEV_MM_SINGLE_POOL ? MatchMaking.pool(0) : MatchMaking.pool(matchMakingIndex.poolIndex);
         MatchMakingSnapshot snapshot = matchMakingSnapshot.putIfAbsent(mkey,new MatchMakingSnapshot(matchMakingSnapshotSize));
         List<DefenseTeamIndex> temp = snapshot.pending.stream().toList();
-        int msize = 5;
         for(DefenseTeamIndex match : temp){
             if(match.playerId != session.distributionId()){
                 matchMakingStore.load(match);
                 if(match.onCooldown() && COOL_DOWN_ENABLED) continue;
-                matches.add(match);
-                msize--;
+                Rating matchElo = platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(match.playerId));
+                if(matchElo.level() > playerElo.level() && matchElo.level()-playerElo.level() < matchEloDifferenceThreshold){
+                    if(matchMakingIndex.higher(match)) break;
+                }
+                if(matchElo.level() < playerElo.level() && playerElo.level()- matchElo.level() < matchEloDifferenceThreshold){
+                    if(matchMakingIndex.lower(match)) break;
+                }
             }
-            if(msize==0) break;
         }
+        matchMakingIndex.poolIndex = (matchMakingIndex.poolIndex < matchMakingPoolSize-1) ? matchMakingIndex.poolIndex+1 : 0;
+        matchMakingIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(reMatchWaitingTime)));
+        matchMakingIndex.reset();
+        matchMakingStore.update(matchMakingIndex);
         return matches;
     }
 
@@ -534,7 +583,10 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     }
 
     private void onMatchMakingPool(long playerId,long teamId){
-        IntegerKey integerKey = MatchMaking.pool(0);
+        IntegerKey integerKey = DEV_MM_SINGLE_POOL ? MatchMaking.pool(0) : MatchMaking.pool(roundRobin.getAndUpdate(v->{
+            if(v<matchMakingPoolSize-1) return v+1;
+            return 0;
+        }));
         DefenseTeamIndex battleTeamIndex = new DefenseTeamIndex(integerKey);
         battleTeamIndex.playerId = playerId;
         battleTeamIndex.distributionId(teamId);
@@ -632,6 +684,13 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         botTeam.playerId = serviceContext.distributionId();
         botTeam.saveAsBot(dataStore);
         return botTeam;
+    }
+
+    private void fillBots(List<BattleTeam> pending){
+        int fill = matchMakingListSize - pending.size();
+        for(int i=0;i<fill;i++){
+            pending.add(bots.get(i));
+        }
     }
 
 

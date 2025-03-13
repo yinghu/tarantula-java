@@ -28,6 +28,7 @@
      "reMatchWaitingTimeMinutes": 60,
      "defenseCooldownMinutes": 60,
      "championsLeaderBoardThreshold": 2050,
+    "botFillEloThreshold": 250,
      "matchMakingSnapshotSize": 100
   },
 

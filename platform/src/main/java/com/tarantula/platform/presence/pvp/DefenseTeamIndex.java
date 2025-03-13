@@ -18,6 +18,11 @@ public class DefenseTeamIndex extends RecoverableObject {
         this.onEdge = true;
     }
 
+    public DefenseTeamIndex(long teamId){
+        this();
+        this.distributionId = teamId;
+    }
+
     public DefenseTeamIndex(IntegerKey poolKey){
         this();
         this.ownerKey = poolKey;

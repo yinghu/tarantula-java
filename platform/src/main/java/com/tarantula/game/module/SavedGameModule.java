@@ -101,7 +101,7 @@ public class SavedGameModule extends ModuleHeader {
             session.write(rating.toJson().toString().getBytes());
         }
         else if(session.action().equals("onPaidMatchMaking")){
-            MatchMaking matchMaking = gameServiceProvider.pvpBattleServiceProvider().matchMaking(session);
+            MatchMaking matchMaking = gameServiceProvider.pvpBattleServiceProvider().forceMatchMaking(session);
             session.write(matchMaking.toJson().toString().getBytes());
         }
         else if(session.action().equals("onMatchMaking")){
