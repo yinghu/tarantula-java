@@ -7,6 +7,7 @@ import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.*;
+import com.tarantula.game.GameRating;
 import com.tarantula.game.SimpleStub;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.configuration.SeasonCredentialConfiguration;
@@ -329,6 +330,19 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     public SeasonCredentialConfiguration.Season currentSeason(){
         SeasonCredentialConfiguration.Season season = seasons.get(CURRENT_SEASON_INDEX);// currentSeason from season rotation
         return season!=null ? season : new SeasonCredentialConfiguration.Season();
+    }
+
+    public void setELO(long playerID, int newELO){
+        GameRating gameRating = platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(playerID));
+        gameRating.level(newELO);
+        gameRating.update();
+
+        PlayerRewardIndex playerRewardIndex = playerRewardIndex(playerID);
+        League league = leagues.get(newELO);
+        if(league!=null){
+            playerRewardIndex.postBattleRewardId = league.postBattleReward.distributionId();
+            playerRewardIndex.update();
+        }
     }
 
     public void onBattleEnd(BattleEndResult battleEndResult){
