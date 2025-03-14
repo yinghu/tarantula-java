@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -42,7 +43,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private int reMatchWaitingTime = 180;
     // seconds end
     private int championsLeaderBoardThreshold = 2050;
-
+    private int championsLeaderBoardSize = 100;
     private int matchEloDifferenceThreshold = 1000;
     private int coolDownTime = 60;
 
@@ -53,7 +54,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private ConcurrentHashMap<Long, Application> rewardIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Long, SeasonCredentialConfiguration.Season> seasons = new ConcurrentHashMap();
     private ConcurrentHashMap<Long,League> leagueConfigs = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<Integer,League> leagues = new ConcurrentHashMap<>();
+    ConcurrentHashMap<Integer,League> leagues = new ConcurrentHashMap<>();
     private ClusterProvider.ClusterStore scheduleStore;
 
     private final SeasonRuntime rotation = new SeasonRuntime();
@@ -68,6 +69,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private ConcurrentHashMap<IntegerKey,MatchMakingSnapshot> matchMakingSnapshot = new ConcurrentHashMap<>();
 
     private List<BattleTeam> bots;
+    private ChampionLeaderBoard championLeaderBoard;
 
     public PlatformPVPBattleServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
@@ -136,6 +138,10 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             logger.warn(bot.botProfile.toString()+" : "+bot.playerId);
         });
         this.platformGameServiceProvider.configurationServiceProvider().addConfigurableListener(OnAccess.SEASON,this);
+    }
+
+    public ChampionLeaderBoard championLeaderBoard(){
+        return championLeaderBoard != null ? championLeaderBoard : ChampionLeaderBoard.noBoard();
     }
 
     public MatchMaking forceMatchMaking(Session session){
@@ -398,6 +404,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         }));
         logger.warn("Season starting ["+seasonRuntime.currentSeason+" : "+seasonRuntime.sequence+"]");
         SeasonCredentialConfiguration.Season season = seasons.get(seasonRuntime.currentSeason);
+        this.championLeaderBoard = new ChampionLeaderBoard(localSeasonPlayerStore,serviceContext.node().nodeId(),season.seasonId,championsLeaderBoardThreshold,championsLeaderBoardSize);
+        this.championLeaderBoard.load();
         seasons.put(CURRENT_SEASON_INDEX,season);
         onSeasonListener(season,false);
     }
@@ -432,7 +440,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             }else{
                 logger.warn("Processing season end ["+rotation.sequence+"]["+rotation.currentSeason+"]");
                 //do end first
-                processReward(ended.seasonId);
+                placementReward(ended.seasonId);
+                leagueReward(ended.seasonId);
                 //start next if any
                 SeasonCredentialConfiguration.Season next = seasons.get(rotation.sequence+1);
                 SeasonRuntime seasonRuntime = new SeasonRuntime();
@@ -543,7 +552,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 defenseElo.level(defenseElo.level()+(gameEndEvent.defenseEloLevelDelta));
                 defenseElo.update();
             }
-            if(gameEndEvent.defenseEloLevelDelta<0){
+            if(gameEndEvent.defenseEloLevelDelta<0){ //cooldown reset
                 DefenseTeamIndex defenseTeamIndex = new DefenseTeamIndex();
                 defenseTeamIndex.distributionId(gameEndEvent.defenseTeamId);
                 if(localMatchMakingStore.load(defenseTeamIndex)){
@@ -560,6 +569,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             localSeasonPlayerStore.createIfAbsent(seasonPlayerIndex,true);
             seasonPlayerIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
             localSeasonPlayerStore.update(seasonPlayerIndex);
+            championLeaderBoard.onBoard(gameEndEvent.offensePlayerId,gameEndEvent.offenseEloLevel);
             return;
         }
         if(event.getClassId()==PortableEventRegistry.TEAM_FORMATION_EVENT_CID){
@@ -655,7 +665,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         }
     }
 
-    private PlayerRewardIndex playerRewardIndex(long playerId){
+    public PlayerRewardIndex playerRewardIndex(long playerId){
         PlayerRewardIndex playerRewardIndex = new PlayerRewardIndex(playerId);
         playerRewardIndex.dataStore(playerRewardStore);
         playerRewardStore.createIfAbsent(playerRewardIndex,true);
@@ -680,11 +690,18 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         }
     }
 
-    private void processReward(long seasonId){
+    private void placementReward(long seasonId){
         logger.warn("Season placement reward granting ["+seasonId+"]");
+        ArrayBlockingQueue<SeasonPlayerIndex> pending  = new ArrayBlockingQueue(100);
         try{
             localSeasonPlayerStore.list(new SeasonPlayerIndexQuery(seasonId),ps->{
-
+                if(!pending.offer(ps)){
+                    ArrayList<SeasonPlayerIndex> drains = new ArrayList<>();
+                    pending.drainTo(drains);
+                    serviceContext.schedule(new ScheduleRunner(10,new PlacementScheduler(drains,this,this.platformGameServiceProvider.presenceServiceProvider())));
+                    pending.clear();
+                    pending.offer(ps);
+                }
                 return true;
             });
         }catch (Exception ex){
@@ -692,13 +709,10 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         }
     }
 
-    private void leagueReward(long seasonId){
-        logger.warn("Season league reward granting ["+seasonId+"]");
-        try{
-
-        }catch (Exception ex){
-            logger.error("Unexpected error",ex);
-        }
+    private void leagueReward(long seasonId) {
+        logger.warn("Season league reward granting [" + seasonId + "]");
+        ChampionLeaderBoard ldb = championLeaderBoard();
+        serviceContext.schedule(new ScheduleRunner(10,new LeagueRewardScheduler(ldb.leaderBoard(),this,platformGameServiceProvider.presenceServiceProvider())));
     }
 
 
