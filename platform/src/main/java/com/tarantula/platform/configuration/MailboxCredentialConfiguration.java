@@ -14,7 +14,7 @@ public class MailboxCredentialConfiguration extends CredentialConfiguration {
 
     private ServiceContext serviceContext;
 
-    private GridlyDownload gridlyDownload;
+    private TolgeeDownload tolgeeDownload;
     private Content content;
 
     public MailboxCredentialConfiguration(String typeId, ConfigurableObject configurableObject){
@@ -27,8 +27,8 @@ public class MailboxCredentialConfiguration extends CredentialConfiguration {
         this.serviceContext = serviceContext;
         content = serviceContext.deploymentServiceProvider().resource(header.get("GridlyView").getAsString());
         if(!content.existed()) return false;
-        gridlyDownload = new GridlyDownload(this,serviceContext);
-        return gridlyDownload.download();
+        tolgeeDownload = new TolgeeDownload(this, serviceContext);
+        return tolgeeDownload.download();
     }
 
     public byte[] load(){
@@ -39,7 +39,7 @@ public class MailboxCredentialConfiguration extends CredentialConfiguration {
     }
 
     public Announcement announcement(String locId){
-        return gridlyDownload.announcement(locId);
+        return tolgeeDownload.announcement(locId);
     }
 
     public boolean inbox(){
