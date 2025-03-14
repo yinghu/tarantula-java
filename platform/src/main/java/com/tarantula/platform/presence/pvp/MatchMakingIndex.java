@@ -1,16 +1,24 @@
 package com.tarantula.platform.presence.pvp;
 
+import com.icodesoftware.DataStore;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+
 public class MatchMakingIndex extends RecoverableObject {
 
-    public long teamIdBelow1;
-    public long teamIdBelow2;
-    public long teamIdBelow3;
-    public long teamIdUp1;
-    public long teamIdUp2;
+    private final ArrayBlockingQueue<DefenseTeamIndex> higher2 = new ArrayBlockingQueue<>(2);
+
+    private final ArrayBlockingQueue<DefenseTeamIndex> lower3 = new ArrayBlockingQueue<>(3);
+
+    public final long[] teamIdBelow = new long[]{0,0,0};
+    public final long[] teamIdHigh = new long[]{0,0};
+
+    public int poolIndex;
 
     @Override
     public int getFactoryId() {
@@ -23,28 +31,83 @@ public class MatchMakingIndex extends RecoverableObject {
 
     @Override
     public boolean write(DataBuffer buffer) {
-        buffer.writeLong(teamIdBelow1);
-        buffer.writeLong(teamIdBelow2);
-        buffer.writeLong(teamIdBelow3);
-        buffer.writeLong(teamIdUp1);
-        buffer.writeLong(teamIdUp2);
+        buffer.writeInt(poolIndex);
+        for(int i=0; i<teamIdBelow.length;i++){
+            buffer.writeLong(teamIdBelow[i]);
+        }
+        for(int i=0; i<teamIdHigh.length;i++){
+            buffer.writeLong(teamIdHigh[i]);
+        }
         buffer.writeLong(timestamp);
         return true;
     }
 
     @Override
     public boolean read(DataBuffer buffer) {
-        teamIdBelow1 = buffer.readLong();
-        teamIdBelow2 = buffer.readLong();
-        teamIdBelow3 = buffer.readLong();
-        teamIdUp1 = buffer.readLong();
-        teamIdUp2 = buffer.readLong();
+        poolIndex = buffer.readInt();
+        for(int i=0; i<teamIdBelow.length;i++){
+            teamIdBelow[i] = buffer.readLong();
+        }
+        for(int i=0; i<teamIdHigh.length;i++){
+            teamIdHigh[i] = buffer.readLong();
+        }
         timestamp = buffer.readLong();
         return true;
     }
 
+    public void reset(){
+        for(int i=0; i<teamIdBelow.length;i++){
+            teamIdBelow[i] = 0;
+        }
+        for(int i=0; i<teamIdHigh.length;i++){
+            teamIdHigh[i] = 0;
+        }
+        ArrayList<DefenseTeamIndex> pending = new ArrayList<>();
+        lower3.drainTo(pending);
+        for(int i=0; i<pending.size();i++){
+            teamIdBelow[i] = pending.get(i).teamId();
+        }
+        pending.clear();
+        higher2.drainTo(pending);
+        for(int i=0; i<pending.size();i++){
+            teamIdHigh[i] = pending.get(i).teamId();
+        }
+    }
+
+    public boolean full(){
+        return higher2.size() == 2 && lower3.size() == 3;
+    }
+
+    public boolean higher(DefenseTeamIndex defenseTeamIndex){
+        higher2.offer(defenseTeamIndex);
+        return full();
+    }
+
+    public boolean lower(DefenseTeamIndex defenseTeamIndex){
+        lower3.offer(defenseTeamIndex);
+        return full();
+    }
+
+    public List<DefenseTeamIndex> list(DataStore dataStore){
+        ArrayList list = new ArrayList();
+        for(int i=0; i<teamIdBelow.length;i++){
+            if(teamIdBelow[i] > 0){
+                list.add(load(teamIdBelow[i],dataStore));
+            }
+        }
+        for(int i=0; i<teamIdHigh.length;i++){
+            if(teamIdHigh[i] > 0) list.add(load(teamIdHigh[i],dataStore));
+        }
+        return list;
+    }
     public boolean expired(){
         return TimeUtil.expired(TimeUtil.fromUTCMilliseconds(timestamp));
+    }
+
+    private DefenseTeamIndex load(long teamId,DataStore dataStore){
+        DefenseTeamIndex defenseTeamIndex = new DefenseTeamIndex(teamId);
+        dataStore.load(defenseTeamIndex);
+        return defenseTeamIndex;
     }
 
 }

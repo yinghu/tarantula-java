@@ -10,12 +10,11 @@ import java.io.IOException;
 
 public class TeamFormationEvent extends Data implements Event {
 
-    public int eloLevel;
 
-    public TeamFormationEvent(long systemId,int eloLevel){
+    public TeamFormationEvent(long playerId,long teamId){
         this();
-        this.distributionId = systemId;
-        this.eloLevel = eloLevel;
+        this.stub = playerId;
+        this.distributionId = teamId;
     }
 
     public TeamFormationEvent(){
@@ -25,13 +24,13 @@ public class TeamFormationEvent extends Data implements Event {
     @Override
     public void writePortable(PortableWriter portableWriter) throws IOException {
         portableWriter.writeLong("1",distributionId);
-        portableWriter.writeInt("2",eloLevel);
+        portableWriter.writeLong("2",stub);
     }
 
     @Override
     public void readPortable(PortableReader portableReader) throws IOException {
         this.distributionId = portableReader.readLong("1");
-        this.eloLevel = portableReader.readInt("2");
+        this.stub = portableReader.readLong("2");
     }
 
     @Override

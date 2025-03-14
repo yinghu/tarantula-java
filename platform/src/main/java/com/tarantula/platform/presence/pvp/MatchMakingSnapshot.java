@@ -5,7 +5,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 public class MatchMakingSnapshot {
 
-    public final ArrayBlockingQueue<Long> pending;
+    public final ArrayBlockingQueue<DefenseTeamIndex> pending;
 
     public MatchMakingSnapshot(int pendingSize){
 

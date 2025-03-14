@@ -3,7 +3,6 @@ package com.tarantula.game.module;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
-import com.icodesoftware.service.Content;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.game.GameRating;
 import com.tarantula.platform.configuration.SeasonCredentialConfiguration;
@@ -101,7 +100,7 @@ public class SavedGameModule extends ModuleHeader {
             session.write(rating.toJson().toString().getBytes());
         }
         else if(session.action().equals("onPaidMatchMaking")){
-            MatchMaking matchMaking = gameServiceProvider.pvpBattleServiceProvider().matchMaking(session);
+            MatchMaking matchMaking = gameServiceProvider.pvpBattleServiceProvider().forceMatchMaking(session);
             session.write(matchMaking.toJson().toString().getBytes());
         }
         else if(session.action().equals("onMatchMaking")){
@@ -127,6 +126,11 @@ public class SavedGameModule extends ModuleHeader {
         else if(session.action().equals("onRewardGrant")){
             gameServiceProvider.pvpBattleServiceProvider().rewardGranted(session);
             session.write(JsonUtil.toSimpleResponse(true,"granted").getBytes());
+        }
+
+        else if(session.action().equals("onChampionLeaderBoard")){
+            ChampionLeaderBoard board = gameServiceProvider.pvpBattleServiceProvider().championLeaderBoard();
+            session.write(board.toJson().toString().getBytes());
         }
 
         //pvp saves end

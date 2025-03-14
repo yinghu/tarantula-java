@@ -3,6 +3,9 @@ package com.tarantula.platform.presence.pvp;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class PlayerBattleLogIndex extends RecoverableObject {
 
     public long battleId0;
@@ -75,12 +78,24 @@ public class PlayerBattleLogIndex extends RecoverableObject {
         update();
     }
 
-    public long[] getOffenseBattles(){
-        return new long[]{battleId0, battleId1, battleId2, battleId3, battleId4};
+    public Set<Long> getOffenseBattles(){
+        HashSet<Long> keysOnly = new HashSet<>();
+        if(battleId0 != 0) keysOnly.add(battleId0);
+        if(battleId1 != 0) keysOnly.add(battleId1);
+        if(battleId2 != 0) keysOnly.add(battleId2);
+        if(battleId3 != 0) keysOnly.add(battleId3);
+        if(battleId4 != 0) keysOnly.add(battleId4);
+        return keysOnly;
     }
 
-    public long[] getDefenseBattles(){
-        return new long[]{battleId5, battleId6, battleId7, battleId8, battleId9};
+    public Set<Long> getDefenseBattles(){
+        HashSet<Long> keysOnly = new HashSet<>();
+        if(battleId5 != 0) keysOnly.add(battleId5);
+        if(battleId6 != 0) keysOnly.add(battleId6);
+        if(battleId7 != 0) keysOnly.add(battleId7);
+        if(battleId8 != 0) keysOnly.add(battleId8);
+        if(battleId9 != 0) keysOnly.add(battleId9);
+        return keysOnly;
     }
 
 }
