@@ -421,7 +421,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             logger.warn("No season rotation has scheduled");
             return;
         }
-        onSeasonListener(currentSeason(),true);
+        SeasonCredentialConfiguration.Season ended = currentSeason();
+        onSeasonListener(ended,true);
         seasons.remove(CURRENT_SEASON_INDEX);
         byte[] lockKey = SnowflakeKey.from(rotation.seasonRotation).asBinary();
         try{
@@ -431,6 +432,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             }else{
                 logger.warn("Processing season end ["+rotation.sequence+"]["+rotation.currentSeason+"]");
                 //do end first
+                processReward(ended.seasonId);
                 //start next if any
                 SeasonCredentialConfiguration.Season next = seasons.get(rotation.sequence+1);
                 SeasonRuntime seasonRuntime = new SeasonRuntime();
@@ -675,6 +677,27 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         int fill = matchMakingListSize - pending.size();
         for(int i=0;i<fill;i++){
             pending.add(bots.get(i));
+        }
+    }
+
+    private void processReward(long seasonId){
+        logger.warn("Season placement reward granting ["+seasonId+"]");
+        try{
+            localSeasonPlayerStore.list(new SeasonPlayerIndexQuery(seasonId),ps->{
+
+                return true;
+            });
+        }catch (Exception ex){
+            logger.error("Unexpected error",ex);
+        }
+    }
+
+    private void leagueReward(long seasonId){
+        logger.warn("Season league reward granting ["+seasonId+"]");
+        try{
+
+        }catch (Exception ex){
+            logger.error("Unexpected error",ex);
         }
     }
 
