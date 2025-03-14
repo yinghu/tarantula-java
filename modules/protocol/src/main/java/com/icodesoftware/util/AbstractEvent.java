@@ -1,6 +1,7 @@
 package com.icodesoftware.util;
 
 import com.icodesoftware.Event;
+import com.icodesoftware.EventListener;
 import com.icodesoftware.service.EventService;
 
 public class AbstractEvent extends TROnApplication implements Event {
@@ -11,7 +12,7 @@ public class AbstractEvent extends TROnApplication implements Event {
     protected int streamingBatchSize = 512;
 
     protected EventService eventService;
-
+    protected EventListener eventListener;
     @Override
     public String tag() {
         return tag;
@@ -79,6 +80,10 @@ public class AbstractEvent extends TROnApplication implements Event {
                 next.on(buffer);
             }
         }
+    }
+    
+    public void eventListener(EventListener eventListener){
+        this.eventListener = eventListener;
     }
 
 }
