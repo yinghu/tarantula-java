@@ -1,5 +1,6 @@
 package com.tarantula.platform.presence.pvp;
 
+import com.icodesoftware.DataStore;
 import com.icodesoftware.util.RecoverableObject;
 import com.icodesoftware.util.TimeUtil;
 import com.tarantula.platform.presence.PresencePortableRegistry;
@@ -87,18 +88,26 @@ public class MatchMakingIndex extends RecoverableObject {
         return full();
     }
 
-    public List<DefenseTeamIndex> list(){
+    public List<DefenseTeamIndex> list(DataStore dataStore){
         ArrayList list = new ArrayList();
         for(int i=0; i<teamIdBelow.length;i++){
-            if(teamIdBelow[i] > 0) list.add(new DefenseTeamIndex(teamIdBelow[i]));
+            if(teamIdBelow[i] > 0){
+                list.add(load(teamIdBelow[i],dataStore));
+            }
         }
         for(int i=0; i<teamIdHigh.length;i++){
-            if(teamIdHigh[i] > 0) list.add(new DefenseTeamIndex(teamIdHigh[i]));
+            if(teamIdHigh[i] > 0) list.add(load(teamIdHigh[i],dataStore));
         }
         return list;
     }
     public boolean expired(){
         return TimeUtil.expired(TimeUtil.fromUTCMilliseconds(timestamp));
+    }
+
+    private DefenseTeamIndex load(long teamId,DataStore dataStore){
+        DefenseTeamIndex defenseTeamIndex = new DefenseTeamIndex(teamId);
+        dataStore.load(defenseTeamIndex);
+        return defenseTeamIndex;
     }
 
 }

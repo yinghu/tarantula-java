@@ -82,7 +82,7 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
     public static final int BATTLE_LOG_CID = 34;
     public static final int PLAYER_BATTLE_LOG_INDEX_CID = 35;
     public static final int MATCH_MAKING_INDEX_CID = 36;
-
+    public static final int SEASON_PLAYER_INDEX_CID = 37;
     public static final int PLAYER_REWARD_INDEX_CID = 38;
     public static final int BATTLE_TEAM_INDEX_CID = 39;
 
@@ -199,6 +199,12 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
                 break;
             case PLAYER_BATTLE_LOG_INDEX_CID:
                 pt = new PlayerBattleLogIndex();
+                break;
+            case MATCH_MAKING_INDEX_CID:
+                pt = new MatchMakingIndex();
+                break;
+            case SEASON_PLAYER_INDEX_CID:
+                pt = new SeasonPlayerIndex();
                 break;
             case PLAYER_REWARD_INDEX_CID:
                 pt = new PlayerRewardIndex();

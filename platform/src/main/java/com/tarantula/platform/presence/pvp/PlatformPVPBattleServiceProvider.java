@@ -19,6 +19,7 @@ import com.tarantula.platform.item.PlatformItemServiceProvider;
 
 import java.io.File;
 import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,9 +30,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     //NEVER PUSH TO REMOTE WITH TRUE
     private static final boolean DEV_CONFIG = false;
-    private static final boolean DEV_TEST_BOT = false;
     private static final boolean COOL_DOWN_ENABLED = false;
-    private static final boolean DEV_MM_SINGLE_POOL = false;
 
     private static final long CURRENT_SEASON_INDEX = 0;
     public static final String NAME = "pvp_battle";
@@ -43,7 +42,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private int reMatchWaitingTime = 180;
     // seconds end
     private int championsLeaderBoardThreshold = 2050;
-    private int botFillEloThreshold = 250;
+
     private int matchEloDifferenceThreshold = 1000;
     private int coolDownTime = 60;
 
@@ -60,9 +59,9 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private final SeasonRuntime rotation = new SeasonRuntime();
 
     private DataStore battleHistory;
-    private DataStore playerStateStore;
-    private DataStore matchMakingStore;
-
+    private DataStore playerRewardStore;
+    private DataStore localMatchMakingStore;
+    private DataStore localSeasonPlayerStore;
 
     private String gameEndTopic = GameEndEvent.GAME_END_TOPIC;
 
@@ -89,11 +88,11 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             coolDownTime = pvp.get("defenseCooldownMinutes").getAsInt()*60;
         }
         championsLeaderBoardThreshold = pvp.get("championsLeaderBoardThreshold").getAsInt();
-        botFillEloThreshold = pvp.get("botFillEloThreshold").getAsInt();
         this.matchMakingSnapshotSize = pvp.get("matchMakingSnapshotSize").getAsInt();
         this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME+"_team_formation");
-        this.playerStateStore = applicationPreSetup.dataStore(gameCluster,NAME+"_player_state");
-        this.matchMakingStore = applicationPreSetup.localDataStore(gameCluster,NAME+"_match_making");
+        this.playerRewardStore = applicationPreSetup.dataStore(gameCluster,NAME+"_player_reward");
+        this.localMatchMakingStore = applicationPreSetup.localDataStore(gameCluster,NAME+"_match_making");
+        this.localSeasonPlayerStore = applicationPreSetup.localDataStore(gameCluster,NAME+"_season_player");
         this.battleHistory = applicationPreSetup.dataStore(gameCluster,NAME+"_history");
         this.scheduleStore = this.serviceContext.clusterProvider().clusterStore(ClusterProvider.ClusterStore.SMALL,gameCluster.typeId()+"."+NAME);
 
@@ -102,26 +101,15 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             onEvent(e);
             return true;
         });
-        if(!DEV_MM_SINGLE_POOL){
-            for(int i=0;i<matchMakingPoolSize;i++){
-                IntegerKey mmPool = MatchMaking.pool(i);
-                MatchMakingSnapshot matchMakingSnapshot = new MatchMakingSnapshot(matchMakingSnapshotSize);
-                this.matchMakingSnapshot.put(mmPool,matchMakingSnapshot);
-                matchMakingStore.list(new DefenseTeamIndexQuery(mmPool,DefenseTeamIndex.POOL_LABEL),(t)->
-                    matchMakingSnapshot.pending.offer(t)
-                );
-            }
-        }
-        else{
-            logger.warn("Running single match making pool ...");
-            IntegerKey mmPool = MatchMaking.pool(0);
+        for(int i=0;i<matchMakingPoolSize;i++){
+            IntegerKey mmPool = MatchMaking.pool(i);
             MatchMakingSnapshot matchMakingSnapshot = new MatchMakingSnapshot(matchMakingSnapshotSize);
             this.matchMakingSnapshot.put(mmPool,matchMakingSnapshot);
-            matchMakingStore.list(new DefenseTeamIndexQuery(mmPool,DefenseTeamIndex.POOL_LABEL),(t)->
-                    matchMakingSnapshot.pending.offer(t)
+            localMatchMakingStore.list(new DefenseTeamIndexQuery(mmPool,DefenseTeamIndex.POOL_LABEL),(t)->
+                matchMakingSnapshot.pending.offer(t)
             );
+            logger.warn("Preloading match making list ["+matchMakingSnapshot.pending.size()+"] from pool ["+mmPool.key()+"]");
         }
-        //to do preload mm-snapshot
 
         bots = dataStore.list(new BotFormationQuery(serviceContext.node().nodeId()));
         if(bots.size()==0){
@@ -153,22 +141,14 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     public MatchMaking forceMatchMaking(Session session){
         MatchMakingIndex matchMakingIndex = new MatchMakingIndex();
         matchMakingIndex.distributionId(session.distributionId());
-        matchMakingStore.createIfAbsent(matchMakingIndex,true);
+        localMatchMakingStore.createIfAbsent(matchMakingIndex,true);
         matchMakingIndex.timestamp(0);
-        matchMakingStore.update(matchMakingIndex);
+        localMatchMakingStore.update(matchMakingIndex);
         return matchMaking(session);
     }
 
     public MatchMaking matchMaking(Session session){
-        if(DEV_TEST_BOT){
-            logger.warn("Testing defense bot formation");
-            MatchMaking botMatchMaking = MatchMaking.success(TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(reMatchWaitingTime)),bots);
-            PlayerRewardIndex playerRewardIndex = playerRewardIndex(session.distributionId());
-            Application postReward = rewardIndex.get(playerRewardIndex.postBattleRewardId);
-            if(postReward==null) return botMatchMaking;
-            botMatchMaking.postBattleReward = postReward;
-            return botMatchMaking;
-        }
+
         TeamFormationIndex teamFormationIndex = teamFormationIndex(session.distributionId());
 
         if(teamFormationIndex.teamId==0){
@@ -176,10 +156,10 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         }
         MatchMakingIndex matchMakingIndex = new MatchMakingIndex();
         matchMakingIndex.distributionId(session.distributionId());
-        matchMakingStore.createIfAbsent(matchMakingIndex,true);
+        localMatchMakingStore.createIfAbsent(matchMakingIndex,true);
         List<DefenseTeamIndex> pending;
         if(!matchMakingIndex.expired()){
-            pending = matchMakingIndex.list();
+            pending = matchMakingIndex.list(localMatchMakingStore);
         }
         else{
             pending = findMatches(session,matchMakingIndex);
@@ -215,7 +195,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 matches.add(defenseTeam);
             }
         });
-        if(matches.size()< 5 && attackerRating.level() < botFillEloThreshold){
+        if(matches.size()< matchMakingListSize){
             fillBots(matches);
         }
         MatchMaking matchMaking = MatchMaking.success(teamFormationIndex.timestamp(),matches);
@@ -394,8 +374,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         battleLog.offenseEloGain = battleEndResult.offenseEloLevelDelta;
         battleLog.defenseElo = battleEndResult.defenseEloLevelUpdated;
         battleHistory.update(battleLog);
-        logger.warn("OFFENSE : "+battleEndResult.offensePlayerId+" : "+battleEndResult.offenseEloLevelUpdated+" : "+battleEndResult.offenseEloLevelDelta);
-        logger.warn("DEFENSE : "+battleEndResult.defensePlayerId+" : "+battleEndResult.defenseEloLevelUpdated+" : "+battleEndResult.defenseEloLevelDelta);
+        //logger.warn("OFFENSE : "+battleEndResult.offensePlayerId+" : "+battleEndResult.offenseEloLevelUpdated+" : "+battleEndResult.offenseEloLevelDelta);
+        //logger.warn("DEFENSE : "+battleEndResult.defensePlayerId+" : "+battleEndResult.defenseEloLevelUpdated+" : "+battleEndResult.defenseEloLevelDelta);
         PlayerBattleLogIndex defenseLogIndex = new PlayerBattleLogIndex();
         defenseLogIndex.distributionId(battleEndResult.defensePlayerId);
         defenseLogIndex.dataStore(battleHistory);
@@ -519,15 +499,13 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     }
 
     private List<DefenseTeamIndex> findMatches(Session session,MatchMakingIndex matchMakingIndex){
-        //temp code to pull first 5 from single pooled.
         Rating playerElo = platformGameServiceProvider.presenceServiceProvider().rating(session);
-        List<DefenseTeamIndex> matches = new ArrayList<>();
-        IntegerKey mkey = DEV_MM_SINGLE_POOL ? MatchMaking.pool(0) : MatchMaking.pool(matchMakingIndex.poolIndex);
+        IntegerKey mkey = MatchMaking.pool(matchMakingIndex.poolIndex);
         MatchMakingSnapshot snapshot = matchMakingSnapshot.putIfAbsent(mkey,new MatchMakingSnapshot(matchMakingSnapshotSize));
         List<DefenseTeamIndex> temp = snapshot.pending.stream().toList();
         for(DefenseTeamIndex match : temp){
             if(match.playerId != session.distributionId()){
-                matchMakingStore.load(match);
+                localMatchMakingStore.load(match);
                 if(match.onCooldown() && COOL_DOWN_ENABLED) continue;
                 Rating matchElo = platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(match.playerId));
                 if(matchElo.level() > playerElo.level() && matchElo.level()-playerElo.level() < matchEloDifferenceThreshold){
@@ -541,7 +519,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         matchMakingIndex.poolIndex = (matchMakingIndex.poolIndex < matchMakingPoolSize-1) ? matchMakingIndex.poolIndex+1 : 0;
         matchMakingIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(reMatchWaitingTime)));
         matchMakingIndex.reset();
-        matchMakingStore.update(matchMakingIndex);
+        localMatchMakingStore.update(matchMakingIndex);
+        List<DefenseTeamIndex> matches = matchMakingIndex.list(localMatchMakingStore);
         return matches;
     }
 
@@ -559,19 +538,26 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             RoutingKey routingKey = serviceContext.eventService().routingKey(gameEndEvent.offenseTeamId,"user/presence");
             if(partitions[routingKey.routingNumber()].opening()){
                 Rating defenseElo = platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(gameEndEvent.defensePlayerId));
-                logger.warn("defense elo before update ["+defenseElo.level()+"]");
                 defenseElo.level(defenseElo.level()+(gameEndEvent.defenseEloLevelDelta));
                 defenseElo.update();
-                logger.warn("defense elo updated ["+defenseElo.level()+"] with delta ["+gameEndEvent.defenseEloLevelDelta+"]");
             }
             if(gameEndEvent.defenseEloLevelDelta<0){
                 DefenseTeamIndex defenseTeamIndex = new DefenseTeamIndex();
                 defenseTeamIndex.distributionId(gameEndEvent.defenseTeamId);
-                if(matchMakingStore.load(defenseTeamIndex)){
+                if(localMatchMakingStore.load(defenseTeamIndex)){
                     defenseTeamIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(coolDownTime)));
-                    matchMakingStore.update(defenseTeamIndex);
+                    localMatchMakingStore.update(defenseTeamIndex);
                 }
             }
+            SeasonCredentialConfiguration.Season season = currentSeason();
+            if(season==null) return;
+            SeasonPlayerIndex seasonPlayerIndex = new SeasonPlayerIndex();
+            seasonPlayerIndex.playerId = gameEndEvent.offensePlayerId;
+            seasonPlayerIndex.seasonId = season.distributionId();
+            seasonPlayerIndex.ownerKey(SnowflakeKey.from(seasonPlayerIndex.seasonId));
+            localSeasonPlayerStore.createIfAbsent(seasonPlayerIndex,true);
+            seasonPlayerIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+            localSeasonPlayerStore.update(seasonPlayerIndex);
             return;
         }
         if(event.getClassId()==PortableEventRegistry.TEAM_FORMATION_EVENT_CID){
@@ -583,23 +569,22 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     }
 
     private void onMatchMakingPool(long playerId,long teamId){
-        IntegerKey integerKey = DEV_MM_SINGLE_POOL ? MatchMaking.pool(0) : MatchMaking.pool(roundRobin.getAndUpdate(v->{
+        IntegerKey integerKey = MatchMaking.pool(roundRobin.getAndUpdate(v->{
             if(v<matchMakingPoolSize-1) return v+1;
             return 0;
         }));
         DefenseTeamIndex battleTeamIndex = new DefenseTeamIndex(integerKey);
         battleTeamIndex.playerId = playerId;
         battleTeamIndex.distributionId(teamId);
-        matchMakingStore.createIfAbsent(battleTeamIndex,false);
+        localMatchMakingStore.createIfAbsent(battleTeamIndex,false);
         battleTeamIndex.ownerKey(SnowflakeKey.from(playerId));
-        matchMakingStore.createEdge(battleTeamIndex,DefenseTeamIndex.PLAYER_LABEL);
+        localMatchMakingStore.createEdge(battleTeamIndex,DefenseTeamIndex.PLAYER_LABEL);
 
         MatchMakingSnapshot snapshot = matchMakingSnapshot.putIfAbsent(integerKey,new MatchMakingSnapshot(matchMakingSnapshotSize));
         if(!snapshot.pending.offer(battleTeamIndex)){
             snapshot.pending.poll();//kick out first
             snapshot.pending.offer(battleTeamIndex);
         }
-        logger.warn("Match making pooled ["+playerId+" : "+teamId);
     }
 
     @Override
@@ -670,8 +655,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     private PlayerRewardIndex playerRewardIndex(long playerId){
         PlayerRewardIndex playerRewardIndex = new PlayerRewardIndex(playerId);
-        playerRewardIndex.dataStore(playerStateStore);
-        playerStateStore.createIfAbsent(playerRewardIndex,true);
+        playerRewardIndex.dataStore(playerRewardStore);
+        playerRewardStore.createIfAbsent(playerRewardIndex,true);
         return playerRewardIndex;
     }
 
