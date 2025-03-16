@@ -11,4 +11,12 @@ public class StringUtil {
         return name.substring(0,1).toUpperCase()+name.substring(1);
     }
 
+    public static String toSnakeCase(String[] path){
+        StringBuffer buffer = new StringBuffer();
+        for(String s : path){
+            buffer.append(s.toLowerCase()).append("_");
+        }
+        return buffer.substring(0,buffer.length()-1);
+    }
+
 }
