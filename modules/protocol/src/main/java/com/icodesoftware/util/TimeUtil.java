@@ -78,4 +78,7 @@ public class TimeUtil {
     public static void sleep(long mills){
         try{Thread.sleep(mills);}catch (Exception ex){}
     }
+    public static long timestamp(){
+        return toUTCMilliseconds(LocalDateTime.now());
+    }
 }
