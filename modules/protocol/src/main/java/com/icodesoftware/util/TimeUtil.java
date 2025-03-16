@@ -74,4 +74,8 @@ public class TimeUtil {
         Instant instant = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
         return instant.toEpochMilli();
     }
+
+    public static void sleep(long mills){
+        try{Thread.sleep(mills);}catch (Exception ex){}
+    }
 }
