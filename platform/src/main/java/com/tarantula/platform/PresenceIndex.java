@@ -10,7 +10,7 @@ import com.icodesoftware.util.RecoverableObject;
 
 public class PresenceIndex extends RecoverableObject implements Presence {
 
-    private int counter;
+    //private int counter;
     private boolean local = true;
     private EventService eventService;
 
@@ -58,14 +58,14 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     }
 
     public boolean write(DataBuffer buffer){
-        buffer.writeInt(counter);
+        buffer.writeInt(count);
         buffer.writeBoolean(local);
         buffer.writeLong(timestamp);
         buffer.writeBoolean(disabled);
         return true;
     }
     public boolean read(DataBuffer buffer) {
-        this.counter = buffer.readInt();
+        this.count = buffer.readInt();
         this.local = buffer.readBoolean();
         this.timestamp = buffer.readLong();
         this.disabled = buffer.readBoolean();
@@ -81,14 +81,14 @@ public class PresenceIndex extends RecoverableObject implements Presence {
     }
 
     public OnSession stub(){
-        counter++;
+        count++;
         this.update();
         return new TROnSession(distributionId,serviceContext.distributionId());
     }
 
     @Override
     public String toString(){
-        return "On Presence ["+this.distributionId()+"/"+timestamp+"/"+counter+"/"+disabled+"]";
+        return "On Presence ["+this.distributionId()+"/"+timestamp+"/"+count+"/"+disabled+"]";
     }
 
 }

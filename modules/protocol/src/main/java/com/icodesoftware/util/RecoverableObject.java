@@ -2,6 +2,7 @@ package com.icodesoftware.util;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.icodesoftware.Countable;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
@@ -9,7 +10,7 @@ import com.icodesoftware.Recoverable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RecoverableObject implements Recoverable {
+public class RecoverableObject implements Recoverable, Countable {
 
 
     protected transient Key ownerKey;
@@ -31,8 +32,14 @@ public class RecoverableObject implements Recoverable {
     protected String index;
 
     protected String name;
+
+    protected int count;
     protected transient DataStore dataStore;
 
+    public int count(int delta){
+        count = count + (delta);
+        return count;
+    }
     public void dataStore(DataStore dataStore) {
         this.dataStore = dataStore;
     }

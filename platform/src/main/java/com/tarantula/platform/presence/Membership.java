@@ -10,7 +10,7 @@ public class Membership extends RecoverableObject implements Subscription {
 
     private long startTimestamp;
     private long endTimestamp;
-    private int count;
+
     private boolean trial;
     public int getFactoryId() {
         return UserPortableRegistry.OID;
