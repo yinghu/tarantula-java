@@ -435,6 +435,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         this.championLeaderBoard = new ChampionLeaderBoard(localSeasonPlayerStore,serviceContext.node().nodeId(),season.seasonId,championsLeaderBoardThreshold,championsLeaderBoardSize);
         this.championLeaderBoard.load();
         seasons.put(CURRENT_SEASON_INDEX,season);
+        season.timestamp(TimeUtil.toUTCMilliseconds(endTime));
         onSeasonListener(season,false);
     }
 
