@@ -4,10 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.ClusterProvider;
-import com.icodesoftware.service.OnPartition;
-import com.icodesoftware.service.RNG;
-import com.icodesoftware.service.ServiceContext;
+import com.icodesoftware.service.*;
 import com.icodesoftware.util.*;
 import com.tarantula.game.GameRating;
 import com.tarantula.game.SimpleStub;
@@ -75,8 +72,12 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private ChampionLeaderBoard championLeaderBoard;
     private RNG rng = new JvmRNG();
 
+    private TokenValidatorProvider tokenValidatorProvider;
+    private final static String ANALYTICS_QUERY_HEADER = "#Analytics";
+    private static String ANALYTICS_QUERY;
     public PlatformPVPBattleServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
+        ANALYTICS_QUERY = gameServiceProvider.gameCluster().typeId()+ANALYTICS_QUERY_HEADER;
     }
 
     @Override
@@ -142,6 +143,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             logger.warn(bot.botProfile.toString()+" : "+bot.playerId);
         });
         this.platformGameServiceProvider.configurationServiceProvider().addConfigurableListener(OnAccess.SEASON,this);
+        this.tokenValidatorProvider = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
     }
 
     public ChampionLeaderBoard championLeaderBoard(){
@@ -225,6 +227,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         defenseTeam.playerId = session.distributionId();
         defenseTeam.saveAsDefense(dataStore,teamFormationIndex,teamCreationWaitingTime);
         this.serviceContext.eventService().publish(new TeamFormationEvent(session.distributionId(),defenseTeam.distributionId()));
+        onAnalyticsEvent(defenseTeam);
         return TeamFormationResponse.responseOnDefenseTeam(teamFormationIndex.timestamp());
     }
 
@@ -410,6 +413,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         offenseLogIndex.dataStore(battleHistory);
         battleHistory.createIfAbsent(offenseLogIndex,true);
         offenseLogIndex.updateOffenseLogs(battleLog.distributionId());
+        onAnalyticsEvent(battleEndResult);
     }
 
     private void startSeason(SeasonRuntime seasonRuntime){
@@ -746,6 +750,23 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         ChampionLeaderBoard ldb = championLeaderBoard();
         serviceContext.schedule(new ScheduleRunner(10,new LeagueRewardScheduler(ldb.leaderBoard(),this,platformGameServiceProvider.presenceServiceProvider())));
     }
+
+    //Analytics callback hook
+    private void onAnalyticsEvent(BattleTeam defenseTeam){
+
+    }
+
+    private void onAnalyticsEvent(BattleEndResult battleEndResult){
+        TokenValidatorProvider.AuthVendor webhook = tokenValidatorProvider.authVendor(OnAccess.WEB_HOOK);
+        //wrapping event
+        //serviceContext.schedule(new ScheduleRunner(100,()->{
+            //publish event bytes
+            //webhook.upload(ANALYTICS_QUERY,);
+        //}));
+
+    }
+
+    //end of analytics
 
 
 }
