@@ -6,6 +6,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.OnPartition;
+import com.icodesoftware.service.RNG;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.*;
 import com.tarantula.game.GameRating;
@@ -22,6 +23,7 @@ import java.io.File;
 import java.time.LocalDateTime;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -71,6 +73,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     private List<BattleTeam> bots;
     private ChampionLeaderBoard championLeaderBoard;
+    private RNG rng = new JvmRNG();
 
     public PlatformPVPBattleServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
@@ -699,9 +702,24 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     private void fillBots(List<BattleTeam> pending){
         int fill = matchMakingListSize - pending.size();
-        for(int i=0;i<fill;i++){
-            pending.add(bots.get(i));
+        int sz = bots.size();
+        int[] rlist = rng.onNextList(sz,10); //can increase number of rng to reduce duplicate
+        HashMap<Integer,Integer> marked = new HashMap<>();
+        for(int x : rlist){
+            if(!marked.containsKey(x)){
+                pending.add(bots.get(x));
+                marked.put(x,x);
+                fill--;
+            }
+            if(fill==0) break;
         }
+        if(fill>0){ //should be very rare to here
+            logger.warn("Opps you are not lucky to have duplicate numbers ["+fill+"]");
+            for(int i=0;i<fill;i++){
+                pending.add(bots.get(rng.onNext(sz)));
+            }
+        }
+
     }
 
     private void placementReward(long seasonId){
