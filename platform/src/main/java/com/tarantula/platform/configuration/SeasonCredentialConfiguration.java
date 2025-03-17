@@ -77,7 +77,7 @@ public class SeasonCredentialConfiguration extends CredentialConfiguration {
                 JsonObject jsonObject = new JsonObject();
                 jsonObject.addProperty("Successful",true);
                 jsonObject.addProperty("SeasonId",seasonId);
-                jsonObject.addProperty("EndTime",LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+                jsonObject.addProperty("EndTime",TimeUtil.fromUTCMilliseconds(timestamp).format(DateTimeFormatter.ISO_DATE_TIME));
                 jsonObject.addProperty("Faction1",faction1.ordinal());
                 jsonObject.addProperty("Faction2",faction2.ordinal());
                 jsonObject.addProperty("Faction3",faction3.ordinal());
