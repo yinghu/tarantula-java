@@ -137,7 +137,9 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             });
         }
         bots.forEach(bot->{
-            bot.load(dataStore,bot.distributionId());
+            if (bot.unitInstances.isEmpty()) {
+                bot.load(dataStore, bot.distributionId());
+            }
             JsonObject profile = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("pvp/profile/profile_"+bot.teamPower+".json"));
             bot.botProfile = profile;
             logger.warn(bot.botProfile.toString()+" : "+bot.playerId);
