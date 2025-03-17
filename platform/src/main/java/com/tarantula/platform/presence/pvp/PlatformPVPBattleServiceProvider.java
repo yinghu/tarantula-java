@@ -390,30 +390,35 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 playerRewardIndex.update();
             }
         }
-        //generate battle log
+        updateBattleLogIndex(battleEndResult,true);
+        updateBattleLogIndex(battleEndResult,false);
+        //logger.warn("OFFENSE : "+battleEndResult.offensePlayerId+" : "+battleEndResult.offenseEloLevelUpdated+" : "+battleEndResult.offenseEloLevelDelta);
+        //logger.warn("DEFENSE : "+battleEndResult.defensePlayerId+" : "+battleEndResult.defenseEloLevelUpdated+" : "+battleEndResult.defenseEloLevelDelta);
+
+        onAnalyticsEvent(battleEndResult);
+    }
+
+    private void updateBattleLogIndex(BattleEndResult battleEndResult,boolean offense){
         BattleLogIndex battleLog = new BattleLogIndex();
-        battleLog.playerId = battleEndResult.offensePlayerId;
+        battleLog.playerId = offense? battleEndResult.offensePlayerId : battleEndResult.defensePlayerId;
         battleLog.defenseTeamId = battleEndResult.defenseTeamId;
         battleHistory.createIfAbsent(battleLog,true);
         battleLog.offenseTeamId = battleEndResult.offenseTeamId;
         battleLog.defenseEloGain = battleEndResult.defenseEloLevelDelta;
         battleLog.offenseEloGain = battleEndResult.offenseEloLevelDelta;
         battleLog.defenseElo = battleEndResult.defenseEloLevelUpdated;
-        battleHistory.update(battleLog);
-        //logger.warn("OFFENSE : "+battleEndResult.offensePlayerId+" : "+battleEndResult.offenseEloLevelUpdated+" : "+battleEndResult.offenseEloLevelDelta);
-        //logger.warn("DEFENSE : "+battleEndResult.defensePlayerId+" : "+battleEndResult.defenseEloLevelUpdated+" : "+battleEndResult.defenseEloLevelDelta);
-        PlayerBattleLogIndex defenseLogIndex = new PlayerBattleLogIndex();
-        defenseLogIndex.distributionId(battleEndResult.defensePlayerId);
-        defenseLogIndex.dataStore(battleHistory);
-        battleHistory.createIfAbsent(defenseLogIndex,true);
-        defenseLogIndex.updateDefenseLogs(battleLog.distributionId());
+        battleHistory.update(battleLog); //overriding previous if same defense team
 
-        PlayerBattleLogIndex offenseLogIndex = new PlayerBattleLogIndex();
-        offenseLogIndex.distributionId(battleEndResult.offensePlayerId);
-        offenseLogIndex.dataStore(battleHistory);
-        battleHistory.createIfAbsent(offenseLogIndex,true);
-        offenseLogIndex.updateOffenseLogs(battleLog.distributionId());
-        onAnalyticsEvent(battleEndResult);
+        PlayerBattleLogIndex playerLogIndex = new PlayerBattleLogIndex();
+        playerLogIndex.distributionId(offense? battleEndResult.offensePlayerId : battleEndResult.defensePlayerId);
+        playerLogIndex.dataStore(battleHistory);
+        battleHistory.createIfAbsent(playerLogIndex,true);
+        if(offense) {
+            playerLogIndex.updateOffenseLogs(battleLog.distributionId());
+        }
+        else {
+            playerLogIndex.updateDefenseLogs(battleLog.distributionId());
+        }
     }
 
     private void startSeason(SeasonRuntime seasonRuntime){
