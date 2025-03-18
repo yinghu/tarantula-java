@@ -151,6 +151,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     }
 
     public MatchMaking forceMatchMaking(Session session){
+        onMatchmakingAnalytic(session.distributionId(), Integer.parseInt(session.name()));
         MatchMakingIndex matchMakingIndex = new MatchMakingIndex();
         matchMakingIndex.distributionId(session.distributionId());
         localMatchMakingStore.createIfAbsent(matchMakingIndex,true);
@@ -227,7 +228,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         defenseTeam.playerId = session.distributionId();
         defenseTeam.saveAsDefense(dataStore,teamFormationIndex,teamCreationWaitingTime);
         this.serviceContext.eventService().publish(new TeamFormationEvent(session.distributionId(),defenseTeam.distributionId()));
-        onAnalyticsEvent(defenseTeam);
+        onSaveDefenseAnalytic(defenseTeam);
         return TeamFormationResponse.responseOnDefenseTeam(teamFormationIndex.timestamp());
     }
 
@@ -413,7 +414,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         offenseLogIndex.dataStore(battleHistory);
         battleHistory.createIfAbsent(offenseLogIndex,true);
         offenseLogIndex.updateOffenseLogs(battleLog.distributionId());
-        onAnalyticsEvent(battleEndResult);
+        onRatingChangeAnalytics(battleEndResult.offensePlayerId, battleEndResult.offenseEloLevelDelta, battleEndResult.offenseEloLevelUpdated, battleEndResult.battleId, true);
+        onRatingChangeAnalytics(battleEndResult.defensePlayerId, battleEndResult.defenseEloLevelDelta, battleEndResult.defenseEloLevelUpdated, battleEndResult.battleId, false);
     }
 
     private void startSeason(SeasonRuntime seasonRuntime){
@@ -451,6 +453,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             return;
         }
         SeasonCredentialConfiguration.Season ended = currentSeason();
+
         onSeasonListener(ended,true);
         seasons.remove(CURRENT_SEASON_INDEX);
         byte[] lockKey = SnowflakeKey.from(rotation.seasonRotation).asBinary();
@@ -468,6 +471,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 SeasonRuntime seasonRuntime = new SeasonRuntime();
                 seasonRuntime.distributionId(rotation.seasonRotation);
                 dataStore.createIfAbsent(seasonRuntime,true);
+                onSeasonChangeAnalytic(ended, next);
                 if(next==null){
                     logger.warn("No season rotation ["+rotation.seasonRotation+"]");
                     seasonRuntime.currentSeason=0;
@@ -752,18 +756,35 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     }
 
     //Analytics callback hook
-    private void onAnalyticsEvent(BattleTeam defenseTeam){
-
+    private void onMatchmakingAnalytic(long playerId, int currencyType){
+        sendAnalytic(new PVPOpponentsRefreshAnalytic(playerId, currencyType).toBytes());
+    }
+    private void onSaveDefenseAnalytic(BattleTeam defenseTeam){
+        sendAnalytic(new DefenseFormationSavedAnalytic(defenseTeam).toBytes());
     }
 
-    private void onAnalyticsEvent(BattleEndResult battleEndResult){
-        TokenValidatorProvider.AuthVendor webhook = tokenValidatorProvider.authVendor(OnAccess.WEB_HOOK);
-        //wrapping event
-        //serviceContext.schedule(new ScheduleRunner(100,()->{
-            //publish event bytes
-            //webhook.upload(ANALYTICS_QUERY,);
-        //}));
+    private void onSeasonChangeAnalytic(SeasonCredentialConfiguration.Season oldSeason, SeasonCredentialConfiguration.Season newSeason){
+        sendAnalytic(new PVPSeasonChangeAnalytic(oldSeason, newSeason).toBytes());
+    }
 
+    private void onRatingChangeAnalytics(long playerId, int eloDelta, int eloUpdated, long battleId, boolean attacking){
+        int oldELO = eloUpdated + eloDelta;
+
+        String oldLeague = leagues.get(oldELO).name();
+        String currentLeague = leagues.get(eloUpdated).name();
+
+        if(!oldLeague.equals(currentLeague)){
+            sendAnalytic(new PVPLeagueChangeAnalytic(playerId, oldLeague, currentLeague, eloUpdated, battleId).toBytes());
+        }
+
+        sendAnalytic(new PVPRatingChangeAnalytic(playerId, eloDelta, eloUpdated, currentLeague, battleId, attacking).toBytes());
+    }
+
+    private void sendAnalytic(byte [] content){
+        TokenValidatorProvider.AuthVendor webhook = tokenValidatorProvider.authVendor(OnAccess.WEB_HOOK);
+        serviceContext.schedule(new ScheduleRunner(100,()->{
+            webhook.upload(ANALYTICS_QUERY,content);
+        }));
     }
 
     //end of analytics

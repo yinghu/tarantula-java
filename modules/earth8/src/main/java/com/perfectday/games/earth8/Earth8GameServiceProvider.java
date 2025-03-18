@@ -208,7 +208,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                 return;
             }
 
-            Rating rating = gameContext.rating(session).elo(battleTransaction.win,battleTransaction.opponentId,battleTransaction.teamId);
+            Rating rating = gameContext.rating(session).elo(battleTransaction.win,battleTransaction.opponentId,battleTransaction.teamId, battleTransaction.distributionId());
             //push analytics event to s3
         }
 

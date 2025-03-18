@@ -25,6 +25,11 @@ public class BattleEndTransaction extends UserAnalyticsTransaction {
         {
             data.add("starsEarned", JsonNull.INSTANCE);
         }
+
+        data.add("season_id", object.get("SeasonId"));
+        data.add("opponent_id", object.get("OpponentId"));
+        data.add("team_id", object.get("TeamId"));
+
         data.addProperty("analyticsBatchId", analyticsBatchId);
     }
 }
