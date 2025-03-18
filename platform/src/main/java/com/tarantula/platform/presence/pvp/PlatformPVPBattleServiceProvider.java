@@ -137,7 +137,9 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             });
         }
         bots.forEach(bot->{
-            bot.load(dataStore,bot.distributionId());
+            if (bot.unitInstances.isEmpty()) {
+                bot.load(dataStore, bot.distributionId());
+            }
             JsonObject profile = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("pvp/profile/profile_"+bot.teamPower+".json"));
             bot.botProfile = profile;
             logger.warn(bot.botProfile.toString()+" : "+bot.playerId);
@@ -209,7 +211,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             }
         });
         if(matches.size()< matchMakingListSize){
-            fillBots(matches);
+            fillBots(session,attackersDefenseTeam,matches);
         }
         MatchMaking matchMaking = MatchMaking.success(teamFormationIndex.timestamp(),matches);
         PlayerRewardIndex playerRewardIndex = playerRewardIndex(session.distributionId());
@@ -391,31 +393,35 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 playerRewardIndex.update();
             }
         }
-        //generate battle log
+        updateBattleLogIndex(battleEndResult,true);
+        updateBattleLogIndex(battleEndResult,false);
+        //logger.warn("OFFENSE : "+battleEndResult.offensePlayerId+" : "+battleEndResult.offenseEloLevelUpdated+" : "+battleEndResult.offenseEloLevelDelta);
+        //logger.warn("DEFENSE : "+battleEndResult.defensePlayerId+" : "+battleEndResult.defenseEloLevelUpdated+" : "+battleEndResult.defenseEloLevelDelta);
+
+        onAnalyticsEvent(battleEndResult);
+    }
+
+    private void updateBattleLogIndex(BattleEndResult battleEndResult,boolean offense){
         BattleLogIndex battleLog = new BattleLogIndex();
-        battleLog.playerId = battleEndResult.offensePlayerId;
+        battleLog.playerId = offense? battleEndResult.offensePlayerId : battleEndResult.defensePlayerId;
         battleLog.defenseTeamId = battleEndResult.defenseTeamId;
         battleHistory.createIfAbsent(battleLog,true);
         battleLog.offenseTeamId = battleEndResult.offenseTeamId;
         battleLog.defenseEloGain = battleEndResult.defenseEloLevelDelta;
         battleLog.offenseEloGain = battleEndResult.offenseEloLevelDelta;
         battleLog.defenseElo = battleEndResult.defenseEloLevelUpdated;
-        battleHistory.update(battleLog);
-        //logger.warn("OFFENSE : "+battleEndResult.offensePlayerId+" : "+battleEndResult.offenseEloLevelUpdated+" : "+battleEndResult.offenseEloLevelDelta);
-        //logger.warn("DEFENSE : "+battleEndResult.defensePlayerId+" : "+battleEndResult.defenseEloLevelUpdated+" : "+battleEndResult.defenseEloLevelDelta);
-        PlayerBattleLogIndex defenseLogIndex = new PlayerBattleLogIndex();
-        defenseLogIndex.distributionId(battleEndResult.defensePlayerId);
-        defenseLogIndex.dataStore(battleHistory);
-        battleHistory.createIfAbsent(defenseLogIndex,true);
-        defenseLogIndex.updateDefenseLogs(battleLog.distributionId());
+        battleHistory.update(battleLog); //overriding previous if same defense team
 
-        PlayerBattleLogIndex offenseLogIndex = new PlayerBattleLogIndex();
-        offenseLogIndex.distributionId(battleEndResult.offensePlayerId);
-        offenseLogIndex.dataStore(battleHistory);
-        battleHistory.createIfAbsent(offenseLogIndex,true);
-        offenseLogIndex.updateOffenseLogs(battleLog.distributionId());
-        onRatingChangeAnalytics(battleEndResult.offensePlayerId, battleEndResult.offenseEloLevelDelta, battleEndResult.offenseEloLevelUpdated, battleEndResult.battleId, true);
-        onRatingChangeAnalytics(battleEndResult.defensePlayerId, battleEndResult.defenseEloLevelDelta, battleEndResult.defenseEloLevelUpdated, battleEndResult.battleId, false);
+        PlayerBattleLogIndex playerLogIndex = new PlayerBattleLogIndex();
+        playerLogIndex.distributionId(offense? battleEndResult.offensePlayerId : battleEndResult.defensePlayerId);
+        playerLogIndex.dataStore(battleHistory);
+        battleHistory.createIfAbsent(playerLogIndex,true);
+        if(offense) {
+            playerLogIndex.updateOffenseLogs(battleLog.distributionId());
+        }
+        else {
+            playerLogIndex.updateDefenseLogs(battleLog.distributionId());
+        }
     }
 
     private void startSeason(SeasonRuntime seasonRuntime){
@@ -430,6 +436,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         this.championLeaderBoard = new ChampionLeaderBoard(localSeasonPlayerStore,serviceContext.node().nodeId(),season.seasonId,championsLeaderBoardThreshold,championsLeaderBoardSize);
         this.championLeaderBoard.load();
         seasons.put(CURRENT_SEASON_INDEX,season);
+        season.timestamp(TimeUtil.toUTCMilliseconds(endTime));
         onSeasonListener(season,false);
     }
 
@@ -708,13 +715,15 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         return botTeam;
     }
 
-    private void fillBots(List<BattleTeam> pending){
+    private void fillBots(Session session,BattleTeam offenseTeam,List<BattleTeam> pending){
         int fill = matchMakingListSize - pending.size();
         int sz = bots.size();
         int[] rlist = rng.onNextList(sz,10); //can increase number of rng to reduce duplicate
         HashMap<Integer,Integer> marked = new HashMap<>();
         for(int x : rlist){
             if(!marked.containsKey(x)){
+                BattleTeam bot = bots.get(x);
+                setupBotBattleTeam(session,offenseTeam,bot);
                 pending.add(bots.get(x));
                 marked.put(x,x);
                 fill--;
@@ -722,13 +731,41 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             if(fill==0) break;
         }
         if(fill>0){ //should be very rare to here
-            logger.warn("Opps you are not lucky to have duplicate numbers ["+fill+"]");
+            logger.warn("Ops you are not lucky to have duplicate numbers ["+fill+"]");
             for(int i=0;i<fill;i++){
-                pending.add(bots.get(rng.onNext(sz)));
+                int ix = rng.onNext(sz);
+                BattleTeam bot = bots.get(ix);
+                setupBotBattleTeam(session,offenseTeam,bot);
+                pending.add(bot);
             }
         }
-
     }
+
+    private void setupBotBattleTeam(Session session,BattleTeam offenseTeam,BattleTeam defenseTeam){
+        Rating attackerRating = this.platformGameServiceProvider.presenceServiceProvider().rating(session);
+        Rating defenderRating = this.platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(defenseTeam.playerId));
+        defenseTeam.elo = defenderRating.level();
+        BattleLogIndex battleLogIndex = new BattleLogIndex();
+        battleLogIndex.playerId = session.distributionId();
+        battleLogIndex.defenseTeamId = defenseTeam.distributionId();
+        if(battleHistory.load(battleLogIndex)) {
+            defenseTeam.battled = true;
+            defenseTeam.battlePoint = battleLogIndex.offenseEloGain;
+        }
+
+        if(!defenseTeam.battled){
+            int currentELO = attackerRating.level();
+            PVPPointGenerator.updateELO(attackerRating, defenderRating, offenseTeam.teamPower, defenseTeam.teamPower, true);
+            defenseTeam.winPointsEstimated = attackerRating.level() - currentELO;
+            attackerRating.level(currentELO);
+
+            PVPPointGenerator.updateELO(attackerRating, defenderRating,offenseTeam.teamPower, defenseTeam.teamPower, false);
+            defenseTeam.losePointsEstimated = attackerRating.level() - currentELO;
+            attackerRating.level(currentELO);
+        }
+    }
+
+
 
     private void placementReward(long seasonId){
         logger.warn("Season placement reward granting ["+seasonId+"]");
