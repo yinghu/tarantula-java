@@ -69,6 +69,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private ConcurrentHashMap<IntegerKey,MatchMakingSnapshot> matchMakingSnapshot = new ConcurrentHashMap<>();
 
     private List<BattleTeam> bots;
+    private HashMap<Integer, BattleTeam> teamPowerToBots = new HashMap<Integer, BattleTeam>();
     private ChampionLeaderBoard championLeaderBoard;
     private RNG rng = new JvmRNG();
 
@@ -142,6 +143,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             }
             JsonObject profile = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("pvp/profile/profile_"+bot.teamPower+".json"));
             bot.botProfile = profile;
+            teamPowerToBots.put(bot.teamPower, bot);
             logger.warn(bot.botProfile.toString()+" : "+bot.playerId);
         });
         this.platformGameServiceProvider.configurationServiceProvider().addConfigurableListener(OnAccess.SEASON,this);
@@ -329,15 +331,11 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             BattleLog battleLog = new BattleLog(log);
             battleLog.defenseTeam = assembly(log.defenseTeamId);
             battleLog.offenseTeam = assembly(log.offenseTeamId);
-            if(battleLog.defenseTeam.teamType == BattleTeam.TeamType.DEFENSE){
-                battleLog.defenseTeam.botProfile = botProfile();
+            if(battleLog.defenseTeam.teamType == BattleTeam.TeamType.BOT){
+                battleLog.defenseTeam.botProfile = teamPowerToBots.get(battleLog.defenseTeam.teamPower).botProfile;
             }
             battleLogs.add(battleLog);
         }
-    }
-
-    private JsonObject botProfile(){
-        return bots.get(rng.onNext(bots.size())).botProfile;
     }
 
     public void onLoaded(SeasonCredentialConfiguration loaded){
