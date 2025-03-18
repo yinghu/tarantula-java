@@ -329,7 +329,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             BattleLog battleLog = new BattleLog(log);
             battleLog.defenseTeam = assembly(log.defenseTeamId);
             battleLog.offenseTeam = assembly(log.offenseTeamId);
-            if(battleLog.defenseTeam.teamType == BattleTeam.TeamType.DEFENSE){
+            if(battleLog.defenseTeam.teamType == BattleTeam.TeamType.BOT){
                 battleLog.defenseTeam.botProfile = botProfile();
             }
             battleLogs.add(battleLog);
