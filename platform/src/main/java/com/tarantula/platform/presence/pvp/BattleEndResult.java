@@ -13,6 +13,6 @@ public class BattleEndResult {
     public int defenseEloLevelUpdated;
     public int offenseEloLevelUpdated;
 
-
+    public long battleId;
 
 }
