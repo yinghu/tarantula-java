@@ -398,7 +398,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         //logger.warn("OFFENSE : "+battleEndResult.offensePlayerId+" : "+battleEndResult.offenseEloLevelUpdated+" : "+battleEndResult.offenseEloLevelDelta);
         //logger.warn("DEFENSE : "+battleEndResult.defensePlayerId+" : "+battleEndResult.defenseEloLevelUpdated+" : "+battleEndResult.defenseEloLevelDelta);
 
-        onAnalyticsEvent(battleEndResult);
+        onRatingChangeAnalytics(battleEndResult.offensePlayerId, battleEndResult.offenseEloLevelDelta, battleEndResult.offenseEloLevelUpdated, battleEndResult.battleId, true);
+        onRatingChangeAnalytics(battleEndResult.defensePlayerId, battleEndResult.defenseEloLevelDelta, battleEndResult.defenseEloLevelUpdated, battleEndResult.battleId, false);
     }
 
     private void updateBattleLogIndex(BattleEndResult battleEndResult,boolean offense){
