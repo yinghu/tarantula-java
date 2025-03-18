@@ -14,10 +14,10 @@ public class PVPSeasonChangeAnalytic extends PVPAnalytic{
         data.addProperty("faction_3", oldSeason.faction3.name());
 
         if(newSeason != null){
-            data.addProperty("new_season_id", oldSeason.seasonId);
-            data.addProperty("faction_1", oldSeason.faction1.name());
-            data.addProperty("faction_2", oldSeason.faction2.name());
-            data.addProperty("faction_3", oldSeason.faction3.name());
+            data.addProperty("new_season_id", newSeason.seasonId);
+            data.addProperty("faction_1", newSeason.faction1.name());
+            data.addProperty("faction_2", newSeason.faction2.name());
+            data.addProperty("faction_3", newSeason.faction3.name());
         }else {
             data.addProperty("new_season_id", 0);
         }
