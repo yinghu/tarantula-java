@@ -329,8 +329,15 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             BattleLog battleLog = new BattleLog(log);
             battleLog.defenseTeam = assembly(log.defenseTeamId);
             battleLog.offenseTeam = assembly(log.offenseTeamId);
+            if(battleLog.defenseTeam.teamType == BattleTeam.TeamType.DEFENSE){
+                battleLog.defenseTeam.botProfile = botProfile();
+            }
             battleLogs.add(battleLog);
         }
+    }
+
+    private JsonObject botProfile(){
+        return bots.get(rng.onNext(bots.size())).botProfile;
     }
 
     public void onLoaded(SeasonCredentialConfiguration loaded){
