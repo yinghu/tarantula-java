@@ -210,7 +210,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             }
         });
         if(matches.size()< matchMakingListSize){
-            fillBots(matches);
+            fillBots(session,attackersDefenseTeam,matches);
         }
         MatchMaking matchMaking = MatchMaking.success(teamFormationIndex.timestamp(),matches);
         PlayerRewardIndex playerRewardIndex = playerRewardIndex(session.distributionId());
@@ -712,13 +712,15 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         return botTeam;
     }
 
-    private void fillBots(List<BattleTeam> pending){
+    private void fillBots(Session session,BattleTeam offenseTeam,List<BattleTeam> pending){
         int fill = matchMakingListSize - pending.size();
         int sz = bots.size();
         int[] rlist = rng.onNextList(sz,10); //can increase number of rng to reduce duplicate
         HashMap<Integer,Integer> marked = new HashMap<>();
         for(int x : rlist){
             if(!marked.containsKey(x)){
+                BattleTeam bot = bots.get(x);
+                setupBotBattleTeam(session,offenseTeam,bot);
                 pending.add(bots.get(x));
                 marked.put(x,x);
                 fill--;
@@ -726,13 +728,41 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             if(fill==0) break;
         }
         if(fill>0){ //should be very rare to here
-            logger.warn("Opps you are not lucky to have duplicate numbers ["+fill+"]");
+            logger.warn("Ops you are not lucky to have duplicate numbers ["+fill+"]");
             for(int i=0;i<fill;i++){
-                pending.add(bots.get(rng.onNext(sz)));
+                int ix = rng.onNext(sz);
+                BattleTeam bot = bots.get(ix);
+                setupBotBattleTeam(session,offenseTeam,bot);
+                pending.add(bot);
             }
         }
-
     }
+
+    private void setupBotBattleTeam(Session session,BattleTeam offenseTeam,BattleTeam defenseTeam){
+        Rating attackerRating = this.platformGameServiceProvider.presenceServiceProvider().rating(session);
+        Rating defenderRating = this.platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(defenseTeam.playerId));
+        defenseTeam.elo = defenderRating.level();
+        BattleLogIndex battleLogIndex = new BattleLogIndex();
+        battleLogIndex.playerId = session.distributionId();
+        battleLogIndex.defenseTeamId = defenseTeam.distributionId();
+        if(battleHistory.load(battleLogIndex)) {
+            defenseTeam.battled = true;
+            defenseTeam.battlePoint = battleLogIndex.offenseEloGain;
+        }
+
+        if(!defenseTeam.battled){
+            int currentELO = attackerRating.level();
+            PVPPointGenerator.updateELO(attackerRating, defenderRating, offenseTeam.teamPower, defenseTeam.teamPower, true);
+            defenseTeam.winPointsEstimated = attackerRating.level() - currentELO;
+            attackerRating.level(currentELO);
+
+            PVPPointGenerator.updateELO(attackerRating, defenderRating,offenseTeam.teamPower, defenseTeam.teamPower, false);
+            defenseTeam.losePointsEstimated = attackerRating.level() - currentELO;
+            attackerRating.level(currentELO);
+        }
+    }
+
+
 
     private void placementReward(long seasonId){
         logger.warn("Season placement reward granting ["+seasonId+"]");
