@@ -33,7 +33,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     //NEVER PUSH TO REMOTE WITH TRUE
     private static final boolean DEV_CONFIG = false;
     private static final boolean COOL_DOWN_ENABLED = false;
-    private static final boolean FORCE_BOT_CREATE = true;
+    private static final boolean FORCE_BOT_CREATE = false;
     private static final long CURRENT_SEASON_INDEX = 0;
     public static final String NAME = "pvp_battle";
 
@@ -70,6 +70,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     private ConcurrentHashMap<IntegerKey,MatchMakingSnapshot> matchMakingSnapshot = new ConcurrentHashMap<>();
 
+    private List<BotIndex> botIndexList;
     private List<BattleTeam> bots;
     private ChampionLeaderBoard championLeaderBoard;
     private RNG rng = new JvmRNG();
@@ -122,9 +123,10 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             logger.warn("Preloading match making list ["+matchMakingSnapshot.pending.size()+"] from pool ["+mmPool.key()+"]");
         }
 
-        bots = dataStore.list(new BotFormationQuery(serviceContext.node().nodeId()));
-        if(FORCE_BOT_CREATE) bots.clear();
-        if(bots.size()==0){
+        botIndexList = localSeasonPlayerStore.list(new BotIndexQuery(serviceContext.node().nodeId()));
+        bots = new ArrayList<>();
+        if(FORCE_BOT_CREATE) botIndexList.clear();
+        if(botIndexList.size()==0){
             List<String> dlist = new ArrayList<>();
             File f = new File("../conf/pvp/entryBots");
             if(f.exists()){
@@ -138,13 +140,13 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             dlist.forEach(js->{
                 logger.warn("Creating bot from ["+js+"]");
                 JsonObject formation = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("pvp/entryBots/"+js));
-                bots.add(saveBot(formation.toString().getBytes()));
+                botIndexList.add(saveBot(formation.toString().getBytes()));
             });
         }
-        bots.forEach(bot->{
-            if (bot.unitInstances.isEmpty()) {
-                bot.load(dataStore, bot.distributionId());
-            }
+        botIndexList.forEach(botIndex->{
+            BattleTeam bot = new BattleTeam();
+            bot.distributionId(botIndex.teamId);
+            bot.load(dataStore, bot.distributionId());
             Profile botProfile = new Profile();
             botProfile.distributionId(bot.distributionId());
             if(!localSeasonPlayerStore.load(botProfile)){
@@ -156,6 +158,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             }
             bot.botProfile = botProfile.toJson();
             logger.warn(bot.botProfile.toString()+" : "+bot.distributionId());
+            bots.add(bot);
         });
         this.platformGameServiceProvider.configurationServiceProvider().addConfigurableListener(OnAccess.SEASON,this);
         this.tokenValidatorProvider = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
@@ -729,14 +732,14 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     }
 
 
-    private BattleTeam saveBot(byte[] content){
+    private BotIndex saveBot(byte[] content){
         BattleTeam botTeam = BattleTeam.parse(content);
         botTeam.ownerKey(SnowflakeKey.from(serviceContext.node().nodeId()));
         botTeam.label("defense_bot");
         botTeam.onEdge(true);
         botTeam.playerId = serviceContext.distributionId();
         botTeam.saveAsBot(dataStore);
-        return botTeam;
+        return new BotIndex(botTeam.distributionId());
     }
 
     private Profile botProfile(long botTeamId){
