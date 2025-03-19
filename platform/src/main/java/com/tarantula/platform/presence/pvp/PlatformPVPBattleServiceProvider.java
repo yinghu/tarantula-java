@@ -15,6 +15,7 @@ import com.tarantula.platform.item.Application;
 import com.tarantula.platform.item.ConfigurableObject;
 import com.tarantula.platform.item.ConfigurableObjectQuery;
 import com.tarantula.platform.item.PlatformItemServiceProvider;
+import com.tarantula.platform.presence.Profile;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -32,7 +33,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     //NEVER PUSH TO REMOTE WITH TRUE
     private static final boolean DEV_CONFIG = false;
     private static final boolean COOL_DOWN_ENABLED = false;
-
+    private static final boolean FORCE_BOT_CREATE = true;
     private static final long CURRENT_SEASON_INDEX = 0;
     public static final String NAME = "pvp_battle";
 
@@ -45,6 +46,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private int championsLeaderBoardThreshold = 2050;
     private int championsLeaderBoardSize = 100;
     private int matchEloDifferenceThreshold = 1000;
+    private int botFillEloThreshold = 300;
     private int coolDownTime = 60;
 
     private int matchMakingSnapshotSize = 100;
@@ -94,8 +96,10 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             reMatchWaitingTime = pvp.get("reMatchWaitingTimeMinutes").getAsInt()*60; //to seconds
             coolDownTime = pvp.get("defenseCooldownMinutes").getAsInt()*60;
         }
-        championsLeaderBoardThreshold = pvp.get("championsLeaderBoardThreshold").getAsInt();
+        this.championsLeaderBoardThreshold = pvp.get("championsLeaderBoardThreshold").getAsInt();
+        this.botFillEloThreshold = pvp.get("botFillEloThreshold").getAsInt();
         this.matchMakingSnapshotSize = pvp.get("matchMakingSnapshotSize").getAsInt();
+        this.matchMakingPoolSize = pvp.get("matchMakingPoolSize").getAsInt();
         this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME+"_team_formation");
         this.playerRewardStore = applicationPreSetup.dataStore(gameCluster,NAME+"_player_reward");
         this.localMatchMakingStore = applicationPreSetup.localDataStore(gameCluster,NAME+"_match_making");
@@ -119,9 +123,10 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         }
 
         bots = dataStore.list(new BotFormationQuery(serviceContext.node().nodeId()));
+        if(FORCE_BOT_CREATE) bots.clear();
         if(bots.size()==0){
             List<String> dlist = new ArrayList<>();
-            File f = new File("../conf/pvp/bot");
+            File f = new File("../conf/pvp/entryBots");
             if(f.exists()){
                 for(String s : f.list()){
                     if(s.endsWith(".json")){
@@ -132,7 +137,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             //SimpleStub bot = new SimpleStub(serviceContext.distributionId());
             dlist.forEach(js->{
                 logger.warn("Creating bot from ["+js+"]");
-                JsonObject formation = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("pvp/bot/"+js));
+                JsonObject formation = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("pvp/entryBots/"+js));
                 bots.add(saveBot(formation.toString().getBytes()));
             });
         }
@@ -140,9 +145,17 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             if (bot.unitInstances.isEmpty()) {
                 bot.load(dataStore, bot.distributionId());
             }
-            JsonObject profile = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("pvp/profile/profile_"+bot.teamPower+".json"));
-            bot.botProfile = profile;
-            logger.warn(bot.botProfile.toString()+" : "+bot.playerId);
+            Profile botProfile = new Profile();
+            botProfile.distributionId(bot.distributionId());
+            if(!localSeasonPlayerStore.load(botProfile)){
+                JsonObject profile = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("pvp/profile/profile_"+bot.teamPower+".json"));
+                botProfile.displayName = profile.get("DisplayName").getAsString();
+                botProfile.iconIndex = profile.get("IconIndex").getAsInt();
+                botProfile.profileSequence = rng.onNext(1000)+rng.onNext(100);
+                localSeasonPlayerStore.createIfAbsent(botProfile,false);
+            }
+            bot.botProfile = botProfile.toJson();
+            logger.warn(bot.botProfile.toString()+" : "+bot.distributionId());
         });
         this.platformGameServiceProvider.configurationServiceProvider().addConfigurableListener(OnAccess.SEASON,this);
         this.tokenValidatorProvider = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
@@ -154,12 +167,16 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     public MatchMaking forceMatchMaking(Session session){
         onMatchmakingAnalytic(session.distributionId(), Integer.parseInt(session.name()));
+        voidMatchMakingTimer(session);
+        return matchMaking(session);
+    }
+
+    private void voidMatchMakingTimer(Session session){
         MatchMakingIndex matchMakingIndex = new MatchMakingIndex();
         matchMakingIndex.distributionId(session.distributionId());
         localMatchMakingStore.createIfAbsent(matchMakingIndex,true);
         matchMakingIndex.timestamp(0);
         localMatchMakingStore.update(matchMakingIndex);
-        return matchMaking(session);
     }
 
     public MatchMaking matchMaking(Session session){
@@ -210,7 +227,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 matches.add(defenseTeam);
             }
         });
-        if(matches.size()< matchMakingListSize){
+        if(matches.size()==0) voidMatchMakingTimer(session); //always allow client to retry mm-list to find matches
+        if(matches.size()< matchMakingListSize && attackerRating.level() < botFillEloThreshold){
             fillBots(session,attackersDefenseTeam,matches);
         }
         MatchMaking matchMaking = MatchMaking.success(teamFormationIndex.timestamp(),matches);
@@ -330,15 +348,12 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             battleLog.defenseTeam = assembly(log.defenseTeamId);
             battleLog.offenseTeam = assembly(log.offenseTeamId);
             if(battleLog.defenseTeam.teamType == BattleTeam.TeamType.BOT){
-                battleLog.defenseTeam.botProfile = botProfile();
+                battleLog.defenseTeam.botProfile = botProfile(log.defenseTeamId).toJson();
             }
             battleLogs.add(battleLog);
         }
     }
 
-    private JsonObject botProfile(){
-        return bots.get(rng.onNext(bots.size())).botProfile;
-    }
 
     public void onLoaded(SeasonCredentialConfiguration loaded){
         long[] ix ={1};
@@ -550,6 +565,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     }
 
     private List<DefenseTeamIndex> findMatches(Session session,MatchMakingIndex matchMakingIndex){
+        //logger.warn("Finding matches ["+matchMakingIndex.poolIndex+"]");
         Rating playerElo = platformGameServiceProvider.presenceServiceProvider().rating(session);
         IntegerKey mkey = MatchMaking.pool(matchMakingIndex.poolIndex);
         MatchMakingSnapshot snapshot = matchMakingSnapshot.putIfAbsent(mkey,new MatchMakingSnapshot(matchMakingSnapshotSize));
@@ -721,6 +737,17 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         botTeam.playerId = serviceContext.distributionId();
         botTeam.saveAsBot(dataStore);
         return botTeam;
+    }
+
+    private Profile botProfile(long botTeamId){
+        Profile profile = new Profile();
+        profile.distributionId(botTeamId);
+        if(localSeasonPlayerStore.load(profile)) return profile;
+        //in case no profile pre-vased
+        profile.displayName = "AetherialAdventurer";
+        profile.iconIndex = 0;
+        profile.profileSequence = PvpErrorCode.NO_BOT_PROFILE;
+        return profile;
     }
 
     private void fillBots(Session session,BattleTeam offenseTeam,List<BattleTeam> pending){
