@@ -14,6 +14,8 @@ public class BattleLogIndex extends RecoverableObject {
     public int offenseEloGain; //positive for win , nagitive for lost
     public int defenseEloGain;
     public int defenseElo; //the elo at end of battle
+    public int offenseElo;
+
 
     @Override
     public int getFactoryId() {
@@ -31,6 +33,7 @@ public class BattleLogIndex extends RecoverableObject {
         buffer.writeInt(offenseEloGain);
         buffer.writeInt(defenseEloGain);
         buffer.writeInt(defenseElo);
+        buffer.writeInt(offenseElo);
         return true;
     }
 
@@ -41,6 +44,9 @@ public class BattleLogIndex extends RecoverableObject {
         offenseEloGain = buffer.readInt();
         defenseEloGain = buffer.readInt();
         defenseElo = buffer.readInt();
+        try {
+            offenseElo = buffer.readInt();
+        }catch (Exception ignored){}
         return true;
     }
 
