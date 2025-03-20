@@ -18,7 +18,7 @@ public class BotIndexQuery implements RecoverableFactory<BotIndex> {
 
     @Override
     public String label() {
-        return "defense_bot_index";
+        return BotIndex.LABEL;
     }
 
     @Override

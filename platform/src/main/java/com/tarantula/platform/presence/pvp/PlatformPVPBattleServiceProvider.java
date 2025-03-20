@@ -70,7 +70,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     private ConcurrentHashMap<IntegerKey,MatchMakingSnapshot> matchMakingSnapshot = new ConcurrentHashMap<>();
 
-    private List<BotIndex> botIndexList;
+    //private List<BotIndex> botIndexList;
     private List<BattleTeam> bots;
     private ChampionLeaderBoard championLeaderBoard;
     private RNG rng = new JvmRNG();
@@ -123,7 +123,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             logger.warn("Preloading match making list ["+matchMakingSnapshot.pending.size()+"] from pool ["+mmPool.key()+"]");
         }
 
-        botIndexList = localSeasonPlayerStore.list(new BotIndexQuery(serviceContext.node().nodeId()));
+        List<BotIndex> botIndexList = localSeasonPlayerStore.list(new BotIndexQuery(serviceContext.node().nodeId()));
         bots = new ArrayList<>();
         if(FORCE_BOT_CREATE) botIndexList.clear();
         if(botIndexList.size()==0){
@@ -137,9 +137,13 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 }
             }
             //SimpleStub bot = new SimpleStub(serviceContext.distributionId());
+            SnowflakeKey ownerKey = SnowflakeKey.from(serviceContext.node().nodeId());
             dlist.forEach(js->{
                 logger.warn("Creating bot from ["+js+"]");
                 JsonObject formation = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("pvp/entryBots/"+js));
+                BotIndex created = saveBot(formation.toString().getBytes());
+                created.ownerKey(ownerKey);
+                localSeasonPlayerStore.create(created);
                 botIndexList.add(saveBot(formation.toString().getBytes()));
             });
         }
@@ -734,9 +738,9 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     private BotIndex saveBot(byte[] content){
         BattleTeam botTeam = BattleTeam.parse(content);
-        botTeam.ownerKey(SnowflakeKey.from(serviceContext.node().nodeId()));
-        botTeam.label("defense_bot");
-        botTeam.onEdge(true);
+        //botTeam.ownerKey(SnowflakeKey.from(serviceContext.node().nodeId()));
+        //botTeam.label("defense_bot");
+        //botTeam.onEdge(true);
         botTeam.playerId = serviceContext.distributionId();
         botTeam.saveAsBot(dataStore);
         return new BotIndex(botTeam.distributionId());
