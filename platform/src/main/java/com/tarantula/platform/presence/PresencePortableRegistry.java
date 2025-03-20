@@ -86,6 +86,7 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
     public static final int PLAYER_REWARD_INDEX_CID = 38;
     public static final int BATTLE_TEAM_INDEX_CID = 39;
     public static final int CHAMPION_LEADER_BOARD_ENTRY_CID = 40;
+    public static final int BOT_INDEX_CID = 41;
 
     //END PVP
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
@@ -215,6 +216,9 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
                 break;
             case CHAMPION_LEADER_BOARD_ENTRY_CID:
                 pt = new ChampionLeaderBoardEntry();
+                break;
+            case BOT_INDEX_CID:
+                pt = new BotIndex();
                 break;
             default:
         }
