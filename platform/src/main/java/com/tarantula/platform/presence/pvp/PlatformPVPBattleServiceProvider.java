@@ -443,6 +443,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         battleLog.defenseEloGain = battleEndResult.defenseEloLevelDelta;
         battleLog.offenseEloGain = battleEndResult.offenseEloLevelDelta;
         battleLog.defenseElo = battleEndResult.defenseEloLevelUpdated;
+        battleLog.offenseElo = battleEndResult.offenseEloLevelUpdated;
         battleHistory.update(battleLog); //overriding previous if same defense team
 
         PlayerBattleLogIndex playerLogIndex = new PlayerBattleLogIndex();
