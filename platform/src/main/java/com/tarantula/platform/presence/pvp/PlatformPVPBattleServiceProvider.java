@@ -33,7 +33,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     //NEVER PUSH TO REMOTE WITH TRUE
     private static final boolean DEV_CONFIG = false;
     private static final boolean COOL_DOWN_ENABLED = false;
-    private static final boolean FORCE_BOT_CREATE = false;
+    private static final boolean FORCE_BOT_CREATE = true;
     private static final long CURRENT_SEASON_INDEX = 0;
     public static final String NAME = "pvp_battle";
 
