@@ -125,7 +125,10 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
         List<BotIndex> botIndexList = localSeasonPlayerStore.list(new BotIndexQuery(serviceContext.node().nodeId()));
         bots = new ArrayList<>();
-        if(FORCE_BOT_CREATE) botIndexList.clear();
+        if(FORCE_BOT_CREATE){
+            botIndexList.forEach(botIndex -> localSeasonPlayerStore.delete(botIndex));
+            botIndexList.clear();
+        }
         if(botIndexList.size()==0){
             List<String> dlist = new ArrayList<>();
             File f = new File("../conf/pvp/entryBots");
