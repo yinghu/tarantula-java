@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -575,8 +576,11 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         }
     }
 
-    public boolean isCurrentDefenseTeam(long teamId, long playerId){
-        return teamId == currentDefenseTeam(new SimpleStub(playerId)).distributionId();
+    public long currentDefenseTeamId(long playerId){
+        TeamFormationIndex teamFormationIndex = new TeamFormationIndex();
+        teamFormationIndex.distributionId(playerId);
+        dataStore.createIfAbsent(teamFormationIndex,true);
+        return teamFormationIndex.teamId;
     }
 
     private List<DefenseTeamIndex> findMatches(Session session,MatchMakingIndex matchMakingIndex){
@@ -585,10 +589,18 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         IntegerKey mkey = MatchMaking.pool(matchMakingIndex.poolIndex);
         MatchMakingSnapshot snapshot = matchMakingSnapshot.putIfAbsent(mkey,new MatchMakingSnapshot(matchMakingSnapshotSize));
         List<DefenseTeamIndex> temp = snapshot.pending.stream().toList();
+        HashMap<Long,Long> currentTeamIDs = new HashMap<>();
         for(DefenseTeamIndex match : temp){
             if(match.playerId != session.distributionId()){
                 localMatchMakingStore.load(match);
-                if((match.onCooldown() && COOL_DOWN_ENABLED) || !isCurrentDefenseTeam(match.distributionId(), match.playerId)) continue;
+                if(match.onCooldown() && COOL_DOWN_ENABLED) continue;
+
+                if(!currentTeamIDs.containsKey(match.playerId)){
+                    currentTeamIDs.put(match.playerId, currentDefenseTeamId(match.playerId));
+                }
+
+                if(currentTeamIDs.get(match.playerId) != match.teamId()) continue;
+
                 Rating matchElo = platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(match.playerId));
                 if(matchElo.level() > playerElo.level() && matchElo.level()-playerElo.level() < matchEloDifferenceThreshold){
                     if(matchMakingIndex.higher(match)) break;
