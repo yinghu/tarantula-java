@@ -575,6 +575,10 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         }
     }
 
+    public boolean isCurrentDefenseTeam(long teamId, long playerId){
+        return teamId == currentDefenseTeam(new SimpleStub(playerId)).distributionId();
+    }
+
     private List<DefenseTeamIndex> findMatches(Session session,MatchMakingIndex matchMakingIndex){
         //logger.warn("Finding matches ["+matchMakingIndex.poolIndex+"]");
         Rating playerElo = platformGameServiceProvider.presenceServiceProvider().rating(session);
@@ -584,7 +588,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         for(DefenseTeamIndex match : temp){
             if(match.playerId != session.distributionId()){
                 localMatchMakingStore.load(match);
-                if(match.onCooldown() && COOL_DOWN_ENABLED) continue;
+                if((match.onCooldown() && COOL_DOWN_ENABLED) || !isCurrentDefenseTeam(match.distributionId(), match.playerId)) continue;
                 Rating matchElo = platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(match.playerId));
                 if(matchElo.level() > playerElo.level() && matchElo.level()-playerElo.level() < matchEloDifferenceThreshold){
                     if(matchMakingIndex.higher(match)) break;
