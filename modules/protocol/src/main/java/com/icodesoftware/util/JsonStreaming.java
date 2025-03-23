@@ -30,10 +30,12 @@ public class JsonStreaming {
     private void handleObject() throws Exception{
         jsonStreamingHandler.onBeginObject(jsonReader.getPath(),index(jsonReader.getPath()));
         jsonReader.beginObject();
+        boolean stopLoop = false;
         while (jsonReader.hasNext()){
+            if(stopLoop) break;
             JsonToken token = jsonReader.peek();
             switch (token){
-                case NAME -> handleName();
+                case NAME -> stopLoop = handleName();
 
                 case BEGIN_OBJECT -> handleObject();
 
@@ -41,6 +43,7 @@ public class JsonStreaming {
 
             }
         }
+        if(stopLoop) return;
         jsonReader.endObject();
         jsonStreamingHandler.onEndObject(jsonReader.getPath(),index(jsonReader.getPath()));
     }
@@ -48,36 +51,44 @@ public class JsonStreaming {
     private void handleArray() throws Exception{
         jsonStreamingHandler.onBeginArray(jsonReader.getPath(),index(jsonReader.getPath()));
         jsonReader.beginArray();
+        boolean stopLoop = false;
         while (jsonReader.hasNext()){
+            if(stopLoop) break;
             JsonToken token = jsonReader.peek();
             switch (token){
                 case BEGIN_OBJECT -> handleObject();
-                default -> handleValue(jsonReader.getPath());
+                default -> stopLoop = handleValue(jsonReader.getPath());
             }
         }
+        if(stopLoop) return;
         jsonReader.endArray();
         jsonStreamingHandler.onEndArray(jsonReader.getPath(),index(jsonReader.getPath()));
     }
 
-    private void handleName() throws Exception{
+    private boolean handleName() throws Exception{
+        boolean stopLoop = false;
         jsonReader.nextName();
         JsonToken tp = jsonReader.peek();
         if(tp == JsonToken.NUMBER || tp == JsonToken.STRING || tp == JsonToken.BOOLEAN || tp == JsonToken.NULL){
-            this.handleValue(jsonReader.getPath());
+            stopLoop = this.handleValue(jsonReader.getPath());
         }
+        return stopLoop;
     }
 
-    private void handleValue(String tag) throws Exception{
+    private boolean handleValue(String tag) throws Exception{
         JsonToken token = jsonReader.peek();
+        boolean stopLoop = false;
         switch (token){
-            case BOOLEAN -> this.jsonStreamingHandler.onBoolean(tag,jsonReader.nextBoolean(),index(tag));
-            case STRING -> this.jsonStreamingHandler.onString(tag,jsonReader.nextString(),index(tag));
-            case NUMBER -> this.jsonStreamingHandler.onNumber(tag,Double.valueOf(jsonReader.nextDouble()),index(tag));
+            case BOOLEAN -> stopLoop = this.jsonStreamingHandler.onBoolean(tag,jsonReader.nextBoolean(),index(tag));
+
+            case STRING -> stopLoop = this.jsonStreamingHandler.onString(tag,jsonReader.nextString(),index(tag));
+            case NUMBER -> stopLoop = this.jsonStreamingHandler.onNumber(tag,Double.valueOf(jsonReader.nextDouble()),index(tag));
             case NULL -> {
                 jsonReader.nextNull();
-                this.jsonStreamingHandler.onNull(tag,index(tag));
+                stopLoop = this.jsonStreamingHandler.onNull(tag,index(tag));
             }
         }
+        return stopLoop;
     }
 
     private int index(String path){

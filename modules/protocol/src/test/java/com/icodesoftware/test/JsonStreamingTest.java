@@ -39,21 +39,25 @@ public class JsonStreamingTest implements JsonStreamingHandler {
     }
 
     @Override
-    public void onString(String tag,String value,int index){
+    public boolean onString(String tag,String value,int index){
         System.out.println("VALUE : "+tag+" : "+value+" : "+index);
+        return false;
     }
     @Override
-    public void onNumber(String tag,Number value,int index){
+    public boolean onNumber(String tag,Number value,int index){
         System.out.println("VALUE : "+tag+" : "+value.intValue()+" ; "+index);
+        return false;
     }
 
     @Override
-    public void onBoolean(String tag,boolean value,int index){
+    public boolean onBoolean(String tag,boolean value,int index){
         System.out.println("VALUE : "+tag+" : "+value+" ; "+index);
+        return true;
     }
 
     @Override
-    public void onNull(String tag,int index) {
+    public boolean onNull(String tag,int index) {
         System.out.println("NULL VALUE : "+tag+" : "+index);
+        return true;
     }
 }
