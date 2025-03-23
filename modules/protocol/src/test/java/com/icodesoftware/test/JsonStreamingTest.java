@@ -19,41 +19,41 @@ public class JsonStreamingTest implements JsonStreamingHandler {
     }
 
     @Override
-    public void onBeginObject(String tag) {
-        System.out.println("Start Object : "+tag);
+    public void onBeginObject(String tag,int index) {
+        System.out.println("Start Object : "+tag+ " : "+index);
     }
 
     @Override
-    public void onEndObject(String tag) {
-        System.out.println("END : "+tag);
+    public void onEndObject(String tag,int index) {
+        System.out.println("END : "+tag+" : "+index);
     }
 
     @Override
-    public void onBeginArray(String tag) {
-        System.out.println("START Array : "+tag);
+    public void onBeginArray(String tag,int index) {
+        System.out.println("START Array : "+tag+" : "+index);
     }
 
     @Override
-    public void onEndArray(String tag) {
-        System.out.println("END Array : "+tag);
+    public void onEndArray(String tag,int index) {
+        System.out.println("END Array : "+tag+" : "+index);
     }
 
     @Override
-    public void onString(String tag,String value){
-        System.out.println("VALUE : "+tag+" : "+value);
+    public void onString(String tag,String value,int index){
+        System.out.println("VALUE : "+tag+" : "+value+" : "+index);
     }
     @Override
-    public void onNumber(String tag,Number value){
-        System.out.println("VALUE : "+tag+" : "+value.intValue());
-    }
-
-    @Override
-    public void onBoolean(String tag,boolean value){
-        System.out.println("VALUE : "+tag+" : "+value);
+    public void onNumber(String tag,Number value,int index){
+        System.out.println("VALUE : "+tag+" : "+value.intValue()+" ; "+index);
     }
 
     @Override
-    public void onNull(String tag) {
-        System.out.println("NULL VALUE : "+tag+" : ");
+    public void onBoolean(String tag,boolean value,int index){
+        System.out.println("VALUE : "+tag+" : "+value+" ; "+index);
+    }
+
+    @Override
+    public void onNull(String tag,int index) {
+        System.out.println("NULL VALUE : "+tag+" : "+index);
     }
 }

@@ -28,7 +28,7 @@ public class JsonStreaming {
     }
 
     private void handleObject() throws Exception{
-        jsonStreamingHandler.onBeginObject(jsonReader.getPath());
+        jsonStreamingHandler.onBeginObject(jsonReader.getPath(),index(jsonReader.getPath()));
         jsonReader.beginObject();
         while (jsonReader.hasNext()){
             JsonToken token = jsonReader.peek();
@@ -42,11 +42,11 @@ public class JsonStreaming {
             }
         }
         jsonReader.endObject();
-        jsonStreamingHandler.onEndObject(jsonReader.getPath());
+        jsonStreamingHandler.onEndObject(jsonReader.getPath(),index(jsonReader.getPath()));
     }
 
     private void handleArray() throws Exception{
-        jsonStreamingHandler.onBeginArray(jsonReader.getPath());
+        jsonStreamingHandler.onBeginArray(jsonReader.getPath(),index(jsonReader.getPath()));
         jsonReader.beginArray();
         while (jsonReader.hasNext()){
             JsonToken token = jsonReader.peek();
@@ -56,7 +56,7 @@ public class JsonStreaming {
             }
         }
         jsonReader.endArray();
-        jsonStreamingHandler.onEndArray(jsonReader.getPath());
+        jsonStreamingHandler.onEndArray(jsonReader.getPath(),index(jsonReader.getPath()));
     }
 
     private void handleName() throws Exception{
@@ -70,14 +70,20 @@ public class JsonStreaming {
     private void handleValue(String tag) throws Exception{
         JsonToken token = jsonReader.peek();
         switch (token){
-            case BOOLEAN -> this.jsonStreamingHandler.onBoolean(tag,jsonReader.nextBoolean());
-            case STRING -> this.jsonStreamingHandler.onString(tag,jsonReader.nextString());
-            case NUMBER -> this.jsonStreamingHandler.onNumber(tag,Double.valueOf(jsonReader.nextDouble()));
+            case BOOLEAN -> this.jsonStreamingHandler.onBoolean(tag,jsonReader.nextBoolean(),index(tag));
+            case STRING -> this.jsonStreamingHandler.onString(tag,jsonReader.nextString(),index(tag));
+            case NUMBER -> this.jsonStreamingHandler.onNumber(tag,Double.valueOf(jsonReader.nextDouble()),index(tag));
             case NULL -> {
                 jsonReader.nextNull();
-                this.jsonStreamingHandler.onNull(tag);
+                this.jsonStreamingHandler.onNull(tag,index(tag));
             }
         }
+    }
+
+    private int index(String path){
+        int ix = path.lastIndexOf("[");
+        if(ix == -1) return -1;
+        return Integer.parseInt(path.substring(ix+1,ix+2));
     }
 
     public static boolean handle(InputStream inputStream,JsonStreamingHandler jsonStreamingHandler){
