@@ -17,7 +17,7 @@ public class JsonStreaming {
     }
 
     private boolean handle(){
-        try{
+        try(jsonReader){
             JsonToken start = jsonReader.peek();
             if(start != JsonToken.BEGIN_OBJECT) throw new RuntimeException("json object start only");
             handleObject();
