@@ -27,7 +27,7 @@ public class JsonStreaming {
         }
     }
 
-    private void handleObject() throws Exception{
+    private boolean handleObject() throws Exception{
         jsonStreamingHandler.onBeginObject(jsonReader.getPath(),index(jsonReader.getPath()));
         jsonReader.beginObject();
         boolean stopLoop = false;
@@ -37,18 +37,18 @@ public class JsonStreaming {
             switch (token){
                 case NAME -> stopLoop = handleName();
 
-                case BEGIN_OBJECT -> handleObject();
+                case BEGIN_OBJECT -> stopLoop = handleObject();
 
-                case BEGIN_ARRAY -> handleArray();
+                case BEGIN_ARRAY -> stopLoop = handleArray();
 
             }
         }
-        if(stopLoop) return;
+        if(stopLoop) return true;
         jsonReader.endObject();
-        jsonStreamingHandler.onEndObject(jsonReader.getPath(),index(jsonReader.getPath()));
+        return jsonStreamingHandler.onEndObject(jsonReader.getPath(),index(jsonReader.getPath()));
     }
 
-    private void handleArray() throws Exception{
+    private boolean handleArray() throws Exception{
         jsonStreamingHandler.onBeginArray(jsonReader.getPath(),index(jsonReader.getPath()));
         jsonReader.beginArray();
         boolean stopLoop = false;
@@ -56,13 +56,13 @@ public class JsonStreaming {
             if(stopLoop) break;
             JsonToken token = jsonReader.peek();
             switch (token){
-                case BEGIN_OBJECT -> handleObject();
+                case BEGIN_OBJECT -> stopLoop = handleObject();
                 default -> stopLoop = handleValue(jsonReader.getPath());
             }
         }
-        if(stopLoop) return;
+        if(stopLoop) return true;
         jsonReader.endArray();
-        jsonStreamingHandler.onEndArray(jsonReader.getPath(),index(jsonReader.getPath()));
+        return jsonStreamingHandler.onEndArray(jsonReader.getPath(),index(jsonReader.getPath()));
     }
 
     private boolean handleName() throws Exception{

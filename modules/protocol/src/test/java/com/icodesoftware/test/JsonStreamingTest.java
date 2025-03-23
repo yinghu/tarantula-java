@@ -24,8 +24,9 @@ public class JsonStreamingTest implements JsonStreamingHandler {
     }
 
     @Override
-    public void onEndObject(String tag,int index) {
+    public boolean onEndObject(String tag,int index) {
         System.out.println("END : "+tag+" : "+index);
+        return false;
     }
 
     @Override
@@ -34,8 +35,9 @@ public class JsonStreamingTest implements JsonStreamingHandler {
     }
 
     @Override
-    public void onEndArray(String tag,int index) {
+    public boolean onEndArray(String tag,int index) {
         System.out.println("END Array : "+tag+" : "+index);
+        return true;
     }
 
     @Override
@@ -52,12 +54,12 @@ public class JsonStreamingTest implements JsonStreamingHandler {
     @Override
     public boolean onBoolean(String tag,boolean value,int index){
         System.out.println("VALUE : "+tag+" : "+value+" ; "+index);
-        return true;
+        return false;
     }
 
     @Override
     public boolean onNull(String tag,int index) {
         System.out.println("NULL VALUE : "+tag+" : "+index);
-        return true;
+        return false;
     }
 }
