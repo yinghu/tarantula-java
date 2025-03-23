@@ -1,7 +1,6 @@
 package com.icodesoftware.util;
 
 import com.google.gson.*;
-import com.icodesoftware.Recoverable;
 
 import java.io.*;
 import java.nio.charset.Charset;
