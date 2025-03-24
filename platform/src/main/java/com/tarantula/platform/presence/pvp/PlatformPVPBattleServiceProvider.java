@@ -32,27 +32,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvider implements Configurable.Listener<SeasonCredentialConfiguration>{
 
     //NEVER PUSH TO REMOTE WITH TRUE
-    private static final boolean DEV_CONFIG = false;
+    private static final boolean DO_NOT_USE_DEV_CONFIG = true;
     private static final boolean COOL_DOWN_ENABLED = false;
-    private static final boolean FORCE_BOT_CREATE = true;
+    private static final boolean FORCE_BOT_CREATE = false;
     private static final long CURRENT_SEASON_INDEX = 0;
     public static final String NAME = "pvp_battle";
 
-    // seconds dev sample config replaced with the pvp config section DEV_CONFIG = false
-    private int teamCreationWaitingTime = 5;
-    private int seasonTimeGap = 60;
-    private int seasonRunningTime = 180;
-    private int reMatchWaitingTime = 180;
-    // seconds end
+    private int seasonTimeGap = 10*60; //10 minutes buffer per season to end
     private int championsLeaderBoardThreshold = 2050;
     private int championsLeaderBoardSize = 100;
     private int matchEloDifferenceThreshold = 1000;
-    private int botFillEloThreshold = 300;
-    private int coolDownTime = 60;
 
-    private int matchMakingSnapshotSize = 100;
-    private int matchMakingPoolSize = 100;
+    private int matchMakingSnapshotSize = 100; //100 formations per pool
     private int matchMakingListSize = 5;
+
+    private RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration();
+
     private final AtomicInteger roundRobin = new AtomicInteger(0);
     private ConcurrentHashMap<Long, Application> rewardIndex = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Long, SeasonCredentialConfiguration.Season> seasons = new ConcurrentHashMap();
@@ -71,7 +66,6 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     private ConcurrentHashMap<IntegerKey,MatchMakingSnapshot> matchMakingSnapshot = new ConcurrentHashMap<>();
 
-    //private List<BotIndex> botIndexList;
     private List<BattleTeam> bots;
     private ChampionLeaderBoard championLeaderBoard;
     private RNG rng = new JvmRNG();
@@ -90,18 +84,11 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         this.logger = JDKLogger.getLogger(PlatformPVPBattleServiceProvider.class);
         Configuration configuration = serviceContext.configuration("game-presence-settings");
         JsonObject pvp = ((JsonElement)configuration.property("pvp")).getAsJsonObject();
-        if(!DEV_CONFIG){
-            logger.warn("Loading configuration values to override dev values");
-            teamCreationWaitingTime = pvp.get("waitingMinutesPerTeamFormation").getAsInt()*60; //to seconds
-            seasonTimeGap = pvp.get("seasonTimeGapMinutes").getAsInt()*60; //to seconds
-            seasonRunningTime= pvp.get("seasonRunningDays").getAsInt()*24*60*60; //to seconds
-            reMatchWaitingTime = pvp.get("reMatchWaitingTimeMinutes").getAsInt()*60; //to seconds
-            coolDownTime = pvp.get("defenseCooldownMinutes").getAsInt()*60;
+
+        //runtime overriding config values
+        if(DO_NOT_USE_DEV_CONFIG){
+            this.resetConfiguration(pvp);
         }
-        this.championsLeaderBoardThreshold = pvp.get("championsLeaderBoardThreshold").getAsInt();
-        this.botFillEloThreshold = pvp.get("botFillEloThreshold").getAsInt();
-        this.matchMakingSnapshotSize = pvp.get("matchMakingSnapshotSize").getAsInt();
-        this.matchMakingPoolSize = pvp.get("matchMakingPoolSize").getAsInt();
         this.dataStore = applicationPreSetup.dataStore(gameCluster,NAME+"_team_formation");
         this.playerRewardStore = applicationPreSetup.dataStore(gameCluster,NAME+"_player_reward");
         this.localMatchMakingStore = applicationPreSetup.localDataStore(gameCluster,NAME+"_match_making");
@@ -114,9 +101,9 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             onEvent(e);
             return true;
         });
-        for(int i=0;i<matchMakingPoolSize;i++){
+        for(int i=0;i<runtimeConfiguration.matchMakingPoolSize.get();i++){
             IntegerKey mmPool = MatchMaking.pool(i);
-            MatchMakingSnapshot matchMakingSnapshot = new MatchMakingSnapshot(matchMakingSnapshotSize);
+            MatchMakingSnapshot matchMakingSnapshot = new MatchMakingSnapshot(mmPool,this.matchMakingSnapshotSize);
             this.matchMakingSnapshot.put(mmPool,matchMakingSnapshot);
             localMatchMakingStore.list(new DefenseTeamIndexQuery(mmPool,DefenseTeamIndex.POOL_LABEL),(t)->
                 matchMakingSnapshot.pending.offer(t)
@@ -140,7 +127,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                     }
                 }
             }
-            //SimpleStub bot = new SimpleStub(serviceContext.distributionId());
+
             SnowflakeKey ownerKey = SnowflakeKey.from(serviceContext.node().nodeId());
             dlist.forEach(js->{
                 logger.warn("Creating bot from ["+js+"]");
@@ -170,6 +157,17 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         });
         this.platformGameServiceProvider.configurationServiceProvider().addConfigurableListener(OnAccess.SEASON,this);
         this.tokenValidatorProvider = (TokenValidatorProvider) serviceContext.serviceProvider(TokenValidatorProvider.NAME);
+        this.platformGameServiceProvider.configurationServiceProvider().addConfigurableListener(RuntimeConfigurationListener.CONFIG_NAME,new RuntimeConfigurationListener(this));
+    }
+
+    public void resetConfiguration(JsonObject pvp){
+        logger.warn("Loading configuration values to override values at runtime");
+        this.runtimeConfiguration.botFillEloThreshold.set(JsonUtil.getJsonInt(pvp,"botFillEloThreshold",300));
+        this.runtimeConfiguration.matchMakingPoolSize.set(JsonUtil.getJsonInt(pvp,"matchMakingPoolSize",100));
+        this.runtimeConfiguration.reMatchWaitingTime.set(JsonUtil.getJsonInt(pvp,"reMatchWaitingTimeMinutes",60)*60);//60 minutes
+        this.runtimeConfiguration.coolDownTime.set(JsonUtil.getJsonInt(pvp,"defenseCooldownMinutes",60)*60);//60 minutes;
+        this.runtimeConfiguration.teamCreationWaitingTime.set(JsonUtil.getJsonInt(pvp,"waitingMinutesPerTeamFormation",5)*60);//5 minutes
+        this.runtimeConfiguration.seasonRunningTime.set(JsonUtil.getJsonInt(pvp,"seasonRunningDays",12)*24*60*60); //12 days
     }
 
     public ChampionLeaderBoard championLeaderBoard(){
@@ -239,7 +237,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             }
         });
         if(matches.size()==0) voidMatchMakingTimer(session); //always allow client to retry mm-list to find matches
-        if(matches.size()< matchMakingListSize && attackerRating.level() < botFillEloThreshold){
+        if(matches.size()< matchMakingListSize && attackerRating.level() < runtimeConfiguration.botFillEloThreshold.get()){
             fillBots(session,attackersDefenseTeam,matches);
         }
         MatchMaking matchMaking = MatchMaking.success(teamFormationIndex.timestamp(),matches);
@@ -257,7 +255,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         if(!teamFormationIndex.expired()) return TeamFormationResponse.failureOnDefenseTeam(teamFormationIndex.timestamp());
         BattleTeam defenseTeam = BattleTeam.parse(content);
         defenseTeam.playerId = session.distributionId();
-        defenseTeam.saveAsDefense(dataStore,teamFormationIndex,teamCreationWaitingTime);
+        defenseTeam.saveAsDefense(dataStore,teamFormationIndex,runtimeConfiguration.teamCreationWaitingTime.get());
         this.serviceContext.eventService().publish(new TeamFormationEvent(session.distributionId(),defenseTeam.distributionId()));
         onSaveDefenseAnalytic(defenseTeam);
         return TeamFormationResponse.responseOnDefenseTeam(teamFormationIndex.timestamp());
@@ -468,7 +466,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         }));
         logger.warn("Season starting ["+seasonRuntime.currentSeason+" : "+seasonRuntime.sequence+"]");
         SeasonCredentialConfiguration.Season season = seasons.get(seasonRuntime.currentSeason);
-        this.championLeaderBoard = new ChampionLeaderBoard(localSeasonPlayerStore,serviceContext.node().nodeId(),season.seasonId,championsLeaderBoardThreshold,championsLeaderBoardSize);
+        this.championLeaderBoard = new ChampionLeaderBoard(localSeasonPlayerStore,serviceContext.node().nodeId(),season.seasonId,this.championsLeaderBoardThreshold,championsLeaderBoardSize);
         this.championLeaderBoard.load();
         seasons.put(CURRENT_SEASON_INDEX,season);
         season.timestamp(TimeUtil.toUTCMilliseconds(endTime));
@@ -523,7 +521,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 else{
                     seasonRuntime.sequence++;
                     seasonRuntime.currentSeason = next.seasonId;
-                    seasonRuntime.endTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(seasonRunningTime).plusSeconds(seasonTimeGap));
+                    seasonRuntime.endTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(runtimeConfiguration.seasonRunningTime.get()).plusSeconds(seasonTimeGap));
                     scheduleStore.mapSet(lockKey,seasonRuntime.toBinary());
                 }
                 dataStore.update(seasonRuntime);
@@ -562,7 +560,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 SeasonCredentialConfiguration.Season startSeason = seasons.get(1L);
                 seasonRuntime.sequence = 1;
                 seasonRuntime.currentSeason = startSeason.seasonId;
-                seasonRuntime.endTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(seasonRunningTime).plusSeconds(seasonTimeGap));
+                seasonRuntime.endTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(runtimeConfiguration.seasonRunningTime.get()).plusSeconds(seasonTimeGap));
                 dataStore.update(seasonRuntime);
                 logger.warn("Initializing season from ["+seasonRuntime.currentSeason+" : "+seasonRuntime.sequence+"]");
             }
@@ -587,7 +585,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         //logger.warn("Finding matches ["+matchMakingIndex.poolIndex+"]");
         Rating playerElo = platformGameServiceProvider.presenceServiceProvider().rating(session);
         IntegerKey mkey = MatchMaking.pool(matchMakingIndex.poolIndex);
-        MatchMakingSnapshot snapshot = matchMakingSnapshot.putIfAbsent(mkey,new MatchMakingSnapshot(matchMakingSnapshotSize));
+        MatchMakingSnapshot snapshot = matchMakingSnapshot(mkey);
         List<DefenseTeamIndex> temp = snapshot.pending.stream().toList();
         HashMap<Long,Long> currentTeamIDs = new HashMap<>();
         for(DefenseTeamIndex match : temp){
@@ -602,7 +600,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 if(currentTeamIDs.get(match.playerId) != match.teamId()) continue;
 
                 Rating matchElo = platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(match.playerId));
-                if(matchElo.level() > playerElo.level() && matchElo.level()-playerElo.level() < matchEloDifferenceThreshold){
+                if(matchElo.level() > playerElo.level() && matchElo.level()-playerElo.level() < this.matchEloDifferenceThreshold){
                     if(matchMakingIndex.higher(match)) break;
                 }
                 if(matchElo.level() < playerElo.level() && playerElo.level()- matchElo.level() < matchEloDifferenceThreshold){
@@ -610,12 +608,22 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 }
             }
         }
-        matchMakingIndex.poolIndex = (matchMakingIndex.poolIndex < matchMakingPoolSize-1) ? matchMakingIndex.poolIndex+1 : 0;
-        matchMakingIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(reMatchWaitingTime)));
+        matchMakingIndex.poolIndex = (snapshot.key.key() < runtimeConfiguration.matchMakingPoolSize.get()-1) ? matchMakingIndex.poolIndex+1 : 0;
+        matchMakingIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(runtimeConfiguration.reMatchWaitingTime.get())));
         matchMakingIndex.reset();
         localMatchMakingStore.update(matchMakingIndex);
         List<DefenseTeamIndex> matches = matchMakingIndex.list(localMatchMakingStore);
         return matches;
+    }
+
+    private MatchMakingSnapshot matchMakingSnapshot(IntegerKey key){
+        return matchMakingSnapshot.computeIfAbsent(key,k->{
+            MatchMakingSnapshot pendingPool = new MatchMakingSnapshot(k,this.matchMakingSnapshotSize);
+            localMatchMakingStore.list(new DefenseTeamIndexQuery(k,DefenseTeamIndex.POOL_LABEL),(t)->
+                    pendingPool.pending.offer(t)
+            );
+            return pendingPool;
+        });
     }
 
     private TeamFormationIndex teamFormationIndex(long systemId){
@@ -639,7 +647,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 DefenseTeamIndex defenseTeamIndex = new DefenseTeamIndex();
                 defenseTeamIndex.distributionId(gameEndEvent.defenseTeamId);
                 if(localMatchMakingStore.load(defenseTeamIndex)){
-                    defenseTeamIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(coolDownTime)));
+                    defenseTeamIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(runtimeConfiguration.coolDownTime.get())));
                     localMatchMakingStore.update(defenseTeamIndex);
                 }
             }
@@ -665,7 +673,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     private void onMatchMakingPool(long playerId,long teamId){
         IntegerKey integerKey = MatchMaking.pool(roundRobin.getAndUpdate(v->{
-            if(v<matchMakingPoolSize-1) return v+1;
+            if(v<runtimeConfiguration.matchMakingPoolSize.get()-1) return v+1;
             return 0;
         }));
         DefenseTeamIndex battleTeamIndex = new DefenseTeamIndex(integerKey);
@@ -675,7 +683,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         battleTeamIndex.ownerKey(SnowflakeKey.from(playerId));
         localMatchMakingStore.createEdge(battleTeamIndex,DefenseTeamIndex.PLAYER_LABEL);
 
-        MatchMakingSnapshot snapshot = matchMakingSnapshot.putIfAbsent(integerKey,new MatchMakingSnapshot(matchMakingSnapshotSize));
+        MatchMakingSnapshot snapshot = matchMakingSnapshot(integerKey);
         if(!snapshot.pending.offer(battleTeamIndex)){
             snapshot.pending.poll();//kick out first
             snapshot.pending.offer(battleTeamIndex);
