@@ -22,8 +22,8 @@
       "pendingReward": true
   },
   "pvp": {
-     "waitingMinutesPerTeamFormation": 5,
-     "seasonRunningDays": 12,
+     "waitingMinutesPerTeamFormation": 1,
+     "seasonRunningDays": 14,
      "reMatchWaitingTimeMinutes": 60,
      "defenseCooldownMinutes": 60,
      "botFillEloThreshold": 300,

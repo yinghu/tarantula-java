@@ -23,7 +23,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -108,7 +107,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             localMatchMakingStore.list(new DefenseTeamIndexQuery(mmPool,DefenseTeamIndex.POOL_LABEL),(t)->
                 matchMakingSnapshot.pending.offer(t)
             );
-            logger.warn("Preloading match making list ["+matchMakingSnapshot.pending.size()+"] from pool ["+mmPool.key()+"]");
+            //logger.warn("Preloading match making list ["+matchMakingSnapshot.pending.size()+"] from pool ["+mmPool.key()+"]");
         }
 
         List<BotIndex> botIndexList = localSeasonPlayerStore.list(new BotIndexQuery(serviceContext.node().nodeId()));
@@ -130,7 +129,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
             SnowflakeKey ownerKey = SnowflakeKey.from(serviceContext.node().nodeId());
             dlist.forEach(js->{
-                logger.warn("Creating bot from ["+js+"]");
+                //logger.warn("Creating bot from ["+js+"]");
                 JsonObject formation = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("pvp/entryBots/"+js));
                 BotIndex created = saveBot(formation.toString().getBytes());
                 created.ownerKey(ownerKey);
@@ -152,7 +151,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 localSeasonPlayerStore.createIfAbsent(botProfile,false);
             }
             bot.botProfile = botProfile.toJson();
-            logger.warn(bot.botProfile.toString()+" : "+bot.distributionId());
+            //logger.warn(bot.botProfile.toString()+" : "+bot.distributionId());
             bots.add(bot);
         });
         this.platformGameServiceProvider.configurationServiceProvider().addConfigurableListener(OnAccess.SEASON,this);
@@ -766,9 +765,6 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     private BotIndex saveBot(byte[] content){
         BattleTeam botTeam = BattleTeam.parse(content);
-        //botTeam.ownerKey(SnowflakeKey.from(serviceContext.node().nodeId()));
-        //botTeam.label("defense_bot");
-        //botTeam.onEdge(true);
         botTeam.playerId = serviceContext.distributionId();
         botTeam.saveAsBot(dataStore);
         return new BotIndex(botTeam.distributionId());
