@@ -12,14 +12,17 @@ public class RuntimeConfigurationListener implements Configurable.Listener<FileC
 
     private static final TarantulaLogger logger = JDKLogger.getLogger(RuntimeConfigurationListener.class);
     public static final String CONFIG_NAME = "pvp";
+    private final PlatformPVPBattleServiceProvider pvpBattleServiceProvider;
 
+    public RuntimeConfigurationListener(PlatformPVPBattleServiceProvider pvpBattleServiceProvider){
+        this.pvpBattleServiceProvider = pvpBattleServiceProvider;
+    }
     public void onLoaded(FileCredentialConfiguration loaded){
-        logger.warn("Loaded");
         JsonObject config = JsonUtil.parse(loaded.load());
-        logger.warn(config.toString());
+        this.pvpBattleServiceProvider.resetConfiguration(config);
     }
 
     public void onRemoved(FileCredentialConfiguration removed){
-       logger.warn("Removed");
+
     }
 }

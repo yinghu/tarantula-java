@@ -4,19 +4,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class RuntimeConfiguration {
 
-    public int teamCreationWaitingTime = 5;
-    public int seasonTimeGap = 60;
-    public int seasonRunningTime = 180;
-    public int reMatchWaitingTime = 180;
+    public AtomicInteger teamCreationWaitingTime = new AtomicInteger(5); // 5 seconds
 
-    // seconds end
-    public int championsLeaderBoardThreshold = 2050;
-    public int championsLeaderBoardSize = 100;
-    public int matchEloDifferenceThreshold = 1000;
-    public int botFillEloThreshold = 300;
-    public int coolDownTime = 60;
+    public AtomicInteger seasonRunningTime = new AtomicInteger(24*60*60); //1 day
 
-    public int matchMakingSnapshotSize = 100;
-    public AtomicInteger matchMakingPoolSize = new AtomicInteger(100);
-    public int matchMakingListSize = 5;
+    public AtomicInteger reMatchWaitingTime = new AtomicInteger(5); //5 seconds
+
+    public AtomicInteger botFillEloThreshold = new AtomicInteger(300);
+
+    public AtomicInteger coolDownTime = new AtomicInteger(60); //60 seconds
+
+    public AtomicInteger matchMakingPoolSize = new AtomicInteger(1); //
 }
