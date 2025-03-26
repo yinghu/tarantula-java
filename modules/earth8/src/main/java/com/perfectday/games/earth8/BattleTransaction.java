@@ -36,6 +36,7 @@ public class BattleTransaction extends RecoverableObject {
             buffer.writeLong(seasonId);
             buffer.writeLong(opponentId);
             buffer.writeLong(teamId);
+            buffer.writeLong(timestamp);
         }catch (Exception ex){
             //ignore
         }
@@ -59,6 +60,7 @@ public class BattleTransaction extends RecoverableObject {
             seasonId = buffer.readLong();
             opponentId = buffer.readLong();
             teamId = buffer.readLong();
+            timestamp = buffer.readLong();
         }catch (Exception exception){
             //ignore
         }
