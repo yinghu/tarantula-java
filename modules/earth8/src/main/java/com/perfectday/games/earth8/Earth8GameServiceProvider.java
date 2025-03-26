@@ -9,6 +9,7 @@ import com.icodesoftware.util.JsonUtil;
 
 import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.SnowflakeKey;
+import com.icodesoftware.util.TimeUtil;
 import com.perfectday.games.earth8.analytics.*;
 
 import com.perfectday.games.earth8.config.SeasonConfigurationListener;
@@ -22,6 +23,7 @@ import com.perfectday.games.earth8.inbox.PlayerActionQuery;
 import com.perfectday.games.earth8.inbox.PlayerEventInbox;
 import com.perfectday.games.earth8.data.PlayerDataTrack;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,6 +34,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     public GameContext gameContext;
     private final static String ANALYTICS_QUERY_HEADER = "#Analytics";
     private final static long EVENT_DISPATCH_DELAY = 100; //100ms
+    private final int MAX_BATTLE_TIME = 10; //10 minutes
     private String ANALYTICS_QUERY;
 
     private ConcurrentHashMap<Long,Tournament> tournamentIndex = new ConcurrentHashMap<>();
@@ -42,7 +45,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     private ConcurrentHashMap<String,ApplicationResource> resourceIndex = new ConcurrentHashMap<>();
 
     ConcurrentHashMap<Long, ScoreRunner> scoreRunners = new ConcurrentHashMap<>();
-
+    PVPBattleChecker battleChecker = new PVPBattleChecker(this);
     private CheatDetectionRule cheatDetectionRule = new CheatDetectionRule(this);
 
     public void setup(GameContext gameContext){
@@ -60,6 +63,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         gamePlayCounts.put(GamePlayCount.ON_END_GAME,new GamePlayCount(gameContext,GamePlayCount.ON_END_GAME,metrics.entry(GamePlayCount.ON_END_GAME).total(),currentPlayers));
         gamePlayCounts.put(GamePlayCount.ON_GAME_CLUSTER_EVENT,new GamePlayCount(gameContext,GamePlayCount.ON_GAME_CLUSTER_EVENT,metrics.entry(GamePlayCount.ON_GAME_CLUSTER_EVENT).total(),null));
         this.gameContext.schedule(new GamePlayEventRunner(gameContext,gamePlayCounts,ANALYTICS_QUERY));
+        this.gameContext.schedule(battleChecker);
 
         this.gameContext.registerConfigurableListener(SeasonConfigurationListener.platformServiceName,OnAccess.SEASON,new SeasonConfigurationListener(this));
         this.gameContext.log("Start earth 8 game service provider with typeId : "+this.gameContext.applicationSchema().typeId(), OnLog.WARN);
@@ -94,6 +98,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
         }
         //single read to validate party items
 
+        battleChecker.endBattle(session.distributionId()); //end pvp battle if one is still pending
+
         if(battleTransaction.opponentId > 0 && battleTransaction.teamId > 0){
             if(configurations.get(OnAccess.SEASON) == null){
                 session.write(JsonUtil.toSimpleResponse(false,"no season available").getBytes());
@@ -102,6 +108,9 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                 session.write(JsonUtil.toSimpleResponse(false,"season has passed").getBytes());
                 return;
             }
+
+            battleTransaction.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusMinutes(MAX_BATTLE_TIME)));
+            battleChecker.add(new PendingBattle(session, battleTransaction), session.distributionId());
         }
 
         //if party check fail return false;
@@ -172,11 +181,13 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
     public void endGame(Session session,byte[] payload) throws Exception{
         long analyticsBatchId = gameContext.applicationSchema().applicationPreSetup().distributionId();
         BattleTransaction battleTransaction = BattleTransaction.fromJson(payload);
+
         if(battleTransaction.distributionId()<=0){
             session.write(JsonUtil.toSimpleResponse(false,"invalid battleId").getBytes());
             this.gamePlayCounts.get(GamePlayCount.ON_END_GAME).failure(session.distributionId());
             return;
         }
+
         boolean win = battleTransaction.win;
         long seasonId = battleTransaction.seasonId;
 
@@ -197,6 +208,8 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
 
         //ELO UPDATE IF PVP battle
         if(battleTransaction.opponentId > 0 && battleTransaction.teamId > 0){
+            battleChecker.remove(session.distributionId());
+
             if(configurations.get(OnAccess.SEASON) == null){
                 session.write(JsonUtil.toSimpleResponse(false,"no season available").getBytes());
                 return;
@@ -206,10 +219,13 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
             } else if (seasonId != battleTransaction.seasonId) {
                 session.write(JsonUtil.toSimpleResponse(false,"cached season ID mismatch").getBytes());
                 return;
+            } else if (TimeUtil.expired(TimeUtil.fromUTCMilliseconds(battleTransaction.timestamp()))){
+                gameContext.rating(session).elo(false,battleTransaction.opponentId,battleTransaction.teamId, battleTransaction.distributionId());
+                session.write(JsonUtil.toSimpleResponse(false,"battle time expired").getBytes());
+                return;
             }
 
-            Rating rating = gameContext.rating(session).elo(battleTransaction.win,battleTransaction.opponentId,battleTransaction.teamId, battleTransaction.distributionId());
-            //push analytics event to s3
+            gameContext.rating(session).elo(battleTransaction.win,battleTransaction.opponentId,battleTransaction.teamId, battleTransaction.distributionId());
         }
 
         session.write(JsonUtil.toSimpleResponse(updated,"battle finished").getBytes());
