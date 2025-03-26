@@ -4,6 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.item.ConfigurableObject;
+import com.tarantula.platform.presence.pvp.PlayerEloRatingProxy;
 
 import java.util.concurrent.ScheduledFuture;
 
@@ -80,7 +81,8 @@ public class PlatformGameContext implements GameContext {
 
     @Override
     public Rating rating(Session session) {
-        return this.platformGameServiceProvider.presenceServiceProvider().rating(session);
+        Rating rating = platformGameServiceProvider.presenceServiceProvider().rating(session);
+        return new PlayerEloRatingProxy(rating,this.platformGameServiceProvider);
     }
 
     @Override
@@ -107,5 +109,12 @@ public class PlatformGameContext implements GameContext {
 
     public Metrics metrics(){
         return this.platformGameServiceProvider.metrics();
+    }
+
+    @Override
+    public void registerConfigurableListener(String serviceName,String name, Configurable.Listener listener) {
+        ServiceProvider serviceProvider = platformGameServiceProvider.serviceProvider(serviceName);
+        if(serviceProvider==null) return;
+        serviceProvider.addConfigurableListener(name,listener);
     }
 }

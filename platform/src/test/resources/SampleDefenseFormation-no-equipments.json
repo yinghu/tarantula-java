@@ -1,0 +1,16 @@
+
+  {"unitInstances":
+   [{"levelAndRank":{"level":1,"rank":7,"currentLevelExperience":0,"currentRankExperience":0},"configID":"d5e5ffc83038c49d7a999df461e62a34",
+      "abilityRanks":{"abilityRanks":[],"passiveRank":1}},
+      {"levelAndRank":{"level":1,"rank":7,"currentLevelExperience":0,"currentRankExperience":0},"configID":"c476967cf201a4c0a8f02c4347b95285",
+
+         "abilityRanks":{"abilityRanks":[],"passiveRank":1}},
+      {"levelAndRank":{"level":1,"rank":7,"currentLevelExperience":0,"currentRankExperience":0},"configID":"43334acc9fecc416bba918bcf6653e52",
+
+         "abilityRanks":{"abilityRanks":[],"passiveRank":1}},
+      {"levelAndRank":{"level":1,"rank":7,"currentLevelExperience":0,"currentRankExperience":0},"configID":"513cd7964843744dda75b54d8965bd03",
+
+         "abilityRanks":{"abilityRanks":[],"passiveRank":1}},
+      {"levelAndRank":{"level":1,"rank":1,"currentLevelExperience":0,"currentRankExperience":0},"configID":"707a0f306d3214085a8a53e9046ae087",
+         "abilityRanks":{"abilityRanks":[],"passiveRank":1}}],
+     "teamPower":21426,"icon":20}

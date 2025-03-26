@@ -142,6 +142,10 @@ public class GameObjectSetup extends GamePreSetup implements ApplicationPreSetup
         return serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,service));
     }
 
+    public DataStore localDataStore(ApplicationSchema gameCluster,String service){
+        return serviceContext.dataStore(Distributable.LOCAL_SCOPE,configureDataStore(gameCluster,service));
+    }
+
     public DataStore dataStore(Descriptor descriptor){
         return serviceContext.dataStore(Distributable.DATA_SCOPE,serviceDataStore(descriptor));
     }

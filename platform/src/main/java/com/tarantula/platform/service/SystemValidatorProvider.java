@@ -498,6 +498,12 @@ public class SystemValidatorProvider implements TokenValidatorProvider {
             postoffice.setup(serviceContext);
             aMap.put(OnAccess.POST_OFFICE,postoffice);
         }
+        AuthVendorRegistry season = TarantulaContext.getInstance().authVendor(OnAccess.SEASON);
+        if(season!=null){
+            season.registerMetricsLister(serviceContext.metrics(Metrics.ACCESS));
+            season.setup(serviceContext);
+            aMap.put(OnAccess.SEASON,season);
+        }
         Configuration configuration = serviceContext.configuration("account-role-user-settings");
         maxOnSessionCount = ((Number)configuration.property("maxOnSessionCount")).intValue();
         //map only store

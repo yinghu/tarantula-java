@@ -14,7 +14,7 @@ public class GameRating extends PlayerGameObject implements Rating {
     public static int RANK_UP_LEVEL_BASE = 100;
 
     public int rank = 1; //rank of lobby
-    public int level = 1; //total level
+    public int level = 0; //total level
     public double xp =0; //total xp
     public boolean granted;
     private double levelUpXp =0;  //xp of arena level
@@ -22,6 +22,11 @@ public class GameRating extends PlayerGameObject implements Rating {
     public GameRating(){
         this.onEdge = true;
         this.label = "rating";
+    }
+
+    public Rating elo(boolean win,long opponentId,long teamPower, long battleId){
+        //no direct call
+        return this;
     }
 
     public Rating update(double xpDelta, double levelUpLimit){
@@ -82,6 +87,7 @@ public class GameRating extends PlayerGameObject implements Rating {
 
     public JsonObject toJson(){
         JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("PlayerId",distributionId);
         jsonObject.addProperty("Rank",rank);
         jsonObject.addProperty("Level",level);
         jsonObject.addProperty("Xp",xp);
@@ -101,5 +107,16 @@ public class GameRating extends PlayerGameObject implements Rating {
     @Override
     public double xp() {
         return xp;
+    }
+
+    public void level(int eloAssigned){
+        this.level = eloAssigned;
+    }
+
+    public static Rating from(long distributionId,int level){
+        GameRating rating = new GameRating();
+        rating.distributionId(distributionId);
+        rating.level(level);
+        return rating;
     }
 }
