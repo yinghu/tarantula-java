@@ -32,13 +32,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvider implements Configurable.Listener<SeasonCredentialConfiguration>{
 
     //NEVER PUSH TO REMOTE WITH TRUE
-    private static final boolean DO_NOT_USE_DEV_CONFIG = false;
-    private static final boolean COOL_DOWN_ENABLED = false;
-    private static final boolean FORCE_BOT_CREATE = false;
+    private static final boolean DO_NOT_USE_DEV_CONFIG = true;
+    private static final boolean COOL_DOWN_ENABLED = true;
+    private static final boolean FORCE_BOT_CREATE = true;
     private static final long CURRENT_SEASON_INDEX = 0;
     public static final String NAME = "pvp_battle";
 
-    private int seasonTimeGap = 2*60; //10 minutes buffer per season to end
+    private int seasonTimeGap = 10*60; //10 minutes buffer per season to end
     private int championsLeaderBoardThreshold = 2050;
     private int championsLeaderBoardSize = 100;
     private int matchEloDifferenceThreshold = 1000;
