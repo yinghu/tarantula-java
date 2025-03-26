@@ -81,6 +81,7 @@ public class Earth8GameServiceProvider implements GameServiceProvider {
                 webhook.upload(ANALYTICS_QUERY,serverConnectTransaction.toString().getBytes()))
         );
         this.gamePlayCounts.get(GamePlayCount.ON_JOINED).success(session.distributionId());
+        battleChecker.endBattle(session.distributionId()); //end pvp battle if one is still pending
     }
 
     @Override
