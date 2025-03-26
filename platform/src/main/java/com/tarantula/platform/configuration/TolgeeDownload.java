@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TolgeeDownload {
     private static final String LANGUAGE_CODES = "en-US,fr-FR,de-DE,es-ES,it-IT,ja-JP,ko-KR,pt-BR,fr-CA";
-    private static final String REST_URL ="http://loc.e8-dev.api.nicegang.com/v2/projects/34/translations?languages=%LANGUAGE_CODES%&filterKeyName=%SUBJECT_KEY%&filterKeyName=%BODY_KEY%";
+    private static final String REST_URL ="https://loc.e8-dev.api.nicegang.com/v2/projects/34/translations?languages=%LANGUAGE_CODES%&filterKeyName=%SUBJECT_KEY%&filterKeyName=%BODY_KEY%";
     private static final String en = "en-US";
     private TarantulaLogger logger = JDKLogger.getLogger(TolgeeDownload.class);
     private final ServiceContext serviceContext;

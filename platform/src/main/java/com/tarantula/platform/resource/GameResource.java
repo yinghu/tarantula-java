@@ -29,7 +29,8 @@ public class GameResource extends Application implements ApplicationResource {
 
     @Override
     public String name(){
-        return header.get("Name").getAsString();
+        if(header.has("Name")) return header.get("Name").getAsString();
+        return configurationName;
     }
 
     public List<Item> list(){

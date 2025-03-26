@@ -1,0 +1,73 @@
+{
+  "type": "category",
+  "category": "system",
+  "version": "1.0",
+  "description": "category item template list",
+  "name": "application-type-settings",
+  "itemList":
+  [
+    {
+      "header": {
+        "scope": "application.data",
+        "type": "Season",
+        "description": "seaon config",
+        "version": "1.0",
+        "rechargeable": false,
+        "constrained": false
+      },
+      "application": {
+        "properties": [
+          {
+            "name": "Faction1",
+            "type": "enum",
+            "reference": "SeasonFaction",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Faction2",
+            "type": "enum",
+            "reference": "SeasonFaction",
+            "nullable": false,
+            "downloadable": false
+          },
+          {
+            "name": "Faction3",
+            "type": "enum",
+            "reference": "SeasonFaction",
+            "nullable": false,
+            "downloadable": false
+          }
+        ]
+      }
+    },
+    {
+      "header": {
+        "scope": "application.data",
+        "type": "SeasonCredentialConfiguration",
+        "description": "pvp season",
+        "version": "1.0",
+        "rechargeable": false,
+        "constrained": false
+      },
+      "application": {
+        "properties": [
+            {
+              "name": "StartTime",
+              "type": "dateTime",
+              "reference": "DateTime",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "SeasonList",
+              "type": "list",
+              "reference": "category:Season",
+              "nullable": false,
+              "downloadable": false
+            }
+          ]
+      }
+    }
+  ]
+}

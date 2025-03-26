@@ -8,6 +8,8 @@ import com.icodesoftware.service.ServiceContext;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.GameCluster;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 
 public class PlatformItemServiceProvider implements ConfigurationServiceProvider, ItemDistributionCallback,ApplicationPreSetup.Listener {
 
@@ -24,6 +26,8 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     protected ApplicationPreSetup applicationPreSetup;
     protected DataStore dataStore;
     protected Descriptor application;
+
+    protected final ConcurrentHashMap<String,Configurable.Listener> configurableListeners = new ConcurrentHashMap<>();
 
     public PlatformItemServiceProvider(PlatformGameServiceProvider gameServiceProvider,String name){
         this.platformGameServiceProvider = gameServiceProvider;
@@ -69,6 +73,10 @@ public class PlatformItemServiceProvider implements ConfigurationServiceProvider
     }
     public boolean onItemReleased(String category,String itemId){
         return false;
+    }
+
+    public void addConfigurableListener(String configurableName,Configurable.Listener listener){
+        configurableListeners.put(configurableName,listener);
     }
 
 }

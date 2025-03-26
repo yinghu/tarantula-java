@@ -19,6 +19,9 @@ public class BattleStartTransaction extends UserAnalyticsTransaction {
         data.add("campaignName", object.get("CampaignName"));
         data.add("dungeonChapterName", object.get("DungeonChapterName"));
         data.add("stageNumber", object.get("StageNumber"));
+        data.add("season_id", object.get("SeasonId"));
+        data.add("opponent_id", object.get("OpponentId"));
+        data.add("team_id", object.get("TeamId"));
         data.addProperty("analyticsBatchId", analyticsBatchId);
     }
 }

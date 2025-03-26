@@ -1,5 +1,6 @@
 package com.icodesoftware.service;
 
+import com.icodesoftware.Configurable;
 import com.icodesoftware.Recoverable;
 
 public interface ServiceProvider extends Serviceable {
@@ -16,6 +17,8 @@ public interface ServiceProvider extends Serviceable {
 
     default void registerSummary(Summary summary){}
     default void updateSummary(Summary summary){}
+
+    default <T extends Configurable> void addConfigurableListener(String configurationName,Configurable.Listener<T> listener){}
 
     interface Summary extends Recoverable{
         default void update(String category,int value){}

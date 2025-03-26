@@ -61,6 +61,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     private DataStore mDataStore;
     private DataStore profileDataStore;
     private DataStore playListDataStore;
+    private DataStore ratingDataStore;
 
     private DistributionPresenceService distributionPresenceService;
     private ConcurrentHashMap<String,ProfileNameSequence> profileNameSequenceMapping;
@@ -120,6 +121,7 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
         this.mDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_mapping_object");
         this.profileDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_profile");
         this.playListDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_play_list");
+        this.ratingDataStore = this.applicationPreSetup.dataStore(gameCluster,NAME+"_player_rating");
         this.tournamentServiceProvider = platformGameServiceProvider.tournamentServiceProvider();
         this.distributionPresenceService = this.serviceContext.clusterProvider().serviceProvider(DistributionPresenceService.NAME);
         this.logger = JDKLogger.getLogger(PlatformPresenceServiceProvider.class);
@@ -211,24 +213,11 @@ public class PlatformPresenceServiceProvider extends PlatformGameServiceSetup {
     }
 
     public GameRating rating(Session session){
-        GameRating[] loaded  = {new GameRating()};
-        CurrentSaveIndex currentSaveIndex = platformGameServiceProvider.savedGameServiceProvider().currentSaveIndex(session);
-        RecoverableQuery<GameRating> query = RecoverableQuery.query(currentSaveIndex.saveId,loaded[0], GamePortableRegistry.INS);
-        mDataStore.list(query,(m)->{
-            if(m.label().equals(loaded[0].label())){
-                loaded[0]=m;
-                return false;
-            }
-            return true;
-        });
-        if(loaded[0].distributionId()==0){
-            loaded[0].ownerKey(query.key());
-            loaded[0].rank = 1;
-            loaded[0].xp = 100;
-            mDataStore.create(loaded[0]);
-        }
-        loaded[0].dataStore(mDataStore);
-        return loaded[0];
+        GameRating gameRating = new GameRating();
+        gameRating.distributionId(session.distributionId());
+        ratingDataStore.createIfAbsent(gameRating,true);
+        gameRating.dataStore(ratingDataStore);
+        return gameRating;
     }
     public Stub stub(Session session,Descriptor lobby){
         DataStore ds = applicationPreSetup.dataStore(gameCluster,NAME+"_"+lobby.tag().replaceAll(Recoverable.PATH_SEPARATOR,"_"));

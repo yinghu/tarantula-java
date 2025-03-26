@@ -17,6 +17,7 @@ import com.tarantula.platform.leaderboard.PlatformLeaderBoardProvider;
 import com.tarantula.platform.lobby.PlatformLobbyServiceProvider;
 import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
 import com.tarantula.platform.presence.dailygiveaway.PlatformDailyGiveawayServiceProvider;
+import com.tarantula.platform.presence.pvp.PlatformPVPBattleServiceProvider;
 import com.tarantula.platform.presence.saves.PlatformSavedGameServiceProvider;
 import com.tarantula.platform.resource.PlatformResourceServiceProvider;
 import com.tarantula.platform.room.PlatformRoomServiceProvider;
@@ -180,6 +181,10 @@ public class PlatformGameServiceProvider implements MetricsListener,ItemDistribu
 
     public PlatformSavedGameServiceProvider savedGameServiceProvider(){
         return serviceProvider(PlatformSavedGameServiceProvider.NAME);
+    }
+
+    public PlatformPVPBattleServiceProvider pvpBattleServiceProvider(){
+        return serviceProvider(PlatformPVPBattleServiceProvider.NAME);
     }
     //leader service provider hook calls
     public LeaderBoard leaderBoard(String category){

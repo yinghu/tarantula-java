@@ -34,6 +34,8 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
 
     private ConcurrentHashMap<String,CredentialConfiguration> vendorCredentials = new ConcurrentHashMap<>();
 
+    //private ConcurrentHashMap<String,Configurable.Listener> configurableListeners = new ConcurrentHashMap<>();
+
     private HashMap<String,JsonObject> vendors = new HashMap<>();
 
     private ScheduledFuture<?> scheduledFuture;
@@ -62,6 +64,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
                     if(credentialConfiguration.setup(serviceContext,dataStore)){
                         vendorCredentials.put(credentialConfiguration.name(),credentialConfiguration);
                         vendorCredentials.put(credentialConfiguration.distributionKey(),credentialConfiguration);
+                        onConfigurableListener(credentialConfiguration.name(),credentialConfiguration,false);
                     }
                 }catch (Exception nex){
                     logger.warn("Credential Configuration Setup failed",nex);
@@ -117,8 +120,8 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
             if (credentialConfiguration.setup(serviceContext, dataStore)) {
                 vendorCredentials.put(credentialConfiguration.name(), credentialConfiguration);
                 vendorCredentials.put(credentialConfiguration.distributionKey(),credentialConfiguration);
-                logger.info(credentialConfiguration.name()+" : "+credentialConfiguration.distributionKey());
-
+                logger.warn(credentialConfiguration.name()+" : "+credentialConfiguration.distributionKey());
+                onConfigurableListener(credentialConfiguration.name(),credentialConfiguration,false);
                 if (credentialConfiguration.name().equals("CheatDetection")){
                     OnAccess access = new OnAccessTrack();
                     access.command("CheatDetectionConfigUpdated");
@@ -143,6 +146,7 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         if(credentialConfiguration==null) return true;
         CredentialConfiguration cx = vendorCredentials.remove(credentialConfiguration.name());
         cx.release();
+        onConfigurableListener(credentialConfiguration.name(),credentialConfiguration,true);
         return true;
     }
 
@@ -219,5 +223,21 @@ public class PlatformConfigurationServiceProvider extends PlatformItemServicePro
         });
         return tem;
     }
+
+    private void onConfigurableListener(String name,Configurable configurable,boolean removed){
+        Configurable.Listener listener = configurableListeners.get(name);
+        if(listener==null) return;
+        if(removed){
+            listener.onRemoved(configurable);
+            return;
+        }
+        listener.onLoaded(configurable);
+    }
+    public void addConfigurableListener(String name,Configurable.Listener listener){
+        super.addConfigurableListener(name,listener);
+        CredentialConfiguration credentialConfiguration = vendorCredentials.get(name);
+        if(credentialConfiguration!=null) listener.onLoaded(credentialConfiguration);
+    }
+
 
 }

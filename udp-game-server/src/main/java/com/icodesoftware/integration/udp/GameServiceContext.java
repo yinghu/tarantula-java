@@ -110,4 +110,9 @@ public class GameServiceContext implements GameContext {
     public Metrics metrics() {
         return null;
     }
+
+    @Override
+    public void registerConfigurableListener(String serviceName,String name, Configurable.Listener listener) {
+
+    }
 }

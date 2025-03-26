@@ -21,6 +21,14 @@
   "inbox": {
       "pendingReward": true
   },
+  "pvp": {
+     "waitingMinutesPerTeamFormation": 1,
+     "seasonRunningDays": 14,
+     "reMatchWaitingTimeMinutes": 60,
+     "defenseCooldownMinutes": 60,
+     "botFillEloThreshold": 300,
+     "matchMakingPoolSize": 100
+  },
 
   "playList":{
     "recentlyListSize" :10,
