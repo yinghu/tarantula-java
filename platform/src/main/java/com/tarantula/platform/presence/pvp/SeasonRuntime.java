@@ -11,6 +11,7 @@ public class SeasonRuntime extends ConfigurableObject {
     public long seasonRotation;
     public long sequence;
     public long currentSeason;
+    public long closeTime;
     public long endTime;
     public boolean ended;
     public ScheduledFuture<?> scheduledFuture;
@@ -30,6 +31,7 @@ public class SeasonRuntime extends ConfigurableObject {
         buffer.writeLong(endTime);
         buffer.writeLong(sequence);
         buffer.writeBoolean(ended);
+        buffer.writeLong(closeTime);
         return true;
     }
 
@@ -39,14 +41,18 @@ public class SeasonRuntime extends ConfigurableObject {
         endTime = buffer.readLong();
         sequence = buffer.readLong();
         ended = buffer.readBoolean();
+        try{
+            closeTime = buffer.readLong();
+        }catch (Exception ex){}
         return true;
     }
 
     @Override
     public byte[] toBinary() {
-        ByteBuffer buffer = ByteBuffer.allocate(24);
+        ByteBuffer buffer = ByteBuffer.allocate(32);
         buffer.putLong(currentSeason);
         buffer.putLong(endTime);
+        buffer.putLong(closeTime);
         buffer.putLong(sequence);
         buffer.flip();
         return buffer.array();
@@ -57,12 +63,14 @@ public class SeasonRuntime extends ConfigurableObject {
         ByteBuffer buffer = ByteBuffer.wrap(payload);
         currentSeason = buffer.getLong();
         endTime = buffer.getLong();
+        closeTime = buffer.getLong();
         sequence = buffer.getLong();
     }
 
     public void schedule(SeasonRuntime seasonRuntime){
         currentSeason = seasonRuntime.currentSeason;
         endTime = seasonRuntime.endTime;
+        closeTime = seasonRuntime.closeTime;
         sequence = seasonRuntime.sequence;
     }
 }

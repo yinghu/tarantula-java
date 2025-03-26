@@ -20,6 +20,7 @@ import com.tarantula.platform.presence.Profile;
 import java.io.File;
 import java.time.LocalDateTime;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,13 +32,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvider implements Configurable.Listener<SeasonCredentialConfiguration>{
 
     //NEVER PUSH TO REMOTE WITH TRUE
-    private static final boolean DO_NOT_USE_DEV_CONFIG = true;
+    private static final boolean DO_NOT_USE_DEV_CONFIG = false;
     private static final boolean COOL_DOWN_ENABLED = false;
     private static final boolean FORCE_BOT_CREATE = false;
     private static final long CURRENT_SEASON_INDEX = 0;
     public static final String NAME = "pvp_battle";
 
-    private int seasonTimeGap = 10*60; //10 minutes buffer per season to end
+    private int seasonTimeGap = 2*60; //10 minutes buffer per season to end
     private int championsLeaderBoardThreshold = 2050;
     private int championsLeaderBoardSize = 100;
     private int matchEloDifferenceThreshold = 1000;
@@ -457,18 +458,18 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     }
 
     private void startSeason(SeasonRuntime seasonRuntime){
-        LocalDateTime endTime = TimeUtil.fromUTCMilliseconds(seasonRuntime.endTime);
-        long endTimeDuration = TimeUtil.expired(endTime)? 100 : TimeUtil.durationUTCMilliseconds(LocalDateTime.now(),TimeUtil.fromUTCMilliseconds(seasonRuntime.endTime));
+        LocalDateTime closeTime = TimeUtil.fromUTCMilliseconds(seasonRuntime.closeTime);
+        long endTimeDuration = TimeUtil.expired(closeTime)? 100 : TimeUtil.durationUTCMilliseconds(LocalDateTime.now(),TimeUtil.fromUTCMilliseconds(seasonRuntime.closeTime));
         this.rotation.schedule(seasonRuntime);
         this.rotation.scheduledFuture = serviceContext.schedule(new ScheduleRunner(endTimeDuration,()->{
-            endSeason();
+            closeSeason();
         }));
-        logger.warn("Season starting ["+seasonRuntime.currentSeason+" : "+seasonRuntime.sequence+"]");
+        logger.warn("Season starting ["+seasonRuntime.currentSeason+" : "+seasonRuntime.sequence+"]["+closeTime.format(DateTimeFormatter.ISO_DATE_TIME)+"]");
         SeasonCredentialConfiguration.Season season = seasons.get(seasonRuntime.currentSeason);
         this.championLeaderBoard = new ChampionLeaderBoard(localSeasonPlayerStore,serviceContext.node().nodeId(),season.seasonId,this.championsLeaderBoardThreshold,championsLeaderBoardSize);
         this.championLeaderBoard.load();
         seasons.put(CURRENT_SEASON_INDEX,season);
-        season.timestamp(TimeUtil.toUTCMilliseconds(endTime));
+        season.timestamp(TimeUtil.toUTCMilliseconds(closeTime));
         onSeasonListener(season,false);
     }
 
@@ -486,15 +487,24 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         listener.onLoaded(updated);
     }
 
+    private void closeSeason(){
+        seasons.remove(CURRENT_SEASON_INDEX);
+        LocalDateTime endTime = TimeUtil.fromUTCMilliseconds(rotation.endTime);
+        logger.warn("Season going to end at ["+endTime.format(DateTimeFormatter.ISO_DATE_TIME)+"]");
+        long endTimeDuration = TimeUtil.expired(endTime)? 100 : TimeUtil.durationUTCMilliseconds(LocalDateTime.now(),TimeUtil.fromUTCMilliseconds(rotation.endTime));
+        this.rotation.scheduledFuture = serviceContext.schedule(new ScheduleRunner(endTimeDuration,()->{
+            endSeason();
+        }));
+    }
+
     private void endSeason(){
         if(rotation.seasonRotation==0){
             logger.warn("No season rotation has scheduled");
             return;
         }
-        SeasonCredentialConfiguration.Season ended = currentSeason();
-
+        SeasonCredentialConfiguration.Season ended = seasons.get(rotation.currentSeason);
         onSeasonListener(ended,true);
-        seasons.remove(CURRENT_SEASON_INDEX);
+
         byte[] lockKey = SnowflakeKey.from(rotation.seasonRotation).asBinary();
         try{
             scheduleStore.mapLock(lockKey);
@@ -512,14 +522,13 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 dataStore.createIfAbsent(seasonRuntime,true);
                 onSeasonChangeAnalytic(ended, next);
                 if(next==null){
-                    logger.warn("No season rotation ["+rotation.seasonRotation+"]");
-                    seasonRuntime.currentSeason=0;
-                    seasonRuntime.endTime = 0;
-                    seasonRuntime.ended = true;
+                    logger.warn("restart season rotation ["+rotation.seasonRotation+"]");
+                    initialSeason(seasonRuntime);
                 }
                 else{
                     seasonRuntime.sequence++;
                     seasonRuntime.currentSeason = next.seasonId;
+                    seasonRuntime.closeTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(runtimeConfiguration.seasonRunningTime.get()));
                     seasonRuntime.endTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(runtimeConfiguration.seasonRunningTime.get()).plusSeconds(seasonTimeGap));
                     scheduleStore.mapSet(lockKey,seasonRuntime.toBinary());
                 }
@@ -533,6 +542,16 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         }
         try{Thread.sleep(1000);}catch (Exception ex){} //waiting for clustering data update
         scheduleSeason();
+    }
+
+    private void initialSeason(SeasonRuntime seasonRuntime){
+        SeasonCredentialConfiguration.Season startSeason = seasons.get(1L);
+        seasonRuntime.sequence = 1;
+        seasonRuntime.currentSeason = startSeason.seasonId;
+        seasonRuntime.closeTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(runtimeConfiguration.seasonRunningTime.get()));
+        seasonRuntime.endTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(runtimeConfiguration.seasonRunningTime.get()).plusSeconds(seasonTimeGap));
+        dataStore.update(seasonRuntime);
+        logger.warn("Initializing season from ["+seasonRuntime.currentSeason+" : "+seasonRuntime.sequence+"]");
     }
 
     private void scheduleSeason(){
@@ -556,12 +575,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 return;
             }
             if(seasonRuntime.currentSeason==0){
-                SeasonCredentialConfiguration.Season startSeason = seasons.get(1L);
-                seasonRuntime.sequence = 1;
-                seasonRuntime.currentSeason = startSeason.seasonId;
-                seasonRuntime.endTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(runtimeConfiguration.seasonRunningTime.get()).plusSeconds(seasonTimeGap));
-                dataStore.update(seasonRuntime);
-                logger.warn("Initializing season from ["+seasonRuntime.currentSeason+" : "+seasonRuntime.sequence+"]");
+                initialSeason(seasonRuntime);
             }
             scheduleStore.mapSet(lockKey,seasonRuntime.toBinary());
             startSeason(seasonRuntime);
@@ -658,7 +672,9 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             seasonPlayerIndex.ownerKey(SnowflakeKey.from(seasonPlayerIndex.seasonId));
             localSeasonPlayerStore.createIfAbsent(seasonPlayerIndex,true);
             seasonPlayerIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
+            seasonPlayerIndex.seasonId = season.distributionId();
             localSeasonPlayerStore.update(seasonPlayerIndex);
+            logger.warn(seasonPlayerIndex.seasonId+" ; "+seasonPlayerIndex.playerId);
             championLeaderBoard.onBoard(gameEndEvent.offensePlayerId,gameEndEvent.offenseEloLevel);
             return;
         }
@@ -750,6 +766,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         league.placementReward = placementReward;
         league.leagueReward = leagueReward;
         leagueConfigs.put(a.distributionId(),league);
+        logger.warn("League ["+league.name()+"] installed from ["+league.startPoint()+"-"+league.endPoint()+"]");
         for(int i=league.startPoint();i<=league.endPoint();i++){
             leagues.put(i,league);
         }
@@ -847,6 +864,10 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 }
                 return true;
             });
+            ArrayList<SeasonPlayerIndex> drains = new ArrayList<>();
+            pending.drainTo(drains);
+            serviceContext.schedule(new ScheduleRunner(10,new PlacementScheduler(drains,this,this.platformGameServiceProvider.presenceServiceProvider())));
+            pending.clear();
         }catch (Exception ex){
             logger.error("Unexpected error",ex);
         }
@@ -860,27 +881,43 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     //Analytics callback hook
     private void onMatchmakingAnalytic(long playerId, int currencyType){
-        sendAnalytic(new PVPOpponentsRefreshAnalytic(playerId, currencyType).toBytes());
+        try {
+            sendAnalytic(new PVPOpponentsRefreshAnalytic(playerId, currencyType).toBytes());
+        }catch (Exception ex){
+            logger.error("on analytics",ex);
+        }
     }
     private void onSaveDefenseAnalytic(BattleTeam defenseTeam){
-        sendAnalytic(new DefenseFormationSavedAnalytic(defenseTeam).toBytes());
+        try {
+            sendAnalytic(new DefenseFormationSavedAnalytic(defenseTeam).toBytes());
+        }catch (Exception ex){
+            logger.error("on analytics",ex);
+        }
     }
 
     private void onSeasonChangeAnalytic(SeasonCredentialConfiguration.Season oldSeason, SeasonCredentialConfiguration.Season newSeason){
-        sendAnalytic(new PVPSeasonChangeAnalytic(oldSeason, newSeason).toBytes());
+        try {
+            sendAnalytic(new PVPSeasonChangeAnalytic(oldSeason, newSeason).toBytes());
+        }catch (Exception ex){
+            logger.error("on analytics",ex);
+        }
     }
 
     private void onRatingChangeAnalytics(long playerId, int eloDelta, int eloUpdated, long battleId, boolean attacking){
-        int oldELO = eloUpdated + eloDelta;
+        try {
+            int oldELO = eloUpdated + eloDelta;
 
-        String oldLeague = leagues.get(oldELO).name();
-        String currentLeague = leagues.get(eloUpdated).name();
+            String oldLeague = leagues.get(oldELO).name();
+            String currentLeague = leagues.get(eloUpdated).name();
 
-        if(!oldLeague.equals(currentLeague)){
-            sendAnalytic(new PVPLeagueChangeAnalytic(playerId, oldLeague, currentLeague, eloUpdated, battleId).toBytes());
+            if (!oldLeague.equals(currentLeague)) {
+                sendAnalytic(new PVPLeagueChangeAnalytic(playerId, oldLeague, currentLeague, eloUpdated, battleId).toBytes());
+            }
+
+            sendAnalytic(new PVPRatingChangeAnalytic(playerId, eloDelta, eloUpdated, currentLeague, battleId, attacking).toBytes());
+        }catch (Exception ex){
+            logger.error("on analytics",ex);
         }
-
-        sendAnalytic(new PVPRatingChangeAnalytic(playerId, eloDelta, eloUpdated, currentLeague, battleId, attacking).toBytes());
     }
 
     private void sendAnalytic(byte [] content){
