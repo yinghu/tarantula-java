@@ -217,7 +217,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 BattleLogIndex battleLogIndex = new BattleLogIndex();
                 battleLogIndex.playerId = session.distributionId();
                 battleLogIndex.defenseTeamId = defenseTeamIndex.teamId();
-                if(battleHistory.load(battleLogIndex)) {
+                if(battleHistory.load(battleLogIndex) && battleLogIndex.timestamp() == matchMakingIndex.timestamp()) {
                     defenseTeam.battled = true;
                     defenseTeam.battlePoint = battleLogIndex.offenseEloGain;
                 }
@@ -238,7 +238,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         });
         if(matches.size()==0) voidMatchMakingTimer(session); //always allow client to retry mm-list to find matches
         if(matches.size()< matchMakingListSize && attackerRating.level() < runtimeConfiguration.botFillEloThreshold.get()){
-            fillBots(session,attackersDefenseTeam,matches);
+            fillBots(session,attackersDefenseTeam,matches, matchMakingIndex);
         }
         MatchMaking matchMaking = MatchMaking.success(teamFormationIndex.timestamp(),matches);
         PlayerRewardIndex playerRewardIndex = playerRewardIndex(session.distributionId());
@@ -443,6 +443,12 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         battleLog.offenseEloGain = battleEndResult.offenseEloLevelDelta;
         battleLog.defenseElo = battleEndResult.defenseEloLevelUpdated;
         battleLog.offenseElo = battleEndResult.offenseEloLevelUpdated;
+        if(offense){
+            MatchMakingIndex matchMakingIndex = new MatchMakingIndex();
+            matchMakingIndex.distributionId(battleEndResult.offensePlayerId);
+            localMatchMakingStore.createIfAbsent(matchMakingIndex,true);
+            battleLog.timestamp(matchMakingIndex.timestamp());
+        }
         battleHistory.update(battleLog); //overriding previous if same defense team
 
         PlayerBattleLogIndex playerLogIndex = new PlayerBattleLogIndex();
@@ -798,7 +804,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         return profile;
     }
 
-    private void fillBots(Session session,BattleTeam offenseTeam,List<BattleTeam> pending){
+    private void fillBots(Session session,BattleTeam offenseTeam,List<BattleTeam> pending, MatchMakingIndex matchMakingIndex){
         int fill = matchMakingListSize - pending.size();
         int sz = bots.size();
         int[] rlist = rng.onNextList(sz,10); //can increase number of rng to reduce duplicate
@@ -806,7 +812,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         for(int x : rlist){
             if(!marked.containsKey(x)){
                 BattleTeam bot = bots.get(x);
-                setupBotBattleTeam(session,offenseTeam,bot);
+                setupBotBattleTeam(session,offenseTeam,bot, matchMakingIndex);
                 pending.add(bots.get(x));
                 marked.put(x,x);
                 fill--;
@@ -818,20 +824,20 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             for(int i=0;i<fill;i++){
                 int ix = rng.onNext(sz);
                 BattleTeam bot = bots.get(ix);
-                setupBotBattleTeam(session,offenseTeam,bot);
+                setupBotBattleTeam(session,offenseTeam,bot,matchMakingIndex);
                 pending.add(bot);
             }
         }
     }
 
-    private void setupBotBattleTeam(Session session,BattleTeam offenseTeam,BattleTeam defenseTeam){
+    private void setupBotBattleTeam(Session session,BattleTeam offenseTeam,BattleTeam defenseTeam, MatchMakingIndex matchMakingIndex){
         Rating attackerRating = this.platformGameServiceProvider.presenceServiceProvider().rating(session);
         Rating defenderRating = this.platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(defenseTeam.playerId));
         defenseTeam.elo = defenderRating.level();
         BattleLogIndex battleLogIndex = new BattleLogIndex();
         battleLogIndex.playerId = session.distributionId();
         battleLogIndex.defenseTeamId = defenseTeam.distributionId();
-        if(battleHistory.load(battleLogIndex)) {
+        if(battleHistory.load(battleLogIndex) && battleLogIndex.timestamp() == matchMakingIndex.timestamp()) {
             defenseTeam.battled = true;
             defenseTeam.battlePoint = battleLogIndex.offenseEloGain;
         }

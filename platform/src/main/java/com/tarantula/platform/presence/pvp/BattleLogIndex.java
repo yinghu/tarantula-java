@@ -16,7 +16,6 @@ public class BattleLogIndex extends RecoverableObject {
     public int defenseElo; //the elo at end of battle
     public int offenseElo;
 
-
     @Override
     public int getFactoryId() {
         return PresencePortableRegistry.OID;
@@ -34,6 +33,7 @@ public class BattleLogIndex extends RecoverableObject {
         buffer.writeInt(defenseEloGain);
         buffer.writeInt(defenseElo);
         buffer.writeInt(offenseElo);
+        buffer.writeLong(timestamp);
         return true;
     }
 
@@ -46,6 +46,7 @@ public class BattleLogIndex extends RecoverableObject {
         defenseElo = buffer.readInt();
         try {
             offenseElo = buffer.readInt();
+            timestamp = buffer.readLong();
         }catch (Exception ignored){}
         return true;
     }
