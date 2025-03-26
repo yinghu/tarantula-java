@@ -884,14 +884,14 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         try {
             sendAnalytic(new PVPOpponentsRefreshAnalytic(playerId, currencyType).toBytes());
         }catch (Exception ex){
-
+            logger.error("on analytics",ex);
         }
     }
     private void onSaveDefenseAnalytic(BattleTeam defenseTeam){
         try {
             sendAnalytic(new DefenseFormationSavedAnalytic(defenseTeam).toBytes());
         }catch (Exception ex){
-
+            logger.error("on analytics",ex);
         }
     }
 
@@ -899,7 +899,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         try {
             sendAnalytic(new PVPSeasonChangeAnalytic(oldSeason, newSeason).toBytes());
         }catch (Exception ex){
-
+            logger.error("on analytics",ex);
         }
     }
 
@@ -916,7 +916,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
             sendAnalytic(new PVPRatingChangeAnalytic(playerId, eloDelta, eloUpdated, currentLeague, battleId, attacking).toBytes());
         }catch (Exception ex){
-
+            logger.error("on analytics",ex);
         }
     }
 
