@@ -2,15 +2,12 @@
   "description": "sample template",
   "revision": 1,
   "enabled": true,
-  "option": null,
   "header": {
     "scope": "shop",
     "type": "Shop",
     "editor": "ConfigurationEditor",
     "version": "1.0",
-    "rechargeable": false,
-    "list": [1,2,3],
-    "objects": [{"a":"av","t": [10,30],"o": {"x":11,"y": 21}},{"b": "bv","t": [50,70],"o": {"x":7,"y": 8}}]
+    "rechargeable": true
   },
   "application": {
     "properties": [
@@ -18,6 +15,13 @@
         "name": "Name",
         "type": "string",
         "reference": "String",
+        "nullable": false,
+        "downloadable": false
+      },
+      {
+        "name": "Score",
+        "type": "number",
+        "reference": "Integer",
         "nullable": false,
         "downloadable": false
       },
