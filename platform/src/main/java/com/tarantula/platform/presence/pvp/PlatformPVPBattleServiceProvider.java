@@ -38,7 +38,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private static final long CURRENT_SEASON_INDEX = 0;
     public static final String NAME = "pvp_battle";
 
-    private int seasonTimeGap = 10*60; //10 minutes buffer per season to end
+    private int seasonTimeGap = 1*60; //10 minutes buffer per season to end
     private int championsLeaderBoardThreshold = 2050;
     private int championsLeaderBoardSize = 100;
     private int matchEloDifferenceThreshold = 1000;
@@ -517,7 +517,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             if(scheduleStore.mapRemove(lockKey)==null){
                 logger.warn("Season end processing on other nodes");
             }else{
-                logger.warn("Processing season end ["+rotation.sequence+"]["+rotation.currentSeason+"]");
+                logger.warn("Processing season end ["+rotation.sequence+"]["+rotation.currentSeason+"]["+ended.seasonId+"]");
                 //do end first
                 placementReward(ended.seasonId);
                 leagueReward(ended.seasonId);

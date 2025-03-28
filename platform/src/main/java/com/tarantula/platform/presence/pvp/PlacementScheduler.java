@@ -1,6 +1,8 @@
 package com.tarantula.platform.presence.pvp;
 
 import com.icodesoftware.Rating;
+import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.logging.JDKLogger;
 import com.tarantula.game.SimpleStub;
 import com.tarantula.platform.presence.PlatformPresenceServiceProvider;
 
@@ -8,7 +10,7 @@ import java.util.List;
 
 
 public class PlacementScheduler implements Runnable{
-
+    private static final TarantulaLogger logger = JDKLogger.getLogger(PlacementScheduler.class);
     private final List<SeasonPlayerIndex> pending;
     private final PlatformPVPBattleServiceProvider pvpBattleServiceProvider;
     private final PlatformPresenceServiceProvider presenceServiceProvider;
@@ -28,9 +30,12 @@ public class PlacementScheduler implements Runnable{
                     PlayerRewardIndex playerRewardIndex = pvpBattleServiceProvider.playerRewardIndex(seasonPlayerIndex.playerId);
                     playerRewardIndex.placementRewardId = league.placementReward.distributionId();
                     playerRewardIndex.update();
+                }else{
+                    logger.warn("No league linked with ["+rating.level()+"] for placement");
                 }
             }catch (Exception ex){
                 //continue if error on single player
+                logger.warn("Error on placement ["+seasonPlayerIndex.playerId+" : "+seasonPlayerIndex.seasonId+"]");
             }
         });
     }
