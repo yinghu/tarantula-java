@@ -6,7 +6,7 @@ public class RuntimeConfiguration {
 
     public AtomicInteger teamCreationWaitingTime = new AtomicInteger(60); // 60 seconds
 
-    public AtomicInteger seasonRunningTime = new AtomicInteger(5*60); // 30 minutes
+    public AtomicInteger seasonRunningTime = new AtomicInteger(30*60); // 30 minutes
 
     public AtomicInteger reMatchWaitingTime = new AtomicInteger(5*60); //5 minutes
 

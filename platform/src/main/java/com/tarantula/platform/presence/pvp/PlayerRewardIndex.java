@@ -5,34 +5,31 @@ import com.tarantula.platform.AssociateKey;
 import com.tarantula.platform.presence.PresencePortableRegistry;
 
 public class PlayerRewardIndex extends RecoverableObject {
-    public static final String LABEL = "reward_index";
+    public static final String POST_BATTLE = "reward_post_battle";
+    public static final String PLACEMENT = "reward_placement";
+    public static final String LEAGUE = "reward_league";
 
-    public long postBattleRewardId;
-    public long placementRewardId;
-    public long leagueRewardId;
-
+    public long rewardId;
     public PlayerRewardIndex(){
-        this.label = LABEL;
+
     }
 
-    public PlayerRewardIndex(long playerId) {
+    public PlayerRewardIndex(long playerId,String label) {
         this();
         this.distributionId = playerId;
+        this.label = label;
     }
 
     @Override
     public boolean write(DataBuffer buffer) {
-        buffer.writeLong(postBattleRewardId);
-        buffer.writeLong(placementRewardId);
-        buffer.writeLong(leagueRewardId);
+        buffer.writeLong(rewardId);
         return true;
     }
 
     @Override
     public boolean read(DataBuffer buffer) {
-        postBattleRewardId = buffer.readLong();
-        placementRewardId  = buffer.readLong();
-        leagueRewardId = buffer.readLong();
+        rewardId = buffer.readLong();
+
         return true;
     }
 

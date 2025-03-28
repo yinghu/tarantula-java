@@ -27,9 +27,8 @@ public class PlacementScheduler implements Runnable{
                 Rating rating = presenceServiceProvider.rating(new SimpleStub(seasonPlayerIndex.playerId));
                 League league = pvpBattleServiceProvider.leagues.get(rating.level());
                 if(league!=null){
-                    PlayerRewardIndex playerRewardIndex = pvpBattleServiceProvider.playerRewardIndex(seasonPlayerIndex.playerId);
-                    playerRewardIndex.placementRewardId = league.placementReward.distributionId();
-                    playerRewardIndex.update();
+                    //logger.warn("Placement ["+seasonPlayerIndex.playerId+" : "+seasonPlayerIndex.seasonId+"]");
+                    pvpBattleServiceProvider.placementReward(seasonPlayerIndex.playerId,league.placementReward.distributionId());
                 }else{
                     logger.warn("No league linked with ["+rating.level()+"] for placement");
                 }

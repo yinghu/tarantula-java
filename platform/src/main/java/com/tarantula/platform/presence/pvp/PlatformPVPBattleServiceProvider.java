@@ -38,7 +38,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private static final long CURRENT_SEASON_INDEX = 0;
     public static final String NAME = "pvp_battle";
 
-    private int seasonTimeGap = 1*60; //10 minutes buffer per season to end
+    private int seasonTimeGap = 10*60; //10 minutes buffer per season to end
     private int championsLeaderBoardThreshold = 2050;
     private int championsLeaderBoardSize = 100;
     private int matchEloDifferenceThreshold = 1000;
@@ -241,8 +241,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             fillBots(session,attackersDefenseTeam,matches, matchMakingIndex);
         }
         MatchMaking matchMaking = MatchMaking.success(teamFormationIndex.timestamp(),matches);
-        PlayerRewardIndex playerRewardIndex = playerRewardIndex(session.distributionId());
-        Application postReward = rewardIndex.get(playerRewardIndex.postBattleRewardId);
+        PlayerRewardIndex post = playerRewardIndex(session.distributionId(),PlayerRewardIndex.POST_BATTLE);
+        Application postReward = rewardIndex.get(post.rewardId);
         if(postReward==null) return matchMaking;
         matchMaking.postBattleReward = postReward;
         return matchMaking;
@@ -299,29 +299,43 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
     public RewardList rewardList(Session session){
         RewardList rewardList = new RewardList();
-        PlayerRewardIndex playerRewardIndex = playerRewardIndex(session.distributionId());
-        if(playerRewardIndex.placementRewardId > 0){
-            rewardList.placementReward = rewardIndex.get(playerRewardIndex.placementRewardId);
+        PlayerRewardIndex placement = playerRewardIndex(session.distributionId(),PlayerRewardIndex.PLACEMENT);
+        if(placement.rewardId > 0){
+            rewardList.placementReward = rewardIndex.get(placement.rewardId);
         }
-        if(playerRewardIndex.leagueRewardId > 0){
-            rewardList.leagueReward = rewardIndex.get(playerRewardIndex.leagueRewardId);
+        PlayerRewardIndex league = playerRewardIndex(session.distributionId(),PlayerRewardIndex.LEAGUE);
+        if(league.rewardId > 0){
+            rewardList.leagueReward = rewardIndex.get(league.rewardId);
         }
         return  rewardList;
     }
 
     public void rewardGranted(Session session){
-        long rewardId = Long.parseLong(session.name());
-        PlayerRewardIndex playerRewardIndex = playerRewardIndex(session.distributionId());
-        if(playerRewardIndex.postBattleRewardId == rewardId){
-            playerRewardIndex.postBattleRewardId = 0;
+        long rewardId;
+        try{
+            rewardId = Long.parseLong(session.name());
+        }catch (Exception ex){
+            return;
         }
-        if(playerRewardIndex.placementRewardId == rewardId){
-            playerRewardIndex.placementRewardId = 0;
+        PlayerRewardIndex post = playerRewardIndex(session.distributionId(),PlayerRewardIndex.POST_BATTLE);
+        if(post.rewardId == rewardId){
+            post.rewardId = 0;
+            post.update();
+            return;
         }
-        if(playerRewardIndex.leagueRewardId == rewardId){
-            playerRewardIndex.leagueRewardId = 0;
+        PlayerRewardIndex placement = playerRewardIndex(session.distributionId(),PlayerRewardIndex.PLACEMENT);
+        if(placement.rewardId == rewardId){
+            placement.rewardId = 0;
+            placement.update();
+            return;
         }
-        playerRewardIndex.update();
+        PlayerRewardIndex league = playerRewardIndex(session.distributionId(),PlayerRewardIndex.LEAGUE);
+        if(league.rewardId == rewardId){
+            league.rewardId = 0;
+            league.update();
+        }
+
+
     }
 
     private BattleTeam assembly(long teamId){
@@ -395,13 +409,9 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         GameRating gameRating = platformGameServiceProvider.presenceServiceProvider().rating(new SimpleStub(playerID));
         gameRating.level(newELO);
         gameRating.update();
-
-        PlayerRewardIndex playerRewardIndex = playerRewardIndex(playerID);
         League league = leagues.get(newELO);
-        if(league!=null){
-            playerRewardIndex.postBattleRewardId = league.postBattleReward.distributionId();
-            playerRewardIndex.update();
-        }
+        if(league==null) return;
+        this.postBattleReward(playerID,league.postBattleReward.distributionId());
     }
 
     public void onBattleEnd(BattleEndResult battleEndResult){
@@ -417,11 +427,10 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
 
         this.serviceContext.eventService().publish(gameEndEvent);
         if(battleEndResult.offenseEloLevelDelta>0){
-            PlayerRewardIndex playerRewardIndex = playerRewardIndex(battleEndResult.offensePlayerId);
+
             League league = leagues.get(battleEndResult.offenseEloLevelUpdated);
             if(league!=null){
-                playerRewardIndex.postBattleRewardId = league.postBattleReward.distributionId();
-                playerRewardIndex.update();
+                postBattleReward(battleEndResult.offensePlayerId,league.postBattleReward.distributionId());
             }
         }
         updateBattleLogIndex(battleEndResult,true);
@@ -680,7 +689,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             seasonPlayerIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
             seasonPlayerIndex.seasonId = season.distributionId();
             localSeasonPlayerStore.update(seasonPlayerIndex);
-            logger.warn(seasonPlayerIndex.seasonId+" ; "+seasonPlayerIndex.playerId);
+            //logger.warn(seasonPlayerIndex.seasonId+" ; "+seasonPlayerIndex.playerId);
             championLeaderBoard.onBoard(gameEndEvent.offensePlayerId,gameEndEvent.offenseEloLevel);
             return;
         }
@@ -778,8 +787,8 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         }
     }
 
-    public PlayerRewardIndex playerRewardIndex(long playerId){
-        PlayerRewardIndex playerRewardIndex = new PlayerRewardIndex(playerId);
+    public PlayerRewardIndex playerRewardIndex(long playerId,String label){
+        PlayerRewardIndex playerRewardIndex = new PlayerRewardIndex(playerId,label);
         playerRewardIndex.dataStore(playerRewardStore);
         playerRewardStore.createIfAbsent(playerRewardIndex,true);
         return playerRewardIndex;
@@ -879,10 +888,30 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         }
     }
 
+
+
+    void postBattleReward(long playerId,long postBattleRewardId){
+        PlayerRewardIndex playerRewardIndex = playerRewardIndex(playerId,PlayerRewardIndex.POST_BATTLE);
+        playerRewardIndex.rewardId = postBattleRewardId;
+        playerRewardIndex.update();
+    }
+
+    void leagueReward(long playerId,long leagueRewardId){
+        PlayerRewardIndex playerRewardIndex = playerRewardIndex(playerId,PlayerRewardIndex.LEAGUE);
+        playerRewardIndex.rewardId = leagueRewardId;
+        playerRewardIndex.update();
+    }
+
+    void placementReward(long playerId,long placementRewardId){
+        PlayerRewardIndex playerRewardIndex = playerRewardIndex(playerId,PlayerRewardIndex.PLACEMENT);
+        playerRewardIndex.rewardId = placementRewardId;
+        playerRewardIndex.update();
+    }
+
     private void leagueReward(long seasonId) {
         logger.warn("Season league reward granting [" + seasonId + "]");
         ChampionLeaderBoard ldb = championLeaderBoard();
-        serviceContext.schedule(new ScheduleRunner(10,new LeagueRewardScheduler(ldb.leaderBoard(),this,platformGameServiceProvider.presenceServiceProvider())));
+        serviceContext.schedule(new ScheduleRunner(10,new LeagueRewardScheduler(ldb.leaderBoard(),this)));
     }
 
     //Analytics callback hook
