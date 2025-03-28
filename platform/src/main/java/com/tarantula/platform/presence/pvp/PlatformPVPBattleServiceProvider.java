@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvider implements Configurable.Listener<SeasonCredentialConfiguration>{
 
     //NEVER PUSH TO REMOTE WITH TRUE
-    private static final boolean DO_NOT_USE_DEV_CONFIG = false;
+    private static final boolean DO_NOT_USE_DEV_CONFIG = true;
     private static final boolean COOL_DOWN_ENABLED = true;
     private static final boolean FORCE_BOT_CREATE = true;
     private static final long CURRENT_SEASON_INDEX = 0;
