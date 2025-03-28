@@ -35,6 +35,8 @@ public interface OnAccess extends OnApplication, DataStore.Updatable {
 
     String POST_OFFICE = "postOffice";
 
+    String SEASON = "season";
+
     String LOGIN = "login";
     String DEVICE_ID = "deviceId";
 

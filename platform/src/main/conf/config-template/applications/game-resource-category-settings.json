@@ -32,6 +32,191 @@
           }
         ]
       }
+    },
+    {
+      "category": {
+        "header": {
+          "scope": "application.resource",
+          "type": "PostBattleReward",
+          "description": "pvp reward",
+          "version": "1.0",
+          "rechargeable": false,
+          "constrained": false
+        },
+        "application": {
+          "properties": [
+            {
+              "name": "MinXPChipVariableRewardCount",
+              "type": "number",
+              "reference": "Integer",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "MaxXPChipVariableRewardCount",
+              "type": "number",
+              "reference": "Integer",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "HardCurrencyPerWin",
+              "type": "category",
+              "reference": "category:HardCurrency",
+              "nullable": false,
+              "downloadable": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "category": {
+        "header": {
+          "scope": "application.resource",
+          "type": "PlacementReward",
+          "description": "pvp league",
+          "version": "1.0",
+          "rechargeable": false,
+          "constrained": false
+        },
+        "application": {
+          "properties": [
+            {
+              "name": "HardCurrency",
+              "type": "category",
+              "reference": "category:HardCurrency",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "XPChipList",
+              "type": "list",
+              "reference": "category:Sku.Potion",
+              "nullable": false,
+              "downloadable": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "category": {
+        "header": {
+          "scope": "application.resource",
+          "type": "LeagueRewardItem",
+          "description": "pvp league",
+          "version": "1.0",
+          "rechargeable": false,
+          "constrained": false
+        },
+        "application": {
+          "properties": [
+            {
+              "name": "MinRank",
+              "type": "number",
+              "reference": "Integer",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "MaxRank",
+              "type": "number",
+              "reference": "Integer",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "RewardPack",
+              "type": "category",
+              "reference": "category:ItemPack",
+              "nullable": false,
+              "downloadable": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "category": {
+        "header": {
+          "scope": "application.resource",
+          "type": "LeagueReward",
+          "description": "pvp league",
+          "version": "1.0",
+          "rechargeable": false,
+          "constrained": false
+        },
+        "application": {
+          "properties": [
+            {
+              "name": "Rewards",
+              "type": "list",
+              "reference": "category:LeageRewardItem",
+              "nullable": false,
+              "downloadable": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "category": {
+        "header": {
+          "scope": "application.resource",
+          "type": "League",
+          "description": "pvp league",
+          "version": "1.0",
+          "rechargeable": false,
+          "constrained": false
+        },
+        "application": {
+          "properties": [
+            {
+              "name": "Name",
+              "type": "string",
+              "reference": "String",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "StartPoint",
+              "type": "number",
+              "reference": "Integer",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "EndPoint",
+              "type": "number",
+              "reference": "Integer",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "PostBattleReward",
+              "type": "category",
+              "reference": "category:PostBattleReward",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "PlacementReward",
+              "type": "category",
+              "reference": "category:PlacementReward",
+              "nullable": false,
+              "downloadable": false
+            },
+            {
+              "name": "LeagueReward",
+              "type": "category",
+              "reference": "category:LeagueReward",
+              "nullable": false,
+              "downloadable": false
+            }
+          ]
+        }
+      }
     }
   ]
 }

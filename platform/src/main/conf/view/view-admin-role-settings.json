@@ -25,6 +25,7 @@
     {"type":"create.global.item.grant.event","moduleResourceFile":"admin/create.global.item.grant.event.html"},
     {"type":"player.data.delete","moduleResourceFile":"admin/player.data.delete.view.html"},
     {"type":"ban.player","moduleResourceFile":"admin/ban.player.view.html"},
-    {"type":"get.player","moduleResourceFile":"admin/player.data.get.view.html"}
+    {"type":"get.player","moduleResourceFile":"admin/player.data.get.view.html"},
+    {"type":"set.elo","moduleResourceFile":"admin/set.elo.view.html"}
   ]
 }

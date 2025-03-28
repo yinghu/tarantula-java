@@ -656,7 +656,10 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
         return distributionTournamentService.onScoreTournament(tournamentServiceProvider.gameServiceName,this.distributionId,instanceId,session.distributionId(),entry.credit(),entry.score());
     }
     public RaceBoard raceBoard(TournamentJoin session){
-        if(session.instanceId==0) return new TournamentRaceBoard();
+        if(session.instanceId==0){
+            tournamentServiceProvider.logger.warn("TMT instance id attached on ["+session.stub()+"]");
+            return new TournamentRaceBoard();
+        }
         if(tournamentServiceProvider.localOperationEnabled){
             Tournament.RaceBoard localBoard = onRaceBoard(session.instanceId);
             localBoard.distributionId(session.instanceId);
@@ -669,7 +672,10 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
 
     public RaceBoard myRaceBoard(TournamentJoin session){
-        if(session.instanceId==0) return new TournamentRaceBoard();
+        if(session.instanceId==0){
+            tournamentServiceProvider.logger.warn("TMT instance id attached on my board ["+session.stub()+"]");
+            return new TournamentRaceBoard();
+        }
         if(tournamentServiceProvider.localOperationEnabled) {
             Tournament.RaceBoard localBoard = onMyRaceBoard(session.instanceId,session.entryId,session.stub());
             localBoard.distributionId(session.instanceId);
@@ -721,7 +727,10 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     public RaceBoard onRaceBoard(long instanceId){
         if(global){
             TournamentSegment segment = lookupSegmentInstance(instanceId);
-            if(segment==null) return new TournamentRaceBoard();
+            if(segment==null){
+                tournamentServiceProvider.logger.warn("TMT no segment attached");
+                return new TournamentRaceBoard();
+            }
             return segment.topList();
         }
         TournamentInstance instance = load(instanceId);
@@ -732,11 +741,17 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     public RaceBoard onMyRaceBoard(long instanceId,long entryId,long systemId){
         if(global){
             TournamentSegment segment = lookupSegmentInstance(instanceId);
-            if(segment==null) return new TournamentRaceBoard();
+            if(segment==null){
+                tournamentServiceProvider.logger.warn("TMT no segment attached on my board ["+systemId+"]");
+                return new TournamentRaceBoard();
+            }
             TournamentRaceBoard myRaceBoard = segment.myRaceBoard(systemId, entryId);
             TournamentEntry livePlayerEntry = new TournamentEntry();
             livePlayerEntry.distributionId(entryId);
-            if(!segment.tournamentInstance.entryDataStore.load(livePlayerEntry) || livePlayerEntry.systemId()!= systemId) return myRaceBoard;
+            if(!segment.tournamentInstance.entryDataStore.load(livePlayerEntry) || livePlayerEntry.systemId()!= systemId){
+                tournamentServiceProvider.logger.warn("TMT no entry attached on ["+systemId+"]");
+                return myRaceBoard;
+            }
             myRaceBoard.livePlayerEntry = livePlayerEntry;
 
             return myRaceBoard;

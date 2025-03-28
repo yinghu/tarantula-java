@@ -15,6 +15,7 @@ import com.icodesoftware.util.SnowflakeKey;
 import com.icodesoftware.util.TimeUtil;
 
 import com.perfectday.games.earth8.inbox.ItemGrantEventQuery;
+import com.tarantula.game.GameRating;
 import com.tarantula.game.SimpleStub;
 import com.tarantula.game.service.PlatformGameServiceProvider;
 import com.tarantula.platform.*;
@@ -340,6 +341,20 @@ public class AdminRoleModule implements Module{
 
             //Return Message To Web UI
             session.write(response.toString().getBytes());
+        }
+        else if(session.action().equals("onSetELO")){
+            //Parse Data From UI
+            OnAccess onAccess = this.builder.create().fromJson(new String(payload),OnAccess.class);
+            String playerID = (String)onAccess.property("playerID");
+            String elo = (String)onAccess.property("eloValue");
+            long playerIdSnowflake = Long.parseLong(playerID);
+            int eloValue = Integer.parseInt(elo);
+
+            GameCluster gameCluster = this.deploymentServiceProvider.gameCluster(Long.parseLong(session.name()));
+            gameCluster.platformGameServiceProvider().pvpBattleServiceProvider().setELO(playerIdSnowflake, eloValue);
+
+            //Return Message To Web UI
+            session.write(JsonUtil.toSimpleResponse(true, "Player ELO Now Set To " + elo).getBytes());
         }
         else{
             session.write(this.builder.create().toJson(new ResponseHeader("onError", session.action()+" operation not supported", false)).getBytes());

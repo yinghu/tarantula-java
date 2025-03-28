@@ -16,6 +16,10 @@ public class BattleTransaction extends RecoverableObject {
 
     public String TEMP_BattleStage;
 
+    public long seasonId;
+    public long opponentId;
+    public long teamId; //the player's team id on battle start
+
     //Data store write contract
     @Override
     public boolean write(DataBuffer buffer) {
@@ -27,8 +31,15 @@ public class BattleTransaction extends RecoverableObject {
         }
         buffer.writeBoolean(win);
         buffer.writeBoolean(disabled);
-
         buffer.writeUTF8(TEMP_BattleStage);
+        try{
+            buffer.writeLong(seasonId);
+            buffer.writeLong(opponentId);
+            buffer.writeLong(teamId);
+            buffer.writeLong(timestamp);
+        }catch (Exception ex){
+            //ignore
+        }
         return true;
     }
 
@@ -45,6 +56,14 @@ public class BattleTransaction extends RecoverableObject {
         win = buffer.readBoolean();
         disabled = buffer.readBoolean();
         TEMP_BattleStage = buffer.readUTF8();
+        try{
+            seasonId = buffer.readLong();
+            opponentId = buffer.readLong();
+            teamId = buffer.readLong();
+            timestamp = buffer.readLong();
+        }catch (Exception exception){
+            //ignore
+        }
         return true;
     }
 
@@ -54,6 +73,9 @@ public class BattleTransaction extends RecoverableObject {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("Successful",true);
         jsonObject.addProperty("BattleId",distributionKey());
+        jsonObject.addProperty("SeasonId",seasonId);
+        jsonObject.addProperty("OpponentId",Long.toString(opponentId));
+        jsonObject.addProperty("TeamId",Long.toString(teamId));
         return jsonObject;
     }
 
@@ -73,7 +95,9 @@ public class BattleTransaction extends RecoverableObject {
         self.win = JsonUtil.getJsonBool(json,"Win",false);
         self.chapterId = JsonUtil.getJsonLong(json,"ChapterId",0);
         self.stageId = JsonUtil.getJsonLong(json,"StageId",0);
-
+        self.seasonId = JsonUtil.getJsonLong(json,"SeasonId",0);
+        self.opponentId = JsonUtil.getJsonLong(json,"OpponentId",0);
+        self.teamId = JsonUtil.getJsonLong(json,"TeamId",0);
         JsonArray party = JsonUtil.getJsonArray(json, "Party");
         self.party = new long[party.size()];
         for(int i=0;i<self.party.length;i++){

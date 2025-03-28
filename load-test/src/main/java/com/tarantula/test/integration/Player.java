@@ -1,5 +1,7 @@
 package com.tarantula.test.integration;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Session;
 import com.icodesoftware.protocol.MessageBuffer;
@@ -109,6 +111,20 @@ public class Player implements Runnable{
             loadTournament();
             Thread.sleep(Main.httpRequestInterval);
             onUpdateGame();
+            Thread.sleep(Main.httpRequestInterval);
+            saveDefenseTeam(Main.battleTeamKey);
+            Thread.sleep(Main.httpRequestInterval);
+            saveOffenseTeam(Main.battleTeamKey);
+            Thread.sleep(Main.httpRequestInterval);
+            rating();
+            Thread.sleep(Main.httpRequestInterval);
+            paidMatchMaking();
+            Thread.sleep(Main.httpRequestInterval);
+            seasonInfo();
+            Thread.sleep(Main.httpRequestInterval);
+            currentDefenseTeam();
+            Thread.sleep(Main.httpRequestInterval);
+            leagueList();
             Thread.sleep(Main.httpRequestInterval);
             headers = new String[]{
                     Session.TARANTULA_TAG,game+"/lobby",
@@ -438,6 +454,162 @@ public class Player implements Runnable{
         if(!suc) {
             result.totalFailure.incrementAndGet();
             //throw new RuntimeException(resp);
+        }else{
+            result.totalSuccess.incrementAndGet();
+        }
+    }
+
+    private void rating() throws Exception{
+        String[] headers = new String[]{
+                Session.TARANTULA_TAG,game+"/save",
+                Session.TARANTULA_ACTION,"onRating",
+                Session.TARANTULA_TOKEN,token,
+        };
+        long requestStart = System.currentTimeMillis();
+        String resp = httpCaller.get("service/action", headers);
+        long delta = System.currentTimeMillis()-requestStart;
+        LoadResult.totalHttpRequestTime.addAndGet(delta);
+        LoadResult.totalHttpRequestCount.incrementAndGet();
+        RequestResult result = LoadResult.requestResult("onRating");
+        result.totalTimed.addAndGet(delta);
+        JsonObject json = JsonUtil.parse(resp);
+        long playerId = json.get("PlayerId").getAsLong();
+        if(playerId > 0) {
+            result.totalSuccess.incrementAndGet();
+        }else{
+            result.totalFailure.incrementAndGet();
+        }
+    }
+
+    private void seasonInfo() throws Exception{
+        String[] headers = new String[]{
+                Session.TARANTULA_TAG,game+"/save",
+                Session.TARANTULA_ACTION,"onSeasonInfo",
+                Session.TARANTULA_TOKEN,token,
+        };
+        long requestStart = System.currentTimeMillis();
+        String resp = httpCaller.get("service/action", headers);
+        long delta = System.currentTimeMillis()-requestStart;
+        LoadResult.totalHttpRequestTime.addAndGet(delta);
+        LoadResult.totalHttpRequestCount.incrementAndGet();
+        RequestResult result = LoadResult.requestResult("onSeasonInfo");
+        result.totalTimed.addAndGet(delta);
+        JsonObject json = JsonUtil.parse(resp);
+        boolean suc = json.get("Successful").getAsBoolean();
+        if(!suc) {
+            result.totalFailure.incrementAndGet();
+        }else{
+            result.totalSuccess.incrementAndGet();
+        }
+    }
+
+    private void paidMatchMaking() throws Exception{
+        String[] headers = new String[]{
+                Session.TARANTULA_TAG,game+"/save",
+                Session.TARANTULA_ACTION,"onPaidMatchMaking",
+                Session.TARANTULA_TOKEN,token,
+                Session.TARANTULA_NAME,"1",
+        };
+        long requestStart = System.currentTimeMillis();
+        String resp = httpCaller.get("service/action", headers);
+        long delta = System.currentTimeMillis()-requestStart;
+        LoadResult.totalHttpRequestTime.addAndGet(delta);
+        LoadResult.totalHttpRequestCount.incrementAndGet();
+        RequestResult result = LoadResult.requestResult("onPaidMatchMaking");
+        result.totalTimed.addAndGet(delta);
+        JsonObject json = JsonUtil.parse(resp);
+        boolean suc = json.get("Successful").getAsBoolean();
+        if(!suc) {
+            result.totalFailure.incrementAndGet();
+        }else{
+            result.totalSuccess.incrementAndGet();
+        }
+    }
+
+    private void currentDefenseTeam() throws Exception{
+        String[] headers = new String[]{
+                Session.TARANTULA_TAG,game+"/save",
+                Session.TARANTULA_ACTION,"onCurrentDefenseTeam",
+                Session.TARANTULA_TOKEN,token,
+        };
+        long requestStart = System.currentTimeMillis();
+        String resp = httpCaller.get("service/action", headers);
+        long delta = System.currentTimeMillis()-requestStart;
+        LoadResult.totalHttpRequestTime.addAndGet(delta);
+        LoadResult.totalHttpRequestCount.incrementAndGet();
+        RequestResult result = LoadResult.requestResult("onCurrentDefenseTeam");
+        result.totalTimed.addAndGet(delta);
+        JsonObject json = JsonUtil.parse(resp);
+        if(json.has("Successful")) {
+            result.totalFailure.incrementAndGet();
+        }else{
+            result.totalSuccess.incrementAndGet();
+        }
+    }
+
+    private void leagueList() throws Exception{
+        String[] headers = new String[]{
+                Session.TARANTULA_TAG,game+"/save",
+                Session.TARANTULA_ACTION,"onLeagueList",
+                Session.TARANTULA_TOKEN,token,
+        };
+        long requestStart = System.currentTimeMillis();
+        String resp = httpCaller.get("service/action", headers);
+        long delta = System.currentTimeMillis()-requestStart;
+        LoadResult.totalHttpRequestTime.addAndGet(delta);
+        LoadResult.totalHttpRequestCount.incrementAndGet();
+        RequestResult result = LoadResult.requestResult("onLeagueList");
+        result.totalTimed.addAndGet(delta);
+        JsonObject json = JsonUtil.parse(resp);
+        JsonArray _leagues = json.getAsJsonArray("_leagues");
+        if(_leagues.isEmpty()) {
+            result.totalFailure.incrementAndGet();
+        }else{
+            result.totalSuccess.incrementAndGet();
+        }
+    }
+
+    private void saveDefenseTeam(String key) throws Exception{
+        String[] headers = new String[]{
+                Session.TARANTULA_TAG,game+"/save",
+                Session.TARANTULA_ACTION,"onSaveDefenseTeam",
+                Session.TARANTULA_TOKEN,token,
+        };
+        long requestStart = System.currentTimeMillis();
+        JsonObject payload = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(key+".json"));
+        String resp = httpCaller.post("service/action", payload.toString().getBytes(), headers);
+        long delta = System.currentTimeMillis()-requestStart;
+        LoadResult.totalHttpRequestTime.addAndGet(delta);
+        LoadResult.totalHttpRequestCount.incrementAndGet();
+        RequestResult result = LoadResult.requestResult("onSaveDefenseTeam");
+        result.totalTimed.addAndGet(delta);
+        JsonObject json = JsonUtil.parse(resp);
+        boolean suc = json.get("Successful").getAsBoolean();
+        if(!suc) {
+            result.totalFailure.incrementAndGet();
+        }else{
+            result.totalSuccess.incrementAndGet();
+        }
+    }
+
+    private void saveOffenseTeam(String key) throws Exception{
+        String[] headers = new String[]{
+                Session.TARANTULA_TAG,game+"/save",
+                Session.TARANTULA_ACTION,"onSaveOffenseTeam",
+                Session.TARANTULA_TOKEN,token,
+        };
+        long requestStart = System.currentTimeMillis();
+        JsonObject payload = JsonUtil.parse(Thread.currentThread().getContextClassLoader().getResourceAsStream(key+".json"));
+        String resp = httpCaller.post("service/action", payload.toString().getBytes(), headers);
+        long delta = System.currentTimeMillis()-requestStart;
+        LoadResult.totalHttpRequestTime.addAndGet(delta);
+        LoadResult.totalHttpRequestCount.incrementAndGet();
+        RequestResult result = LoadResult.requestResult("onSaveOffenseTeam");
+        result.totalTimed.addAndGet(delta);
+        JsonObject json = JsonUtil.parse(resp);
+        boolean suc = json.get("Successful").getAsBoolean();
+        if(!suc) {
+            result.totalFailure.incrementAndGet();
         }else{
             result.totalSuccess.incrementAndGet();
         }

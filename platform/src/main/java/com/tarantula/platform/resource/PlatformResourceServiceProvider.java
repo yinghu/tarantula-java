@@ -72,6 +72,10 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
             this.platformGameServiceProvider.storeServiceProvider().onItemRegistered(category,itemId);
             return true;
         }
+        if(configurationObject.configurationCategory().equals("League")){
+            this.platformGameServiceProvider.pvpBattleServiceProvider().onItemRegistered(category,itemId);
+            return true;
+        }
         GameResource gameResource = new GameResource(configurationObject);
         gameResource.configurableSetting(gameCluster.configurableCategories(Configurable.APPLICATION_CONFIG_TYPE));
         gameResource.setup();
@@ -84,6 +88,7 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
         this.platformGameServiceProvider.dailyGiveawayServiceProvider().onItemReleased(category,itemId);
         this.platformGameServiceProvider.achievementServiceProvider().onItemReleased(category,itemId);
         this.platformGameServiceProvider.storeServiceProvider().onItemReleased(category,itemId);
+        this.platformGameServiceProvider.pvpBattleServiceProvider().onItemReleased(category,itemId);
         String[] released = {null};
         gameResourceIndex.forEach((k,v)->{
             if(v.distributionKey().equals(itemId)) released[0] = k;
@@ -112,6 +117,7 @@ public class PlatformResourceServiceProvider extends PlatformItemServiceProvider
         this.platformGameServiceProvider.achievementServiceProvider().registerConfigurableListener(descriptor,listener);
         this.platformGameServiceProvider.dailyGiveawayServiceProvider().registerConfigurableListener(descriptor,listener);
         this.platformGameServiceProvider.storeServiceProvider().registerConfigurableListener(descriptor,listener);
+        this.platformGameServiceProvider.pvpBattleServiceProvider().registerConfigurableListener(descriptor,listener);
         return null;
     }
 
