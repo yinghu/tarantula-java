@@ -536,9 +536,9 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                     seasonRuntime.currentSeason = next.seasonId;
                     seasonRuntime.closeTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(runtimeConfiguration.seasonRunningTime.get()));
                     seasonRuntime.endTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(runtimeConfiguration.seasonRunningTime.get()).plusSeconds(seasonTimeGap));
-                    scheduleStore.mapSet(lockKey,seasonRuntime.toBinary());
+                    //scheduleStore.mapSet(lockKey,seasonRuntime.toBinary());
+                    dataStore.update(seasonRuntime);
                 }
-                dataStore.update(seasonRuntime);
             }
         }catch (Exception ex){
             logger.error("Error on end season",ex);
