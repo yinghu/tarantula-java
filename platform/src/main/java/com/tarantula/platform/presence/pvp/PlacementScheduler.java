@@ -24,18 +24,89 @@ public class PlacementScheduler implements Runnable{
     public void run() {
         pending.forEach(seasonPlayerIndex -> {
             try{
-                Rating rating = presenceServiceProvider.rating(new SimpleStub(seasonPlayerIndex.playerId));
-                League league = pvpBattleServiceProvider.leagues.get(rating.level());
-                if(league!=null){
-                    //logger.warn("Placement ["+seasonPlayerIndex.playerId+" : "+seasonPlayerIndex.seasonId+"]");
-                    pvpBattleServiceProvider.placementReward(seasonPlayerIndex.playerId,league.placementReward.distributionId());
-                }else{
-                    logger.warn("No league linked with ["+rating.level()+"] for placement");
+                if(seasonPlayerIndex.onSeason){
+                    Rating rating = presenceServiceProvider.rating(new SimpleStub(seasonPlayerIndex.playerId));
+                    League league = pvpBattleServiceProvider.leagues.get(rating.level());
+                    if(league!=null){
+                        //logger.warn("Placement ["+seasonPlayerIndex.playerId+" : "+seasonPlayerIndex.seasonId+"]");
+                        pvpBattleServiceProvider.placementReward(seasonPlayerIndex.playerId,league.placementReward.distributionId());
+                        eloReset(rating,league);
+                    }else{
+                        logger.warn("No league linked with ["+rating.level()+"] for placement");
+                    }
                 }
             }catch (Exception ex){
                 //continue if error on single player
                 logger.warn("Error on placement ["+seasonPlayerIndex.playerId+" : "+seasonPlayerIndex.seasonId+"]");
             }
         });
+    }
+
+    private void eloReset(Rating rating,League league){
+        //starter1 starter2 starter3  no change
+        //bronze1 -> 300 bronze2 --> 300  bronze3 --> 350
+        //silver1 --> 400 silver2 --> 500  silver3 -- > 600
+        //gold1 750 gold2 900 gold3 1050
+        //diamond1 1250 diamond2 1450 diamond3 1650
+        if(league.name().startsWith("starter")) return;
+        if(league.name().equals("bronze1")){
+            rating.level(300);
+            rating.update();
+            return;
+        }
+        if(league.name().equals("bronze2")){
+            rating.level(300);
+            rating.update();
+            return;
+        }
+        if(league.name().equals("bronze3")){
+            rating.level(350);
+            rating.update();
+            return;
+        }
+        if(league.name().equals("silver1")){
+            rating.level(400);
+            rating.update();
+            return;
+        }
+        if(league.name().equals("silver2")){
+            rating.level(500);
+            rating.update();
+            return;
+        }
+        if(league.name().equals("silver3")){
+            rating.level(600);
+            rating.update();
+            return;
+        }
+        if(league.name().equals("gold1")){
+            rating.level(750);
+            rating.update();
+            return;
+        }
+        if(league.name().equals("gold2")){
+            rating.level(900);
+            rating.update();
+            return;
+        }
+        if(league.name().equals("gold3")){
+            rating.level(1050);
+            rating.update();
+            return;
+        }
+        if(league.name().equals("diamond1")){
+            rating.level(1250);
+            rating.update();
+            return;
+        }
+        if(league.name().equals("diamond2")){
+            rating.level(1450);
+            rating.update();
+            return;
+        }
+        if(league.name().equals("diamond3")){
+            rating.level(1650);
+            rating.update();
+        }
     }
 }

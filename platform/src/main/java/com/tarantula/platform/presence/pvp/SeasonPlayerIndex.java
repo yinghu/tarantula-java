@@ -12,6 +12,7 @@ public class SeasonPlayerIndex extends RecoverableObject {
     public long seasonId;
 
     public int elo;
+    public boolean onSeason;
 
     public SeasonPlayerIndex(){
         this.label = LABEL;
@@ -21,12 +22,22 @@ public class SeasonPlayerIndex extends RecoverableObject {
     @Override
     public boolean write(DataBuffer buffer) {
         buffer.writeLong(timestamp);
+        try{
+            buffer.writeBoolean(onSeason);
+        }catch (Exception ex){
+
+        }
         return true;
     }
 
     @Override
     public boolean read(DataBuffer buffer) {
         this.timestamp = buffer.readLong();
+        try{
+            onSeason = buffer.readBoolean();
+        }catch (Exception ex){
+
+        }
         return true;
     }
 
