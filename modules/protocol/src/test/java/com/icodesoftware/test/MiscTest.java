@@ -1,6 +1,7 @@
 package com.icodesoftware.test;
 
 
+import com.beust.ah.A;
 import com.icodesoftware.service.RNG;
 import com.icodesoftware.util.*;
 import org.testng.Assert;
@@ -8,6 +9,10 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import java.nio.ByteBuffer;
 
+import java.util.ArrayList;
+import java.util.HexFormat;
+import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -123,6 +128,16 @@ public class MiscTest {
         Assert.assertEquals(_m.size(),10);
     }
 
-
+    @Test(groups = { "misc test" })
+    public void streamTest(){
+        ArrayBlockingQueue<String> limit = new ArrayBlockingQueue<>(10);
+        for(int i=0;i<100;i++){
+            limit.offer("a"+i);
+        }
+        Assert.assertEquals(limit.size(),10);
+        List<String> list = limit.stream().toList();
+        Assert.assertEquals(list.size(),10);
+        Assert.assertEquals(limit.size(),10);
+    }
 
 }
