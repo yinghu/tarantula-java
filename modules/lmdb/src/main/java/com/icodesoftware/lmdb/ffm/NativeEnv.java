@@ -138,9 +138,8 @@ public class NativeEnv implements Serviceable {
     private void mdbTxnAbort(MemorySegment txn){
         try{
             MemorySegment mdbEnvSetMaxDbs = lib.find(" mdb_txn_abort").get();
-            MethodHandle caller = Linker.nativeLinker().downcallHandle(mdbEnvSetMaxDbs,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS));
-            int ret = (int)caller.invokeExact(txn);
-            if(ret != 0) throw new RuntimeException("code ["+ret+"]");
+            MethodHandle caller = Linker.nativeLinker().downcallHandle(mdbEnvSetMaxDbs,FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
+            caller.invokeExact(txn);
         }catch (Throwable throwable){
             logger.error(" mdb_txn_abort",throwable);
             throw new RuntimeException(throwable);
@@ -150,9 +149,8 @@ public class NativeEnv implements Serviceable {
     private void mdbTxnReset(MemorySegment txn){
         try{
             MemorySegment mdbEnvSetMaxDbs = lib.find(" mdb_txn_reset").get();
-            MethodHandle caller = Linker.nativeLinker().downcallHandle(mdbEnvSetMaxDbs,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS));
-            int ret = (int)caller.invokeExact(txn);
-            if(ret != 0) throw new RuntimeException("code ["+ret+"]");
+            MethodHandle caller = Linker.nativeLinker().downcallHandle(mdbEnvSetMaxDbs,FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
+            caller.invokeExact(txn);
         }catch (Throwable throwable){
             logger.error(" mdb_txn_reset",throwable);
             throw new RuntimeException(throwable);
@@ -187,8 +185,7 @@ public class NativeEnv implements Serviceable {
         try{
             MemorySegment mdbDbiClose = lib.find(" mdb_dbi_close").get();
             MethodHandle caller = Linker.nativeLinker().downcallHandle(mdbDbiClose,FunctionDescriptor.ofVoid(ValueLayout.ADDRESS,ValueLayout.ADDRESS));
-            int ret = (int)caller.invokeExact(evn,dbi);
-            if(ret != 0) throw new RuntimeException("code ["+ret+"]");
+            caller.invokeExact(evn,dbi);
         }catch (Throwable throwable){
             logger.error(" mdb_dbi_close",throwable);
             throw new RuntimeException(throwable);
@@ -197,9 +194,21 @@ public class NativeEnv implements Serviceable {
 
     private void mdbDrop(MemorySegment txn,MemorySegment dbi,int deleted){
         try{
-            MemorySegment mdbDrop = lib.find(" mdb_drop").get();
-            MethodHandle caller = Linker.nativeLinker().downcallHandle(mdbDrop,FunctionDescriptor.ofVoid(ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.JAVA_INT));
+            MemorySegment mdbDrop = lib.find("mdb_drop").get();
+            MethodHandle caller = Linker.nativeLinker().downcallHandle(mdbDrop,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.JAVA_INT));
             int ret = (int)caller.invokeExact(txn,dbi,deleted);
+            if(ret != 0) throw new RuntimeException("code ["+ret+"]");
+        }catch (Throwable throwable){
+            logger.error("mdb_drop",throwable);
+            throw new RuntimeException(throwable);
+        }
+    }
+
+    private void mdbPut(MemorySegment txn,MemorySegment dbi,MemorySegment key,MemorySegment value,int flags){
+        try{
+            MemorySegment mdbPut = lib.find("mdb_put").get();
+            MethodHandle caller = Linker.nativeLinker().downcallHandle(mdbPut,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.JAVA_INT));
+            int ret = (int)caller.invokeExact(txn,dbi,key,value,flags);
             if(ret != 0) throw new RuntimeException("code ["+ret+"]");
         }catch (Throwable throwable){
             logger.error(" mdb_drop",throwable);
@@ -207,6 +216,28 @@ public class NativeEnv implements Serviceable {
         }
     }
 
+    private void mdbGet(MemorySegment txn,MemorySegment dbi,MemorySegment key,MemorySegment value){
+        try{
+            MemorySegment mdbGet = lib.find("mdb_get").get();
+            MethodHandle caller = Linker.nativeLinker().downcallHandle(mdbGet,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.ADDRESS));
+            int ret = (int)caller.invokeExact(txn,dbi,key,value);
+            if(ret != 0) throw new RuntimeException("code ["+ret+"]");
+        }catch (Throwable throwable){
+            logger.error(" mdb_get",throwable);
+            throw new RuntimeException(throwable);
+        }
+    }
 
+    private void mdbDel(MemorySegment txn,MemorySegment dbi,MemorySegment key,MemorySegment value){
+        try{
+            MemorySegment mdbDel = lib.find("mdb_del").get();
+            MethodHandle caller = Linker.nativeLinker().downcallHandle(mdbDel,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.ADDRESS));
+            int ret = (int)caller.invokeExact(txn,dbi,key,value);
+            if(ret != 0) throw new RuntimeException("code ["+ret+"]");
+        }catch (Throwable throwable){
+            logger.error(" mdb_del",throwable);
+            throw new RuntimeException(throwable);
+        }
+    }
 
 }
