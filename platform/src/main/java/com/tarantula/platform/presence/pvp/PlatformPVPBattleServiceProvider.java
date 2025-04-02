@@ -472,7 +472,22 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         }
     }
 
+    private void seasonReset(SeasonRuntime seasonRuntime){
+        ArrayBlockingQueue<SeasonPlayerIndex> pending  = new ArrayBlockingQueue(100);
+        localSeasonPlayerStore.list(new SeasonPlayerIndexQuery(seasonRuntime.currentSeason),ps->{
+            if(!pending.offer(ps)){
+                ArrayList<SeasonPlayerIndex> drains = new ArrayList<>();
+                pending.drainTo(drains);
+                serviceContext.schedule(new ScheduleRunner(10,new SeasonResetScheduler(drains,this.localSeasonPlayerStore)));
+                pending.clear();
+                pending.offer(ps);
+            }
+            return true;
+        });
+    }
+
     private void startSeason(SeasonRuntime seasonRuntime){
+        seasonReset(seasonRuntime);
         LocalDateTime closeTime = TimeUtil.fromUTCMilliseconds(seasonRuntime.closeTime);
         long endTimeDuration = TimeUtil.expired(closeTime)? 100 : TimeUtil.durationUTCMilliseconds(LocalDateTime.now(),TimeUtil.fromUTCMilliseconds(seasonRuntime.closeTime));
         this.rotation.schedule(seasonRuntime);
@@ -553,9 +568,9 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             logger.error("Error on end season",ex);
         }
         finally {
+            try{Thread.sleep(1000*60);}catch (Exception ex){} //waiting 60 seconds to have rewarding tasks to be finished
             scheduleStore.mapUnlock(lockKey);
         }
-        try{Thread.sleep(1000);}catch (Exception ex){} //waiting for clustering data update
         scheduleSeason();
     }
 
@@ -688,6 +703,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             localSeasonPlayerStore.createIfAbsent(seasonPlayerIndex,true);
             seasonPlayerIndex.timestamp(TimeUtil.toUTCMilliseconds(LocalDateTime.now()));
             seasonPlayerIndex.seasonId = season.distributionId();
+            seasonPlayerIndex.onSeason = true;
             localSeasonPlayerStore.update(seasonPlayerIndex);
             //logger.warn(seasonPlayerIndex.seasonId+" ; "+seasonPlayerIndex.playerId);
             championLeaderBoard.onBoard(gameEndEvent.offensePlayerId,gameEndEvent.offenseEloLevel);
