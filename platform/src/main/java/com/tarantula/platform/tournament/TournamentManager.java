@@ -657,7 +657,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
     }
     public RaceBoard raceBoard(TournamentJoin session){
         if(session.instanceId==0){
-            tournamentServiceProvider.logger.warn("TMT instance id attached on ["+session.stub()+"]");
+            tournamentServiceProvider.logger.info("TMT instance id attached on ["+session.stub()+"]");
             return new TournamentRaceBoard();
         }
         if(tournamentServiceProvider.localOperationEnabled){
@@ -673,7 +673,7 @@ public class TournamentManager extends RecoverableObject implements Tournament, 
 
     public RaceBoard myRaceBoard(TournamentJoin session){
         if(session.instanceId==0){
-            tournamentServiceProvider.logger.warn("TMT instance id attached on my board ["+session.stub()+"]");
+            tournamentServiceProvider.logger.info("TMT instance id attached on my board ["+session.stub()+"]");
             return new TournamentRaceBoard();
         }
         if(tournamentServiceProvider.localOperationEnabled) {
