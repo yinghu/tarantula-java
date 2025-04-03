@@ -40,7 +40,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private static final long CURRENT_SEASON_INDEX = 0;
     public static final String NAME = "pvp_battle";
 
-    private int seasonTimeGap = 5*60; //10 minutes buffer per season to end
+    private int seasonTimeGap = 10*60; //10 minutes buffer per season to end
     private int championsLeaderBoardThreshold = 2050;
     private int championsLeaderBoardSize = 100;
     private int matchEloDifferenceThreshold = 1000;
@@ -170,9 +170,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         this.runtimeConfiguration.reMatchWaitingTime.set(JsonUtil.getJsonInt(pvp,"reMatchWaitingTimeMinutes",60)*60);//60 minutes
         this.runtimeConfiguration.coolDownTime.set(JsonUtil.getJsonInt(pvp,"defenseCooldownMinutes",60)*60);//60 minutes;
         this.runtimeConfiguration.teamCreationWaitingTime.set(JsonUtil.getJsonInt(pvp,"waitingMinutesPerTeamFormation",5)*60);//5 minutes
-        //this.runtimeConfiguration.seasonRunningTime.set(JsonUtil.getJsonInt(pvp,"seasonRunningDays",12)*24*60*60); //12 days
-        this.runtimeConfiguration.seasonRunningTime.set(600); //12 days
-
+        this.runtimeConfiguration.seasonRunningTime.set(JsonUtil.getJsonInt(pvp,"seasonRunningDays",12)*24*60*60); //12 days
     }
 
     public ChampionLeaderBoard championLeaderBoard(){
