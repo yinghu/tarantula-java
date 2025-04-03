@@ -18,8 +18,10 @@ import com.tarantula.platform.item.PlatformItemServiceProvider;
 import com.tarantula.platform.presence.Profile;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,6 +75,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private TokenValidatorProvider tokenValidatorProvider;
     private final static String ANALYTICS_QUERY_HEADER = "#Analytics";
     private static String ANALYTICS_QUERY;
+    private LocalDateTime seasonStartTime;
     public PlatformPVPBattleServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
         ANALYTICS_QUERY = gameServiceProvider.gameCluster().typeId()+ANALYTICS_QUERY_HEADER;
@@ -386,6 +389,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             logger.warn("Season installed on ["+ix[0]+"] "+season.seasonId);
             ix[0]++;
         });
+        seasonStartTime = loaded.startTime();
         this.rotation.seasonRotation = loaded.distributionId();
         long delay = TimeUtil.expired(loaded.startTime())? 100 : TimeUtil.durationUTCMilliseconds(LocalDateTime.now(),loaded.startTime());
         serviceContext.schedule(new ScheduleRunner(delay,()->scheduleSeason()));
@@ -558,8 +562,9 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 else{
                     seasonRuntime.sequence++;
                     seasonRuntime.currentSeason = next.seasonId;
-                    seasonRuntime.closeTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(runtimeConfiguration.seasonRunningTime.get()));
-                    seasonRuntime.endTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(runtimeConfiguration.seasonRunningTime.get()).plusSeconds(seasonTimeGap));
+                    LocalDateTime lastSeasonClose = TimeUtil.fromUTCMilliseconds(seasonRuntime.closeTime);
+                    seasonRuntime.closeTime = TimeUtil.toUTCMilliseconds(lastSeasonClose.plusSeconds(runtimeConfiguration.seasonRunningTime.get()));
+                    seasonRuntime.endTime = TimeUtil.toUTCMilliseconds(lastSeasonClose.plusSeconds(runtimeConfiguration.seasonRunningTime.get()).plusSeconds(seasonTimeGap));
                     //scheduleStore.mapSet(lockKey,seasonRuntime.toBinary());
                     dataStore.update(seasonRuntime);
                 }
@@ -578,8 +583,19 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         SeasonCredentialConfiguration.Season startSeason = seasons.get(1L);
         seasonRuntime.sequence = 1;
         seasonRuntime.currentSeason = startSeason.seasonId;
-        seasonRuntime.closeTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(runtimeConfiguration.seasonRunningTime.get()));
-        seasonRuntime.endTime = TimeUtil.toUTCMilliseconds(LocalDateTime.now().plusSeconds(runtimeConfiguration.seasonRunningTime.get()).plusSeconds(seasonTimeGap));
+        LocalDateTime lastSeasonClose = TimeUtil.fromUTCMilliseconds(seasonRuntime.closeTime);
+        seasonRuntime.closeTime = TimeUtil.toUTCMilliseconds(lastSeasonClose.plusSeconds(runtimeConfiguration.seasonRunningTime.get()));
+        seasonRuntime.endTime = TimeUtil.toUTCMilliseconds(lastSeasonClose.plusSeconds(runtimeConfiguration.seasonRunningTime.get()).plusSeconds(seasonTimeGap));
+        dataStore.update(seasonRuntime);
+        logger.warn("Initializing season from ["+seasonRuntime.currentSeason+" : "+seasonRuntime.sequence+"]");
+    }
+
+    private void initialSeasonRegister(SeasonRuntime seasonRuntime){
+        SeasonCredentialConfiguration.Season startSeason = seasons.get(1L);
+        seasonRuntime.sequence = 1;
+        seasonRuntime.currentSeason = startSeason.seasonId;
+        seasonRuntime.closeTime = TimeUtil.toUTCMilliseconds(seasonStartTime.plusSeconds(runtimeConfiguration.seasonRunningTime.get()));
+        seasonRuntime.endTime = TimeUtil.toUTCMilliseconds(seasonStartTime.plusSeconds(runtimeConfiguration.seasonRunningTime.get()).plusSeconds(seasonTimeGap));
         dataStore.update(seasonRuntime);
         logger.warn("Initializing season from ["+seasonRuntime.currentSeason+" : "+seasonRuntime.sequence+"]");
     }
@@ -605,7 +621,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 return;
             }
             if(seasonRuntime.currentSeason==0){
-                initialSeason(seasonRuntime);
+                initialSeasonRegister(seasonRuntime);
             }
             scheduleStore.mapSet(lockKey,seasonRuntime.toBinary());
             startSeason(seasonRuntime);
