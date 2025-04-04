@@ -1,23 +1,19 @@
 package com.icodesoftware.lmdb.test;
 
-import com.icodesoftware.lmdb.EnvSetting;
-import com.icodesoftware.lmdb.LMDBEnv;
-import com.icodesoftware.lmdb.ffm.MaskFlag;
+import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.ffm.NativeEnv;
-import org.lmdbjava.TargetName;
+import com.icodesoftware.util.BufferProxy;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.lang.invoke.VarHandle;
+
 
 public class ForeignAPITest {
 
@@ -121,12 +117,136 @@ public class ForeignAPITest {
             throwable = ex;
         }
         Assert.assertNull(throwable);
-        System.out.println("mask : "+(MaskFlag.ENV_NO_SYNC.mask()|MaskFlag.ENV_WRITE_MAP.mask()));
+        //System.out.println("mask : "+(MaskFlag.ENV_NO_SYNC.mask()|MaskFlag.ENV_WRITE_MAP.mask()));
+    }
+
+    @Test(groups = { "foreign API" })
+    public void bufferOnMemorySegmentTest(){
+        try(Arena arena = Arena.ofConfined()) {
+            MemorySegment memorySegment = arena.allocate(200);
+            Recoverable.DataBuffer buffer = BufferProxy.buffer(memorySegment.asByteBuffer());
+            buffer.writeInt(100).writeInt(200).flip();
+            int x0 = memorySegment.get(ValueLayout.JAVA_INT,0);
+            int x1 = memorySegment.get(ValueLayout.JAVA_INT,4);
+            Assert.assertEquals(x0,100);
+            Assert.assertEquals(x1,200);
+        }
+    }
+
+    @Test(groups = { "foreign API" })
+    public void structOnMemorySegmentTest(){
+        Throwable throwable = null;
+        try(Arena arena = Arena.ofConfined()) {
+            MemoryLayout groupLayout = MemoryLayout.structLayout(ValueLayout.JAVA_LONG.withName("mv_size"),ValueLayout.ADDRESS.withName("mv_data"));
+            MemorySegment key = arena.allocateFrom("test");
+            MemorySegment memorySegment = arena.allocate(groupLayout);
+            memorySegment.set(ValueLayout.JAVA_LONG,0,10);
+            memorySegment.set(ValueLayout.ADDRESS,8,key);
+        }catch (Throwable ex){
+            throwable = ex;
+        }
+        Assert.assertNull(throwable);
+    }
+
+    @Test(groups = { "foreign API" })
+    public void structNestedArrayOnMemorySegmentTest(){
+        Throwable throwable = null;
+        //struct{ size_t mv_size,byte[] mv_data}
+        try(Arena arena = Arena.ofConfined()) {
+            SequenceLayout arr = MemoryLayout.sequenceLayout(11,ValueLayout.JAVA_BYTE).withName("mv_data");
+            MemoryLayout groupLayout = MemoryLayout.structLayout(ValueLayout.JAVA_LONG.withName("mv_size"),arr);
+            MemorySegment memorySegment = arena.allocate(groupLayout);
+            memorySegment.set(ValueLayout.JAVA_LONG,groupLayout.byteOffset(MemoryLayout.PathElement.groupElement("mv_size")),11);
+            long offset = groupLayout.byteOffset(MemoryLayout.PathElement.groupElement("mv_data"));
+            for(int i=0;i<10;i++){
+                memorySegment.set(ValueLayout.JAVA_BYTE,offset+i,(byte)'C');
+            }
+            for(int i=0;i<10;i++){
+                Assert.assertEquals((char)memorySegment.get(ValueLayout.JAVA_BYTE,offset+i),'C');
+            }
+            Assert.assertEquals(memorySegment.get(ValueLayout.JAVA_LONG,groupLayout.byteOffset(MemoryLayout.PathElement.groupElement("mv_size"))),11);
+            Assert.assertEquals(offset,8);
+
+        }catch (Throwable ex){
+            throwable = ex;
+        }
+        Assert.assertNull(throwable);
+    }
+
+    @Test(groups = { "foreign API" })
+    public void ValHandeMemorySegmentTest(){
+        Throwable throwable = null;
+        try(Arena arena = Arena.ofConfined()) {
+            MemoryLayout groupLayout = MemoryLayout.structLayout(ValueLayout.JAVA_LONG.withName("mv_size"),MemoryLayout.paddingLayout(8),
+                    MemoryLayout.sequenceLayout(10,ValueLayout.JAVA_INT).withName("mv_data"));
+            MemorySegment memorySegment = arena.allocate(groupLayout);
+            VarHandle vSize = groupLayout.varHandle(MemoryLayout.PathElement.groupElement("mv_size"));
+            vSize.set(memorySegment,0,100);
+            Assert.assertEquals(vSize.get(memorySegment,0),100L);
+            for(int i=0;i<10;i++){
+                VarHandle vData = groupLayout.varHandle(MemoryLayout.PathElement.groupElement("mv_data"), MemoryLayout.PathElement.sequenceElement(i));
+                vData.set(memorySegment,0,12);
+                Assert.assertEquals(vData.get(memorySegment,0),12);
+            }
+            Assert.assertEquals(vSize.get(memorySegment,0),100L);
+            for(int i=0;i<10;i++){
+                VarHandle vData = groupLayout.varHandle(MemoryLayout.PathElement.groupElement("mv_data"), MemoryLayout.PathElement.sequenceElement(i));
+                Assert.assertEquals(vData.get(memorySegment,0),12);
+            }
+        }catch (Throwable ex){
+            throwable = ex;
+        }
+        Assert.assertNull(throwable);
+    }
+    @Test(groups = { "foreign API" })
+    public void sliceMemorySegmentTest(){
+        Throwable throwable = null;
+        try(Arena arena = Arena.ofConfined()) {
+
+            MemorySegment memorySegment = arena.allocate(12);
+            
+            VarHandle vData = ValueLayout.JAVA_INT.varHandle();
+            vData.set(memorySegment.asSlice(0,4),0,100); //0-3
+            vData.set(memorySegment.asSlice(4,4),0,400); //4-7
+            vData.set(memorySegment.asSlice(8,4),0,500); //8-11
+
+            Assert.assertEquals(vData.get(memorySegment,0),100);
+            Assert.assertEquals(vData.get(memorySegment,4),400);
+            Assert.assertEquals(vData.get(memorySegment,8),500);
+
+
+        }catch (Throwable ex){
+            throwable = ex;
+        }
+        Assert.assertNull(throwable);
+    }
+    @Test(groups = { "foreign API" })
+    public void zeroLengthMemorySegmentTest(){
+        Throwable throwable = null;
+        try(Arena arena = Arena.ofConfined()) {
+            MemoryLayout groupLayout = MemoryLayout.structLayout(ValueLayout.JAVA_LONG.withName("mv_size"),ValueLayout.ADDRESS.withName("mv_data"));
+            MemorySegment memorySegment = arena.allocate(groupLayout);
+            System.out.println(memorySegment.byteSize());
+            //VarHandle vData = groupLayout.varHandle(MemoryLayout.PathElement.groupElement("mv_data"));
+            //MemorySegment data = (MemorySegment)vData.get(memorySegment,1);
+            //MemorySegment data = memorySegment.get(ValueLayout.ADDRESS,0);
+            //data.reinterpret(10);
+            //System.out.println(data.address());
+            //data.set(ValueLayout.JAVA_INT,0,100);
+
+        }catch (Throwable ex){
+            throwable = ex;
+        }
+        Assert.assertNull(throwable);
     }
 
     public static void main(String[] arg) throws Exception{
         NativeEnv nativeEnv = new NativeEnv();
         nativeEnv.start();
+        //nativeEnv.createDbi("test100");
+        //nativeEnv.createDbi("test2");
+        //nativeEnv.createDbi("test3");
+        nativeEnv.putTest("test_mill","key1123","value1121");
         nativeEnv.shutdown();
     }
 
