@@ -14,7 +14,6 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.VarHandle;
 
-
 public class ForeignAPITest {
 
     @Test(groups = { "foreign API" })
@@ -204,7 +203,7 @@ public class ForeignAPITest {
         try(Arena arena = Arena.ofConfined()) {
 
             MemorySegment memorySegment = arena.allocate(12);
-            
+
             VarHandle vData = ValueLayout.JAVA_INT.varHandle();
             vData.set(memorySegment.asSlice(0,4),0,100); //0-3
             vData.set(memorySegment.asSlice(4,4),0,400); //4-7
@@ -219,6 +218,65 @@ public class ForeignAPITest {
             throwable = ex;
         }
         Assert.assertNull(throwable);
+    }
+    @Test(groups = { "foreign API" })
+    public void memoryLayoutTest(){
+        ValueLayout intValue = ValueLayout.JAVA_INT;
+        ValueLayout doubleValue = ValueLayout.JAVA_DOUBLE;
+        Assert.assertEquals(intValue.byteSize(),4);
+        Assert.assertEquals(doubleValue.byteSize(),8);
+
+        AddressLayout addressLayout = ValueLayout.ADDRESS;
+        Assert.assertEquals(addressLayout.byteSize(),8);
+
+        SequenceLayout sequenceLayout = MemoryLayout.sequenceLayout(10,ValueLayout.JAVA_INT);
+        Assert.assertEquals(sequenceLayout.byteSize(),40);
+
+        StructLayout structLayout = MemoryLayout.structLayout(ValueLayout.JAVA_INT.withName("x"), ValueLayout.JAVA_INT.withName("y"));
+        Assert.assertEquals(structLayout.byteSize(),8);
+
+        UnionLayout unionLayout = MemoryLayout.unionLayout(ValueLayout.JAVA_INT, ValueLayout.JAVA_LONG,ValueLayout.JAVA_INT);
+        Assert.assertEquals(unionLayout.byteSize(),8);
+
+        MemoryLayout memoryLayout1 = ValueLayout.JAVA_INT;//4
+        MemoryLayout memoryLayout2 = MemoryLayout.structLayout(ValueLayout.JAVA_LONG);//8
+        PaddingLayout paddingLayout = MemoryLayout.paddingLayout(4);// 4
+        MemoryLayout complexLayout = MemoryLayout.structLayout(memoryLayout1,paddingLayout, memoryLayout2);
+        Assert.assertEquals(complexLayout.byteSize(),16);
+    }
+
+    @Test(groups = { "foreign API" })
+    public void valHandleTest(){
+        MemoryLayout pointLayout = MemoryLayout.structLayout(
+                ValueLayout.JAVA_INT.withName("x"),
+                ValueLayout.JAVA_INT.withName("y")
+        );
+        VarHandle xHandle = pointLayout.varHandle(MemoryLayout.PathElement.groupElement("x"));
+        VarHandle yHandle = pointLayout.varHandle(MemoryLayout.PathElement.groupElement("y"));
+        try(Arena arena = Arena.ofConfined()){
+            MemorySegment segment = arena.allocate(pointLayout);
+            xHandle.set(segment,0,10);
+            yHandle.set(segment,0,20);
+            int xValue = (int)xHandle.get(segment, 0);
+            int yValue = (int)yHandle.get(segment, 0);
+            Assert.assertEquals(xValue,10);
+            Assert.assertEquals(yValue,20);
+        }
+
+        SequenceLayout pointsLayout = MemoryLayout.sequenceLayout(10, pointLayout);
+        VarHandle vHandle = pointsLayout.varHandle(MemoryLayout.PathElement.sequenceElement(), MemoryLayout.PathElement.groupElement("x"));
+        try(Arena arena = Arena.ofConfined()){
+            MemorySegment segment = arena.allocate(pointsLayout);
+
+            for (int i = 0; i < 10; i++) {
+                vHandle.set(segment, 0, i, i);
+            }
+
+            for (int i = 0; i < 10; i++) {
+                Assert.assertEquals(i, vHandle.get(segment, 0, i));
+            }
+        }
+
     }
     @Test(groups = { "foreign API" })
     public void zeroLengthMemorySegmentTest(){
