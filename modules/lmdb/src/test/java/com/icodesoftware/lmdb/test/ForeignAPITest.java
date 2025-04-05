@@ -278,19 +278,49 @@ public class ForeignAPITest {
         }
 
     }
+
     @Test(groups = { "foreign API" })
     public void zeroLengthMemorySegmentTest(){
         Throwable throwable = null;
         try(Arena arena = Arena.ofConfined()) {
-            MemoryLayout groupLayout = MemoryLayout.structLayout(ValueLayout.JAVA_LONG.withName("mv_size"),ValueLayout.ADDRESS.withName("mv_data"));
-            MemorySegment memorySegment = arena.allocate(groupLayout);
-            System.out.println(memorySegment.byteSize());
-            //VarHandle vData = groupLayout.varHandle(MemoryLayout.PathElement.groupElement("mv_data"));
-            //MemorySegment data = (MemorySegment)vData.get(memorySegment,1);
-            //MemorySegment data = memorySegment.get(ValueLayout.ADDRESS,0);
-            //data.reinterpret(10);
-            //System.out.println(data.address());
-            //data.set(ValueLayout.JAVA_INT,0,100);
+
+            MemorySegment memorySegment = arena.allocate(ValueLayout.ADDRESS);
+            MemorySegment newM = memorySegment.reinterpret(10,arena,mg->{
+                Assert.assertEquals(mg.byteSize(),10L);
+            });
+            newM.set(ValueLayout.JAVA_INT,0,10);
+            Assert.assertEquals(memorySegment.byteSize(),8L);
+            Assert.assertEquals(newM.byteSize(),10L);
+            Assert.assertEquals(newM.get(ValueLayout.JAVA_INT,0),10);
+
+
+        }catch (Throwable ex){
+            ex.printStackTrace();
+            throwable = ex;
+        }
+        Assert.assertNull(throwable);
+    }
+
+    @Test(groups = { "foreign API" })
+    public void zeroLengthWrapperMemorySegmentTest(){
+        Throwable throwable = null;
+        try(Arena arena = Arena.ofConfined()) {
+            StructLayout structLayout = MemoryLayout.structLayout(ValueLayout.JAVA_LONG.withName("mv_size"),MemoryLayout.sequenceLayout(100,ValueLayout.JAVA_BYTE).withName("mv_data"));
+            //SequenceLayout bytes = MemoryLayout.sequenceLayout(100,ValueLayout.JAVA_BYTE);
+            AddressLayout addressLayout = ValueLayout.ADDRESS.withTargetLayout(structLayout);
+            MemorySegment pointer = arena.allocate(addressLayout);
+            MemorySegment data = pointer.reinterpret(108,arena,mg->{
+                System.out.println("clean out");
+            });
+            data.setAtIndex(ValueLayout.JAVA_LONG,0,100);
+            Assert.assertEquals(data.getAtIndex(ValueLayout.JAVA_LONG,0),100L);
+            for(int i=0;i<40;i++){
+                data.setAtIndex(ValueLayout.JAVA_BYTE,i+8,(byte)'c');
+            }
+            Assert.assertEquals(data.getAtIndex(ValueLayout.JAVA_LONG,0),100l);
+            for(int i=0;i<40;i++){
+                Assert.assertEquals((char)data.getAtIndex(ValueLayout.JAVA_BYTE,i+8),'c');
+            }
 
         }catch (Throwable ex){
             throwable = ex;
