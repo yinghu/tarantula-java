@@ -79,18 +79,18 @@ public class NativeEnv implements Serviceable {
 
     private MemorySegment mdbVal(Arena arena,String val){
         byte[] vc = val.getBytes(StandardCharsets.UTF_8);
-        MemoryLayout arr = MemoryLayout.sequenceLayout(vc.length+1,ValueLayout.JAVA_BYTE).withName("mv_data");
-        StructLayout groupLayout = MemoryLayout.structLayout(ValueLayout.JAVA_LONG.withName("mv_size"),MemoryLayout.paddingLayout(8),arr);
-        MemorySegment memorySegment = arena.allocate(groupLayout);
-        VarHandle vSize = groupLayout.varHandle(MemoryLayout.PathElement.groupElement("mv_size"));
-        vSize.set(memorySegment,0,vc.length+1);
+        StructLayout struct = MemoryLayout.structLayout(ValueLayout.JAVA_LONG.withName("mv_size"),MemoryLayout.sequenceLayout(100,ValueLayout.JAVA_BYTE).withName("mv_data"));
+        MemorySegment memorySegment = arena.allocate(ValueLayout.ADDRESS.withTargetLayout(struct));
+        MemorySegment pointer = memorySegment.reinterpret(108,arena,pt->{
+            System.out.println("mg clean");
+        });
+        pointer.setAtIndex(ValueLayout.JAVA_LONG,0,vc.length);
         for(int i=0;i<vc.length;i++){
-            VarHandle vData = groupLayout.varHandle(MemoryLayout.PathElement.groupElement("mv_data"), MemoryLayout.PathElement.sequenceElement(i));
-            vData.set(memorySegment,0,vc[i]);
+            pointer.setAtIndex(ValueLayout.JAVA_BYTE,i+8,vc[i]);
         }
-        VarHandle vData = groupLayout.varHandle(MemoryLayout.PathElement.groupElement("mv_data"), MemoryLayout.PathElement.sequenceElement(vc.length));
-        vData.set(memorySegment,0,(byte)0);
-        return memorySegment;
+        pointer.setAtIndex(ValueLayout.JAVA_BYTE,vc.length+8,(byte)'\0');
+        System.out.println(pointer.getAtIndex(ValueLayout.JAVA_LONG,0));
+        return memorySegment;//.get(ValueLayout.ADDRESS,0);
     }
 
 

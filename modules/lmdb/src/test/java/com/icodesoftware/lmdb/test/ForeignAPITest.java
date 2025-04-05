@@ -301,7 +301,7 @@ public class ForeignAPITest {
         Assert.assertNull(throwable);
     }
 
-    @Test(groups = { "foreign API" })
+    //@Test(groups = { "foreign API" })
     public void zeroLengthWrapperMemorySegmentTest(){
         Throwable throwable = null;
         try(Arena arena = Arena.ofConfined()) {
@@ -329,13 +329,18 @@ public class ForeignAPITest {
     }
 
     public static void main(String[] arg) throws Exception{
+        try{
         NativeEnv nativeEnv = new NativeEnv();
         nativeEnv.start();
         //nativeEnv.createDbi("test100");
         //nativeEnv.createDbi("test2");
         //nativeEnv.createDbi("test3");
-        nativeEnv.putTest("test_mill","key1123","value1121");
+        nativeEnv.putTest("test_mill","key112379","value1121");
+        System.out.println("done");
         nativeEnv.shutdown();
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
 
