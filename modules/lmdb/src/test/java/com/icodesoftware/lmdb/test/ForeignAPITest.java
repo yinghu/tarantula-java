@@ -2,6 +2,7 @@ package com.icodesoftware.lmdb.test;
 
 import com.beust.ah.A;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.lmdb.ffm.NativeDbi;
 import com.icodesoftware.lmdb.ffm.NativeEnv;
 import com.icodesoftware.util.BufferProxy;
 
@@ -16,7 +17,7 @@ import java.lang.invoke.MethodType;
 import java.lang.invoke.VarHandle;
 import java.nio.charset.StandardCharsets;
 
-public class ForeignAPITest {
+public class ForeignAPITest extends TestSetup{
 
     @Test(groups = { "foreign API" })
     public void memorySegmentTest(){
@@ -325,14 +326,25 @@ public class ForeignAPITest {
 
     public static void main(String[] arg) throws Exception{
         try{
-        NativeEnv nativeEnv = new NativeEnv();
-        nativeEnv.start();
-        //nativeEnv.createDbi("test100");
-        //nativeEnv.createDbi("test2");
-        //nativeEnv.createDbi("test3");
-        nativeEnv.putTest("key11237912","value11");
-        System.out.println("done");
-        nativeEnv.shutdown();
+            NativeEnv nativeEnv = new NativeEnv();
+            nativeEnv.start();
+            NativeDbi dbi = nativeEnv.createDbi("test");
+            dbi.drop(false);
+            System.out.println(dbi.entries());
+            System.out.println(dbi.pageSize());
+            System.out.println(dbi.depth());
+            Recoverable.DataBuffer key = BufferProxy.buffer(100,true);
+            key.write("hello12377b".getBytes()).flip();
+            Recoverable.DataBuffer value = BufferProxy.buffer(100,true);
+            value.write("world".getBytes()).flip();
+            dbi.put(key,value);
+            dbi.stat();
+            System.out.println(dbi.entries());
+            key.rewind();
+            value.clear();
+            dbi.get(key,value);
+            System.out.println(new String(value.array()));
+            nativeEnv.shutdown();
         }catch (Exception ex){
             ex.printStackTrace();
         }
