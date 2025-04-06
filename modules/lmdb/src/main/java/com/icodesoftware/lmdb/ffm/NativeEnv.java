@@ -21,6 +21,7 @@ public class NativeEnv implements Serviceable {
 
     private Arena arena = Arena.ofShared();
     private MemorySegment env;
+    private MemorySegment dbi;
 
     @Override
     public void start() throws Exception {
@@ -31,11 +32,17 @@ public class NativeEnv implements Serviceable {
         mdbEnvSetMaxReaders();
         mdbEnvSetMaxDbs();
         mdbEnvOpen();
+        createDbi("test699");
+        MemorySegment stat = envStat(arena);
+        mdbEnvStat(stat);
+        System.out.println(stat.get(ValueLayout.JAVA_INT,0));
+        System.out.println(stat.get(ValueLayout.JAVA_LONG,32));
     }
 
     @Override
     public void shutdown() throws Exception {
         mdbEnvSync(1);
+        mdbDbiClose(dbi);
         mdbEnvClose();
         arena.close();
     }
@@ -44,53 +51,59 @@ public class NativeEnv implements Serviceable {
         try(Arena a = Arena.ofConfined()) {
             MemorySegment txn = a.allocate(AddressLayout.ADDRESS);
             MemorySegment dbiName = a.allocateFrom(name);
-            MemorySegment dbi = a.allocate(ValueLayout.JAVA_INT);
-            System.out.println(dbi.get(ValueLayout.JAVA_INT,0));
+            MemorySegment dm = arena.allocate(ValueLayout.ADDRESS);
+            //System.out.println(dbi.get(ValueLayout.JAVA_INT,0));
             mdbTxnBegin(MemorySegment.NULL,txn,0);
-            mdbDbiOpen(txn.get(ValueLayout.ADDRESS,0),dbiName,dbi,MaskFlag.DBI_CREATE.mask());
-            System.out.println(dbi.get(ValueLayout.JAVA_INT,0));
+            mdbDbiOpen(txn.get(ValueLayout.ADDRESS,0),dbiName,dm,MaskFlag.DBI_CREATE.mask());
+            //System.out.println(dbi.get(ValueLayout.JAVA_INT,0));
             mdbTxnCommit(txn.get(ValueLayout.ADDRESS,0));
-            mdbDbiClose(dbi);
+            dbi = dm.get(ValueLayout.ADDRESS,0);
+            //mdbDbiClose(dbi);
         }
     }
 
-    public void putTest(String db,String key,String value){
+    public void putTest(String key,String value){
 
         try(Arena a = Arena.ofConfined()) {
-            MemorySegment txn = a.allocate(AddressLayout.ADDRESS);
-            MemorySegment dbiName = a.allocateFrom(db);
-            MemorySegment dbi = arena.allocateFrom(ValueLayout.JAVA_INT,0);
-            System.out.println(dbi.get(ValueLayout.JAVA_INT,0));
-            mdbTxnBegin(MemorySegment.NULL,txn,0);
-            MemorySegment ptxn = txn.get(ValueLayout.ADDRESS,0);
-            mdbDbiOpen(ptxn,dbiName,dbi,MaskFlag.DBI_CREATE.mask());
-            mdbTxnCommit(ptxn);
-            System.out.println(dbi.get(ValueLayout.JAVA_INT,0));
 
             MemorySegment put = a.allocate(AddressLayout.ADDRESS);
             mdbTxnBegin(MemorySegment.NULL,put,0);
-            MemorySegment putXn = put.get(ValueLayout.ADDRESS,0);
-            MemorySegment km = mdbVal(a,key);
-            MemorySegment vm = mdbVal(a,value);
-            mdbPut(putXn,dbi,km,vm,0);
-            mdbTxnCommit(putXn);
+            MemorySegment txn = put.get(ValueLayout.ADDRESS,0);
+            MemorySegment k = mdbVal(a,key);
+            MemorySegment v = mdbVal(a,value);
+            //mdbPut(txn,dbi,k,v,0);
+            MemorySegment stat = dbiStat(a);
+            mdbStat(txn,dbi,stat);
+            System.out.println(stat.get(ValueLayout.JAVA_INT,0));
+            System.out.println(stat.get(ValueLayout.JAVA_LONG,32));
+            mdbTxnCommit(txn);
+
         }
     }
 
-    private MemorySegment mdbVal(Arena arena,String val){
-        byte[] vc = val.getBytes(StandardCharsets.UTF_8);
-        StructLayout struct = MemoryLayout.structLayout(ValueLayout.JAVA_LONG.withName("mv_size"),MemoryLayout.sequenceLayout(100,ValueLayout.JAVA_BYTE).withName("mv_data"));
-        MemorySegment memorySegment = arena.allocate(ValueLayout.ADDRESS.withTargetLayout(struct));
-        MemorySegment pointer = memorySegment.reinterpret(108,arena,pt->{
-            System.out.println("mg clean");
-        });
-        pointer.setAtIndex(ValueLayout.JAVA_LONG,0,vc.length);
-        for(int i=0;i<vc.length;i++){
-            pointer.setAtIndex(ValueLayout.JAVA_BYTE,i+8,vc[i]);
-        }
-        pointer.setAtIndex(ValueLayout.JAVA_BYTE,vc.length+8,(byte)'\0');
-        System.out.println(pointer.getAtIndex(ValueLayout.JAVA_LONG,0));
-        return memorySegment;//.get(ValueLayout.ADDRESS,0);
+    private MemorySegment dbiStat(Arena a){
+        StructLayout layout = MemoryLayout.structLayout(ValueLayout.JAVA_INT.withName("ms_psize"),ValueLayout.JAVA_INT.withName("ms_depth"),
+                ValueLayout.JAVA_LONG.withName("ms_branch_pages"),ValueLayout.JAVA_LONG.withName("ms_leaf_pages"),ValueLayout.JAVA_LONG.withName("ms_overflow_pages"),ValueLayout.JAVA_LONG.withName("ms_entries"));
+        MemorySegment memorySegment = a.allocate(layout);
+        return memorySegment;
+    }
+
+    private MemorySegment envStat(Arena a){
+        StructLayout layout = MemoryLayout.structLayout(ValueLayout.JAVA_INT.withName("ms_psize"),ValueLayout.JAVA_INT.withName("ms_depth"),
+                ValueLayout.JAVA_LONG.withName("ms_branch_pages"),ValueLayout.JAVA_LONG.withName("ms_leaf_pages"),ValueLayout.JAVA_LONG.withName("ms_overflow_pages"),ValueLayout.JAVA_LONG.withName("ms_entries"));
+        MemorySegment memorySegment = a.allocate(layout);
+        return memorySegment;
+    }
+
+    private MemorySegment mdbVal(Arena a,String val){
+        StructLayout struct = MemoryLayout.structLayout(ValueLayout.JAVA_LONG.withName("mv_size"),ValueLayout.ADDRESS.withName("mv_data"));
+        MemorySegment pointer = a.allocate(struct);
+        VarHandle vSize = struct.varHandle(MemoryLayout.PathElement.groupElement("mv_size"));
+        vSize.set(pointer,0,val.length()+1);
+        VarHandle vData = struct.varHandle(MemoryLayout.PathElement.groupElement("mv_data"));
+        MemorySegment data = arena.allocateFrom(val, StandardCharsets.US_ASCII);
+        vData.set(pointer,0,data);
+        return pointer;//.get(ValueLayout.ADDRESS,0);
     }
 
 
@@ -317,9 +330,48 @@ public class NativeEnv implements Serviceable {
             int ret = (int)caller.invokeExact(txn,dbi,key,value);
             if(ret != 0) throw new RuntimeException("code ["+ret+"]");
         }catch (Throwable throwable){
-            logger.error(" mdb_del",throwable);
+            logger.error("mdb_del",throwable);
             throw new RuntimeException(throwable);
         }
     }
+
+    private void mdbStat(MemorySegment txn,MemorySegment dbi,MemorySegment stat){
+        try{
+            MemorySegment mdbDel = lib.find("mdb_stat").get();
+            MethodHandle caller = Linker.nativeLinker().downcallHandle(mdbDel,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.ADDRESS));
+            int ret = (int)caller.invokeExact(txn,dbi,stat);
+            if(ret != 0) throw new RuntimeException("code ["+ret+"]");
+        }catch (Throwable throwable){
+            logger.error("mdb_stat",throwable);
+            throw new RuntimeException(throwable);
+        }
+    }
+
+    private void mdbEnvStat(MemorySegment stat){
+        try{
+            MemorySegment mdbEnvStat = lib.find("mdb_env_stat").get();
+            MethodHandle caller = Linker.nativeLinker().downcallHandle(mdbEnvStat,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.ADDRESS));
+            int ret = (int)caller.invokeExact(env,stat);
+            if(ret != 0) throw new RuntimeException("code ["+ret+"]");
+        }catch (Throwable throwable){
+            logger.error("mdb_env_stat",throwable);
+            throw new RuntimeException(throwable);
+        }
+    }
+
+    private void mdbEnvInfo(MemorySegment info){
+        try{
+            MemorySegment mdbEnvSetMaxDbs = lib.find("mdb_env_info").get();
+            MethodHandle caller = Linker.nativeLinker().downcallHandle(mdbEnvSetMaxDbs,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.ADDRESS));
+            int ret = (int)caller.invokeExact(env,info);
+            if(ret != 0) throw new RuntimeException("code ["+ret+"]");
+        }catch (Throwable throwable){
+            logger.error("mdb_env_info",throwable);
+            throw new RuntimeException(throwable);
+        }
+    }
+
+
+
 
 }

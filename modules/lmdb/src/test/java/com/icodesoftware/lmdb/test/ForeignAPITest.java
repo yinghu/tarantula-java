@@ -1,5 +1,6 @@
 package com.icodesoftware.lmdb.test;
 
+import com.beust.ah.A;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.ffm.NativeEnv;
 import com.icodesoftware.util.BufferProxy;
@@ -13,6 +14,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.VarHandle;
+import java.nio.charset.StandardCharsets;
 
 public class ForeignAPITest {
 
@@ -301,28 +303,21 @@ public class ForeignAPITest {
         Assert.assertNull(throwable);
     }
 
-    //@Test(groups = { "foreign API" })
+    @Test(groups = { "foreign API" })
     public void zeroLengthWrapperMemorySegmentTest(){
         Throwable throwable = null;
-        try(Arena arena = Arena.ofConfined()) {
-            StructLayout structLayout = MemoryLayout.structLayout(ValueLayout.JAVA_LONG.withName("mv_size"),MemoryLayout.sequenceLayout(100,ValueLayout.JAVA_BYTE).withName("mv_data"));
-            //SequenceLayout bytes = MemoryLayout.sequenceLayout(100,ValueLayout.JAVA_BYTE);
-            AddressLayout addressLayout = ValueLayout.ADDRESS.withTargetLayout(structLayout);
-            MemorySegment pointer = arena.allocate(addressLayout);
-            MemorySegment data = pointer.reinterpret(108,arena,mg->{
-                System.out.println("clean out");
-            });
-            data.setAtIndex(ValueLayout.JAVA_LONG,0,100);
-            Assert.assertEquals(data.getAtIndex(ValueLayout.JAVA_LONG,0),100L);
-            for(int i=0;i<40;i++){
-                data.setAtIndex(ValueLayout.JAVA_BYTE,i+8,(byte)'c');
-            }
-            Assert.assertEquals(data.getAtIndex(ValueLayout.JAVA_LONG,0),100l);
-            for(int i=0;i<40;i++){
-                Assert.assertEquals((char)data.getAtIndex(ValueLayout.JAVA_BYTE,i+8),'c');
-            }
+        try(Arena arena = Arena.ofConfined()){
+            StructLayout structLayout = MemoryLayout.structLayout(ValueLayout.JAVA_LONG.withName("mv_size"),AddressLayout.ADDRESS.withName("mv_data"));
+            MemorySegment pointer = arena.allocate(structLayout);
+            VarHandle vSize = structLayout.varHandle(MemoryLayout.PathElement.groupElement("mv_size"));
+            vSize.set(pointer,0,100);
+            VarHandle vData = structLayout.varHandle(MemoryLayout.PathElement.groupElement("mv_data"));
+            MemorySegment data = arena.allocateFrom("test", StandardCharsets.US_ASCII);
+            vData.set(pointer,0,data);
 
         }catch (Throwable ex){
+            ex.printStackTrace();
+
             throwable = ex;
         }
         Assert.assertNull(throwable);
@@ -335,7 +330,7 @@ public class ForeignAPITest {
         //nativeEnv.createDbi("test100");
         //nativeEnv.createDbi("test2");
         //nativeEnv.createDbi("test3");
-        nativeEnv.putTest("test_mill","key112379","value1121");
+        nativeEnv.putTest("key112379","value11");
         System.out.println("done");
         nativeEnv.shutdown();
         }catch (Exception ex){
