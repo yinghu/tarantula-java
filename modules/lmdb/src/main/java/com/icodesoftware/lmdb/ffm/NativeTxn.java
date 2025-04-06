@@ -113,6 +113,6 @@ public class NativeTxn implements AutoCloseable{
 
     @Override
     public void close(){
-        logger.warn("TXN CLOSE");
+
     }
 }

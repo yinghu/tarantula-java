@@ -63,6 +63,14 @@ public class NativeDbi extends NativeStat implements Serviceable {
         }
     }
 
+    public void delete(Recoverable.DataBuffer key){
+        try(Arena arena = Arena.ofConfined();NativeTxn txn = env.write(arena)){
+            MemorySegment k = mdbVal(arena,key);
+            mdbDel(txn,k,MemorySegment.NULL);
+            txn.commit();
+        }
+    }
+
     public void get(Recoverable.DataBuffer key,Recoverable.DataBuffer value){
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.read(arena)){
             MemorySegment k = mdbVal(arena,key);
@@ -146,6 +154,19 @@ public class NativeDbi extends NativeStat implements Serviceable {
         }catch (Throwable throwable){
             txn.abort();
             logger.error("mdb_get",throwable);
+            throw new RuntimeException(throwable);
+        }
+    }
+
+    private void mdbDel(NativeTxn txn,MemorySegment key,MemorySegment value){
+        try{
+            MemorySegment mdbDel = env.lib.find("mdb_del").get();
+            MethodHandle caller = env.linker.downcallHandle(mdbDel,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.ADDRESS));
+            int ret = (int)caller.invokeExact(txn.pointer(),dbi,key,value);
+            if(ret != 0) throw new RuntimeException("code ["+ret+"]");
+        }catch (Throwable throwable){
+            txn.abort();
+            logger.error("mdb_del",throwable);
             throw new RuntimeException(throwable);
         }
     }

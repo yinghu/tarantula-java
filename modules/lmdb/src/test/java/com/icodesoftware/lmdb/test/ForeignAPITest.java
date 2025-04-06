@@ -329,7 +329,7 @@ public class ForeignAPITest extends TestSetup{
             NativeEnv nativeEnv = new NativeEnv();
             nativeEnv.start();
             NativeDbi dbi = nativeEnv.createDbi("test");
-            dbi.drop(false);
+            //dbi.drop(false);
             System.out.println(dbi.entries());
             System.out.println(dbi.pageSize());
             System.out.println(dbi.depth());
@@ -338,12 +338,12 @@ public class ForeignAPITest extends TestSetup{
             Recoverable.DataBuffer value = BufferProxy.buffer(100,true);
             value.write("world".getBytes()).flip();
             dbi.put(key,value);
-            dbi.stat();
-            System.out.println(dbi.entries());
             key.rewind();
             value.clear();
-            dbi.get(key,value);
-            System.out.println(new String(value.array()));
+            dbi.delete(key);
+            dbi.stat();
+            System.out.println(dbi.entries());
+            //System.out.println(new String(value.array()));
             nativeEnv.shutdown();
         }catch (Exception ex){
             ex.printStackTrace();

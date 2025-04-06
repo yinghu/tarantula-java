@@ -182,19 +182,6 @@ public class NativeEnv extends NativeStat implements Serviceable {
     }
 
 
-
-    private void mdbDel(MemorySegment txn,MemorySegment dbi,MemorySegment key,MemorySegment value){
-        try{
-            MemorySegment mdbDel = lib.find("mdb_del").get();
-            MethodHandle caller = Linker.nativeLinker().downcallHandle(mdbDel,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.ADDRESS));
-            int ret = (int)caller.invokeExact(txn,dbi,key,value);
-            if(ret != 0) throw new RuntimeException("code ["+ret+"]");
-        }catch (Throwable throwable){
-            logger.error("mdb_del",throwable);
-            throw new RuntimeException(throwable);
-        }
-    }
-
     private void mdbEnvStat(MemorySegment stat){
         try{
             MemorySegment mdbEnvStat = lib.find("mdb_env_stat").get();
