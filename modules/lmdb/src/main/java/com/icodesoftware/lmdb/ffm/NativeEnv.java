@@ -71,7 +71,21 @@ public class NativeEnv implements Serviceable {
             MemorySegment txn = put.get(ValueLayout.ADDRESS,0);
             MemorySegment k = mdbVal(a,key);
             MemorySegment v = mdbVal(a,value);
-            //mdbPut(txn,dbi,k,v,0);
+            mdbPut(txn,dbi,k,v,0);
+            MemorySegment loaded = mdbVal(a);
+            mdbGet(txn,dbi,mdbVal(a,key),loaded);
+            System.out.println(loaded.get(ValueLayout.JAVA_LONG,0));
+            MemorySegment data = loaded.get(ValueLayout.ADDRESS,8);
+            System.out.println(data.byteSize());
+            MemorySegment x = data.reinterpret(loaded.get(ValueLayout.JAVA_LONG,0),a,mg->{
+                System.out.println("clean value");
+            });
+            System.out.println((char)x.getAtIndex(ValueLayout.JAVA_BYTE,0));
+            System.out.println((char)x.getAtIndex(ValueLayout.JAVA_BYTE,1));
+            System.out.println((char)x.getAtIndex(ValueLayout.JAVA_BYTE,2));
+            System.out.println((char)x.getAtIndex(ValueLayout.JAVA_BYTE,3));
+            System.out.println((char)x.getAtIndex(ValueLayout.JAVA_BYTE,4));
+            System.out.println((char)x.getAtIndex(ValueLayout.JAVA_BYTE,5));
             MemorySegment stat = dbiStat(a);
             mdbStat(txn,dbi,stat);
             System.out.println(stat.get(ValueLayout.JAVA_INT,0));
@@ -103,7 +117,18 @@ public class NativeEnv implements Serviceable {
         VarHandle vData = struct.varHandle(MemoryLayout.PathElement.groupElement("mv_data"));
         MemorySegment data = arena.allocateFrom(val, StandardCharsets.US_ASCII);
         vData.set(pointer,0,data);
-        return pointer;//.get(ValueLayout.ADDRESS,0);
+        return pointer;
+    }
+
+    private MemorySegment mdbVal(Arena a){
+        StructLayout struct = MemoryLayout.structLayout(ValueLayout.JAVA_LONG.withName("mv_size"),ValueLayout.ADDRESS.withName("mv_data"));
+        MemorySegment pointer = a.allocate(struct);
+        //VarHandle vSize = struct.varHandle(MemoryLayout.PathElement.groupElement("mv_size"));
+        //vSize.set(pointer,0,val.length()+1);
+        //VarHandle vData = struct.varHandle(MemoryLayout.PathElement.groupElement("mv_data"));
+        //MemorySegment data = arena.allocateFrom(val, StandardCharsets.US_ASCII);
+        //vData.set(pointer,0,data);
+        return pointer;
     }
 
 

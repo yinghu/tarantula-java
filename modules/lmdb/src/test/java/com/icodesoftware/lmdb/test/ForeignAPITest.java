@@ -330,7 +330,7 @@ public class ForeignAPITest {
         //nativeEnv.createDbi("test100");
         //nativeEnv.createDbi("test2");
         //nativeEnv.createDbi("test3");
-        nativeEnv.putTest("key112379","value11");
+        nativeEnv.putTest("key11237912","value11");
         System.out.println("done");
         nativeEnv.shutdown();
         }catch (Exception ex){
