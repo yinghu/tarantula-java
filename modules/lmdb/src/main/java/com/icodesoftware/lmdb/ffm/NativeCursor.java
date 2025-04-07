@@ -1,13 +1,15 @@
 package com.icodesoftware.lmdb.ffm;
 
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.util.BufferProxy;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 
-public class NativeCursor {
+public class NativeCursor implements AutoCloseable{
 
     private static final TarantulaLogger logger = JDKLogger.getLogger(NativeCursor.class);
     private final NativeEnv env;
@@ -28,42 +30,58 @@ public class NativeCursor {
         }
     }
 
-    public boolean next(Recoverable.DataBuffer key, Recoverable.DataBuffer value){
+    public void forEach(Recoverable.DataBuffer key, DataStore.BufferStream stream){
+        try(Arena arena = Arena.ofConfined()){
+            MemorySegment k = NativeUtil.mdbVal(arena,key);
+            MemorySegment v = NativeUtil.mdbVal(arena);
+            boolean next = mdbCursorGet(k,v,CursorOp.MDB_SET.mask());
+            if(!next) return;
+            next = mdbCursorGet(k,v,CursorOp.MDB_FIRST_DUP.mask());
+            if(next){
+                MemorySegment valueData = v.get(ValueLayout.ADDRESS,8);
+                long vLen = v.get(ValueLayout.JAVA_LONG,0);
+                MemorySegment xv = valueData.reinterpret(vLen,arena,null);
+                stream.on(BufferProxy.buffer(k.asByteBuffer()),BufferProxy.buffer(xv.asByteBuffer()));
+            }
+            while (mdbCursorGet(k,v,CursorOp.MDB_NEXT_DUP.mask())){
+                MemorySegment valueData = v.get(ValueLayout.ADDRESS,8);
+                long vLen = v.get(ValueLayout.JAVA_LONG,0);
+                MemorySegment xv = valueData.reinterpret(vLen,arena,null);
+                stream.on(BufferProxy.buffer(k.asByteBuffer()),BufferProxy.buffer(xv.asByteBuffer()));
+            }
+        }
+    }
+
+    public boolean next(DataStore.BufferStream stream){
         try(Arena arena = Arena.ofConfined()){
             MemorySegment k = dbi.mdbVal(arena);
             MemorySegment v = dbi.mdbVal(arena);
             boolean next = mdbCursorGet(k,v,CursorOp.MDB_NEXT.mask());
             if(next){
+                //Recoverable.DataBuffer key = BufferProxy.buffer(100,true);
+                //Recoverable.DataBuffer value = BufferProxy.buffer(100,true);
                 MemorySegment keyData = k.get(ValueLayout.ADDRESS,8);
                 long kLen = k.get(ValueLayout.JAVA_LONG,0);
                 MemorySegment xk = keyData.reinterpret(kLen,arena,null);
-                for(long i=0;i<kLen-1;i++){
-                    key.writeByte(xk.getAtIndex(ValueLayout.JAVA_BYTE,i));
-                }
-                key.flip();
+                //for(long i=0;i<kLen-1;i++){
+                    //key.writeByte(xk.getAtIndex(ValueLayout.JAVA_BYTE,i));
+                //}
+                //key.flip();
 
                 MemorySegment valueData = v.get(ValueLayout.ADDRESS,8);
                 long vLen = v.get(ValueLayout.JAVA_LONG,0);
                 MemorySegment xv = valueData.reinterpret(vLen,arena,null);
-                for(long i=0;i<vLen-1;i++) {
-                    value.writeByte(xv.getAtIndex(ValueLayout.JAVA_BYTE,i));
-                }
-                value.flip();
+                //for(long i=0;i<vLen-1;i++) {
+                    //value.writeByte(xv.getAtIndex(ValueLayout.JAVA_BYTE,i));
+                //}
+                //value.flip();
+                stream.on(BufferProxy.buffer(xk.asByteBuffer()),BufferProxy.buffer(xv.asByteBuffer()));
             }
             return next;
         }
     }
 
-    //count of duplicates for current key
-    public long count(){
-        long count;
-        try(Arena arena = Arena.ofConfined()){
-            MemorySegment cm = arena.allocate(ValueLayout.JAVA_LONG);
-            mdbCursorCount(cm);
-            count = cm.get(ValueLayout.JAVA_LONG,0);
-        }
-        return count;
-    }
+
 
     public void close(){
         mdbCursorClose();
@@ -89,7 +107,7 @@ public class NativeCursor {
             MethodHandle caller = env.linker.downcallHandle(mdbGet,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.JAVA_INT));
             int ret = (int)caller.invokeExact(cursor,key,value,op);
             if(ret == NativeCode.MDB_SUCCESS) return true;
-            if(ret == NativeCode.MDB_NOTFOUND) return false;
+            if(ret == NativeCode.MDB_NOT_FOUND) return false;
             throw new RuntimeException("code ["+ret+"]");
         }catch (Throwable throwable){
             logger.error("mdb_cursor_get",throwable);
@@ -97,18 +115,6 @@ public class NativeCursor {
         }
     }
 
-
-    private void mdbCursorCount(MemorySegment count){
-        try{
-            MemorySegment mdbCursorCount = env.lib.find("mdb_cursor_count").get();
-            MethodHandle caller = env.linker.downcallHandle(mdbCursorCount, FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.ADDRESS));
-            int ret = (int)caller.invokeExact(cursor,count);
-            if(ret != 0) throw new RuntimeException("code ["+ret+"]");
-        }catch (Throwable throwable){
-            logger.error("mdb_cursor_count",throwable);
-            throw new RuntimeException(throwable);
-        }
-    }
 
     private void mdbCursorClose(){
         try{

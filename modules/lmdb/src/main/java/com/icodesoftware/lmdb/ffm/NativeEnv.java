@@ -64,6 +64,16 @@ public class NativeEnv extends NativeStat implements Serviceable {
         });
     }
 
+    public NativeDbi createDbi(String name,String label){
+        return nativeDbs.computeIfAbsent(name,key->{
+            NativeDbi nativeDbi = new NativeDbi(this,name,label);
+            try{nativeDbi.start();}catch (Exception ex){
+                throw new RuntimeException(ex);
+            }
+            return nativeDbi;
+        });
+    }
+
     public NativeTxn read(Arena arena){
         MemorySegment pointer = arena.allocate(AddressLayout.ADDRESS);
         mdbTxnBegin(MemorySegment.NULL,pointer,MaskFlag.TXN_RD_ONLY.mask());

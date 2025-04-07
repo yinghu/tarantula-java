@@ -1,6 +1,5 @@
 package com.icodesoftware.lmdb.test;
 
-import com.beust.ah.A;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.ffm.NativeCursor;
 import com.icodesoftware.lmdb.ffm.NativeDbi;
@@ -329,32 +328,40 @@ public class ForeignAPITest extends TestSetup{
         try{
             NativeEnv nativeEnv = new NativeEnv();
             nativeEnv.start();
-            NativeDbi dbi = nativeEnv.createDbi("test");
+            NativeDbi dbi = nativeEnv.createDbi("test","player");
+            System.out.println(dbi.name());
             //dbi.drop(false);
             System.out.println(dbi.entries());
             System.out.println(dbi.pageSize());
             System.out.println(dbi.depth());
             Recoverable.DataBuffer key = BufferProxy.buffer(100,true);
-            key.write("hello12379999912".getBytes()).flip();
+            key.write("player23".getBytes()).flip();
             Recoverable.DataBuffer value = BufferProxy.buffer(100,true);
-            value.write("12world7878".getBytes()).flip();
-            dbi.put(key,value);
-            key.rewind();
-            value.clear();
+            value.write("player2006".getBytes()).flip();
+            //dbi.put(key,value);
+            //key.rewind();
+            //value.clear();
             //dbi.delete(key);
-            dbi.stat();
-            System.out.println(dbi.entries());
+            //dbi.stat();
+            //System.out.println(dbi.entries());
             //System.out.println(new String(value.array()));
             NativeCursor cursor = dbi.openCursor();
-            key.clear();
-            value.clear();
 
-            while (cursor.next(key,value)) {
-                System.out.println(new String(key.array()));
-                System.out.println(new String(value.array()));
-                key.clear();
-                value.clear();
-            }
+            //key.clear();
+            value.clear();
+            //key.rewind();
+            cursor.forEach(key,(k,v)->{
+                //System.out.println(new String(k.array()));
+                System.out.println(new String(v.array()));
+                //System.out.println("call");
+                return true;
+            });
+            //{
+               //System.out.println(new String(key.array()));
+               //System.out.println(new String(value.array()));
+               //key.clear();
+               //value.clear();
+            //}
             cursor.close();
             nativeEnv.shutdown();
         }catch (Exception ex){

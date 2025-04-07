@@ -30,7 +30,13 @@ public enum CursorOp {
 
     MDB_PREV_DUP(13),
 
-    MDB_PREV_NODUP(14);
+    MDB_PREV_NODUP(14),
+
+    MDB_SET(15),
+
+    MDB_SET_KEY(16),
+
+    MDB_SET_RANGE(17);
 
     private final int mask;
 
