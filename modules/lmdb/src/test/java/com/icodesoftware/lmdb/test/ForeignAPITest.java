@@ -2,6 +2,7 @@ package com.icodesoftware.lmdb.test;
 
 import com.beust.ah.A;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.lmdb.ffm.NativeCursor;
 import com.icodesoftware.lmdb.ffm.NativeDbi;
 import com.icodesoftware.lmdb.ffm.NativeEnv;
 import com.icodesoftware.util.BufferProxy;
@@ -334,16 +335,35 @@ public class ForeignAPITest extends TestSetup{
             System.out.println(dbi.pageSize());
             System.out.println(dbi.depth());
             Recoverable.DataBuffer key = BufferProxy.buffer(100,true);
-            key.write("hello12377b".getBytes()).flip();
+            key.write("hello123799999".getBytes()).flip();
             Recoverable.DataBuffer value = BufferProxy.buffer(100,true);
-            value.write("world".getBytes()).flip();
+            value.write("world7878".getBytes()).flip();
             dbi.put(key,value);
             key.rewind();
             value.clear();
-            dbi.delete(key);
+            //dbi.delete(key);
             dbi.stat();
             System.out.println(dbi.entries());
             //System.out.println(new String(value.array()));
+            NativeCursor cursor = dbi.openCursor();
+            key.clear();
+            value.clear();
+            cursor.next(key,value);
+            System.out.println(new String(key.array()));
+            System.out.println(new String(value.array()));
+
+            key.clear();
+            value.clear();
+            cursor.next(key,value);
+            System.out.println(new String(key.array()));
+            System.out.println(new String(value.array()));
+            key.clear();
+            value.clear();
+            cursor.next(key,value);
+            System.out.println(new String(key.array()));
+            System.out.println(new String(value.array()));
+            //System.out.println(cursor.count());
+            cursor.close();
             nativeEnv.shutdown();
         }catch (Exception ex){
             ex.printStackTrace();

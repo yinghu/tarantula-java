@@ -25,6 +25,10 @@ public class NativeDbi extends NativeStat implements Serviceable {
         this.name = name;
     }
 
+    public MemorySegment pointer(){
+        return dbi;
+    }
+
     @Override
     public void start() throws Exception {
         try(Arena a = Arena.ofConfined(); NativeTxn txn = env.write(a)) {
@@ -87,6 +91,14 @@ public class NativeDbi extends NativeStat implements Serviceable {
         }
     }
 
+
+
+    public NativeCursor openCursor(){
+        NativeCursor cursor = new NativeCursor(this.env,this);
+        cursor.open();
+        return cursor;
+    }
+
     public void stat(){
         try(Arena arena = Arena.ofConfined();NativeTxn txn = env.read(arena)){
             MemorySegment stat = dbiStat(arena);
@@ -119,7 +131,7 @@ public class NativeDbi extends NativeStat implements Serviceable {
         return pointer;
     }
 
-    private MemorySegment mdbVal(Arena a){
+    public MemorySegment mdbVal(Arena a){
         StructLayout struct = MemoryLayout.structLayout(ValueLayout.JAVA_LONG.withName("mv_size"),ValueLayout.ADDRESS.withName("mv_data"));
         MemorySegment pointer = a.allocate(struct);
         return pointer;
@@ -220,5 +232,6 @@ public class NativeDbi extends NativeStat implements Serviceable {
             throw new RuntimeException(throwable);
         }
     }
+
 
 }
