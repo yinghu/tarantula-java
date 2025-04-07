@@ -38,6 +38,15 @@ public class NativeUtil {
         MemorySegment memorySegment = arena.allocate(layout);
         return memorySegment;
     }
+
+    public static MemorySegment mdbInfo(Arena arena){
+        StructLayout layout = MemoryLayout.structLayout(AddressLayout.ADDRESS.withName("me_mapaddr"),ValueLayout.JAVA_LONG.withName("me_mapsize")
+                ,ValueLayout.JAVA_LONG.withName("me_last_pgno"),ValueLayout.JAVA_LONG.withName("me_last_txnid"),
+                ValueLayout.JAVA_INT.withName("me_max_readers"),ValueLayout.JAVA_INT.withName("me_numreaders"));
+        MemorySegment memorySegment = arena.allocate(layout);
+        return memorySegment;
+    }
+
     public static MemorySegment mdbPointer(Arena arena){
         return arena.allocate(AddressLayout.ADDRESS);
     }

@@ -86,13 +86,6 @@ public class NativeEnv extends NativeStat implements Serviceable {
         return new NativeTxn(this,pointer.get(ValueLayout.ADDRESS,0),true);
     }
 
-    private MemorySegment envStat(Arena a){
-        StructLayout layout = MemoryLayout.structLayout(ValueLayout.JAVA_INT.withName("ms_psize"),ValueLayout.JAVA_INT.withName("ms_depth"),
-                ValueLayout.JAVA_LONG.withName("ms_branch_pages"),ValueLayout.JAVA_LONG.withName("ms_leaf_pages"),ValueLayout.JAVA_LONG.withName("ms_overflow_pages"),ValueLayout.JAVA_LONG.withName("ms_entries"));
-        MemorySegment memorySegment = a.allocate(layout);
-        return memorySegment;
-    }
-
     private void mdbEnvCreate(){
         try{
             MemorySegment mdbEnvCreate = lib.find("mdb_env_create").get();

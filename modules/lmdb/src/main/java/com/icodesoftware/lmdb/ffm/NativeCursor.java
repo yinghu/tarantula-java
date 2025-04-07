@@ -41,23 +41,22 @@ public class NativeCursor implements AutoCloseable{
                 MemorySegment valueData = v.get(ValueLayout.ADDRESS,8);
                 long vLen = v.get(ValueLayout.JAVA_LONG,0);
                 MemorySegment xv = valueData.reinterpret(vLen,arena,null);
-                stream.on(BufferProxy.buffer(k.asByteBuffer()),BufferProxy.buffer(xv.asByteBuffer()));
+                if(!stream.on(BufferProxy.buffer(k.asByteBuffer()),BufferProxy.buffer(xv.asByteBuffer()))) return;
             }
             while (mdbCursorGet(k,v,CursorOp.MDB_NEXT_DUP.mask())){
                 MemorySegment valueData = v.get(ValueLayout.ADDRESS,8);
                 long vLen = v.get(ValueLayout.JAVA_LONG,0);
                 MemorySegment xv = valueData.reinterpret(vLen,arena,null);
-                stream.on(BufferProxy.buffer(k.asByteBuffer()),BufferProxy.buffer(xv.asByteBuffer()));
+                if(!stream.on(BufferProxy.buffer(k.asByteBuffer()),BufferProxy.buffer(xv.asByteBuffer()))) break;
             }
         }
     }
 
-    public boolean next(DataStore.BufferStream stream){
+    public void forEach(DataStore.BufferStream stream){
         try(Arena arena = Arena.ofConfined()){
             MemorySegment k = dbi.mdbVal(arena);
             MemorySegment v = dbi.mdbVal(arena);
-            boolean next = mdbCursorGet(k,v,CursorOp.MDB_NEXT.mask());
-            if(next){
+            while (mdbCursorGet(k,v,CursorOp.MDB_NEXT.mask())){
                 //Recoverable.DataBuffer key = BufferProxy.buffer(100,true);
                 //Recoverable.DataBuffer value = BufferProxy.buffer(100,true);
                 MemorySegment keyData = k.get(ValueLayout.ADDRESS,8);
@@ -75,9 +74,8 @@ public class NativeCursor implements AutoCloseable{
                     //value.writeByte(xv.getAtIndex(ValueLayout.JAVA_BYTE,i));
                 //}
                 //value.flip();
-                stream.on(BufferProxy.buffer(xk.asByteBuffer()),BufferProxy.buffer(xv.asByteBuffer()));
+                if(!stream.on(BufferProxy.buffer(xk.asByteBuffer()),BufferProxy.buffer(xv.asByteBuffer()))) break;
             }
-            return next;
         }
     }
 
