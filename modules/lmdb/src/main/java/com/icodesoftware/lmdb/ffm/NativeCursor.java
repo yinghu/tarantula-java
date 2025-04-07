@@ -28,27 +28,29 @@ public class NativeCursor {
         }
     }
 
-    public void next(Recoverable.DataBuffer key, Recoverable.DataBuffer value){
+    public boolean next(Recoverable.DataBuffer key, Recoverable.DataBuffer value){
         try(Arena arena = Arena.ofConfined()){
             MemorySegment k = dbi.mdbVal(arena);
             MemorySegment v = dbi.mdbVal(arena);
-            mdbCursorGet(k,v,CursorOp.MDB_NEXT.mask());
+            boolean next = mdbCursorGet(k,v,CursorOp.MDB_NEXT.mask());
+            if(next){
+                MemorySegment keyData = k.get(ValueLayout.ADDRESS,8);
+                long kLen = k.get(ValueLayout.JAVA_LONG,0);
+                MemorySegment xk = keyData.reinterpret(kLen,arena,null);
+                for(long i=0;i<kLen-1;i++){
+                    key.writeByte(xk.getAtIndex(ValueLayout.JAVA_BYTE,i));
+                }
+                key.flip();
 
-            MemorySegment keyData = k.get(ValueLayout.ADDRESS,8);
-            long kLen = k.get(ValueLayout.JAVA_LONG,0);
-            MemorySegment xk = keyData.reinterpret(kLen,arena,null);
-            for(long i=0;i<kLen-1;i++){
-                value.writeByte(xk.getAtIndex(ValueLayout.JAVA_BYTE,i));
+                MemorySegment valueData = v.get(ValueLayout.ADDRESS,8);
+                long vLen = v.get(ValueLayout.JAVA_LONG,0);
+                MemorySegment xv = valueData.reinterpret(vLen,arena,null);
+                for(long i=0;i<vLen-1;i++) {
+                    value.writeByte(xv.getAtIndex(ValueLayout.JAVA_BYTE,i));
+                }
+                value.flip();
             }
-            key.flip();
-
-            MemorySegment valueData = v.get(ValueLayout.ADDRESS,8);
-            long vLen = v.get(ValueLayout.JAVA_LONG,0);
-            MemorySegment xv = valueData.reinterpret(vLen,arena,null);
-            for(long i=0;i<vLen-1;i++) {
-                value.writeByte(xv.getAtIndex(ValueLayout.JAVA_BYTE,i));
-            }
-            value.flip();
+            return next;
         }
     }
 
@@ -81,12 +83,14 @@ public class NativeCursor {
         }
     }
 
-    private void mdbCursorGet(MemorySegment key,MemorySegment value,int op){
+    private boolean mdbCursorGet(MemorySegment key,MemorySegment value,int op){
         try{
             MemorySegment mdbGet = env.lib.find("mdb_cursor_get").get();
             MethodHandle caller = env.linker.downcallHandle(mdbGet,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.JAVA_INT));
             int ret = (int)caller.invokeExact(cursor,key,value,op);
-            if(ret != 0) throw new RuntimeException("code ["+ret+"]");
+            if(ret == NativeCode.MDB_SUCCESS) return true;
+            if(ret == NativeCode.MDB_NOTFOUND) return false;
+            throw new RuntimeException("code ["+ret+"]");
         }catch (Throwable throwable){
             logger.error("mdb_cursor_get",throwable);
             throw new RuntimeException(throwable);

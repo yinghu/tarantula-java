@@ -335,9 +335,9 @@ public class ForeignAPITest extends TestSetup{
             System.out.println(dbi.pageSize());
             System.out.println(dbi.depth());
             Recoverable.DataBuffer key = BufferProxy.buffer(100,true);
-            key.write("hello123799999".getBytes()).flip();
+            key.write("hello12379999912".getBytes()).flip();
             Recoverable.DataBuffer value = BufferProxy.buffer(100,true);
-            value.write("world7878".getBytes()).flip();
+            value.write("12world7878".getBytes()).flip();
             dbi.put(key,value);
             key.rewind();
             value.clear();
@@ -348,21 +348,13 @@ public class ForeignAPITest extends TestSetup{
             NativeCursor cursor = dbi.openCursor();
             key.clear();
             value.clear();
-            cursor.next(key,value);
-            System.out.println(new String(key.array()));
-            System.out.println(new String(value.array()));
 
-            key.clear();
-            value.clear();
-            cursor.next(key,value);
-            System.out.println(new String(key.array()));
-            System.out.println(new String(value.array()));
-            key.clear();
-            value.clear();
-            cursor.next(key,value);
-            System.out.println(new String(key.array()));
-            System.out.println(new String(value.array()));
-            //System.out.println(cursor.count());
+            while (cursor.next(key,value)) {
+                System.out.println(new String(key.array()));
+                System.out.println(new String(value.array()));
+                key.clear();
+                value.clear();
+            }
             cursor.close();
             nativeEnv.shutdown();
         }catch (Exception ex){
