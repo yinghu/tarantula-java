@@ -65,7 +65,7 @@ public class NativeEnv extends NativeStat implements Serviceable {
     }
 
     public NativeDbi createDbi(String name,String label){
-        return nativeDbs.computeIfAbsent(name,key->{
+        return nativeDbs.computeIfAbsent(name+"#"+label,key->{
             NativeDbi nativeDbi = new NativeDbi(this,name,label);
             try{nativeDbi.start();}catch (Exception ex){
                 throw new RuntimeException(ex);

@@ -16,21 +16,25 @@ public class NativeCursor implements AutoCloseable{
     private final NativeDbi dbi;
 
     private MemorySegment cursor;
-
-    public NativeCursor(final NativeEnv env,final NativeDbi dbi){
+    private NativeTxn txn;
+    private final boolean edge;
+    public NativeCursor(final NativeEnv env,final NativeDbi dbi,boolean edge){
         this.env = env;
         this.dbi = dbi;
+        this.edge = edge;
     }
 
     public void open(){
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.read(arena)){
             MemorySegment cm = arena.allocate(AddressLayout.ADDRESS);
             mdbCursorOpen(txn,cm);
+            this.txn = txn;
             cursor = cm.get(ValueLayout.ADDRESS,0);
         }
     }
 
     public void forEach(Recoverable.DataBuffer key, DataStore.BufferStream stream){
+        if(!edge) return;
         try(Arena arena = Arena.ofConfined()){
             MemorySegment k = NativeUtil.mdbVal(arena,key);
             MemorySegment v = NativeUtil.mdbVal(arena);
@@ -82,6 +86,7 @@ public class NativeCursor implements AutoCloseable{
 
 
     public void close(){
+        txn.abort();
         mdbCursorClose();
     }
 

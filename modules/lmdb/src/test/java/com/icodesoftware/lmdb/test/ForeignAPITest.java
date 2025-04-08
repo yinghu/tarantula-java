@@ -324,45 +324,50 @@ public class ForeignAPITest extends TestSetup{
         Assert.assertNull(throwable);
     }
 
+    private static NativeDbi dataDbi(NativeEnv env,String player){
+        NativeDbi dbi = env.createDbi("test");
+        Recoverable.DataBuffer key = BufferProxy.buffer(100,true);
+        key.write(player.getBytes()).flip();
+        Recoverable.DataBuffer value = BufferProxy.buffer(100,true);
+        value.write("player2006".getBytes()).flip();
+        dbi.put(key,value);
+        try(NativeCursor cursor = dbi.openCursor()){
+            //key.rewind();
+            cursor.forEach((k,v)->{
+                System.out.println(new String(v.array()));
+                return true;
+            });
+        }
+        return dbi;
+    }
+
+    private static NativeDbi edgeDbi(NativeEnv env,String player){
+        NativeDbi dbi = env.createDbi("test","player");
+        Recoverable.DataBuffer key = BufferProxy.buffer(100,true);
+        key.write(player.getBytes()).flip();
+        Recoverable.DataBuffer value = BufferProxy.buffer(100,true);
+        value.write("playerEdge11".getBytes()).flip();
+        dbi.put(key,value);
+        try(NativeCursor cursor = dbi.openCursor()){
+            key.rewind();
+            cursor.forEach(key,(k,v)->{
+                System.out.println(new String(v.array()));
+                return true;
+            });
+        }
+        return dbi;
+    }
+
     public static void main(String[] arg) throws Exception{
         try{
             NativeEnv nativeEnv = new NativeEnv();
             nativeEnv.start();
-            NativeDbi dbi = nativeEnv.createDbi("test","player");
-            System.out.println(dbi.name());
-            //dbi.drop(false);
-            System.out.println(dbi.entries());
-            System.out.println(dbi.pageSize());
-            System.out.println(dbi.depth());
-            Recoverable.DataBuffer key = BufferProxy.buffer(100,true);
-            key.write("player23".getBytes()).flip();
-            Recoverable.DataBuffer value = BufferProxy.buffer(100,true);
-            value.write("player2006".getBytes()).flip();
-            //dbi.put(key,value);
-            //key.rewind();
-            //value.clear();
-            //dbi.delete(key);
-            //dbi.stat();
-            //System.out.println(dbi.entries());
-            //System.out.println(new String(value.array()));
-            NativeCursor cursor = dbi.openCursor();
-
-            //key.clear();
-            value.clear();
-            //key.rewind();
-            cursor.forEach(key,(k,v)->{
-                //System.out.println(new String(k.array()));
-                System.out.println(new String(v.array()));
-                //System.out.println("call");
-                return true;
-            });
-            //{
-               //System.out.println(new String(key.array()));
-               //System.out.println(new String(value.array()));
-               //key.clear();
-               //value.clear();
-            //}
-            cursor.close();
+            NativeDbi data = dataDbi(nativeEnv,"player1x");
+            data.stat();
+            System.out.println(data.entries());
+            NativeDbi edge = edgeDbi(nativeEnv,"player1x");
+            edge.stat();
+            System.out.println(edge.entries());
             nativeEnv.shutdown();
         }catch (Exception ex){
             ex.printStackTrace();

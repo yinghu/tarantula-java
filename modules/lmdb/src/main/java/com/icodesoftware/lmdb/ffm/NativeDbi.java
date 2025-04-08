@@ -111,13 +111,13 @@ public class NativeDbi extends NativeStat implements Serviceable {
     }
 
     public NativeCursor openCursor(){
-        NativeCursor cursor = new NativeCursor(this.env,this);
+        NativeCursor cursor = new NativeCursor(this.env,this,putFlag==MaskFlag.PUT_NO_DUP_DATA.mask());
         cursor.open();
         return cursor;
     }
 
     public void stat(){
-        try(Arena arena = Arena.ofConfined();NativeTxn txn = env.read(arena)){
+        try(Arena arena = Arena.ofConfined() ; NativeTxn txn = env.read(arena)){
             MemorySegment stat = dbiStat(arena);
             mdbStat(txn,dbi,stat);
             pageSize.set(stat.get(ValueLayout.JAVA_INT,0));
