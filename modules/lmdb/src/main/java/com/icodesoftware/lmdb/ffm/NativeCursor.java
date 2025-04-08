@@ -38,16 +38,16 @@ public class NativeCursor implements AutoCloseable{
         try(Arena arena = Arena.ofConfined()){
             MemorySegment k = NativeUtil.mdbVal(arena,key);
             MemorySegment v = NativeUtil.mdbVal(arena);
-            boolean next = mdbCursorGet(k,v,CursorOp.MDB_SET.mask());
+            boolean next = mdbCursorGet(k,v, CursorMask.MDB_SET.mask());
             if(!next) return;
-            next = mdbCursorGet(k,v,CursorOp.MDB_FIRST_DUP.mask());
+            next = mdbCursorGet(k,v, CursorMask.MDB_FIRST_DUP.mask());
             if(next){
                 MemorySegment valueData = v.get(ValueLayout.ADDRESS,8);
                 long vLen = v.get(ValueLayout.JAVA_LONG,0);
                 MemorySegment xv = valueData.reinterpret(vLen,arena,null);
                 if(!stream.on(BufferProxy.buffer(k.asByteBuffer()),BufferProxy.buffer(xv.asByteBuffer()))) return;
             }
-            while (mdbCursorGet(k,v,CursorOp.MDB_NEXT_DUP.mask())){
+            while (mdbCursorGet(k,v, CursorMask.MDB_NEXT_DUP.mask())){
                 MemorySegment valueData = v.get(ValueLayout.ADDRESS,8);
                 long vLen = v.get(ValueLayout.JAVA_LONG,0);
                 MemorySegment xv = valueData.reinterpret(vLen,arena,null);
@@ -60,7 +60,7 @@ public class NativeCursor implements AutoCloseable{
         try(Arena arena = Arena.ofConfined()){
             MemorySegment k = dbi.mdbVal(arena);
             MemorySegment v = dbi.mdbVal(arena);
-            while (mdbCursorGet(k,v,CursorOp.MDB_NEXT.mask())){
+            while (mdbCursorGet(k,v, CursorMask.MDB_NEXT.mask())){
                 //Recoverable.DataBuffer key = BufferProxy.buffer(100,true);
                 //Recoverable.DataBuffer value = BufferProxy.buffer(100,true);
                 MemorySegment keyData = k.get(ValueLayout.ADDRESS,8);

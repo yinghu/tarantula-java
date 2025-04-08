@@ -76,7 +76,7 @@ public class NativeEnv extends NativeStat implements Serviceable {
 
     public NativeTxn read(Arena arena){
         MemorySegment pointer = arena.allocate(AddressLayout.ADDRESS);
-        mdbTxnBegin(MemorySegment.NULL,pointer,MaskFlag.TXN_RD_ONLY.mask());
+        mdbTxnBegin(MemorySegment.NULL,pointer, TxnMask.TXN_RD_ONLY.mask());
         return new NativeTxn(this,pointer.get(ValueLayout.ADDRESS,0),true);
     }
 
@@ -105,7 +105,7 @@ public class NativeEnv extends NativeStat implements Serviceable {
             MemorySegment mdbEnvOpen = lib.find("mdb_env_open").get();
             MethodHandle caller = Linker.nativeLinker().downcallHandle(mdbEnvOpen,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.JAVA_INT,ValueLayout.JAVA_INT));
             MemorySegment dir = arena.allocateFrom(databasePath);
-            int ret = (int)caller.invokeExact(env,dir,MaskFlag.ENV_NO_SYNC.mask(),MaskFlag.LINUX_MODE.mask());
+            int ret = (int)caller.invokeExact(env,dir,EnvMask.ENV_NO_SYNC.mask(),EnvMask.ACCESS_MODE.mask());
             if(ret != 0) throw new RuntimeException("code ["+ret+"]");
         }catch (Throwable throwable){
             logger.error("mdb_env_open",throwable);

@@ -27,8 +27,8 @@ public class NativeDbi extends NativeStat implements Serviceable {
     public NativeDbi(final NativeEnv env,final String name,final String label){
         this.env = env;
         this.name = label==null ? name : name+"#"+label;
-        this.openFlag = label==null? MaskFlag.DBI_CREATE.mask() : (MaskFlag.DBI_CREATE.mask() | MaskFlag.DBI_DUP_SORT.mask());
-        this.putFlag = label==null? 0 : MaskFlag.PUT_NO_DUP_DATA.mask();
+        this.openFlag = label==null? DbiMask.DBI_CREATE.mask() : (DbiMask.DBI_CREATE.mask() | DbiMask.DBI_DUP_SORT.mask());
+        this.putFlag = label==null? 0 : PutMask.PUT_NO_DUP_DATA.mask();
     }
 
     public String name(){
@@ -111,7 +111,7 @@ public class NativeDbi extends NativeStat implements Serviceable {
     }
 
     public NativeCursor openCursor(){
-        NativeCursor cursor = new NativeCursor(this.env,this,putFlag==MaskFlag.PUT_NO_DUP_DATA.mask());
+        NativeCursor cursor = new NativeCursor(this.env,this,putFlag== PutMask.PUT_NO_DUP_DATA.mask());
         cursor.open();
         return cursor;
     }

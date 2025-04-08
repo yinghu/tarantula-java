@@ -1,6 +1,6 @@
 package com.icodesoftware.lmdb.ffm;
 
-public enum CursorOp {
+public enum CursorMask implements NativeMask{
 
     MDB_FIRST(0),
 
@@ -40,7 +40,7 @@ public enum CursorOp {
 
     private final int mask;
 
-    CursorOp(int mask){
+    CursorMask(int mask){
         this.mask = mask;
     }
 
