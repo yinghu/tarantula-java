@@ -18,10 +18,8 @@ import com.tarantula.platform.item.PlatformItemServiceProvider;
 import com.tarantula.platform.presence.Profile;
 
 import java.io.File;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,6 +74,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     private final static String ANALYTICS_QUERY_HEADER = "#Analytics";
     private static String ANALYTICS_QUERY;
     private LocalDateTime seasonStartTime;
+    private boolean resetELO = false;
     public PlatformPVPBattleServiceProvider(PlatformGameServiceProvider gameServiceProvider){
         super(gameServiceProvider,NAME);
         ANALYTICS_QUERY = gameServiceProvider.gameCluster().typeId()+ANALYTICS_QUERY_HEADER;
@@ -390,6 +389,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
             ix[0]++;
         });
         seasonStartTime = loaded.startTime();
+        resetELO = loaded.resetELO();
         this.rotation.seasonRotation = loaded.distributionId();
         long delay = TimeUtil.expired(loaded.startTime())? 100 : TimeUtil.durationUTCMilliseconds(LocalDateTime.now(),loaded.startTime());
         serviceContext.schedule(new ScheduleRunner(delay,()->scheduleSeason()));
@@ -491,7 +491,7 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     }
 
     private void startSeason(SeasonRuntime seasonRuntime){
-        seasonReset(seasonRuntime);
+        if(resetELO) seasonReset(seasonRuntime);
         LocalDateTime closeTime = TimeUtil.fromUTCMilliseconds(seasonRuntime.closeTime);
         long endTimeDuration = TimeUtil.expired(closeTime)? 100 : TimeUtil.durationUTCMilliseconds(LocalDateTime.now(),TimeUtil.fromUTCMilliseconds(seasonRuntime.closeTime));
         this.rotation.schedule(seasonRuntime);

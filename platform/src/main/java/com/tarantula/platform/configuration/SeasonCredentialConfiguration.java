@@ -32,6 +32,10 @@ public class SeasonCredentialConfiguration extends CredentialConfiguration {
         return TimeUtil.fromString("yyyy-MM-dd'T'HH:mm",header.get("StartTime").getAsString());
     }
 
+    public boolean resetELO(){
+        return header.get("ResetELO").getAsBoolean();
+    }
+
     public List<Season> list(){
         return seasons;
     }
