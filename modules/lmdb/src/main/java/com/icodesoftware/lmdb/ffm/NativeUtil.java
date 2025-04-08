@@ -47,7 +47,4 @@ public class NativeUtil {
         return memorySegment;
     }
 
-    public static MemorySegment mdbPointer(Arena arena){
-        return arena.allocate(AddressLayout.ADDRESS);
-    }
 }

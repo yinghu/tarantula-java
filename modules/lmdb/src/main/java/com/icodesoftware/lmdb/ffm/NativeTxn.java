@@ -18,6 +18,7 @@ public class NativeTxn implements AutoCloseable{
     private final NativeEnv env;
     private final MemorySegment txn;
     private final boolean readOnly;
+    private boolean committed = false;
 
     public NativeTxn(final NativeEnv env,final MemorySegment txn,final boolean readOnly){
         this.env = env;
@@ -35,10 +36,12 @@ public class NativeTxn implements AutoCloseable{
 
     public void commit(){
         mdbTxnCommit();
+        committed = true;
     }
 
     public void abort(){
         mdbTxnAbort();
+        committed = true;
     }
 
     public void reset(){
@@ -113,6 +116,6 @@ public class NativeTxn implements AutoCloseable{
 
     @Override
     public void close(){
-
+        //if(!committed) abort();
     }
 }
