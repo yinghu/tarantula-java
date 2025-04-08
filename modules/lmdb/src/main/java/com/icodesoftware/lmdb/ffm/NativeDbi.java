@@ -76,6 +76,13 @@ public class NativeDbi extends NativeStat implements Serviceable {
             txn.commit();
         }
     }
+    public void put(Recoverable.DataBuffer key,Recoverable.DataBuffer value,NativeTxn txn){
+        try(Arena arena = Arena.ofConfined()){
+            MemorySegment k = mdbVal(arena,key);
+            MemorySegment v = mdbVal(arena,value);
+            mdbPut(txn,dbi,k,v,putFlag);
+        }
+    }
 
     public void delete(Recoverable.DataBuffer key){
         try(Arena arena = Arena.ofConfined();NativeTxn txn = env.write(arena)){

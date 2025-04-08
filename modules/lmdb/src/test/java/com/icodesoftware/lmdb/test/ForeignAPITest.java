@@ -4,8 +4,10 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.ffm.NativeCursor;
 import com.icodesoftware.lmdb.ffm.NativeDbi;
 import com.icodesoftware.lmdb.ffm.NativeEnv;
+import com.icodesoftware.lmdb.ffm.NativeTxn;
 import com.icodesoftware.util.BufferProxy;
 
+import com.icodesoftware.util.IntegerKey;
 import com.icodesoftware.util.LocalHeader;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -342,17 +344,14 @@ public class ForeignAPITest extends TestSetup{
         return dbi;
     }
 
-    private static NativeDbi edgeDbi(NativeEnv env,String player){
-        NativeDbi dbi = env.createDbi("test","player");
+    private static NativeDbi edgeDbi(NativeEnv env, Recoverable.Key okey){
+        NativeDbi dbi = env.createDbi("access","provider");
         Recoverable.DataBuffer key = BufferProxy.buffer(100,true);
-        key.write(player.getBytes()).flip();
-        Recoverable.DataBuffer value = BufferProxy.buffer(100,true);
-        value.write("playerEdge11".getBytes()).flip();
-        dbi.put(key,value);
+        okey.write(key);
+        key.flip();
         try(NativeCursor cursor = dbi.openCursor()){
-            key.rewind();
             cursor.forEach(key,(k,v)->{
-                System.out.println(new String(v.array()));
+                System.out.println(v.readUTF8());
                 return true;
             });
         }
@@ -361,14 +360,25 @@ public class ForeignAPITest extends TestSetup{
 
     private static void save(NativeEnv env,TestAccessIndex accessIndex){
         NativeDbi dbi = env.createDbi("access");
-        Recoverable.DataBuffer key = BufferProxy.buffer(500,true);
-        Recoverable.DataBuffer value = BufferProxy.buffer(1000,true);
-        value.writeHeader(LocalHeader.create(accessIndex.getFactoryId(),accessIndex.getClassId(),1));
-        accessIndex.writeKey(key);
-        accessIndex.write(value);
-        key.flip();
-        value.flip();
-        dbi.put(key,value);
+        NativeDbi edge = env.createDbi("access",accessIndex.label());
+        try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena)){
+            Recoverable.DataBuffer key = BufferProxy.buffer(500,true);
+            Recoverable.DataBuffer value = BufferProxy.buffer(1000,true);
+            value.writeHeader(LocalHeader.create(accessIndex.getFactoryId(),accessIndex.getClassId(),1));
+            accessIndex.writeKey(key);
+            accessIndex.write(value);
+            key.flip();
+            value.flip();
+            dbi.put(key,value,txn);
+            key.clear();
+            value.clear();
+            accessIndex.ownerKey().write(key);
+            accessIndex.writeKey(value);
+            key.flip();
+            value.flip();
+            edge.put(key,value,txn);
+            txn.commit();
+        }
     }
     private static void load(NativeEnv env,TestAccessIndex accessIndex){
         NativeDbi dbi = env.createDbi("access");
@@ -388,16 +398,19 @@ public class ForeignAPITest extends TestSetup{
         try{
             NativeEnv nativeEnv = new NativeEnv();
             nativeEnv.start();
-            TestAccessIndex accessIndex = new TestAccessIndex("tester1");
-            accessIndex.referenceId = 200;
-            accessIndex.distributionId(4001);
-            accessIndex.group = "admin2";
+            TestAccessIndex accessIndex = new TestAccessIndex("tester6");
+            accessIndex.label("provider");
+            accessIndex.referenceId = 300;
+            accessIndex.distributionId(5001);
+            accessIndex.group = "admin45";
+            accessIndex.ownerKey(IntegerKey.from(300));
             save(nativeEnv,accessIndex);
-            TestAccessIndex load = new TestAccessIndex("tester1");
+            TestAccessIndex load = new TestAccessIndex("tester4");
             load(nativeEnv,load);
             System.out.println(load.referenceId);
             System.out.println(load.distributionId());
             System.out.println(load.group);
+            edgeDbi(nativeEnv,IntegerKey.from(300));
             //NativeDbi data = dataDbi(nativeEnv,"player1x");
             //data.stat();
             //System.out.println(data.entries());
