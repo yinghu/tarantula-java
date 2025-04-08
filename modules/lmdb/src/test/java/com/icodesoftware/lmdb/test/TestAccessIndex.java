@@ -12,6 +12,7 @@ import com.icodesoftware.util.RecoverableObject;
 public class TestAccessIndex extends RecoverableObject implements AccessIndex {
 
     public int referenceId;
+    public String group;
     public TestAccessIndex(){
         this.label = "access";
         this.onEdge = true;
@@ -44,11 +45,13 @@ public class TestAccessIndex extends RecoverableObject implements AccessIndex {
     public boolean read(DataBuffer buffer){
         this.referenceId = buffer.readInt();
         this.distributionId = buffer.readLong();
+        this.group = buffer.readUTF8();
         return true;
     }
     public boolean write(DataBuffer buffer) {
         buffer.writeInt(referenceId);
         buffer.writeLong(distributionId);
+        buffer.writeUTF8(group);
         return true;
     }
 

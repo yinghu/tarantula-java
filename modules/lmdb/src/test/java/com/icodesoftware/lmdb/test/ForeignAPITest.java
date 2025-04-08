@@ -6,6 +6,7 @@ import com.icodesoftware.lmdb.ffm.NativeDbi;
 import com.icodesoftware.lmdb.ffm.NativeEnv;
 import com.icodesoftware.util.BufferProxy;
 
+import com.icodesoftware.util.LocalHeader;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -358,16 +359,51 @@ public class ForeignAPITest extends TestSetup{
         return dbi;
     }
 
+    private static void save(NativeEnv env,TestAccessIndex accessIndex){
+        NativeDbi dbi = env.createDbi("access");
+        Recoverable.DataBuffer key = BufferProxy.buffer(500,true);
+        Recoverable.DataBuffer value = BufferProxy.buffer(1000,true);
+        value.writeHeader(LocalHeader.create(accessIndex.getFactoryId(),accessIndex.getClassId(),1));
+        accessIndex.writeKey(key);
+        accessIndex.write(value);
+        key.flip();
+        value.flip();
+        dbi.put(key,value);
+    }
+    private static void load(NativeEnv env,TestAccessIndex accessIndex){
+        NativeDbi dbi = env.createDbi("access");
+        Recoverable.DataBuffer key = BufferProxy.buffer(500,true);
+        Recoverable.DataBuffer value = BufferProxy.buffer(1000,true);
+        accessIndex.writeKey(key);
+        key.flip();
+        dbi.get(key,value);
+        Recoverable.DataHeader h = value.readHeader();
+        System.out.println(h.revision());
+        System.out.println(h.factoryId());
+        System.out.println(h.classId());
+        accessIndex.read(value);
+    }
+
     public static void main(String[] arg) throws Exception{
         try{
             NativeEnv nativeEnv = new NativeEnv();
             nativeEnv.start();
-            NativeDbi data = dataDbi(nativeEnv,"player1x");
-            data.stat();
-            System.out.println(data.entries());
-            NativeDbi edge = edgeDbi(nativeEnv,"player1x");
-            edge.stat();
-            System.out.println(edge.entries());
+            TestAccessIndex accessIndex = new TestAccessIndex("tester1");
+            accessIndex.referenceId = 200;
+            accessIndex.distributionId(4001);
+            accessIndex.group = "admin2";
+            save(nativeEnv,accessIndex);
+            TestAccessIndex load = new TestAccessIndex("tester1");
+            load(nativeEnv,load);
+            System.out.println(load.referenceId);
+            System.out.println(load.distributionId());
+            System.out.println(load.group);
+            //NativeDbi data = dataDbi(nativeEnv,"player1x");
+            //data.stat();
+            //System.out.println(data.entries());
+            //NativeDbi edge = edgeDbi(nativeEnv,"player1x");
+            //edge.stat();
+            //System.out.println(edge.entries());
             nativeEnv.shutdown();
         }catch (Exception ex){
             ex.printStackTrace();
