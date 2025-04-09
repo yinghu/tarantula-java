@@ -878,21 +878,16 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
         BattleLogIndex battleLogIndex = new BattleLogIndex();
         battleLogIndex.playerId = session.distributionId();
         battleLogIndex.defenseTeamId = defenseTeam.distributionId();
-        if(battleHistory.load(battleLogIndex) && battleLogIndex.timestamp() == matchMakingIndex.timestamp()) {
-            defenseTeam.battled = true;
-            defenseTeam.battlePoint = battleLogIndex.offenseEloGain;
-        }
+        battleHistory.load(battleLogIndex);
 
-        if(!defenseTeam.battled){
-            int currentELO = attackerRating.level();
-            PVPPointGenerator.updateELO(attackerRating, defenderRating, offenseTeam.teamPower, defenseTeam.teamPower, true);
-            defenseTeam.winPointsEstimated = attackerRating.level() - currentELO;
-            attackerRating.level(currentELO);
+        int currentELO = attackerRating.level();
+        PVPPointGenerator.updateELO(attackerRating, defenderRating, offenseTeam.teamPower, defenseTeam.teamPower, true);
+        defenseTeam.winPointsEstimated = attackerRating.level() - currentELO;
+        attackerRating.level(currentELO);
 
-            PVPPointGenerator.updateELO(attackerRating, defenderRating,offenseTeam.teamPower, defenseTeam.teamPower, false);
-            defenseTeam.losePointsEstimated = attackerRating.level() - currentELO;
-            attackerRating.level(currentELO);
-        }
+        PVPPointGenerator.updateELO(attackerRating, defenderRating,offenseTeam.teamPower, defenseTeam.teamPower, false);
+        defenseTeam.losePointsEstimated = attackerRating.level() - currentELO;
+        attackerRating.level(currentELO);
     }
 
 
