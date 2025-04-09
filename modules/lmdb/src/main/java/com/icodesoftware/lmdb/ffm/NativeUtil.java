@@ -47,4 +47,13 @@ public class NativeUtil {
         return memorySegment;
     }
 
+    public static String storeName(String name){
+        return name;
+    }
+
+    public static String storeName(String name,String label){
+        return name+"#"+label;
+    }
+
+
 }

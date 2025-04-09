@@ -398,7 +398,7 @@ public class ForeignAPITest extends TestSetup{
         try{
             NativeEnv nativeEnv = new NativeEnv();
             nativeEnv.start();
-            TestAccessIndex accessIndex = new TestAccessIndex("tester6");
+            TestAccessIndex accessIndex = new TestAccessIndex("tester8");
             accessIndex.label("provider");
             accessIndex.referenceId = 300;
             accessIndex.distributionId(5001);

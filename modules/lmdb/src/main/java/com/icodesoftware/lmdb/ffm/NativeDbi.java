@@ -16,7 +16,9 @@ public class NativeDbi extends NativeStat implements Serviceable {
 
     private MemorySegment dbi;
     private final NativeEnv env;
+    private final String storeName;
     private final String name;
+    private final String label;
     private final int openFlag;
     private final int putFlag;
 
@@ -26,13 +28,19 @@ public class NativeDbi extends NativeStat implements Serviceable {
 
     public NativeDbi(final NativeEnv env,final String name,final String label){
         this.env = env;
-        this.name = label==null ? name : name+"#"+label;
-        this.openFlag = label==null? DbiMask.DBI_CREATE.mask() : (DbiMask.DBI_CREATE.mask() | DbiMask.DBI_DUP_SORT.mask());
-        this.putFlag = label==null? 0 : PutMask.PUT_NO_DUP_DATA.mask();
+        this.storeName = label==null ? NativeUtil.storeName(name) : NativeUtil.storeName(name,label);
+        this.name = NativeUtil.storeName(name);
+        this.label = NativeUtil.storeName(label);
+
+        this.openFlag = this.label==null? DbiMask.DBI_CREATE.mask() : (DbiMask.DBI_CREATE.mask() | DbiMask.DBI_DUP_SORT.mask());
+        this.putFlag = this.label==null? 0 : PutMask.PUT_NO_DUP_DATA.mask();
     }
 
     public String name(){
         return name;
+    }
+    public String label(){
+        return label;
     }
 
     public MemorySegment pointer(){
@@ -42,7 +50,7 @@ public class NativeDbi extends NativeStat implements Serviceable {
     @Override
     public void start() throws Exception {
         try(Arena a = Arena.ofConfined(); NativeTxn txn = env.write(a)) {
-            MemorySegment dbiName = a.allocateFrom(name, StandardCharsets.US_ASCII);
+            MemorySegment dbiName = a.allocateFrom(storeName, StandardCharsets.US_ASCII);
             MemorySegment dm = env.allocate(arena -> arena.allocate(AddressLayout.ADDRESS));
             mdbDbiOpen(txn,dbiName,dm);
             txn.commit();
@@ -118,7 +126,7 @@ public class NativeDbi extends NativeStat implements Serviceable {
     }
 
     public NativeCursor openCursor(){
-        NativeCursor cursor = new NativeCursor(this.env,this,putFlag== PutMask.PUT_NO_DUP_DATA.mask());
+        NativeCursor cursor = new NativeCursor(this.env,this,putFlag == PutMask.PUT_NO_DUP_DATA.mask());
         cursor.open();
         return cursor;
     }

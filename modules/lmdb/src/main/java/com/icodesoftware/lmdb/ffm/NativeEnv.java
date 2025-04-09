@@ -7,6 +7,7 @@ import com.icodesoftware.service.Serviceable;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class NativeEnv extends NativeStat implements Serviceable {
@@ -55,7 +56,7 @@ public class NativeEnv extends NativeStat implements Serviceable {
     }
 
     public NativeDbi createDbi(String name){
-        return nativeDbs.computeIfAbsent(name,key->{
+        return nativeDbs.computeIfAbsent(NativeUtil.storeName(name),key->{
             NativeDbi nativeDbi = new NativeDbi(this,name);
             try{nativeDbi.start();}catch (Exception ex){
                 throw new RuntimeException(ex);
@@ -65,7 +66,7 @@ public class NativeEnv extends NativeStat implements Serviceable {
     }
 
     public NativeDbi createDbi(String name,String label){
-        return nativeDbs.computeIfAbsent(name+"#"+label,key->{
+        return nativeDbs.computeIfAbsent(NativeUtil.storeName(name,label),key->{
             NativeDbi nativeDbi = new NativeDbi(this,name,label);
             try{nativeDbi.start();}catch (Exception ex){
                 throw new RuntimeException(ex);
@@ -84,6 +85,13 @@ public class NativeEnv extends NativeStat implements Serviceable {
         MemorySegment pointer = arena.allocate(AddressLayout.ADDRESS);
         mdbTxnBegin(MemorySegment.NULL,pointer,0);
         return new NativeTxn(this,pointer.get(ValueLayout.ADDRESS,0),true);
+    }
+
+    public void copy(String path){
+        try(Arena a = Arena.ofConfined()){
+            MemorySegment pth = a.allocateFrom(path, StandardCharsets.US_ASCII);
+            mdbEnvCopy(pth);
+        }
     }
 
     private void mdbEnvCreate(){
@@ -209,7 +217,17 @@ public class NativeEnv extends NativeStat implements Serviceable {
         }
     }
 
-
+    private void mdbEnvCopy(MemorySegment path){
+        try{
+            MemorySegment mdbEnvSetMaxDbs = lib.find("mdb_env_copy").get();
+            MethodHandle caller = Linker.nativeLinker().downcallHandle(mdbEnvSetMaxDbs,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.ADDRESS));
+            int ret = (int)caller.invokeExact(env,path);
+            if(ret != 0) throw new RuntimeException("code ["+ret+"]");
+        }catch (Throwable throwable){
+            logger.error("mdb_env_copy",throwable);
+            throw new RuntimeException(throwable);
+        }
+    }
 
 
 }
