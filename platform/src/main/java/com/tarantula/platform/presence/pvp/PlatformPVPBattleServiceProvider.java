@@ -491,7 +491,6 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
     }
 
     private void startSeason(SeasonRuntime seasonRuntime){
-        if(resetELO) seasonReset(seasonRuntime);
         LocalDateTime closeTime = TimeUtil.fromUTCMilliseconds(seasonRuntime.closeTime);
         long endTimeDuration = TimeUtil.expired(closeTime)? 100 : TimeUtil.durationUTCMilliseconds(LocalDateTime.now(),TimeUtil.fromUTCMilliseconds(seasonRuntime.closeTime));
         this.rotation.schedule(seasonRuntime);
@@ -546,14 +545,15 @@ public class PlatformPVPBattleServiceProvider extends PlatformItemServiceProvide
                 logger.warn("Season end processing on other nodes");
             }else{
                 logger.warn("Processing season end ["+rotation.sequence+"]["+rotation.currentSeason+"]["+ended.seasonId+"]");
-                //do end first
-                placementReward(ended.seasonId);
-                leagueReward(ended.seasonId);
-                //start next if any
-                SeasonCredentialConfiguration.Season next = seasons.get(rotation.sequence+1);
                 SeasonRuntime seasonRuntime = new SeasonRuntime();
                 seasonRuntime.distributionId(rotation.seasonRotation);
                 dataStore.createIfAbsent(seasonRuntime,true);
+                //do end first
+                placementReward(ended.seasonId);
+                leagueReward(ended.seasonId);
+                if(resetELO) seasonReset(seasonRuntime);
+                //start next if any
+                SeasonCredentialConfiguration.Season next = seasons.get(rotation.sequence+1);
                 onSeasonChangeAnalytic(ended, next);
                 if(next==null){
                     logger.warn("restart season rotation ["+rotation.seasonRotation+"]");
