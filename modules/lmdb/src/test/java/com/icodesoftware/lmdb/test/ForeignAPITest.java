@@ -334,9 +334,9 @@ public class ForeignAPITest extends TestSetup{
         Recoverable.DataBuffer value = BufferProxy.buffer(100,true);
         value.write("player2006".getBytes()).flip();
         dbi.put(key,value);
-        try(NativeCursor cursor = dbi.openCursor()){
+        try(NativeCursor cursor = dbi.cursor()){
             //key.rewind();
-            cursor.forEach((k,v)->{
+            cursor.read().forEach((k,v)->{
                 System.out.println(new String(v.array()));
                 return true;
             });
@@ -349,8 +349,8 @@ public class ForeignAPITest extends TestSetup{
         Recoverable.DataBuffer key = BufferProxy.buffer(100,true);
         okey.write(key);
         key.flip();
-        try(NativeCursor cursor = dbi.openCursor()){
-            cursor.forEach(key,(k,v)->{
+        try(NativeCursor cursor = dbi.cursor()){
+            cursor.write().forEach(key,(k,v)->{
                 System.out.println(v.readUTF8());
                 return true;
             });

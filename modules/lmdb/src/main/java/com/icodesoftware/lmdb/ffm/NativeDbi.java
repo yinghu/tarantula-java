@@ -125,9 +125,8 @@ public class NativeDbi extends NativeStat implements Serviceable {
         }
     }
 
-    public NativeCursor openCursor(){
+    public NativeCursor cursor(){
         NativeCursor cursor = new NativeCursor(this.env,this,putFlag == PutMask.PUT_NO_DUP_DATA.mask());
-        cursor.open();
         return cursor;
     }
 

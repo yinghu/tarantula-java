@@ -24,13 +24,23 @@ public class NativeCursor implements AutoCloseable{
         this.edge = edge;
     }
 
-    public void open(){
+    public NativeCursor read(){
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.read(arena)){
             MemorySegment cm = arena.allocate(AddressLayout.ADDRESS);
             mdbCursorOpen(txn,cm);
             this.txn = txn;
             cursor = cm.get(ValueLayout.ADDRESS,0);
         }
+        return this;
+    }
+    public NativeCursor write(){
+        try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena)){
+            MemorySegment cm = arena.allocate(AddressLayout.ADDRESS);
+            mdbCursorOpen(txn,cm);
+            this.txn = txn;
+            cursor = cm.get(ValueLayout.ADDRESS,0);
+        }
+        return this;
     }
 
     public void forEach(Recoverable.DataBuffer key, DataStore.BufferStream stream){
