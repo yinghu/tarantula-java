@@ -21,6 +21,7 @@ public class League extends GameResource {
     public int endPoint(){
         return header.get("EndPoint").getAsInt();
     }
+    public int resetPoint() { return header.get("ResetPoint").getAsInt();}
 
     public JsonObject toJson(){
         return super.toJson();
