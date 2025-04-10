@@ -16,6 +16,13 @@ public class SubscribeEvent extends EtcdEvent{
         this.nodeName = nodeName;
     }
 
+    private SubscribeEvent(String prefix,String topic, String nodeName){
+        this();
+        this.prefix = prefix;
+        this.topic = topic;
+        this.nodeName = nodeName;
+    }
+
     @Override
     public int getClassId() {
         return EtcdPortableRegistry.SUBSCRIBE_EVENT_CID;
@@ -41,5 +48,9 @@ public class SubscribeEvent extends EtcdEvent{
 
     public static SubscribeEvent create(String topic, String nodeName){
         return new SubscribeEvent(topic,nodeName);
+    }
+
+    public static SubscribeEvent create(String prefix,String topic, String nodeName){
+        return new SubscribeEvent(prefix,topic,nodeName);
     }
 }
