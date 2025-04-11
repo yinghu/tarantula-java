@@ -345,13 +345,28 @@ public class ForeignAPITest extends TestSetup{
     }
 
     private static NativeDbi edgeDbi(NativeEnv env, Recoverable.Key okey){
-        NativeDbi dbi = env.createDbi("access","provider");
+        NativeDbi dbi = env.createDbi("access");
+
+        NativeDbi edge = env.createDbi("access","provider");
+
         Recoverable.DataBuffer key = BufferProxy.buffer(100,true);
         okey.write(key);
         key.flip();
-        try(NativeCursor cursor = dbi.cursor()){
-            cursor.write().forEach(key,(k,v)->{
-                System.out.println(v.readUTF8());
+        try(NativeCursor cursor = edge.cursor()){
+            cursor.read().forEach(key,(k,v)->{
+                //System.out.println(v.readUTF8());
+                Recoverable.DataBuffer fv = BufferProxy.buffer(100,true);
+                fv.writeUTF8(v.readUTF8()).flip();
+                Recoverable.DataBuffer value = BufferProxy.buffer(100,true);
+                dbi.get(fv,value,cursor.txn());
+                Recoverable.DataHeader h = value.readHeader();
+                System.out.println(h.factoryId()+" ; "+h.classId()+ ", "+h.revision());
+                TestAccessIndex testAccessIndex = new TestAccessIndex();
+                testAccessIndex.read(value);
+                System.out.println(testAccessIndex.distributionId());
+                System.out.println(testAccessIndex.referenceId);
+                System.out.println(testAccessIndex.group);
+
                 return true;
             });
         }
@@ -405,11 +420,11 @@ public class ForeignAPITest extends TestSetup{
             accessIndex.group = "admin45";
             accessIndex.ownerKey(IntegerKey.from(300));
             save(nativeEnv,accessIndex);
-            TestAccessIndex load = new TestAccessIndex("tester4");
-            load(nativeEnv,load);
-            System.out.println(load.referenceId);
-            System.out.println(load.distributionId());
-            System.out.println(load.group);
+            //TestAccessIndex load = new TestAccessIndex("tester4");
+            //load(nativeEnv,load);
+            //System.out.println(load.referenceId);
+            //System.out.println(load.distributionId());
+            //System.out.println(load.group);
             edgeDbi(nativeEnv,IntegerKey.from(300));
             //NativeDbi data = dataDbi(nativeEnv,"player1x");
             //data.stat();

@@ -125,6 +125,21 @@ public class NativeDbi extends NativeStat implements Serviceable {
         }
     }
 
+    public void get(Recoverable.DataBuffer key,Recoverable.DataBuffer value,NativeTxn txn){
+        try(Arena arena = Arena.ofConfined()){
+            MemorySegment k = mdbVal(arena,key);
+            MemorySegment v = mdbVal(arena);
+            if(!mdbGet(txn,dbi,k,v)) return;
+            MemorySegment data = v.get(ValueLayout.ADDRESS,8);
+            long len = v.get(ValueLayout.JAVA_LONG,0);
+            MemorySegment x = data.reinterpret(len,arena,null);
+            for(long i=0;i<len-1;i++){
+                value.writeByte(x.getAtIndex(ValueLayout.JAVA_BYTE,i));
+            }
+            value.flip();
+        }
+    }
+
     public NativeCursor cursor(){
         NativeCursor cursor = new NativeCursor(this.env,this,putFlag == PutMask.PUT_NO_DUP_DATA.mask());
         return cursor;
@@ -172,12 +187,14 @@ public class NativeDbi extends NativeStat implements Serviceable {
         }
     }
 
-    private void mdbGet(NativeTxn txn,MemorySegment dbi,MemorySegment key,MemorySegment value){
+    private boolean mdbGet(NativeTxn txn,MemorySegment dbi,MemorySegment key,MemorySegment value){
         try{
             MemorySegment mdbGet = env.lib.find("mdb_get").get();
             MethodHandle caller = env.linker.downcallHandle(mdbGet,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.ADDRESS));
             int ret = (int)caller.invokeExact(txn.pointer(),dbi,key,value);
-            if(ret != 0) throw new RuntimeException("code ["+ret+"]");
+            if(ret == 0) return true;
+            if(ret == NativeCode.MDB_NOT_FOUND) return false;
+            throw new RuntimeException("code ["+ret+"]");
         }catch (Throwable throwable){
             txn.abort();
             logger.error("mdb_get",throwable);

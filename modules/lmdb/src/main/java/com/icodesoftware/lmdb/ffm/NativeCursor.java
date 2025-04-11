@@ -24,6 +24,10 @@ public class NativeCursor implements AutoCloseable{
         this.edge = edge;
     }
 
+    public NativeTxn txn(){
+        return txn;
+    }
+
     public NativeCursor read(){
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.read(arena)){
             MemorySegment cm = arena.allocate(AddressLayout.ADDRESS);
