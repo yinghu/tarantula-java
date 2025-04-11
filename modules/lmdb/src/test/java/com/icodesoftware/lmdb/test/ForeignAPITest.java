@@ -1,10 +1,7 @@
 package com.icodesoftware.lmdb.test;
 
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.lmdb.ffm.NativeCursor;
-import com.icodesoftware.lmdb.ffm.NativeDbi;
-import com.icodesoftware.lmdb.ffm.NativeEnv;
-import com.icodesoftware.lmdb.ffm.NativeTxn;
+import com.icodesoftware.lmdb.ffm.*;
 import com.icodesoftware.util.BufferProxy;
 
 import com.icodesoftware.util.IntegerKey;
@@ -18,6 +15,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.VarHandle;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 public class ForeignAPITest extends TestSetup{
@@ -321,7 +319,29 @@ public class ForeignAPITest extends TestSetup{
 
         }catch (Throwable ex){
             ex.printStackTrace();
+            throwable = ex;
+        }
+        Assert.assertNull(throwable);
+    }
 
+    @Test(groups = { "foreign API" })
+    public void memorySegmentWriteTest(){
+        Throwable throwable = null;
+        try(Arena arena = Arena.ofConfined()){
+            StructLayout structLayout = MemoryLayout.structLayout(ValueLayout.JAVA_LONG.withName("mv_size"),AddressLayout.ADDRESS.withName("mv_data"));
+            MemorySegment pointer = arena.allocate(structLayout);
+            VarHandle vSize = structLayout.varHandle(MemoryLayout.PathElement.groupElement("mv_size"));
+            vSize.set(pointer,0,100);
+            VarHandle vData = structLayout.varHandle(MemoryLayout.PathElement.groupElement("mv_data"));
+            MemorySegment data = arena.allocate(MemoryLayout.sequenceLayout(1780,ValueLayout.JAVA_BYTE));
+            ByteBuffer buffer = data.asByteBuffer();
+            TestObject testObject = new TestObject("TYPE","NAME");
+            testObject.write(BufferProxy.buffer(buffer));
+            buffer.flip();
+            vData.set(pointer,0,data);
+
+        }catch (Throwable ex){
+            ex.printStackTrace();
             throwable = ex;
         }
         Assert.assertNull(throwable);
@@ -411,21 +431,32 @@ public class ForeignAPITest extends TestSetup{
 
     public static void main(String[] arg) throws Exception{
         try{
+            NativeDataStoreProvider nativeDataStoreProvider = new NativeDataStoreProvider();
             NativeEnv nativeEnv = new NativeEnv();
             nativeEnv.start();
-            TestAccessIndex accessIndex = new TestAccessIndex("tester8");
-            accessIndex.label("provider");
-            accessIndex.referenceId = 300;
-            accessIndex.distributionId(5001);
-            accessIndex.group = "admin45";
-            accessIndex.ownerKey(IntegerKey.from(300));
-            save(nativeEnv,accessIndex);
-            //TestAccessIndex load = new TestAccessIndex("tester4");
-            //load(nativeEnv,load);
+            NativeDataStore nativeDataStore = new NativeDataStore("access",nativeDataStoreProvider,nativeEnv);
+            TestObject accessIndex = new TestObject("tester8","testName");
+            //accessIndex.label("provider");
+            //accessIndex.referenceId = 300;
+            //accessIndex.distributionId(5001);
+            //accessIndex.group = "admin45";
+            //accessIndex.ownerKey(IntegerKey.from(300));
+            System.out.println(nativeDataStore.create(accessIndex));
+            System.out.println(accessIndex.distributionId());
+            TestObject load = new TestObject();
+            load.distributionId(accessIndex.distributionId());
+            System.out.println(nativeDataStore.load(load));
+            System.out.println(load.name);
+            System.out.println(load.type);
+            System.out.println(load.revision());
+            //save(nativeEnv,accessIndex);
+            //TestAccessIndex load = new TestAccessIndex("tester8");
+            //nativeDataStore.load(load);
+            //System.out.println(load.group);
             //System.out.println(load.referenceId);
             //System.out.println(load.distributionId());
-            //System.out.println(load.group);
-            edgeDbi(nativeEnv,IntegerKey.from(300));
+            //System.out.println(load.revision());
+            //edgeDbi(nativeEnv,IntegerKey.from(300));
             //NativeDbi data = dataDbi(nativeEnv,"player1x");
             //data.stat();
             //System.out.println(data.entries());

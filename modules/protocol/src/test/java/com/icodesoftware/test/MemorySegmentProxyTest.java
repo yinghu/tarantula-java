@@ -21,7 +21,7 @@ public class MemorySegmentProxyTest {
     public void memoryProxyTest() {
         try(Arena arena = Arena.ofConfined()){
             MemorySegment memorySegment = arena.allocate(1000);
-            Recoverable.DataBuffer proxy = BufferProxy.buffer(memorySegment.asByteBuffer());
+            Recoverable.DataBuffer proxy = BufferProxy.buffer(memorySegment);
             Recoverable.DataHeader h = new LocalHeader(10,1,3);
             proxy.writeHeader(h);
             proxy.writeShort((short)1);
@@ -50,7 +50,20 @@ public class MemorySegmentProxyTest {
             Assert.assertTrue(proxy.readBoolean());
             Assert.assertEquals(proxy.readUTF8(),"hello");
             Assert.assertTrue(proxy.src().isDirect());
-
+            //copy out
+            MemorySegment copy = arena.allocate(1000);
+            copy.copyFrom(memorySegment);
+            Recoverable.DataBuffer buffer = BufferProxy.buffer(copy);
+            Recoverable.DataHeader hx = buffer.readHeader();
+            Assert.assertEquals(hx.revision(),r.revision());
+            Assert.assertEquals(hx.factoryId(),r.factoryId());
+            Assert.assertEquals(hx.classId(),r.classId());
+            Assert.assertEquals(buffer.readShort(),1);
+            Assert.assertEquals(buffer.readLong(),100L);
+            Assert.assertEquals(buffer.readInt(),5);
+            Assert.assertTrue(buffer.readBoolean());
+            Assert.assertEquals(buffer.readUTF8(),"hello");
+            Assert.assertNotNull(buffer.pointer());
         }
 
     }

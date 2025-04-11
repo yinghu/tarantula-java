@@ -1,5 +1,6 @@
 package com.icodesoftware;
 
+import java.lang.foreign.MemorySegment;
 import java.nio.ByteBuffer;
 
 public interface Recoverable extends Distributable,JsonSerializable,Bufferable,Validatable {
@@ -108,6 +109,7 @@ public interface Recoverable extends Distributable,JsonSerializable,Bufferable,V
         int size();
         boolean direct();
         default int type(){ return MEMORY;}
+        default MemorySegment pointer(){ return null;}
     }
 
     interface DataBufferPair extends Resettable,AutoCloseable{

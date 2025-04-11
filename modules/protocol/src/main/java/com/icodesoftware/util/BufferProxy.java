@@ -2,16 +2,23 @@ package com.icodesoftware.util;
 
 import com.icodesoftware.Recoverable;
 
+import java.lang.foreign.MemorySegment;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 public class BufferProxy implements Recoverable.DataBuffer {
 
     private final ByteBuffer buffer;
-
+    private final MemorySegment pointer;
     private BufferProxy(ByteBuffer buffer){
         this.buffer = buffer;
+        this.pointer = null;
         if(buffer.order()!=ByteOrder.nativeOrder()) this.buffer.order(ByteOrder.nativeOrder());
+    }
+
+    private BufferProxy(MemorySegment pointer){
+        this.pointer = pointer;
+        this.buffer = this.pointer.asByteBuffer();
     }
 
     public Recoverable.DataBuffer writeHeader(Recoverable.DataHeader dataHeader){
@@ -140,6 +147,15 @@ public class BufferProxy implements Recoverable.DataBuffer {
             if(!hasRemaining()) break;
             dest.writeByte(readByte());
         }
+    }
+
+    @Override
+    public MemorySegment pointer() {
+        return pointer;
+    }
+
+    public static Recoverable.DataBuffer buffer(MemorySegment pointer){
+        return new BufferProxy(pointer);
     }
 
     public static Recoverable.DataBuffer buffer(ByteBuffer buffer){
