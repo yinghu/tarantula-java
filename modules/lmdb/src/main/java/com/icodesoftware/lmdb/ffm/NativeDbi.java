@@ -76,6 +76,23 @@ public class NativeDbi extends NativeStat implements Serviceable {
         }
     }
 
+    public void put(MemorySegment key,MemorySegment value){
+        try(Arena arena = Arena.ofConfined();NativeTxn txn = env.write(arena)){
+            //MemorySegment k = mdbVal(arena,key);
+            //MemorySegment v = mdbVal(arena,value);
+            mdbPut(txn,dbi,key,value,putFlag);
+            txn.commit();
+        }
+    }
+
+    public void put(MemorySegment key,MemorySegment value,NativeTxn txn){
+        //try(Arena arena = Arena.ofConfined()){
+            //MemorySegment k = mdbVal(arena,key);
+            //MemorySegment v = mdbVal(arena,value);
+            mdbPut(txn,dbi,key,value,putFlag);
+        //}
+    }
+
     public void put(Recoverable.DataBuffer key,Recoverable.DataBuffer value){
         try(Arena arena = Arena.ofConfined();NativeTxn txn = env.write(arena)){
             MemorySegment k = mdbVal(arena,key);
@@ -123,6 +140,21 @@ public class NativeDbi extends NativeStat implements Serviceable {
             value.flip();
             txn.abort();
         }
+    }
+
+    public void get(MemorySegment key,MemorySegment value,NativeTxn txn){
+        //try(Arena arena = Arena.ofConfined()){
+            //MemorySegment k = mdbVal(arena,key);
+            //MemorySegment v = mdbVal(arena);
+            if(!mdbGet(txn,dbi,key,value)) throw new RuntimeException("not found");
+            //MemorySegment data = v.get(ValueLayout.ADDRESS,8);
+            //long len = v.get(ValueLayout.JAVA_LONG,0);
+            //MemorySegment x = data.reinterpret(len,arena,null);
+            //for(long i=0;i<len-1;i++){
+                //value.writeByte(x.getAtIndex(ValueLayout.JAVA_BYTE,i));
+            //}
+            //value.flip();
+        //}
     }
 
     public void get(Recoverable.DataBuffer key,Recoverable.DataBuffer value,NativeTxn txn){
