@@ -75,6 +75,15 @@ public class NativeEnv extends NativeStat implements Serviceable {
         });
     }
 
+    public void names(){
+        //try(Arena na = Arena.ofConfined();NativeTxn txn = write(na)){
+            //MemorySegment dm = na.allocate(AddressLayout.ADDRESS);
+            //mdbDbiOpen(txn,dm);
+            //MemorySegment dbi = dm.get(ValueLayout.ADDRESS,0);
+            //NativeCursor cursor = new NativeCursor(this,dbi,false);
+        //}
+    }
+
     public NativeTxn read(Arena arena){
         MemorySegment pointer = arena.allocate(AddressLayout.ADDRESS);
         mdbTxnBegin(MemorySegment.NULL,pointer, TxnMask.TXN_RD_ONLY.mask());
@@ -192,6 +201,18 @@ public class NativeEnv extends NativeStat implements Serviceable {
         }
     }
 
+    private void mdbDbiOpen(NativeTxn txn,MemorySegment dbi){
+        try{
+            MemorySegment mdbDbiOpen = lib.find("mdb_dbi_open").get();
+            MethodHandle caller = linker.downcallHandle(mdbDbiOpen,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.JAVA_INT,ValueLayout.ADDRESS));
+            int ret = (int)caller.invokeExact(txn.pointer(),MemorySegment.NULL,DbiMask.DBI_CREATE.mask(),dbi);
+            if(ret != 0) throw new RuntimeException("code ["+ret+"]");
+        }catch (Throwable throwable){
+            txn.abort();
+            logger.error("mdb_dbi_open",throwable);
+            throw new RuntimeException(throwable);
+        }
+    }
 
     private void mdbEnvStat(MemorySegment stat){
         try{
