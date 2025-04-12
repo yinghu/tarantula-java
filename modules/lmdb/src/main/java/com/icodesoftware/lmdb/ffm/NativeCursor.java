@@ -4,7 +4,6 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.util.BufferProxy;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
@@ -14,7 +13,7 @@ public class NativeCursor implements AutoCloseable{
     private static final TarantulaLogger logger = JDKLogger.getLogger(NativeCursor.class);
     private final NativeEnv env;
     private final NativeDbi dbi;
-
+    private final Arena arena;
     private MemorySegment cursor;
     private NativeTxn txn;
     private final boolean edge;
@@ -22,60 +21,58 @@ public class NativeCursor implements AutoCloseable{
         this.env = env;
         this.dbi = dbi;
         this.edge = edge;
+        this.arena = Arena.ofConfined();
     }
 
     public NativeTxn txn(){
         return txn;
     }
-
+    public Arena arena(){
+        return arena;
+    }
     public NativeCursor read(){
-        try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.read(arena)){
-            MemorySegment cm = arena.allocate(AddressLayout.ADDRESS);
-            mdbCursorOpen(txn,cm);
-            this.txn = txn;
-            cursor = cm.get(ValueLayout.ADDRESS,0);
-        }
+        NativeTxn txn = env.read(arena);
+        MemorySegment cm = arena.allocate(AddressLayout.ADDRESS);
+        mdbCursorOpen(txn,cm);
+        this.txn = txn;
+        cursor = cm.get(ValueLayout.ADDRESS,0);
         return this;
     }
     public NativeCursor write(){
-        try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena)){
-            MemorySegment cm = arena.allocate(AddressLayout.ADDRESS);
-            mdbCursorOpen(txn,cm);
-            this.txn = txn;
-            cursor = cm.get(ValueLayout.ADDRESS,0);
-        }
+        NativeTxn txn = env.write(arena);
+        MemorySegment cm = arena.allocate(AddressLayout.ADDRESS);
+        mdbCursorOpen(txn,cm);
+        this.txn = txn;
+        cursor = cm.get(ValueLayout.ADDRESS,0);
         return this;
     }
 
-    public void forEach(Recoverable.DataBuffer key, DataStore.BufferStream stream){
+    public void forEach(Recoverable.Key key, DataStore.BufferStream stream){
         if(!edge) return;
-        try(Arena arena = Arena.ofConfined()){
-            MemorySegment k = NativeUtil.mdbVal(arena,key);
-            MemorySegment v = NativeUtil.mdbVal(arena);
-            boolean next = mdbCursorGet(k,v, CursorMask.MDB_SET.mask());
-            if(!next) return;
-            next = mdbCursorGet(k,v, CursorMask.MDB_FIRST_DUP.mask());
-            if(next){
-                MemorySegment valueData = v.get(ValueLayout.ADDRESS,8);
-                long vLen = v.get(ValueLayout.JAVA_LONG,0);
-                MemorySegment xv = valueData.reinterpret(vLen,arena,null);
-                if(!stream.on(BufferProxy.buffer(k.asByteBuffer()),BufferProxy.buffer(xv.asByteBuffer()))) return;
-            }
-            while (mdbCursorGet(k,v, CursorMask.MDB_NEXT_DUP.mask())){
-                MemorySegment valueData = v.get(ValueLayout.ADDRESS,8);
-                long vLen = v.get(ValueLayout.JAVA_LONG,0);
-                MemorySegment xv = valueData.reinterpret(vLen,arena,null);
-                if(!stream.on(BufferProxy.buffer(k.asByteBuffer()),BufferProxy.buffer(xv.asByteBuffer()))) break;
-            }
+        MemorySegment k = NativeData.in(arena,100).write(buffer -> key.write(buffer)).pointer();
+        NativeData.OutVal v = NativeData.out(arena);
+        boolean next = mdbCursorGet(k,v.pointer(), CursorMask.MDB_SET.mask());
+        if(!next) return;
+        next = mdbCursorGet(k,v.pointer(), CursorMask.MDB_FIRST_DUP.mask());
+        boolean[] streaming = {false};
+        if(next){
+            v.read(arena,buffer -> {
+                streaming[0] = stream.on(null,buffer);
+            });
+        }
+        if(!streaming[0]) return;
+        while (mdbCursorGet(k,v.pointer(), CursorMask.MDB_NEXT_DUP.mask())){
+            v.read(arena,buffer -> {
+                streaming[0] = stream.on(null,buffer);
+            });
+            if(!streaming[0]) break;
         }
     }
 
     public void forEach(DataStore.BufferStream stream){
-        try(Arena arena = Arena.ofConfined()){
-            NativeData.OutPair kv = NativeData.outPair(arena);
-            while (mdbCursorGet(kv.pointer1(),kv.pointer2(), CursorMask.MDB_NEXT.mask())){
-                if(!kv.stream(arena,stream)) break;
-            }
+        NativeData.OutPair kv = NativeData.outPair(arena);
+        while (mdbCursorGet(kv.pointer1(),kv.pointer2(), CursorMask.MDB_NEXT.mask())){
+            if(!kv.stream(arena,stream)) break;
         }
     }
 
@@ -84,6 +81,7 @@ public class NativeCursor implements AutoCloseable{
     public void close(){
         txn.abort();
         mdbCursorClose();
+        arena.close();
     }
 
 

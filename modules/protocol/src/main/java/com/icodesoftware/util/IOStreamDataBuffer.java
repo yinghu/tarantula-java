@@ -139,7 +139,9 @@ public class IOStreamDataBuffer implements Recoverable.DataBuffer {
     public void position(int position) {
         throw new RuntimeException("must override on subclass");
     }
+    public void limit(int limit){
 
+    }
     @Override
     public boolean full() {
         return false;

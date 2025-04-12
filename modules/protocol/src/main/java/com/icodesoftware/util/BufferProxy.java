@@ -230,6 +230,9 @@ public class BufferProxy implements Recoverable.DataBuffer {
         buffer.position(position);
     }
 
+    public void limit(int limit){
+        buffer.limit(limit);
+    }
     @Override
     public boolean full() {
         return buffer.position() == buffer.capacity();

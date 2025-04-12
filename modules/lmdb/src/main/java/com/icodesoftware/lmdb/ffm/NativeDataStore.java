@@ -3,13 +3,16 @@ package com.icodesoftware.lmdb.ffm;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
+import com.icodesoftware.service.DataStoreSummary;
 import com.icodesoftware.util.LocalHeader;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
+import java.util.ArrayList;
+import java.util.List;
 
 
-public class NativeDataStore {
+public class NativeDataStore implements DataStore, DataStore.Backup {
 
     private NativeDataStoreProvider nativeDataStoreProvider;
     private NativeEnv env;
@@ -19,6 +22,14 @@ public class NativeDataStore {
         this.name = name;
         this.nativeDataStoreProvider = nativeDataStoreProvider;
         this.env = nativeEnv;
+    }
+
+    public int scope(){
+        return 0;
+    }
+
+    public String name(){
+        return name;
     }
 
     public <T extends Recoverable> boolean create(T t) {
@@ -141,16 +152,126 @@ public class NativeDataStore {
             }
             txn.commit();
             return true;
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
         }
     }
 
-    public <T extends Recoverable> void list(RecoverableFactory<T> query, DataStore.Stream<T> stream) {
-
+    public <T extends Recoverable> boolean createEdge(T t,String label){
+        NativeDbi edge = env.createDbi(name,label);
+        try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena)){
+            MemorySegment key = NativeData.in(arena,100).write(buffer -> t.ownerKey().write(buffer)).pointer();
+            MemorySegment value = NativeData.in(arena,100).write(buffer -> t.key().write(buffer)).pointer();
+            if(!edge.put(key,value,txn)){
+                txn.abort();
+                return false;
+            }
+            txn.commit();
+            return true;
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
     }
 
+    public  boolean deleteEdge(Recoverable.Key t,String label){
+        NativeDbi edge = env.createDbi(name,label);
+        try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena)){
+            MemorySegment key = NativeData.in(arena,100).write(buffer -> t.write(buffer)).pointer();
+            if(!edge.delete(key,txn)){
+                txn.abort();
+                return false;
+            }
+            txn.commit();
+            return true;
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public boolean deleteEdge(Recoverable.Key t,Recoverable.Key edgeKey,String label){
+        NativeDbi edge = env.createDbi(name,label);
+        try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena)){
+            MemorySegment key = NativeData.in(arena,100).write(buffer -> t.write(buffer)).pointer();
+            MemorySegment value = NativeData.in(arena,100).write(buffer -> edgeKey.write(buffer)).pointer();
+            if(!edge.delete(key,value,txn)){
+                txn.abort();
+                return false;
+            }
+            txn.commit();
+            return true;
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+    }
+    public <T extends Recoverable> List<T> list(RecoverableFactory<T> query) {
+        ArrayList<T> list = new ArrayList<>();
+        this.list(query,t-> list.add(t));
+        return list;
+    }
+    public <T extends Recoverable> void list(RecoverableFactory<T> query, DataStore.Stream<T> stream) {
+        NativeDbi dbi = env.createDbi(name);
+        NativeDbi edge = env.createDbi(name,query.label());
+        try(NativeCursor cursor = edge.cursor()){
+            cursor.read().forEach(query.key(),(k,v)->{
+                v.limit(v.remaining()-1);
+                NativeData.OutVal out = NativeData.out(cursor.arena());
+                MemorySegment pv = NativeData.in(cursor.arena(),100).write(buffer -> v.read(buffer)).pointer();
+                boolean[] streaming ={true};
+                if(dbi.get(pv,out.pointer(),cursor.txn())){
+                    out.read(cursor.arena(),buffer -> {
+                        Recoverable.DataHeader h = buffer.readHeader();
+                        T t = query.create();
+                        t.read(buffer);
+                        t.revision(h.revision());
+                        streaming[0] = stream.on(t);
+                    });
+                }
+                return streaming[0];
+            });
+        }
+    }
+
+    @Override
+    public Backup backup() {
+        return this;
+    }
+
+    //backup
     public void forEach(DataStore.BufferStream stream) {
         NativeDbi dbi = env.createDbi(name);
         NativeCursor cursor = dbi.cursor();
         cursor.read().forEach(stream);
     }
+
+    public void drop(boolean delete){
+
+    }
+
+    public boolean get(Recoverable.Key key, BufferStream buffer){
+        return true;
+    }
+    public boolean set(BufferStream bufferStream){
+        return true;
+    }
+    public void forEachEdgeKey(Recoverable.Key key,String label,BufferStream bufferStream){
+
+    }
+
+    public void forEachEdgeKeyValue(Recoverable.Key key,String label,BufferStream bufferStream){
+
+    }
+    public boolean setEdge(String label,BufferStream bufferStream){
+        return true;
+    }
+
+    public boolean unsetEdge(String label,BufferStream bufferStream,boolean fromLabel){
+        return true;
+    }
+    public boolean unset(BufferStream bufferStream){
+        return true;
+    }
+
+
+    public void view(DataStoreSummary dataStoreSummary){}
+
 }

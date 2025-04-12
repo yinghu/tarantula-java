@@ -7,6 +7,7 @@ import com.icodesoftware.util.BufferProxy;
 
 import com.icodesoftware.util.IntegerKey;
 import com.icodesoftware.util.LocalHeader;
+import com.icodesoftware.util.SnowflakeKey;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -348,6 +349,14 @@ public class ForeignAPITest extends TestSetup{
         Assert.assertNull(throwable);
     }
 
+    private static void createIfAbsent(NativeDataStore dataStore){
+        TestAccessIndex testAccessIndex = new TestAccessIndex("tester");
+        testAccessIndex.referenceId = 10;
+        testAccessIndex.group = "provider";
+        testAccessIndex.distributionId(100);
+        System.out.println(dataStore.createIfAbsent(testAccessIndex,false));
+    }
+
 
     public static void main(String[] arg) throws Exception{
         try{
@@ -355,46 +364,21 @@ public class ForeignAPITest extends TestSetup{
             NativeEnv nativeEnv = new NativeEnv();
             nativeEnv.start();
             NativeDataStore nativeDataStore = new NativeDataStore("access",nativeDataStoreProvider,nativeEnv);
+            //createIfAbsent(nativeDataStore);
             TestObject accessIndex = new TestObject("tester6","testName");
-            //accessIndex.label("provider");
-            //accessIndex.referenceId = 300;
-            //accessIndex.distributionId(5001);
-            //accessIndex.group = "admin45";
-            //accessIndex.ownerKey(IntegerKey.from(300));
             System.out.println(nativeDataStore.create(accessIndex));
             System.out.println(accessIndex.distributionId());
-            TestObject load = new TestObject();
-            load.distributionId(accessIndex.distributionId());
-            System.out.println(nativeDataStore.load(load));
-            System.out.println(load.name);
-            System.out.println(load.type);
-            System.out.println(load.revision());
-            load.type = "updateTye";
-            System.out.println(nativeDataStore.update(load));
-            load.type = "";
-            System.out.println(nativeDataStore.load(load));
-            System.out.println(load.revision()+" ; "+load.type);
-            System.out.println(nativeDataStore.delete(load));
-            System.out.println(nativeDataStore.load(load));
-            //nativeDataStore.forEach((k,v)->{
-                //System.out.println(k.remaining()+" ; "+v.remaining());
-                //System.out.println(k.readLong());
-                //return true;
-            //});
-            //save(nativeEnv,accessIndex);
-            //TestAccessIndex load = new TestAccessIndex("tester8");
-            //nativeDataStore.load(load);
-            //System.out.println(load.group);
-            //System.out.println(load.referenceId);
-            //System.out.println(load.distributionId());
-            //System.out.println(load.revision());
-            //edgeDbi(nativeEnv,IntegerKey.from(300));
-            //NativeDbi data = dataDbi(nativeEnv,"player1x");
-            //data.stat();
-            //System.out.println(data.entries());
-            //NativeDbi edge = edgeDbi(nativeEnv,"player1x");
-            //edge.stat();
-            //System.out.println(edge.entries());
+            accessIndex.ownerKey(SnowflakeKey.from(100));
+            System.out.println(nativeDataStore.createEdge(accessIndex,"type"));
+            TestObjectQuery query = new TestObjectQuery(100,"type");
+            int[] ct = {0};
+            nativeDataStore.list(query,t->{
+                System.out.println("QUERY ["+t.type+" : "+t.name+" ; " +t.revision());
+                ct[0]++;
+                return true;//ct[0]< 10;
+            });
+            System.out.println("CT : "+ct[0]);
+            System.out.println("LT : "+nativeDataStore.list(query).size());
             nativeEnv.shutdown();
         }catch (Exception ex){
             ex.printStackTrace();

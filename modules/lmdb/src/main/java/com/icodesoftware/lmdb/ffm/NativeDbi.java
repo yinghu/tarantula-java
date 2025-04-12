@@ -1,6 +1,5 @@
 package com.icodesoftware.lmdb.ffm;
 
-import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Serviceable;
@@ -89,6 +88,10 @@ public class NativeDbi extends NativeStat implements Serviceable {
         return mdbDel(txn,key,MemorySegment.NULL) == NativeCode.MDB_SUCCESS;
     }
 
+    public boolean delete(MemorySegment key,MemorySegment edge,NativeTxn txn){
+        return mdbDel(txn,key,edge) == NativeCode.MDB_SUCCESS;
+    }
+
 
     public NativeCursor cursor(){
         NativeCursor cursor = new NativeCursor(this.env,this,putFlag == PutMask.PUT_NO_DUP_DATA.mask());
@@ -109,14 +112,6 @@ public class NativeDbi extends NativeStat implements Serviceable {
         }
     }
 
-
-    private MemorySegment mdbVal(Arena a, Recoverable.DataBuffer value){
-        return NativeUtil.mdbVal(a,value);
-    }
-
-    public MemorySegment mdbVal(Arena a){
-        return NativeUtil.mdbVal(a);
-    }
 
     private MemorySegment dbiStat(Arena a){
         return NativeUtil.mdbStat(a);
