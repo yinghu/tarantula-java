@@ -72,27 +72,9 @@ public class NativeCursor implements AutoCloseable{
 
     public void forEach(DataStore.BufferStream stream){
         try(Arena arena = Arena.ofConfined()){
-            MemorySegment k = dbi.mdbVal(arena);
-            MemorySegment v = dbi.mdbVal(arena);
-            while (mdbCursorGet(k,v, CursorMask.MDB_NEXT.mask())){
-                //Recoverable.DataBuffer key = BufferProxy.buffer(100,true);
-                //Recoverable.DataBuffer value = BufferProxy.buffer(100,true);
-                MemorySegment keyData = k.get(ValueLayout.ADDRESS,8);
-                long kLen = k.get(ValueLayout.JAVA_LONG,0);
-                MemorySegment xk = keyData.reinterpret(kLen,arena,null);
-                //for(long i=0;i<kLen-1;i++){
-                    //key.writeByte(xk.getAtIndex(ValueLayout.JAVA_BYTE,i));
-                //}
-                //key.flip();
-
-                MemorySegment valueData = v.get(ValueLayout.ADDRESS,8);
-                long vLen = v.get(ValueLayout.JAVA_LONG,0);
-                MemorySegment xv = valueData.reinterpret(vLen,arena,null);
-                //for(long i=0;i<vLen-1;i++) {
-                    //value.writeByte(xv.getAtIndex(ValueLayout.JAVA_BYTE,i));
-                //}
-                //value.flip();
-                if(!stream.on(BufferProxy.buffer(xk.asByteBuffer()),BufferProxy.buffer(xv.asByteBuffer()))) break;
+            NativeData.OutPair kv = NativeData.outPair(arena);
+            while (mdbCursorGet(kv.pointer1(),kv.pointer2(), CursorMask.MDB_NEXT.mask())){
+                if(!kv.stream(arena,stream)) break;
             }
         }
     }

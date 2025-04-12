@@ -349,101 +349,13 @@ public class ForeignAPITest extends TestSetup{
     }
 
 
-
-
-
-
-
-
-    private static NativeDbi dataDbi(NativeEnv env,String player){
-        NativeDbi dbi = env.createDbi("test");
-        Recoverable.DataBuffer key = BufferProxy.buffer(100,true);
-        key.write(player.getBytes()).flip();
-        Recoverable.DataBuffer value = BufferProxy.buffer(100,true);
-        value.write("player2006".getBytes()).flip();
-        dbi.put(key,value);
-        try(NativeCursor cursor = dbi.cursor()){
-            //key.rewind();
-            cursor.read().forEach((k,v)->{
-                System.out.println(new String(v.array()));
-                return true;
-            });
-        }
-        return dbi;
-    }
-
-    private static NativeDbi edgeDbi(NativeEnv env, Recoverable.Key okey){
-        NativeDbi dbi = env.createDbi("access");
-
-        NativeDbi edge = env.createDbi("access","provider");
-
-        Recoverable.DataBuffer key = BufferProxy.buffer(100,true);
-        okey.write(key);
-        key.flip();
-        try(NativeCursor cursor = edge.cursor()){
-            cursor.read().forEach(key,(k,v)->{
-                //System.out.println(v.readUTF8());
-                Recoverable.DataBuffer fv = BufferProxy.buffer(100,true);
-                fv.writeUTF8(v.readUTF8()).flip();
-                Recoverable.DataBuffer value = BufferProxy.buffer(100,true);
-                dbi.get(fv,value,cursor.txn());
-                Recoverable.DataHeader h = value.readHeader();
-                System.out.println(h.factoryId()+" ; "+h.classId()+ ", "+h.revision());
-                TestAccessIndex testAccessIndex = new TestAccessIndex();
-                testAccessIndex.read(value);
-                System.out.println(testAccessIndex.distributionId());
-                System.out.println(testAccessIndex.referenceId);
-                System.out.println(testAccessIndex.group);
-
-                return true;
-            });
-        }
-        return dbi;
-    }
-
-    private static void save(NativeEnv env,TestAccessIndex accessIndex){
-        NativeDbi dbi = env.createDbi("access");
-        NativeDbi edge = env.createDbi("access",accessIndex.label());
-        try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena)){
-            Recoverable.DataBuffer key = BufferProxy.buffer(500,true);
-            Recoverable.DataBuffer value = BufferProxy.buffer(1000,true);
-            value.writeHeader(LocalHeader.create(accessIndex.getFactoryId(),accessIndex.getClassId(),1));
-            accessIndex.writeKey(key);
-            accessIndex.write(value);
-            key.flip();
-            value.flip();
-            dbi.put(key,value,txn);
-            key.clear();
-            value.clear();
-            accessIndex.ownerKey().write(key);
-            accessIndex.writeKey(value);
-            key.flip();
-            value.flip();
-            edge.put(key,value,txn);
-            txn.commit();
-        }
-    }
-    private static void load(NativeEnv env,TestAccessIndex accessIndex){
-        NativeDbi dbi = env.createDbi("access");
-        Recoverable.DataBuffer key = BufferProxy.buffer(500,true);
-        Recoverable.DataBuffer value = BufferProxy.buffer(1000,true);
-        accessIndex.writeKey(key);
-        key.flip();
-        dbi.get(key,value);
-        Recoverable.DataHeader h = value.readHeader();
-        System.out.println(h.revision());
-        System.out.println(h.factoryId());
-        System.out.println(h.classId());
-        accessIndex.read(value);
-    }
-
     public static void main(String[] arg) throws Exception{
         try{
             NativeDataStoreProvider nativeDataStoreProvider = new NativeDataStoreProvider();
             NativeEnv nativeEnv = new NativeEnv();
             nativeEnv.start();
             NativeDataStore nativeDataStore = new NativeDataStore("access",nativeDataStoreProvider,nativeEnv);
-            TestObject accessIndex = new TestObject("tester8","testName");
+            TestObject accessIndex = new TestObject("tester6","testName");
             //accessIndex.label("provider");
             //accessIndex.referenceId = 300;
             //accessIndex.distributionId(5001);
@@ -457,6 +369,18 @@ public class ForeignAPITest extends TestSetup{
             System.out.println(load.name);
             System.out.println(load.type);
             System.out.println(load.revision());
+            load.type = "updateTye";
+            System.out.println(nativeDataStore.update(load));
+            load.type = "";
+            System.out.println(nativeDataStore.load(load));
+            System.out.println(load.revision()+" ; "+load.type);
+            System.out.println(nativeDataStore.delete(load));
+            System.out.println(nativeDataStore.load(load));
+            //nativeDataStore.forEach((k,v)->{
+                //System.out.println(k.remaining()+" ; "+v.remaining());
+                //System.out.println(k.readLong());
+                //return true;
+            //});
             //save(nativeEnv,accessIndex);
             //TestAccessIndex load = new TestAccessIndex("tester8");
             //nativeDataStore.load(load);

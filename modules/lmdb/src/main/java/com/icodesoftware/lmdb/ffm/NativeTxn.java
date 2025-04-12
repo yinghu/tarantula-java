@@ -86,7 +86,7 @@ public class NativeTxn implements AutoCloseable{
             long ret = (long)caller.invokeExact(txn);
             return ret;
         }catch (Throwable throwable){
-            logger.error(" mdb_txn_id",throwable);
+            logger.error("mdb_txn_id",throwable);
             throw new RuntimeException(throwable);
         }
     }
@@ -97,7 +97,7 @@ public class NativeTxn implements AutoCloseable{
             MethodHandle caller = Linker.nativeLinker().downcallHandle(mdbEnvSetMaxDbs,FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
             caller.invokeExact(txn);
         }catch (Throwable throwable){
-            logger.error(" mdb_txn_reset",throwable);
+            logger.error("mdb_txn_reset",throwable);
             throw new RuntimeException(throwable);
         }
     }
@@ -109,13 +109,13 @@ public class NativeTxn implements AutoCloseable{
             int ret = (int)caller.invokeExact(txn);
             if(ret != 0) throw new RuntimeException("code ["+ret+"]");
         }catch (Throwable throwable){
-            logger.error(" mdb_txn_renew",throwable);
+            logger.error("mdb_txn_renew",throwable);
             throw new RuntimeException(throwable);
         }
     }
 
     @Override
     public void close(){
-        //if(!committed) abort();
+        if(!readOnly && !committed) abort();
     }
 }
