@@ -35,7 +35,12 @@ public class NativeEnv extends NativeStat implements Serviceable {
         mdbEnvSetMaxReaders();
         mdbEnvSetMaxDbs();
         mdbEnvOpen();
-        logger.warn("Native Env Opened");
+        NativeData.Stat stat = NativeData.stat(arena);
+        mdbEnvStat(stat.pointer());
+        pageSize.set(stat.pageSize());
+        NativeData.Info info = NativeData.info(arena);
+        mdbEnvInfo(info.pointer());
+        logger.warn("Native Env Opened ["+pageSize.get()+"]["+info.lastTxnId()+"]["+info.maxReaders()+"]");
     }
 
     @Override
@@ -208,19 +213,6 @@ public class NativeEnv extends NativeStat implements Serviceable {
             if(ret != 0) throw new RuntimeException("code ["+ret+"]");
         }catch (Throwable throwable){
             logger.error("mdb_txn_begin",throwable);
-            throw new RuntimeException(throwable);
-        }
-    }
-
-    private void mdbDbiOpen(NativeTxn txn,MemorySegment dbi){
-        try{
-            MemorySegment mdbDbiOpen = lib.find("mdb_dbi_open").get();
-            MethodHandle caller = linker.downcallHandle(mdbDbiOpen,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.JAVA_INT,ValueLayout.ADDRESS));
-            int ret = (int)caller.invokeExact(txn.pointer(),MemorySegment.NULL,DbiMask.DBI_CREATE.mask(),dbi);
-            if(ret != 0) throw new RuntimeException("code ["+ret+"]");
-        }catch (Throwable throwable){
-            txn.abort();
-            logger.error("mdb_dbi_open",throwable);
             throw new RuntimeException(throwable);
         }
     }

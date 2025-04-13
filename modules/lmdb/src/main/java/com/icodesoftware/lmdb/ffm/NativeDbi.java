@@ -3,7 +3,6 @@ package com.icodesoftware.lmdb.ffm;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Serviceable;
-import com.kenai.jnr.x86asm.Mem;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
