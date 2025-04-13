@@ -34,12 +34,8 @@ public class NativeData {
         return new NativeData.Stat(arena);
     }
 
-    public static MemorySegment mdbInfo(Arena arena){
-        StructLayout layout = MemoryLayout.structLayout(AddressLayout.ADDRESS.withName("me_mapaddr"),ValueLayout.JAVA_LONG.withName("me_mapsize")
-                ,ValueLayout.JAVA_LONG.withName("me_last_pgno"),ValueLayout.JAVA_LONG.withName("me_last_txnid"),
-                ValueLayout.JAVA_INT.withName("me_max_readers"),ValueLayout.JAVA_INT.withName("me_numreaders"));
-        MemorySegment memorySegment = arena.allocate(layout);
-        return memorySegment;
+    public static Info info(Arena arena){
+        return new NativeData.Info(arena);
     }
 
 
@@ -195,6 +191,39 @@ public class NativeData {
         public MemorySegment pointer(){
             return pointer;
         }
+    }
+
+    public static class Info{
+        private MemorySegment pointer;
+
+        public Info(Arena arena){
+            StructLayout layout = MemoryLayout.structLayout(AddressLayout.ADDRESS.withName("me_mapaddr"),ValueLayout.JAVA_LONG.withName("me_mapsize")
+                    ,ValueLayout.JAVA_LONG.withName("me_last_pgno"),ValueLayout.JAVA_LONG.withName("me_last_txnid"),
+                    ValueLayout.JAVA_INT.withName("me_max_readers"),ValueLayout.JAVA_INT.withName("me_numreaders"));
+            pointer = arena.allocate(layout);
+        }
+
+        public long mapSize(){
+            return pointer.get(ValueLayout.JAVA_LONG,8);
+        }
+        public long lastPageNo(){
+            return pointer.get(ValueLayout.JAVA_LONG,16);
+        }
+        public long lastTxnId(){
+            return pointer.get(ValueLayout.JAVA_LONG,24);
+        }
+        public int maxReaders(){
+            return pointer.get(ValueLayout.JAVA_INT,32);
+        }
+
+        public int numberOfReaders(){
+            return pointer.get(ValueLayout.JAVA_INT,36);
+        }
+
+        public MemorySegment pointer(){
+            return pointer;
+        }
+
     }
 
 
