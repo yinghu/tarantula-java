@@ -17,15 +17,17 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     private NativeDataStoreProvider nativeDataStoreProvider;
     private NativeEnv env;
     private String name;
+    private int scope;
 
-    public NativeDataStore(String name,NativeDataStoreProvider nativeDataStoreProvider,NativeEnv nativeEnv){
+    public NativeDataStore(int scope,String name,NativeDataStoreProvider nativeDataStoreProvider,NativeEnv nativeEnv){
+        this.scope = scope;
         this.name = name;
         this.nativeDataStoreProvider = nativeDataStoreProvider;
         this.env = nativeEnv;
     }
 
     public int scope(){
-        return 0;
+        return scope;
     }
 
     public String name(){
@@ -244,31 +246,124 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     }
 
     public void drop(boolean delete){
-
+        NativeDbi dbi = env.createDbi(name);
+        dbi.drop(delete);
     }
 
-    public boolean get(Recoverable.Key key, BufferStream buffer){
+    public boolean get(Recoverable.Key key, BufferStream stream){
+        NativeDbi dbi = env.createDbi(name);
+        try(Arena arena = Arena.ofConfined();NativeTxn txn = env.read(arena)){
+            MemorySegment k = NativeData.in(arena,100).write(buffer -> key.write(buffer)).pointer();
+            NativeData.OutVal v = NativeData.out(arena);
+            if(!dbi.get(k,v.pointer(),txn)){
+                txn.abort();
+                return false;
+            }
+            v.read(arena,buffer -> {
+                stream.on(null,buffer);
+            });
+            txn.abort();
+        }
         return true;
     }
     public boolean set(BufferStream bufferStream){
+
         return true;
     }
-    public void forEachEdgeKey(Recoverable.Key key,String label,BufferStream bufferStream){
 
+    public void forEachEdgeKey(Recoverable.Key key,String label,BufferStream bufferStream){
+        NativeDbi edge = env.createDbi(name,label);
+        try(NativeCursor cursor = edge.cursor()){
+            cursor.read().forEach(key,bufferStream);
+        }
     }
 
     public void forEachEdgeKeyValue(Recoverable.Key key,String label,BufferStream bufferStream){
-
+        NativeDbi edge = env.createDbi(name,label);
+        NativeDbi dbi = env.createDbi(name);
+        try(NativeCursor cursor = edge.cursor()){
+            cursor.read().forEach(key,(k,v)->{
+                v.limit(v.remaining()-1);
+                NativeData.OutVal out = NativeData.out(cursor.arena());
+                MemorySegment pv = NativeData.in(cursor.arena(),100).write(buffer -> v.read(buffer)).pointer();
+                boolean[] streaming ={true};
+                if(dbi.get(pv,out.pointer(),cursor.txn())){
+                    out.read(cursor.arena(),buffer ->{
+                        v.rewind();
+                        streaming[0] = bufferStream.on(v,buffer);
+                    });
+                }
+                return streaming[0];
+            });
+        }
     }
     public boolean setEdge(String label,BufferStream bufferStream){
-        return true;
+        NativeDbi edge = env.createDbi(name,label);
+        try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena)){
+            boolean[] pending={false};
+            NativeData.InPair inPair = NativeData.inPair(arena,100).write((b1,b2)->{
+                pending[0] = bufferStream.on(b1,b2);
+            });
+            if(!pending[0]){
+                txn.abort();
+                return false;
+            }
+            if(!edge.put(inPair.pointer1(),inPair.pointer2(),txn)){
+                txn.abort();
+                return false;
+            }
+            txn.commit();
+            return true;
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
     }
 
     public boolean unsetEdge(String label,BufferStream bufferStream,boolean fromLabel){
-        return true;
+        NativeDbi edge = env.createDbi(name,label);
+        try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena)){
+            boolean[] pending={false};
+            NativeData.InPair inPair = NativeData.inPair(arena,100).write((b1,b2)->{
+                pending[0] = bufferStream.on(b1,b2);
+            });
+            if(!pending[0]){
+                txn.abort();
+                return false;
+            }
+            if(fromLabel){
+                if(!edge.delete(inPair.pointer1(),txn)){
+                    txn.abort();
+                    return false;
+                }
+            }
+            else if(!edge.delete(inPair.pointer1(),inPair.pointer2(),txn)){
+                txn.abort();
+                return false;
+            }
+            txn.commit();
+            return true;
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
     }
     public boolean unset(BufferStream bufferStream){
-        return true;
+        NativeDbi dbi = env.createDbi(name);
+        try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena)){
+            MemorySegment key = NativeData.in(arena,100).write(buffer -> bufferStream.on(buffer,buffer)).pointer();
+            NativeData.OutVal value = NativeData.out(arena);
+            if(!dbi.get(key,value.pointer(),txn)){
+                txn.abort();
+                return false;
+            }
+            if(!dbi.delete(key,txn)){
+                txn.abort();
+                return false;
+            }
+            txn.commit();
+            return true;
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
     }
 
 

@@ -1,6 +1,7 @@
 package com.icodesoftware.lmdb.test;
 
 import com.beust.ah.A;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.lmdb.ffm.*;
 import com.icodesoftware.util.BufferProxy;
@@ -363,7 +364,7 @@ public class ForeignAPITest extends TestSetup{
             NativeDataStoreProvider nativeDataStoreProvider = new NativeDataStoreProvider();
             NativeEnv nativeEnv = new NativeEnv();
             nativeEnv.start();
-            NativeDataStore nativeDataStore = new NativeDataStore("access",nativeDataStoreProvider,nativeEnv);
+            NativeDataStore nativeDataStore = new NativeDataStore(Distributable.DATA_SCOPE,"access",nativeDataStoreProvider,nativeEnv);
             //createIfAbsent(nativeDataStore);
             TestObject accessIndex = new TestObject("tester6","testName");
             System.out.println(nativeDataStore.create(accessIndex));
@@ -379,6 +380,19 @@ public class ForeignAPITest extends TestSetup{
             });
             System.out.println("CT : "+ct[0]);
             System.out.println("LT : "+nativeDataStore.list(query).size());
+            nativeDataStore.get(SnowflakeKey.from(accessIndex.distributionId()),(k,v)->{
+                System.out.println("VZ : "+v.remaining());
+                return true;
+            });
+            nativeDataStore.forEachEdgeKey(SnowflakeKey.from(100),"type",(k,v)->{
+                System.out.println("TZ : "+v.remaining());
+                return true;
+            });
+            nativeDataStore.forEachEdgeKeyValue(SnowflakeKey.from(100),"type",(k,v)->{
+                System.out.println("TXY : "+k.remaining());
+                System.out.println("TXZ : "+v.remaining());
+                return true;
+            });
             nativeEnv.shutdown();
         }catch (Exception ex){
             ex.printStackTrace();
