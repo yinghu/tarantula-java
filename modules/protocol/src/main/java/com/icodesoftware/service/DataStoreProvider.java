@@ -38,16 +38,16 @@ public interface DataStoreProvider extends MapStoreListener,MetricsListener {
 
     List<String> list(int scope);
 
-    DataStore lookup(String name);
+    default DataStore lookup(String name){ return null;}
 
     Transaction transaction(int scope);
 
-    Recoverable.DataBufferPair dataBufferPair();
+    default Recoverable.DataBufferPair dataBufferPair(){ return null;}
     void assign(Recoverable.DataBuffer dataBuffer);
-    long storeSize();
-    int maxReaderNumber();
-    int maxDatabaseNumber();
-    boolean diskSyncOnCommit();
+    default long storeSize(){ return 1000;}
+    default int maxReaderNumber(){return 100;}
+    default int maxDatabaseNumber(){return 1024;};
+    default boolean diskSyncOnCommit(){ return false;}
 
     interface OnStart{
         void on(DataStoreProvider dataStoreProvider);

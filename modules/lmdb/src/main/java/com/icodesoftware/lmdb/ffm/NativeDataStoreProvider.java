@@ -1,18 +1,19 @@
 package com.icodesoftware.lmdb.ffm;
 
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Distributable;
-import com.icodesoftware.Recoverable;
-import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.*;
 import com.icodesoftware.lmdb.EnvSetting;
 import com.icodesoftware.lmdb.LocalDistributionIdGenerator;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DataStoreProvider;
+import com.icodesoftware.service.MapStoreListener;
+import com.icodesoftware.service.Metadata;
 import com.icodesoftware.util.TimeUtil;
 
+import java.io.File;
+import java.util.List;
 import java.util.Map;
 
-public class NativeDataStoreProvider{
+public class NativeDataStoreProvider implements DataStoreProvider{
 
     private static final TarantulaLogger logger = JDKLogger.getLogger(NativeDataStoreProvider.class);
 
@@ -36,7 +37,25 @@ public class NativeDataStoreProvider{
     public void registerDistributionIdGenerator(DataStoreProvider.DistributionIdGenerator distributionIdGenerator){
         if(distributionIdGenerator!=null) this.distributionIdGenerator = distributionIdGenerator;
     }
+    public void registerMapStoreListener(int scope, MapStoreListener mapStoreListener){
 
+    }
+    public File backup(int scope){
+        return null;
+    }
+
+    public List<String> list(){
+        return dataEnv.names();
+    }
+
+    public List<String> list(int scope){
+        return dataEnv.names();
+    }
+
+    @Override
+    public Transaction transaction(int scope) {
+        return null;
+    }
 
     public void start() throws Exception {
         if(distributionIdGenerator==null) throw new RuntimeException("Distributed id generator must be registered");
@@ -52,6 +71,25 @@ public class NativeDataStoreProvider{
         return new NativeDataStore(name,this,dataEnv);
     }
 
+    public DataStore createAccessIndexDataStore(String name){
+        return new NativeDataStore(name,this,integrationEnv);
+    }
+
+    //create none-partitioned local scope data store
+    public DataStore createKeyIndexDataStore(String name){
+        return new NativeDataStore(name,this,indexEnv);
+    }
+
+
+    //create partitioned data scope data store
+    public DataStore createLocalDataStore(String name){
+        return new NativeDataStore(name,this,localEnv);
+    }
+
+    public DataStore createLogDataStore(String name){
+        return new NativeDataStore(name,this,logEnv);
+    }
+
     public void assign(Recoverable.DataBuffer dataBuffer){
         this.distributionIdGenerator.assign(dataBuffer);
     }
@@ -63,5 +101,37 @@ public class NativeDataStoreProvider{
         logEnv.shutdown();
         localEnv.shutdown();
         logger.warn("Native data store provider shut down!");
+    }
+
+    public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value, long transactionId){
+
+    }
+    //recover cluster operation
+    public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
+        return false;
+    }
+
+    public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferStream bufferStream){
+        return false;
+    }
+
+    public boolean onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
+        return false;
+    }
+
+    public void onCommit(int scope,long transactionId){
+
+    }
+
+    public void onAbort(int scope,long transactionId){}
+
+    @Override
+    public void onUpdated(String category, double delta) {
+
+    }
+
+    @Override
+    public String name() {
+        return EnvSetting.ENV_PROVIDER_NAME;
     }
 }
