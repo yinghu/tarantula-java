@@ -22,7 +22,7 @@ public class NativeDataStoreProvider implements DataStoreProvider{
 
     @Override
     public void configure(Map<String, Object> properties) {
-        
+
     }
 
     public void registerDistributionIdGenerator(DataStoreProvider.DistributionIdGenerator distributionIdGenerator){

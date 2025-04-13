@@ -30,6 +30,18 @@ public class NativeData {
         return new NativeData.OutPair(arena);
     }
 
+    public static Stat stat(Arena arena){
+        return new NativeData.Stat(arena);
+    }
+
+    public static MemorySegment mdbInfo(Arena arena){
+        StructLayout layout = MemoryLayout.structLayout(AddressLayout.ADDRESS.withName("me_mapaddr"),ValueLayout.JAVA_LONG.withName("me_mapsize")
+                ,ValueLayout.JAVA_LONG.withName("me_last_pgno"),ValueLayout.JAVA_LONG.withName("me_last_txnid"),
+                ValueLayout.JAVA_INT.withName("me_max_readers"),ValueLayout.JAVA_INT.withName("me_numreaders"));
+        MemorySegment memorySegment = arena.allocate(layout);
+        return memorySegment;
+    }
+
 
     public static class InVal{
         private MemorySegment pointer;
@@ -152,8 +164,37 @@ public class NativeData {
         public MemorySegment pointer2(){
             return pointer2;
         }
+    }
 
+    public static class Stat{
+        private MemorySegment pointer;
 
+        public Stat(Arena arena){
+            StructLayout layout = MemoryLayout.structLayout(ValueLayout.JAVA_INT.withName("ms_psize"),ValueLayout.JAVA_INT.withName("ms_depth"),
+                    ValueLayout.JAVA_LONG.withName("ms_branch_pages"),ValueLayout.JAVA_LONG.withName("ms_leaf_pages"),ValueLayout.JAVA_LONG.withName("ms_overflow_pages"),ValueLayout.JAVA_LONG.withName("ms_entries"));
+            pointer = arena.allocate(layout);
+        }
+        public int pageSize(){
+            return pointer.get(ValueLayout.JAVA_INT,0);
+        }
+        public int depth(){
+            return pointer.get(ValueLayout.JAVA_INT,4);
+        }
+        public long branchPages(){
+            return pointer.get(ValueLayout.JAVA_LONG,8);
+        }
+        public long leafPages(){
+            return pointer.get(ValueLayout.JAVA_LONG,16);
+        }
+        public long overflowPages(){
+            return pointer.get(ValueLayout.JAVA_LONG,24);
+        }
+        public long entries(){
+            return pointer.get(ValueLayout.JAVA_LONG,32);
+        }
+        public MemorySegment pointer(){
+            return pointer;
+        }
     }
 
 

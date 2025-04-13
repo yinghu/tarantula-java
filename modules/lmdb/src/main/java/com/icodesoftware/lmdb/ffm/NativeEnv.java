@@ -8,6 +8,8 @@ import com.icodesoftware.service.Serviceable;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class NativeEnv extends NativeStat implements Serviceable {
@@ -75,13 +77,22 @@ public class NativeEnv extends NativeStat implements Serviceable {
         });
     }
 
-    public void names(){
-        //try(Arena na = Arena.ofConfined();NativeTxn txn = write(na)){
-            //MemorySegment dm = na.allocate(AddressLayout.ADDRESS);
-            //mdbDbiOpen(txn,dm);
-            //MemorySegment dbi = dm.get(ValueLayout.ADDRESS,0);
-            //NativeCursor cursor = new NativeCursor(this,dbi,false);
-        //}
+    public List<String> names(){
+        try{
+            ArrayList<String> names = new ArrayList<>();
+            NativeDbi dbi = new NativeDbi(this,null);
+            dbi.start();
+            NativeCursor cursor = dbi.cursor();
+            cursor.read().forEach((k,v)->{
+                names.add(new String(k.array()));
+                return true;
+            });
+            cursor.close();
+            return names;
+        }catch (Exception ex){
+            logger.error("error on names",ex);
+            throw new RuntimeException(ex);
+        }
     }
 
     public NativeTxn read(Arena arena){

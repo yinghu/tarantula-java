@@ -3,6 +3,7 @@ package com.icodesoftware.lmdb.ffm;
 import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Serviceable;
+import com.kenai.jnr.x86asm.Mem;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
@@ -30,7 +31,6 @@ public class NativeDbi extends NativeStat implements Serviceable {
         this.storeName = label==null ? NativeUtil.storeName(name) : NativeUtil.storeName(name,label);
         this.name = NativeUtil.storeName(name);
         this.label = NativeUtil.storeName(label);
-
         this.openFlag = this.label==null? DbiMask.DBI_CREATE.mask() : (DbiMask.DBI_CREATE.mask() | DbiMask.DBI_DUP_SORT.mask());
         this.putFlag = this.label==null? 0 : PutMask.PUT_NO_DUP_DATA.mask();
     }
@@ -49,11 +49,19 @@ public class NativeDbi extends NativeStat implements Serviceable {
     @Override
     public void start() throws Exception {
         try(Arena a = Arena.ofConfined(); NativeTxn txn = env.write(a)) {
-            MemorySegment dbiName = a.allocateFrom(storeName, StandardCharsets.US_ASCII);
-            MemorySegment dm = env.allocate(arena -> arena.allocate(AddressLayout.ADDRESS));
-            mdbDbiOpen(txn,dbiName,dm);
-            txn.commit();
-            dbi = dm.get(ValueLayout.ADDRESS,0);
+            if(storeName!=null){
+                MemorySegment dbiName = a.allocateFrom(storeName, StandardCharsets.US_ASCII);
+                MemorySegment dm = env.allocate(arena -> arena.allocate(AddressLayout.ADDRESS));
+                mdbDbiOpen(txn,dbiName,dm);
+                txn.commit();
+                dbi = dm.get(ValueLayout.ADDRESS,0);
+            }
+            else{
+                MemorySegment dm = env.allocate(arena -> arena.allocate(AddressLayout.ADDRESS));
+                mdbDbiOpen(txn,dm);
+                txn.commit();
+                dbi = dm.get(ValueLayout.ADDRESS,0);
+            }
         }
         stat();
     }
@@ -100,21 +108,16 @@ public class NativeDbi extends NativeStat implements Serviceable {
 
     public void stat(){
         try(Arena arena = Arena.ofConfined() ; NativeTxn txn = env.read(arena)){
-            MemorySegment stat = dbiStat(arena);
-            mdbStat(txn,dbi,stat);
-            pageSize.set(stat.get(ValueLayout.JAVA_INT,0));
-            depth.set(stat.get(ValueLayout.JAVA_INT,4));
-            branchPages.set(stat.get(ValueLayout.JAVA_LONG,8));
-            leafPages.set(stat.get(ValueLayout.JAVA_LONG,16));
-            overflowPages.set(stat.get(ValueLayout.JAVA_LONG,24));
-            entries.set(stat.get(ValueLayout.JAVA_LONG,32));
+            NativeData.Stat stat = NativeData.stat(arena);
+            mdbStat(txn,dbi,stat.pointer());
+            pageSize.set(stat.pageSize());
+            depth.set(stat.depth());
+            branchPages.set(stat.branchPages());
+            leafPages.set(stat.leafPages());
+            overflowPages.set(stat.overflowPages());
+            entries.set(stat.entries());
             txn.abort();
         }
-    }
-
-
-    private MemorySegment dbiStat(Arena a){
-        return NativeUtil.mdbStat(a);
     }
 
     private int mdbPut(NativeTxn txn,MemorySegment key,MemorySegment value,int flags){
@@ -171,6 +174,19 @@ public class NativeDbi extends NativeStat implements Serviceable {
             MemorySegment mdbDbiOpen = env.lib.find("mdb_dbi_open").get();
             MethodHandle caller = env.linker.downcallHandle(mdbDbiOpen,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.JAVA_INT,ValueLayout.ADDRESS));
             int ret = (int)caller.invokeExact(txn.pointer(),dbName,openFlag,dbi);
+            if(ret != 0) throw new RuntimeException("code ["+ret+"]");
+        }catch (Throwable throwable){
+            txn.abort();
+            logger.error("mdb_dbi_open",throwable);
+            throw new RuntimeException(throwable);
+        }
+    }
+
+    private void mdbDbiOpen(NativeTxn txn,MemorySegment dbi){
+        try{
+            MemorySegment mdbDbiOpen = env.lib.find("mdb_dbi_open").get();
+            MethodHandle caller = env.linker.downcallHandle(mdbDbiOpen,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.JAVA_INT,ValueLayout.ADDRESS));
+            int ret = (int)caller.invokeExact(txn.pointer(),MemorySegment.NULL,openFlag,dbi);
             if(ret != 0) throw new RuntimeException("code ["+ret+"]");
         }catch (Throwable throwable){
             txn.abort();

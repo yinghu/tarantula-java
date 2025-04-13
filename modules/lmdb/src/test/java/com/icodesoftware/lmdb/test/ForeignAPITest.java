@@ -364,6 +364,7 @@ public class ForeignAPITest extends TestSetup{
             NativeDataStoreProvider nativeDataStoreProvider = new NativeDataStoreProvider();
             NativeEnv nativeEnv = new NativeEnv();
             nativeEnv.start();
+            System.out.println("DBS : ["+nativeEnv.names().size()+"]");
             NativeDataStore nativeDataStore = new NativeDataStore(Distributable.DATA_SCOPE,"access",nativeDataStoreProvider,nativeEnv);
             //createIfAbsent(nativeDataStore);
             TestObject accessIndex = new TestObject("tester6","testName");
