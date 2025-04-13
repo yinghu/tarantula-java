@@ -77,7 +77,7 @@ public class LocalDataStore {
     }
 
     public int partition(){
-        return env.envSetting.partition;
+        return 0;//env.envSetting.partition;
     }
 
 }

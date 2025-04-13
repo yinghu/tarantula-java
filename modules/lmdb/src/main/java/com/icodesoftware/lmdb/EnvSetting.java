@@ -36,18 +36,17 @@ public class EnvSetting {
     public static final String log ="log";
     public static final String local ="local";
 
-    public static final EnvSetting DataSetting = new EnvSetting(data,ENV_BASE_DIR+"/data",0,1,true);
-    public static final EnvSetting IntegrationSetting = new EnvSetting(integration,ENV_BASE_DIR+"/integration",0,1,true);
-    public static final EnvSetting IndexSetting = new EnvSetting(index,ENV_BASE_DIR+"/index",0,1,true);
-    public static final EnvSetting LogSetting = new EnvSetting(log,ENV_BASE_DIR+"/log",0,1,true);
-    public static final EnvSetting LocalSetting = new EnvSetting(local,ENV_BASE_DIR+"/local",0,1,true);
+    public static final EnvSetting DataSetting = new EnvSetting(data,ENV_BASE_DIR+"/data",0,true);
+    public static final EnvSetting IntegrationSetting = new EnvSetting(integration,ENV_BASE_DIR+"/integration",0,true);
+    public static final EnvSetting IndexSetting = new EnvSetting(index,ENV_BASE_DIR+"/index",0,true);
+    public static final EnvSetting LogSetting = new EnvSetting(log,ENV_BASE_DIR+"/log",0,true);
+    public static final EnvSetting LocalSetting = new EnvSetting(local,ENV_BASE_DIR+"/local",0,true);
 
 
-    public EnvSetting(String name,String storePath,int mbSize,int partition,boolean enabled){
+    public EnvSetting(String name,String storePath,int mbSize,boolean enabled){
         this.name = name;
         this.storePath = storePath;
         this.mbSize = mbSize;
-        this.partition = partition;
         this.enabled = enabled;
         this.scope = scope();
     }
@@ -56,7 +55,6 @@ public class EnvSetting {
     public final String name;
     public final String storePath;
     public final int mbSize;
-    public final int partition;
     public final boolean enabled;
 
 
@@ -72,19 +70,19 @@ public class EnvSetting {
     public static EnvSetting disable(int scope){
         switch (scope){
             case Distributable.DATA_SCOPE -> {
-                return new EnvSetting(data,ENV_BASE_DIR+"/data",0,1,false);
+                return new EnvSetting(data,ENV_BASE_DIR+"/data",0,false);
             }
             case Distributable.INTEGRATION_SCOPE -> {
-                return new EnvSetting(integration,ENV_BASE_DIR+"/integration",0,1,false);
+                return new EnvSetting(integration,ENV_BASE_DIR+"/integration",0,false);
             }
             case Distributable.INDEX_SCOPE -> {
-                return new EnvSetting(index,ENV_BASE_DIR+"/index",0,1,false);
+                return new EnvSetting(index,ENV_BASE_DIR+"/index",0,false);
             }
             case Distributable.LOG_SCOPE -> {
-                return new EnvSetting(log,ENV_BASE_DIR+"/log",0,1,false);
+                return new EnvSetting(log,ENV_BASE_DIR+"/log",0,false);
             }
             case Distributable.LOCAL_SCOPE -> {
-                return new EnvSetting(local,ENV_BASE_DIR+"/local",0,1,false);
+                return new EnvSetting(local,ENV_BASE_DIR+"/local",0,false);
             }
             default -> throw new UnsupportedOperationException("scope not supported ["+scope+"]");
         }
@@ -92,19 +90,19 @@ public class EnvSetting {
     public static EnvSetting setting(int scope,String baseDir,int mbSize){
         switch (scope){
             case Distributable.DATA_SCOPE -> {
-                return new EnvSetting(data,baseDir+"/data",mbSize,1,true);
+                return new EnvSetting(data,baseDir+"/data",mbSize,true);
             }
             case Distributable.INTEGRATION_SCOPE -> {
-                return new EnvSetting(integration,baseDir+"/integration",mbSize,1,true);
+                return new EnvSetting(integration,baseDir+"/integration",mbSize,true);
             }
             case Distributable.INDEX_SCOPE -> {
-                return new EnvSetting(index,baseDir+"/index",mbSize,1,true);
+                return new EnvSetting(index,baseDir+"/index",mbSize,true);
             }
             case Distributable.LOG_SCOPE -> {
-                return new EnvSetting(log,baseDir+"/log",mbSize,1,true);
+                return new EnvSetting(log,baseDir+"/log",mbSize,true);
             }
             case Distributable.LOCAL_SCOPE -> {
-                return new EnvSetting(local,baseDir+"/local",mbSize,1,true);
+                return new EnvSetting(local,baseDir+"/local",mbSize,true);
             }
             default -> throw new UnsupportedOperationException("scope not supported ["+scope+"]");
         }
@@ -120,7 +118,6 @@ public class EnvSetting {
         jsonObject.addProperty("scope",scope);
         jsonObject.addProperty("storePath",storePath);
         jsonObject.addProperty("mdSize",mbSize);
-        jsonObject.addProperty("partition",partition);
         jsonObject.addProperty("enabled",enabled);
         return jsonObject;
     }

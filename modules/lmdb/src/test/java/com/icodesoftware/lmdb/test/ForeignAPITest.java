@@ -1,8 +1,10 @@
 package com.icodesoftware.lmdb.test;
 
 import com.beust.ah.A;
+import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.lmdb.EnvSetting;
 import com.icodesoftware.lmdb.ffm.*;
 import com.icodesoftware.util.BufferProxy;
 
@@ -20,6 +22,8 @@ import java.lang.invoke.MethodType;
 import java.lang.invoke.VarHandle;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ForeignAPITest extends TestSetup{
 
@@ -350,7 +354,7 @@ public class ForeignAPITest extends TestSetup{
         Assert.assertNull(throwable);
     }
 
-    private static void createIfAbsent(NativeDataStore dataStore){
+    private static void createIfAbsent(DataStore dataStore){
         TestAccessIndex testAccessIndex = new TestAccessIndex("tester");
         testAccessIndex.referenceId = 10;
         testAccessIndex.group = "provider";
@@ -362,10 +366,16 @@ public class ForeignAPITest extends TestSetup{
     public static void main(String[] arg) throws Exception{
         try{
             NativeDataStoreProvider nativeDataStoreProvider = new NativeDataStoreProvider();
-            NativeEnv nativeEnv = new NativeEnv();
-            nativeEnv.start();
-            System.out.println("DBS : ["+nativeEnv.names().size()+"]");
-            NativeDataStore nativeDataStore = new NativeDataStore(Distributable.DATA_SCOPE,"access",nativeDataStoreProvider,nativeEnv);
+            Map<String,Object> config = new HashMap<>();
+            String baseDir = "/var/lmdb";
+            config.put(EnvSetting.data,EnvSetting.setting(Distributable.DATA_SCOPE,baseDir,10));
+            config.put(EnvSetting.integration,EnvSetting.setting(Distributable.INTEGRATION_SCOPE,baseDir,10));
+            config.put(EnvSetting.index,EnvSetting.setting(Distributable.INDEX_SCOPE,baseDir,10));
+            config.put(EnvSetting.log,EnvSetting.setting(Distributable.LOG_SCOPE,baseDir,10));
+            config.put(EnvSetting.local,EnvSetting.setting(Distributable.LOCAL_SCOPE,baseDir,10));
+            nativeDataStoreProvider.configure(config);
+            nativeDataStoreProvider.start();
+            DataStore nativeDataStore = nativeDataStoreProvider.createDataStore("access");
             //createIfAbsent(nativeDataStore);
             TestObject accessIndex = new TestObject("tester6","testName");
             System.out.println(nativeDataStore.create(accessIndex));
@@ -381,20 +391,20 @@ public class ForeignAPITest extends TestSetup{
             });
             System.out.println("CT : "+ct[0]);
             System.out.println("LT : "+nativeDataStore.list(query).size());
-            nativeDataStore.get(SnowflakeKey.from(accessIndex.distributionId()),(k,v)->{
+            nativeDataStore.backup().get(SnowflakeKey.from(accessIndex.distributionId()),(k,v)->{
                 System.out.println("VZ : "+v.remaining());
                 return true;
             });
-            nativeDataStore.forEachEdgeKey(SnowflakeKey.from(100),"type",(k,v)->{
+            nativeDataStore.backup().forEachEdgeKey(SnowflakeKey.from(100),"type",(k,v)->{
                 System.out.println("TZ : "+v.remaining());
                 return true;
             });
-            nativeDataStore.forEachEdgeKeyValue(SnowflakeKey.from(100),"type",(k,v)->{
+            nativeDataStore.backup().forEachEdgeKeyValue(SnowflakeKey.from(100),"type",(k,v)->{
                 System.out.println("TXY : "+k.remaining());
                 System.out.println("TXZ : "+v.remaining());
                 return true;
             });
-            nativeEnv.shutdown();
+            nativeDataStoreProvider.shutdown();
         }catch (Exception ex){
             ex.printStackTrace();
         }

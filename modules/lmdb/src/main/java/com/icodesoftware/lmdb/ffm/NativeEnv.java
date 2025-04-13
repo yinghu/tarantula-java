@@ -4,6 +4,7 @@ import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.lmdb.EnvSetting;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Serviceable;
+import com.icodesoftware.util.FileUtil;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
@@ -16,8 +17,6 @@ public class NativeEnv extends NativeStat implements Serviceable {
 
     private static TarantulaLogger logger = JDKLogger.getLogger(NativeEnv.class);
 
-    private static String nativeLibPath = "/home/yinghu/lmdb.dll";
-    private static String databasePath = "/home/yinghu/tst";
     SymbolLookup lib;
     Linker linker;
 
@@ -25,10 +24,27 @@ public class NativeEnv extends NativeStat implements Serviceable {
     private MemorySegment env;
 
     private final ConcurrentHashMap<String,NativeDbi> nativeDbs = new ConcurrentHashMap<>();
+    private EnvSetting envSetting;
+
+    public NativeEnv(EnvSetting envSetting){
+        this.envSetting = envSetting;
+    }
+
+    public void envSetting(EnvSetting envSetting){
+        this.envSetting = envSetting;
+    }
+    public EnvSetting envSetting(){
+        return envSetting;
+    }
+
+    public int scope(){
+        return this.envSetting.scope;
+    }
 
     @Override
     public void start() throws Exception {
-        lib = SymbolLookup.libraryLookup(nativeLibPath,arena);
+        FileUtil.createDirectory(envSetting.storePath);
+        lib = SymbolLookup.libraryLookup(NativeUtil.libName(),arena);
         linker = Linker.nativeLinker();
         mdbEnvCreate();
         mdbEnvSetMapSize();
@@ -51,7 +67,7 @@ public class NativeEnv extends NativeStat implements Serviceable {
         });
         mdbEnvClose();
         arena.close();
-        logger.warn("Native Env Closed");
+        logger.warn("Native Env Closed ["+scope()+"]");
     }
 
     public MemorySegment pointer(){
@@ -137,7 +153,7 @@ public class NativeEnv extends NativeStat implements Serviceable {
         try{
             MemorySegment mdbEnvOpen = lib.find("mdb_env_open").get();
             MethodHandle caller = Linker.nativeLinker().downcallHandle(mdbEnvOpen,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.ADDRESS,ValueLayout.JAVA_INT,ValueLayout.JAVA_INT));
-            MemorySegment dir = arena.allocateFrom(databasePath);
+            MemorySegment dir = arena.allocateFrom(envSetting.storePath);
             int ret = (int)caller.invokeExact(env,dir,EnvMask.ENV_NO_SYNC.mask(),EnvMask.ACCESS_MODE.mask());
             if(ret != 0) throw new RuntimeException("code ["+ret+"]");
         }catch (Throwable throwable){
@@ -173,7 +189,7 @@ public class NativeEnv extends NativeStat implements Serviceable {
         try{
             MemorySegment mdbEnvSetMapSize = lib.find("mdb_env_set_mapsize").get();
             MethodHandle caller = Linker.nativeLinker().downcallHandle(mdbEnvSetMapSize,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.JAVA_LONG));
-            int ret = (int)caller.invokeExact(env, EnvSetting.toBytesFromMb(10));
+            int ret = (int)caller.invokeExact(env, EnvSetting.toBytesFromMb(envSetting.mbSize));
             if(ret != 0) throw new RuntimeException("code ["+ret+"]");
         }catch (Throwable throwable){
             logger.error("mdb_env_set_mapsize",throwable);
@@ -185,7 +201,7 @@ public class NativeEnv extends NativeStat implements Serviceable {
         try{
             MemorySegment mdbEnvSetMaxReaders = lib.find("mdb_env_set_maxreaders").get();
             MethodHandle caller = Linker.nativeLinker().downcallHandle(mdbEnvSetMaxReaders,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.JAVA_INT));
-            int ret = (int)caller.invokeExact(env,100);
+            int ret = (int)caller.invokeExact(env,EnvSetting.MAX_READER_NUMBER);
             if(ret != 0) throw new RuntimeException("code ["+ret+"]");
         }catch (Throwable throwable){
             logger.error("mdb_env_set_maxreaders",throwable);
@@ -197,7 +213,7 @@ public class NativeEnv extends NativeStat implements Serviceable {
         try{
             MemorySegment mdbEnvSetMaxDbs = lib.find("mdb_env_set_maxdbs").get();
             MethodHandle caller = Linker.nativeLinker().downcallHandle(mdbEnvSetMaxDbs,FunctionDescriptor.of(ValueLayout.JAVA_INT,ValueLayout.ADDRESS,ValueLayout.JAVA_INT));
-            int ret = (int)caller.invokeExact(env,1024);
+            int ret = (int)caller.invokeExact(env,EnvSetting.MAX_STORE_NUMBER);
             if(ret != 0) throw new RuntimeException("code ["+ret+"]");
         }catch (Throwable throwable){
             logger.error("mdb_env_set_maxdbs",throwable);
