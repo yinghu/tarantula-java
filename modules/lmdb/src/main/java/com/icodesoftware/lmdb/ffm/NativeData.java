@@ -48,7 +48,7 @@ public class NativeData {
             this.data = arena.allocate(ValueLayout.JAVA_BYTE,size);
         }
 
-        public InVal write(NativeDataWriter onData){
+        public Recoverable.DataBuffer write(NativeDataWriter onData){
             Recoverable.DataBuffer buffer = BufferProxy.buffer(data);
             onData.onBuffer(buffer);
             buffer.writeByte((byte)'\0');
@@ -57,12 +57,7 @@ public class NativeData {
             vSize.set(pointer,0,buffer.remaining());
             VarHandle vData = struct.varHandle(MemoryLayout.PathElement.groupElement("mv_data"));
             vData.set(pointer,0,data);
-            return this;
-        }
-
-        public MemorySegment read(NativeDataWriter onData){
-            onData.onBuffer(BufferProxy.buffer(data));
-            return this.pointer;
+            return buffer;
         }
 
         public MemorySegment pointer(){

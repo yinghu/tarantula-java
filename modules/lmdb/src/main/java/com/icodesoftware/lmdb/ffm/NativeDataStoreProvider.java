@@ -104,7 +104,7 @@ public class NativeDataStoreProvider implements DataStoreProvider{
     }
 
     public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value, long transactionId){
-
+        logger.warn("Updating ["+transactionId+"]"+key.remaining()+" : "+value.remaining()+" ; "+metadata.source()+" ; "+metadata.scope()+" ; "+metadata.label());
     }
     //recover cluster operation
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
@@ -120,7 +120,7 @@ public class NativeDataStoreProvider implements DataStoreProvider{
     }
 
     public void onCommit(int scope,long transactionId){
-
+        logger.warn("Commiting ["+scope+"]["+transactionId+"]");
     }
 
     public void onAbort(int scope,long transactionId){}

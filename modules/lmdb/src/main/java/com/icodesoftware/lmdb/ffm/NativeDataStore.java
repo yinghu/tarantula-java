@@ -5,6 +5,7 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.lmdb.EnvSetting;
 import com.icodesoftware.service.DataStoreSummary;
+import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.util.LocalHeader;
 
 import java.lang.foreign.Arena;
@@ -37,16 +38,22 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     public <T extends Recoverable> boolean create(T t) {
         NativeDbi dbi = env.createDbi(name);
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena)){
-            MemorySegment key = NativeData.in(arena, EnvSetting.KEY_SIZE).write(buffer -> nativeDataStoreProvider.assign(buffer))
-                    .read(buffer -> t.readKey(buffer));
-            MemorySegment value = NativeData.in(arena,EnvSetting.VALUE_SIZE).write(buffer -> {
+            long txnId = txn.transactionId();
+            NativeData.InVal keyIn = NativeData.in(arena, EnvSetting.KEY_SIZE);
+            Recoverable.DataBuffer key = keyIn.write(buffer -> nativeDataStoreProvider.assign(buffer));
+            t.readKey(key);
+            NativeData.InVal valueIn = NativeData.in(arena,EnvSetting.VALUE_SIZE);
+            Recoverable.DataBuffer value = valueIn.write(buffer -> {
                 buffer.writeHeader(LocalHeader.create(t.getFactoryId(),t.getClassId(),1L));
                 if(!t.write(buffer)) throw new RuntimeException("no data");
-            }).pointer();
-            if(!dbi.put(key,value,txn)){
+            });
+            if(!dbi.put(keyIn.pointer(),valueIn.pointer(),txn)){
                 txn.abort();
                 return false;
             }
+            key.rewind();
+            nativeDataStoreProvider.onUpdating(dbi.metadata(), BufferProxy.copy(key.src()),BufferProxy.copy(value.src()), txnId);
+            nativeDataStoreProvider.onCommit(dbi.metadata().scope(),txnId);
             txn.commit();
             return true;
         }
@@ -89,9 +96,10 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     public <T extends Recoverable> boolean load(T t) {
         NativeDbi dbi = env.createDbi(name);
         try(Arena arena = Arena.ofConfined();NativeTxn txn = env.read(arena)){
-            MemorySegment key = NativeData.in(arena,EnvSetting.KEY_SIZE).write(buffer -> t.writeKey(buffer)).read(buffer -> {});
+            NativeData.InVal keyIn = NativeData.in(arena,EnvSetting.KEY_SIZE);
+            keyIn.write(buffer -> t.writeKey(buffer));
             NativeData.OutVal value = NativeData.out(arena);
-            if(!dbi.get(key,value.pointer(),txn)){
+            if(!dbi.get(keyIn.pointer(),value.pointer(),txn)){
                 txn.abort();
                 return false;
             }
@@ -268,7 +276,16 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     }
     public boolean set(BufferStream bufferStream){
 
-        return true;
+        NativeDbi dbi = env.createDbi(name);
+        try(Arena arena = Arena.ofConfined();NativeTxn txn = env.write(arena)) {
+            NativeData.InVal key = NativeData.in(arena,EnvSetting.KEY_SIZE);
+            NativeData.InVal val = NativeData.in(arena,EnvSetting.VALUE_SIZE);
+            //bufferStream.on()
+            dbi.put(key.pointer(),val.pointer(),txn);
+            return true;
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
     }
 
     public void forEachEdgeKey(Recoverable.Key key,String label,BufferStream bufferStream){

@@ -1,7 +1,9 @@
 package com.icodesoftware.lmdb.ffm;
 
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.lmdb.LocalMetadata;
 import com.icodesoftware.logging.JDKLogger;
+import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.Serviceable;
 
 import java.lang.foreign.*;
@@ -20,12 +22,14 @@ public class NativeDbi extends NativeStat implements Serviceable {
     private final String label;
     private final int openFlag;
     private final int putFlag;
+    private final Metadata metadata;
 
     public NativeDbi(final NativeEnv env,final String name){
         this(env,name,null);
     }
 
     public NativeDbi(final NativeEnv env,final String name,final String label){
+        this.metadata = new LocalMetadata(env.scope(),name,label);
         this.env = env;
         this.storeName = label==null ? NativeUtil.storeName(name) : NativeUtil.storeName(name,label);
         this.name = NativeUtil.storeName(name);
@@ -39,6 +43,9 @@ public class NativeDbi extends NativeStat implements Serviceable {
     }
     public String label(){
         return label;
+    }
+    public Metadata metadata(){
+        return metadata;
     }
 
     public MemorySegment pointer(){
