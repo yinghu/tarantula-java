@@ -23,6 +23,8 @@ public class NativeDataStoreProvider implements DataStoreProvider{
     private NativeEnv logEnv = new NativeEnv(EnvSetting.setting(Distributable.LOG_SCOPE,EnvSetting.ENV_BASE_DIR,10));
     private NativeEnv localEnv = new NativeEnv(EnvSetting.setting(Distributable.LOCAL_SCOPE,EnvSetting.ENV_BASE_DIR,10));
 
+    private MapStoreListener integrationMapStoreListener;
+    private MapStoreListener dataMapStoreListener;
 
     private DataStoreProvider.DistributionIdGenerator distributionIdGenerator = new LocalDistributionIdGenerator(1,TimeUtil.epochMillisecondsFromMidnight(2020,1,1));;
 
@@ -38,7 +40,14 @@ public class NativeDataStoreProvider implements DataStoreProvider{
         if(distributionIdGenerator!=null) this.distributionIdGenerator = distributionIdGenerator;
     }
     public void registerMapStoreListener(int scope, MapStoreListener mapStoreListener){
-
+        if(mapStoreListener==null) return;
+        if(scope==Distributable.DATA_SCOPE){
+            this.dataMapStoreListener = mapStoreListener;
+            return;
+        }
+        if(scope==Distributable.INTEGRATION_SCOPE){
+            this.integrationMapStoreListener = mapStoreListener;
+        }
     }
     public File backup(int scope){
         return null;
@@ -104,7 +113,10 @@ public class NativeDataStoreProvider implements DataStoreProvider{
     }
 
     public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value, long transactionId){
-        logger.warn("Updating ["+transactionId+"]"+key.remaining()+" : "+value.remaining()+" ; "+metadata.source()+" ; "+metadata.scope()+" ; "+metadata.label());
+        if(metadata.scope()==Distributable.DATA_SCOPE && dataMapStoreListener!=null){
+            logger.warn("Updating ["+transactionId+"]"+key.remaining()+" : "+value.remaining()+" ; "+metadata.source()+" ; "+metadata.scope()+" ; "+metadata.label());
+            dataMapStoreListener.onUpdating(metadata,key,value,transactionId);
+        }
     }
     //recover cluster operation
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
@@ -120,7 +132,10 @@ public class NativeDataStoreProvider implements DataStoreProvider{
     }
 
     public void onCommit(int scope,long transactionId){
-        logger.warn("Commiting ["+scope+"]["+transactionId+"]");
+        if(scope==Distributable.DATA_SCOPE && dataMapStoreListener!=null){
+            logger.warn("Commiting ["+scope+"]["+transactionId+"]");
+            dataMapStoreListener.onCommit(scope,transactionId);
+        }
     }
 
     public void onAbort(int scope,long transactionId){}

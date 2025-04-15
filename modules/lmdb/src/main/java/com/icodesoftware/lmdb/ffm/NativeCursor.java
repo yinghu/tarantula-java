@@ -3,6 +3,7 @@ package com.icodesoftware.lmdb.ffm;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.TarantulaLogger;
+import com.icodesoftware.lmdb.EnvSetting;
 import com.icodesoftware.logging.JDKLogger;
 
 import java.lang.foreign.*;
@@ -49,11 +50,12 @@ public class NativeCursor implements AutoCloseable{
 
     public void forEach(Recoverable.Key key, DataStore.BufferStream stream){
         if(!edge) return;
-        MemorySegment k = NativeData.in(arena,100).write(buffer -> key.write(buffer)).pointer();
+        NativeData.InVal k = NativeData.in(arena, EnvSetting.KEY_SIZE);
+        k.write(buffer -> key.write(buffer));
         NativeData.OutVal v = NativeData.out(arena);
-        boolean next = mdbCursorGet(k,v.pointer(), CursorMask.MDB_SET.mask());
+        boolean next = mdbCursorGet(k.pointer(),v.pointer(), CursorMask.MDB_SET.mask());
         if(!next) return;
-        next = mdbCursorGet(k,v.pointer(), CursorMask.MDB_FIRST_DUP.mask());
+        next = mdbCursorGet(k.pointer(),v.pointer(), CursorMask.MDB_FIRST_DUP.mask());
         boolean[] streaming = {false};
         if(next){
             v.read(arena,buffer -> {
@@ -61,7 +63,7 @@ public class NativeCursor implements AutoCloseable{
             });
         }
         if(!streaming[0]) return;
-        while (mdbCursorGet(k,v.pointer(), CursorMask.MDB_NEXT_DUP.mask())){
+        while (mdbCursorGet(k.pointer(),v.pointer(), CursorMask.MDB_NEXT_DUP.mask())){
             v.read(arena,buffer -> {
                 streaming[0] = stream.on(null,buffer);
             });
@@ -71,12 +73,10 @@ public class NativeCursor implements AutoCloseable{
 
     public void forEach(DataStore.BufferStream stream){
         NativeData.OutPair kv = NativeData.outPair(arena);
-        while (mdbCursorGet(kv.pointer1(),kv.pointer2(), CursorMask.MDB_NEXT.mask())){
+        while (mdbCursorGet(kv.keyPointer(),kv.valuePointer(), CursorMask.MDB_NEXT.mask())){
             if(!kv.stream(arena,stream)) break;
         }
     }
-
-
 
     public void close(){
         txn.abort();

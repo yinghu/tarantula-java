@@ -18,8 +18,8 @@ public class NativeData {
         return new NativeData.InVal(arena,size);
     }
 
-    public static InPair inPair(Arena arena,long size){
-        return new NativeData.InPair(arena,size);
+    public static InPair inPair(Arena arena,long keySize,long valueSize){
+        return new NativeData.InPair(arena,keySize,valueSize);
     }
 
     public static OutVal out(Arena arena){
@@ -104,11 +104,11 @@ public class NativeData {
             return stream.on(BufferProxy.buffer(data1.reinterpret(len1,arena,null)),BufferProxy.buffer(data2.reinterpret(len2,arena,null)));
         }
 
-        public MemorySegment pointer1(){
+        public MemorySegment keyPointer(){
             return pointer1;
         }
 
-        public MemorySegment pointer2(){
+        public MemorySegment valuePointer(){
             return pointer2;
         }
     }
@@ -121,11 +121,11 @@ public class NativeData {
         private MemorySegment data2;
 
 
-        private InPair(Arena arena,long size){
+        private InPair(Arena arena,long keySize,long valueSize){
             this.pointer1 = arena.allocate(struct);
-            this.data1 = arena.allocate(ValueLayout.JAVA_BYTE,size);
+            this.data1 = arena.allocate(ValueLayout.JAVA_BYTE,keySize);
             this.pointer2 = arena.allocate(struct);
-            this.data2 = arena.allocate(ValueLayout.JAVA_BYTE,size);
+            this.data2 = arena.allocate(ValueLayout.JAVA_BYTE,valueSize);
         }
 
         public InPair write(NativeDataPairWriter onData){
@@ -148,11 +148,11 @@ public class NativeData {
             return this;
         }
 
-        public MemorySegment pointer1(){
+        public MemorySegment keyPointer(){
             return pointer1;
         }
 
-        public MemorySegment pointer2(){
+        public MemorySegment valuePointer(){
             return pointer2;
         }
     }

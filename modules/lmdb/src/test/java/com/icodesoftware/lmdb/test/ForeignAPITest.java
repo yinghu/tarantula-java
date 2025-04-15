@@ -4,9 +4,11 @@ import com.beust.ah.A;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.Transaction;
 import com.icodesoftware.lmdb.EnvSetting;
 import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.lmdb.ffm.*;
+import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.util.BufferProxy;
 
 import com.icodesoftware.util.IntegerKey;
@@ -24,6 +26,7 @@ import java.lang.invoke.VarHandle;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ForeignAPITest extends TestSetup{
@@ -367,10 +370,12 @@ public class ForeignAPITest extends TestSetup{
     public static void main(String[] arg) throws Exception{
         try{
             NativeDataStoreProvider nativeDataStoreProvider = new NativeDataStoreProvider();
-            TestContext context = new TestContext();
-            context.lmdbDataStoreProvider = nativeDataStoreProvider;
-            TransactionLogManager transactionLogManager = new TransactionLogManager();
-            transactionLogManager.setup(context);
+            TestMapStoreListener mapStoreListener = new TestMapStoreListener(nativeDataStoreProvider);
+            mapStoreListener.verifier = (tid)->{
+                List<Transaction.Log> logs = mapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
+                System.out.println("TID : "+tid+" : " +logs.size());
+            };
+            nativeDataStoreProvider.registerMapStoreListener(Distributable.DATA_SCOPE,mapStoreListener);
             Map<String,Object> config = new HashMap<>();
             String baseDir = "/var/lmdb";
             config.put(EnvSetting.data,EnvSetting.setting(Distributable.DATA_SCOPE,baseDir,10));
