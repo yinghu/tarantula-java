@@ -57,18 +57,7 @@ public class PlatformInboxServiceProvider extends PlatformGameServiceSetup {
     public Mailbox mailbox(Session session){
         Map<Long,MailboxCredentialConfiguration> inbox = this.platformGameServiceProvider.configurationServiceProvider().inbox();
         Mailbox mailbox = new Mailbox();
-        if(inbox.size()==0) return mailbox;
-        String locId  = session.name();
-        inbox.forEach((k,v)->{
-            if(TimeUtil.expired(v.startTime()) && !TimeUtil.expired(v.expirationTime())){
-                Announcement announcement = v.announcement(locId);
-                if(announcement!=null){
-                    announcement.startTime = v.startTime();
-                    announcement.distributionId(k);
-                    mailbox.announcementList.add(announcement);
-                }
-            }
-        });
+
         return mailbox;
     }
 

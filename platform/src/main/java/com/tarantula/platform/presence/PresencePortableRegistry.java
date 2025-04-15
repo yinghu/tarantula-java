@@ -13,7 +13,6 @@ import com.tarantula.platform.lobby.LobbyItem;
 import com.tarantula.platform.lobby.RoomItem;
 import com.tarantula.platform.lobby.ZoneItem;
 import com.tarantula.platform.presence.dailygiveaway.DailyLoginTrack;
-import com.tarantula.platform.presence.pvp.*;
 import com.tarantula.platform.presence.saves.*;
 import com.tarantula.platform.resource.GameResource;
 
@@ -73,22 +72,7 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
 
     public static final int BANNED_PLAYER_CID = 28;
 
-    //PVP
-    public static final int UNIT_INSTANCE_CID = 29;
-    public static final int EQUIPMENT_INSTANCE_CID = 30;
-    public static final int DEFENSE_TEAM_CID = 31;
-    public static final int TEAM_FORMATION_INDEX_CID = 32;
-    public static final int SEASON_RUNTIME_CID = 33;
-    public static final int BATTLE_LOG_CID = 34;
-    public static final int PLAYER_BATTLE_LOG_INDEX_CID = 35;
-    public static final int MATCH_MAKING_INDEX_CID = 36;
-    public static final int SEASON_PLAYER_INDEX_CID = 37;
-    public static final int PLAYER_REWARD_INDEX_CID = 38;
-    public static final int BATTLE_TEAM_INDEX_CID = 39;
-    public static final int CHAMPION_LEADER_BOARD_ENTRY_CID = 40;
-    public static final int BOT_INDEX_CID = 41;
 
-    //END PVP
     public static final int GAME_CLUSTER_CID = PortableEventRegistry.GAME_CLUSTER_CID;
 
     public static PresencePortableRegistry INS;
@@ -181,45 +165,7 @@ public class PresencePortableRegistry<T extends Recoverable> extends AbstractRec
             case BANNED_PLAYER_CID:
                 pt = new PlatformBannedPlayer();
                 break;
-            case UNIT_INSTANCE_CID:
-                pt = new UnitInstance();
-                break;
-            case EQUIPMENT_INSTANCE_CID:
-                pt = new EquipmentInstance();
-                break;
-            case DEFENSE_TEAM_CID:
-                pt = new BattleTeam();
-                break;
-            case TEAM_FORMATION_INDEX_CID:
-                pt = new TeamFormationIndex();
-                break;
-            case SEASON_RUNTIME_CID:
-                pt = new SeasonRuntime();
-                break;
-            case BATTLE_LOG_CID:
-                pt = new BattleLogIndex();
-                break;
-            case PLAYER_BATTLE_LOG_INDEX_CID:
-                pt = new PlayerBattleLogIndex();
-                break;
-            case MATCH_MAKING_INDEX_CID:
-                pt = new MatchMakingIndex();
-                break;
-            case SEASON_PLAYER_INDEX_CID:
-                pt = new SeasonPlayerIndex();
-                break;
-            case PLAYER_REWARD_INDEX_CID:
-                pt = new PlayerRewardIndex();
-                break;
-            case BATTLE_TEAM_INDEX_CID:
-                pt = new DefenseTeamIndex();
-                break;
-            case CHAMPION_LEADER_BOARD_ENTRY_CID:
-                pt = new ChampionLeaderBoardEntry();
-                break;
-            case BOT_INDEX_CID:
-                pt = new BotIndex();
-                break;
+
             default:
         }
         return (T)pt;

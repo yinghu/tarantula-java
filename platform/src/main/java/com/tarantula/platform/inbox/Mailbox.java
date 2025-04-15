@@ -9,18 +9,13 @@ import java.util.List;
 
 public class Mailbox extends RecoverableObject {
 
-    public List<Announcement> announcementList = new ArrayList<>();
 
     @Override
     public JsonObject toJson() {
         JsonObject resp = new JsonObject();
         resp.addProperty("Successful",true);
         JsonArray announcements = new JsonArray();
-        if(announcementList!=null){
-            announcementList.forEach(a->{
-                announcements.add(a.toJson());
-            });
-        }
+
         resp.add("_announcements",announcements);
         return resp;
     }
