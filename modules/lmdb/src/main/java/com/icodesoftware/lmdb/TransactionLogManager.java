@@ -171,7 +171,9 @@ public class TransactionLogManager implements Transaction.LogManager{
 
     public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferStream bufferStream){
         DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
-        if(metadata.label()==null) return false;
+        if(metadata.label()==null){
+            return dataStore.backup().get(DataBufferKey.from(key),(k,v)->bufferStream.on(k,v));
+        }
         List<Recoverable.DataBuffer> ex = new ArrayList<>();
         List<Recoverable.DataBuffer> ev = new ArrayList<>();
         dataStore.backup().forEachEdgeKeyValue(DataBufferKey.from(key),metadata.label(),(e,v)->{

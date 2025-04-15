@@ -1,18 +1,13 @@
 package com.icodesoftware.lmdb.test;
 
-import com.beust.ah.A;
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Transaction;
 import com.icodesoftware.lmdb.EnvSetting;
-import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.lmdb.ffm.*;
-import com.icodesoftware.service.MapStoreListener;
 import com.icodesoftware.util.BufferProxy;
 
-import com.icodesoftware.util.IntegerKey;
-import com.icodesoftware.util.LocalHeader;
 import com.icodesoftware.util.SnowflakeKey;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -28,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class ForeignAPITest extends TestSetup{
 
@@ -358,12 +354,39 @@ public class ForeignAPITest extends TestSetup{
         Assert.assertNull(throwable);
     }
 
-    private static void createIfAbsent(DataStore dataStore){
-        TestAccessIndex testAccessIndex = new TestAccessIndex("tester");
+    private static void createIfAbsent(DataStore dataStore,DataStore index){
+        TestAccessIndex testAccessIndex = new TestAccessIndex(UUID.randomUUID().toString());
         testAccessIndex.referenceId = 10;
         testAccessIndex.group = "provider";
         testAccessIndex.distributionId(100);
-        System.out.println(dataStore.createIfAbsent(testAccessIndex,false));
+        testAccessIndex.ownerKey(SnowflakeKey.from(9090));
+        System.out.println(dataStore.createIfAbsent(testAccessIndex, false));
+        boolean loaded = dataStore.backup().get(testAccessIndex.key(),(k,v)->{
+            System.out.println(k.remaining());
+            System.out.println(v.remaining());
+            index.backup().set((xk,xv)->{
+                xk.write(k);
+                xv.write(v);
+                return true;
+            });
+            return true;
+        });
+        System.out.println(loaded);
+        index.backup().get(testAccessIndex.key(),(k,v)->{
+            Recoverable.DataHeader h = v.readHeader();
+            System.out.println(h.factoryId()+" : "+h.classId()+" ; "+h.revision());
+            TestAccessIndex cp = new TestAccessIndex();
+            cp.readKey(k);
+            cp.read(v);
+            System.out.println(cp.group);
+            System.out.println(cp.owner());
+            return true;
+        });
+        dataStore.backup().forEach((k,v)->{
+            System.out.println(k.remaining());
+            System.out.println(v.remaining());
+            return true;
+        });
     }
 
 
@@ -386,34 +409,13 @@ public class ForeignAPITest extends TestSetup{
             nativeDataStoreProvider.configure(config);
             nativeDataStoreProvider.start();
             DataStore nativeDataStore = nativeDataStoreProvider.createDataStore("access");
-            //createIfAbsent(nativeDataStore);
-            TestObject accessIndex = new TestObject("tester6","testName");
-            System.out.println(nativeDataStore.create(accessIndex));
-            System.out.println(accessIndex.distributionId());
-            accessIndex.ownerKey(SnowflakeKey.from(100));
-            //System.out.println(nativeDataStore.createEdge(accessIndex,"type"));
-            //TestObjectQuery query = new TestObjectQuery(100,"type");
-            //int[] ct = {0};
-            //nativeDataStore.list(query,t->{
-                //System.out.println("QUERY ["+t.type+" : "+t.name+" ; " +t.revision());
-                //ct[0]++;
-                //return true;//ct[0]< 10;
-            //});
-            //System.out.println("CT : "+ct[0]);
-            //System.out.println("LT : "+nativeDataStore.list(query).size());
-            //nativeDataStore.backup().get(SnowflakeKey.from(accessIndex.distributionId()),(k,v)->{
-                //System.out.println("VZ : "+v.remaining());
-                //return true;
-            //});
-            //nativeDataStore.backup().forEachEdgeKey(SnowflakeKey.from(100),"type",(k,v)->{
-                //System.out.println("TZ : "+v.remaining());
-                //return true;
-            //});
-            //nativeDataStore.backup().forEachEdgeKeyValue(SnowflakeKey.from(100),"type",(k,v)->{
-                //System.out.println("TXY : "+k.remaining());
-                //System.out.println("TXZ : "+v.remaining());
-                //return true;
-            //});
+            DataStore index = nativeDataStoreProvider.createKeyIndexDataStore("index");
+            createIfAbsent(nativeDataStore,index);
+            //TestObject accessIndex = new TestObject("tester6","testName");
+            //System.out.println(nativeDataStore.create(accessIndex));
+            //System.out.println(accessIndex.distributionId());
+            //accessIndex.ownerKey(SnowflakeKey.from(100));
+
             nativeDataStoreProvider.shutdown();
         }catch (Exception ex){
             ex.printStackTrace();

@@ -113,32 +113,65 @@ public class NativeDataStoreProvider implements DataStoreProvider{
     }
 
     public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value, long transactionId){
+        if(metadata.scope()==Distributable.INTEGRATION_SCOPE && integrationMapStoreListener!=null){
+            integrationMapStoreListener.onUpdating(metadata,key,value,transactionId);
+            return;
+        }
         if(metadata.scope()==Distributable.DATA_SCOPE && dataMapStoreListener!=null){
-            logger.warn("Updating ["+transactionId+"]"+key.remaining()+" : "+value.remaining()+" ; "+metadata.source()+" ; "+metadata.scope()+" ; "+metadata.label());
             dataMapStoreListener.onUpdating(metadata,key,value,transactionId);
         }
     }
     //recover cluster operation
     public boolean onRecovering(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value){
+        if(metadata.scope()==Distributable.INTEGRATION_SCOPE && integrationMapStoreListener!=null){
+            return integrationMapStoreListener.onRecovering(metadata,key,value);
+        }
+        if(metadata.scope()==Distributable.DATA_SCOPE && dataMapStoreListener!=null){
+            return dataMapStoreListener.onRecovering(metadata,key,value);
+        }
         return false;
     }
 
     public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferStream bufferStream){
+        if(metadata.scope()==Distributable.INTEGRATION_SCOPE && integrationMapStoreListener!=null){
+            return integrationMapStoreListener.onRecovering(metadata,key,bufferStream);
+        }
+        if(metadata.scope()==Distributable.DATA_SCOPE && dataMapStoreListener!=null){
+            return dataMapStoreListener.onRecovering(metadata,key,bufferStream);
+
+        }
         return false;
     }
 
     public boolean onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
-        return false;
+        if(metadata.scope()==Distributable.INTEGRATION_SCOPE && integrationMapStoreListener!=null){
+            return integrationMapStoreListener.onDeleting(metadata,key,value,transactionId);
+        }
+        if(metadata.scope()==Distributable.DATA_SCOPE && dataMapStoreListener!=null){
+            return dataMapStoreListener.onDeleting(metadata,key,value,transactionId);
+        }
+        return true;
     }
 
     public void onCommit(int scope,long transactionId){
-        if(scope==Distributable.DATA_SCOPE && dataMapStoreListener!=null){
-            logger.warn("Commiting ["+scope+"]["+transactionId+"]");
-            dataMapStoreListener.onCommit(scope,transactionId);
+        if(scope==Distributable.DATA_SCOPE && this.dataMapStoreListener!=null){
+            this.dataMapStoreListener.onCommit(scope,transactionId);
+            return;
+        }
+        if(scope==Distributable.INTEGRATION_SCOPE && this.integrationMapStoreListener!=null){
+            this.integrationMapStoreListener.onCommit(scope,transactionId);
         }
     }
 
-    public void onAbort(int scope,long transactionId){}
+    public void onAbort(int scope,long transactionId){
+        if(scope==Distributable.DATA_SCOPE && this.dataMapStoreListener!=null){
+            this.dataMapStoreListener.onAbort(scope,transactionId);
+            return;
+        }
+        if(scope==Distributable.INTEGRATION_SCOPE && this.integrationMapStoreListener!=null){
+            this.integrationMapStoreListener.onAbort(scope,transactionId);
+        }
+    }
 
     @Override
     public void onUpdated(String category, double delta) {

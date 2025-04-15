@@ -57,6 +57,7 @@ public class NativeData {
             vSize.set(pointer,0,buffer.remaining());
             VarHandle vData = struct.varHandle(MemoryLayout.PathElement.groupElement("mv_data"));
             vData.set(pointer,0,data);
+            buffer.limit(buffer.remaining()-1);
             return buffer;
         }
 
@@ -76,7 +77,9 @@ public class NativeData {
         public void read(Arena arena, NativeDataWriter onData){
             MemorySegment data = pointer.get(ValueLayout.ADDRESS,8);
             long len = pointer.get(ValueLayout.JAVA_LONG,0);
-            onData.onBuffer(BufferProxy.buffer(data.reinterpret(len,arena,null)));
+            Recoverable.DataBuffer buffer = BufferProxy.buffer(data.reinterpret(len,arena,null));
+            buffer.limit(buffer.remaining()-1);
+            onData.onBuffer(buffer);
         }
 
         public MemorySegment pointer(){
@@ -97,11 +100,13 @@ public class NativeData {
         public boolean stream(Arena arena, DataStore.BufferStream stream){
             MemorySegment data1 = pointer1.get(ValueLayout.ADDRESS,8);
             long len1 = pointer1.get(ValueLayout.JAVA_LONG,0);
-
             MemorySegment data2 = pointer2.get(ValueLayout.ADDRESS,8);
             long len2 = pointer2.get(ValueLayout.JAVA_LONG,0);
-
-            return stream.on(BufferProxy.buffer(data1.reinterpret(len1,arena,null)),BufferProxy.buffer(data2.reinterpret(len2,arena,null)));
+            Recoverable.DataBuffer buffer1 = BufferProxy.buffer(data1.reinterpret(len1,arena,null));
+            buffer1.limit(buffer1.remaining()-1);
+            Recoverable.DataBuffer buffer2 = BufferProxy.buffer(data2.reinterpret(len2,arena,null));
+            buffer2.limit(buffer2.remaining()-1);
+            return stream.on(buffer1,buffer2);
         }
 
         public MemorySegment keyPointer(){
