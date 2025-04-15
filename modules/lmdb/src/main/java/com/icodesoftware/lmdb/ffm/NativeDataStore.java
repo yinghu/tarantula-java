@@ -155,10 +155,14 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     public <T extends Recoverable> boolean update(T t) {
         NativeDbi dbi = env.createDbi(name);
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena)){
+            long txnId = txn.transactionId();
             NativeData.InVal key = NativeData.in(arena,EnvSetting.KEY_SIZE);
-            key.write(buffer -> t.writeKey(buffer));
+            Recoverable.DataBuffer kBuffer = key.write(buffer -> t.writeKey(buffer));
             NativeData.OutVal value = NativeData.out(arena);
-            if(!dbi.get(key.pointer(),value.pointer(),txn)) return false;
+            if(!dbi.get(key.pointer(),value.pointer(),txn)){
+                txn.abort();
+                return false;
+            }
             boolean[] pending ={false};
             value.read(arena,buffer -> {
                 Recoverable.DataHeader h = buffer.readHeader();
@@ -169,7 +173,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
                 return false;
             }
             NativeData.InVal update = NativeData.in(arena,EnvSetting.VALUE_SIZE);
-            update.write(buffer -> {
+            Recoverable.DataBuffer vBuffer = update.write(buffer -> {
                 buffer.writeHeader(LocalHeader.create(t.getFactoryId(),t.getClassId(),t.revision()+1));
                 t.write(buffer);
             });
@@ -178,6 +182,8 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
                 return false;
             }
             t.revision(t.revision()+1);
+            nativeDataStoreProvider.onUpdating(dbi.metadata(), BufferProxy.copy(kBuffer.src()),BufferProxy.copy(vBuffer.src()), txnId);
+            nativeDataStoreProvider.onCommit(dbi.metadata().scope(),txnId);
             txn.commit();
             return true;
         }catch (Exception ex){
@@ -188,8 +194,9 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     public <T extends Recoverable> boolean delete(T t){
         NativeDbi dbi = env.createDbi(name);
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena)){
+            long txnId = txn.transactionId();
             NativeData.InVal key = NativeData.in(arena,EnvSetting.KEY_SIZE);
-            key.write(buffer -> t.writeKey(buffer));
+            Recoverable.DataBuffer kBuffer = key.write(buffer -> t.writeKey(buffer));
             NativeData.OutVal value = NativeData.out(arena);
             if(!dbi.get(key.pointer(),value.pointer(),txn)){
                 txn.abort();
@@ -199,6 +206,8 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
                 txn.abort();
                 return false;
             }
+            nativeDataStoreProvider.onDeleting(dbi.metadata(), BufferProxy.copy(kBuffer.src()),BufferProxy.copy(kBuffer.src()),txnId);
+            nativeDataStoreProvider.onCommit(dbi.metadata().scope(),txnId);
             txn.commit();
             return true;
         }catch (Exception ex){
@@ -209,14 +218,17 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     public <T extends Recoverable> boolean createEdge(T t,String label){
         NativeDbi edge = env.createDbi(name,label);
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena)){
+            long txnId = txn.transactionId();
             NativeData.InVal key = NativeData.in(arena,EnvSetting.KEY_SIZE);
-            key.write(buffer -> t.ownerKey().write(buffer));
+            Recoverable.DataBuffer kBuffer = key.write(buffer -> t.ownerKey().write(buffer));
             NativeData.InVal value = NativeData.in(arena,EnvSetting.KEY_SIZE);
-            value.write(buffer -> t.key().write(buffer));
+            Recoverable.DataBuffer vBuffer = value.write(buffer -> t.key().write(buffer));
             if(!edge.put(key.pointer(),value.pointer(),txn)){
                 txn.abort();
                 return false;
             }
+            nativeDataStoreProvider.onUpdating(edge.metadata(), BufferProxy.copy(kBuffer.src()),BufferProxy.copy(vBuffer.src()), txnId);
+            nativeDataStoreProvider.onCommit(edge.metadata().scope(),txnId);
             txn.commit();
             return true;
         }catch (Exception ex){
@@ -227,12 +239,15 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     public  boolean deleteEdge(Recoverable.Key t,String label){
         NativeDbi edge = env.createDbi(name,label);
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena)){
+            long txnId = txn.transactionId();
             NativeData.InVal key = NativeData.in(arena,EnvSetting.KEY_SIZE);
-            key.write(buffer -> t.write(buffer));
+            Recoverable.DataBuffer kBuffer = key.write(buffer -> t.write(buffer));
             if(!edge.delete(key.pointer(),txn)){
                 txn.abort();
                 return false;
             }
+            nativeDataStoreProvider.onDeleting(edge.metadata(),kBuffer,kBuffer,txnId);
+            nativeDataStoreProvider.onCommit(edge.metadata().scope(),txnId);
             txn.commit();
             return true;
         }catch (Exception ex){
@@ -243,14 +258,17 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     public boolean deleteEdge(Recoverable.Key t,Recoverable.Key edgeKey,String label){
         NativeDbi edge = env.createDbi(name,label);
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena)){
+            long txnId = txn.transactionId();
             NativeData.InVal key = NativeData.in(arena,EnvSetting.KEY_SIZE);
-            key.write(buffer -> t.write(buffer));
+            Recoverable.DataBuffer kBuffer = key.write(buffer -> t.write(buffer));
             NativeData.InVal value = NativeData.in(arena,EnvSetting.KEY_SIZE);
-            value.write(buffer -> edgeKey.write(buffer));
+            Recoverable.DataBuffer vBuffer = value.write(buffer -> edgeKey.write(buffer));
             if(!edge.delete(key.pointer(),value.pointer(),txn)){
                 txn.abort();
                 return false;
             }
+            nativeDataStoreProvider.onDeleting(edge.metadata(),kBuffer,vBuffer,txnId);
+            nativeDataStoreProvider.onCommit(edge.metadata().scope(),txnId);
             txn.commit();
             return true;
         }catch (Exception ex){
@@ -293,8 +311,9 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     //backup
     public void forEach(DataStore.BufferStream stream) {
         NativeDbi dbi = env.createDbi(name);
-        NativeCursor cursor = dbi.cursor();
-        cursor.read().forEach(stream);
+        try(NativeCursor cursor = dbi.cursor()){
+            cursor.read().forEach(stream);
+        }
     }
 
     public void drop(boolean delete){
@@ -354,7 +373,6 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
         NativeDbi dbi = env.createDbi(name);
         try(NativeCursor cursor = edge.cursor()){
             cursor.read().forEach(key,(k,v)->{
-                //v.limit(v.remaining()-1);
                 NativeData.OutVal out = NativeData.out(cursor.arena());
                 NativeData.InVal pv = NativeData.in(cursor.arena(),EnvSetting.KEY_SIZE);
                 pv.write(buffer -> v.read(buffer));
@@ -375,6 +393,8 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
             boolean[] pending={false};
             NativeData.InPair inPair = NativeData.inPair(arena,EnvSetting.KEY_SIZE,EnvSetting.KEY_SIZE).write((b1,b2)->{
                 pending[0] = bufferStream.on(b1,b2);
+                //System.out.println(b1.remaining());
+                //System.out.println(b2.remaining());
             });
             if(!pending[0]){
                 txn.abort();
@@ -384,6 +404,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
                 txn.abort();
                 return false;
             }
+            System.out.println(edge.metadata().label()+" ; "+edge.name()+" ; ");
             txn.commit();
             return true;
         }catch (Exception ex){

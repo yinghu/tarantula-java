@@ -166,6 +166,13 @@ public class BufferProxy implements Recoverable.DataBuffer {
         return new BufferProxy(direct?ByteBuffer.allocateDirect(size):ByteBuffer.allocate(size));
     }
 
+    public static Recoverable.DataBuffer buffer(int size,Recoverable.Key key){
+        Recoverable.DataBuffer kBuffer = BufferProxy.buffer(size,false);
+        key.write(kBuffer);
+        kBuffer.flip();
+        return  kBuffer;
+    }
+
     public static Recoverable.DataBuffer wrap(byte[] data){
         return new BufferProxy(ByteBuffer.wrap(data));
     }

@@ -139,6 +139,7 @@ public class NativeData {
             onData.onBuffer(buffer1,buffer2);
             buffer1.writeByte((byte)'\0');
             buffer1.flip();
+            //System.out.println(buffer1.remaining());
             VarHandle vSize1 = struct.varHandle(MemoryLayout.PathElement.groupElement("mv_size"));
             vSize1.set(pointer1,0,buffer1.remaining());
             VarHandle vData1 = struct.varHandle(MemoryLayout.PathElement.groupElement("mv_data"));
@@ -146,6 +147,7 @@ public class NativeData {
 
             buffer2.writeByte((byte)'\0');
             buffer2.flip();
+            //System.out.println(buffer2.remaining());
             VarHandle vSize2 = struct.varHandle(MemoryLayout.PathElement.groupElement("mv_size"));
             vSize2.set(pointer2,0,buffer2.remaining());
             VarHandle vData2 = struct.varHandle(MemoryLayout.PathElement.groupElement("mv_data"));

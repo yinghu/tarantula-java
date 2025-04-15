@@ -354,6 +354,30 @@ public class ForeignAPITest extends TestSetup{
         Assert.assertNull(throwable);
     }
 
+    private static void create(DataStore dataStore,DataStore index){
+        TestObject accessIndex = new TestObject("tester6","testName");
+        accessIndex.ownerKey(SnowflakeKey.from(100));
+        accessIndex.label("tester");
+        accessIndex.onEdge(true);
+        System.out.println(dataStore.create(accessIndex));
+        System.out.println(accessIndex.distributionId());
+        System.out.println(dataStore.list(new TestObjectQuery(100,"tester")).size());
+        dataStore.createEdge(accessIndex,"link");
+        System.out.println(dataStore.list(new TestObjectQuery(100,"link")).size());
+        dataStore.deleteEdge(SnowflakeKey.from(100),"link");
+        System.out.println(dataStore.list(new TestObjectQuery(100,"link")).size());
+        dataStore.deleteEdge(SnowflakeKey.from(100),accessIndex.key(),"tester");
+        System.out.println(dataStore.list(new TestObjectQuery(100,"tester")).size());
+        System.out.println(dataStore.backup().setEdge("ace_me",(k,v)->{
+            //k.write(BufferProxy.buffer(EnvSetting.KEY_SIZE,SnowflakeKey.from(100)));
+            //v.write(BufferProxy.buffer(EnvSetting.KEY_SIZE,accessIndex.key()));
+            k.writeLong(100);
+            v.writeLong(accessIndex.distributionId());
+            return true;
+        }));
+        System.out.println(dataStore.list(new TestObjectQuery(100,"ace_me")).size());
+    }
+
     private static void createIfAbsent(DataStore dataStore,DataStore index){
         TestAccessIndex testAccessIndex = new TestAccessIndex(UUID.randomUUID().toString());
         testAccessIndex.referenceId = 10;
@@ -378,15 +402,34 @@ public class ForeignAPITest extends TestSetup{
             TestAccessIndex cp = new TestAccessIndex();
             cp.readKey(k);
             cp.read(v);
-            System.out.println(cp.group);
-            System.out.println(cp.owner());
+            //System.out.println(cp.group);
+            //System.out.println(cp.owner());
             return true;
         });
         dataStore.backup().forEach((k,v)->{
-            System.out.println(k.remaining());
-            System.out.println(v.remaining());
+            //System.out.println(k.remaining());
+            //System.out.println(v.remaining());
             return true;
         });
+        dataStore.list(new TestAccessQuery(9090,"access"),ta->{
+            //System.out.println(">>>>>>>>>>>>"+ta.group);
+            return true;
+        });
+        System.out.println("SZ : "+dataStore.list(new TestAccessQuery(9090,"access")).size());
+        TestAccessIndex load = new TestAccessIndex(testAccessIndex.owner());
+        dataStore.load(load);
+        System.out.println(load.group);
+        load.group = "provider1";
+        dataStore.update(load);
+        TestAccessIndex load1 = new TestAccessIndex(testAccessIndex.owner());
+        dataStore.load(load1);
+        System.out.println(load1.group);
+
+        TestAccessIndex load2 = new TestAccessIndex(testAccessIndex.owner());
+        dataStore.createIfAbsent(load2,true);
+        System.out.println(load2.group);
+        System.out.println(dataStore.delete(load2));
+        System.out.println(dataStore.load(load1));
     }
 
 
@@ -410,7 +453,8 @@ public class ForeignAPITest extends TestSetup{
             nativeDataStoreProvider.start();
             DataStore nativeDataStore = nativeDataStoreProvider.createDataStore("access");
             DataStore index = nativeDataStoreProvider.createKeyIndexDataStore("index");
-            createIfAbsent(nativeDataStore,index);
+            //createIfAbsent(nativeDataStore,index);
+            create(nativeDataStore,index);
             //TestObject accessIndex = new TestObject("tester6","testName");
             //System.out.println(nativeDataStore.create(accessIndex));
             //System.out.println(accessIndex.distributionId());
