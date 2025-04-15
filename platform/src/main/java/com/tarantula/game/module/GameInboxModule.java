@@ -27,10 +27,6 @@ public class GameInboxModule extends ModuleHeader{
         else if(session.action().equals("onMailbox")){
             session.write(this.gameServiceProvider.inboxServiceProvider().mailbox(session).toJson().toString().getBytes());
         }
-        else if(session.action().equals("onCheckGlobalItemGrants")){
-            this.gameServiceProvider.presenceServiceProvider().checkGlobalItemGrant(session);
-            session.write(JsonUtil.toSimpleResponse(true, "Done").getBytes());
-        }
         else{
             throw new UnsupportedOperationException(session.action()+" not support");
         }

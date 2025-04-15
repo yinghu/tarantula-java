@@ -4,7 +4,6 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.service.Content;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.TimeUtil;
-import com.tarantula.platform.inbox.Announcement;
 import com.tarantula.platform.item.ConfigurableObject;
 
 import java.time.LocalDateTime;
@@ -14,7 +13,6 @@ public class MailboxCredentialConfiguration extends CredentialConfiguration {
 
     private ServiceContext serviceContext;
 
-    private TolgeeDownload tolgeeDownload;
     private Content content;
 
     public MailboxCredentialConfiguration(String typeId, ConfigurableObject configurableObject){
@@ -27,8 +25,7 @@ public class MailboxCredentialConfiguration extends CredentialConfiguration {
         this.serviceContext = serviceContext;
         content = serviceContext.deploymentServiceProvider().resource(header.get("GridlyView").getAsString());
         if(!content.existed()) return false;
-        tolgeeDownload = new TolgeeDownload(this, serviceContext);
-        return tolgeeDownload.download();
+        return true;
     }
 
     public byte[] load(){
@@ -38,9 +35,6 @@ public class MailboxCredentialConfiguration extends CredentialConfiguration {
         return content.data();
     }
 
-    public Announcement announcement(String locId){
-        return tolgeeDownload.announcement(locId);
-    }
 
     public boolean inbox(){
         return header.get("Inbox").getAsBoolean();

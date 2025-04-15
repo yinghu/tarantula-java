@@ -4,13 +4,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.util.JsonUtil;
-import com.tarantula.game.GameRating;
-import com.tarantula.platform.configuration.SeasonCredentialConfiguration;
 import com.tarantula.platform.presence.*;
 
 import com.tarantula.game.PlayerSavedGames;
 import com.tarantula.game.util.SavedGameDeserializer;
-import com.tarantula.platform.presence.pvp.*;
+
 import com.tarantula.platform.presence.saves.CurrentSaveIndex;
 import com.tarantula.platform.presence.saves.PlatformSavedGameServiceProvider;
 import com.tarantula.platform.presence.saves.SaveRevisionInfo;
@@ -78,62 +76,6 @@ public class SavedGameModule extends ModuleHeader {
             session.write(JsonUtil.toSimpleResponse(successful,"create player profile").getBytes());
         }
 
-        //pvp saves start
-        else if(session.action().equals("onSaveDefenseTeam")){
-            TeamFormationResponse response  = gameServiceProvider.pvpBattleServiceProvider().saveDefenseTeam(session,bytes);
-            session.write(response.toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onSaveOffenseTeam")){
-            TeamFormationResponse response  = gameServiceProvider.pvpBattleServiceProvider().saveOffenseTeam(session,bytes);
-            session.write(response.toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onSeasonInfo")){
-            SeasonCredentialConfiguration.Season season  = gameServiceProvider.pvpBattleServiceProvider().currentSeason();
-            session.write(season.toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onBattleLog")){
-           BattleLogList battleLogList = gameServiceProvider.pvpBattleServiceProvider().battleLogList(session);
-           session.write(battleLogList.toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onRating")){
-            GameRating rating = presenceServiceProvider.rating(session);
-            session.write(rating.toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onPaidMatchMaking")){
-            MatchMaking matchMaking = gameServiceProvider.pvpBattleServiceProvider().forceMatchMaking(session);
-            session.write(matchMaking.toJson().toString().getBytes());
-        }
-        else if(session.action().equals("onMatchMaking")){
-            MatchMaking matchMaking = gameServiceProvider.pvpBattleServiceProvider().matchMaking(session);
-            session.write(matchMaking.toJson().toString().getBytes());
-        }
-
-        else if(session.action().equals("onCurrentDefenseTeam")){
-            BattleTeam battleTeam = gameServiceProvider.pvpBattleServiceProvider().currentDefenseTeam(session);
-            session.write(battleTeam.toJson().toString().getBytes());
-        }
-
-        else if(session.action().equals("onLeagueList")){
-            LeagueList leagueList = gameServiceProvider.pvpBattleServiceProvider().league();
-            session.write(leagueList.toJson().toString().getBytes());
-        }
-
-        else if(session.action().equals("onRewardList")){
-            RewardList rewardList = gameServiceProvider.pvpBattleServiceProvider().rewardList(session);
-            session.write(rewardList.toJson().toString().getBytes());
-        }
-
-        else if(session.action().equals("onRewardGrant")){
-            gameServiceProvider.pvpBattleServiceProvider().rewardGranted(session);
-            session.write(JsonUtil.toSimpleResponse(true,"granted").getBytes());
-        }
-
-        else if(session.action().equals("onChampionLeaderBoard")){
-            ChampionLeaderBoard board = gameServiceProvider.pvpBattleServiceProvider().championLeaderBoard();
-            session.write(board.toJson().toString().getBytes());
-        }
-
-        //pvp saves end
         else{
             throw new UnsupportedOperationException(session.action());
         }

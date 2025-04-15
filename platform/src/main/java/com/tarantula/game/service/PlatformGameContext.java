@@ -4,7 +4,7 @@ import com.icodesoftware.*;
 import com.icodesoftware.protocol.*;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.item.ConfigurableObject;
-import com.tarantula.platform.presence.pvp.PlayerEloRatingProxy;
+
 
 import java.util.concurrent.ScheduledFuture;
 
@@ -81,8 +81,7 @@ public class PlatformGameContext implements GameContext {
 
     @Override
     public Rating rating(Session session) {
-        Rating rating = platformGameServiceProvider.presenceServiceProvider().rating(session);
-        return new PlayerEloRatingProxy(rating,this.platformGameServiceProvider);
+        return platformGameServiceProvider.presenceServiceProvider().rating(session);
     }
 
     @Override

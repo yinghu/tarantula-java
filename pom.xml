@@ -18,7 +18,6 @@
         <module>modules/lmdb</module>
         <module>platform</module>
         <module>modules/agent</module>
-        <module>modules/earth8</module>
         <module>udp-game-server</module>
         <module>load-test</module>
     </modules>
