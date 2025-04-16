@@ -1,9 +1,6 @@
 package com.icodesoftware.lmdb.test;
 
-import com.icodesoftware.DataStore;
-import com.icodesoftware.Distributable;
-import com.icodesoftware.Recoverable;
-import com.icodesoftware.Transaction;
+import com.icodesoftware.*;
 import com.icodesoftware.lmdb.EnvSetting;
 import com.icodesoftware.lmdb.ffm.*;
 import com.icodesoftware.util.BufferProxy;
@@ -353,6 +350,42 @@ public class ForeignAPITest extends TestSetup{
         }
         Assert.assertNull(throwable);
     }
+    private static void delete(DataStore dataStore,DataStore index){
+        TestObject accessIndex = new TestObject("tester6","testName");
+        accessIndex.ownerKey(SnowflakeKey.from(100));
+        accessIndex.label("tester");
+        accessIndex.onEdge(true);
+        System.out.println(dataStore.create(accessIndex));
+        TestObject load = new TestObject();
+        load.distributionId(accessIndex.distributionId());
+        dataStore.load(load);
+        System.out.println(load.type+" ; "+load.name);
+        System.out.println(dataStore.delete(accessIndex));
+        TestObject delete = new TestObject();
+        load.distributionId(accessIndex.distributionId());
+        System.out.println(dataStore.load(delete));
+
+        TestObject to = new TestObject("to100","to200");
+        System.out.println(dataStore.create(to));
+        dataStore.backup().unset((k,v)->{
+            to.key().write(k);
+            return true;
+        });
+        TestObject del = new TestObject();
+        del.distributionId(to.distributionId());
+        System.out.println(dataStore.load(del));
+
+        for(int i=0;i<10;i++){
+            TestObject abc = new TestObject("tester6","testName");
+            abc.ownerKey(SnowflakeKey.from(200));
+            abc.label("fork");
+            abc.onEdge(true);
+            System.out.println(dataStore.create(abc));
+        }
+        System.out.println("TX : "+dataStore.list(new TestObjectQuery(200,"fork")).size());
+        dataStore.deleteEdge(SnowflakeKey.from(200),"fork");
+        System.out.println("TX : "+dataStore.list(new TestObjectQuery(200,"fork")).size());
+    }
 
     private static void create(DataStore dataStore,DataStore index){
         TestObject accessIndex = new TestObject("tester6","testName");
@@ -369,13 +402,29 @@ public class ForeignAPITest extends TestSetup{
         dataStore.deleteEdge(SnowflakeKey.from(100),accessIndex.key(),"tester");
         System.out.println(dataStore.list(new TestObjectQuery(100,"tester")).size());
         System.out.println(dataStore.backup().setEdge("ace_me",(k,v)->{
-            //k.write(BufferProxy.buffer(EnvSetting.KEY_SIZE,SnowflakeKey.from(100)));
-            //v.write(BufferProxy.buffer(EnvSetting.KEY_SIZE,accessIndex.key()));
-            k.writeLong(100);
-            v.writeLong(accessIndex.distributionId());
+            SnowflakeKey.from(100).write(k);
+            accessIndex.key().write(v);
             return true;
         }));
         System.out.println(dataStore.list(new TestObjectQuery(100,"ace_me")).size());
+        index.createEdge(accessIndex,"delete_me");
+        int[] ct = {0};
+        index.backup().forEachEdgeKey(SnowflakeKey.from(100),"delete_me",(k,v)->{
+            ct[0]++;
+            return true;
+        });
+        System.out.println("delete_me : "+ct[0]);
+        index.backup().unsetEdge("delete_me",(k,v)->{
+            SnowflakeKey.from(100).write(k);
+            accessIndex.key().write(v);
+            return true;
+        },false);
+        ct[0]=0;
+        index.backup().forEachEdgeKey(SnowflakeKey.from(100),"delete_me",(k,v)->{
+            ct[0]++;
+            return true;
+        });
+        System.out.println("delete_me : "+ct[0]);
     }
 
     private static void createIfAbsent(DataStore dataStore,DataStore index){
@@ -402,8 +451,6 @@ public class ForeignAPITest extends TestSetup{
             TestAccessIndex cp = new TestAccessIndex();
             cp.readKey(k);
             cp.read(v);
-            //System.out.println(cp.group);
-            //System.out.println(cp.owner());
             return true;
         });
         dataStore.backup().forEach((k,v)->{
@@ -452,9 +499,10 @@ public class ForeignAPITest extends TestSetup{
             nativeDataStoreProvider.configure(config);
             nativeDataStoreProvider.start();
             DataStore nativeDataStore = nativeDataStoreProvider.createDataStore("access");
-            DataStore index = nativeDataStoreProvider.createKeyIndexDataStore("index");
-            //createIfAbsent(nativeDataStore,index);
+            DataStore index = nativeDataStoreProvider.createKeyIndexDataStore("access_index");
+            createIfAbsent(nativeDataStore,index);
             create(nativeDataStore,index);
+            delete(nativeDataStore,index);
             //TestObject accessIndex = new TestObject("tester6","testName");
             //System.out.println(nativeDataStore.create(accessIndex));
             //System.out.println(accessIndex.distributionId());

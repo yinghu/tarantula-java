@@ -393,8 +393,6 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
             boolean[] pending={false};
             NativeData.InPair inPair = NativeData.inPair(arena,EnvSetting.KEY_SIZE,EnvSetting.KEY_SIZE).write((b1,b2)->{
                 pending[0] = bufferStream.on(b1,b2);
-                //System.out.println(b1.remaining());
-                //System.out.println(b2.remaining());
             });
             if(!pending[0]){
                 txn.abort();
@@ -404,7 +402,6 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
                 txn.abort();
                 return false;
             }
-            System.out.println(edge.metadata().label()+" ; "+edge.name()+" ; ");
             txn.commit();
             return true;
         }catch (Exception ex){
@@ -443,7 +440,12 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
         NativeDbi dbi = env.createDbi(name);
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena)){
             NativeData.InVal key = NativeData.in(arena,EnvSetting.KEY_SIZE);
-            key.write(buffer -> bufferStream.on(buffer,buffer));
+            boolean[] pending = {false};
+            key.write(buffer -> pending[0] = bufferStream.on(buffer,buffer));
+            if(!pending[0]){
+                txn.abort();
+                return false;
+            }
             NativeData.OutVal value = NativeData.out(arena);
             if(!dbi.get(key.pointer(),value.pointer(),txn)){
                 txn.abort();
