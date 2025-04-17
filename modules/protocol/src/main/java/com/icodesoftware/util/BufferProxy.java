@@ -168,7 +168,7 @@ public class BufferProxy implements Recoverable.DataBuffer {
 
     public static Recoverable.DataBuffer buffer(int size,Recoverable.Key key){
         Recoverable.DataBuffer kBuffer = BufferProxy.buffer(size,false);
-        key.write(kBuffer);
+        //kBuffer.write(key);
         kBuffer.flip();
         return  kBuffer;
     }

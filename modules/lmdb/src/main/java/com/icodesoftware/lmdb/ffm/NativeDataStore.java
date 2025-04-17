@@ -99,7 +99,6 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
                 txn.abort();
                 return false;
             }
-
             NativeData.InVal value = NativeData.in(arena,EnvSetting.VALUE_SIZE);
             Recoverable.DataBuffer vBuffer = value.write(buffer ->{
                 buffer.writeHeader(LocalHeader.create(t.getFactoryId(),t.getClassId(),1));

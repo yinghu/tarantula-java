@@ -5,6 +5,7 @@ import com.icodesoftware.lmdb.EnvSetting;
 import com.icodesoftware.lmdb.ffm.*;
 import com.icodesoftware.util.BufferProxy;
 
+import com.icodesoftware.util.DataBufferKey;
 import com.icodesoftware.util.SnowflakeKey;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -479,6 +480,23 @@ public class ForeignAPITest extends TestSetup{
         System.out.println(dataStore.load(load1));
     }
 
+    private static void recovery(DataStore dataStore,DataStore index){
+        TestAccessIndex testAccessIndex = new TestAccessIndex("testx4000");
+        testAccessIndex.referenceId = 10;
+        testAccessIndex.group = "provider";
+        testAccessIndex.distributionId(100);
+        testAccessIndex.ownerKey(SnowflakeKey.from(9090));
+        System.out.println(dataStore.createIfAbsent(testAccessIndex, false));
+        System.out.println(dataStore.createIfAbsent(testAccessIndex, false));
+        Recoverable.DataBuffer rkey = BufferProxy.buffer(EnvSetting.KEY_SIZE,false);
+        testAccessIndex.writeKey(rkey);
+        rkey.flip();
+        index.backup().get(testAccessIndex.key(), (k, v)->{
+            System.out.println("loaded 123");
+            return true;
+        });
+    }
+
 
     public static void main(String[] arg) throws Exception{
         try{
@@ -487,7 +505,15 @@ public class ForeignAPITest extends TestSetup{
             mapStoreListener.verifier = (tid)->{
                 List<Transaction.Log> logs = mapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
                 System.out.println("TID : "+tid+" : " +logs.size());
+                mapStoreListener.transactionLogManager.onTransaction(logs);
             };
+            mapStoreListener.transactionLogManager.registerLogListener(log->{
+                System.out.println("DELETED : "+log.deleting()+" : "+log.source()+" : "+log.edgeLabel());
+                //mapStoreListener.transactionLogManager.get()
+                if(!log.deleting() && log.edgeLabel()==null){
+                    //nativeDataStoreProvider.onRecovering()
+                }
+            });
             nativeDataStoreProvider.registerMapStoreListener(Distributable.DATA_SCOPE,mapStoreListener);
             Map<String,Object> config = new HashMap<>();
             String baseDir = "/var/lmdb";
@@ -499,15 +525,11 @@ public class ForeignAPITest extends TestSetup{
             nativeDataStoreProvider.configure(config);
             nativeDataStoreProvider.start();
             DataStore nativeDataStore = nativeDataStoreProvider.createDataStore("access");
-            DataStore index = nativeDataStoreProvider.createKeyIndexDataStore("access_index");
-            createIfAbsent(nativeDataStore,index);
-            create(nativeDataStore,index);
-            delete(nativeDataStore,index);
-            //TestObject accessIndex = new TestObject("tester6","testName");
-            //System.out.println(nativeDataStore.create(accessIndex));
-            //System.out.println(accessIndex.distributionId());
-            //accessIndex.ownerKey(SnowflakeKey.from(100));
-
+            DataStore index = nativeDataStoreProvider.createKeyIndexDataStore("index_d_access");
+            //createIfAbsent(nativeDataStore,index);
+            //create(nativeDataStore,index);
+            //delete(nativeDataStore,index);
+            recovery(nativeDataStore,index);
             nativeDataStoreProvider.shutdown();
         }catch (Exception ex){
             ex.printStackTrace();

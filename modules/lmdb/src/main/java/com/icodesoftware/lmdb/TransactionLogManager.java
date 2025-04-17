@@ -168,7 +168,13 @@ public class TransactionLogManager implements Transaction.LogManager{
         return edgeValueSet;
     }
 
-
+    public boolean onRecovering(Metadata metadata,Recoverable.Key key,DataStore.BufferStream bufferStream){
+        DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
+        if(metadata.label()==null){
+            return dataStore.backup().get(key,(k,v)->bufferStream.on(k,v));
+        }
+        return false;
+    }
     public boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferStream bufferStream){
         DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
         if(metadata.label()==null){
@@ -259,6 +265,7 @@ public class TransactionLogManager implements Transaction.LogManager{
     public void onTransaction(List<Transaction.Log> transactionLogs) {
         for(Transaction.Log log : transactionLogs){
             DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(log.sourceScope())+log.source());
+            System.out.println("ds : "+dataStore.name());
             if(log.deleting()){
                 if(log.edgeLabel()==null){
                     dataStore.backup().unset((k,v)->{
@@ -275,11 +282,11 @@ public class TransactionLogManager implements Transaction.LogManager{
                 }
             }else{
                 if(log.edgeLabel()==null){//write key/value
-                    dataStore.backup().set((k,v)->{
+                    System.out.println(dataStore.backup().set((k,v)->{
                         k.write(log.primaryKey());
                         v.write(log.value());
                         return true;
-                    });
+                    }));
                 }else{
                     //write edge
                     dataStore.backup().setEdge(log.edgeLabel(),(k,v)->{

@@ -21,4 +21,6 @@ public interface MapStoreListener extends ServiceProvider {
 
     void onAbort(int scope,long transactionId);
 
+    default boolean onRecovering(Metadata metadata,Recoverable.Key key,DataStore.BufferStream bufferStream){ return false;}
+
 }

@@ -27,7 +27,7 @@ public class DataBufferKey implements Recoverable.Key {
         return true;
     }
     public boolean write(Recoverable.DataBuffer buffer){
-        buffer.clear();
+        //buffer.clear();
         if(key==null) return false;
         while (key.hasRemaining()){
             buffer.writeByte(key.readByte());

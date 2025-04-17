@@ -142,6 +142,16 @@ public class NativeDataStoreProvider implements DataStoreProvider{
         }
         return false;
     }
+    public boolean onRecovering(Metadata metadata,Recoverable.Key key,DataStore.BufferStream bufferStream){
+        if(metadata.scope()==Distributable.INTEGRATION_SCOPE && integrationMapStoreListener!=null){
+            return integrationMapStoreListener.onRecovering(metadata,key,bufferStream);
+        }
+        if(metadata.scope()==Distributable.DATA_SCOPE && dataMapStoreListener!=null){
+            return dataMapStoreListener.onRecovering(metadata,key,bufferStream);
+
+        }
+        return false;
+    }
 
     public boolean onDeleting(Metadata metadata,Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId){
         if(metadata.scope()==Distributable.INTEGRATION_SCOPE && integrationMapStoreListener!=null){
