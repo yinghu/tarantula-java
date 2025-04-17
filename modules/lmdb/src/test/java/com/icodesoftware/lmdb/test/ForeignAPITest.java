@@ -481,20 +481,28 @@ public class ForeignAPITest extends TestSetup{
     }
 
     private static void recovery(DataStore dataStore,DataStore index){
-        TestAccessIndex testAccessIndex = new TestAccessIndex("testx4000");
-        testAccessIndex.referenceId = 10;
-        testAccessIndex.group = "provider";
-        testAccessIndex.distributionId(100);
-        testAccessIndex.ownerKey(SnowflakeKey.from(9090));
-        System.out.println(dataStore.createIfAbsent(testAccessIndex, false));
-        System.out.println(dataStore.createIfAbsent(testAccessIndex, false));
-        Recoverable.DataBuffer rkey = BufferProxy.buffer(EnvSetting.KEY_SIZE,false);
-        testAccessIndex.writeKey(rkey);
-        rkey.flip();
-        index.backup().get(testAccessIndex.key(), (k, v)->{
-            System.out.println("loaded 123");
-            return true;
-        });
+        for(int i=0;i<100;i++) {
+            TestAccessIndex testAccessIndex = new TestAccessIndex("gp-"+i);
+            testAccessIndex.label("google-play");
+            testAccessIndex.referenceId = 10;
+            testAccessIndex.group = "provider";
+            testAccessIndex.distributionId(100);
+            testAccessIndex.ownerKey(SnowflakeKey.from(9090));
+            System.out.println(dataStore.createIfAbsent(testAccessIndex, false));
+        }
+        //System.out.println(dataStore.createIfAbsent(testAccessIndex, false));
+        //Recoverable.DataBuffer rkey = BufferProxy.buffer(EnvSetting.KEY_SIZE,false);
+        //testAccessIndex.writeKey(rkey);
+        //rkey.flip();
+        //index.backup().get(testAccessIndex.key(), (k, v)->{
+           //System.out.println("loaded 123");
+            //return true;
+        //});
+        //System.out.println(dataStore.list(new TestAccessQuery(9090,"access")).size());
+    }
+
+    private static void recoveryFromEdge(DataStore dataStore){
+        System.out.println(dataStore.list(new TestAccessQuery(9090,"google-play")).size());
     }
 
 
@@ -529,7 +537,8 @@ public class ForeignAPITest extends TestSetup{
             //createIfAbsent(nativeDataStore,index);
             //create(nativeDataStore,index);
             //delete(nativeDataStore,index);
-            recovery(nativeDataStore,index);
+            //recovery(nativeDataStore,index);
+            recoveryFromEdge(nativeDataStore);
             nativeDataStoreProvider.shutdown();
         }catch (Exception ex){
             ex.printStackTrace();

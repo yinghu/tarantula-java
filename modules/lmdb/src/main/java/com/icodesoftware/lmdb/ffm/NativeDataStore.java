@@ -5,7 +5,9 @@ import com.icodesoftware.Recoverable;
 import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.lmdb.EnvSetting;
 import com.icodesoftware.service.DataStoreSummary;
+import com.icodesoftware.service.Metadata;
 import com.icodesoftware.util.BufferProxy;
+import com.icodesoftware.util.DataBufferKey;
 import com.icodesoftware.util.LocalHeader;
 
 import java.lang.foreign.Arena;
@@ -76,6 +78,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     public <T extends Recoverable> boolean createIfAbsent(T t, boolean loading) {
         NativeDbi dbi = env.createDbi(name);
         NativeDbi edge = edgeDbi(t);
+        recover(dbi.metadata(),t);
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena)){
             long txnId = txn.transactionId();
             NativeData.InVal key = NativeData.in(arena,EnvSetting.KEY_SIZE);
@@ -130,6 +133,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
 
     public <T extends Recoverable> boolean load(T t) {
         NativeDbi dbi = env.createDbi(name);
+        recover(dbi.metadata(),t);
         try(Arena arena = Arena.ofConfined();NativeTxn txn = env.read(arena)){
             NativeData.InVal keyIn = NativeData.in(arena,EnvSetting.KEY_SIZE);
             keyIn.write(buffer -> t.writeKey(buffer));
@@ -153,6 +157,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
 
     public <T extends Recoverable> boolean update(T t) {
         NativeDbi dbi = env.createDbi(name);
+        recover(dbi.metadata(),t);
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena)){
             long txnId = txn.transactionId();
             NativeData.InVal key = NativeData.in(arena,EnvSetting.KEY_SIZE);
@@ -282,6 +287,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     public <T extends Recoverable> void list(RecoverableFactory<T> query, DataStore.Stream<T> stream) {
         NativeDbi dbi = env.createDbi(name);
         NativeDbi edge = env.createDbi(name,query.label());
+        recover(edge.metadata(),query);
         try(NativeCursor cursor = edge.cursor()){
             cursor.read().forEach(query.key(),(k,v)->{
                 NativeData.OutVal out = NativeData.out(cursor.arena());
@@ -466,6 +472,61 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
 
     private <T extends Recoverable> NativeDbi edgeDbi(T t){
         return (t.onEdge() && t.label() != null && t.ownerKey() != null)? env.createDbi(name,t.label()) : null;
+    }
+
+    private <T extends Recoverable> void recover(Metadata metadata,T t){
+        nativeDataStoreProvider.onRecovering(metadata,t.key(),(k,v)->{
+            Recoverable.DataHeader h = v.readHeader();
+            Recoverable.DataHeader[] eh ={null};
+            get(t.key(),(ek,ev)->{
+                eh[0] = ev.readHeader();
+                return true;
+            });
+            if(eh[0]==null || h.revision() > eh[0].revision()){
+                v.rewind();
+                set((rk,rv)->{
+                    t.writeKey(rk);
+                    rv.write(v);
+                    return true;
+                });
+                if(t.onEdge() && t.ownerKey()!=null && t.label()!=null){
+                    setEdge(t.label(),(dk,dv)->{
+                        t.ownerKey().write(dk);
+                        t.key().write(dv);
+                        return true;
+                    });
+                }
+            }
+            return true;
+        });
+    }
+
+    private <T extends Recoverable> void recover(Metadata metadata,RecoverableFactory<T> q){
+        nativeDataStoreProvider.onRecovering(metadata,q.key(),(k,v)->{
+            Recoverable.DataHeader h = v.readHeader();
+            Recoverable.DataHeader[] eh ={null};
+            DataBufferKey key = DataBufferKey.from(k);
+            get(key,(ek,ev)->{
+                eh[0] = ev.readHeader();
+                return true;
+            });
+            if(eh[0]==null || h.revision() > eh[0].revision()){
+                k.rewind();
+                v.rewind();
+                set((rk,rv)->{
+                    rk.write(k);
+                    rv.write(v);
+                    return true;
+                });
+                k.rewind();
+                setEdge(q.label(),(dk,dv)->{
+                    q.key().write(dk);
+                    dv.write(k);
+                    return true;
+                });
+            }
+            return true;
+        });
     }
 
 }
