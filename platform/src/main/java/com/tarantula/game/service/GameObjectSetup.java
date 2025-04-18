@@ -145,6 +145,12 @@ public class GameObjectSetup extends GamePreSetup implements ApplicationPreSetup
     public DataStore dataStore(Descriptor descriptor){
         return serviceContext.dataStore(Distributable.DATA_SCOPE,serviceDataStore(descriptor));
     }
+
+    @Override
+    public void parent(Transaction.DataStoreContext parentContext) {
+
+    }
+
     @Override
     public DataStore onDataStore(String name) {
         return serviceContext.dataStore(Distributable.DATA_SCOPE,configureDataStore(gameCluster,name));

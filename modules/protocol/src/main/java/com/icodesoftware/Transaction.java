@@ -19,8 +19,8 @@ public interface Transaction extends AutoCloseable{
         boolean update(DataStoreContext dataStoreContext);
     }
     interface DataStoreContext extends Closable{
-        default void parent(DataStoreContext parentContext){}
-        default DataStore onDataStore(String name){ return null;}
+        void parent(DataStoreContext parentContext);
+        DataStore onDataStore(String name);
 
     }
     interface Listener{

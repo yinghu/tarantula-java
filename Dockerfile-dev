@@ -1,19 +1,18 @@
 #### BUILD
-FROM maven:3.9.6-eclipse-temurin-21 AS build
+FROM maven:3.9.6-eclipse-24-jdk-temurin AS build
 
 WORKDIR /app
 
 COPY pom.xml ./pom.xml
 COPY modules ./modules
 COPY platform ./platform
-COPY load-test ./load-test
-COPY udp-game-server ./udp-game-server
 
 RUN mvn clean
 RUN mvn clean install -DskipTests
 
 #### PACKAGE
-FROM gcr.io/distroless/java21:debug
+#FROM gcr.io/distroless/java22:debug
+FROM openjdk:24-jdk-temurin
 
 COPY --from=build /app/platform/target/release/gec-platform-2.0-bin/gec-platform-2.0 /platform
 COPY docker-entrypoint.sh /platform/bin/docker-entrypoint.sh

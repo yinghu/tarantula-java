@@ -51,6 +51,11 @@ public class LocalTransaction implements Transaction, Transaction.DataStoreConte
     }
 
     @Override
+    public void parent(DataStoreContext parentContext) {
+
+    }
+
+    @Override
     public DataStore onDataStore(String name) {
        return dataStoreProvider.createDataStore(scope,name,txn,transactionId);
     }

@@ -20,7 +20,14 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     private NativeDataStoreProvider nativeDataStoreProvider;
     private NativeEnv env;
     private String name;
+    private NativeTxn parentTxn;
 
+    public NativeDataStore(String name,NativeDataStoreProvider nativeDataStoreProvider,NativeEnv nativeEnv,NativeTxn parent){
+        this.name = name;
+        this.nativeDataStoreProvider = nativeDataStoreProvider;
+        this.env = nativeEnv;
+        this.parentTxn = parent;
+    }
 
     public NativeDataStore(String name,NativeDataStoreProvider nativeDataStoreProvider,NativeEnv nativeEnv){
         this.name = name;

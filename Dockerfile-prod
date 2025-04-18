@@ -6,8 +6,6 @@ WORKDIR /app
 COPY pom.xml ./pom.xml
 COPY modules ./modules
 COPY platform ./platform
-COPY load-test ./load-test
-COPY udp-game-server ./udp-game-server
 
 RUN mvn clean
 RUN mvn clean install -DskipTests

@@ -271,7 +271,6 @@ public class TransactionLogManager implements Transaction.LogManager{
     public void onTransaction(List<Transaction.Log> transactionLogs) {
         for(Transaction.Log log : transactionLogs){
             DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(log.sourceScope())+log.source());
-            System.out.println("ds : "+dataStore.name());
             if(log.deleting()){
                 if(log.edgeLabel()==null){
                     dataStore.backup().unset((k,v)->{
@@ -288,11 +287,11 @@ public class TransactionLogManager implements Transaction.LogManager{
                 }
             }else{
                 if(log.edgeLabel()==null){//write key/value
-                    System.out.println(dataStore.backup().set((k,v)->{
+                    dataStore.backup().set((k,v)->{
                         k.write(log.primaryKey());
                         v.write(log.value());
                         return true;
-                    }));
+                    });
                 }else{
                     //write edge
                     dataStore.backup().setEdge(log.edgeLabel(),(k,v)->{

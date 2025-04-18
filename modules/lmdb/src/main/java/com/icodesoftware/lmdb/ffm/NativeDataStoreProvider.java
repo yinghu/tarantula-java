@@ -63,7 +63,24 @@ public class NativeDataStoreProvider implements DataStoreProvider{
 
     @Override
     public Transaction transaction(int scope) {
-        return null;
+        switch (scope){
+            case Distributable.DATA_SCOPE -> {
+                return new NativeLocalTransaction(dataEnv,this);
+            }
+            case Distributable.INTEGRATION_SCOPE -> {
+                return new NativeLocalTransaction(integrationEnv,this);
+            }
+            case Distributable.INDEX_SCOPE -> {
+                return new NativeLocalTransaction(indexEnv,this);
+            }
+            case Distributable.LOG_SCOPE -> {
+                return new NativeLocalTransaction(logEnv,this);
+            }
+            case Distributable.LOCAL_SCOPE -> {
+                return new NativeLocalTransaction(localEnv,this);
+            }
+            default -> throw new RuntimeException("scope not supported");
+        }
     }
 
     public void start() throws Exception {
