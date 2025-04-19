@@ -54,7 +54,7 @@ public class NativeDbi extends NativeStat implements Serviceable {
 
     @Override
     public void start() throws Exception {
-        try(Arena a = Arena.ofConfined(); NativeTxn txn = env.write(a)) {
+        try(Arena a = Arena.ofConfined(); NativeTxn txn = env.write(a,MemorySegment.NULL)) {
             if(storeName!=null){
                 MemorySegment dbiName = a.allocateFrom(storeName, StandardCharsets.US_ASCII);
                 MemorySegment dm = env.allocate(arena -> arena.allocate(AddressLayout.ADDRESS));
@@ -78,7 +78,7 @@ public class NativeDbi extends NativeStat implements Serviceable {
     }
 
     public void drop(boolean delete){
-        try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena)){
+        try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena,MemorySegment.NULL)){
             if(delete) {
                 mdbDrop(txn,1);
                 txn.commit();

@@ -122,9 +122,9 @@ public class NativeEnv extends NativeStat implements Serviceable {
         return new NativeTxn(this,pointer.get(ValueLayout.ADDRESS,0),true);
     }
 
-    public NativeTxn write(Arena arena){
+    public NativeTxn write(Arena arena,MemorySegment parent){
         MemorySegment pointer = arena.allocate(AddressLayout.ADDRESS);
-        mdbTxnBegin(MemorySegment.NULL,pointer,0);
+        mdbTxnBegin(parent,pointer,0);
         return new NativeTxn(this,pointer.get(ValueLayout.ADDRESS,0),true);
     }
 

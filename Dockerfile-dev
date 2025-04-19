@@ -1,6 +1,5 @@
 #### BUILD
 FROM maven:3.9.6-eclipse-24-jdk-temurin AS build
-
 WORKDIR /app
 
 COPY pom.xml ./pom.xml
@@ -12,7 +11,7 @@ RUN mvn clean install -DskipTests
 
 #### PACKAGE
 #FROM gcr.io/distroless/java22:debug
-FROM openjdk:24-jdk-temurin
+FROM openjdk:24
 
 COPY --from=build /app/platform/target/release/gec-platform-2.0-bin/gec-platform-2.0 /platform
 COPY docker-entrypoint.sh /platform/bin/docker-entrypoint.sh

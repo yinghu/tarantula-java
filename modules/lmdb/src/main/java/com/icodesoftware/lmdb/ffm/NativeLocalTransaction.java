@@ -4,6 +4,7 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Transaction;
 
 import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
 
 public class NativeLocalTransaction implements Transaction, Transaction.DataStoreContext, Transaction.Listener{
 
@@ -15,13 +16,13 @@ public class NativeLocalTransaction implements Transaction, Transaction.DataStor
     public NativeLocalTransaction(NativeEnv nativeEnv,NativeDataStoreProvider nativeDataStoreProvider){
         this.nativeEnv = nativeEnv;
         this.nativeDataStoreProvider = nativeDataStoreProvider;
-        txn = this.nativeEnv.write(arena);
+        txn = this.nativeEnv.write(arena, MemorySegment.NULL);
         transactionId = txn.transactionId();
     }
 
     @Override
     public boolean execute(TransactionContext transactionContext) {
-        try(txn){
+        try{
             if(!transactionContext.update(this)){
                 txn.abort();
                 nativeDataStoreProvider.onAbort(nativeEnv.scope(),transactionId);

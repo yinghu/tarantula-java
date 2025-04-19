@@ -40,7 +40,7 @@ public class NativeCursor implements AutoCloseable{
         return this;
     }
     public NativeCursor write(){
-        NativeTxn txn = env.write(arena);
+        NativeTxn txn = env.write(arena,MemorySegment.NULL);
         MemorySegment cm = arena.allocate(AddressLayout.ADDRESS);
         mdbCursorOpen(txn,cm);
         this.txn = txn;

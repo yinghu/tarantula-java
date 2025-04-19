@@ -67,7 +67,7 @@ public class HttpEndpoint extends HttpEndpointService{
 		httpDevelopmentHandler.resource(this.resource);
 		this.server.createContext(httpDevelopmentHandler.path(),httpDevelopmentHandler);
 
-        log.info("Tarantula HTTP Endpoint is listening on ["+address+"]");
+        log.info("Tarantula HTTP Endpoint is listening on ["+address+"]["+port+"]");
 	}
 
 	@Override

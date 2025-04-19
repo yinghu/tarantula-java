@@ -553,7 +553,7 @@ public class ForeignAPITest extends TestSetup{
             config.put(EnvSetting.local,EnvSetting.setting(Distributable.LOCAL_SCOPE,baseDir,10));
             nativeDataStoreProvider.configure(config);
             nativeDataStoreProvider.start();
-            //DataStore nativeDataStore = nativeDataStoreProvider.createDataStore("access");
+            DataStore nativeDataStore = nativeDataStoreProvider.createDataStore("access");
             //DataStore index = nativeDataStoreProvider.createKeyIndexDataStore("index_d_access");
             //createIfAbsent(nativeDataStore,index);
             //create(nativeDataStore,index);
@@ -561,11 +561,12 @@ public class ForeignAPITest extends TestSetup{
             //recovery(nativeDataStore,index);
             //recoveryFromEdge(nativeDataStore);
             //recoveryFromLoad(nativeDataStore);
+
             try(Transaction transaction = nativeDataStoreProvider.transaction(Distributable.DATA_SCOPE)){
                 transaction.execute(ctx->{
                     DataStore dataStore = ctx.onDataStore("test");
-                    System.out.println(dataStore.name());
-                    return false;
+                    TestObject tob = new TestObject("type","name");
+                    return dataStore.create(tob);
                 });
             }
             nativeDataStoreProvider.shutdown();
