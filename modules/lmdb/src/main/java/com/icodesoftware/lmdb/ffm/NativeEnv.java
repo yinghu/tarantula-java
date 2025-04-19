@@ -79,23 +79,37 @@ public class NativeEnv extends NativeStat implements Serviceable {
     }
 
     public NativeDbi createDbi(String name,NativeTxn txn){
-        return nativeDbs.computeIfAbsent(NativeUtil.storeName(name),key->{
-            NativeDbi nativeDbi = new NativeDbi(this,name,txn);
-            try{nativeDbi.start();}catch (Exception ex){
-                throw new RuntimeException(ex);
-            }
-            return nativeDbi;
-        });
+        if(txn==null){
+            return nativeDbs.computeIfAbsent(NativeUtil.storeName(name),key->{
+                NativeDbi nativeDbi = new NativeDbi(this,name,null);
+                try{nativeDbi.start();}catch (Exception ex){
+                    throw new RuntimeException(ex);
+                }
+                return nativeDbi;
+            });
+        }
+        NativeDbi nativeDbi = new NativeDbi(this,name,txn);
+        try{nativeDbi.start();}catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+        return nativeDbi;
     }
 
     public NativeDbi createDbi(String name,String label,NativeTxn txn){
-        return nativeDbs.computeIfAbsent(NativeUtil.storeName(name,label),key->{
-            NativeDbi nativeDbi = new NativeDbi(this,name,label,txn);
-            try{nativeDbi.start();}catch (Exception ex){
-                throw new RuntimeException(ex);
-            }
-            return nativeDbi;
-        });
+        if(txn==null){
+            return nativeDbs.computeIfAbsent(NativeUtil.storeName(name,label),key->{
+                NativeDbi nativeDbi = new NativeDbi(this,name,label,null);
+                try{nativeDbi.start();}catch (Exception ex){
+                    throw new RuntimeException(ex);
+                }
+                return nativeDbi;
+            });
+        }
+        NativeDbi nativeDbi = new NativeDbi(this,name,label,txn);
+        try{nativeDbi.start();}catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
+        return nativeDbi;
     }
 
     public List<String> names(){

@@ -1,13 +1,16 @@
 package com.icodesoftware.lmdb.ffm;
 
 import com.icodesoftware.DataStore;
+import com.icodesoftware.TarantulaLogger;
 import com.icodesoftware.Transaction;
+import com.icodesoftware.logging.JDKLogger;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 
 public class NativeLocalTransaction implements Transaction, Transaction.DataStoreContext, Transaction.Listener{
 
+    private static final TarantulaLogger logger = JDKLogger.getLogger(NativeLocalTransaction.class);
     private NativeDataStoreProvider nativeDataStoreProvider;
     private NativeEnv nativeEnv;
     private final NativeTxn txn;
@@ -32,6 +35,7 @@ public class NativeLocalTransaction implements Transaction, Transaction.DataStor
             nativeDataStoreProvider.onCommit(nativeEnv.scope(),transactionId);
             return true;
         }catch (Exception ex){
+            logger.error("transaction failed",ex);
             txn.abort();
             return false;
         }

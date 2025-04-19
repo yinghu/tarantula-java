@@ -46,7 +46,10 @@ public class SmokeNativeTest extends LMDBHook{
         TestAccessIndex testObject = new TestAccessIndex("tester");
         testObject.ownerKey(SnowflakeKey.from(100));
         Assert.assertTrue(dataStore.createIfAbsent(testObject,false));
-        Assert.assertFalse(dataStore.createIfAbsent(testObject,false));
+        TestAccessIndex testObject1 = new TestAccessIndex("tester");
+        testObject1.ownerKey(SnowflakeKey.from(100));
+        Assert.assertFalse(dataStore.createIfAbsent(testObject1,true));
+        Assert.assertEquals(testObject1.revision(),1L);
         Assert.assertEquals(count(dataStore),1);
     }
 
@@ -97,9 +100,24 @@ public class SmokeNativeTest extends LMDBHook{
                 return true;
             });
         }
+        try(Transaction transaction = lmdbDataStoreProvider.transaction(Distributable.DATA_SCOPE)){
+            transaction.execute(ctx->{
+                DataStore dataStore = ctx.onDataStore("transaction_test_object");
+                for(int i=0;i<10;i++){
+                    TestObject testObject = new TestObject("atype","aname");
+                    Assert.assertTrue(dataStore.create(testObject));
+                    Assert.assertTrue(testObject.distributionId()>0);
+                    Assert.assertFalse(dataStore.createEdge(testObject,"link"));
+                    testObject.ownerKey(SnowflakeKey.from(100));
+                    testObject.onEdge(true);
+                    Assert.assertTrue(dataStore.createEdge(testObject,"link"));
+                }
+                return true;
+            });
+        }
         DataStore dataStore = lmdbDataStoreProvider.createDataStore("transaction_test_object");
-        Assert.assertEquals(count(dataStore),10);
-        Assert.assertEquals(count(dataStore,SnowflakeKey.from(100),"link"),10);
+        Assert.assertEquals(count(dataStore),20);
+        Assert.assertEquals(count(dataStore,SnowflakeKey.from(100),"link"),20);
     }
 
 }

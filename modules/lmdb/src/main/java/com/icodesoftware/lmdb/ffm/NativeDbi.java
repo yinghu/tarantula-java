@@ -93,7 +93,8 @@ public class NativeDbi extends NativeStat implements Serviceable {
 
 
     public boolean put(MemorySegment key,MemorySegment value,NativeTxn txn){
-        return mdbPut(txn,key,value,putFlag) == NativeCode.MDB_SUCCESS;
+        int ret = mdbPut(txn,key,value,putFlag);
+        return ret == NativeCode.MDB_SUCCESS;
     }
 
     public boolean get(MemorySegment key,MemorySegment value,NativeTxn txn){
