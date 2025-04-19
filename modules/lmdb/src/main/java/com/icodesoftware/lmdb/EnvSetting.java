@@ -3,8 +3,13 @@ package com.icodesoftware.lmdb;
 import com.google.gson.JsonObject;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.lmdb.ffm.NativeUtil;
+import com.icodesoftware.util.FileUtil;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class EnvSetting {
@@ -72,11 +77,15 @@ public class EnvSetting {
     }
 
     public Path lib(){
-        try{
-            URL url = Thread.currentThread().getContextClassLoader().getResource(NativeUtil.libName());
-            return Path.of(url.toURI());
+        File file = new File(FileUtil.currentDirectory()+"/target/"+NativeUtil.libName());
+        if(file.exists()) return file.toPath();
+        try(InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(NativeUtil.libName());
+            FileOutputStream out = new FileOutputStream(FileUtil.currentDirectory()+"/target/"+NativeUtil.libName())){
+            in.transferTo(out);
+            out.flush();
+            return Path.of(FileUtil.currentDirectory()+"/target/"+NativeUtil.libName());
         }catch (Exception ex){
-            throw new RuntimeException("No native lib found");
+            throw new RuntimeException("No native lib found",ex);
         }
     }
 
