@@ -21,10 +21,10 @@ public class NativeUtil {
             return "/home/yinghu/"+arch+"-windows-gnu.dll";
         }
         if(OSUtil.linux()){
-            return "/home/yinghu/"+arch+"-linux-gnu.dll";
+            return "/home/yinghu/"+arch+"-linux-gnu.so";
         }
         if(OSUtil.macOS()){
-            return "/home/yinghu/"+arch+"-macos-none.dll";
+            return "/home/yinghu/"+arch+"-macos-none.so";
         }
         throw new UnsupportedOperationException("Native lib not supported");
     }
