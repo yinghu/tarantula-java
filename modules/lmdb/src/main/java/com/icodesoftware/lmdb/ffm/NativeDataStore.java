@@ -45,7 +45,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     }
 
     public <T extends Recoverable> boolean create(T t) {
-        NativeDbi dbi = env.createDbi(name);
+        NativeDbi dbi = env.createDbi(name,parentTxn);
         NativeDbi edge = edgeDbi(t);
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena,parentTxn==null? MemorySegment.NULL:parentTxn.pointer())){
             long txnId = txn.transactionId();
@@ -84,7 +84,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     }
 
     public <T extends Recoverable> boolean createIfAbsent(T t, boolean loading) {
-        NativeDbi dbi = env.createDbi(name);
+        NativeDbi dbi = env.createDbi(name,parentTxn);
         NativeDbi edge = edgeDbi(t);
         recover(dbi.metadata(),t);
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena,parentTxn==null?MemorySegment.NULL:parentTxn.pointer())){
@@ -140,7 +140,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     }
 
     public <T extends Recoverable> boolean load(T t) {
-        NativeDbi dbi = env.createDbi(name);
+        NativeDbi dbi = env.createDbi(name,parentTxn);
         recover(dbi.metadata(),t);
         try(Arena arena = Arena.ofConfined();NativeTxn txn = env.read(arena)){
             NativeData.InVal keyIn = NativeData.in(arena,EnvSetting.KEY_SIZE);
@@ -164,7 +164,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     }
 
     public <T extends Recoverable> boolean update(T t) {
-        NativeDbi dbi = env.createDbi(name);
+        NativeDbi dbi = env.createDbi(name,parentTxn);
         recover(dbi.metadata(),t);
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena,parentTxn==null?MemorySegment.NULL:parentTxn.pointer())){
             long txnId = txn.transactionId();
@@ -204,7 +204,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     }
 
     public <T extends Recoverable> boolean delete(T t){
-        NativeDbi dbi = env.createDbi(name);
+        NativeDbi dbi = env.createDbi(name,parentTxn);
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena,parentTxn==null?MemorySegment.NULL:parentTxn.pointer())){
             long txnId = txn.transactionId();
             NativeData.InVal key = NativeData.in(arena,EnvSetting.KEY_SIZE);
@@ -228,7 +228,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     }
 
     public <T extends Recoverable> boolean createEdge(T t,String label){
-        NativeDbi edge = env.createDbi(name,label);
+        NativeDbi edge = env.createDbi(name,label,parentTxn);
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena,parentTxn==null?MemorySegment.NULL:parentTxn.pointer())){
             long txnId = txn.transactionId();
             NativeData.InVal key = NativeData.in(arena,EnvSetting.KEY_SIZE);
@@ -249,7 +249,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     }
 
     public  boolean deleteEdge(Recoverable.Key t,String label){
-        NativeDbi edge = env.createDbi(name,label);
+        NativeDbi edge = env.createDbi(name,label,parentTxn);
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena,parentTxn==null?MemorySegment.NULL:parentTxn.pointer())){
             long txnId = txn.transactionId();
             NativeData.InVal key = NativeData.in(arena,EnvSetting.KEY_SIZE);
@@ -268,7 +268,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     }
 
     public boolean deleteEdge(Recoverable.Key t,Recoverable.Key edgeKey,String label){
-        NativeDbi edge = env.createDbi(name,label);
+        NativeDbi edge = env.createDbi(name,label,parentTxn);
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena,parentTxn==null?MemorySegment.NULL:parentTxn.pointer())){
             long txnId = txn.transactionId();
             NativeData.InVal key = NativeData.in(arena,EnvSetting.KEY_SIZE);
@@ -293,8 +293,8 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
         return list;
     }
     public <T extends Recoverable> void list(RecoverableFactory<T> query, DataStore.Stream<T> stream) {
-        NativeDbi dbi = env.createDbi(name);
-        NativeDbi edge = env.createDbi(name,query.label());
+        NativeDbi dbi = env.createDbi(name,parentTxn);
+        NativeDbi edge = env.createDbi(name,query.label(),parentTxn);
         recover(edge.metadata(),query);
         try(NativeCursor cursor = edge.cursor()){
             cursor.read().forEach(query.key(),(k,v)->{
@@ -323,19 +323,19 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
 
     //backup
     public void forEach(DataStore.BufferStream stream) {
-        NativeDbi dbi = env.createDbi(name);
+        NativeDbi dbi = env.createDbi(name,parentTxn);
         try(NativeCursor cursor = dbi.cursor()){
             cursor.read().forEach(stream);
         }
     }
 
     public void drop(boolean delete){
-        NativeDbi dbi = env.createDbi(name);
+        NativeDbi dbi = env.createDbi(name,parentTxn);
         dbi.drop(delete);
     }
 
     public boolean get(Recoverable.Key key, BufferStream stream){
-        NativeDbi dbi = env.createDbi(name);
+        NativeDbi dbi = env.createDbi(name,parentTxn);
         try(Arena arena = Arena.ofConfined();NativeTxn txn = env.read(arena)){
             NativeData.InVal k = NativeData.in(arena,EnvSetting.KEY_SIZE);
             Recoverable.DataBuffer kBuffer = k.write(buffer -> key.write(buffer));
@@ -352,7 +352,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
         return true;
     }
     public boolean set(BufferStream bufferStream){
-        NativeDbi dbi = env.createDbi(name);
+        NativeDbi dbi = env.createDbi(name,parentTxn);
         try(Arena arena = Arena.ofConfined();NativeTxn txn = env.write(arena,parentTxn==null?MemorySegment.NULL:parentTxn.pointer())) {
             NativeData.InPair keyValue = NativeData.inPair(arena,EnvSetting.KEY_SIZE,EnvSetting.VALUE_SIZE);
             boolean[] pending = {false};
@@ -375,15 +375,15 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     }
 
     public void forEachEdgeKey(Recoverable.Key key,String label,BufferStream bufferStream){
-        NativeDbi edge = env.createDbi(name,label);
+        NativeDbi edge = env.createDbi(name,label,parentTxn);
         try(NativeCursor cursor = edge.cursor()){
             cursor.read().forEach(key,bufferStream);
         }
     }
 
     public void forEachEdgeKeyValue(Recoverable.Key key,String label,BufferStream bufferStream){
-        NativeDbi edge = env.createDbi(name,label);
-        NativeDbi dbi = env.createDbi(name);
+        NativeDbi edge = env.createDbi(name,label,parentTxn);
+        NativeDbi dbi = env.createDbi(name,parentTxn);
         try(NativeCursor cursor = edge.cursor()){
             cursor.read().forEach(key,(k,v)->{
                 NativeData.OutVal out = NativeData.out(cursor.arena());
@@ -401,7 +401,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
         }
     }
     public boolean setEdge(String label,BufferStream bufferStream){
-        NativeDbi edge = env.createDbi(name,label);
+        NativeDbi edge = env.createDbi(name,label,parentTxn);
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena,parentTxn==null?MemorySegment.NULL:parentTxn.pointer())){
             boolean[] pending={false};
             NativeData.InPair inPair = NativeData.inPair(arena,EnvSetting.KEY_SIZE,EnvSetting.KEY_SIZE).write((b1,b2)->{
@@ -423,7 +423,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     }
 
     public boolean unsetEdge(String label,BufferStream bufferStream,boolean fromLabel){
-        NativeDbi edge = env.createDbi(name,label);
+        NativeDbi edge = env.createDbi(name,label,parentTxn);
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena,parentTxn==null?MemorySegment.NULL:parentTxn.pointer())){
             boolean[] pending={false};
             NativeData.InPair inPair = NativeData.inPair(arena,EnvSetting.KEY_SIZE,EnvSetting.KEY_SIZE).write((b1,b2)->{
@@ -450,7 +450,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
         }
     }
     public boolean unset(BufferStream bufferStream){
-        NativeDbi dbi = env.createDbi(name);
+        NativeDbi dbi = env.createDbi(name,parentTxn);
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena,parentTxn==null?MemorySegment.NULL:parentTxn.pointer())){
             NativeData.InVal key = NativeData.in(arena,EnvSetting.KEY_SIZE);
             boolean[] pending = {false};
@@ -479,7 +479,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     public void view(DataStoreSummary dataStoreSummary){}
 
     private <T extends Recoverable> NativeDbi edgeDbi(T t){
-        return (t.onEdge() && t.label() != null && t.ownerKey() != null)? env.createDbi(name,t.label()) : null;
+        return (t.onEdge() && t.label() != null && t.ownerKey() != null)? env.createDbi(name,t.label(),parentTxn) : null;
     }
 
     private <T extends Recoverable> void recover(Metadata metadata,T t){

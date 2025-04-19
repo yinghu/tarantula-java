@@ -78,9 +78,9 @@ public class NativeEnv extends NativeStat implements Serviceable {
         return memoryAllocator.onAllocate(arena);
     }
 
-    public NativeDbi createDbi(String name){
+    public NativeDbi createDbi(String name,NativeTxn txn){
         return nativeDbs.computeIfAbsent(NativeUtil.storeName(name),key->{
-            NativeDbi nativeDbi = new NativeDbi(this,name);
+            NativeDbi nativeDbi = new NativeDbi(this,name,txn);
             try{nativeDbi.start();}catch (Exception ex){
                 throw new RuntimeException(ex);
             }
@@ -88,9 +88,9 @@ public class NativeEnv extends NativeStat implements Serviceable {
         });
     }
 
-    public NativeDbi createDbi(String name,String label){
+    public NativeDbi createDbi(String name,String label,NativeTxn txn){
         return nativeDbs.computeIfAbsent(NativeUtil.storeName(name,label),key->{
-            NativeDbi nativeDbi = new NativeDbi(this,name,label);
+            NativeDbi nativeDbi = new NativeDbi(this,name,label,txn);
             try{nativeDbi.start();}catch (Exception ex){
                 throw new RuntimeException(ex);
             }
@@ -101,7 +101,7 @@ public class NativeEnv extends NativeStat implements Serviceable {
     public List<String> names(){
         try{
             ArrayList<String> names = new ArrayList<>();
-            NativeDbi dbi = new NativeDbi(this,null);
+            NativeDbi dbi = new NativeDbi(this,null,null);
             dbi.start();
             NativeCursor cursor = dbi.cursor();
             cursor.read().forEach((k,v)->{

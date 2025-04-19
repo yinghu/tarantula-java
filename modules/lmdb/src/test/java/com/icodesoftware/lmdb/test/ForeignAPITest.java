@@ -562,11 +562,23 @@ public class ForeignAPITest extends TestSetup{
             //recoveryFromEdge(nativeDataStore);
             //recoveryFromLoad(nativeDataStore);
 
+            TestObject tob = new TestObject("type","name");
             try(Transaction transaction = nativeDataStoreProvider.transaction(Distributable.DATA_SCOPE)){
                 transaction.execute(ctx->{
                     DataStore dataStore = ctx.onDataStore("test");
-                    TestObject tob = new TestObject("type","name");
                     return dataStore.create(tob);
+                });
+            }
+            System.out.println(tob.distributionId());
+            //TestObject tox = new TestObject();
+            //tox.distributionId(tob.distributionId());
+            //DataStore dataStore = nativeDataStoreProvider.createDataStore("test");
+            //System.out.println(dataStore.load(tox));
+            //System.out.println(tox.name+" : "+tox.type);
+            try(Transaction transaction = nativeDataStoreProvider.transaction(Distributable.DATA_SCOPE)){
+                transaction.execute(ctx->{
+                    DataStore dataStore = ctx.onDataStore("test");
+                    return dataStore.delete(tob);
                 });
             }
             nativeDataStoreProvider.shutdown();

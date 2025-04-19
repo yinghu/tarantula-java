@@ -23,12 +23,13 @@ public class NativeDbi extends NativeStat implements Serviceable {
     private final int openFlag;
     private final int putFlag;
     private final Metadata metadata;
+    private final NativeTxn parent;
 
-    public NativeDbi(final NativeEnv env,final String name){
-        this(env,name,null);
+    public NativeDbi(final NativeEnv env,final String name,NativeTxn parent){
+        this(env,name,null,parent);
     }
 
-    public NativeDbi(final NativeEnv env,final String name,final String label){
+    public NativeDbi(final NativeEnv env,final String name,final String label,NativeTxn parent){
         this.metadata = new LocalMetadata(env.scope(),name,label);
         this.env = env;
         this.storeName = label==null ? NativeUtil.storeName(name) : NativeUtil.storeName(name,label);
@@ -36,6 +37,7 @@ public class NativeDbi extends NativeStat implements Serviceable {
         this.label = NativeUtil.storeName(label);
         this.openFlag = this.label==null? DbiMask.DBI_CREATE.mask() : (DbiMask.DBI_CREATE.mask() | DbiMask.DBI_DUP_SORT.mask());
         this.putFlag = this.label==null? 0 : PutMask.PUT_NO_DUP_DATA.mask();
+        this.parent = parent;
     }
 
     public String name(){
@@ -54,7 +56,7 @@ public class NativeDbi extends NativeStat implements Serviceable {
 
     @Override
     public void start() throws Exception {
-        try(Arena a = Arena.ofConfined(); NativeTxn txn = env.write(a,MemorySegment.NULL)) {
+        try(Arena a = Arena.ofConfined(); NativeTxn txn = env.write(a,parent==null?MemorySegment.NULL:parent.pointer())) {
             if(storeName!=null){
                 MemorySegment dbiName = a.allocateFrom(storeName, StandardCharsets.US_ASCII);
                 MemorySegment dm = env.allocate(arena -> arena.allocate(AddressLayout.ADDRESS));
@@ -69,7 +71,7 @@ public class NativeDbi extends NativeStat implements Serviceable {
                 dbi = dm.get(ValueLayout.ADDRESS,0);
             }
         }
-        stat();
+        //stat();
     }
 
     @Override
