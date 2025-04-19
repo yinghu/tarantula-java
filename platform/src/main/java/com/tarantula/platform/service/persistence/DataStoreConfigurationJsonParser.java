@@ -2,7 +2,7 @@ package com.tarantula.platform.service.persistence;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.icodesoftware.lmdb.EnvSetting;
+import com.tarantula.platform.lmdb.EnvSetting;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.DeploymentServiceProvider;
 import com.icodesoftware.service.ServiceContext;

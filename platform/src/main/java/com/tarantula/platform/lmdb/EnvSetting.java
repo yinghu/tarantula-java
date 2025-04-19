@@ -1,16 +1,8 @@
-package com.icodesoftware.lmdb;
+package com.tarantula.platform.lmdb;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Distributable;
-import com.icodesoftware.lmdb.ffm.NativeUtil;
-import com.icodesoftware.util.FileUtil;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 public class EnvSetting {
 
@@ -52,7 +44,7 @@ public class EnvSetting {
     public static final EnvSetting LocalSetting = new EnvSetting(local,ENV_BASE_DIR+"/local",0,true);
 
 
-    public EnvSetting(String name,String storePath,int mbSize,boolean enabled){
+    public EnvSetting(String name, String storePath, int mbSize, boolean enabled){
         this.name = name;
         this.storePath = storePath;
         this.mbSize = mbSize;
@@ -74,20 +66,6 @@ public class EnvSetting {
         if(name.equals(log)) return Distributable.LOG_SCOPE;
         if(name.equals(local)) return Distributable.LOCAL_SCOPE;
         throw new UnsupportedOperationException("named LMDB env ["+name+"] not supported");
-    }
-
-    public Path lib(){
-        File file = new File(FileUtil.currentDirectory()+"/target/"+NativeUtil.libName());
-        if(file.exists()) return file.toPath();
-        FileUtil.createDirectory("target");
-        try(InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(NativeUtil.libName());
-            FileOutputStream out = new FileOutputStream(FileUtil.currentDirectory()+"/target/"+NativeUtil.libName())){
-            in.transferTo(out);
-            out.flush();
-            return Path.of(FileUtil.currentDirectory()+"/target/"+NativeUtil.libName());
-        }catch (Exception ex){
-            throw new RuntimeException("No native lib found",ex);
-        }
     }
 
     public static EnvSetting disable(int scope){

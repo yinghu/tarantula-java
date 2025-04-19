@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.hazelcast.nio.serialization.Portable;
 import com.icodesoftware.*;
 
-import com.icodesoftware.lmdb.TransactionLogManager;
+import com.tarantula.platform.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
 import com.tarantula.platform.event.TransactionReplicationEvent;
 import com.tarantula.platform.service.cluster.DistributionReplicator;

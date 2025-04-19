@@ -6,8 +6,6 @@ import com.google.gson.JsonObject;
 
 import com.icodesoftware.*;
 import com.icodesoftware.Module;
-import com.icodesoftware.lmdb.LMDBDataStoreProvider;
-import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.*;
 import com.icodesoftware.util.JsonUtil;
 
@@ -46,7 +44,6 @@ public class AdminRoleModule implements Module{
 
     private ConcurrentHashMap<String,Descriptor> pendingGameServices;
 
-    private TarantulaLogger logger = JDKLogger.getLogger(LMDBDataStoreProvider.class);
 
 
     @Override

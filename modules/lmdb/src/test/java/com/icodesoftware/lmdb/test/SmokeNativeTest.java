@@ -6,7 +6,7 @@ import com.icodesoftware.util.SnowflakeKey;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class SmokeTest extends LMDBHook{
+public class SmokeNativeTest extends LMDBHook{
 
 
     @Test(groups = { "native data store" })
@@ -56,6 +56,11 @@ public class SmokeTest extends LMDBHook{
         Assert.assertTrue(dataStore.create(testObject));
         Assert.assertTrue(testObject.distributionId()>0);
         Assert.assertEquals(count(dataStore),1);
+        Assert.assertFalse(dataStore.createEdge(testObject,"link"));
+        testObject.ownerKey(SnowflakeKey.from(100));
+        testObject.onEdge(true);
+        Assert.assertTrue(dataStore.createEdge(testObject,"link"));
+        Assert.assertEquals(count(dataStore,SnowflakeKey.from(100),"link"),1);
     }
 
 }

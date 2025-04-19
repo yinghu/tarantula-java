@@ -4,7 +4,6 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Transaction;
-import com.icodesoftware.lmdb.TransactionLog;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Batchable;
 import com.icodesoftware.service.MapStoreListener;

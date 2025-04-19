@@ -4,8 +4,7 @@ import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.icodesoftware.Transaction;
-import com.icodesoftware.lmdb.TransactionLog;
-import com.icodesoftware.util.BufferProxy;
+import com.tarantula.platform.lmdb.TransactionLog;
 import com.icodesoftware.util.RecoverableObject;
 import com.tarantula.platform.event.PortableEventRegistry;
 

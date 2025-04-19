@@ -33,6 +33,12 @@ public class TestSetup {
         testMapStoreListener = new TestMapStoreListener(lmdbDataStoreProvider);
         lmdbDataStoreProvider.registerMapStoreListener(Distributable.DATA_SCOPE,testMapStoreListener);
         lmdbDataStoreProvider.registerMapStoreListener(Distributable.INTEGRATION_SCOPE,testMapStoreListener);
+        Runtime.getRuntime().addShutdownHook(new Thread(()->{
+            try{
+                lmdbDataStoreProvider.shutdown();
+            }catch (Exception ex){
+            }
+        }));
     }
 
 }

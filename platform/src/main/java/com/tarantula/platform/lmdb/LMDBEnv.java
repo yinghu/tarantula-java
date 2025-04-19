@@ -1,4 +1,4 @@
-package com.icodesoftware.lmdb;
+package com.tarantula.platform.lmdb;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.TarantulaLogger;
@@ -44,7 +44,7 @@ public class LMDBEnv implements Serviceable {
         return txn==null? new CachedLMDBDataStore(name,dbi,this) : new LMDBDataStore(name,dbi,txn,transactionId,this);
     }
 
-    public LocalEdgeDataStore localEdgeDataStore(String source,String label,Txn<ByteBuffer> txn){
+    public LocalEdgeDataStore localEdgeDataStore(String source, String label, Txn<ByteBuffer> txn){
         if(!envSetting.enabled) throw new RuntimeException("lmdb ["+envSetting.name+"] disabled");
         String edgeName = source+"#"+label;
         Dbi<ByteBuffer> dbi = txn==null? env.openDbi(edgeName,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT) : env.openDbi(txn,edgeName.getBytes(),null,false,DbiFlags.MDB_CREATE,DbiFlags.MDB_DUPSORT);

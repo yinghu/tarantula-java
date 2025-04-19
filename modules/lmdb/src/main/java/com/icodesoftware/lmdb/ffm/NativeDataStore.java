@@ -228,7 +228,9 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     }
 
     public <T extends Recoverable> boolean createEdge(T t,String label){
-        NativeDbi edge = env.createDbi(name,label,parentTxn);
+        t.label(label);
+        NativeDbi edge = edgeDbi(t);
+        if(edge==null) return false;
         try(Arena arena = Arena.ofConfined(); NativeTxn txn = env.write(arena,parentTxn==null?MemorySegment.NULL:parentTxn.pointer())){
             long txnId = txn.transactionId();
             NativeData.InVal key = NativeData.in(arena,EnvSetting.KEY_SIZE);

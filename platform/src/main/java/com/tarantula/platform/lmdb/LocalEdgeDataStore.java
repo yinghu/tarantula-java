@@ -1,4 +1,4 @@
-package com.icodesoftware.lmdb;
+package com.tarantula.platform.lmdb;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.service.Metadata;
@@ -15,7 +15,7 @@ public class LocalEdgeDataStore {
     public LocalEdgeDataStore(final Metadata metadata,final Dbi<ByteBuffer> dbi){
         this(metadata,dbi,null);
     }
-    public LocalEdgeDataStore(final Metadata metadata,final Dbi<ByteBuffer> dbi,LMDBEnv env){
+    public LocalEdgeDataStore(final Metadata metadata, final Dbi<ByteBuffer> dbi, LMDBEnv env){
         this.metadata = metadata;
         this.dbi = dbi;
         this.env = env;
@@ -48,9 +48,9 @@ public class LocalEdgeDataStore {
         try(Cursor<ByteBuffer> cursor = dbi.openCursor(txn)){
             if(!cursor.get(key, GetOp.MDB_SET)) return;
             if(!cursor.seek(SeekOp.MDB_FIRST_DUP)) return;
-            if(!stream.on(com.icodesoftware.util.BufferProxy.buffer(cursor.val()),null)) return;
+            if(!stream.on(BufferProxy.buffer(cursor.val()),null)) return;
             while (cursor.seek(SeekOp.MDB_NEXT_DUP)){
-                if(!stream.on(com.icodesoftware.util.BufferProxy.buffer(cursor.val()),null)) break;
+                if(!stream.on(BufferProxy.buffer(cursor.val()),null)) break;
             }
         }
     }
@@ -90,7 +90,7 @@ public class LocalEdgeDataStore {
         try(final Txn<ByteBuffer> txn = env.txnRead(); final Cursor<ByteBuffer> cursor = dbi.openCursor(txn)){
             if(!cursor.get(key, GetOp.MDB_SET)) return;
             if(!cursor.seek(SeekOp.MDB_FIRST_DUP)) return;
-            if(!stream.on(com.icodesoftware.util.BufferProxy.buffer(cursor.val()),null)) return;
+            if(!stream.on(BufferProxy.buffer(cursor.val()),null)) return;
             while (cursor.seek(SeekOp.MDB_NEXT_DUP)){
                 if(!stream.on(BufferProxy.buffer(cursor.val()),null)) break;
             }

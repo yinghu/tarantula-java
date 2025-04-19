@@ -2,7 +2,7 @@ package com.tarantula.test;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.lmdb.TransactionLogManager;
+import com.tarantula.platform.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
 
 public class TestMapStoreListener implements MapStoreListener {

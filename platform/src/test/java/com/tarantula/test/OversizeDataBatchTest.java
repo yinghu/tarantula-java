@@ -1,7 +1,7 @@
 package com.tarantula.test;
 
 import com.google.gson.JsonObject;
-import com.icodesoftware.lmdb.EnvSetting;
+import com.tarantula.platform.lmdb.EnvSetting;
 import com.icodesoftware.util.JsonUtil;
 import com.tarantula.platform.presence.saves.BatchedMappingObject;
 import com.tarantula.platform.presence.saves.OversizeDataBatch;

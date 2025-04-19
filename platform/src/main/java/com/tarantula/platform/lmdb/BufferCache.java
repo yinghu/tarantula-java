@@ -1,4 +1,4 @@
-package com.icodesoftware.lmdb;
+package com.tarantula.platform.lmdb;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.util.BufferProxy;
@@ -12,7 +12,7 @@ public class BufferCache implements Recoverable.DataBufferPair {
 
     private final ArrayBlockingQueue<BufferCache> bufferQueue;
 
-    public BufferCache(final int keySize,final int valueSize,ArrayBlockingQueue<BufferCache> bufferQueue){
+    public BufferCache(final int keySize, final int valueSize, ArrayBlockingQueue<BufferCache> bufferQueue){
         this.key = BufferProxy.buffer(keySize,true);
         this.value = BufferProxy.buffer(valueSize,true);
         this.bufferQueue = bufferQueue;

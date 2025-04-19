@@ -1,12 +1,14 @@
-package com.icodesoftware.lmdb;
+package com.tarantula.platform.lmdb;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.*;
 import com.icodesoftware.logging.JDKLogger;
-import com.icodesoftware.service.*;
-
+import com.icodesoftware.service.MapStoreListener;
+import com.icodesoftware.service.Metadata;
+import com.icodesoftware.service.MetricsListener;
+import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.JsonUtil;
-import org.lmdbjava.*;
+import org.lmdbjava.Txn;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,12 +22,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class LMDBDataStoreProvider implements LocalLMDBProvider{
+public class LMDBDataStoreProvider implements LocalLMDBProvider {
 
     private TarantulaLogger logger = JDKLogger.getLogger(LMDBDataStoreProvider.class);
 
@@ -53,7 +54,7 @@ public class LMDBDataStoreProvider implements LocalLMDBProvider{
     boolean envNoSyncFlag = EnvSetting.ENV_NO_SYNC_Flag;
     boolean storeReindexing;
     private final ConcurrentHashMap<String,DataStore> storeMap = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String,LocalEdgeDataStore> edgMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, LocalEdgeDataStore> edgMap = new ConcurrentHashMap<>();
 
     final ArrayBlockingQueue<BufferCache> pendingQueue = new ArrayBlockingQueue<>(PENDING_BUFFER_SIZE);;
 
@@ -68,26 +69,26 @@ public class LMDBDataStoreProvider implements LocalLMDBProvider{
 
     @Override
     public void configure(Map<String, Object> properties) {
-        this.name = (String)properties.getOrDefault(EnvSetting.ENV_CONFIG_NAME,EnvSetting.ENV_PROVIDER_NAME);
+        this.name = (String)properties.getOrDefault(EnvSetting.ENV_CONFIG_NAME, EnvSetting.ENV_PROVIDER_NAME);
         this.storeSize = EnvSetting.toBytesFromMb((int)properties.getOrDefault(EnvSetting.ENV_CONFIG_STORE_SIZE_MB,1));
-        this.envNoSyncFlag = (boolean)properties.getOrDefault(EnvSetting.ENV_CONFIG_NO_SYNC_FLAG,EnvSetting.ENV_NO_SYNC_Flag);
+        this.envNoSyncFlag = (boolean)properties.getOrDefault(EnvSetting.ENV_CONFIG_NO_SYNC_FLAG, EnvSetting.ENV_NO_SYNC_Flag);
         this.storeReindexing = (boolean)properties.getOrDefault(EnvSetting.ENV_CONFIG_STORE_REINDEXING,false);
         boolean externalKeyValueBufferUsed = (boolean)properties.getOrDefault(EnvSetting.ENV_CONFIG_EXTERNAL_KEY_VALUE_BUFFER_USED,false);
         if(externalKeyValueBufferUsed){
             logger.warn("External key size, value size and pending buffer size used");
-            int keySizeUsed = (int)properties.getOrDefault(EnvSetting.ENV_CONFIG_STORE_KEY_SIZE,EnvSetting.KEY_SIZE);
-            int valueSizeUsed = (int)properties.getOrDefault(EnvSetting.ENV_CONFIG_STORE_VALUE_SIZE,EnvSetting.VALUE_SIZE);
-            int bufferSizeUsed = (int)properties.getOrDefault(EnvSetting.ENV_CONFIG_STORE_PENDING_BUFFER_SIZE,EnvSetting.MAX_PENDING_BUFFER_NUMBER);
+            int keySizeUsed = (int)properties.getOrDefault(EnvSetting.ENV_CONFIG_STORE_KEY_SIZE, EnvSetting.KEY_SIZE);
+            int valueSizeUsed = (int)properties.getOrDefault(EnvSetting.ENV_CONFIG_STORE_VALUE_SIZE, EnvSetting.VALUE_SIZE);
+            int bufferSizeUsed = (int)properties.getOrDefault(EnvSetting.ENV_CONFIG_STORE_PENDING_BUFFER_SIZE, EnvSetting.MAX_PENDING_BUFFER_NUMBER);
             if(keySizeUsed>0 && keySizeUsed <= EnvSetting.MAX_LMDB_KEY_SIZE) KEY_SIZE = keySizeUsed;
             if(valueSizeUsed>0 && valueSizeUsed <= 2032 ) VALUE_SIZE = valueSizeUsed;
             if(bufferSizeUsed > EnvSetting.MAX_PENDING_BUFFER_NUMBER) PENDING_BUFFER_SIZE = bufferSizeUsed;
         }
-        dataEnv.envSetting = (EnvSetting) properties.getOrDefault(EnvSetting.data,EnvSetting.DataSetting);
-        integrationEnv.envSetting = (EnvSetting) properties.getOrDefault(EnvSetting.integration,EnvSetting.IntegrationSetting);
-        indexEnv.envSetting = (EnvSetting) properties.getOrDefault(EnvSetting.index,EnvSetting.IndexSetting);
-        logEnv.envSetting = (EnvSetting) properties.getOrDefault(EnvSetting.log,EnvSetting.LogSetting);
-        localEnv.envSetting = (EnvSetting) properties.getOrDefault(EnvSetting.local,EnvSetting.LocalSetting);
-        this.baseDir = (String)properties.getOrDefault(EnvSetting.ENV_CONFIG_BASE_DIR,EnvSetting.ENV_BASE_DIR);
+        dataEnv.envSetting = (EnvSetting) properties.getOrDefault(EnvSetting.data, EnvSetting.DataSetting);
+        integrationEnv.envSetting = (EnvSetting) properties.getOrDefault(EnvSetting.integration, EnvSetting.IntegrationSetting);
+        indexEnv.envSetting = (EnvSetting) properties.getOrDefault(EnvSetting.index, EnvSetting.IndexSetting);
+        logEnv.envSetting = (EnvSetting) properties.getOrDefault(EnvSetting.log, EnvSetting.LogSetting);
+        localEnv.envSetting = (EnvSetting) properties.getOrDefault(EnvSetting.local, EnvSetting.LocalSetting);
+        this.baseDir = (String)properties.getOrDefault(EnvSetting.ENV_CONFIG_BASE_DIR, EnvSetting.ENV_BASE_DIR);
         this.migration = new LocalDataMigration((JsonObject)properties.get(EnvSetting.ENV_CONFIG_MIGRATION));
     }
 

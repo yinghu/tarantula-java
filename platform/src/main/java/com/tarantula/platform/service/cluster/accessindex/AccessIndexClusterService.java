@@ -7,8 +7,8 @@ import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
 import com.icodesoftware.*;
 
-import com.icodesoftware.lmdb.LocalMetadata;
-import com.icodesoftware.lmdb.TransactionLogManager;
+import com.tarantula.platform.lmdb.LocalMetadata;
+import com.tarantula.platform.lmdb.TransactionLogManager;
 import com.icodesoftware.service.*;
 import com.icodesoftware.logging.JDKLogger;
 

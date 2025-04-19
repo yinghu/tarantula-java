@@ -2,7 +2,6 @@ package com.icodesoftware.lmdb.test;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Recoverable;
-import com.icodesoftware.lmdb.LMDBDataStoreProvider;
 import com.icodesoftware.lmdb.TransactionLogManager;
 import com.icodesoftware.service.DataStoreProvider;
 import com.icodesoftware.service.MapStoreListener;

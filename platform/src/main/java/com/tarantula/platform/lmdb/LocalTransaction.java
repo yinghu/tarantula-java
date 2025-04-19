@@ -1,8 +1,9 @@
-package com.icodesoftware.lmdb;
+package com.tarantula.platform.lmdb;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.Transaction;
 import org.lmdbjava.Txn;
+
 import java.nio.ByteBuffer;
 
 public class LocalTransaction implements Transaction, Transaction.DataStoreContext, Transaction.Listener {
@@ -15,7 +16,7 @@ public class LocalTransaction implements Transaction, Transaction.DataStoreConte
     private DataStoreContext dataStoreContext;
     private Listener listener;
 
-    public LocalTransaction(int scope,LMDBDataStoreProvider dataStoreProvider){
+    public LocalTransaction(int scope, LMDBDataStoreProvider dataStoreProvider){
         this.scope = scope;
         this.dataStoreProvider = dataStoreProvider;
         this.dataStoreContext = this;

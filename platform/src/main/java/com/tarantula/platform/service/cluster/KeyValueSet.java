@@ -3,8 +3,8 @@ package com.tarantula.platform.service.cluster;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.icodesoftware.lmdb.EdgeValueSet;
 import com.tarantula.platform.event.PortableEventRegistry;
+import com.tarantula.platform.lmdb.EdgeValueSet;
 
 import java.io.IOException;
 

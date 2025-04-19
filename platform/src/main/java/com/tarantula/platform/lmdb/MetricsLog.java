@@ -1,4 +1,4 @@
-package com.icodesoftware.lmdb;
+package com.tarantula.platform.lmdb;
 
 import com.icodesoftware.Statistics;
 import com.icodesoftware.protocol.statistics.StatisticsEntry;

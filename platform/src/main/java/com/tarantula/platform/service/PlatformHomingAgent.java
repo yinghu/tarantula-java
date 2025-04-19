@@ -3,13 +3,13 @@ package com.tarantula.platform.service;
 import com.icodesoftware.Session;
 import com.icodesoftware.Statistics;
 import com.icodesoftware.TarantulaLogger;
-import com.icodesoftware.lmdb.MetricsLog;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.Content;
 import com.icodesoftware.service.ServiceContext;
 import com.icodesoftware.util.HttpCaller;
 import com.icodesoftware.util.ScheduleRunner;
 import com.icodesoftware.util.TarantulaAgent;
+import com.tarantula.platform.lmdb.MetricsLog;
 import com.tarantula.platform.service.deployment.ContentMapping;
 
 import java.net.URI;

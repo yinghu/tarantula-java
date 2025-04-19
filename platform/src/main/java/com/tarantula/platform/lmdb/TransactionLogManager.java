@@ -1,6 +1,9 @@
-package com.icodesoftware.lmdb;
+package com.tarantula.platform.lmdb;
 
-import com.icodesoftware.*;
+import com.icodesoftware.DataStore;
+import com.icodesoftware.Distributable;
+import com.icodesoftware.Recoverable;
+import com.icodesoftware.Transaction;
 import com.icodesoftware.service.Batchable;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.Metadata;
@@ -156,7 +159,18 @@ public class TransactionLogManager implements Transaction.LogManager{
         dataStore.backup().forEachEdgeKeyValue(DataBufferKey.from(key),metadata.label(),(e,v)->stream.on(BufferProxy.copy(e.src()),BufferProxy.copy(v.src())));
         stream.on(null,null);
     }
-    
+
+    public List<Batchable.BatchData> loadEdgeValueFromCommitted(Metadata metadata, byte[] key){
+        DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
+        List<Batchable.BatchData> edgeValueSet = new ArrayList<>();
+        if(metadata.label()==null) return edgeValueSet;
+        dataStore.backup().forEachEdgeKeyValue(BinaryKey.from(key),metadata.label(),(e,v)->{
+            edgeValueSet.add(new EdgeValueSet(e.array(),v.array()));
+            return true;
+        });
+        return edgeValueSet;
+    }
+
     public boolean onRecovering(Metadata metadata,Recoverable.Key key,DataStore.BufferStream bufferStream){
         DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
         if(metadata.label()==null){

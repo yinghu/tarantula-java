@@ -4,7 +4,7 @@ import com.icodesoftware.DataStore;
 import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Transaction;
-import com.icodesoftware.lmdb.LocalMetadata;
+import com.tarantula.platform.lmdb.LocalMetadata;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.util.SnowflakeKey;

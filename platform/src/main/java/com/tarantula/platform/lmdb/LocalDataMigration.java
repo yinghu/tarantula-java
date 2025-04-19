@@ -1,4 +1,4 @@
-package com.icodesoftware.lmdb;
+package com.tarantula.platform.lmdb;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

@@ -2,7 +2,7 @@ package com.tarantula.platform.service.persistence;
 
 import com.icodesoftware.DataStore;
 import com.icodesoftware.TarantulaLogger;
-import com.icodesoftware.lmdb.TransactionLogManager;
+import com.tarantula.platform.lmdb.TransactionLogManager;
 import com.icodesoftware.logging.JDKLogger;
 import com.icodesoftware.service.DataStoreProvider;
 

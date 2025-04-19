@@ -1,6 +1,6 @@
 package com.tarantula.test;
 
-import com.icodesoftware.lmdb.TransactionLogManager;
+import com.tarantula.platform.lmdb.TransactionLogManager;
 import com.icodesoftware.service.DataStoreProvider;
 import com.icodesoftware.service.ServiceContext;
 import org.testng.annotations.AfterTest;
