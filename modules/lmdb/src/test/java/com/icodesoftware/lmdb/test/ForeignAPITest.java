@@ -11,11 +11,13 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 
+import java.io.InputStream;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.VarHandle;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -529,6 +531,8 @@ public class ForeignAPITest extends TestSetup{
 
     public static void main(String[] arg) throws Exception{
         try{
+            //URL url = Thread.currentThread().getContextClassLoader().getResource(NativeUtil.libName());
+            //System.out.println(url.getFile();
             NativeDataStoreProvider nativeDataStoreProvider = new NativeDataStoreProvider();
             TestMapStoreListener mapStoreListener = new TestMapStoreListener(nativeDataStoreProvider);
             mapStoreListener.verifier = (tid)->{

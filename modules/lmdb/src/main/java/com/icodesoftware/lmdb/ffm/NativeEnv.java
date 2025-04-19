@@ -44,7 +44,7 @@ public class NativeEnv extends NativeStat implements Serviceable {
     @Override
     public void start() throws Exception {
         FileUtil.createDirectory(envSetting.storePath);
-        lib = SymbolLookup.libraryLookup(NativeUtil.libName(),arena);
+        lib = SymbolLookup.libraryLookup(envSetting.lib(),arena);
         linker = Linker.nativeLinker();
         mdbEnvCreate();
         mdbEnvSetMapSize();

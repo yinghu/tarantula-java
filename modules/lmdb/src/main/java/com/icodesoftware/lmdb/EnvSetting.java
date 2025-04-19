@@ -2,6 +2,10 @@ package com.icodesoftware.lmdb;
 
 import com.google.gson.JsonObject;
 import com.icodesoftware.Distributable;
+import com.icodesoftware.lmdb.ffm.NativeUtil;
+
+import java.net.URL;
+import java.nio.file.Path;
 
 public class EnvSetting {
 
@@ -65,6 +69,15 @@ public class EnvSetting {
         if(name.equals(log)) return Distributable.LOG_SCOPE;
         if(name.equals(local)) return Distributable.LOCAL_SCOPE;
         throw new UnsupportedOperationException("named LMDB env ["+name+"] not supported");
+    }
+
+    public Path lib(){
+        try{
+            URL url = Thread.currentThread().getContextClassLoader().getResource(NativeUtil.libName());
+            return Path.of(url.toURI());
+        }catch (Exception ex){
+            throw new RuntimeException("No native lib found");
+        }
     }
 
     public static EnvSetting disable(int scope){

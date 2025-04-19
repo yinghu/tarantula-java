@@ -18,13 +18,13 @@ public class NativeUtil {
     public static String libName(){
         String arch = OSUtil.arch();
         if(OSUtil.windows()){
-            return "/home/yinghu/"+arch+"-windows-gnu.dll";
+            return arch+"-windows-gnu.dll";
         }
         if(OSUtil.linux()){
-            return "/home/yinghu/"+arch+"-linux-gnu.so";
+            return arch+"-linux-gnu.so";
         }
         if(OSUtil.macOS()){
-            return "/home/yinghu/"+arch+"-macos-none.so";
+            return arch+"-macos-none.so";
         }
         throw new UnsupportedOperationException("Native lib not supported");
     }
