@@ -42,8 +42,6 @@ public class BufferTest {
         tk.writeLong(fk.readLong());
         tk.flip();
         Assert.assertEquals(tk.readLong(),10L);
-        //SnowflakeKey key = SnowflakeKey.from(10);
-        //System.out.println(ByteOrder.nativeOrder());
         Assert.assertEquals(ByteBuffer.allocate(10).order(),ByteOrder.BIG_ENDIAN);
     }
 
