@@ -56,7 +56,7 @@ public class NativeEnv extends NativeStat implements Serviceable {
         pageSize.set(stat.pageSize());
         NativeData.Info info = NativeData.info(arena);
         mdbEnvInfo(info.pointer());
-        logger.warn("Native Env Opened ["+pageSize.get()+"]["+info.lastTxnId()+"]["+info.maxReaders()+"]");
+        logger.warn("Native Env Opened ["+pageSize.get()+"]["+info.lastTxnId()+"]["+info.maxReaders()+"]["+envSetting.storePath+"]");
     }
 
     @Override
