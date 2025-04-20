@@ -7,6 +7,9 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 public class BufferTest {
 
     @BeforeClass
@@ -29,7 +32,19 @@ public class BufferTest {
         Assert.assertEquals(nk.readUTF8(),"tester");
         Recoverable.DataBuffer ik = BufferProxy.buffer(100, IntegerKey.from(90));
         Assert.assertEquals(ik.readInt(),90);
+    }
 
+    @Test(groups = { "buffer" })
+    public void bufferEndianTest() {
+        Recoverable.DataBuffer fk = BufferProxy.buffer(10, SnowflakeKey.from(10));
+        Recoverable.DataBuffer tk = BufferProxy.buffer(10,false);
+        tk.src().order(ByteOrder.BIG_ENDIAN);
+        tk.writeLong(fk.readLong());
+        tk.flip();
+        Assert.assertEquals(tk.readLong(),10L);
+        //SnowflakeKey key = SnowflakeKey.from(10);
+        //System.out.println(ByteOrder.nativeOrder());
+        Assert.assertEquals(ByteBuffer.allocate(10).order(),ByteOrder.BIG_ENDIAN);
     }
 
     @Test(groups = { "buffer" })
