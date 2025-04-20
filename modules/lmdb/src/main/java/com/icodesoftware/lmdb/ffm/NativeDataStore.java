@@ -303,7 +303,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
             cursor.read().forEach(query.key(),(k,v)->{
                 NativeData.OutVal out = NativeData.out(cursor.arena());
                 NativeData.InVal pv = NativeData.in(cursor.arena(),EnvSetting.KEY_SIZE);
-                pv.write(buffer -> v.read(buffer));
+                Recoverable.DataBuffer pk = pv.write(buffer -> v.read(buffer));
                 boolean[] streaming ={true};
                 if(dbi.get(pv.pointer(),out.pointer(),cursor.txn())){
                     out.read(cursor.arena(),buffer -> {
@@ -311,6 +311,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
                         T t = query.create();
                         t.read(buffer);
                         t.revision(h.revision());
+                        t.readKey(pk);
                         streaming[0] = stream.on(t);
                     });
                 }
