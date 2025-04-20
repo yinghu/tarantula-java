@@ -109,16 +109,6 @@ public class TransactionLogManager implements Transaction.LogManager{
         });
     }
 
-    public byte[] loadFromCommitted(Metadata metadata,byte[] key){
-        DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());
-        if(metadata.label()!=null) return null;
-        byte[][] loaded = new byte[1][];
-        if(dataStore.backup().get(BinaryKey.from(key),(k,v)->{
-            loaded[0] = v.array();
-            return true;
-        })) return loaded[0];
-        return null;
-    }
 
     public Recoverable.DataBuffer get(Metadata metadata, Recoverable.DataBuffer key){
         DataStore dataStore = serviceContext.dataStore(Distributable.INDEX_SCOPE,indexPrefix(metadata.scope())+metadata.source());

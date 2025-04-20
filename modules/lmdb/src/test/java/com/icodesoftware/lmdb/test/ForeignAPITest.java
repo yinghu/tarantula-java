@@ -537,11 +537,11 @@ public class ForeignAPITest extends TestSetup{
             TestMapStoreListener mapStoreListener = new TestMapStoreListener(nativeDataStoreProvider);
             mapStoreListener.verifier = (tid)->{
                 List<Transaction.Log> logs = mapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
-                System.out.println("TID : "+tid+" : " +logs.size());
+                //System.out.println("TID : "+tid+" : " +logs.size());
                 mapStoreListener.transactionLogManager.onTransaction(logs);
             };
             mapStoreListener.transactionLogManager.registerLogListener(log->{
-                System.out.println("DELETED : "+log.deleting()+" : "+log.source()+" : "+log.edgeLabel());
+                System.out.println("DELETED : "+log.deleting()+" : "+log.source()+" : "+log.edgeLabel()+" : "+log.revisionNumber());
                 //mapStoreListener.transactionLogManager.get()
                 if(!log.deleting() && log.edgeLabel()==null){
                     //nativeDataStoreProvider.onRecovering()
@@ -557,7 +557,7 @@ public class ForeignAPITest extends TestSetup{
             config.put(EnvSetting.local,EnvSetting.setting(Distributable.LOCAL_SCOPE,baseDir,10));
             nativeDataStoreProvider.configure(config);
             nativeDataStoreProvider.start();
-            DataStore nativeDataStore = nativeDataStoreProvider.createDataStore("access");
+            //DataStore nativeDataStore = nativeDataStoreProvider.createDataStore("access");
             //DataStore index = nativeDataStoreProvider.createKeyIndexDataStore("index_d_access");
             //createIfAbsent(nativeDataStore,index);
             //create(nativeDataStore,index);
@@ -569,22 +569,22 @@ public class ForeignAPITest extends TestSetup{
             TestObject tob = new TestObject("type","name");
             try(Transaction transaction = nativeDataStoreProvider.transaction(Distributable.DATA_SCOPE)){
                 transaction.execute(ctx->{
-                    DataStore dataStore = ctx.onDataStore("test");
+                    DataStore dataStore = ctx.onDataStore("test_me");
                     return dataStore.create(tob);
                 });
             }
-            System.out.println(tob.distributionId());
+            //System.out.println(tob.distributionId());
             //TestObject tox = new TestObject();
             //tox.distributionId(tob.distributionId());
             //DataStore dataStore = nativeDataStoreProvider.createDataStore("test");
             //System.out.println(dataStore.load(tox));
             //System.out.println(tox.name+" : "+tox.type);
-            try(Transaction transaction = nativeDataStoreProvider.transaction(Distributable.DATA_SCOPE)){
-                transaction.execute(ctx->{
-                    DataStore dataStore = ctx.onDataStore("test");
-                    return dataStore.delete(tob);
-                });
-            }
+            //try(Transaction transaction = nativeDataStoreProvider.transaction(Distributable.DATA_SCOPE)){
+                //transaction.execute(ctx->{
+                    //DataStore dataStore = ctx.onDataStore("test");
+                    //return dataStore.delete(tob);
+                //});
+           // }
             nativeDataStoreProvider.shutdown();
         }catch (Exception ex){
             ex.printStackTrace();

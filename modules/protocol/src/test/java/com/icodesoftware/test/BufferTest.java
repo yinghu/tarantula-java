@@ -2,8 +2,7 @@ package com.icodesoftware.test;
 
 import com.icodesoftware.Recoverable;
 import com.icodesoftware.Tournament;
-import com.icodesoftware.util.BufferProxy;
-import com.icodesoftware.util.DataBufferOutputStream;
+import com.icodesoftware.util.*;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -20,6 +19,17 @@ public class BufferTest {
         Assert.assertFalse(buffer.full());
         buffer.writeInt(19);
         Assert.assertTrue(buffer.full());
+    }
+
+    @Test(groups = { "buffer" })
+    public void keyToBufferTest() {
+        Recoverable.DataBuffer fk = BufferProxy.buffer(10, SnowflakeKey.from(10));
+        Assert.assertEquals(fk.readLong(),10L);
+        Recoverable.DataBuffer nk = BufferProxy.buffer(100, NaturalKey.from("tester"));
+        Assert.assertEquals(nk.readUTF8(),"tester");
+        Recoverable.DataBuffer ik = BufferProxy.buffer(100, IntegerKey.from(90));
+        Assert.assertEquals(ik.readInt(),90);
+
     }
 
     @Test(groups = { "buffer" })

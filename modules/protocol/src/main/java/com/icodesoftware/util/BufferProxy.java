@@ -10,15 +10,17 @@ public class BufferProxy implements Recoverable.DataBuffer {
 
     private final ByteBuffer buffer;
     private final MemorySegment pointer;
+
     private BufferProxy(ByteBuffer buffer){
         this.buffer = buffer;
         this.pointer = null;
-        if(buffer.order()!=ByteOrder.nativeOrder()) this.buffer.order(ByteOrder.nativeOrder());
+        this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     }
 
     private BufferProxy(MemorySegment pointer){
         this.pointer = pointer;
         this.buffer = this.pointer.asByteBuffer();
+        this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     }
 
     public Recoverable.DataBuffer writeHeader(Recoverable.DataHeader dataHeader){
@@ -168,7 +170,7 @@ public class BufferProxy implements Recoverable.DataBuffer {
 
     public static Recoverable.DataBuffer buffer(int size,Recoverable.Key key){
         Recoverable.DataBuffer kBuffer = BufferProxy.buffer(size,false);
-        //kBuffer.write(key);
+        key.write(kBuffer);
         kBuffer.flip();
         return  kBuffer;
     }

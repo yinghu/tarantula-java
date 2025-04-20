@@ -74,7 +74,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
             }
             key.rewind();
             nativeDataStoreProvider.onUpdating(dbi.metadata(), BufferProxy.copy(key.src()),BufferProxy.copy(value.src()), txnId);
-            nativeDataStoreProvider.onCommit(dbi.metadata().scope(),txnId);
+            if(parentTxn==null) nativeDataStoreProvider.onCommit(dbi.metadata().scope(),txnId);
             txn.commit();
             return true;
         }
@@ -130,10 +130,10 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
                 }
                 nativeDataStoreProvider.onUpdating(edge.metadata(),BufferProxy.copy(bkey.src()),BufferProxy.copy(bEdge.src()),txnId);
             }
-            nativeDataStoreProvider.onUpdating(dbi.metadata(), BufferProxy.copy(kBuffer.src()),BufferProxy.copy(vBuffer.src()), txnId);
-            nativeDataStoreProvider.onCommit(dbi.metadata().scope(),txnId);
-            txn.commit();
             t.revision(1L);
+            nativeDataStoreProvider.onUpdating(dbi.metadata(), BufferProxy.copy(kBuffer.src()),BufferProxy.copy(vBuffer.src()), txnId);
+            if(parentTxn==null) nativeDataStoreProvider.onCommit(dbi.metadata().scope(),txnId);
+            txn.commit();
             return true;
         }catch (Exception ex){
             throw new RuntimeException(ex);
@@ -196,7 +196,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
             }
             t.revision(t.revision()+1);
             nativeDataStoreProvider.onUpdating(dbi.metadata(), BufferProxy.copy(kBuffer.src()),BufferProxy.copy(vBuffer.src()), txnId);
-            nativeDataStoreProvider.onCommit(dbi.metadata().scope(),txnId);
+            if(parentTxn==null) nativeDataStoreProvider.onCommit(dbi.metadata().scope(),txnId);
             txn.commit();
             return true;
         }catch (Exception ex){
@@ -220,7 +220,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
                 return false;
             }
             nativeDataStoreProvider.onDeleting(dbi.metadata(), BufferProxy.copy(kBuffer.src()),BufferProxy.copy(kBuffer.src()),txnId);
-            nativeDataStoreProvider.onCommit(dbi.metadata().scope(),txnId);
+            if(parentTxn==null) nativeDataStoreProvider.onCommit(dbi.metadata().scope(),txnId);
             txn.commit();
             return true;
         }catch (Exception ex){
@@ -243,7 +243,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
                 return false;
             }
             nativeDataStoreProvider.onUpdating(edge.metadata(), BufferProxy.copy(kBuffer.src()),BufferProxy.copy(vBuffer.src()), txnId);
-            nativeDataStoreProvider.onCommit(edge.metadata().scope(),txnId);
+            if(parentTxn==null) nativeDataStoreProvider.onCommit(edge.metadata().scope(),txnId);
             txn.commit();
             return true;
         }catch (Exception ex){
@@ -262,7 +262,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
                 return false;
             }
             nativeDataStoreProvider.onDeleting(edge.metadata(),kBuffer,kBuffer,txnId);
-            nativeDataStoreProvider.onCommit(edge.metadata().scope(),txnId);
+            if(parentTxn==null) nativeDataStoreProvider.onCommit(edge.metadata().scope(),txnId);
             txn.commit();
             return true;
         }catch (Exception ex){
@@ -283,7 +283,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
                 return false;
             }
             nativeDataStoreProvider.onDeleting(edge.metadata(),kBuffer,vBuffer,txnId);
-            nativeDataStoreProvider.onCommit(edge.metadata().scope(),txnId);
+            if(parentTxn==null) nativeDataStoreProvider.onCommit(edge.metadata().scope(),txnId);
             txn.commit();
             return true;
         }catch (Exception ex){
