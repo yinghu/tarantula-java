@@ -4,7 +4,6 @@ import com.icodesoftware.Recoverable;
 
 import java.lang.foreign.MemorySegment;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 public class BufferProxy implements Recoverable.DataBuffer {
 
@@ -14,13 +13,11 @@ public class BufferProxy implements Recoverable.DataBuffer {
     private BufferProxy(ByteBuffer buffer){
         this.buffer = buffer;
         this.pointer = null;
-        this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     }
 
     private BufferProxy(MemorySegment pointer){
         this.pointer = pointer;
         this.buffer = this.pointer.asByteBuffer();
-        this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     }
 
     public Recoverable.DataBuffer writeHeader(Recoverable.DataHeader dataHeader){

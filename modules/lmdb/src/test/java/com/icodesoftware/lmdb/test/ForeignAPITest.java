@@ -5,20 +5,18 @@ import com.icodesoftware.lmdb.EnvSetting;
 import com.icodesoftware.lmdb.ffm.*;
 import com.icodesoftware.util.BufferProxy;
 
-import com.icodesoftware.util.DataBufferKey;
 import com.icodesoftware.util.SnowflakeKey;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-
-import java.io.InputStream;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.VarHandle;
-import java.net.URL;
+
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -136,10 +134,16 @@ public class ForeignAPITest extends TestSetup{
             MemorySegment memorySegment = arena.allocate(200);
             Recoverable.DataBuffer buffer = BufferProxy.buffer(memorySegment.asByteBuffer());
             buffer.writeInt(100).writeInt(200).flip();
-            int x0 = memorySegment.get(ValueLayout.JAVA_INT,0);
-            int x1 = memorySegment.get(ValueLayout.JAVA_INT,4);
+            int x0 = memorySegment.get(ValueLayout.JAVA_INT.withOrder(ByteOrder.BIG_ENDIAN),0);
+            int x1 = memorySegment.get(ValueLayout.JAVA_INT.withOrder(ByteOrder.BIG_ENDIAN),4);
             Assert.assertEquals(x0,100);
             Assert.assertEquals(x1,200);
+            Assert.assertEquals(buffer.src().order(),ByteOrder.BIG_ENDIAN);
+            ByteBuffer byteBuffer = memorySegment.asByteBuffer();
+            int y0 = byteBuffer.getInt();
+            int y1 = byteBuffer.getInt();
+            Assert.assertEquals(y0,100);
+            Assert.assertEquals(y1,200);
         }
     }
 
