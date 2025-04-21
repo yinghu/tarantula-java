@@ -34,8 +34,6 @@ public class CreateTest extends LMDBHook{
         Assert.assertEquals(count(index),1);
         Assert.assertEquals(count(index,SnowflakeKey.from(100),"link"),1);
 
-
-
         testMapStoreListener.transactionLogManager.onRecovering(LocalMetadata.metadata(Distributable.DATA_SCOPE, dataStore.name(),null),testObject.key(),(k,v)->{
             TestObject tox = new TestObject();
             Recoverable.DataHeader h = v.readHeader();

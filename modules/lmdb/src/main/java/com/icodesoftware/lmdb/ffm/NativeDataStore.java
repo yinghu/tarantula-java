@@ -113,7 +113,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
             }
             NativeData.InVal value = NativeData.in(arena,EnvSetting.VALUE_SIZE);
             Recoverable.DataBuffer vBuffer = value.write(buffer ->{
-                buffer.writeHeader(LocalHeader.create(t.getFactoryId(),t.getClassId(),1l));
+                buffer.writeHeader(LocalHeader.create(t.getFactoryId(),t.getClassId(),EnvSetting.REVISION_START));
                 t.write(buffer);
             });
             if(!dbi.put(key.pointer(),value.pointer(),txn)){
@@ -131,7 +131,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
                 }
                 nativeDataStoreProvider.onUpdating(edge.metadata(),BufferProxy.copy(bkey.src()),BufferProxy.copy(bEdge.src()),txnId);
             }
-            t.revision(1L);
+            t.revision(EnvSetting.REVISION_START);
             nativeDataStoreProvider.onUpdating(dbi.metadata(), BufferProxy.copy(kBuffer.src()),BufferProxy.copy(vBuffer.src()), txnId);
             if(parentTxn==null) nativeDataStoreProvider.onCommit(dbi.metadata().scope(),txnId);
             txn.commit();
@@ -496,7 +496,6 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
                 return true;
             });
             if(eh[0]==null || h.revision() > eh[0].revision()){
-
                 v.rewind();
                 set((rk,rv)->{
                     t.writeKey(rk);
