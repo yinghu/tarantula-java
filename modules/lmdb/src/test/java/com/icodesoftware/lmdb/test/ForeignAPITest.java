@@ -539,8 +539,8 @@ public class ForeignAPITest extends TestSetup{
             //System.out.println(url.getFile();
             NativeDataStoreProvider nativeDataStoreProvider = new NativeDataStoreProvider();
             TestMapStoreListener mapStoreListener = new TestMapStoreListener(nativeDataStoreProvider);
-            mapStoreListener.verifier = (tid)->{
-                List<Transaction.Log> logs = mapStoreListener.transactionLogManager.committed(Distributable.DATA_SCOPE,tid);
+            mapStoreListener.verifier = (scope,tid)->{
+                List<Transaction.Log> logs = mapStoreListener.transactionLogManager.committed(scope,tid);
                 //System.out.println("TID : "+tid+" : " +logs.size());
                 mapStoreListener.transactionLogManager.onTransaction(logs);
             };

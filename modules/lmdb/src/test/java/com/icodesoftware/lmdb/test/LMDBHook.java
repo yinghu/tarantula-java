@@ -1,11 +1,15 @@
 package com.icodesoftware.lmdb.test;
 
 import com.icodesoftware.DataStore;
+import com.icodesoftware.Distributable;
 import com.icodesoftware.Recoverable;
+import com.icodesoftware.Transaction;
 import com.icodesoftware.lmdb.*;
 import com.icodesoftware.service.DataStoreProvider;
 
 import org.testng.annotations.BeforeClass;
+
+import java.util.List;
 
 
 public class LMDBHook {
@@ -21,6 +25,10 @@ public class LMDBHook {
         lmdbDataStoreProvider = TestSetup.lmdbDataStoreProvider;
         localDistributionIdGenerator = TestSetup.localDistributionIdGenerator;
         testMapStoreListener = TestSetup.testMapStoreListener;
+        testMapStoreListener.verifier = (scope,tid)->{
+            List<Transaction.Log> logs = testMapStoreListener.transactionLogManager.committed(scope,tid);
+            testMapStoreListener.transactionLogManager.onTransaction(logs);
+        };
     }
 
     int count(DataStore dataStore){

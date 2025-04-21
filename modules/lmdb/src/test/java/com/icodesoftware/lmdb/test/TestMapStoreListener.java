@@ -26,7 +26,7 @@ public class TestMapStoreListener implements MapStoreListener {
     public boolean onRecovering(Metadata metadata,Recoverable.Key key,DataStore.BufferStream bufferStream){
         return transactionLogManager.onRecovering(metadata,key,bufferStream);
     }
-    
+
     @Override
     public void onUpdating(Metadata metadata, Recoverable.DataBuffer key, Recoverable.DataBuffer value,long transactionId) {
         transactionLogManager.onUpdating(metadata,key,value,transactionId);
@@ -36,14 +36,14 @@ public class TestMapStoreListener implements MapStoreListener {
     public void onCommit(int scope,long transactionId) {
         transactionLogManager.onCommit(scope,transactionId);
         if(verifier==null) return;
-        verifier.onTransaction(transactionId);
+        verifier.onTransaction(scope,transactionId);
     }
 
     @Override
     public void onAbort(int scope,long transactionId) {
         transactionLogManager.onAbort(scope,transactionId);
         if(abort==null) return;
-        abort.onTransaction(transactionId);
+        abort.onTransaction(scope,transactionId);
     }
 
     @Override

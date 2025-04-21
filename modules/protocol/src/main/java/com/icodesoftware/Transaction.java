@@ -50,8 +50,8 @@ public interface Transaction extends AutoCloseable{
         byte[] toBinary();
         void fromBinary(byte[] payload);
 
-         boolean read(Recoverable.DataBuffer buffer);
-         boolean write(Recoverable.DataBuffer buffer);
+        boolean read(Recoverable.DataBuffer buffer);
+        boolean write(Recoverable.DataBuffer buffer);
     }
 
     interface History extends Recoverable{
@@ -61,6 +61,7 @@ public interface Transaction extends AutoCloseable{
     }
 
     interface LogManager{
+
         void setup(ServiceContext serviceContext);
 
         //callback on local transaction commit
@@ -86,13 +87,21 @@ public interface Transaction extends AutoCloseable{
 
         //callback on store load
         boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,Recoverable.DataBuffer value);
+
         boolean onRecovering(Metadata metadata,Recoverable.DataBuffer key,DataStore.BufferStream bufferStream);
+
         boolean onRecovering(Metadata metadata,Recoverable.Key key,DataStore.BufferStream bufferStream);
+
         List<History> history(int scope,ClusterProvider.Node node);
+
         void history(int scope, ClusterProvider.Node node, DataStore.Stream<History> stream);
+
         Recoverable.DataBuffer get(Metadata metadata, Recoverable.DataBuffer key);
+
         void get(Metadata metadata, Recoverable.DataBuffer key, DataStore.BufferStream stream);
+
         boolean set(Metadata metadata,Recoverable.DataBuffer key,Recoverable.DataBuffer value);
+
         boolean setEdge(Metadata metadata,Recoverable.DataBuffer key,Recoverable.DataBuffer value);
     }
 

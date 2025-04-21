@@ -1,7 +1,6 @@
 package com.icodesoftware.lmdb;
 
 import com.icodesoftware.*;
-import com.icodesoftware.service.Batchable;
 import com.icodesoftware.service.ClusterProvider;
 import com.icodesoftware.service.Metadata;
 import com.icodesoftware.service.ServiceContext;

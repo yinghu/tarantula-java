@@ -7,10 +7,8 @@ public class LocalMetadata  implements Metadata {
     private int scope;
     private String name;
     private String label;
-    public LocalMetadata(int scope,String name){
-        this.name = name;
-        this.scope = scope;
-    }
+
+
     public LocalMetadata(int scope,String name,String label){
         this.name = name;
         this.scope = scope;
@@ -48,6 +46,10 @@ public class LocalMetadata  implements Metadata {
 
     public String toString(){
         return "Name ["+name+"] Scope ["+scope+"] Label ["+label+"]";
+    }
+
+    public static Metadata metadata(int scope,String name,String label){
+        return new LocalMetadata(scope,name,label);
     }
 
 }

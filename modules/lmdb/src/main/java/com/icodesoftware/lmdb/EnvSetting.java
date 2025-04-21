@@ -14,6 +14,7 @@ import java.nio.file.Path;
 
 public class EnvSetting {
 
+    public static final long REVISION_START = 1L;
     public static final String ENV_CONFIG_NAME = "name";
     public static final String ENV_CONFIG_BASE_DIR = "dir";
     public static final String ENV_CONFIG_STORE_SIZE_MB = "storeSizeMb";

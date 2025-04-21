@@ -54,8 +54,8 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
             t.readKey(key);
             NativeData.InVal valueIn = NativeData.in(arena,EnvSetting.VALUE_SIZE);
             Recoverable.DataBuffer value = valueIn.write(buffer -> {
-                buffer.writeHeader(LocalHeader.create(t.getFactoryId(),t.getClassId(),1L));
-                if(!t.write(buffer)) throw new RuntimeException("no data");
+                buffer.writeHeader(LocalHeader.create(t.getFactoryId(),t.getClassId(),EnvSetting.REVISION_START));
+                if(!t.write(buffer)) throw new RuntimeException("no data provided");
             });
             if(!dbi.put(keyIn.pointer(),valueIn.pointer(),txn)){
                 txn.abort();
@@ -72,6 +72,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
                 }
                 nativeDataStoreProvider.onUpdating(edge.metadata(),BufferProxy.copy(bkey.src()),BufferProxy.copy(bEdge.src()),txnId);
             }
+            t.revision(EnvSetting.REVISION_START);
             key.rewind();
             nativeDataStoreProvider.onUpdating(dbi.metadata(), BufferProxy.copy(key.src()),BufferProxy.copy(value.src()), txnId);
             if(parentTxn==null) nativeDataStoreProvider.onCommit(dbi.metadata().scope(),txnId);
