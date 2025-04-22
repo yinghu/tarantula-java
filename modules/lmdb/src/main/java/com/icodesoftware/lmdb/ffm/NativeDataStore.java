@@ -6,7 +6,6 @@ import com.icodesoftware.RecoverableFactory;
 import com.icodesoftware.lmdb.EnvSetting;
 import com.icodesoftware.service.DataStoreSummary;
 import com.icodesoftware.service.Metadata;
-import com.icodesoftware.util.BufferProxy;
 import com.icodesoftware.util.DataBufferKey;
 import com.icodesoftware.util.LocalHeader;
 
@@ -70,11 +69,11 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
                     txn.abort();
                     return false;
                 }
-                nativeDataStoreProvider.onUpdating(edge.metadata(),BufferProxy.copy(bkey.src()),BufferProxy.copy(bEdge.src()),txnId);
+                nativeDataStoreProvider.onUpdating(edge.metadata(),bkey,bEdge,txnId);
             }
             t.revision(EnvSetting.REVISION_START);
             key.rewind();
-            nativeDataStoreProvider.onUpdating(dbi.metadata(), BufferProxy.copy(key.src()),BufferProxy.copy(value.src()), txnId);
+            nativeDataStoreProvider.onUpdating(dbi.metadata(),key,value, txnId);
             if(parentTxn==null) nativeDataStoreProvider.onCommit(dbi.metadata().scope(),txnId);
             txn.commit();
             return true;
@@ -129,10 +128,10 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
                     txn.abort();
                     return false;
                 }
-                nativeDataStoreProvider.onUpdating(edge.metadata(),BufferProxy.copy(bkey.src()),BufferProxy.copy(bEdge.src()),txnId);
+                nativeDataStoreProvider.onUpdating(edge.metadata(),bkey,bEdge,txnId);
             }
             t.revision(EnvSetting.REVISION_START);
-            nativeDataStoreProvider.onUpdating(dbi.metadata(), BufferProxy.copy(kBuffer.src()),BufferProxy.copy(vBuffer.src()), txnId);
+            nativeDataStoreProvider.onUpdating(dbi.metadata(), kBuffer,vBuffer, txnId);
             if(parentTxn==null) nativeDataStoreProvider.onCommit(dbi.metadata().scope(),txnId);
             txn.commit();
             return true;
@@ -196,7 +195,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
                 return false;
             }
             t.revision(t.revision()+1);
-            nativeDataStoreProvider.onUpdating(dbi.metadata(), BufferProxy.copy(kBuffer.src()),BufferProxy.copy(vBuffer.src()), txnId);
+            nativeDataStoreProvider.onUpdating(dbi.metadata(), kBuffer,vBuffer, txnId);
             if(parentTxn==null) nativeDataStoreProvider.onCommit(dbi.metadata().scope(),txnId);
             txn.commit();
             return true;
@@ -220,7 +219,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
                 txn.abort();
                 return false;
             }
-            nativeDataStoreProvider.onDeleting(dbi.metadata(), BufferProxy.copy(kBuffer.src()),BufferProxy.copy(kBuffer.src()),txnId);
+            nativeDataStoreProvider.onDeleting(dbi.metadata(), kBuffer,kBuffer,txnId);
             if(parentTxn==null) nativeDataStoreProvider.onCommit(dbi.metadata().scope(),txnId);
             txn.commit();
             return true;
@@ -243,7 +242,7 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
                 txn.abort();
                 return false;
             }
-            nativeDataStoreProvider.onUpdating(edge.metadata(), BufferProxy.copy(kBuffer.src()),BufferProxy.copy(vBuffer.src()), txnId);
+            nativeDataStoreProvider.onUpdating(edge.metadata(), kBuffer,vBuffer, txnId);
             if(parentTxn==null) nativeDataStoreProvider.onCommit(edge.metadata().scope(),txnId);
             txn.commit();
             return true;
