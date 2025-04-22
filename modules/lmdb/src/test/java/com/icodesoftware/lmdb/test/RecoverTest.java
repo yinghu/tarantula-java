@@ -44,9 +44,12 @@ public class RecoverTest extends LMDBHook{
 
         TestObject load = new TestObject();
         load.distributionId(testObject.distributionId());
+
+
         Assert.assertTrue(dataStore.load(load));
         Assert.assertEquals(load.revision(),2L);
         Assert.assertEquals(load.type,"btype");
+
 
     }
 
