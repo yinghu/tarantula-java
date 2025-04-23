@@ -225,6 +225,7 @@ public class TransactionLogManager implements Transaction.LogManager{
         if(scope==Distributable.INDEX_SCOPE) return INDEX_PREFIX;
         return "log_";
     }
+
     private String indexPrefix(int scope){
         if(scope==Distributable.DATA_SCOPE) return DATA_PREFIX_I;
         if(scope==Distributable.INTEGRATION_SCOPE) return ACCESS_PREFIX_I;
