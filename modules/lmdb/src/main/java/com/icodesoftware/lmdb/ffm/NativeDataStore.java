@@ -487,7 +487,10 @@ public class NativeDataStore implements DataStore, DataStore.Backup {
     }
 
     private <T extends Recoverable> void recover(Metadata metadata,T t){
+        System.out.println(t.key().toString());
         nativeDataStoreProvider.onRecovering(metadata,t.key(),(k,v)->{
+            System.out.println(k.remaining());
+            System.out.println(v.remaining());
             Recoverable.DataHeader h = v.readHeader();
             Recoverable.DataHeader[] eh ={null};
             get(t.key(),(ek,ev)->{
