@@ -1,0 +1,60 @@
+﻿<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.icodesoftware</groupId>
+		<artifactId>tarantula-java</artifactId>
+		<version>1.0</version>
+		<relativePath>../../pom.xml</relativePath>
+	</parent>
+	<groupId>com.icodesoftware</groupId>
+  <artifactId>tarantula-tournament</artifactId>
+  <version>1.0</version>
+  <packaging>jar</packaging>
+  <name>Tarantula Java Tournament</name>
+  <description>Game Cluster Platform</description>
+  <dependencies>
+
+	  <dependency>
+		  <groupId>com.icodesoftware</groupId>
+		  <artifactId>tarantula-protocol</artifactId>
+		  <version>1.0</version>
+	  </dependency>
+
+	  <dependency>
+		  <groupId>org.apache.commons</groupId>
+		  <artifactId>commons-dbcp2</artifactId>
+		  <version>2.11.0</version>
+	  </dependency>
+	  <dependency>
+		  <groupId>org.postgresql</groupId>
+		  <artifactId>postgresql</artifactId>
+		  <version>42.7.2</version>
+	  </dependency>
+  </dependencies>
+  <build>
+  	<plugins>
+        <plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+        	<artifactId>maven-assembly-plugin</artifactId>
+			<version>2.6</version>
+        	<executions>
+	          	<execution>
+	            	<id>tarantula-assembly</id>
+	            	<phase>package</phase>
+	            	<goals>
+	              		<goal>single</goal>
+	            	</goals>
+	            	<configuration>
+	        			<outputDirectory>target/release</outputDirectory>
+	          			<descriptors>
+	            				<descriptor>assembly.xml</descriptor>
+	          			</descriptors>
+	        		</configuration>
+	          	</execution>
+        	</executions>      	
+       </plugin>
+  	</plugins>
+  </build>
+</project>

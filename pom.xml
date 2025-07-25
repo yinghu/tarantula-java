@@ -7,7 +7,7 @@
     <groupId>com.icodesoftware</groupId>
     <artifactId>tarantula-java</artifactId>
     <packaging>pom</packaging>
-    <version>3.0</version>
+    <version>1.0</version>
     <name>Tarantula Java</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -16,9 +16,12 @@
     <modules>
         <module>modules/protocol</module>
         <module>modules/lmdb</module>
-        <module>platform</module>
-        <!--<module>modules/earth8</module>-->
-        <!--<module>load-test</module>-->
+        <module>applications/presence</module>
+        <module>applications/profile</module>
+        <module>applications/inventory</module>
+        <module>applications/asset</module>
+        <module>applications/tournament</module>
+        <module>applications/admin</module>
     </modules>
 
     <build>

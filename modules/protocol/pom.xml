@@ -5,15 +5,15 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.icodesoftware</groupId>
-        <artifactId>game-cluster</artifactId>
-        <version>3.0</version>
+        <artifactId>tarantula-java</artifactId>
+        <version>1.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <groupId>com.icodesoftware</groupId>
-    <artifactId>gec-protocol</artifactId>
-    <version>2.0</version>
+    <artifactId>tarantula-protocol</artifactId>
+    <version>1.0</version>
     <packaging>jar</packaging>
-    <name>Game Cluster API Protocol</name>
+    <name>Tarantula Java API Protocol</name>
     <dependencies>
     </dependencies>
 </project>
