@@ -13,7 +13,7 @@
   <version>1.0</version>
   <packaging>jar</packaging>
   <name>Tarantula Java Presence</name>
-  <description>Game Cluster Platform</description>
+  <description>Tarantula Java</description>
   <dependencies>
 
 	  <dependency>
