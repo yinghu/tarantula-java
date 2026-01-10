@@ -4,16 +4,16 @@
   <modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.icodesoftware</groupId>
-		<artifactId>game-cluster</artifactId>
+		<artifactId>tarantula-java</artifactId>
 		<version>3.0</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>com.icodesoftware</groupId>
-  <artifactId>gec-platform</artifactId>
+  <artifactId>tarantula-platform</artifactId>
   <version>3.0</version>
   <packaging>jar</packaging>
-  <name>Game Cluster Platform</name>
-  <description>Game Cluster Platform</description>
+  <name>Tarantula Game Platform</name>
+  <description>Tarantula Game Platform</description>
   <dependencies>
    	<dependency>
 		<groupId>com.hazelcast</groupId>
