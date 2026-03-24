@@ -103,7 +103,7 @@ public class TarantulaContext implements Serviceable, ServiceContext, MetricsHom
     public static long operationRejectInterval;
 
 
-    private final ConcurrentHashMap<String,ServiceProvider> serviceProviders = new ConcurrentHashMap();
+    private final ConcurrentHashMap<String,ServiceProvider> serviceProviders = new ConcurrentHashMap<>();
 
     public DataStoreProvider deploymentDataStoreProvider;
     private DataScopeReplicationProxy dataScopeReplicationProxy;

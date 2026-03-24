@@ -42,7 +42,7 @@ public class IntegrationCluster extends TarantulaApplicationHeader implements Cl
 
     private final ConcurrentHashMap<String,ITopic<Event>> topicList = new ConcurrentHashMap<>();
 
-    private final ConcurrentLinkedQueue<Event> replicationQueue = new ConcurrentLinkedQueue();
+    private final ConcurrentLinkedQueue<Event> replicationQueue = new ConcurrentLinkedQueue<>();
     private final ConcurrentHashMap<String,EventSubscriber> eventSubscribers = new ConcurrentHashMap<>();
 
     private final ConcurrentHashMap<String,BucketReceiver> bMap = new ConcurrentHashMap<>();
